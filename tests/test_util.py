@@ -417,7 +417,10 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
     ],
 )
 def test_pad_temporal_data(
-    data_to_pad: dict[str, dict[str, list[Any]]], fill_value: Any, tail_pad: bool, expected: dict[str, dict[str, list[Any]]]
+    data_to_pad: dict[str, dict[str, list[Any]]],
+    fill_value: Any,
+    tail_pad: bool,
+    expected: dict[str, dict[str, list[Any]]],
 ) -> None:
     """Tests the utility method pad_temporal_data."""
     actual = Utility.pad_temporal_data(data_to_pad, fill_value=fill_value, pad_tail_values=tail_pad)
