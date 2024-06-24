@@ -134,7 +134,7 @@ class Utility:
                 else:
                     if last_value is None:
                         padded_variable_data["values"].append(last_value)
-                        padded_variable_data["info_maps"].append(last_value)
+                        padded_variable_data["info_maps"].append({"simulation_day": day})
                     else:
                         padded_variable_data["values"].append(last_value[0])
                         padded_variable_data["info_maps"].append(last_value[1].copy())
@@ -142,7 +142,7 @@ class Utility:
 
             for day in range(last_day_of_original_data + 1, last_day + 1):
                 padded_variable_data["values"].append(None)
-                padded_variable_data["info_maps"].append(None)
+                padded_variable_data["info_maps"].append({"simulation_day": day})
 
             padded_data[key] = padded_variable_data
 

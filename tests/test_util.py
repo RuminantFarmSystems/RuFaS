@@ -334,14 +334,14 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                         {"simulation_day": 3},
                         {"simulation_day": 4},
                         {"simulation_day": 5},
-                        None,
+                        {"simulation_day": 6},
                     ],
                 },
                 "b": {
                     "values": [None, None, "d", "e", "e", "f"],
                     "info_maps": [
-                        None,
-                        None,
+                        {"simulation_day": 1},
+                        {"simulation_day": 2},
                         {"simulation_day": 3},
                         {"simulation_day": 4},
                         {"simulation_day": 5},
@@ -356,8 +356,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 "b": {"values": ["b", "c"], "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}]},
             },
             {
-                "a": {"values": ["a", None, None], "info_maps": [{"simulation_day": 2}, None, None]},
-                "b": {"values": [None, "b", "c"], "info_maps": [None, {"simulation_day": 3}, {"simulation_day": 4}]},
+                "a": {"values": ["a", None, None], "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}]},
+                "b": {"values": [None, "b", "c"], "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}]},
             },
         ),
         (
