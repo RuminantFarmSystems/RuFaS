@@ -15,37 +15,20 @@ class Time:
         """
         This object is responsible for creating and tracking time in the simulation.
         """
-<<<<<<< IM_disentangling
         self.im = InputManager()
-        self._init_time_config()
-        self.calendar_year: int = self.start_year_int
-        self.year: int = 1  # current year
-        self.simulation_length = self._calc_sim_length()
-=======
-        self.config_data: Dict[str, str | int | bool] = im.get_data("config")
+        self.config_data: Dict[str, str | int | bool] = self.im.get_data("config")
         self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], "%Y:%j")
         self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], "%Y:%j")
 
         self.current_date: datetime = self.start_date
         self.simulation_length_days: int = (self.end_date - self.start_date).days
         self.simulation_length_years: int = self.end_date.year - self.start_date.year + 1
->>>>>>> main
 
     def advance(self) -> None:
         """
         Advances the time in the simulation by 1 day.
         """
-<<<<<<< IM_disentangling
-        config_data = self.im.get_data("config")
-        self.start_full_date: list[str] = config_data["start_date"].split(":")
-        self.end_full_date: list[str] = config_data["end_date"].split(":")
-        self.start_year_int: int = int(self.start_full_date[0])
-        self.end_year_int: int = int(self.end_full_date[0])
-        self.start_day: int = int(self.start_full_date[1])
-        self.end_day: int = int(self.end_full_date[1])
-=======
         self.current_date += datetime.timedelta(days=1)
->>>>>>> main
 
     @property
     def years(self) -> List[List[int]]:
