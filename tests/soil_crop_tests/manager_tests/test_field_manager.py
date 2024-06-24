@@ -186,14 +186,17 @@ def test_annual_update_routine(fields: List[Field]):
 def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
     """Tests that the correct manure supplier is provided for setting up Fields."""
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
-    get_data = mocker.patch.object(im, "get_data", return_value=animals)
     add_log = mocker.patch.object(om, "add_log")
     mocker.patch("RUFAS.routines.field.manager.field_manager.FieldManager.__init__", return_value=None)
+
     field_manager = FieldManager()
+    field_manager.im = mocker.MagicMock()
+    field_manager.im.get_data.return_value = animals
+
 
     actual = field_manager._get_manure_supplier(mock_manure_manager)
 
-    get_data.assert_called_once_with("config.simulate_animals")
+    field_manager.im.get_data.assert_called_once_with("config.simulate_animals")
     if animals:
         assert actual == mock_manure_manager
         add_log.assert_not_called()

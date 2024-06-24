@@ -142,10 +142,8 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
 
-    patch_for_get_data = mocker.patch(
-        "RUFAS.simulation_engine.im.get_data",
-        side_effect=[{}, {}, {"manure_management_scenarios": {}}, {}],
-    )
+    simulation_engine.im = mocker.MagicMock()
+    simulation_engine.im.get_data.side_effect = [{}, {}, {"manure_management_scenarios": {}}, {}]
 
     mock_weather = mocker.MagicMock()
     patch_for_weather = mocker.patch("RUFAS.simulation_engine.Weather", return_value=mock_weather)
@@ -175,7 +173,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     simulation_engine._initialize_simulation()
 
     # Assert
-    patch_for_get_data.assert_has_calls(
+    simulation_engine.im.get_data.assert_has_calls(
         [
             mocker.call("weather"),
             mocker.call("feed"),
