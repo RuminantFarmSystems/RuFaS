@@ -7,7 +7,6 @@ from typing import Dict, Any
 
 import numpy as np
 
-from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle import animal_constants as const
@@ -29,7 +28,6 @@ from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 
 om = OutputManager()
-im = InputManager()
 
 
 class MilkProductionHistory:
