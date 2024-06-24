@@ -34,7 +34,6 @@ SLICE_START = -365
 SLICE_END = -364
 FINAL_DAY_SLICE_START = -1
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -50,7 +49,7 @@ EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR = 1.30
 
 class EmissionsEstimator:
     def __init__(self) -> None:
-        pass
+        self.im = InputManager()
 
     def estimate_emissions(self) -> None:
         (
@@ -224,12 +223,13 @@ class EmissionsEstimator:
 
     def _calculate_actual_purchased_feed_emissions(self, actual_purchased_feeds: dict[str, float]) -> dict[str, float]:
         """Calculates the emissions from feeds that were actually purchased during the simulation."""
-        county_code = im.get_data("config.FIPS_county_code")
 
-        purchased_feed_emissions_data = im.get_data("purchased_feeds_emissions")
+        county_code = self.im.get_data("config.FIPS_county_code")
+
+        purchased_feed_emissions_data = self.im.get_data("purchased_feeds_emissions")
         purchased_feed_emissions = self._get_feed_emissions_data(county_code, purchased_feed_emissions_data)
 
-        land_use_change_emissions_data = im.get_data("purchased_feed_land_use_change_emissions")
+        land_use_change_emissions_data = self.im.get_data("purchased_feed_land_use_change_emissions")
         land_use_change_emissions = self._get_feed_emissions_data(county_code, land_use_change_emissions_data)
 
         actual_purchased_feed_emissions = {}
