@@ -86,7 +86,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
         new_daily_output.liquid_manure_total_ammoniacal_nitrogen = min(
-            self._current_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * 1.15, 
+            self._current_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * 1.65, 
             self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         )
         new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
