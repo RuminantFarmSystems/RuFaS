@@ -1696,7 +1696,8 @@ def test_filter_variables_pool_complex(
         "test_case_1_1.a": {"values": ["A", "AA"]},
         "test_case_1_2.a": {"values": ["AAA"]},
     }
-
+    import pdb
+    pdb.set_trace()
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
     # unpacking pool error
