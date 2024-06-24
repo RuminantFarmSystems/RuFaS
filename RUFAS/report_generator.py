@@ -205,9 +205,6 @@ class ReportGenerator:
 
         try:
             report_filter_data = {}
-            if filter_content.get("pad_data", False):
-                pad_tail_values = filter_content.get("pad_tail_values", False)
-                filtered_pool = Utility.pad_temporal_data(filtered_pool, pad_tail_values=pad_tail_values)
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
                 cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])

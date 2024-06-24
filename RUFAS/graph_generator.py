@@ -201,9 +201,6 @@ class GraphGenerator:
         try:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             var_units_logs: list[dict[str, str | dict[str, str]]] = []
-            if graph_details.get("pad_data", False):
-                pad_tail_values = graph_details.get("pad_tail_values", False)
-                filtered_pool = Utility.pad_temporal_data(filtered_pool, pad_tail_values=pad_tail_values)
             updated_pool = filtered_pool
             if graph_details.get("display_units", True):
                 updated_pool, var_units_logs = self._add_var_units(

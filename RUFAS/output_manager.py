@@ -1004,9 +1004,9 @@ class OutputManager(object):
         counter: int = 0
         for key in filtered_pool.keys():
             sliced_info_maps: List[Dict[str, Any]] = (
-                filtered_pool[key]["info_maps"][slice_start:slice_end] if "info_maps" in filtered_pool[key] else []
+                filtered_pool[key]["info_maps"] if "info_maps" in filtered_pool[key] else []
             )
-            sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
+            sliced_data: List[Any] = filtered_pool[key]["values"]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
@@ -1035,6 +1035,20 @@ class OutputManager(object):
                         }
                     self._variables_usage_counter.update([f"{key}.{filtered_key}"])
             counter += 1
+
+        # if "Padded Population and feed totals" in filter_content.values():
+        #     import remote_pdb
+        #     remote_pdb.RemotePdb("localhost", 4444).set_trace()
+        if filter_content.get("pad_data", False):
+            pad_tail_values = filter_content.get("pad_tail_values", False)
+            results = Utility.pad_temporal_data(results, pad_tail_values=pad_tail_values)
+
+        for key in results.keys():
+            results[key]["info_maps"] = (
+                results[key]["info_maps"][slice_start:slice_end] if "info_maps" in results[key] else []
+            )
+            results[key]["values"] = results[key]["values"][slice_start:slice_end]
+
         return results
 
     def save_results(
