@@ -2,11 +2,12 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
+from RUFAS.input_manager import InputManager
 
 
 def test_purchased_feed_emissions_estimator(mocker: MockerFixture) -> None:
     """Tests that PurchasedFeedEmissionsEstimator is created correctly."""
-    get_data = mocker.patch("RUFAS.routines.animal.purchased_feed_emissions_estimator.im.get_data")
+    mock_get_data = mocker.patch("RUFAS.routines.animal.purchased_feed_emissions_estimator.InputManager.get_data")
     add_var = mocker.patch("RUFAS.routines.animal.purchased_feed_emissions_estimator.om.add_variable")
     setup_emissions = mocker.patch.object(PurchasedFeedEmissionsEstimator, "_setup_feed_emissions")
     expected_get_data_calls = [
@@ -17,7 +18,7 @@ def test_purchased_feed_emissions_estimator(mocker: MockerFixture) -> None:
 
     estimator = PurchasedFeedEmissionsEstimator()
 
-    get_data.assert_has_calls(expected_get_data_calls)
+    mock_get_data.assert_has_calls(expected_get_data_calls)
     assert add_var.call_count == 3
     assert setup_emissions.call_count == 2
     assert estimator.missing_purchased_feed_ids == []
