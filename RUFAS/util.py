@@ -99,8 +99,7 @@ class Utility:
             The data to be padded. The top level key is a variable name, and points to a dictionary that contains the
             keys "values" and optionally "info_maps".
         fill_value : Any, default numpy.nan
-            Value that is used to pad data from before original data was collected, and optionally after original data
-            is collected. TODO make this description better.
+            Value that is used to pad the front of the data values, and optionally the back.
         pad_tail_values : bool, default False
             Whether tail values should be padded with the last known value from a data set, or with the fill value.
         TODO: add option to choose whether to pad values with last know value or with fill value for whole data sequence
@@ -110,7 +109,10 @@ class Utility:
         dict[str, dict[str, list[Any]]]
             The padded data, so that gaps in the data are filled in with the last know value or None.
 
-        TODO: Untested if there are multiple different values for one simulation day.
+        Notes
+        -----
+        This method assumes there will never be multiple values recorded for a single variable on a single simulation
+        day.
 
         """
         all_simulation_days = []
@@ -142,7 +144,7 @@ class Utility:
                     padded_variable_data["info_maps"].append(last_value[1])
                     padded_variable_data["info_maps"][-1]["simulation_day"] = day
                 else:
-                    if last_value == fill_value:
+                    if last_value is fill_value:
                         padded_variable_data["values"].append(last_value)
                         padded_variable_data["info_maps"].append({"simulation_day": day})
                     else:
