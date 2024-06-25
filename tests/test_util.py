@@ -319,11 +319,19 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             {
                 "a": {
                     "values": ["a", "b", "c"],
-                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 4}, {"simulation_day": 5}],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                    ],
                 },
                 "b": {
                     "values": ["d", "e", "f"],
-                    "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}, {"simulation_day": 6}],
+                    "info_maps": [
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
                 },
             },
             math.nan,
@@ -332,85 +340,129 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 "a": {
                     "values": ["a", "a", "a", "b", "c", math.nan],
                     "info_maps": [
-                        {"simulation_day": 1},
-                        {"simulation_day": 2},
-                        {"simulation_day": 3},
-                        {"simulation_day": 4},
-                        {"simulation_day": 5},
-                        {"simulation_day": 6},
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 2, "units": "kg"},
+                        {"simulation_day": 3, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                        {"simulation_day": 6, "units": "kg"},
                     ],
                 },
                 "b": {
                     "values": [math.nan, math.nan, "d", "e", "e", "f"],
                     "info_maps": [
-                        {"simulation_day": 1},
-                        {"simulation_day": 2},
-                        {"simulation_day": 3},
-                        {"simulation_day": 4},
-                        {"simulation_day": 5},
-                        {"simulation_day": 6},
+                        {"simulation_day": 1, "units": "g"},
+                        {"simulation_day": 2, "units": "g"},
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 5, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
                     ],
                 },
             },
         ),
         (
             {
-                "a": {"values": ["a"], "info_maps": [{"simulation_day": 2}]},
-                "b": {"values": ["b", "c"], "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}]},
+                "a": {"values": ["a"], "info_maps": [{"simulation_day": 2, "units": "pi"}]},
+                "b": {
+                    "values": ["b", "c"],
+                    "info_maps": [{"simulation_day": 3, "units": "pi"}, {"simulation_day": 4, "units": "pi"}],
+                },
             },
             None,
             True,
             {
                 "a": {
                     "values": ["a", "a", "a"],
-                    "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}],
+                    "info_maps": [
+                        {"simulation_day": 2, "units": "pi"},
+                        {"simulation_day": 3, "units": "pi"},
+                        {"simulation_day": 4, "units": "pi"},
+                    ],
                 },
                 "b": {
                     "values": [None, "b", "c"],
-                    "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}],
+                    "info_maps": [
+                        {"simulation_day": 2, "units": "pi"},
+                        {"simulation_day": 3, "units": "pi"},
+                        {"simulation_day": 4, "units": "pi"},
+                    ],
                 },
             },
         ),
         (
             {
-                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
-                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
+                "b": {
+                    "values": ["c", "d"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
             },
             8,
             False,
             {
-                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
-                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
+                "b": {
+                    "values": ["c", "d"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
             },
         ),
         (
             {
-                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
-                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha^2"}, {"simulation_day": 3, "units": "ha^2"}],
+                },
+                "b": {
+                    "values": ["c", "d"],
+                    "info_maps": [{"simulation_day": 1, "units": "l"}, {"simulation_day": 3, "units": "l"}],
+                },
             },
             "fill",
             True,
             {
                 "a": {
                     "values": ["a", "a", "b"],
-                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "ha^2"},
+                        {"simulation_day": 2, "units": "ha^2"},
+                        {"simulation_day": 3, "units": "ha^2"},
+                    ],
                 },
                 "b": {
                     "values": ["c", "c", "d"],
-                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "l"},
+                        {"simulation_day": 2, "units": "l"},
+                        {"simulation_day": 3, "units": "l"},
+                    ],
                 },
             },
         ),
         (
             {
-                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "GB"}, {"simulation_day": 3, "units": "GB"}],
+                },
             },
             math.pi,
             False,
             {
                 "a": {
                     "values": ["a", "a", "b"],
-                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "GB"},
+                        {"simulation_day": 2, "units": "GB"},
+                        {"simulation_day": 3, "units": "GB"},
+                    ],
                 }
             },
         ),
