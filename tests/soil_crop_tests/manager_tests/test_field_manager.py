@@ -186,14 +186,16 @@ def test_annual_update_routine(fields: List[Field]):
 def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
     """Tests that the correct manure supplier is provided for setting up Fields."""
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
-    get_data = mocker.patch.object(im, "get_data", return_value=animals)
     add_log = mocker.patch.object(om, "add_log")
     mocker.patch("RUFAS.routines.field.manager.field_manager.FieldManager.__init__", return_value=None)
+
     field_manager = FieldManager()
+    field_manager.im = mocker.MagicMock()
+    field_manager.im.get_data = mocker.MagicMock(return_value=animals)
 
     actual = field_manager._get_manure_supplier(mock_manure_manager)
 
-    get_data.assert_called_once_with("config.simulate_animals")
+    field_manager.im.get_data.assert_called_once_with("config.simulate_animals")
     if animals:
         assert actual == mock_manure_manager
         add_log.assert_not_called()
@@ -295,6 +297,15 @@ def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
                     6.904443,
                     6.904443,
                 ],
+                potassium_masses=[
+                    22.417,
+                    22.417,
+                    27.90919,
+                    39.072871,
+                    39.072871,
+                    39.072871,
+                    39.072871,
+                ],
                 application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 pattern_repeat=0,
@@ -323,6 +334,7 @@ def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
                 days=[200],
                 nitrogen_masses=[1000],
                 phosphorus_masses=[5],
+                potassium_masses=[400.0],
                 application_depths=[0.0],
                 surface_remainder_fractions=[1.0],
                 pattern_repeat=0,

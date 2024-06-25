@@ -10,9 +10,7 @@
             "harvest_type": "scheduled",
             "pattern_repeat": 3,
             "planting_skip": 0,
-            "harvesting_skip": 0,
-            "planting_order": "1st",
-            "extracted": true
+            "harvesting_skip": 0
         }
     ]
 }
