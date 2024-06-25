@@ -1,5 +1,6 @@
 import json
 import os
+from collections import Counter
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Union, Type
@@ -1395,7 +1396,7 @@ def returner(arg: Any) -> Any:
                 "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
                 "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
             },
-            True
+            True,
         ),
         (
             {"filters": ["key1", "key2"], "pad_data": True},
@@ -1403,7 +1404,7 @@ def returner(arg: Any) -> Any:
                 "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
                 "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
             },
-            True
+            True,
         ),
         (
             {"filters": ["key1", "key2"], "filter_by_exclusion": True},
@@ -1445,7 +1446,7 @@ def test_filter_variables_pool(
     mocker: MockerFixture,
     filter_content: Dict[str, Any],
     expected: Dict[str, Dict[str, str]],
-    data_padded: bool
+    data_padded: bool,
 ) -> None:
     """Tests filter_variables_pool in the OutputManager."""
     mock_output_manager.variables_pool = mock_simple_variables_pool
@@ -1686,6 +1687,75 @@ def test_filter_variables_pool_complex(
     mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
     mock_output_manager.variables_pool = {}
+
+
+@pytest.mark.parametrize(
+    "pool,vars,exclusion,expected,expected_counter",
+    [
+        (
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "DummyClass1.dummy_fun1.dummy_var2": {
+                    "values": [{"a": "A", "b": 1.0, "c": True}, {"a": "AA", "b": 2.0, "c": True}]
+                },
+                "DummyClass1.dummy_fun2.dummy_var3": {"values": [{"a": "AAA", "b": 3.0, "c": False}]},
+            },
+            ["a"],
+            False,
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "a": {"values": ["A", "AA", "AAA"]},
+            },
+            Counter(
+                {
+                    "DummyClass1.dummy_fun1.dummy_var1": 1,
+                    "DummyClass1.dummy_fun1.dummy_var2.a": 1,
+                    "DummyClass1.dummy_fun2.dummy_var3.a": 1,
+                }
+            ),
+        ),
+        (
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "DummyClass1.dummy_fun1.dummy_var2": {
+                    "values": [{"a": "A", "b": 1.0, "c": True}, {"a": "AA", "b": 2.0, "c": True}]
+                },
+                "DummyClass1.dummy_fun2.dummy_var3": {"values": [{"a": "AAA", "b": 3.0, "c": False}]},
+            },
+            ["a"],
+            True,
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "b": {"values": [1.0, 2.0, 3.0]},
+                "c": {"values": [True, True, False]},
+            },
+            Counter(
+                {
+                    "DummyClass1.dummy_fun1.dummy_var1": 1,
+                    "DummyClass1.dummy_fun1.dummy_var2.b": 1,
+                    "DummyClass1.dummy_fun1.dummy_var2.c": 1,
+                    "DummyClass1.dummy_fun2.dummy_var3.b": 1,
+                    "DummyClass1.dummy_fun2.dummy_var3.c": 1,
+                }
+            ),
+        ),
+    ],
+)
+def test_parse_filtered_variables(
+    mock_output_manager: OutputManager,
+    pool: Dict[str, OutputManager.pool_element_type],
+    vars: list[str],
+    exclusion: bool,
+    expected: Dict[str, OutputManager.pool_element_type],
+    expected_counter: Counter,
+) -> None:
+    """Tests _parse_filtered_variables in the Output Manager."""
+    mock_output_manager._variables_usage_counter = Counter()
+
+    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", False, exclusion)
+
+    assert actual == expected
+    assert mock_output_manager._variables_usage_counter == expected_counter
 
 
 @pytest.mark.parametrize(
