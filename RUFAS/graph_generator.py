@@ -422,7 +422,7 @@ class GraphGenerator:
         optional_graph_filter_keys = (
             list(FIGURE_SETTERS.keys())
             + list(AXES_SETTERS.keys())
-            + ["variables", "omit_legend_prefix", "omit_legend_suffix", "display_units", "pad_data", "pad_tail_values"]
+            + ["variables", "omit_legend_prefix", "omit_legend_suffix", "display_units"]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
