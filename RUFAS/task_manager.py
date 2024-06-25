@@ -344,7 +344,7 @@ class TaskManager:
 
             handler = pre_validation_handlers.get(task_type)
             if handler:
-                TaskManager.call_handler(handler,args=args, input_manager=input_manager, output_manager=output_manager,
+                TaskManager.call_handler(handler, args=args, input_manager=input_manager, output_manager=output_manager,
                                          task_id=task_id, produce_graphics=produce_graphics)
                 return
             # if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
@@ -372,7 +372,7 @@ class TaskManager:
 
             handler = post_validation_handlers.get(task_type)
             if handler:
-                TaskManager.call_handler(handler,args=args, input_manager=input_manager, output_manager=output_manager,
+                TaskManager.call_handler(handler, args=args, input_manager=input_manager, output_manager=output_manager,
                                          task_id=task_id, produce_graphics=produce_graphics)
                 return
 
@@ -385,7 +385,8 @@ class TaskManager:
             #     if args["input_patch"]:
             #         Utility.deep_merge(input_manager.pool, args["input_patch"])
             #     TaskManager.handle_single_simulation_run(args, output_manager)
-            #     TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
+            #     TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics,
+            #     True)
             #
             # if args["task_type"] == TaskType.POST_PROCESSING:
             #     TaskManager.handle_post_processing(
