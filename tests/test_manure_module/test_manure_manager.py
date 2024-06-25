@@ -7,29 +7,10 @@ from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import
 )
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_manager import simulate_daily_manure_manager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-
-
-def test_simulate_daily_manure_manager(mocker: MockFixture) -> None:
-    """Unit test for simulate_daily_manure_manager() in manure_manager.py"""
-    # Arrange
-    mock_manure_manager = mocker.MagicMock()
-    mock_manure_manager.daily_update.return_value = None
-    mock_animal_manager = mocker.MagicMock()
-    mock_animal_manager.all_pens = mocker.MagicMock()
-    mock_animal_manager.simulation_day = mocker.MagicMock()
-
-    # Act
-    simulate_daily_manure_manager(mock_manure_manager, mock_animal_manager.all_pens, mock_animal_manager.simulation_day)
-
-    # Assert
-    mock_manure_manager.daily_update.assert_called_once_with(
-        mock_animal_manager.all_pens, mock_animal_manager.simulation_day
-    )
 
 
 def test_manure_manager_init(mocker: MockFixture) -> None:
@@ -154,10 +135,8 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
         return_value=mock_manure_separator,
     )
 
-    mock_custom_manure_treatment_config = mocker.MagicMock()
-    mock_manure_manager_config_handler.get_custom_manure_treatment_config.return_value = (
-        mock_custom_manure_treatment_config
-    )
+    mock_manure_treatment_config = mocker.MagicMock()
+    mock_manure_manager_config_handler.get_manure_treatment_config.return_value = mock_manure_treatment_config
     mock_manure_treatment = mocker.MagicMock()
     patch_for_manure_treatment_factory_get_instance = mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureTreatmentFactory.get_instance",
@@ -210,45 +189,35 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
         )
         assert manure_manager.manure_separators[pen_id] == mock_manure_separator
 
-    mock_manure_manager_config_handler.get_custom_manure_treatment_config.assert_called_once_with(manure_treatment)
+    mock_manure_manager_config_handler.get_manure_treatment_config.assert_called_once_with(manure_treatment)
     patch_for_manure_treatment_factory_get_instance.assert_called_once_with(
-        manure_treatment_type_name=manure_treatment,
+        configuration_name=manure_treatment,
         weather=mock_weather,
         time=mock_time,
-        custom_manure_treatment_config=mock_custom_manure_treatment_config,
+        manure_treatment_config=mock_manure_treatment_config,
     )
     assert manure_manager.manure_treatments[pen_id] == mock_manure_treatment
 
 
 @pytest.mark.parametrize(
-    "manure_treatment_type, is_compound_anaerobic_treatment",
+    "manure_treatment_name, is_compound_anaerobic_treatment",
     [
-        (ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR, False),
-        (ManureTreatmentType.SLURRY_STORAGE_OUTDOOR, False),
-        (ManureTreatmentType.ANAEROBIC_LAGOON, False),
-        (ManureTreatmentType.ANAEROBIC_DIGESTION, False),
-        (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON, True),
-        (ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR, True),
+        ("slurry storage underfloor", False),
+        ("slurry storage outdoor", False),
+        ("anaerobic lagoon", False),
+        ("anaerobic digestion", False),
+        ("totally custom manure treatment", False),
+        ("anaerobic digestion and lagoon", True),
+        ("anaerobic digestion and lagoon with separator", True),
     ],
 )
 def test_is_compound_anaerobic_manure_treatment(
-    manure_treatment_type: ManureTreatmentType,
+    manure_treatment_name: str,
     is_compound_anaerobic_treatment: bool,
-    mocker: MockFixture,
 ) -> None:
     """Unit test for _is_compound_anaerobic_manure_treatment() in manure_manager.py."""
-    # Arrange
-    manure_treatment_name = "test_manure_treatment"
-    patch_for_manure_treatment_type_get_type = mocker.patch(
-        "RUFAS.routines.manure.manure_manager.ManureTreatmentType.get_type",
-        return_value=manure_treatment_type,
-    )
-
-    # Act
     result = ManureManager._is_compound_anaerobic_manure_treatment(manure_treatment_name)
 
-    # Assert
-    patch_for_manure_treatment_type_get_type.assert_called_once_with(manure_treatment_name)
     assert result == is_compound_anaerobic_treatment
 
 
