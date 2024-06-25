@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 import pytest
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
+import math
 
 from RUFAS.util import Utility
 
@@ -309,6 +310,143 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
         "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": [8, {"x": [9, 10], "y": 11}, 12]}},
     }
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "data_to_pad,fill_value,tail_pad,expected",
+    [
+        (
+            {
+                "a": {
+                    "values": ["a", "b", "c"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 4}, {"simulation_day": 5}],
+                },
+                "b": {
+                    "values": ["d", "e", "f"],
+                    "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}, {"simulation_day": 6}],
+                },
+            },
+            math.nan,
+            False,
+            {
+                "a": {
+                    "values": ["a", "a", "a", "b", "c", math.nan],
+                    "info_maps": [
+                        {"simulation_day": 1},
+                        {"simulation_day": 2},
+                        {"simulation_day": 3},
+                        {"simulation_day": 4},
+                        {"simulation_day": 5},
+                        {"simulation_day": 6},
+                    ],
+                },
+                "b": {
+                    "values": [math.nan, math.nan, "d", "e", "e", "f"],
+                    "info_maps": [
+                        {"simulation_day": 1},
+                        {"simulation_day": 2},
+                        {"simulation_day": 3},
+                        {"simulation_day": 4},
+                        {"simulation_day": 5},
+                        {"simulation_day": 6},
+                    ],
+                },
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a"], "info_maps": [{"simulation_day": 2}]},
+                "b": {"values": ["b", "c"], "info_maps": [{"simulation_day": 3}, {"simulation_day": 4}]},
+            },
+            None,
+            True,
+            {
+                "a": {
+                    "values": ["a", "a", "a"],
+                    "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}],
+                },
+                "b": {
+                    "values": [None, "b", "c"],
+                    "info_maps": [{"simulation_day": 2}, {"simulation_day": 3}, {"simulation_day": 4}],
+                },
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+            },
+            8,
+            False,
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}]},
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+                "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+            },
+            "fill",
+            True,
+            {
+                "a": {
+                    "values": ["a", "a", "b"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                },
+                "b": {
+                    "values": ["c", "c", "d"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                },
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+            },
+            math.pi,
+            False,
+            {
+                "a": {
+                    "values": ["a", "a", "b"],
+                    "info_maps": [{"simulation_day": 1}, {"simulation_day": 2}, {"simulation_day": 3}],
+                }
+            },
+        ),
+    ],
+)
+def test_pad_temporal_data(
+    data_to_pad: dict[str, dict[str, list[Any]]],
+    fill_value: Any,
+    tail_pad: bool,
+    expected: dict[str, dict[str, list[Any]]],
+) -> None:
+    """Tests the utility method pad_temporal_data."""
+    actual = Utility.pad_temporal_data(data_to_pad, fill_value=fill_value, pad_tail_values=tail_pad)
+
+    assert actual == expected
+
+
+def test_pad_temporal_data_errors() -> None:
+    """Tests that errors are correctly raised by pad_temporal_data."""
+    data_one = {"a": {"values": ["a", "b"]}, "b": {"values": ["c", "d"]}}
+    with pytest.raises(TypeError, match="no info maps"):
+        Utility.pad_temporal_data(data_one)
+
+    data_two: dict[str, dict[str, list[Any]]] = {
+        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
+        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+    }
+    with pytest.raises(ValueError, match="number of values and info maps"):
+        Utility.pad_temporal_data(data_two)
+
+    data_three: dict[str, dict[str, list[Any]]] = {
+        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
+        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+    }
+    with pytest.raises(ValueError, match="simulation day value in every info map"):
+        Utility.pad_temporal_data(data_three)
 
 
 def test_deep_merge_dict() -> None:
