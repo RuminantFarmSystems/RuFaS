@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Union, Callable, Sequence
 
 import pandas as pd
+import traceback
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
