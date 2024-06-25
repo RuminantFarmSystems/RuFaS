@@ -1,6 +1,8 @@
 # from .hardcoded_ration import get_ration
 import math
-from typing import Dict, Any
+from typing import Any, Dict
+
+from RUFAS.routines.animal.life_cycle.calf import Calf
 
 
 class CalfRationManager:
@@ -41,7 +43,11 @@ class CalfRationManager:
 
     @classmethod
     def calc_requirements(
-        cls, calf, feed: Dict[str, float], temp: float, animal_intake: Dict
+        cls,
+        calf: Calf,
+        feed: Dict[str, float],
+        temp: float,
+        animal_intake: Dict[str, int | float],
     ) -> Dict[str, Dict[str, Any]]:
         """
         Calculate dietary intake and nutrient requirements for the calf.
@@ -103,12 +109,16 @@ class CalfRationManager:
         starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
 
         # [A.1B.C.5]
-        milk_me_proportion = (whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me) / me_intake
+        milk_me_proportion = (
+            whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me
+        ) / me_intake
         # [A.1B.C.6]
         starter_me_proportion = starter_intake * starter_me / me_intake
 
         # [A.1B.E.2]
-        milk_cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake)
+        milk_cp_intake = 0.01 * (
+            whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake
+        )
         starter_cp_intake = 0.01 * starter_cp * starter_intake
 
         # [A.1B.D.2]
@@ -141,7 +151,10 @@ class CalfRationManager:
         # [A.1B.G.2]
         endo_urine_N = 0.0002 * calf.body_weight**0.75 * 1000
         # [A.1B.G.3]
-        meta_fecal_N = (0.0019 * (whole_milk_intake + milk_replacer_intake) + 0.0033 * starter_intake) * 1000
+        meta_fecal_N = (
+            0.0019 * (whole_milk_intake + milk_replacer_intake)
+            + 0.0033 * starter_intake
+        ) * 1000
 
         # [A.1B.G.4]
         adp_maint = 6.25 * (1 / bio_val * (endo_urine_N + meta_fecal_N) - meta_fecal_N)
@@ -155,7 +168,9 @@ class CalfRationManager:
         # [A.1B.H.3]
         energy_allow_gain = 0
         if ne_gain >= 0:
-            energy_allow_gain = math.exp(0.833 * math.log((1.19 * ne_gain) / (0.69 * calf.body_weight**0.355)))
+            energy_allow_gain = math.exp(
+                0.833 * math.log((1.19 * ne_gain) / (0.69 * calf.body_weight**0.355))
+            )
 
         # [A.1B.H.4]
         adp_allow_gain = (adp_intake - adp_maint) * bio_val / 0.188 * 0.001
@@ -181,12 +196,12 @@ class CalfRationManager:
     @classmethod
     def calc_intake(
         cls,
-        calf,
+        calf: Calf,
         feed: Dict[str, float],
         wean_day: int,
         wean_length: int,
         milk_type: str,
-    ) -> Dict:
+    ) -> Dict[str, float]:
         """
         Calculating calf intake values.
 
@@ -264,28 +279,40 @@ class CalfRationManager:
         if whole_milk_intake != 0:
             milk_intake_wean = whole_milk_intake * (1 - milk_reduct / (wean_length + 1))
         else:
-            milk_intake_wean = milk_replacer_intake * (1 - milk_reduct / (wean_length + 1))
+            milk_intake_wean = milk_replacer_intake * (
+                1 - milk_reduct / (wean_length + 1)
+            )
 
         # [A.1B.D.1]
         dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
         # [A.1B.C.4]
         me_intake = (
-            whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me * starter_intake
+            whole_milk_me * whole_milk_intake
+            + milk_replacer_me * milk_replacer_intake
+            + starter_me * starter_intake
         )
         # [A.1B.E.1]
         cp_intake = 0.01 * (
-            whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake + starter_cp * starter_intake
+            whole_milk_cp * whole_milk_intake
+            + milk_replacer_cp * milk_replacer_intake
+            + starter_cp * starter_intake
         )
 
         # [A.1B.C.5]
-        milk_me_proportion = (whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me) / me_intake
+        milk_me_proportion = (
+            whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me
+        ) / me_intake
         # [A.1B.C.6]
         starter_me_proportion = starter_intake * starter_me / me_intake
 
         # [A.1B.E.2]
-        milk_cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake)
+        milk_cp_intake = 0.01 * (
+            whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake
+        )
         starter_cp_intake = 0.01 * starter_cp * starter_intake
-        adp_intake = (0.93 * milk_cp_intake / cp_intake + 0.75 * starter_cp_intake / cp_intake) * 1000
+        adp_intake = (
+            0.93 * milk_cp_intake / cp_intake + 0.75 * starter_cp_intake / cp_intake
+        ) * 1000
 
         # [A.1B.D.2]
         milk_proportion = (whole_milk_intake + milk_replacer_intake) / dm_intake
@@ -309,4 +336,5 @@ class CalfRationManager:
             "starter_proportion": starter_proportion,
         }
 
+        return animal_intake
         return animal_intake
