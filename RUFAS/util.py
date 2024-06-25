@@ -134,6 +134,7 @@ class Utility:
             padded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
             zipped_data = zip(data["values"], data["info_maps"])
             indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
+            original_units = indexed_data[min(indexed_data.keys())][1]["units"]
             last_day_of_original_data = max(indexed_data.keys())
             last_value = fill_value
             for day in range(first_day, last_day_of_original_data + 1):
@@ -144,7 +145,7 @@ class Utility:
                     padded_variable_data["info_maps"][-1]["simulation_day"] = day
                 elif last_value is fill_value:
                     padded_variable_data["values"].append(last_value)
-                    padded_variable_data["info_maps"].append({"simulation_day": day})
+                    padded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
                 else:
                     padded_variable_data["values"].append(last_value[0])
                     padded_variable_data["info_maps"].append(last_value[1].copy())
@@ -153,7 +154,7 @@ class Utility:
             tail_fill_value = indexed_data[last_day_of_original_data][0] if pad_tail_values else fill_value
             for day in range(last_day_of_original_data + 1, last_day + 1):
                 padded_variable_data["values"].append(tail_fill_value)
-                padded_variable_data["info_maps"].append({"simulation_day": day})
+                padded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
 
             padded_data[key] = padded_variable_data
 
