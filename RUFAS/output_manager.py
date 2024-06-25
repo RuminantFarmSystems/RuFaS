@@ -1014,7 +1014,7 @@ class OutputManager(object):
         slice_start: int = filter_content.get("slice_start", 0)
         slice_end: int | None = filter_content.get("slice_end")
         for key in results.keys():
-            if "info_maps" in results.keys():
+            if "info_maps" in results[key].keys():
                 results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
             results[key]["values"] = results[key]["values"][slice_start:slice_end]
 

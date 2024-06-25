@@ -13,6 +13,7 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
@@ -1368,59 +1369,94 @@ def test_list_filter_files_in_dir(
     mock_output_manager.add_warning = output_manager_original_method_states["add_warning"]
 
 
+@pytest.fixture
+def mock_simple_variables_pool() -> Dict[str, OutputManager.pool_element_type]:
+    """Simple variables pool to be used for testing the Output Manager."""
+    return {
+        "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
+        "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+        "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
+    }
+
+
+def returner(arg: Any) -> Any:
+    """Returns whatever arg is passed to this method."""
+    return arg
+
+
 @pytest.mark.parametrize(
-    "variables_pool,filter_content,expected",
+    "filter_content,expected,data_padded",
     [
-        ({"key1": "value1", "key2": "value2", "key3": "value3"}, {"filters": []}, {}),
+        ({"filters": []}, {}, False),
         (
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
-            {"filters": [], "filter_by_exclusion": True},
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
+            {"filters": [], "filter_by_exclusion": True, "pad_data": True},
+            {
+                "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
+                "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+                "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
+            },
+            True
         ),
         (
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
-            {"filters": ["key1", "key2"]},
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}},
+            {"filters": ["key1", "key2"], "pad_data": True},
+            {
+                "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
+                "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+            },
+            True
         ),
         (
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
             {"filters": ["key1", "key2"], "filter_by_exclusion": True},
-            {"key3": {"values": "value3"}},
+            {"key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]}},
+            False,
         ),
         (
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
             {"filters": ["key1", "key4"], "filter_by_exclusion": False},
-            {"key1": {"values": "value1"}},
+            {"key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]}},
+            False,
         ),
         (
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
-            {"filters": ["key1", "key4"], "filter_by_exclusion": True},
-            {"key2": {"values": "value2"}, "key3": {"values": "value3"}},
+            {"filters": ["key1", "key4"], "slice_start": 1, "filter_by_exclusion": True},
+            {
+                "key2": {"values": ["value5", "value6"], "info_maps": []},
+                "key3": {"values": ["value8", "value9"], "info_maps": []},
+            },
+            False,
         ),
         (
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
-            {"filters": ["key1", "key1"], "filter_by_exclusion": False},
-            {"key1": {"values": "value1"}},
+            {"filters": ["key1", "key1"], "slice_end": 1, "filter_by_exclusion": False},
+            {"key1": {"values": ["value1"], "info_maps": [{"key": "val"}]}},
+            False,
         ),
         (
-            {"key1": {"values": "value1"}, "key2": {"values": "value2"}, "key3": {"values": "value3"}},
             {"filters": ["key1", "key1"], "filter_by_exclusion": True},
-            {"key2": {"values": "value2"}, "key3": {"values": "value3"}},
+            {
+                "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+                "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
+            },
+            False,
         ),
     ],
 )
 def test_filter_variables_pool(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    variables_pool: Dict[str, Dict[str, str]],
+    mock_simple_variables_pool: Dict[str, OutputManager.pool_element_type],
+    mocker: MockerFixture,
     filter_content: Dict[str, Any],
     expected: Dict[str, Dict[str, str]],
+    data_padded: bool
 ) -> None:
     """Tests filter_variables_pool in the OutputManager."""
-    mock_output_manager.variables_pool = variables_pool
+    mock_output_manager.variables_pool = mock_simple_variables_pool
+    pad_data = mocker.patch.object(Utility, "pad_temporal_data", side_effect=returner)
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected
 
+    if data_padded:
+        pad_data.assert_called_once()
+    else:
+        pad_data.assert_not_called()
     mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
     mock_output_manager.variables_pool = {}
 
