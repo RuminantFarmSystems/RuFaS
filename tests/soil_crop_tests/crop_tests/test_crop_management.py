@@ -199,7 +199,9 @@ def test_manage_harvest(
             kill.assert_called_once()
             store_crop.assert_not_called()
 
-        record_yield.assert_called_once_with(field_name, field_size, mock_time.calendar_year, mock_time.day)
+        record_yield.assert_called_once_with(
+            field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
+        )
         transfer_residue.assert_called_once_with(soil_data, killed)
 
 
@@ -387,12 +389,12 @@ def test_record_yield(
         "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
         "harvest_index": MeasurementUnits.UNITLESS,
-        "planting_date": {
-            "year": MeasurementUnits.CALENDAR_YEAR,
-            "day": MeasurementUnits.ORDINAL_DAY,
-        },
-        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+        "planting_year": MeasurementUnits.CALENDAR_YEAR,
+        "planting_day": MeasurementUnits.ORDINAL_DAY,
+        "harvest_year": MeasurementUnits.CALENDAR_YEAR,
+        "harvest_day": MeasurementUnits.ORDINAL_DAY,
         "field_size": MeasurementUnits.HECTARE,
+        "field_name": MeasurementUnits.UNITLESS,
     }
 
     expected_info_map = {
@@ -407,11 +409,14 @@ def test_record_yield(
         "dry_yield": dry_mass,
         "nitrogen": nitrogen,
         "phosphorus": phosphorus,
-        "planting_date": {"year": 1995, "day": 100},
+        "planting_year": 1995,
+        "planting_day": 100,
         "yield_residue": crop_manager.data.yield_residue,
         "harvest_index": crop_manager.data.harvest_index,
-        "harvest_date": {"year": year, "day": day},
+        "harvest_year": year,
+        "harvest_day": day,
         "field_size": field_size,
+        "field_name": field_name,
     }
 
     with patch.object(om, "add_variable") as add_variable:

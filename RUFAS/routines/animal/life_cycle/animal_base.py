@@ -7,8 +7,6 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 
-im = InputManager()
-
 
 class AnimalBase:
     config: Dict[str, Any] = {}
@@ -20,6 +18,7 @@ class AnimalBase:
 
     @staticmethod
     def set_config(config):
+        im = InputManager()
         AnimalBase.config = config
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
