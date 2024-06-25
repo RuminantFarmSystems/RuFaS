@@ -1,14 +1,15 @@
+from typing import List, Set, Tuple, Any, Dict
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
-from RUFAS.input_manager import InputManager
-from RUFAS.general_constants import GeneralConstants
-from typing import Tuple
 
 
 class AnimalBase:
-    config = {}
+    config: Dict[str, Any] = {}
     nutrients = None
 
     @staticmethod
@@ -45,9 +46,9 @@ class AnimalBase:
         self.semen_used = self.config["semen_type"]
         self.culled = False
         self.do_not_breed = False
-        self.body_weight_history = []
+        self.body_weight_history: List[BodyWeightHistory] = []
         self.events = AnimalEvents()
-        self.pen_history = []
+        self.pen_history: List[PenHistory] = []
         self.daily_growth = 0.0
         self.nutrient_rqmts = {}
         self.set_default_nutrient_rqmts()
@@ -131,7 +132,12 @@ class AnimalBase:
             self.dP_reserves = 0
 
         # amount of P in the animal (A.1G.A.3)
-        self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - dP_reserves_prev)
+        self.p_animal = (
+            self.p_animal
+            + self.p_gest
+            + self.p_growth
+            + (self.dP_reserves - dP_reserves_prev)
+        )
 
     def calc_base_manure(self) -> Tuple[float, float]:
         """
@@ -153,8 +159,14 @@ class AnimalBase:
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
-        elif self.dP_reserves < 0 and self.p_intake >= self.p_req and self.p_excess >= (-1) * self.dP_reserves / 0.7:
-            p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + self.dP_reserves / 0.7
+        elif (
+            self.dP_reserves < 0
+            and self.p_intake >= self.p_req
+            and self.p_excess >= (-1) * self.dP_reserves / 0.7
+        ):
+            p_feces_excrt = (
+                self.p_intake - self.p_req + self.p_maint_feces + self.dP_reserves / 0.7
+            )
         else:
             p_feces_excrt = self.p_maint_feces
 
@@ -167,7 +179,9 @@ class AnimalBase:
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
-    def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
+    def update_pen_history(
+        self, curr_pen: int, curr_day: int, classes_in_pen: Set[str]
+    ):
         """
         Updates the animal's pen history by either appending to the existing
         history if the animal is in a different pen than it was the last time
@@ -181,12 +195,14 @@ class AnimalBase:
         """
         last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
-            self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen, list(classes_in_pen)))
+            self.pen_history.append(
+                PenHistory(curr_day, curr_day, curr_pen, list(classes_in_pen))
+            )
         else:  # last_pen == curr_pen
             self.pen_history[-1].end_date = curr_day
             self.pen_history[-1].classes_in_pen = list(classes_in_pen)
 
-    def update_body_weight_history(self, sim_day):
+    def update_body_weight_history(self, sim_day: int) -> None:
         """
         Updates the animal's body weight history by appending a
         BodyWeightHistory object to the list.
@@ -194,4 +210,9 @@ class AnimalBase:
         Args:
             sim_day: simulation day
         """
-        self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))
+        self.body_weight_history.append(
+            BodyWeightHistory(sim_day, self.days_born, self.body_weight)
+        )
+        self.body_weight_history.append(
+            BodyWeightHistory(sim_day, self.days_born, self.body_weight)
+        )
