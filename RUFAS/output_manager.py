@@ -1003,15 +1003,15 @@ class OutputManager(object):
         results: Dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
         for key in filtered_pool.keys():
-            info_maps: List[Dict[str, Any]] = (
-                filtered_pool[key]["info_maps"] if "info_maps" in filtered_pool[key] else []
+            sliced_info_maps: List[Dict[str, Any]] = (
+                filtered_pool[key]["info_maps"][slice_start:slice_end] if "info_maps" in filtered_pool[key] else []
             )
-            data: List[Any] = filtered_pool[key]["values"]
-            is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
+            sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
+            is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
-                results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {
-                    "values": data
+                results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
+                    "values": sliced_data
                 }
                 self._variables_usage_counter.update([key])
             elif is_data_in_dict:
@@ -1022,29 +1022,19 @@ class OutputManager(object):
                         f"{is_data_in_dict=}, {selected_variables=}, see Wiki for proper setup details.",
                         info_map,
                     )
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
                     combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
                     if combined_key in results.keys():
-                        results[combined_key].get("info_maps", []).extend(info_maps)
+                        results[combined_key].get("info_maps", []).extend(sliced_info_maps)
                         results[combined_key]["values"].extend(filtered_value)
                     else:
-                        results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {
+                        results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
                             "values": filtered_value
                         }
                     self._variables_usage_counter.update([f"{key}.{filtered_key}"])
             counter += 1
-
-        if filter_content.get("pad_data", False):
-            pad_tail_values = filter_content.get("pad_tail_values", False)
-            results = Utility.pad_temporal_data(results, pad_tail_values=pad_tail_values)
-
-        for key in results.keys():
-            if "info_maps" in results.keys():
-                results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
-            results[key]["values"] = results[key]["values"][slice_start:slice_end]
-
         return results
 
     def save_results(
