@@ -142,14 +142,13 @@ class Utility:
                     padded_variable_data["values"].append(last_value[0])
                     padded_variable_data["info_maps"].append(last_value[1])
                     padded_variable_data["info_maps"][-1]["simulation_day"] = day
+                elif last_value is fill_value:
+                    padded_variable_data["values"].append(last_value)
+                    padded_variable_data["info_maps"].append({"simulation_day": day})
                 else:
-                    if last_value is fill_value:
-                        padded_variable_data["values"].append(last_value)
-                        padded_variable_data["info_maps"].append({"simulation_day": day})
-                    else:
-                        padded_variable_data["values"].append(last_value[0])
-                        padded_variable_data["info_maps"].append(last_value[1].copy())
-                        padded_variable_data["info_maps"][-1]["simulation_day"] = day
+                    padded_variable_data["values"].append(last_value[0])
+                    padded_variable_data["info_maps"].append(last_value[1].copy())
+                    padded_variable_data["info_maps"][-1]["simulation_day"] = day
 
             tail_fill_value = indexed_data[last_day_of_original_data][0] if pad_tail_values else fill_value
             for day in range(last_day_of_original_data + 1, last_day + 1):
