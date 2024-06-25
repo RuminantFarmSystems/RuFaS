@@ -34,7 +34,6 @@ from RUFAS.util import Utility
 # 'bound' is used to restrict the type to only the classes listed in the union.
 GenericAnimal = TypeVar("GenericAnimal", bound=Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -51,6 +50,7 @@ class LifeCycleManager:
             data: life cycle data from the input JSON file
 
         """
+        self.im = InputManager()
         self.avg_calving_to_preg_time = {
             "1": 0.0,
             "2": 0.0,
@@ -184,7 +184,7 @@ class LifeCycleManager:
             A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows
 
         """
-        animal_population = im.get_data("runtime_animal_population")
+        animal_population = self.im.get_data("runtime_animal_population")
         self.animal_population = AnimalPopulation(
             calves=list(map(Calf, animal_population["calves"])),
             heiferIs=list(map(HeiferI, animal_population["heiferIs"])),

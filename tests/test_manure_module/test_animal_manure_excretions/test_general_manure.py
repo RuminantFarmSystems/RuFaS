@@ -1,10 +1,8 @@
 from pytest import approx
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import (
-    AnimalManureExcretions,
-    calculate_phosphorus_excretion_values,
-)
+from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 
 
 def test_animal_manure_excretion_typed_dict() -> None:
@@ -12,7 +10,7 @@ def test_animal_manure_excretion_typed_dict() -> None:
     # Arrange
     urea = 1.0
     urine = 2.0
-    total_ammoniacal_nitrogen_concentration = 3.0
+    manure_total_ammoniacal_nitrogen = 4.0
     urine_nitrogen = 4.0
     manure_nitrogen = 5.0
     manure_mass = 6.0
@@ -30,7 +28,7 @@ def test_animal_manure_excretion_typed_dict() -> None:
     animal_manure_excretions = AnimalManureExcretions(
         urea=urea,
         urine=urine,
-        total_ammoniacal_nitrogen_concentration=total_ammoniacal_nitrogen_concentration,
+        manure_total_ammoniacal_nitrogen=manure_total_ammoniacal_nitrogen,
         urine_nitrogen=urine_nitrogen,
         manure_nitrogen=manure_nitrogen,
         manure_mass=manure_mass,
@@ -48,9 +46,7 @@ def test_animal_manure_excretion_typed_dict() -> None:
     # Assert
     assert animal_manure_excretions["urea"] == approx(urea)
     assert animal_manure_excretions["urine"] == approx(urine)
-    assert animal_manure_excretions["total_ammoniacal_nitrogen_concentration"] == approx(
-        total_ammoniacal_nitrogen_concentration
-    )
+    assert animal_manure_excretions["manure_total_ammoniacal_nitrogen"] == approx(manure_total_ammoniacal_nitrogen)
     assert animal_manure_excretions["urine_nitrogen"] == approx(urine_nitrogen)
     assert animal_manure_excretions["manure_nitrogen"] == approx(manure_nitrogen)
     assert animal_manure_excretions["manure_mass"] == approx(manure_mass)
