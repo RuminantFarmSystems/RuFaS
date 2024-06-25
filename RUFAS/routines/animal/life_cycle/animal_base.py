@@ -132,12 +132,7 @@ class AnimalBase:
             self.dP_reserves = 0
 
         # amount of P in the animal (A.1G.A.3)
-        self.p_animal = (
-            self.p_animal
-            + self.p_gest
-            + self.p_growth
-            + (self.dP_reserves - dP_reserves_prev)
-        )
+        self.p_animal = self.p_animal + self.p_gest + self.p_growth + (self.dP_reserves - dP_reserves_prev)
 
     def calc_base_manure(self) -> Tuple[float, float]:
         """
@@ -159,14 +154,8 @@ class AnimalBase:
         # amount of P excreted by an animal (g) (A.1G.B.2)
         if self.dP_reserves == 0 and self.p_intake >= self.p_req:
             p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces
-        elif (
-            self.dP_reserves < 0
-            and self.p_intake >= self.p_req
-            and self.p_excess >= (-1) * self.dP_reserves / 0.7
-        ):
-            p_feces_excrt = (
-                self.p_intake - self.p_req + self.p_maint_feces + self.dP_reserves / 0.7
-            )
+        elif self.dP_reserves < 0 and self.p_intake >= self.p_req and self.p_excess >= (-1) * self.dP_reserves / 0.7:
+            p_feces_excrt = self.p_intake - self.p_req + self.p_maint_feces + self.dP_reserves / 0.7
         else:
             p_feces_excrt = self.p_maint_feces
 
@@ -179,9 +168,7 @@ class AnimalBase:
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
-    def update_pen_history(
-        self, curr_pen: int, curr_day: int, classes_in_pen: Set[str]
-    ):
+    def update_pen_history(self, curr_pen: int, curr_day: int, classes_in_pen: Set[str]):
         """
         Updates the animal's pen history by either appending to the existing
         history if the animal is in a different pen than it was the last time
@@ -195,9 +182,7 @@ class AnimalBase:
         """
         last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
-            self.pen_history.append(
-                PenHistory(curr_day, curr_day, curr_pen, list(classes_in_pen))
-            )
+            self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen, list(classes_in_pen)))
         else:  # last_pen == curr_pen
             self.pen_history[-1].end_date = curr_day
             self.pen_history[-1].classes_in_pen = list(classes_in_pen)
@@ -210,9 +195,5 @@ class AnimalBase:
         Args:
             sim_day: simulation day
         """
-        self.body_weight_history.append(
-            BodyWeightHistory(sim_day, self.days_born, self.body_weight)
-        )
-        self.body_weight_history.append(
-            BodyWeightHistory(sim_day, self.days_born, self.body_weight)
-        )
+        self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))
+        self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))
