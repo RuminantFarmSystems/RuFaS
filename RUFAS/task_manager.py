@@ -537,8 +537,9 @@ class TaskManager:
         output_manager.add_log("Random seed used", f"Seeded libaries with {random_seed=}", info_map)
 
     @staticmethod
-    def _input_data_audit_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
-                                task_id: Any) -> None:
+    def _input_data_audit_tasks(
+        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any
+    ) -> None:
         TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
@@ -550,16 +551,22 @@ class TaskManager:
         )
 
     @staticmethod
-    def _herd_init_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
-                         task_id: Any) -> None:
+    def _herd_init_tasks(
+        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any
+    ) -> None:
         """Handler for all methods related to herd initialization."""
         args["init_herd"] = True
         TaskManager.handle_herd_initializaition(args, output_manager)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
     @staticmethod
-    def _simulation_engine_run_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
-                                     task_id: Any, produce_graphics: bool) -> None:
+    def _simulation_engine_run_tasks(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+    ) -> None:
         """Handler for all methods related to simulation run."""
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
