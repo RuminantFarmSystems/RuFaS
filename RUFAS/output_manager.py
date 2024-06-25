@@ -1045,7 +1045,13 @@ class OutputManager(object):
             Whether keys in dictionaries should be filtered by exclusion.
 
         """
-        info_map = {self.__class__.__name__, self._parse_filtered_variables.__name__}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._parse_filtered_variables.__name__,
+            "filter_name": filter_name,
+            "filter_by_exclusion": filter_by_exclusion,
+            "use_filter_name": use_filter_name,
+        }
         results: Dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
         for key in filtered_pool.keys():

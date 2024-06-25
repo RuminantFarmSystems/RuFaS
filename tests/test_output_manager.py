@@ -6,7 +6,6 @@ from typing import Any, Callable, Dict, List, Union, Type
 
 import pandas as pd
 import pytest
-from freezegun import freeze_time
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
@@ -1597,8 +1596,7 @@ def test_filter_variables_pool_complex(
         "a": {"values": ["A", "AA", "AAA"]},
     }
     mock_output_manager.add_error = MagicMock()
-    with freeze_time("2023-12-12 13:34:42"):
-        actual: Dict[str, OutputManager.pool_element_type] = mock_output_manager.filter_variables_pool(filter_content)
+    actual: Dict[str, OutputManager.pool_element_type] = mock_output_manager.filter_variables_pool(filter_content)
     mock_output_manager.add_error.assert_has_calls(
         [
             call(
@@ -1608,11 +1606,10 @@ def test_filter_variables_pool_complex(
                 "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
-                    "function": "filter_variables_pool",
+                    "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
                     "use_filter_name": False,
-                    "timestamp": "12-Dec-2023_Tue_13-34-42.000000",
                 },
             ),
             call(
@@ -1622,11 +1619,10 @@ def test_filter_variables_pool_complex(
                 "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
-                    "function": "filter_variables_pool",
+                    "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
                     "use_filter_name": False,
-                    "timestamp": "12-Dec-2023_Tue_13-34-42.000000",
                 },
             ),
         ]
