@@ -7,7 +7,7 @@ import random
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 import traceback
-from typing import Any, Dict, List, Tuple, Callable
+from typing import Any, Dict, List, Tuple
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
@@ -512,13 +512,30 @@ class TaskManager:
 
     @staticmethod
     def _input_data_audit_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
-                               task_id: Any) -> None:
+                                task_id: Any) -> None:
         TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
     @staticmethod
     def _compare_metadata_properties_tasks(args: Dict[str, Any], input_manager: InputManager) -> None:
+        """Handler for all methods related to metadata property comparison."""
         input_manager.compare_metadata_properties(
             args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
         )
 
+    @staticmethod
+    def _herd_init_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
+                         task_id: Any) -> None:
+        """Handler for all methods related to herd initialization."""
+        args["init_herd"] = True
+        TaskManager.handle_herd_initializaition(args, output_manager)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+
+    @staticmethod
+    def _simulation_engine_run_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
+                                     task_id: Any, produce_graphics: bool) -> None:
+        """Handler for all methods related to simulation run."""
+        if args["input_patch"]:
+            Utility.deep_merge(input_manager.pool, args["input_patch"])
+        TaskManager.handle_single_simulation_run(args, output_manager)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
