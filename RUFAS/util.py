@@ -88,7 +88,8 @@ class Utility:
     def pad_temporal_data(
         data_to_pad: dict[str, dict[str, list[Any]]],
         fill_value: Any = np.nan,
-        pad_tail_values: bool = False,
+        fill_gap_values: bool = False,
+        fill_end_values: bool = False,
     ) -> dict[str, dict[str, list[Any]]]:
         """
         Pads data based on the simulation day(s) it was recorded on, relative to when other data was recorded.
@@ -100,8 +101,12 @@ class Utility:
             keys "values" and optionally "info_maps".
         fill_value : Any, default numpy.nan
             Value that is used to pad the front of the data values, and optionally the back.
-        pad_tail_values : bool, default False
-            Whether tail values should be padded with the last known value from a data set, or with the fill value.
+        fill_gap_values : bool, default False
+            If true, values between known data points are padded with the last known value from the data set. If false,
+            values between known data points are filled with `fill_value`.
+        fill_end_values : bool, default False
+            If true, values after last known data point are padded with the last known value from the data set. If
+            false, values after the last known data point are filled with `fill_value`.
 
         Returns
         -------
@@ -151,7 +156,7 @@ class Utility:
                     padded_variable_data["info_maps"].append(last_value[1].copy())
                     padded_variable_data["info_maps"][-1]["simulation_day"] = day
 
-            tail_fill_value = indexed_data[last_day_of_original_data][0] if pad_tail_values else fill_value
+            tail_fill_value = indexed_data[last_day_of_original_data][0] if fill_end_values else fill_value
             for day in range(last_day_of_original_data + 1, last_day + 1):
                 padded_variable_data["values"].append(tail_fill_value)
                 padded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
