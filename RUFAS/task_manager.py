@@ -511,8 +511,9 @@ class TaskManager:
         output_manager.add_log("Random seed used", f"Seeded libaries with {random_seed=}", info_map)
 
     @staticmethod
-    def _input_data_audit_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
-                               task_id: Any) -> None:
+    def _input_data_audit_tasks(
+        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any
+    ) -> None:
         TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
@@ -521,4 +522,3 @@ class TaskManager:
         input_manager.compare_metadata_properties(
             args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
         )
-
