@@ -720,7 +720,7 @@ def test_add_to_pool(
     """Unit test for function _add_to_pool in file output_manager.py"""
 
     # Arrange
-    info_map = {
+    info_map: Dict[str, Any] = {
         "class": "dummy_class",
         "function": "dummy_func",
         "context": "dummy_context",
