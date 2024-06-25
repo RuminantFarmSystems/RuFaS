@@ -322,12 +322,15 @@ class TaskManager:
         }
         task_id = args["task_id"]
         output_manager = OutputManager()
-        pre_validation_handlers = {TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
-                                   TaskType.COMPARE_METADATA_PROPERTIES:
-                                       TaskManager._compare_metadata_properties_tasks}
-        post_validation_handlers = {TaskType.HERD_INITIALIZATION: TaskManager._herd_init_tasks,
-                                    TaskType.SIMULATION_SINGLE_RUN: TaskManager._simulation_engine_run_tasks,
-                                    TaskType.POST_PROCESSING: TaskManager._postprocessing_tasks}
+        pre_validation_handlers = {
+            TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
+            TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._compare_metadata_properties_tasks,
+        }
+        post_validation_handlers = {
+            TaskType.HERD_INITIALIZATION: TaskManager._herd_init_tasks,
+            TaskType.SIMULATION_SINGLE_RUN: TaskManager._simulation_engine_run_tasks,
+            TaskType.POST_PROCESSING: TaskManager._postprocessing_tasks,
+        }
         try:
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
@@ -344,8 +347,14 @@ class TaskManager:
 
             handler = pre_validation_handlers.get(task_type)
             if handler:
-                TaskManager.call_handler(handler, args=args, input_manager=input_manager, output_manager=output_manager,
-                                         task_id=task_id, produce_graphics=produce_graphics)
+                TaskManager.call_handler(
+                    handler,
+                    args=args,
+                    input_manager=input_manager,
+                    output_manager=output_manager,
+                    task_id=task_id,
+                    produce_graphics=produce_graphics,
+                )
                 return
             # if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
             #     TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
@@ -372,8 +381,14 @@ class TaskManager:
 
             handler = post_validation_handlers.get(task_type)
             if handler:
-                TaskManager.call_handler(handler, args=args, input_manager=input_manager, output_manager=output_manager,
-                                         task_id=task_id, produce_graphics=produce_graphics)
+                TaskManager.call_handler(
+                    handler,
+                    args=args,
+                    input_manager=input_manager,
+                    output_manager=output_manager,
+                    task_id=task_id,
+                    produce_graphics=produce_graphics,
+                )
                 return
 
             # if args["task_type"] == TaskType.HERD_INITIALIZATION:
@@ -575,9 +590,12 @@ class TaskManager:
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
 
     @staticmethod
-    def _postprocessing_tasks(args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager,
-                              task_id: Any, produce_graphics: bool) -> None:
+    def _postprocessing_tasks(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+    ) -> None:
         """Handler for all methods related to postprocessing."""
-        TaskManager.handle_post_processing(
-            args, input_manager, output_manager, task_id, produce_graphics, True, True
-        )
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True, True)
