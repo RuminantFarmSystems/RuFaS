@@ -110,7 +110,9 @@ class ManureManagerPen:
             "compost bedded pack barn", or "open lot".
         """
 
-        ExposedManureSurfaceArea = NamedTuple("ExposedManureSurfaceArea", [("has_lac_cows", float), ("no_lac_cows", float)])
+        ExposedManureSurfaceArea = NamedTuple(
+            "ExposedManureSurfaceArea", [("has_lac_cows", float), ("no_lac_cows", float)]
+        )
         freestall = ExposedManureSurfaceArea(has_lac_cows=3.5, no_lac_cows=2.5)
         tiestall = ExposedManureSurfaceArea(has_lac_cows=1.2, no_lac_cows=1.0)
         bedded_pack = ExposedManureSurfaceArea(has_lac_cows=5.0, no_lac_cows=3.0)
