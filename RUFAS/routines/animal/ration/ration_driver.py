@@ -4,19 +4,21 @@ from typing import Dict, List, Literal, Set, Tuple
 import scipy
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.feed.feed import Feed
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_grouping_scenarios import \
-    AnimalGroupingScenario
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_typed_dicts import (AvailableFeedsTypedDict,
-                                                      FeedInfoTypedDict)
+from RUFAS.routines.animal.animal_typed_dicts import (
+    AvailableFeedsTypedDict,
+    FeedInfoTypedDict,
+)
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
-from RUFAS.routines.animal.ration.user_defined_ration import \
-    UserDefinedRationManager as UserDefinedRationManager
+from RUFAS.routines.animal.ration.user_defined_ration import (
+    UserDefinedRationManager as UserDefinedRationManager,
+)
+from RUFAS.routines.feed.feed import Feed
 from RUFAS.units import MeasurementUnits
 
 udrm = UserDefinedRationManager()
@@ -36,7 +38,10 @@ class RationManager:
 
     @classmethod
     def formulate_ration(
-        cls, pen: Pen, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario: AnimalGroupingScenario
+        cls,
+        pen: Pen,
+        available_feeds: AvailableFeedsTypedDict,
+        animal_grouping_scenario: AnimalGroupingScenario,
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
@@ -66,7 +71,9 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.is_udr:
-            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
+            ration, ration_vals = cls.get_user_defined_ration(
+                req, pen, available_feeds, animal_grouping_scenario
+            )
             return ration, ration_vals
 
         if hasattr(pen, "ration_per_animal"):
@@ -98,7 +105,9 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
+                ) = ration_optimizer.attempt_optimization(
+                    req, available_feeds, pen.animal_combination, previous_ration
+                )
                 info_map = {
                     "class": "RationManager",
                     "function": cls.formulate_ration.__name__,
@@ -109,7 +118,9 @@ class RationManager:
                     "simulation day": sim_day,
                     "reattempt number": num_reattempts,
                     "constraints_failed_dict": constraints_failed_list,
-                    "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
+                    "ration_attempted": cls.make_ration_from_solution(
+                        available_feeds, solution
+                    ),
                     "pen requirements": pen.avg_nutrient_rqmts,
                 }
                 fail_summary_units = {
@@ -159,7 +170,10 @@ class RationManager:
         float
             Average running milk
         """
-        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in list(pen.animals_in_pen.values()))
+        total_milk_in_pen = sum(
+            animal.estimated_daily_milk_produced
+            for animal in list(pen.animals_in_pen.values())
+        )
         starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
         return starting_milk_average
 
@@ -187,7 +201,9 @@ class RationManager:
 
     @classmethod
     def make_ration_from_solution(
-        cls, available_feeds: AvailableFeedsTypedDict, solution: scipy.optimize.OptimizeResult
+        cls,
+        available_feeds: AvailableFeedsTypedDict,
+        solution: scipy.optimize.OptimizeResult,
     ) -> Dict[str, float | str]:
         """
         Generates ration dictionary from scipy result
@@ -215,12 +231,16 @@ class RationManager:
             ration[available_feeds["feed_key"][feed_id]] = round(num, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
-        ration_config.price_list = RationOptimizer.triple_values_in_list(available_feeds["price"])
+        ration_config.price_list = RationOptimizer.triple_values_in_list(
+            available_feeds["price"]
+        )
         ration["objective"] = ration_optimizer.objective(solution.x, ration_config)
         return ration
 
     @classmethod
-    def make_solution_from_fixed_ration(cls, ration: Dict[str, float | bool]) -> List[float]:
+    def make_solution_from_fixed_ration(
+        cls, ration: Dict[str, float | bool]
+    ) -> List[float]:
         """
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_optimizer.py
         Simply puts the value in triplicate, and multiplies by the MEact defined in  ration_config
@@ -335,7 +355,9 @@ class RationManager:
                 "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
                 "reattempt number": num_reattempts,
                 "constraints_failed_dict": constraints_failed_list,
-                "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
+                "ration_attempted": cls.make_ration_from_solution(
+                    available_feeds, solution
+                ),
                 "pen requirements": pen.avg_nutrient_rqmts,
             }
             om.add_variable(
@@ -344,9 +366,17 @@ class RationManager:
                 dict(info_map, **{"units": fail_summary_units}),
             )
 
-        if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
-            ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
+        if (
+            udrm.milk_reduction_maximum == 0.0
+            and udrm.tolerance == 0.0
+            and not solution.success
+        ):
+            ration = UserDefinedRationManager.make_ration_from_user_values(
+                ration_percents, available_feeds, req
+            )
+            ration_vals = ration_optimizer.get_ration_vals(
+                cls.make_solution_from_fixed_ration(ration), ration_config
+            )
             return ration, ration_vals
 
         if pen.animal_combination.name not in ["LAC_COW"] and not solution.success:
@@ -376,7 +406,9 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
+                ) = ration_optimizer.attempt_optimization(
+                    req, available_feeds, pen.animal_combination, previous_ration
+                )
                 failed_constraints = []
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
@@ -386,10 +418,14 @@ class RationManager:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
                     fail_summary = {
-                        "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
+                        "simulation day": animal_list[0]
+                        .body_weight_history[-1]
+                        .simulation_day,
                         "reattempt number": num_reattempts,
                         "constraints_failed_dict": constraints_failed_list,
-                        "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
+                        "ration_attempted": cls.make_ration_from_solution(
+                            available_feeds, solution
+                        ),
                         "pen requirements": pen.avg_nutrient_rqmts,
                     }
                     om.add_variable(
@@ -399,8 +435,12 @@ class RationManager:
                     )
 
         if fixed_ration:
-            ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
+            ration = UserDefinedRationManager.make_ration_from_user_values(
+                ration_percents, available_feeds, req
+            )
+            ration_vals = ration_optimizer.get_ration_vals(
+                cls.make_solution_from_fixed_ration(ration), ration_config
+            )
         else:
             ration = cls.make_ration_from_solution(available_feeds, solution)
             ration_vals = ration_optimizer.get_ration_vals(solution.x, ration_config)
@@ -1243,7 +1283,9 @@ class AvailableFeeds:
         # RuFaS > Docs & Files > Animal Module > Ration Driver Logic
 
         if not self._feed_id_to_list_idx_dict:
-            self._feed_id_to_list_idx_dict = {fid: i for i, fid in enumerate(self.feed_id)}
+            self._feed_id_to_list_idx_dict = {
+                fid: i for i, fid in enumerate(self.feed_id)
+            }
 
         excluded_keys = ["_feed_id_to_list_idx_dict"]
         result = collections.defaultdict(list)
@@ -1269,9 +1311,6 @@ class AvailableFeeds:
                         f"Check that price was set in purchased_feeds in input feed json, "
                         f"and that it is included in the specified NRC or NASEM csv.",
                         info_map,
-                    )
-                    raise
-        return result
                     )
                     raise
         return result
