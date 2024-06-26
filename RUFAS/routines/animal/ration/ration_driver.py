@@ -422,7 +422,7 @@ class RationReporter:
     # fmt: off
     @classmethod
     def report_ration(  # noqa
-        cls, ration: Dict[str, float],
+        cls, ration: Dict[str, float | str],
         available_feeds: Dict[str, Dict[str, float]]
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         # fmt: on
