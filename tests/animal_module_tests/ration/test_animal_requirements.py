@@ -373,9 +373,7 @@ def test_default_initialization() -> None:
         ),
     ],
 )
-def test_calc_pen_requirements(
-    argument_lists: List[List[float]], stat_method: str, expected: List[float]
-) -> None:
+def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: str, expected: List[float]) -> None:
     """
     Test the calc_pen_requirement() method across varying statistical methods within the AnimalRequirements class.
 
