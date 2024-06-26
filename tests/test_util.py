@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 import pytest
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
+import math
 
 from RUFAS.util import Utility
 
@@ -309,6 +310,254 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
         "b": {"i": {"c": 5, "d": 6}, "j": {"c": 7, "d": [8, {"x": [9, 10], "y": 11}, 12]}},
     }
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "data_to_pad,fill_value,gap_pad,end_pad,expected",
+    [
+        (
+            {
+                "a": {
+                    "values": ["a", "b", "c"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                    ],
+                },
+                "b": {
+                    "values": ["d", "e", "f"],
+                    "info_maps": [
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
+                },
+            },
+            math.nan,
+            True,
+            False,
+            {
+                "a": {
+                    "values": ["a", "a", "a", "b", "c", math.nan],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 2, "units": "kg"},
+                        {"simulation_day": 3, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                        {"simulation_day": 6, "units": "kg"},
+                    ],
+                },
+                "b": {
+                    "values": [math.nan, math.nan, "d", "e", "e", "f"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "g"},
+                        {"simulation_day": 2, "units": "g"},
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 5, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
+                },
+            },
+        ),
+        (
+            {
+                "a": {
+                    "values": ["a", "b", "c"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                    ],
+                },
+                "b": {
+                    "values": ["d", "e", "f"],
+                    "info_maps": [
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
+                },
+            },
+            math.nan,
+            False,
+            True,
+            {
+                "a": {
+                    "values": ["a", math.nan, math.nan, "b", "c", "c"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 2, "units": "kg"},
+                        {"simulation_day": 3, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                        {"simulation_day": 6, "units": "kg"},
+                    ],
+                },
+                "b": {
+                    "values": [math.nan, math.nan, "d", "e", math.nan, "f"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "g"},
+                        {"simulation_day": 2, "units": "g"},
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 5, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
+                },
+            },
+        ),
+        (
+            {
+                "a": {"values": ["a"], "info_maps": [{"simulation_day": 2, "units": "pi"}]},
+                "b": {
+                    "values": ["b", "c"],
+                    "info_maps": [{"simulation_day": 3, "units": "pi"}, {"simulation_day": 4, "units": "pi"}],
+                },
+            },
+            None,
+            False,
+            True,
+            {
+                "a": {
+                    "values": ["a", "a", "a"],
+                    "info_maps": [
+                        {"simulation_day": 2, "units": "pi"},
+                        {"simulation_day": 3, "units": "pi"},
+                        {"simulation_day": 4, "units": "pi"},
+                    ],
+                },
+                "b": {
+                    "values": [None, "b", "c"],
+                    "info_maps": [
+                        {"simulation_day": 2, "units": "pi"},
+                        {"simulation_day": 3, "units": "pi"},
+                        {"simulation_day": 4, "units": "pi"},
+                    ],
+                },
+            },
+        ),
+        (
+            {
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
+                "b": {
+                    "values": ["c", "d"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
+            },
+            8,
+            True,
+            False,
+            {
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
+                "b": {
+                    "values": ["c", "d"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha"}, {"simulation_day": 2, "units": "ha"}],
+                },
+            },
+        ),
+        (
+            {
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "ha^2"}, {"simulation_day": 3, "units": "ha^2"}],
+                },
+                "b": {
+                    "values": ["c", "d"],
+                    "info_maps": [{"simulation_day": 1, "units": "l"}, {"simulation_day": 3, "units": "l"}],
+                },
+            },
+            "fill",
+            False,
+            True,
+            {
+                "a": {
+                    "values": ["a", "fill", "b"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "ha^2"},
+                        {"simulation_day": 2, "units": "ha^2"},
+                        {"simulation_day": 3, "units": "ha^2"},
+                    ],
+                },
+                "b": {
+                    "values": ["c", "fill", "d"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "l"},
+                        {"simulation_day": 2, "units": "l"},
+                        {"simulation_day": 3, "units": "l"},
+                    ],
+                },
+            },
+        ),
+        (
+            {
+                "a": {
+                    "values": ["a", "b"],
+                    "info_maps": [{"simulation_day": 1, "units": "GB"}, {"simulation_day": 3, "units": "GB"}],
+                },
+            },
+            math.pi,
+            False,
+            False,
+            {
+                "a": {
+                    "values": ["a", math.pi, "b"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "GB"},
+                        {"simulation_day": 2, "units": "GB"},
+                        {"simulation_day": 3, "units": "GB"},
+                    ],
+                }
+            },
+        ),
+    ],
+)
+def test_fill_data_temporally(
+    data_to_pad: dict[str, dict[str, list[Any]]],
+    fill_value: Any,
+    gap_pad: bool,
+    end_pad: bool,
+    expected: dict[str, dict[str, list[Any]]],
+) -> None:
+    """Tests the utility method pad_temporal_data."""
+    actual = Utility.fill_data_temporally(
+        data_to_pad, fill_value=fill_value, fill_gap_values=gap_pad, fill_end_values=end_pad
+    )
+
+    assert actual == expected
+
+
+def test_pad_temporal_data_errors() -> None:
+    """Tests that errors are correctly raised by pad_temporal_data."""
+    empty_data = {}
+    with pytest.raises(ValueError, match="empty dataset"):
+        Utility.fill_data_temporally(empty_data)
+
+    data_one = {"a": {"values": ["a", "b"]}, "b": {"values": ["c", "d"]}}
+    with pytest.raises(TypeError, match="no info maps"):
+        Utility.fill_data_temporally(data_one)
+
+    data_two: dict[str, dict[str, list[Any]]] = {
+        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
+        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+    }
+    with pytest.raises(ValueError, match="number of values and info maps"):
+        Utility.fill_data_temporally(data_two)
+
+    data_three: dict[str, dict[str, list[Any]]] = {
+        "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
+        "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
+    }
+    with pytest.raises(ValueError, match="simulation day value in every info map"):
+        Utility.fill_data_temporally(data_three)
 
 
 def test_deep_merge_dict() -> None:
