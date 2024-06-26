@@ -1,3 +1,6 @@
+from RUFAS.routines.animal.pen import Pen
+
+
 class PenHistory:
     """
     A class to represent the history of a pen on a farm.
@@ -23,7 +26,7 @@ class PenHistory:
     """
 
     # TODO: Annotate pen later when circular dependency is resolved - may be solved by GitHub Issue # 793
-    def __init__(self, start: int, end: int, pen, classes_in_pen: list[str]):
+    def __init__(self, start: int, end: int, pen: Pen, classes_in_pen: list[str]):
         """
         Construct the necessary attributes for the PenHistory object.
 
