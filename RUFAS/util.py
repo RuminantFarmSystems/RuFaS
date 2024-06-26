@@ -100,7 +100,8 @@ class Utility:
             The data to be padded. The top level key is a variable name, and points to a dictionary that contains the
             keys "values" and optionally "info_maps".
         fill_value : Any, default numpy.nan
-            Value that is used to pad the front of the data values, and optionally the back.
+            Value that is used to pad the front of the data values, and optionally the values in between original values
+            and after the last original value.
         fill_gap_values : bool, default False
             If true, values between known data points are padded with the last known value from the data set. If false,
             values between known data points are filled with `fill_value`.
@@ -112,6 +113,14 @@ class Utility:
         -------
         dict[str, dict[str, list[Any]]]
             The padded data, so that gaps in the data are filled in with the last known value or None.
+
+        Raises
+        ------
+        TypeError
+            If a variable has no info maps.
+        ValueError
+            If the number of info maps does not match the number of values for a variable.
+            If a value for "simulation_day" is not present in every info map.
 
         Notes
         -----
@@ -137,16 +146,16 @@ class Utility:
         padded_data: dict[str, dict[str, list[Any]]] = {}
         for key, data in data_to_pad.items():
             padded_variable_data: dict[str, list[Any]] = {"values": [], "info_maps": []}
+            original_units = data["info_maps"][0]["units"]
             zipped_data = zip(data["values"], data["info_maps"])
             indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
-            original_units = indexed_data[min(indexed_data.keys())][1]["units"]
             last_day_of_original_data = max(indexed_data.keys())
             last_value = fill_value
             for day in range(first_day, last_day_of_original_data + 1):
                 if day in indexed_data.keys():
-                    last_value = indexed_data[day]
-                    padded_variable_data["values"].append(last_value[0])
-                    padded_variable_data["info_maps"].append(last_value[1])
+                    last_value = indexed_data[day] if fill_gap_values else fill_value
+                    padded_variable_data["values"].append(indexed_data[day][0])
+                    padded_variable_data["info_maps"].append(indexed_data[day][1])
                     padded_variable_data["info_maps"][-1]["simulation_day"] = day
                 elif last_value is fill_value:
                     padded_variable_data["values"].append(last_value)
