@@ -812,7 +812,7 @@ def test_slurry_storage_daily_update_helper(
 
     mock_pen = mocker.MagicMock()
     mock_pen.num_animals = num_animals = 100
-    mock_pen.barn_area_from_pen_type = 1000.0
+    mock_pen.exposed_manure_surface_area_from_pen_type = 1000.0
     slurry_storage._current_pen = mock_pen
 
     initial_manure_treatment_daily_output = ManureTreatmentDailyOutput()
