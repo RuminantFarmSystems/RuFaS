@@ -133,6 +133,7 @@ class OutputManager(object):
                 "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
+            self.time = None
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -141,7 +142,6 @@ class OutputManager(object):
                     "function": "__init__",
                 },
             )
-            self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
 
     def _pool_element_factory(self) -> pool_element_type:
@@ -157,6 +157,7 @@ class OutputManager(object):
         value: Any,
         info_map: Dict[str, Any],
         first_info_map_only: bool = False,
+        record_simulation_day: bool = False,
     ) -> None:
         """
         Adds value and info map at key in the given pool.
@@ -174,6 +175,9 @@ class OutputManager(object):
         first_info_map_only : bool, default False
             If true, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
+        record_simulation_day : bool, default False
+            If true, attempts to record the simulation day in the info map using the Time instance held by the Output
+            Manager.
 
         """
 
@@ -185,6 +189,11 @@ class OutputManager(object):
             discard_info_map = False
 
         if not self._exclude_info_maps_flag and not discard_info_map:
+            attempt_add_sim_day = (
+                "simulation_day" not in info_map.keys() and self.time is not None and record_simulation_day
+            )
+            if attempt_add_sim_day:
+                info_map["simulation_day"] = self.time.simulation_day  # type: ignore[attr-defined]
             reduced_info_map = {k: v for k, v in info_map.items() if k not in ["class", "function"]}
             pool[key]["info_maps"].append(reduced_info_map)
 
@@ -193,7 +202,14 @@ class OutputManager(object):
         else:
             pool[key]["values"].append(deepcopy(value))
 
-    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any], first_info_map_only: bool = False) -> None:
+    def add_variable(
+        self,
+        name: str,
+        value: Any,
+        info_map: Dict[str, Any],
+        first_info_map_only: bool = False,
+        record_simulation_day: bool = True,
+    ) -> None:
         """
         Adds a variable to the pool.
 
@@ -219,6 +235,9 @@ class OutputManager(object):
         first_info_map_only : bool, default False
             If true, records only the first info map passed for that variable. If false, records all info maps passed
             for that variable.
+        record_simulation_day : bool, default True
+            If true, attempts to record the simulation day in the info map using the Time instance held by the Output
+            Manager.
 
         """
         units = info_map.get("units")
@@ -227,7 +246,9 @@ class OutputManager(object):
         units = self._stringify_units(units)
 
         key = self._generate_key(name, info_map)
-        self._add_to_pool(self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only)
+        self._add_to_pool(
+            self.variables_pool, key, value, {**info_map, "units": units}, first_info_map_only, record_simulation_day
+        )
 
         if isinstance(value, dict):
             for k, v in value.items():
