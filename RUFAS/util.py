@@ -92,7 +92,8 @@ class Utility:
         fill_end_values: bool = False,
     ) -> dict[str, dict[str, list[Any]]]:
         """
-        Pads data based on the simulation day(s) it was recorded on, relative to when other data was recorded.
+        Pads data based on the simulation day(s) it was recorded on, relative to when other data was recorded, so that
+        values are present for all days in a certain range.
 
         Parameters
         ----------
