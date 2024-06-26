@@ -280,7 +280,8 @@ def test_report_ration_interval_data(animal_manager_fixture: AnimalManager, mock
         return_value="ration_supply_report",
     )
 
-    AnimalModuleReporter.report_ration_interval_data(animal_manager_fixture.all_pens, feed, 1)
+    for pen in animal_manager_fixture.all_pens:
+        AnimalModuleReporter.report_ration_interval_data(pen, feed, 1)
 
     for i in range(1, 2):
         assert om.variables_pool[
