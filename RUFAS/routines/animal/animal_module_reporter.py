@@ -2,6 +2,7 @@ from typing import Dict, List, Any, Sequence
 import numpy as np
 import sys
 
+from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants
@@ -12,8 +13,8 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...data_structures.animal_manure_excretions import AnimalManureExcretions
+from ...enums import AnimalCombination
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed import Feed
 
@@ -460,9 +461,9 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
+            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,
             "total_solids": MeasurementUnits.KILOGRAMS,
             "degradable_volatile_solids": MeasurementUnits.KILOGRAMS,
@@ -507,7 +508,7 @@ class AnimalModuleReporter:
         manure_value_units = {
             "urea": MeasurementUnits.GRAMS_PER_LITER,
             "urine": MeasurementUnits.KILOGRAMS,
-            "total_ammoniacal_nitrogen_concentration": MeasurementUnits.GRAMS_PER_LITER,
+            "manure_total_ammoniacal_nitrogen": MeasurementUnits.KILOGRAMS,
             "urine_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_nitrogen": MeasurementUnits.KILOGRAMS,
             "manure_mass": MeasurementUnits.KILOGRAMS,
@@ -961,41 +962,206 @@ class AnimalModuleReporter:
                 AnimalModuleReporter.report_milk(pen, animal_manager.simulation_day)
 
     @classmethod
-    def report_end_of_simulation(cls, life_cycle_manager: LifeCycleManager, total_days: int) -> None:
+    def report_end_of_simulation(
+        cls, life_cycle_manager: LifeCycleManager, time: Time, heiferIIs: List[HeiferII], cows: List[Cow]
+    ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of AnimalManager class.
-        total_days : int
-            The total number of days in the simulation
+        life_cycle_manager : LifeCycleManager
+            Instance of LifeCycleManager class.
+        time : Time
+            The Time object with the current time information.
+        heiferIIs : List[HeiferII]
+            The list of HeiferIIs.
+        cows : List[Cow]
+            The list of Cows
         """
         AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
         if life_cycle_manager.sold_calves_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 life_cycle_manager.sold_calves_info,
                 "sold_calves",
-                total_days,
+                time.simulation_day,
             )
         if life_cycle_manager.sold_heiferIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-                life_cycle_manager.sold_heiferIIs_info, "heiferII", total_days
+                life_cycle_manager.sold_heiferIIs_info, "heiferII", time.simulation_day
             )
         if life_cycle_manager.sold_heiferIIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-                life_cycle_manager.sold_heiferIIIs_info, "heiferIII", total_days
+                life_cycle_manager.sold_heiferIIIs_info, "heiferIII", time.simulation_day
             )
         if life_cycle_manager.sold_and_died_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 life_cycle_manager.sold_and_died_cows_info,
                 "sold_and_died_cows",
-                total_days,
+                time.simulation_day,
             )
         if life_cycle_manager.sold_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
                 life_cycle_manager.sold_cows_info,
                 "sold_cows",
-                total_days,
+                time.simulation_day,
             )
+        AnimalModuleReporter._record_animal_events(cows, time.simulation_day)
+        AnimalModuleReporter._record_animal_events(heiferIIs, time.simulation_day)
+        AnimalModuleReporter._record_heiferIIs_conception_rate()
+        AnimalModuleReporter._record_cows_conception_rate()
+
+    @classmethod
+    def _record_animal_events(
+        cls, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow], simulation_day: int
+    ) -> None:
+        """
+        Record the events of the animals.
+
+        Parameters
+        ----------
+        animals : list[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            A list of animals.
+        simulation_day : int
+            The current simulation day.
+
+        Returns
+        -------
+        None
+        """
+
+        info_map = {
+            "class": AnimalModuleReporter.__class__.__name__,
+            "function": AnimalModuleReporter._record_animal_events.__name__,
+        }
+        for animal in animals:
+            om.add_variable(
+                f"{animal.__class__.__name__}_{animal.id}_day_{simulation_day}",
+                animal.events,
+                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+            )
+
+    @classmethod
+    def _record_heiferIIs_conception_rate(cls) -> None:
+        """
+        Record the conception rate of heiferIIs.
+        """
+
+        info_map = {
+            "class": AnimalModuleReporter.__class__.__name__,
+            "function": AnimalModuleReporter._record_heiferIIs_conception_rate.__name__,
+        }
+        om.add_variable(
+            "heiferII_total_num_ai_performed",
+            HeiferII.stats["num_ai_performed"],
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
+        )
+        om.add_variable(
+            "heiferII_total_num_successful_conceptions",
+            HeiferII.stats["num_successful_conceptions"],
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        heiferII_overall_conception_rate = (
+            (HeiferII.stats["num_successful_conceptions"] / HeiferII.stats["num_ai_performed"])
+            if HeiferII.stats["num_ai_performed"] > 0
+            else 0
+        )
+        om.add_variable(
+            "heiferII_overall_conception_rate",
+            heiferII_overall_conception_rate,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
+        )
+
+        om.add_variable(
+            "heiferII_num_ai_performed_in_ED",
+            HeiferII.stats["num_ai_performed_in_ED"],
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions_in_ED",
+            HeiferII.stats["num_successful_conceptions_in_ED"],
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        ed_conception_rate = (
+            (HeiferII.stats["num_successful_conceptions_in_ED"] / HeiferII.stats["num_ai_performed_in_ED"])
+            if HeiferII.stats["num_ai_performed_in_ED"] > 0
+            else 0
+        )
+        om.add_variable(
+            "heiferII_ED_conception_rate",
+            ed_conception_rate,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
+        )
+
+        om.add_variable(
+            "heiferII_num_ai_performed_in_TAI",
+            HeiferII.stats["num_ai_performed_in_TAI"],
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions_in_TAI",
+            HeiferII.stats["num_successful_conceptions_in_TAI"],
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        tai_conception_rate = (
+            (HeiferII.stats["num_successful_conceptions_in_TAI"] / HeiferII.stats["num_ai_performed_in_TAI"])
+            if HeiferII.stats["num_ai_performed_in_TAI"] > 0
+            else 0
+        )
+        om.add_variable(
+            "heiferII_TAI_conception_rate",
+            tai_conception_rate,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
+        )
+
+        om.add_variable(
+            "heiferII_num_ai_performed_in_SynchED",
+            HeiferII.stats["num_ai_performed_in_SynchED"],
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
+        )
+        om.add_variable(
+            "heiferII_num_successful_conceptions_in_SynchED",
+            HeiferII.stats["num_successful_conceptions_in_SynchED"],
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        synch_ed_conception_rate = (
+            (HeiferII.stats["num_successful_conceptions_in_SynchED"] / HeiferII.stats["num_ai_performed_in_SynchED"])
+            if HeiferII.stats["num_ai_performed_in_SynchED"] > 0
+            else 0
+        )
+        om.add_variable(
+            "heiferII_SynchED_conception_rate",
+            synch_ed_conception_rate,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
+        )
+
+    @classmethod
+    def _record_cows_conception_rate(cls) -> None:
+        """
+        Record the conception rate of cows.
+        """
+
+        info_map = {
+            "class": AnimalModuleReporter.__class__.__name__,
+            "function": AnimalModuleReporter._record_cows_conception_rate.__name__,
+        }
+        om.add_variable(
+            "cow_total_num_ai_performed",
+            Cow.stats["num_ai_performed"],
+            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
+        )
+        om.add_variable(
+            "cow_total_num_successful_conceptions",
+            Cow.stats["num_successful_conceptions"],
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
+        )
+        cow_overall_conception_rate = (
+            (Cow.stats["num_successful_conceptions"] / Cow.stats["num_ai_performed"])
+            if Cow.stats["num_ai_performed"] > 0
+            else 0
+        )
+        om.add_variable(
+            "cow_overall_conception_rate",
+            cow_overall_conception_rate,
+            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
+        )

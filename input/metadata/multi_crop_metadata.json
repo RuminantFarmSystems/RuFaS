@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/no_animal.json",
+      "path": "input/data/animal/default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },

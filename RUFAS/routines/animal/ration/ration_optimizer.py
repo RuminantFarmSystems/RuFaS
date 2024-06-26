@@ -11,7 +11,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
 
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ....enums import AnimalCombination
 
 import numpy.typing as npt
 from RUFAS.output_manager import OutputManager
