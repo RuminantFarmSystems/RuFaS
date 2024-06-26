@@ -67,9 +67,12 @@ class Weather:
             date_key = time.convert_simulation_day_to_date(jday)
             if time.start_date <= date_key <= time.end_date:
                 conditions = CurrentDayConditions(
-                    incoming_light=weather_file["Hday"][i], min_air_temperature=weather_file["low"][i],
-                    mean_air_temperature=weather_file["avg"][i], max_air_temperature=weather_file["high"][i],
-                    precipitation=weather_file["precip"][i], irrigation=weather_file["irrigation"][i]
+                    incoming_light=weather_file["Hday"][i],
+                    min_air_temperature=weather_file["low"][i],
+                    mean_air_temperature=weather_file["avg"][i],
+                    max_air_temperature=weather_file["high"][i],
+                    precipitation=weather_file["precip"][i],
+                    irrigation=weather_file["irrigation"][i],
                 )
                 self.weather_data[date_key] = conditions
             self.check_adequate_weather_data()
