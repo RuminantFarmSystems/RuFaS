@@ -1,6 +1,6 @@
+import math
 from typing import Dict, List
 
-import math
 import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
@@ -158,13 +158,17 @@ class AnimalRequirements:
         stats_args = [default_percentile] if calc_method == "percentile" else []
 
         for attribute_name, arg in attr_names_to_args_map.items():
-            setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
+            setattr(
+                self,
+                attribute_name,
+                calc_method_to_function_map[calc_method](arg, *stats_args),
+            )
 
     def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
-        populates the corresponding class variables.
+        populates the corresponding class variables.s
 
         Parameters
         ----------
@@ -193,9 +197,13 @@ class AnimalRequirements:
             "CP_milk": [0],
         }
         if recalc:
-            requirements_lists = self.recalculate_requirements(pen, animal_grouping_scenario, requirements_lists)
+            requirements_lists = self.recalculate_requirements(
+                pen, animal_grouping_scenario, requirements_lists
+            )
         else:
-            requirements_lists = self.use_existing_requirements(pen, animal_grouping_scenario, requirements_lists)
+            requirements_lists = self.use_existing_requirements(
+                pen, animal_grouping_scenario, requirements_lists
+            )
 
         self.calc_pen_requirements(
             requirements_lists["NEmaint_requirement"],
@@ -230,9 +238,16 @@ class AnimalRequirements:
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
 
-        pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
+        pen.set_milk_avgs(
+            self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction
+        )
 
-    def recalculate_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def recalculate_requirements(
+        self,
+        pen,
+        animal_grouping_scenario,
+        requirements_lists: Dict[str, List[int]],
+    ):
         """
         Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -310,17 +325,23 @@ class AnimalRequirements:
                 animal.DNED_requirement = (
                     req["NEmaint_requirement"] + req["NEl_requirement"]
                 ) / animal.DMIest_requirement
-                animal.DMDP_requirement = (req["MP_requirement"]) / animal.DMIest_requirement
+                animal.DMDP_requirement = (
+                    (req["MP_requirement"]) / animal.DMIest_requirement
+                )
 
                 # calculating the activity requirement for energy
-                animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor)
+                animal.calc_daily_walking_dist(
+                    pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor
+                )
                 NEa_val = self.energy_activity_rqmts(
                     animal.body_weight,
                     pen.housing_type,
                     (math.sqrt(animal.DVD**2 + animal.DHD**2)),
                 )
                 requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
-                requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
+                requirements_lists["milk_production_reduction"].append(
+                    animal.milk_production_reduction
+                )
                 requirements_lists["CP_milk"].append(animal.CP_milk)
             else:
                 NEa_val = 0
@@ -337,7 +358,12 @@ class AnimalRequirements:
             requirements_lists["BW"].append(animal.body_weight)
         return requirements_lists
 
-    def use_existing_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def use_existing_requirements(
+        self,
+        pen,
+        animal_grouping_scenario,
+        requirements_lists: Dict[str, List[int]],
+    ):
         """
         Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -364,14 +390,18 @@ class AnimalRequirements:
             animal = pen.animals_in_pen[animal_id]
             animal_type = animal_grouping_scenario.get_animal_type(animal)
             if animal_type in [AnimalType.LAC_COW]:
-                animal.calc_daily_walking_dist(pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor)
+                animal.calc_daily_walking_dist(
+                    pen.vertical_dist_to_parlor, pen.horizontal_dist_to_parlor
+                )
                 NEa_val = self.energy_activity_rqmts(
                     animal.body_weight,
                     pen.housing_type,
                     (math.sqrt(animal.DVD**2 + animal.DHD**2)),
                 )
                 requirements_lists["milk"].append(animal.estimated_daily_milk_produced)
-                requirements_lists["milk_production_reduction"].append(animal.milk_production_reduction)
+                requirements_lists["milk_production_reduction"].append(
+                    animal.milk_production_reduction
+                )
                 requirements_lists["CP_milk"].append(animal.CP_milk)
             else:
                 NEa_val = 0
@@ -493,7 +523,9 @@ class AnimalRequirements:
                 calving_interval,
                 average_daily_gain_heifer,
             )
-            net_energy_pregnancy = self.calculate_NRC_energy_pregnancy_requirements(day_of_pregnancy, calf_birth_weight)
+            net_energy_pregnancy = self.calculate_NRC_energy_pregnancy_requirements(
+                day_of_pregnancy, calf_birth_weight
+            )
             net_energy_lactation = self.calculate_NRC_energy_lactation_requirements(
                 animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
             )
@@ -582,15 +614,17 @@ class AnimalRequirements:
                 gravid_uterine_weight,
                 uterine_weight,
             )
-            metabolizable_protein_requirement = self.calculate_NASEM_protein_requirements(
-                lactating,
-                body_weight,
-                frame_weight_gain,
-                gravid_uterine_weight_gain,
-                dry_matter_intake_estimate,
-                milk_true_protein,
-                milk_production,
-                NDF_conc,
+            metabolizable_protein_requirement = (
+                self.calculate_NASEM_protein_requirements(
+                    lactating,
+                    body_weight,
+                    frame_weight_gain,
+                    gravid_uterine_weight_gain,
+                    dry_matter_intake_estimate,
+                    milk_true_protein,
+                    milk_production,
+                    NDF_conc,
+                )
             )
             calcium_requirement = self.calculate_NASEM_calcium_requirements(
                 body_weight,
@@ -691,7 +725,9 @@ class AnimalRequirements:
         calf_birth_weight = mature_body_weight * 0.06275 if day_of_pregnancy else 0.0
         conceptus_weight = 0.0
         if day_of_pregnancy and day_of_pregnancy > 190:
-            conceptus_weight = (18 + (day_of_pregnancy - 190) * 0.665) * (calf_birth_weight / 45)
+            conceptus_weight = (18 + (day_of_pregnancy - 190) * 0.665) * (
+                calf_birth_weight / 45
+            )
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
             net_energy_maintenance = 0.08 * (body_weight - conceptus_weight) ** 0.75
         elif animal_type in [
@@ -765,8 +801,12 @@ class AnimalRequirements:
             )
             if days_in_milk is None:
                 days_in_milk = 0
-            uterine_weight = ((calf_birth_weight * 0.2288 - 0.204) * math.exp(-0.2 * days_in_milk)) + 0.204
-            net_energy_maintenance = 0.10 * (body_weight - gravid_uterine_weight - uterine_weight) ** 0.75
+            uterine_weight = (
+                (calf_birth_weight * 0.2288 - 0.204) * math.exp(-0.2 * days_in_milk)
+            ) + 0.204
+            net_energy_maintenance = (
+                0.10 * (body_weight - gravid_uterine_weight - uterine_weight) ** 0.75
+            )
         return net_energy_maintenance, gravid_uterine_weight, uterine_weight
 
     def calculate_NRC_energy_growth_requirements(
@@ -931,8 +971,16 @@ class AnimalRequirements:
         EBG = 0.85 * average_daily_gain
         if average_daily_gain == 0:
             average_daily_gain = 0.00001  # fix to avoid divide by 0 error
-        FatADG = (0.067 + 0.375 * (body_weight / mature_body_weight)) * EBG / average_daily_gain
-        ProtADG = (0.201 - 0.081 * (body_weight / mature_body_weight)) * EBG / average_daily_gain
+        FatADG = (
+            (0.067 + 0.375 * (body_weight / mature_body_weight))
+            * EBG
+            / average_daily_gain
+        )
+        ProtADG = (
+            (0.201 - 0.081 * (body_weight / mature_body_weight))
+            * EBG
+            / average_daily_gain
+        )
         frame_weight_gain = FatADG + ProtADG
         REFADG = (9.4 * FatADG + 5.55 * ProtADG) * average_daily_gain
         # MEFrameADG = REFADG / 0.4  # Possible future use for this calc, see docstring notes
@@ -976,7 +1024,9 @@ class AnimalRequirements:
         if day_of_pregnancy is None:
             MEpreg = 0.0
         elif day_of_pregnancy > 190:
-            MEpreg = (2 * 0.00159 * day_of_pregnancy - 0.0352) * (calf_birth_weight / (45 * 0.14))
+            MEpreg = (2 * 0.00159 * day_of_pregnancy - 0.0352) * (
+                calf_birth_weight / (45 * 0.14)
+            )
         else:
             MEpreg = 0.0
         # [A.Cow.A.16]-[A.Heifer.A.17]
@@ -1038,7 +1088,9 @@ class AnimalRequirements:
         elif day_of_pregnancy is None:
             gravid_uterine_weight_gain = 0.0
         else:
-            gravid_uterine_weight_gain = (0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_uterine_weight
+            gravid_uterine_weight_gain = (
+                0.0243 - (0.0000245 * day_of_pregnancy)
+            ) * gravid_uterine_weight
         net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
         return net_energy_pregnancy, gravid_uterine_weight_gain
 
@@ -1084,7 +1136,11 @@ class AnimalRequirements:
         if animal_type in [AnimalType.LAC_COW]:
             # [A.Cow.A.17]
             # Milk energy (Mcal/kg of milk production)
-            milk_energy_Mcal_per_kg = 0.0929 * milk_fat + (0.0547 / 0.93) * milk_true_protein + 0.0395 * milk_lactose
+            milk_energy_Mcal_per_kg = (
+                0.0929 * milk_fat
+                + (0.0547 / 0.93) * milk_true_protein
+                + 0.0395 * milk_lactose
+            )
             # [A.Cow.A.18]
             # Net energy requirement for lactation (Mcal)
             net_energy_lactation = milk_energy_Mcal_per_kg * milk_production
@@ -1134,7 +1190,11 @@ class AnimalRequirements:
 
         """
         if animal_type in [AnimalType.LAC_COW]:
-            milk_energy_Mcal_per_kg = 0.0929 * milk_fat + (0.0547 / 0.93) * milk_true_protein + 0.0395 * milk_lactose
+            milk_energy_Mcal_per_kg = (
+                0.0929 * milk_fat
+                + (0.0547 / 0.93) * milk_true_protein
+                + 0.0395 * milk_lactose
+            )
             net_energy_lactation = milk_energy_Mcal_per_kg * milk_production
         else:
             net_energy_lactation = 0.0
@@ -1217,7 +1277,9 @@ class AnimalRequirements:
         # [A.Cow.B.1]-[A.Heifer.B.1]
         # Metabolizable protein requirement for maintenance (g)
 
-        MP_bactria_estimate = dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * TDN_conc * 0.13
+        MP_bactria_estimate = (
+            dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * TDN_conc * 0.13
+        )
 
         MPm = (
             0.3 * (body_weight - conceptus_weight) ** 0.6
@@ -1235,7 +1297,9 @@ class AnimalRequirements:
         if average_daily_gain == 0:
             NPg = 0.0
         else:
-            NPg = average_daily_gain * (268 - 29.4 * (net_energy_growth / average_daily_gain))
+            NPg = average_daily_gain * (
+                268 - 29.4 * (net_energy_growth / average_daily_gain)
+            )
         # [A.Cow.B.3]-[A.Heifer.B.3]
         # Efficiency of converting metabolizable protein to net protein
         if equivalent_shrunk_body_weight <= 478:
@@ -1252,14 +1316,20 @@ class AnimalRequirements:
         if day_of_pregnancy is None:
             MPpreg = 0.0
         elif day_of_pregnancy > 190:
-            MPpreg = (0.69 * day_of_pregnancy - 69.2) * (calf_birth_weight / (45 * 0.33))
+            MPpreg = (0.69 * day_of_pregnancy - 69.2) * (
+                calf_birth_weight / (45 * 0.33)
+            )
         else:
             MPpreg = 0.0
         # Lactation Requirement
         # ---------------------
         if animal_type in [AnimalType.LAC_COW]:
             # [A.Cow.B.6]
-            MPlact = milk_production * (milk_true_protein / 100) * (GeneralConstants.KG_TO_GRAMS / 0.67)
+            MPlact = (
+                milk_production
+                * (milk_true_protein / 100)
+                * (GeneralConstants.KG_TO_GRAMS / 0.67)
+            )
         # Total Protein Requirement  (g)
         # ---------------------
         if animal_type in [AnimalType.LAC_COW]:
@@ -1341,20 +1411,29 @@ class AnimalRequirements:
             National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
         """
         NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
-        NPEndUrin: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        NPEndUrin: float = (
+            53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        )
         CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
         NPMFP: float = CPMFP * 0.73
         NPGrowth: float = frame_weight_gain * 0.11 * 0.86
         NPGest: float = gravid_uterine_weight_gain * 125
-        NPMilk: float = (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
+        NPMilk: float = (
+            (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
+        )
         TargetEffMP: float = 0.69
         if lactating:
             metabolizable_protein_requirement: float = (
-                ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP) + (NPGest / 0.33) + NPEndUrin
+                ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP)
+                + (NPGest / 0.33)
+                + NPEndUrin
             )
         else:
             metabolizable_protein_requirement = (
-                (NPscurf + NPMFP) / TargetEffMP + (NPGest / 0.33) + (NPGrowth / 0.40) + NPEndUrin
+                (NPscurf + NPMFP) / TargetEffMP
+                + (NPGest / 0.33)
+                + (NPGrowth / 0.40)
+                + NPEndUrin
             )
         return metabolizable_protein_requirement
 
@@ -1420,7 +1499,12 @@ class AnimalRequirements:
             Ca_maint = 0.0154 * body_weight + 0.08 * (body_weight / 100)
         # [A.Cow.C.2]-[A.Heifer.C.2]
         # Calcium growth requirement (g)
-        Ca_growth = 9.83 * mature_body_weight**0.22 * body_weight ** (-0.22) * (average_daily_gain / 0.96)
+        Ca_growth = (
+            9.83
+            * mature_body_weight**0.22
+            * body_weight ** (-0.22)
+            * (average_daily_gain / 0.96)
+        )
         # [A.Cow.C.3]-[A.Heifer.C.3]
         # Calcium pregnancy requirement (g)
         if day_of_pregnancy is None:
@@ -1428,7 +1512,9 @@ class AnimalRequirements:
         elif day_of_pregnancy > 190:
             Ca_preg = 0.02456 * math.exp(
                 (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
-            ) - 0.02456 * math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+            ) - 0.02456 * math.exp(
+                (0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
+            )
         else:
             Ca_preg = 0.0
         if animal_type in [AnimalType.LAC_COW]:
@@ -1500,7 +1586,9 @@ class AnimalRequirements:
         """
         Ca_Maint: float = 0.90 * dry_matter_intake_estimate
         if parity <= 2:
-            Ca_Growth: float = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
+            Ca_Growth: float = (
+                (9.83 * mature_body_weight**-0.22) * body_weight**-0.22
+            ) * average_daily_gain
         else:
             Ca_Growth = 0.0
         if day_of_pregnancy is None:
@@ -1508,9 +1596,9 @@ class AnimalRequirements:
         else:
             Ca_Preg = 0.02456 * math.exp(
                 (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
-            ) - 0.02456 * math.exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)) * (
-                body_weight / 715
-            )
+            ) - 0.02456 * math.exp(
+                (0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
+            ) * (body_weight / 715)
         Ca_Lact: float = (0.295 + 0.239 * milk_true_protein) * milk_production
         calcium_requirement: float = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
@@ -1556,15 +1644,17 @@ class AnimalRequirements:
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
         """
-        P_growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (
-            average_daily_gain / 0.96
-        )
+        P_growth: float = (
+            1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)
+        ) * (average_daily_gain / 0.96)
         if day_of_pregnancy is None:
             P_preg: float = 0.0
         elif day_of_pregnancy > 190:
             P_preg = 0.02743 * math.exp(
                 (0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy
-            ) - 0.02743 * math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+            ) - 0.02743 * math.exp(
+                (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
+            )
         else:
             P_preg = 0.0
         if animal_type in [AnimalType.LAC_COW]:
@@ -1646,7 +1736,9 @@ class AnimalRequirements:
         else:
             P_Maint = 0.0
         if parity <= 2:
-            P_Growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
+            P_Growth: float = (
+                1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22
+            ) * average_daily_gain
         else:
             P_Growth = 0.0
         if day_of_pregnancy is None or day_of_pregnancy < 190:
@@ -1654,8 +1746,15 @@ class AnimalRequirements:
         else:
             P_Preg = (
                 (
-                    0.02743 * math.exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy)
-                    - 0.02743 * math.exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+                    0.02743
+                    * math.exp(
+                        (0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy
+                    )
+                    - 0.02743
+                    * math.exp(
+                        (0.05527 - 0.000075 * (day_of_pregnancy - 1))
+                        * (day_of_pregnancy - 1)
+                    )
                 )
                 * body_weight
                 / 715
@@ -1724,19 +1823,25 @@ class AnimalRequirements:
             DivFact = net_energy_diet_concentration
 
         if animal_type in [AnimalType.LAC_COW]:
-            fat_corrected_milk_kg = (0.4 * milk_production) + (15 * milk_fat * (milk_production / 100))
-            dry_matter_intake_estimate: float = (0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75) * (
-                1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67))
+            fat_corrected_milk_kg = (0.4 * milk_production) + (
+                15 * milk_fat * (milk_production / 100)
             )
+            dry_matter_intake_estimate: float = (
+                0.372 * fat_corrected_milk_kg + 0.0968 * body_weight**0.75
+            ) * (1 - math.exp(-0.192 * ((days_in_milk / 7) + 3.67)))
         elif animal_type in [AnimalType.DRY_COW]:
-            dry_matter_intake_estimate = ((1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100) * body_weight
+            dry_matter_intake_estimate = (
+                (1.97 - 0.75 * math.exp(0.16 * (day_of_pregnancy - 280))) / 100
+            ) * body_weight
         else:
             if days_born and days_born > 365:
                 value_to_use = 0.1128
             else:
                 value_to_use = 0.0869
             dry_matter_intake_estimate = (
-                body_weight**0.75 * (0.2435 * DivFact - 0.0466 * DivFact**2 - value_to_use) / DivFact
+                body_weight**0.75
+                * (0.2435 * DivFact - 0.0466 * DivFact**2 - value_to_use)
+                / DivFact
             )
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)
@@ -1808,10 +1913,16 @@ class AnimalRequirements:
                 + 0.305 * net_energy_lactation
                 + 0.022 * body_weight
                 + (-0.689 - 1.87 * parity_adjustment_factor) * body_condition_score_5
-            ) * (1 - (0.212 + parity_adjustment_factor * 0.136) * math.exp(-0.053 * days_in_milk))
+            ) * (
+                1
+                - (0.212 + parity_adjustment_factor * 0.136)
+                * math.exp(-0.053 * days_in_milk)
+            )
         else:
             dry_matter_intake_estimate = (
-                0.0226 * mature_body_weight * (1 - math.exp(-1.47 * (body_weight / mature_body_weight)))
+                0.0226
+                * mature_body_weight
+                * (1 - math.exp(-1.47 * (body_weight / mature_body_weight)))
             ) - (
                 0.082
                 * (
@@ -1829,7 +1940,9 @@ class AnimalRequirements:
             AnimalModuleConstants.MINIMUM_DMI,
         )
 
-    def energy_activity_rqmts(self, body_weight: float, housing: str, distance: float) -> float:
+    def energy_activity_rqmts(
+        self, body_weight: float, housing: str, distance: float
+    ) -> float:
         """
         Calculates the net energy for activity requirement portion of the energy
         requirements for animals. This is separate because it must be calculated after
@@ -1876,14 +1989,18 @@ class AnimalRequirements:
                 net_energy_activity1 = 0.0
             # [A.Cow.A.6]-[A.Heifer.A.7]
             # Total net energy for activity requirement (Mcal)
-            net_energy_activity: float = distance * 0.00045 * body_weight + net_energy_activity1
+            net_energy_activity: float = (
+                distance * 0.00045 * body_weight + net_energy_activity1
+            )
             return net_energy_activity
         elif nutrient_standard == "NASEM":
             if housing == "Barn":
                 net_energy_activity = distance * 0.00035 * body_weight
             elif housing == "Grazing":
                 nonpasturekgDMI: float = 1.0
-                net_energy_activity = distance * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
+                net_energy_activity = (
+                    distance * body_weight * 0.75 * (600 - 12 * nonpasturekgDMI) / 600
+                )
             else:
                 net_energy_activity = 0.0
             return net_energy_activity
