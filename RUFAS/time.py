@@ -7,7 +7,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -16,7 +15,8 @@ class Time:
         """
         This object is responsible for creating and tracking time in the simulation.
         """
-        self.config_data: Dict[str, str | int | bool] = im.get_data("config")
+        self.im = InputManager()
+        self.config_data: Dict[str, str | int | bool] = self.im.get_data("config")
         self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], "%Y:%j")
         self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], "%Y:%j")
 
