@@ -315,7 +315,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_pen.id = pen_id = 1
     mock_pen.num_animals = num_animals = 100
     mock_pen.num_lactating_cows = 100
-    mock_pen.barn_area_from_pen_type = barn_area_from_pen_type = 101.0
+    mock_pen.exposed_manure_surface_area_from_pen_type = exposed_manure_surface_area_from_pen_type = 101.0
     mock_pen.manure = mock_manure
     mock_pen.pen_type = "freestall"
 
@@ -370,17 +370,17 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     # Assert
     patch_for_calc_housing_ammonia_emission.assert_called_once_with(
         num_animals=num_animals,
-        barn_area=barn_area_from_pen_type,
+        barn_area=exposed_manure_surface_area_from_pen_type,
         urine_total_ammoniacal_nitrogen=TAN,
         urine=urine,
         temp=current_day_avg_tempC,
     )
     patch_for_calc_housing_methane_emission.assert_called_once_with(
-        barn_area=barn_area_from_pen_type,
+        barn_area=exposed_manure_surface_area_from_pen_type,
         barn_temp=current_day_avg_tempC,
     )
     patch_for_calc_housing_carbon_dioxide_emission.assert_called_once_with(
-        barn_area=barn_area_from_pen_type,
+        barn_area=exposed_manure_surface_area_from_pen_type,
         barn_temp=current_day_avg_tempC,
     )
     assert manure_handler_daily_output.simulation_day == sim_day

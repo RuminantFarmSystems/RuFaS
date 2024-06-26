@@ -111,7 +111,7 @@ class Utility:
         Returns
         -------
         dict[str, dict[str, list[Any]]]
-            The padded data, so that gaps in the data are filled in with the last know value or None.
+            The padded data, so that gaps in the data are filled in with the last known value or None.
 
         Notes
         -----
