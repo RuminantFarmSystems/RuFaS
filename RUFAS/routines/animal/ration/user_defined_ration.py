@@ -1,6 +1,6 @@
 from typing import Dict
 
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from RUFAS.enums import AnimalCombination
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
