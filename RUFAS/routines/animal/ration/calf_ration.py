@@ -2,8 +2,6 @@
 import math
 from typing import Any, Dict
 
-from RUFAS.routines.animal.life_cycle.calf import Calf
-
 
 class CalfRationManager:
     """
