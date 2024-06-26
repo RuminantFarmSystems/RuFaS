@@ -1,10 +1,13 @@
-import pandas as pd
-import numpy as np
 import math
+from typing import List
+
+import numpy as np
+import numpy.typing as npt
+import pandas as pd
 from scipy.stats import percentileofscore
 
 
-def norm(x):
+def norm(x: List[int | float]) -> npt.NDArray[np.float64 | np.int64]:
     """
     Helper function to normalize a list of values and return that normalized
     list.
@@ -12,15 +15,15 @@ def norm(x):
     Args:
         x: A list of values
     """
-    x = np.array(x)
-    if max(x) != min(x):
-        normalized = (x - min(x)) / (max(x) - min(x))
+    x_array = np.array(x)
+    if max(x_array) != min(x_array):
+        normalized = (x_array - min(x_array)) / (max(x_array) - min(x_array))
         return normalized
     else:
-        return x
+        return x_array
 
 
-def percentile_list(original_list):
+def percentile_list(original_list: List[int | float]) -> List[int | float]:
     """
     Helper function that returns a list of percentiles corresponding
     to its matching value in the original list.
@@ -164,4 +167,5 @@ def grouping(cow_list, pens, stocking_density):
         key += 1
 
     # returning the dictionary of groupings
+    return grouping_data
     return grouping_data

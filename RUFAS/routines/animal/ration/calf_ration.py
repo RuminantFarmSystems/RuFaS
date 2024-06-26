@@ -1,6 +1,6 @@
 # from .hardcoded_ration import get_ration
 import math
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 class CalfRationManager:
@@ -41,7 +41,11 @@ class CalfRationManager:
 
     @classmethod
     def calc_requirements(
-        cls, calf, feed: Dict[str, float], temp: float, animal_intake: Dict
+        cls,
+        calf: Calf,
+        feed: Dict[str, float],
+        temp: float,
+        animal_intake: Dict[str, int | float],
     ) -> Dict[str, Dict[str, Any]]:
         """
         Calculate dietary intake and nutrient requirements for the calf.
@@ -181,12 +185,12 @@ class CalfRationManager:
     @classmethod
     def calc_intake(
         cls,
-        calf,
+        calf: Calf,
         feed: Dict[str, float],
         wean_day: int,
         wean_length: int,
         milk_type: str,
-    ) -> Dict:
+    ) -> Dict[str, float]:
         """
         Calculating calf intake values.
 
@@ -309,4 +313,5 @@ class CalfRationManager:
             "starter_proportion": starter_proportion,
         }
 
+        return animal_intake
         return animal_intake
