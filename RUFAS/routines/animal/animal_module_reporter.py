@@ -30,7 +30,7 @@ class AnimalModuleReporter:
         thing_to_add: Any,
         simulation_day: int,
         info_map: Dict[str, Any],
-        units: Dict[str, str] | str,
+        units: Dict[str, MeasurementUnits] | MeasurementUnits,
     ) -> None:
         """
         Pads a variable in OutputManager for entries that it "missed" relative to another variable.
@@ -181,26 +181,27 @@ class AnimalModuleReporter:
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
 
     @classmethod
-    def report_ration_interval_data(cls, pen_list: List[Pen], feed: Feed, simulation_day: int) -> None:
+    def report_ration_interval_data(cls, pen: Pen, feed: Feed, simulation_day: int) -> None:
         """
         For each pen, adds ration per animal and other supply reports, to output manager.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of class AnimalManager.
+        pen : Pen
+            Pen object.
         feed : Feed
             Instance of class Feed.
         simulation_day : int
             Day of simulation.
         """
 
-        for pen in pen_list:
+        if pen.is_populated:
             nutrient_amount = pen.ration_nutrient_amount
             nutrient_conc = pen.ration_nutrient_conc
             ration_per_animal = pen.ration_per_animal.copy()
-            del ration_per_animal["status"]
-            del ration_per_animal["objective"]
+            for non_numeric_key in ["status", "objective"]:
+                if non_numeric_key in ration_per_animal:
+                    del ration_per_animal[non_numeric_key]
             ration_per_animal["dry_matter_intake_total"] = sum(
                 [ration_per_animal[key] for key in ration_per_animal.keys()]
             )
@@ -211,7 +212,7 @@ class AnimalModuleReporter:
             info_map = {
                 "class": AnimalModuleReporter.__name__,
                 "function": AnimalModuleReporter.report_ration_interval_data.__name__,
-                "data_origin": [("AnimalManager", "_calc_ration_at_interval")],
+                "data_origin": [("AnimalManager", "_handle_pen_ration")],
                 "number_animals_in_pen": len(pen.animals_in_pen),
                 "simulation_day": simulation_day,
             }
@@ -315,9 +316,12 @@ class AnimalModuleReporter:
                     "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
                     "metabolizable_protein": MeasurementUnits.GRAMS,
                 }
-                ration_supply_report = RationReporter.report_ration_supply(
-                    pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
-                )
+                if pen.ration_per_animal:
+                    ration_supply_report = RationReporter.report_ration_supply(
+                        pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
+                    )
+                else:
+                    ration_supply_report = {}
                 AnimalModuleReporter.data_padder(
                     f"{classname}.{funcname}.ration_supply_report_for_pen_0_CALF",
                     f"{classname}.{funcname}.ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -351,8 +355,9 @@ class AnimalModuleReporter:
         }
         for pen in animal_manager.all_pens:
             ration_per_animal = pen.ration_per_animal.copy()
-            del ration_per_animal["status"]
-            del ration_per_animal["objective"]
+            for non_numeric_key in ["status", "objective"]:
+                if non_numeric_key in ration_per_animal:
+                    del ration_per_animal[non_numeric_key]
             ration_total = {}
             ration_total["dry_matter_intake_total"] = 0.0
             ration_total["byproducts_total"] = 0.0
