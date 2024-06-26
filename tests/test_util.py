@@ -313,7 +313,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
 
 
 @pytest.mark.parametrize(
-    "data_to_pad,fill_value,tail_pad,expected",
+    "data_to_pad,fill_value,gap_pad,end_pad,expected",
     [
         (
             {
@@ -335,6 +335,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             math.nan,
+            True,
             False,
             {
                 "a": {
@@ -363,6 +364,53 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
         ),
         (
             {
+                "a": {
+                    "values": ["a", "b", "c"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                    ],
+                },
+                "b": {
+                    "values": ["d", "e", "f"],
+                    "info_maps": [
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
+                },
+            },
+            math.nan,
+            False,
+            True,
+            {
+                "a": {
+                    "values": ["a", math.nan, math.nan, "b", "c", "c"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "kg"},
+                        {"simulation_day": 2, "units": "kg"},
+                        {"simulation_day": 3, "units": "kg"},
+                        {"simulation_day": 4, "units": "kg"},
+                        {"simulation_day": 5, "units": "kg"},
+                        {"simulation_day": 6, "units": "kg"},
+                    ],
+                },
+                "b": {
+                    "values": [math.nan, math.nan, "d", "e", math.nan, "f"],
+                    "info_maps": [
+                        {"simulation_day": 1, "units": "g"},
+                        {"simulation_day": 2, "units": "g"},
+                        {"simulation_day": 3, "units": "g"},
+                        {"simulation_day": 4, "units": "g"},
+                        {"simulation_day": 5, "units": "g"},
+                        {"simulation_day": 6, "units": "g"},
+                    ],
+                },
+            },
+        ),
+        (
+            {
                 "a": {"values": ["a"], "info_maps": [{"simulation_day": 2, "units": "pi"}]},
                 "b": {
                     "values": ["b", "c"],
@@ -370,6 +418,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             None,
+            False,
             True,
             {
                 "a": {
@@ -402,6 +451,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             8,
+            True,
             False,
             {
                 "a": {
@@ -426,10 +476,11 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             "fill",
+            False,
             True,
             {
                 "a": {
-                    "values": ["a", "a", "b"],
+                    "values": ["a", "fill", "b"],
                     "info_maps": [
                         {"simulation_day": 1, "units": "ha^2"},
                         {"simulation_day": 2, "units": "ha^2"},
@@ -437,7 +488,7 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                     ],
                 },
                 "b": {
-                    "values": ["c", "c", "d"],
+                    "values": ["c", "fill", "d"],
                     "info_maps": [
                         {"simulation_day": 1, "units": "l"},
                         {"simulation_day": 2, "units": "l"},
@@ -455,9 +506,10 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
             },
             math.pi,
             False,
+            False,
             {
                 "a": {
-                    "values": ["a", "a", "b"],
+                    "values": ["a", math.pi, "b"],
                     "info_maps": [
                         {"simulation_day": 1, "units": "GB"},
                         {"simulation_day": 2, "units": "GB"},
@@ -471,11 +523,14 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
 def test_pad_temporal_data(
     data_to_pad: dict[str, dict[str, list[Any]]],
     fill_value: Any,
-    tail_pad: bool,
+    gap_pad: bool,
+    end_pad: bool,
     expected: dict[str, dict[str, list[Any]]],
 ) -> None:
     """Tests the utility method pad_temporal_data."""
-    actual = Utility.pad_temporal_data(data_to_pad, fill_value=fill_value, pad_tail_values=tail_pad)
+    actual = Utility.pad_temporal_data(
+        data_to_pad, fill_value=fill_value, fill_gap_values=gap_pad, fill_end_values=end_pad
+    )
 
     assert actual == expected
 
