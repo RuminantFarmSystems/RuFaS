@@ -104,8 +104,8 @@ class Utility:
             Value that is used to pad the front of the data values, and optionally the values in between original values
             and after the last original value.
         fill_gap_values : bool, default False
-            If true, values between known data points are padded with the last known value from the data set. If false,
-            values between known data points are filled with `fill_value`.
+            If true, values between known data points are expanded with the last known value from the data set. If
+            false, values between known data points are filled with `fill_value`.
         fill_end_values : bool, default False
             If true, values after last known data point are padded with the last known value from the data set. If
             false, values after the last known data point are filled with `fill_value`.
@@ -113,7 +113,7 @@ class Utility:
         Returns
         -------
         dict[str, dict[str, list[Any]]]
-            The padded data, so that gaps in the data are filled in with the last known value or `fill_value`.
+            The filled data, so that gaps in the data are filled in with the last known value or `fill_value`.
 
         Raises
         ------
@@ -155,18 +155,16 @@ class Utility:
             zipped_data = zip(data["values"], data["info_maps"])
             indexed_data = {data[1]["simulation_day"]: data for data in zipped_data}
             last_day_of_original_data = max(indexed_data.keys())
-            last_value = fill_value
+            last_value = (fill_value, {"simulation_day": 0, "units": original_units})
             for day in range(first_day, last_day_of_original_data + 1):
                 if day in indexed_data.keys():
-                    last_value = indexed_data[day] if fill_gap_values else fill_value
+                    last_value = indexed_data[day] if fill_gap_values else (fill_value, indexed_data[day][1])
                     filled_variable_data["values"].append(indexed_data[day][0])
                     filled_variable_data["info_maps"].append(indexed_data[day][1])
                     filled_variable_data["info_maps"][-1]["simulation_day"] = day
-                elif last_value is fill_value:
-                    filled_variable_data["values"].append(last_value)
-                    filled_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
                 else:
                     filled_variable_data["values"].append(last_value[0])
+                    print(last_value[1])
                     filled_variable_data["info_maps"].append(last_value[1].copy())
                     filled_variable_data["info_maps"][-1]["simulation_day"] = day
 
