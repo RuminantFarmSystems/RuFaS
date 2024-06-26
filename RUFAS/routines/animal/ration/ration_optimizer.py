@@ -5,9 +5,9 @@ import numpy as np
 import numpy.typing as npt
 from scipy.optimize import OptimizeResult, minimize
 
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
@@ -37,8 +37,12 @@ class RationOptimizer:
         """initializes RationOptimizer object"""
 
         self.constraint_functions: List[Callable[[Any, Any], float]] = []
-        self.cow_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
-        self.heifer_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
+        self.cow_constraints: List[
+            Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str
+        ] = []
+        self.heifer_constraints: List[
+            Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str
+        ] = []
 
     def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
         # establishing the constraints of the NLP
@@ -59,10 +63,15 @@ class RationOptimizer:
             self.DMI_constraint_lower,
         ]
 
-        self.cow_constraints = [{"type": "ineq", "fun": func, "args": arguments} for func in self.constraint_functions]
+        self.cow_constraints = [
+            {"type": "ineq", "fun": func, "args": arguments}
+            for func in self.constraint_functions
+        ]
 
         self.heifer_constraints = [
-            cons for cons in self.cow_constraints if cons["fun"] not in [self.total_energy, self.NEl_constraint]
+            cons
+            for cons in self.cow_constraints
+            if cons["fun"] not in [self.total_energy, self.NEl_constraint]
         ]
 
     @staticmethod
@@ -91,7 +100,9 @@ class RationOptimizer:
         return tripled_list
 
     @staticmethod
-    def objective(decision_vector: npt.NDArray[np.float64], ration_config: RationConfig) -> float:
+    def objective(
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
+    ) -> float:
         """
         Sets up the objective function in the optimize function for the non-linear
         program. Whenever the paramert x is used, it refers to the "decision vetor

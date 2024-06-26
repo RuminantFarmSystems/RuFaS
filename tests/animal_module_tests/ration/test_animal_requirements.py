@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List
 
 import pytest
-from pytest import approx  # type:ignore[no-untyped-def]
+from pytest import approx
 
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 

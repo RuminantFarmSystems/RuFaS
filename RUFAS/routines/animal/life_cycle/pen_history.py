@@ -1,6 +1,3 @@
-from RUFAS.routines.animal.pen import Pen
-
-
 class PenHistory:
     """
     A class to represent the history of a pen on a farm.
