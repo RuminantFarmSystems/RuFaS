@@ -1003,9 +1003,12 @@ class OutputManager(object):
         )
 
         if filter_content.get("pad_data", False):
-            pad_tail_values = filter_content.get("pad_tail_values", False)
+            fill_gap_values = filter_content.get("fill_gap_values", False)
+            fill_end_values = filter_content.get("fill_end_values", False)
             try:
-                results = Utility.pad_temporal_data(results, pad_tail_values=pad_tail_values)
+                results = Utility.pad_temporal_data(
+                    results, fill_gap_values=fill_gap_values, fill_end_values=fill_end_values
+                )
             except (TypeError, ValueError) as e:
                 error_title = f"Error {e} raised when padding data"
                 error_msg = f"Unable to pad data for variables gathered for {filter_name=}."
