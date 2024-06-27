@@ -33,7 +33,12 @@ class EndToEndTester:
 
     def simulate(self) -> None:
         """Runs a limited RuFaS simulation."""
-        pass
+        while not self.time.current_date > self.time.end_date:
+            if self.time.simulation_day % 7 == 0:
+                self.feed_manager.process_degradations(self.weather, self.time)
+
+            self.time.record_time()
+            self.time.advance()
 
     def _setup_feed_storage(self) -> None:
         """Prepares the FeedManager to simulate stored feed degradations."""

@@ -232,7 +232,11 @@ class Storage:
         """
         Records the total mass and nutrient amounts held in storage.
         """
-        info_map = {"class": self.__class__.__name__, "function": self.record_stored_crops.__name__, "units": "kg"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.record_stored_crops.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
         om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
         total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
