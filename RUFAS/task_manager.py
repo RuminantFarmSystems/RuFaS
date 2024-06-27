@@ -322,6 +322,8 @@ class TaskManager:
         }
         task_id = args["task_id"]
         output_manager = OutputManager()
+        print(output_manager)
+
         pre_validation_handlers = {
             TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
             TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._compare_metadata_properties_tasks,
@@ -342,6 +344,7 @@ class TaskManager:
                 RUFAS_VERSION,
                 task_id,
             )
+            print("aaaaaaaaaaaaaaaaaaaaaa")
             input_manager = InputManager(metadata_depth_limit)
             task_type = args.get("task_type")
 
