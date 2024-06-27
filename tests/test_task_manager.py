@@ -5,14 +5,15 @@ from pytest_mock import MockerFixture
 from pathlib import Path
 
 from RUFAS.input_manager import InputManager
-from RUFAS.task_manager import TaskManager, TaskType
-from RUFAS.output_manager import LogVerbosity
+from RUFAS.task_manager import TaskManager, TaskType, RUFAS_VERSION
+from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
 def mock_output_manager() -> Generator[Any, Any, Any]:
     with patch("RUFAS.task_manager.OutputManager") as mock:
+        print(str(mock)+"fixure")
         yield mock
 
 
@@ -46,8 +47,8 @@ def test_invalid_task_type_from_string() -> None:
 
 
 def test_task_manager_init(
-    task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
+        task_manager: TaskManager,
+        mock_output_manager: Generator[Any, Any, Any],
 ) -> None:
     assert task_manager.output_manager is mock_output_manager
 
@@ -87,7 +88,7 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
 def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> None:
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(0, mock_output_manager)
-        mock_randint.assert_called_once_with(0, 2**32 - 1)
+        mock_randint.assert_called_once_with(0, 2 ** 32 - 1)
         mock_output_manager.add_log.assert_called_with(
             "Random seed used",
             "Seeded libaries with random_seed=4321",
@@ -97,12 +98,12 @@ def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> 
 
 @pytest.mark.parametrize("seed, expected", [(12345, 12345), (0, 4321)])
 def test_set_random_seed_with_parameters(
-    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
+        seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
 ) -> None:
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(seed, mock_output_manager)
         if seed == 0:
-            mock_randint.assert_called_once_with(0, 2**32 - 1)
+            mock_randint.assert_called_once_with(0, 2 ** 32 - 1)
         mock_output_manager.add_log.assert_called_with(
             "Random seed used",
             f"Seeded libaries with random_seed={expected}",
@@ -165,10 +166,10 @@ def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_handle_post_processing(
-    task_manager: TaskManager,
-    mock_output_manager: Generator[Any, Any, Any],
-    suppress_logs: bool,
-    mocker: MockerFixture,
+        task_manager: TaskManager,
+        mock_output_manager: Generator[Any, Any, Any],
+        suppress_logs: bool,
+        mocker: MockerFixture,
 ) -> None:
     args = {
         "filters_directory": Path("/fake/filters"),
@@ -198,7 +199,8 @@ def test_handle_post_processing(
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_input_data_audit(
-    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool, mocker: MockerFixture
+        mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool,
+        mocker: MockerFixture
 ) -> None:
     args = {
         "metadata_file_path": Path("/fake/metadata"),
@@ -224,3 +226,60 @@ def test_input_data_audit(
         mock_save_metadata_properties.assert_called_once()
     else:
         mock_save_metadata_properties.assert_not_called()
+
+
+@pytest.mark.parametrize("task_type,pre_validate", [[TaskType.INPUT_DATA_AUDIT, True],
+                                                    [TaskType.COMPARE_METADATA_PROPERTIES, True],
+                                                    [TaskType.COMPARE_METADATA_PROPERTIES, False],
+                                                    [TaskType.SIMULATION_SINGLE_RUN, False],
+                                                    [TaskType.POST_PROCESSING, False]])
+def test_task(
+        mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture,
+        task_type: TaskType, pre_validate: bool
+) -> None:
+
+    args = {
+        "task_type": task_type,
+        "log_verbosity": LogVerbosity.LOGS,
+        "exclude_info_maps": False,
+        "output_prefix": "test",
+        "logs_directory": Path("/fake/logs"),
+        "task_id": 1,
+        "random-seed": 924
+    }
+    #mock_run_startup = mocker.patch.object(OutputManager, "run_startup_sequence", return_value=None)
+    mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
+    pre_validation_handlers = {
+        TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
+        TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._compare_metadata_properties_tasks,
+    }
+    post_validation_handlers = {
+        TaskType.HERD_INITIALIZATION: TaskManager._herd_init_tasks,
+        TaskType.SIMULATION_SINGLE_RUN: TaskManager._simulation_engine_run_tasks,
+        TaskType.POST_PROCESSING: TaskManager._postprocessing_tasks,
+    }
+    produce_graphics = False
+    #mock_init = mocker.patch.object(task_manager.input_manager, "__init__", return_value=None)
+    # mock_call_handler = mocker.patch.object(task_manager, "call_handler", return_value=None)
+    # mock_handle_input_data_audit = mocker.patch.object(task_manager, "handle_input_data_audit",
+    #                                                    return_value=None)
+    # mock_set_random_seed = mocker.patch.object(task_manager, "set_random_seed", return_value=None)
+    #m1 = mocker.patch.object(mock_output_manager, "run_startup_sequence", return_value=None)
+    om = OutputManager()
+    print(str(om)+"test")
+    m1 = mocker.patch.object(om, "run_startup_sequence", return_value=None)
+    task_manager.task(args, produce_graphics, 10)
+    mock_im_init.assert_called_once_with(10)
+    m1.assert_called_once_with(
+        LogVerbosity(args["log_verbosity"]), args["exclude_info_maps"], Path(""), False, Path(""),
+        args["output_prefix"], RUFAS_VERSION, args["task_id"]
+    )
+
+    if pre_validate:
+        assert mock_call_handler.assert_called_with(pre_validation_handlers.get(task_type))
+
+    else:
+        assert mock_handle_input_data_audit.assert_called_with(args, mock_input_manager, mock_output_manager,
+                                                                       True)
+        assert mock_set_random_seed.assert_called_with(args["random_seed"], mock_output_manager)
+        assert mock_call_handler.assert_called_with(post_validation_handlers.get(task_type))
