@@ -688,7 +688,6 @@ def test_record_planting(
     expected_value: Dict,
 ) -> None:
     """Tests that crop plantings are correctly recorded to the OutputManager."""
-    om.time = None
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
         manure_supplier=MagicMock(ManureManager),
@@ -1379,7 +1378,6 @@ def test_record_fertilizer_application(
     field_size: float,
 ) -> None:
     """Tests that fertilizer applications are correctly recorded in the OutputManager."""
-    om.time = None
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
         manure_supplier=MagicMock(ManureManager),
@@ -1994,7 +1992,6 @@ def test_record_manure_application(
     potassium: float,
 ) -> None:
     """Tests that manure applications are recorded correctly."""
-    om.time = None
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
         manure_supplier=MagicMock(ManureManager),
@@ -2874,7 +2871,6 @@ def test_record_field_watering(
     expected_info_map: Dict,
     expected_value: Dict,
 ) -> None:
-    om.time = None
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
         manure_supplier=MagicMock(ManureManager),

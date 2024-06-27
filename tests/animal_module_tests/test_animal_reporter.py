@@ -132,7 +132,6 @@ def test_report_daily_animal_population(mocker: MockerFixture) -> None:
         cow.is_lactating = True
     animal_manager.cows[0].is_lactating = False
     om.variables_pool = {}
-    om.time = None
     AnimalModuleReporter.report_daily_animal_population(animal_manager)
 
     report_daily_animal_total = om.variables_pool["AnimalModuleReporter.report_daily_animal_population.num_animals"][
