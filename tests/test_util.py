@@ -29,8 +29,8 @@ def test_remove_items_from_list_by_indices() -> None:
     """Unit test for function remove_items_from_list_by_indices in file util.py"""
     # Given an empty list and an empty list of removal indices,
     # the function should do nothing.
-    arr = []
-    del_idx = []
+    arr: list[Any] = []
+    del_idx: list[int] = []
     Utility.remove_items_from_list_by_indices(arr, del_idx)
     assert len(arr) == 0
 
@@ -110,33 +110,33 @@ def test_percent_calculator() -> None:
         pc(1.0)
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_empty_list():
+def test_convert_list_of_dicts_to_dict_of_lists_empty_list() -> None:
     result = Utility.convert_list_of_dicts_to_dict_of_lists([])
     assert result == {}
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_single_dict():
+def test_convert_list_of_dicts_to_dict_of_lists_single_dict() -> None:
     input_data = [{"a": 1, "b": 2}]
     expected_result = {"a": [1], "b": [2]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts():
+def test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts() -> None:
     input_data = [{"a": 1, "b": 2}, {"a": 3, "c": 4}]
     expected_result = {"a": [1, 3], "b": [2], "c": [4]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_empty_values():
-    input_data = [{"a": 1, "b": 2}, {"a": None, "b": 3}]
+def test_convert_list_of_dicts_to_dict_of_lists_empty_values() -> None:
+    input_data: list[dict[str, Any]] = [{"a": 1, "b": 2}, {"a": None, "b": 3}]
     expected_result = {"a": [1, None], "b": [2, 3]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_empty_keys():
+def test_convert_list_of_dicts_to_dict_of_lists_empty_keys() -> None:
     input_data = [{"a": 1, "b": 2}, {"": 3, "b": 4}]
     expected_result = {"a": [1], "b": [2, 4], "": [3]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
