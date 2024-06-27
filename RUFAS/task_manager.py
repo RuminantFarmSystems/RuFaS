@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Tuple
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
+from RUFAS.end_to_end_tester import EndToEndTester
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
@@ -209,7 +210,6 @@ class TaskManager:
         task_type_to_expander_map = {
             TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
             TaskType.SENSITIVITY_ANALYSIS: self._expand_sensitivity_analysis_args,
-            TaskType.END_TO_END_TESTING: self._expand_end_to_end_testing_args,
         }
         for multi_run_arg in multi_run_args:
             task_type = multi_run_arg["task_type"]
@@ -414,6 +414,8 @@ class TaskManager:
         info_map = {"class": TaskManager.__name__, "function": TaskManager.handle_end_to_end_testing.__name__}
 
         output_manager.add_log("Starting end-to-end testing", "", info_map)
+        end_to_end_tester = EndToEndTester()
+        end_to_end_tester.run_end_to_end_testing()
         output_manager.add_log("Completed end-to-end testing", "", info_map)
 
     @staticmethod
