@@ -440,7 +440,10 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
+            report_data: Dict[str, List[Any]] = filtered_pool
+            if filter_content.get("display_units", True):
+                report_data = self._add_var_units(report_data)
+            report_data = {key: report_data[key]["values"] for key in report_data.keys()}
             if not all(report_data[key] for key in report_data.keys()):
                 raise ValueError
             self._add_constants_to_report_data(report_data, filter_content)
@@ -478,11 +481,34 @@ class ReportGenerator:
             has_multiple_columns = len(vertically_aggregated) > 1
 
             if has_dict_variables or has_multiple_columns:
-                aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
+                aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
             else:
                 aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
 
         return aggregate_report
+
+    @staticmethod
+    def _update_key(key: str) -> str:
+        """Updates dictionary keys to keep units at the end of the key.
+
+        Parameters
+        ----------
+        key : str
+            The key to be updated
+
+        Returns
+        -------
+        str
+            The updated key.
+        """
+        match = re.search(r"\(.*\)", key)
+        if match:
+            units = match.group(0)
+            base_key = key[:match.start()].strip()
+            updated_key = f"{base_key}_ver_agg {units}"
+        else:
+            updated_key = f"{key}_ver_agg"
+        return updated_key
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
@@ -714,3 +740,43 @@ class ReportGenerator:
 
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
+
+    def _add_var_units(
+        self,
+        report_data: dict[str, List[Any]]
+    ) -> dict[str, List[Any]]:
+        """Adds variable units to variable name for graphing.
+
+        Parameters
+        ----------
+        filtered_pool : dict[str, List[Any]]
+            The data to be graphed.
+
+        Returns
+        -------
+        dict[str, List[Any]]
+            The updated data with units added.
+        """
+        updated_data = {}
+        if not any("info_maps" in details for details in report_data.values()):
+            return report_data
+        for var_name, details in report_data.items():
+            unit_info = details["info_maps"][0]["units"]
+            if isinstance(unit_info, dict):
+                unit = unit_info.get(var_name, "not available")
+                # if unit == "not available":
+                #     logs.append(
+                #         {
+                #             "warning": "Missing unit information",
+                #             "message": f"Unit for '{var_name}' not found in units dictionary. "
+                #             "Using default 'not available'.",
+                #             "info_map": info_map,
+                #         }
+                #     )
+            else:
+                unit = unit_info
+
+            new_var_name = f"{var_name} ({unit})"
+            updated_data[new_var_name] = details
+
+        return updated_data
