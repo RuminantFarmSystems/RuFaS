@@ -8,6 +8,8 @@ from .baleage import Baleage
 from .grain import Grain, Dry, HighMoisture
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .silage import Silage, Bag, Bunker, Pile
+from ...time import Time
+from ...weather import Weather
 
 # Defines the compatilibty between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
@@ -98,12 +100,12 @@ class FeedManager:
 
         self.active_storages[storage_type].receive_crop(harvested_crop)
 
-    def process_degradations(self) -> None:
+    def process_degradations(self, weather: Weather, time: Time) -> None:
         """
         Processes the degradation of all stored feeds over time.
         """
         for _, storage in self.active_storages.items():
-            storage.process_degradations()
+            storage.process_degradations(weather, time)
 
     def give_feed(self, amount: float, crop_type: CropType) -> float:
         """
