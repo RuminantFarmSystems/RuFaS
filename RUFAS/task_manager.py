@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Tuple
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
+from RUFAS.end_to_end_tester import EndToEndTester
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
@@ -46,7 +47,7 @@ class TaskType(Enum):
 
     def is_multi_run(self) -> bool:
         """Checks if the task type involves multiple runs."""
-        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS, TaskType.END_TO_END_TESTING]
+        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS]
 
 
 class TaskManager:
@@ -209,7 +210,6 @@ class TaskManager:
         task_type_to_expander_map = {
             TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
             TaskType.SENSITIVITY_ANALYSIS: self._expand_sensitivity_analysis_args,
-            TaskType.END_TO_END_TESTING: self._expand_end_to_end_testing_args,
         }
         for multi_run_arg in multi_run_args:
             task_type = multi_run_arg["task_type"]
@@ -289,9 +289,9 @@ class TaskManager:
 
         return single_run_args
 
-    def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Placeholder for expanding end-to-end testing multi-run tasks."""
-        return []
+    # def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
+    #     """Placeholder for expanding end-to-end testing multi-run tasks."""
+    #     return []
 
     def _run_tasks(
         self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
@@ -361,6 +361,9 @@ class TaskManager:
                 TaskManager.handle_single_simulation_run(args, output_manager)
                 TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
 
+            if args["task_type"] == TaskType.END_TO_END_TESTING:
+                TaskManager.handle_end_to_end_testing(args, output_manager)
+
             if args["task_type"] == TaskType.POST_PROCESSING:
                 TaskManager.handle_post_processing(
                     args, input_manager, output_manager, task_id, produce_graphics, True, True
@@ -404,6 +407,16 @@ class TaskManager:
         simulator = SimulationEngine()
         simulator.simulate()
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
+
+    @staticmethod
+    def handle_end_to_end_testing(args: Dict[str, Any], output_manager: OutputManager) -> None:
+        """Runs end-to-end testing routine."""
+        info_map = {"class": TaskManager.__name__, "function": TaskManager.handle_end_to_end_testing.__name__}
+
+        output_manager.add_log("Starting end-to-end testing", "", info_map)
+        end_to_end_tester = EndToEndTester()
+        end_to_end_tester.run_end_to_end_testing()
+        output_manager.add_log("Completed end-to-end testing", "", info_map)
 
     @staticmethod
     def handle_input_data_audit(
