@@ -34,9 +34,8 @@ class EndToEndTester:
     def simulate(self) -> None:
         """Runs a limited RuFaS simulation."""
         while not self.time.current_date > self.time.end_date:
-            if self.time.simulation_day % 7 == 0:
-                self.feed_manager.process_degradations(self.weather, self.time)
-
+            self.feed_manager.process_degradations(self.weather, self.time)
+            self.weather.record_weather(self.time)
             self.time.record_time()
             self.time.advance()
 
@@ -132,4 +131,12 @@ class EndToEndTester:
 
     def compare_results(self) -> None:
         """Compares expected test results with actual results."""
+        all_result_data = self.om.filter_variables_pool({"filters": [".*"]})
+        actual_results = self.convert_data_to_expected_format(all_result_data)
+        expected_results = self.im.get_data("end_to_end_testing_results")
+        if expected_results is None:
+            raise ValueError("Could not obtain expected end-to-end testing results.")
+        assert actual_results == expected_results
+
+    def convert_data_to_expected_format(self, data_to_convert) -> None:
         pass
