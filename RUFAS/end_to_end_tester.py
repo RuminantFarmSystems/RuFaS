@@ -131,12 +131,20 @@ class EndToEndTester:
 
     def compare_results(self) -> None:
         """Compares expected test results with actual results."""
-        all_result_data = self.om.filter_variables_pool({"filters": [".*"]})
-        actual_results = self.convert_data_to_expected_format(all_result_data)
+        info_map = {"class": self.__class__.__name__, "function": self.compare_results.__name__}
+        err_msg = "End-to-end testing failed."
+        actual_results = self.om.filter_variables_pool({"name": "End-to-end testing results", "filters": [".*"]})
         expected_results = self.im.get_data("end_to_end_testing_results")
         if expected_results is None:
-            raise ValueError("Could not obtain expected end-to-end testing results.")
-        assert actual_results == expected_results
-
-    def convert_data_to_expected_format(self, data_to_convert) -> None:
-        pass
+            err_title = "Could not obtain expected end-to-end testing results"
+            self.om.add_error(err_title, err_msg, info_map)
+            raise ValueError(err_title)
+        try:
+            assert actual_results == expected_results
+        except AssertionError:
+            err_title = "Actual end-to-end testing results different from expected results"
+            self.om.add_error(err_title, err_msg, info_map)
+            raise AssertionError(err_title)
+        log_title = "Actual end-to-end testing results the same as expected results"
+        log_message = "End-to-end testing successful."
+        self.om.add_log(log_title, log_message, info_map)

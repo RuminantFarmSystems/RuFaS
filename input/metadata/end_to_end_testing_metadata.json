@@ -14,6 +14,12 @@
       "type": "csv",
       "properties": "weather_properties"
     },
+    "end_to_end_testing_results": {
+      "title": "End to end test results",
+      "path": "input/data/end_to_end_testing_results/end_to_end_results.json",
+      "type": "json",
+      "properties": "end_to_end_test_results_properties"
+    },
     "properties": {
       "title": "Metadata Properties",
       "description": "The properties of input data.",

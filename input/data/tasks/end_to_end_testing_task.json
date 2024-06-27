@@ -6,6 +6,7 @@
       "metadata_file_path": "input/metadata/end_to_end_testing_metadata.json",
       "output_prefix": "end-to-end-testing",
       "log_verbosity": "logs",
+      "exclude_info_maps": true,
       "random_seed": 42
     }
   ]
