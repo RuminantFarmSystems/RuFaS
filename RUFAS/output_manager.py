@@ -981,11 +981,11 @@ class OutputManager(object):
             filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion
         )
 
-        if filter_content.get("pad_data", False):
+        if filter_content.get("expand_data", False):
             fill_gap_values = filter_content.get("fill_gap_values", False)
             fill_end_values = filter_content.get("fill_end_values", False)
             try:
-                results = Utility.pad_temporal_data(
+                results = Utility.expand_data_temporally(
                     results, fill_gap_values=fill_gap_values, fill_end_values=fill_end_values
                 )
             except (TypeError, ValueError) as e:

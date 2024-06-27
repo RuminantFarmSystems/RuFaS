@@ -1371,7 +1371,7 @@ def returner(arg: Any) -> Any:
     [
         ({"filters": []}, {}, False),
         (
-            {"filters": [], "filter_by_exclusion": True, "pad_data": True},
+            {"filters": [], "filter_by_exclusion": True, "expand_data": True},
             {
                 "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
                 "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
@@ -1380,7 +1380,7 @@ def returner(arg: Any) -> Any:
             True,
         ),
         (
-            {"filters": ["key1", "key2"], "pad_data": True},
+            {"filters": ["key1", "key2"], "expand_data": True},
             {
                 "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
                 "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
@@ -1431,14 +1431,14 @@ def test_filter_variables_pool(
 ) -> None:
     """Tests filter_variables_pool in the OutputManager."""
     mock_output_manager.variables_pool = mock_simple_variables_pool
-    pad_data = mocker.patch.object(Utility, "pad_temporal_data", side_effect=returner)
+    expand_data_temporally = mocker.patch.object(Utility, "expand_data_temporally", side_effect=returner)
 
     assert mock_output_manager.filter_variables_pool(filter_content) == expected
 
     if data_padded:
-        pad_data.assert_called_once()
+        expand_data_temporally.assert_called_once()
     else:
-        pad_data.assert_not_called()
+        expand_data_temporally.assert_not_called()
     mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
     mock_output_manager.variables_pool = {}
 
