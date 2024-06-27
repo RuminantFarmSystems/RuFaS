@@ -18,7 +18,6 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -47,11 +46,11 @@ class FieldManager:
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
-
+        self.im = InputManager()
         self.fields: List[Field] = []
-        fields = im.get_data_keys_by_properties("field_properties")
+        fields = self.im.get_data_keys_by_properties("field_properties")
         if not fields:
             om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
@@ -106,7 +105,7 @@ class FieldManager:
         """
         info_map = {"class": self.__class__.__name__, "function": self._get_manure_supplier.__name__}
 
-        animals_simulated = im.get_data("config.simulate_animals")
+        animals_simulated = self.im.get_data("config.simulate_animals")
 
         if animals_simulated:
             return manure_manager
@@ -139,6 +138,7 @@ class FieldManager:
             A `Field` instance configured with the specified input data
 
         """
+        im = InputManager()
         field_configuration_data = im.get_data(field_name)
         field_size = field_configuration_data.get("field_size")
         absolute_latitude = field_configuration_data.get("absolute_latitude")
@@ -226,6 +226,7 @@ class FieldManager:
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
+        im = InputManager()
         fertilizer_data = im.get_data(fertilizer_schedule)
         available_fertilizer_mixes = {}
         fertilizer_mix_data = fertilizer_data.get("available_fertilizer_mixes")
@@ -243,6 +244,7 @@ class FieldManager:
             days=fertilizer_data.get("days"),
             nitrogen_masses=fertilizer_data.get("nitrogen_masses"),
             phosphorus_masses=fertilizer_data.get("phosphorus_masses"),
+            potassium_masses=fertilizer_data.get("potassium_masses"),
             application_depths=fertilizer_data.get("application_depths"),
             surface_remainder_fractions=fertilizer_data.get("surface_remainder_fractions"),
             pattern_skip=fertilizer_data.get("pattern_skip"),
@@ -267,6 +269,7 @@ class FieldManager:
             ManureSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         manure_schedule_data = im.get_data(manure_schedule)
         manure_type_strings = manure_schedule_data.get("manure_types")
         manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
@@ -301,6 +304,7 @@ class FieldManager:
             TillageSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         tillage_schedule_data = im.get_data(tillage_schedule)
         tillage_schedule_instance = TillageSchedule(
             name="tillage_schedule",
@@ -331,6 +335,7 @@ class FieldManager:
             List of all crop schedules that have been created from the input specifications.
 
         """
+        im = InputManager()
         schedules = []
         crop_rotation_data = im.get_data(f"{crop_rotation}.crop_schedules")
 
@@ -378,6 +383,7 @@ class FieldManager:
             If no specification is provided for soil layers.
 
         """
+        im = InputManager()
         soil_configuration_data = im.get_data(soil_configuration)
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")

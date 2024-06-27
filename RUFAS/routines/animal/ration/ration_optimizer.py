@@ -3,6 +3,7 @@ import random
 from scipy.optimize import minimize, OptimizeResult
 from typing import Callable, Dict, List, Tuple, Any
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
@@ -10,7 +11,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
 
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ....enums import AnimalCombination
 
 import numpy.typing as npt
 from RUFAS.output_manager import OutputManager
@@ -492,10 +493,8 @@ class RationOptimizer:
         """
         Sets up the RHS multipliers for the phosphorus requirements satisfied by each
         feed. Each calculation has a reference to the respective calculation in the
-        pseudocode. Becasue the maintenance requirement contains non-linearity
-        properties, that requirement will be calculated in this function. Note the
-        calculated phosphorus requirement 'P_req' is in grams and x is in kg thus
-        the divide by 1000.
+        pseudocode. Note the calculated phosphorus requirement 'P_requirement' is in grams and the formualted ration is
+        reported in kg.
 
         Parameters
         ----------
@@ -528,7 +527,7 @@ class RationOptimizer:
                     ration_config.dP_list,
                 ),
             )
-        ) - (ration_config.P_requirement / 1000))
+        ) - (ration_config.P_requirement * GeneralConstants.GRAMS_TO_KG))
 
     # fmt: off
     @staticmethod

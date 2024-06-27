@@ -921,6 +921,7 @@ class LayerData:
         SWAT 2:3.2.1, 2
 
         """
+
         return max(0.0, self.water_content - self.field_capacity_content)
 
     @property
