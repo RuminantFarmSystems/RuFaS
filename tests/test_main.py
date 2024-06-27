@@ -4,34 +4,38 @@ import sys
 import pytest
 from mock import patch
 from pytest_mock import MockerFixture
+from typing import Any, Generator
 
 from main import CaseInsensitiveArgumentAction, main, parse_gnu_args
 from RUFAS.output_manager import LogVerbosity
 
 
 @pytest.fixture
-def mock_task_manager():
+def mock_task_manager() -> Generator[Any, Any, Any]:
     with patch("main.TaskManager") as mock:
         yield mock
 
 
-def test_main_success(mock_task_manager, monkeypatch):
+def test_main_success(mock_task_manager, monkeypatch) -> None:  # type: ignore
     mock_instance = mock_task_manager.return_value
     mock_instance.start.return_value = None
 
     # Simulating command line arguments
-    test_args = ["program_name", "-v", "errors", "-o", "output/"]
+    test_args = ["program_name", "-v", "errors", "-o", "output/", "-s", "-l", "test_log_dir"]
     monkeypatch.setattr(sys, "argv", test_args)
 
     main()
 
     mock_instance.start.assert_called_once_with(
-        Path("input/metadata/task_manager_metadata.json"),
+        metadata_path=Path("input/metadata/task_manager_metadata.json"),
         verbosity=LogVerbosity.ERRORS,
         exclude_info_maps=False,
         output_directory=Path("output"),
+        logs_directory=Path("test_log_dir"),
         clear_output_directory=False,
         produce_graphics=True,
+        suppress_log_files=True,
+        metadata_depth_limit=None,
     )
 
 
@@ -47,7 +51,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 5
+    assert mock_add_argument.call_count == 9
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-g",
@@ -79,6 +83,30 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--output-dir",
             help="The saving directory for output",
             default="output/",
+        ),
+        mocker.call(
+            "-s",
+            "--suppress-log-files",
+            help="Prevents logs from the Task Manager being written to files",
+            action="store_true",
+        ),
+        mocker.call(
+            "-l",
+            "--logs-dir",
+            help="The directory for saving log files too",
+            default="output/logs",
+        ),
+        mocker.call(
+            "-m",
+            "--metadata-depth-limit",
+            type=int,
+            help="Overrides the default metadata depth limit in the Input Manager",
+        ),
+        mocker.call(
+            "-p",
+            "--path-to-metadata",
+            help="Path to the task manager metadata that will determine the tasks run",
+            default="input/metadata/task_manager_metadata.json",
         ),
     ]
     mock_parse_args.assert_called_once()

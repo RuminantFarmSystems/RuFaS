@@ -78,7 +78,7 @@ class CropManagement:
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.calendar_year, time.day)
+        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
     # ---- Sub Methods ----
@@ -287,19 +287,19 @@ class CropManagement:
 
         """
         units = {
-            "crop": MeasurementUnits.UNITLESS.value,
-            "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE.value,
-            "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-            "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-            "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-            "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-            "harvest_index": MeasurementUnits.UNITLESS.value,
-            "planting_date": {
-                "year": MeasurementUnits.CALENDAR_YEAR.value,
-                "day": MeasurementUnits.ORDINAL_DAY.value,
-            },
-            "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
-            "field_size": MeasurementUnits.HECTARE.value,
+            "crop": MeasurementUnits.UNITLESS,
+            "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
+            "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+            "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+            "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+            "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+            "harvest_index": MeasurementUnits.UNITLESS,
+            "planting_year": MeasurementUnits.CALENDAR_YEAR,
+            "planting_day": MeasurementUnits.ORDINAL_DAY,
+            "harvest_year": MeasurementUnits.CALENDAR_YEAR,
+            "harvest_day": MeasurementUnits.ORDINAL_DAY,
+            "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
         }
         wet_yield_collected = self.data.wet_yield_collected
         dry_yield_collected = self.data.dry_matter_yield_collected
@@ -319,12 +319,12 @@ class CropManagement:
             "phosphorus": phosphorus_harvested,
             "yield_residue": self.data.yield_residue,
             "harvest_index": self.data.harvest_index,
-            "planting_date": {
-                "year": self.data.planting_year,
-                "day": self.data.planting_day,
-            },
-            "harvest_date": {"year": year, "day": day},
+            "planting_year": self.data.planting_year,
+            "planting_day": self.data.planting_day,
+            "harvest_year": year,
+            "harvest_day": day,
             "field_size": field_size,
+            "field_name": field_name,
         }
         om.add_variable("harvest_yield", value, info_map)
 
