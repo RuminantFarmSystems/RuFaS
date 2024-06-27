@@ -1,0 +1,40 @@
+{
+  "files": {
+    "config": {
+      "title": "Config Data",
+      "description": "Configuration file for general simulation parameters.",
+      "path": "input/data/config/end_to_end_testing_config.json",
+      "type": "json",
+      "properties": "config_properties"
+    },
+    "animal": {
+      "title": "Animal data",
+      "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
+      "path": "input/data/animal/default_animal.json",
+      "type": "json",
+      "properties": "animal_properties"
+    },
+    "animal_population": {
+      "title": "Animal population data",
+      "description": "Animal objects that herd initialization draws from during the simulation. A similar file can be generated using the -I and -s command line arguments simultaneously.",
+      "path": "input/data/animal/animal_population.json",
+      "type": "json",
+      "properties": "animal_population_properties"
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
+      "path": "input/data/weather/barnyard_weather.csv",
+      "type": "csv",
+      "properties": "weather_properties"
+    },
+    "properties": {
+      "title": "Metadata Properties",
+      "description": "The properties of input data.",
+      "path": "input/metadata/properties/default.json",
+      "type": "json",
+      "properties": "NA"
+    }
+  },
+  "cross-validation": {}
+}

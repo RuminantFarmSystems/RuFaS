@@ -1,0 +1,12 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "END_TO_END_TESTING",
+      "metadata_file_path": "input/metadata/end_to_end_testing_metadata.json",
+      "output_prefix": "end-to-end-testing",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    }
+  ]
+}
