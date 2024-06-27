@@ -132,7 +132,6 @@ def test_report_daily_animal_population(mocker: MockerFixture) -> None:
         cow.is_lactating = True
     animal_manager.cows[0].is_lactating = False
     om.variables_pool = {}
-    om.time = None
     AnimalModuleReporter.report_daily_animal_population(animal_manager)
 
     report_daily_animal_total = om.variables_pool["AnimalModuleReporter.report_daily_animal_population.num_animals"][
@@ -281,7 +280,8 @@ def test_report_ration_interval_data(animal_manager_fixture: AnimalManager, mock
         return_value="ration_supply_report",
     )
 
-    AnimalModuleReporter.report_ration_interval_data(animal_manager_fixture.all_pens, feed, 1)
+    for pen in animal_manager_fixture.all_pens:
+        AnimalModuleReporter.report_ration_interval_data(pen, feed, 1)
 
     for i in range(1, 2):
         assert om.variables_pool[

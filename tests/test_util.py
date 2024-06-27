@@ -29,8 +29,8 @@ def test_remove_items_from_list_by_indices() -> None:
     """Unit test for function remove_items_from_list_by_indices in file util.py"""
     # Given an empty list and an empty list of removal indices,
     # the function should do nothing.
-    arr = []
-    del_idx = []
+    arr: list[Any] = []
+    del_idx: list[int] = []
     Utility.remove_items_from_list_by_indices(arr, del_idx)
     assert len(arr) == 0
 
@@ -110,33 +110,33 @@ def test_percent_calculator() -> None:
         pc(1.0)
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_empty_list():
+def test_convert_list_of_dicts_to_dict_of_lists_empty_list() -> None:
     result = Utility.convert_list_of_dicts_to_dict_of_lists([])
     assert result == {}
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_single_dict():
+def test_convert_list_of_dicts_to_dict_of_lists_single_dict() -> None:
     input_data = [{"a": 1, "b": 2}]
     expected_result = {"a": [1], "b": [2]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts():
+def test_convert_list_of_dicts_to_dict_of_lists_multiple_dicts() -> None:
     input_data = [{"a": 1, "b": 2}, {"a": 3, "c": 4}]
     expected_result = {"a": [1, 3], "b": [2], "c": [4]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_empty_values():
-    input_data = [{"a": 1, "b": 2}, {"a": None, "b": 3}]
+def test_convert_list_of_dicts_to_dict_of_lists_empty_values() -> None:
+    input_data: list[dict[str, Any]] = [{"a": 1, "b": 2}, {"a": None, "b": 3}]
     expected_result = {"a": [1, None], "b": [2, 3]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
     assert result == expected_result
 
 
-def test_convert_list_of_dicts_to_dict_of_lists_empty_keys():
+def test_convert_list_of_dicts_to_dict_of_lists_empty_keys() -> None:
     input_data = [{"a": 1, "b": 2}, {"": 3, "b": 4}]
     expected_result = {"a": [1], "b": [2, 4], "": [3]}
     result = Utility.convert_list_of_dicts_to_dict_of_lists(input_data)
@@ -520,40 +520,44 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
         ),
     ],
 )
-def test_pad_temporal_data(
+def test_expand_data_temporally(
     data_to_pad: dict[str, dict[str, list[Any]]],
     fill_value: Any,
     gap_pad: bool,
     end_pad: bool,
     expected: dict[str, dict[str, list[Any]]],
 ) -> None:
-    """Tests the utility method pad_temporal_data."""
-    actual = Utility.pad_temporal_data(
+    """Tests the utility method expand_data_temporally."""
+    actual = Utility.expand_data_temporally(
         data_to_pad, fill_value=fill_value, fill_gap_values=gap_pad, fill_end_values=end_pad
     )
 
     assert actual == expected
 
 
-def test_pad_temporal_data_errors() -> None:
-    """Tests that errors are correctly raised by pad_temporal_data."""
+def test_expand_data_temporally_errors() -> None:
+    """Tests that errors are correctly raised by expand_data_temporally."""
+    empty_data: dict[str, dict[str, list[Any]]] = {}
+    with pytest.raises(ValueError, match="empty dataset"):
+        Utility.expand_data_temporally(empty_data)
+
     data_one = {"a": {"values": ["a", "b"]}, "b": {"values": ["c", "d"]}}
     with pytest.raises(TypeError, match="no info maps"):
-        Utility.pad_temporal_data(data_one)
+        Utility.expand_data_temporally(data_one)
 
     data_two: dict[str, dict[str, list[Any]]] = {
         "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
         "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
     }
     with pytest.raises(ValueError, match="number of values and info maps"):
-        Utility.pad_temporal_data(data_two)
+        Utility.expand_data_temporally(data_two)
 
     data_three: dict[str, dict[str, list[Any]]] = {
         "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
         "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
     }
     with pytest.raises(ValueError, match="simulation day value in every info map"):
-        Utility.pad_temporal_data(data_three)
+        Utility.expand_data_temporally(data_three)
 
 
 def test_deep_merge_dict() -> None:
