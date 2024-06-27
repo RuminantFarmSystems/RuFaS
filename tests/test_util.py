@@ -520,44 +520,44 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
         ),
     ],
 )
-def test_fill_data_temporally(
+def test_expand_data_temporally(
     data_to_pad: dict[str, dict[str, list[Any]]],
     fill_value: Any,
     gap_pad: bool,
     end_pad: bool,
     expected: dict[str, dict[str, list[Any]]],
 ) -> None:
-    """Tests the utility method pad_temporal_data."""
-    actual = Utility.fill_data_temporally(
+    """Tests the utility method expand_data_temporally."""
+    actual = Utility.expand_data_temporally(
         data_to_pad, fill_value=fill_value, fill_gap_values=gap_pad, fill_end_values=end_pad
     )
 
     assert actual == expected
 
 
-def test_pad_temporal_data_errors() -> None:
-    """Tests that errors are correctly raised by pad_temporal_data."""
-    empty_data = {}
+def test_expand_data_temporally_errors() -> None:
+    """Tests that errors are correctly raised by expand_data_temporally."""
+    empty_data: dict[str, dict[str, list[Any]]] = {}
     with pytest.raises(ValueError, match="empty dataset"):
-        Utility.fill_data_temporally(empty_data)
+        Utility.expand_data_temporally(empty_data)
 
     data_one = {"a": {"values": ["a", "b"]}, "b": {"values": ["c", "d"]}}
     with pytest.raises(TypeError, match="no info maps"):
-        Utility.fill_data_temporally(data_one)
+        Utility.expand_data_temporally(data_one)
 
     data_two: dict[str, dict[str, list[Any]]] = {
         "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}]},
         "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
     }
     with pytest.raises(ValueError, match="number of values and info maps"):
-        Utility.fill_data_temporally(data_two)
+        Utility.expand_data_temporally(data_two)
 
     data_three: dict[str, dict[str, list[Any]]] = {
         "a": {"values": ["a", "b"], "info_maps": [{"simulation_day": 1}, {"foo": "bar"}]},
         "b": {"values": ["c", "d"], "info_maps": [{"simulation_day": 1}, {"simulation_day": 3}]},
     }
     with pytest.raises(ValueError, match="simulation day value in every info map"):
-        Utility.fill_data_temporally(data_three)
+        Utility.expand_data_temporally(data_three)
 
 
 def test_deep_merge_dict() -> None:
