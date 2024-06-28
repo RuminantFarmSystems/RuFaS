@@ -466,6 +466,9 @@ class ReportGenerator:
             aggregate_report = self._handle_horizontal_and_vertical_aggregations(
                 aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
             )
+            if filter_content.get("display_units", True):
+                units = re.search(r"\(.*\)", next(iter(report_data)))
+                aggregate_report = {units.group(0): list(aggregate_report.values())[0]}
 
         elif horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
