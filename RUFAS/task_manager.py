@@ -21,7 +21,7 @@ RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2 ** 32 - 1
 
 
 class TaskType(Enum):
@@ -306,13 +306,13 @@ class TaskManager:
             pass
 
     @staticmethod
-    def call_handler(handler: Callable[..., None], **kwargs: Any) -> None:
-
+    def call_handler(handler: Callable[..., None], args: Dict[str, Any],
+                     input_manager: InputManager,
+                     output_manager: OutputManager,
+                     task_id: Any,
+                     produce_graphics: bool, ) -> None:
         """Wrapper function to call the function map with each of its arguments."""
-        sig = inspect.signature(handler)
-        filtered_params = {k: v for k, v in kwargs.items() if k in sig.parameters}
-        handler(**filtered_params)
-
+        handler(args, input_manager, output_manager, task_id, produce_graphics)
 
     @staticmethod
     def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> None:
@@ -534,13 +534,16 @@ class TaskManager:
 
     @staticmethod
     def _input_data_audit_tasks(
-            args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any
+            args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any,
+            produce_grahics: bool
     ) -> None:
         TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
     @staticmethod
-    def _compare_metadata_properties_tasks(args: Dict[str, Any], input_manager: InputManager) -> None:
+    def _compare_metadata_properties_tasks(args: Dict[str, Any], input_manager: InputManager,
+                                           output_manager: OutputManager, task_id: Any,
+                                           produce_grahics: bool) -> None:
         """Handler for all methods related to metadata property comparison."""
         input_manager.compare_metadata_properties(
             args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
@@ -548,7 +551,8 @@ class TaskManager:
 
     @staticmethod
     def _herd_init_tasks(
-            args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any
+            args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any,
+            produce_grahics: bool
     ) -> None:
         """Handler for all methods related to herd initialization."""
         args["init_herd"] = True
