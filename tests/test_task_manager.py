@@ -47,8 +47,8 @@ def test_invalid_task_type_from_string() -> None:
 
 
 def test_task_manager_init(
-        task_manager: TaskManager,
-        mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
+    mock_output_manager: Generator[Any, Any, Any],
 ) -> None:
     assert task_manager.output_manager is mock_output_manager
 
@@ -88,7 +88,7 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
 def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> None:
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(0, mock_output_manager)
-        mock_randint.assert_called_once_with(0, 2 ** 32 - 1)
+        mock_randint.assert_called_once_with(0, 2**32 - 1)
         mock_output_manager.add_log.assert_called_with(
             "Random seed used",
             "Seeded libaries with random_seed=4321",
@@ -98,12 +98,12 @@ def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> 
 
 @pytest.mark.parametrize("seed, expected", [(12345, 12345), (0, 4321)])
 def test_set_random_seed_with_parameters(
-        seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
+    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
 ) -> None:
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(seed, mock_output_manager)
         if seed == 0:
-            mock_randint.assert_called_once_with(0, 2 ** 32 - 1)
+            mock_randint.assert_called_once_with(0, 2**32 - 1)
         mock_output_manager.add_log.assert_called_with(
             "Random seed used",
             f"Seeded libaries with random_seed={expected}",
@@ -166,10 +166,10 @@ def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_handle_post_processing(
-        task_manager: TaskManager,
-        mock_output_manager: Generator[Any, Any, Any],
-        suppress_logs: bool,
-        mocker: MockerFixture,
+    task_manager: TaskManager,
+    mock_output_manager: Generator[Any, Any, Any],
+    suppress_logs: bool,
+    mocker: MockerFixture,
 ) -> None:
     args = {
         "filters_directory": Path("/fake/filters"),
@@ -199,8 +199,7 @@ def test_handle_post_processing(
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_input_data_audit(
-        mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool,
-        mocker: MockerFixture
+    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool, mocker: MockerFixture
 ) -> None:
     args = {
         "metadata_file_path": Path("/fake/metadata"),
@@ -228,14 +227,22 @@ def test_input_data_audit(
         mock_save_metadata_properties.assert_not_called()
 
 
-@pytest.mark.parametrize("task_type,pre_validate", [[TaskType.INPUT_DATA_AUDIT, True],
-                                                    [TaskType.COMPARE_METADATA_PROPERTIES, True],
-                                                    [TaskType.HERD_INITIALIZATION, False],
-                                                    [TaskType.SIMULATION_SINGLE_RUN, False],
-                                                    [TaskType.POST_PROCESSING, False]])
+@pytest.mark.parametrize(
+    "task_type,pre_validate",
+    [
+        [TaskType.INPUT_DATA_AUDIT, True],
+        [TaskType.COMPARE_METADATA_PROPERTIES, True],
+        [TaskType.HERD_INITIALIZATION, False],
+        [TaskType.SIMULATION_SINGLE_RUN, False],
+        [TaskType.POST_PROCESSING, False],
+    ],
+)
 def test_task(
-        mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture,
-        task_type: TaskType, pre_validate: bool
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
+    mocker: MockerFixture,
+    task_type: TaskType,
+    pre_validate: bool,
 ) -> None:
     args = {
         "task_type": task_type,
@@ -248,15 +255,14 @@ def test_task(
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
-        "produce_graphics": False
+        "produce_graphics": False,
     }
 
     mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
     produce_graphics = False
 
     mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
-    mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit",
-                                                       return_value=True)
+    mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
     task_manager.task(args, produce_graphics, 10)
     mock_im_init.assert_called_once_with(10)
@@ -275,19 +281,20 @@ def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
     args = {
         "properties_file_path": Path("fake/properties/path"),
         "comparison_properties_file_path": Path("fake/comparison/properties/path"),
-        "logs_directory": Path("/fake/logs")
+        "logs_directory": Path("/fake/logs"),
     }
-    mock_input_manager = MagicMock(name='InputManager')
-    mock_output_manager = MagicMock(name='OutputManager')
+    mock_input_manager = MagicMock(name="InputManager")
+    mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
     task_id = 6
 
     mock_compare_metadata_properties = mocker.patch.object(
-        mock_input_manager, 'compare_metadata_properties', return_value=None
+        mock_input_manager, "compare_metadata_properties", return_value=None
     )
 
-    TaskManager._compare_metadata_properties_tasks(args, mock_input_manager, mock_output_manager, task_id,
-                                                   produce_graphic)
+    TaskManager._compare_metadata_properties_tasks(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphic
+    )
 
     mock_compare_metadata_properties.assert_called_once_with(
         args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
@@ -304,29 +311,24 @@ def test_herd_init_tasks() -> None:
         "random_seed": 924,
         "suppress_log_files": True,
         "metadata_file_path": "/fake/logs",
-        "properties_file_path": "more/fake/paths"
+        "properties_file_path": "more/fake/paths",
     }
     task_id = 5
 
     # Create mocks for InputManager and OutputManager
-    mock_input_manager = MagicMock(name='InputManager')
-    mock_output_manager = MagicMock(name='OutputManager')
+    mock_input_manager = MagicMock(name="InputManager")
+    mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
-    with patch.object(TaskManager, 'handle_herd_initializaition',
-                      return_value=None) as mock_handle_herd_initializaition, \
-            patch.object(TaskManager, 'handle_post_processing',
-                         return_value=None) as mock_handle_post_processing:
+    with (
+        patch.object(TaskManager, "handle_herd_initializaition", return_value=None) as mock_handle_herd_initializaition,
+        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
+    ):
         TaskManager._herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
         mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
         mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
 
 
-@pytest.mark.parametrize("input_patch,produce_graphics", [
-    (True, True),
-    (False, True),
-    (False, False),
-    (True, False)
-])
+@pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
 def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) -> None:
     args = {
         "log_verbosity": "logs",
@@ -338,33 +340,34 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) 
         "suppress_log_files": True,
         "metadata_file_path": "/fake/logs",
         "properties_file_path": "more/fake/paths",
-        "input_patch": input_patch
+        "input_patch": input_patch,
     }
     task_id = 5
-    mock_input_manager = MagicMock(name='InputManager')
-    mock_output_manager = MagicMock(name='OutputManager')
-    with patch.object(TaskManager, 'handle_single_simulation_run',
-                      return_value=None) as mock_handle_single_simulation_run, \
-            patch.object(TaskManager, 'handle_post_processing',
-                         return_value=None) as mock_handle_post_processing, \
-            patch.object(Utility, 'deep_merge', return_value=None) as mock_deep_merge:
+    mock_input_manager = MagicMock(name="InputManager")
+    mock_output_manager = MagicMock(name="OutputManager")
+    with (
+        patch.object(
+            TaskManager, "handle_single_simulation_run", return_value=None
+        ) as mock_handle_single_simulation_run,
+        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
+        patch.object(Utility, "deep_merge", return_value=None) as mock_deep_merge,
+    ):
 
-        TaskManager._simulation_engine_run_tasks(args, mock_input_manager, mock_output_manager, task_id,
-                                                 produce_graphics)
+        TaskManager._simulation_engine_run_tasks(
+            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+        )
         if input_patch:
             mock_deep_merge.assert_called_once_with(mock_input_manager.pool, args["input_patch"])
         else:
             mock_deep_merge.assert_not_called()
 
         mock_handle_single_simulation_run.assert_called_once_with(args, mock_output_manager)
-        mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager,
-                                                            task_id, produce_graphics, True)
+        mock_handle_post_processing.assert_called_once_with(
+            args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True
+        )
 
 
-@pytest.mark.parametrize("produce_graphics", [
-    True,
-    False
-])
+@pytest.mark.parametrize("produce_graphics", [True, False])
 def test_postprocessing_tasks(produce_graphics: bool) -> None:
     args = {
         "log_verbosity": "logs",
@@ -375,15 +378,16 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
         "random_seed": 924,
         "suppress_log_files": True,
         "metadata_file_path": "/fake/logs",
-        "properties_file_path": "more/fake/paths"
+        "properties_file_path": "more/fake/paths",
     }
     task_id = 5
-    mock_input_manager = MagicMock(name='InputManager')
-    mock_output_manager = MagicMock(name='OutputManager')
-    with patch.object(TaskManager, 'handle_post_processing', return_value=None) as mock_handle_post_processing:
+    mock_input_manager = MagicMock(name="InputManager")
+    mock_output_manager = MagicMock(name="OutputManager")
+    with patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing:
         TaskManager._postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics)
-        mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager,
-                                                            task_id, produce_graphics, True, True)
+        mock_handle_post_processing.assert_called_once_with(
+            args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
+        )
 
 
 def test_call_handler():
@@ -396,26 +400,29 @@ def test_call_handler():
         "random_seed": 924,
         "suppress_log_files": True,
         "metadata_file_path": "/fake/logs",
-        "properties_file_path": "more/fake/paths"
+        "properties_file_path": "more/fake/paths",
     }
     task_id = 5
-    mock_input_manager = MagicMock(name='InputManager')
-    mock_output_manager = MagicMock(name='OutputManager')
+    mock_input_manager = MagicMock(name="InputManager")
+    mock_output_manager = MagicMock(name="OutputManager")
     produce_graphics = False
 
     # Call the call_handler method
-    with patch.object(TaskManager, '_postprocessing_tasks', return_value=None) as mock_handle_post_processing:
-        TaskManager.call_handler(mock_handle_post_processing, args=args,
-                                 input_manager=mock_input_manager,
-                                 output_manager=mock_output_manager,
-                                 task_id=task_id,
-                                 produce_graphics=produce_graphics
-                                 )
+    with patch.object(TaskManager, "_postprocessing_tasks", return_value=None) as mock_handle_post_processing:
+        TaskManager.call_handler(
+            mock_handle_post_processing,
+            args=args,
+            input_manager=mock_input_manager,
+            output_manager=mock_output_manager,
+            task_id=task_id,
+            produce_graphics=produce_graphics,
+        )
 
         # Verify that the handler was called with the correct filtered arguments
         print(mock_handle_post_processing.call_args)
-        mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager,
-                                                            task_id, produce_graphics)
+        mock_handle_post_processing.assert_called_once_with(
+            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+        )
 
 
 def test_input_data_audit_tasks() -> None:
@@ -428,16 +435,17 @@ def test_input_data_audit_tasks() -> None:
         "random_seed": 924,
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
-        "properties_file_path": Path("more/fake/paths")
+        "properties_file_path": Path("more/fake/paths"),
     }
     task_id = 5
     im = InputManager()
     om = OutputManager()
     produce_graphic = False
 
-    with (patch.object(TaskManager, 'handle_input_data_audit', return_value=None) as
-          mock_handle_input_data_audit, patch.object(TaskManager, 'handle_post_processing', return_value=None)
-          as mock_handle_post_processing):
+    with (
+        patch.object(TaskManager, "handle_input_data_audit", return_value=None) as mock_handle_input_data_audit,
+        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
+    ):
         TaskManager._input_data_audit_tasks(args, im, om, task_id, produce_graphic)
 
         mock_handle_input_data_audit.assert_called_once_with(args, im, om, False)
