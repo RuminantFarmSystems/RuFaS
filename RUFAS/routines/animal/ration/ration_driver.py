@@ -2,6 +2,7 @@ import collections
 from typing import Set, Dict, List, Tuple, Literal, Any
 
 from RUFAS.units import MeasurementUnits
+from 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
@@ -70,10 +71,9 @@ class RationManager:
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
+        previous_ration = None
         if hasattr(pen, "ration_per_animal"):
             previous_ration = pen.ration_per_animal
-        else:
-            previous_ration = None
 
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
@@ -86,7 +86,7 @@ class RationManager:
             return pen.ration, ration_vals
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         # GitHub Issue #793
-        if pen.animal_combination.name in ["LAC_COW"]:
+        if pen.animal_combination == in ["LAC_COW"]:
             while not solution.success:
                 cls.handle_failed_constraints(
                     num_reattempts=num_reattempts,
