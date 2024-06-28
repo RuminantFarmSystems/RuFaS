@@ -4,6 +4,9 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
+from RUFAS.routines.manure.constants_and_units.manure_constants import (
+    ManureConstants,
+)
 from RUFAS.routines.manure.gas_emissions.calculator import (
     GasEmissionsCalculator,
 )
@@ -86,24 +89,32 @@ class AnaerobicDigestion(BaseManureTreatment):
         top_cover_volume = minimum_digester_volume * self.config.top_cover_volume_fraction
 
         new_daily_output.liquid_manure_total_ammoniacal_nitrogen = min(
-            self._current_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * 1.65, 
+            self._current_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * ManureConstants.AD_TAN_INCREASE_FACTOR, 
             self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         )
         new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
+        AD_carbon_dioxide = (methane_generation_volume * 
+                             GasEmissionConstants.AD_CARBON_DIOXIDE_TO_METHANE_RATIO) * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
+        AD_VS_destruction = new_daily_output.biogas + AD_carbon_dioxide
+        
+        new_daily_output.liquid_manure_total_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_solids
+            - AD_VS_destruction
+        )
+        new_daily_output.liquid_manure_total_volatile_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
+            - AD_VS_destruction
+        )
         new_daily_output.liquid_manure_total_degradable_volatile_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            - (self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.5)
+            - AD_VS_destruction
         )
         new_daily_output.liquid_manure_total_non_degradable_volatile_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
         )
-        new_daily_output.liquid_manure_total_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.5
-        )
-        new_daily_output.liquid_manure_total_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_solids
-            - (self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids * 0.5)
-        )
+        
+        
+        
         new_daily_output.daily_final_manure_volume = (
             self._current_manure_treatment_daily_input.liquid_manure_daily_volume
             - (new_daily_output.biogas / 990)
