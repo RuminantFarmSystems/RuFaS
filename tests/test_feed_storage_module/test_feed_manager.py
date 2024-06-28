@@ -1,7 +1,12 @@
 import pytest
+from pytest_mock import MockerFixture
 from RUFAS.routines.feed_storage.feed_manager import FeedManager, StorageType
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.grain import Dry
+from RUFAS.routines.feed_storage.silage import Pile
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass
 
@@ -81,6 +86,20 @@ def test_receive_crop_error(feed_manager: FeedManager, harvested_crop: Harvested
             storage_type=incompatible_storage,
         )
     assert "is not compatible with storage type" in str(excinfo.value)
+
+
+def test_process_degradations(feed_manager: FeedManager, mocker: MockerFixture) -> None:
+    """Tests process_degradations in the FeedManager."""
+    mock_time = mocker.MagicMock()
+    mock_weather = mocker.MagicMock()
+    dry_storage = mocker.MagicMock(autospec=Dry)
+    pile_storage = mocker.MagicMock(autospec=Pile)
+    feed_manager.active_storages = {StorageType.DRY: dry_storage, StorageType.PILE: pile_storage}
+
+    feed_manager.process_degradations(mock_weather, mock_time)
+
+    dry_storage.process_degradations.assert_called_once_with(mock_weather, mock_time)
+    pile_storage.process_degradations.assert_called_once_with(mock_weather, mock_time)
 
 
 def test_query_available_feeds_no_parameters(
