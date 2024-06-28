@@ -298,7 +298,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
     # different unit from docMeasurementUnitsing m^3 vs m^3/day?
     biogas: float = 0.0  # biogas production per day (m3/day)
-    biogas_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS_PER_DAY
+    biogas_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS_PER_DAY
 
     biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
     biogas_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES_PER_CUBIC_METER

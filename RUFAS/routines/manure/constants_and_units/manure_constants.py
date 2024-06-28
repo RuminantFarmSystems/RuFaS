@@ -71,3 +71,8 @@ class ManureConstants:
     """
     The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
     """
+
+    AD_TAN_INCREASE_FACTOR = 1.60
+    """
+    The factor by which manure total ammoniacal nitrogen content is by the anaerobic digestion process (unitless).
+    """
