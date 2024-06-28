@@ -793,9 +793,8 @@ class GasEmissionsCalculator:
 
         """
         return (
-            GasEmissionConstants.METHANE_POTENTIAL_Go
+            GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
             * manure_total_volatile_solids
-            * GeneralConstants.GRAMS_TO_KG
         )
 
     @classmethod

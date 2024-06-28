@@ -305,7 +305,7 @@
       "potassium_removal_efficiency_for_treatment": 0.0,
       "hydraulic_retention_time": 25,
       "sludge_accumulation_period": 1.0,
-      "sludge_accumulation_volume_fraction": 0.03,
+      "sludge_accumulation_volume_fraction": 0.0,
       "top_cover_volume_fraction": 0.2,
       "evaporation_fraction": 0.02,
       "anaerobic_digestion_temperature_set_point": 37.5,
