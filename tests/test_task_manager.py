@@ -4,6 +4,7 @@ from unittest.mock import patch, MagicMock
 from pytest_mock import MockerFixture
 from pathlib import Path
 
+from RUFAS.end_to_end_tester import EndToEndTester
 from RUFAS.input_manager import InputManager
 from RUFAS.task_manager import TaskManager, TaskType
 from RUFAS.output_manager import LogVerbosity
@@ -194,6 +195,20 @@ def test_handle_post_processing(
     else:
         mock_dump_data_logs.assert_not_called()
         mock_output_manager.dump_all_nondata_pools.assert_not_called()
+
+
+def test_handle_end_to_end_testing(
+    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture
+) -> None:
+    """Test that end-to-end testing is executed correctly."""
+    mocker.patch.object(EndToEndTester, "__init__", return_value=None)
+    tester = mocker.patch.object(EndToEndTester, "run_end_to_end_testing")
+    add_log = mocker.patch.object(mock_output_manager, "add_log")
+
+    task_manager.handle_end_to_end_testing({}, mock_output_manager)
+
+    tester.assert_called_once()
+    assert add_log.call_count == 2
 
 
 @pytest.mark.parametrize("suppress_logs", [True, False])

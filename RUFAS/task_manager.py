@@ -289,10 +289,6 @@ class TaskManager:
 
         return single_run_args
 
-    # def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
-    #     """Placeholder for expanding end-to-end testing multi-run tasks."""
-    #     return []
-
     def _run_tasks(
         self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
     ) -> None:
