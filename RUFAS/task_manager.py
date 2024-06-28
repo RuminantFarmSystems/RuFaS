@@ -1,6 +1,5 @@
 from enum import Enum
 from functools import partial
-import inspect
 import multiprocessing
 import numpy
 from pathlib import Path

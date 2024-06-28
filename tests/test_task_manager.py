@@ -247,7 +247,17 @@ def test_task(
         "random_seed": 924,
         "suppress_log_files": True,
         "metadata_file_path": Path("/fake/logs"),
-        "properties_file_path": Path("more/fake/paths")
+        "properties_file_path": Path("more/fake/paths"),
+        "produce_graphics": False
+    }
+    pre_validation_handlers = {
+        TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
+        TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._compare_metadata_properties_tasks,
+    }
+    post_validation_handlers = {
+        TaskType.HERD_INITIALIZATION: TaskManager._herd_init_tasks,
+        TaskType.SIMULATION_SINGLE_RUN: TaskManager._simulation_engine_run_tasks,
+        TaskType.POST_PROCESSING: TaskManager._postprocessing_tasks,
     }
     mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
     produce_graphics = False
