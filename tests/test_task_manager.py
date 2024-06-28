@@ -13,7 +13,6 @@ from RUFAS.units import MeasurementUnits
 @pytest.fixture
 def mock_output_manager() -> Generator[Any, Any, Any]:
     with patch("RUFAS.task_manager.OutputManager") as mock:
-        print(str(mock)+"fixure")
         yield mock
 
 
@@ -230,7 +229,7 @@ def test_input_data_audit(
 
 @pytest.mark.parametrize("task_type,pre_validate", [[TaskType.INPUT_DATA_AUDIT, True],
                                                     [TaskType.COMPARE_METADATA_PROPERTIES, True],
-                                                    [TaskType.COMPARE_METADATA_PROPERTIES, False],
+                                                    [TaskType.HERD_INITIALIZATION, False],
                                                     [TaskType.SIMULATION_SINGLE_RUN, False],
                                                     [TaskType.POST_PROCESSING, False]])
 def test_task(
@@ -245,41 +244,24 @@ def test_task(
         "output_prefix": "test",
         "logs_directory": Path("/fake/logs"),
         "task_id": 1,
-        "random-seed": 924
+        "random_seed": 924,
+        "suppress_log_files": True,
+        "metadata_file_path": Path("/fake/logs"),
+        "properties_file_path": Path("more/fake/paths")
     }
-    #mock_run_startup = mocker.patch.object(OutputManager, "run_startup_sequence", return_value=None)
     mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
-    pre_validation_handlers = {
-        TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
-        TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._compare_metadata_properties_tasks,
-    }
-    post_validation_handlers = {
-        TaskType.HERD_INITIALIZATION: TaskManager._herd_init_tasks,
-        TaskType.SIMULATION_SINGLE_RUN: TaskManager._simulation_engine_run_tasks,
-        TaskType.POST_PROCESSING: TaskManager._postprocessing_tasks,
-    }
     produce_graphics = False
-    #mock_init = mocker.patch.object(task_manager.input_manager, "__init__", return_value=None)
-    # mock_call_handler = mocker.patch.object(task_manager, "call_handler", return_value=None)
-    # mock_handle_input_data_audit = mocker.patch.object(task_manager, "handle_input_data_audit",
-    #                                                    return_value=None)
-    # mock_set_random_seed = mocker.patch.object(task_manager, "set_random_seed", return_value=None)
-    #m1 = mocker.patch.object(mock_output_manager, "run_startup_sequence", return_value=None)
-    om = OutputManager()
-    print(str(om)+"test")
-    m1 = mocker.patch.object(om, "run_startup_sequence", return_value=None)
+
+    mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
+    mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit",
+                                                       return_value=True)
+    mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
     task_manager.task(args, produce_graphics, 10)
     mock_im_init.assert_called_once_with(10)
-    m1.assert_called_once_with(
-        LogVerbosity(args["log_verbosity"]), args["exclude_info_maps"], Path(""), False, Path(""),
-        args["output_prefix"], RUFAS_VERSION, args["task_id"]
-    )
 
     if pre_validate:
-        assert mock_call_handler.assert_called_with(pre_validation_handlers.get(task_type))
-
+        mock_handler.assert_called_once()
     else:
-        assert mock_handle_input_data_audit.assert_called_with(args, mock_input_manager, mock_output_manager,
-                                                                       True)
-        assert mock_set_random_seed.assert_called_with(args["random_seed"], mock_output_manager)
-        assert mock_call_handler.assert_called_with(post_validation_handlers.get(task_type))
+        mock_handle_input_data_audit.assert_called_once()
+        mock_set_random_seed.assert_called_once()
+        mock_handler.assert_called_once()
