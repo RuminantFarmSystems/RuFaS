@@ -1,5 +1,6 @@
 from enum import Enum
 from functools import partial
+import inspect
 import multiprocessing
 import numpy
 from pathlib import Path
@@ -7,7 +8,7 @@ import random
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 import traceback
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Callable
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
@@ -20,7 +21,7 @@ RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2 ** 32 - 1
 
 
 class TaskType(Enum):
@@ -56,16 +57,16 @@ class TaskManager:
         self.output_manager = OutputManager()
 
     def start(
-        self,
-        metadata_path: Path,
-        verbosity: LogVerbosity,
-        exclude_info_maps: bool,
-        output_directory: Path,
-        logs_directory: Path,
-        clear_output_directory: bool,
-        produce_graphics: bool,
-        suppress_log_files: bool,
-        metadata_depth_limit: int,
+            self,
+            metadata_path: Path,
+            verbosity: LogVerbosity,
+            exclude_info_maps: bool,
+            output_directory: Path,
+            logs_directory: Path,
+            clear_output_directory: bool,
+            produce_graphics: bool,
+            suppress_log_files: bool,
+            metadata_depth_limit: int,
     ) -> None:
         """
         Initializes and starts the task management process.
@@ -133,7 +134,7 @@ class TaskManager:
         parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
         self.output_manager.add_log(
             "Task Manager parsed tasks",
-            f"Parsed {len(parsed_single_run_args)+len(parsed_multi_run_args)} tasks args.",
+            f"Parsed {len(parsed_single_run_args) + len(parsed_multi_run_args)} tasks args.",
             info_map,
         )
         expanded_args = self._expand_multi_runs_to_single_runs(parsed_multi_run_args)
@@ -144,7 +145,7 @@ class TaskManager:
             info_map,
         )
         for i in range(len(runnable_args)):
-            runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
+            runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
         self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
         TaskManager.handle_post_processing(
             args={
@@ -223,7 +224,7 @@ class TaskManager:
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
             new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
-            new_args["output_prefix"] = f"{new_args['output_prefix']} run {i+1}"
+            new_args["output_prefix"] = f"{new_args['output_prefix']} run {i + 1}"
             single_run_args.append(new_args)
 
         return single_run_args
@@ -278,7 +279,7 @@ class TaskManager:
         for sample_number in range(start_sample, stop_sample):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-            run_number = f"{sample_number+1}".zfill(digits)
+            run_number = f"{sample_number + 1}".zfill(digits)
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {run_number}"
             new_args["input_patch"] = {
                 names[variable_number]: data_types[variable_number](sampled_values[sample_number, variable_number])
@@ -294,7 +295,7 @@ class TaskManager:
         return []
 
     def _run_tasks(
-        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
+            self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
@@ -303,6 +304,15 @@ class TaskManager:
         results = self.pool.imap(task_with_args, single_run_args)
         for _ in results:
             pass
+
+    @staticmethod
+    def call_handler(handler: Callable[..., None], args: Dict[str, Any],
+                     input_manager: InputManager,
+                     output_manager: OutputManager,
+                     task_id: Any,
+                     produce_graphics: bool, ) -> None:
+        """Wrapper function to call the function map with each of its arguments."""
+        handler(args, input_manager, output_manager, task_id, produce_graphics)
 
     @staticmethod
     def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> None:
@@ -314,6 +324,17 @@ class TaskManager:
         }
         task_id = args["task_id"]
         output_manager = OutputManager()
+        print(output_manager)
+
+        pre_validation_handlers = {
+            TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
+            TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._compare_metadata_properties_tasks,
+        }
+        post_validation_handlers = {
+            TaskType.HERD_INITIALIZATION: TaskManager._herd_init_tasks,
+            TaskType.SIMULATION_SINGLE_RUN: TaskManager._simulation_engine_run_tasks,
+            TaskType.POST_PROCESSING: TaskManager._postprocessing_tasks,
+        }
         try:
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
@@ -325,20 +346,24 @@ class TaskManager:
                 RUFAS_VERSION,
                 task_id,
             )
+
             input_manager = InputManager(metadata_depth_limit)
+            task_type = args.get("task_type")
 
-            if args["task_type"] == TaskType.INPUT_DATA_AUDIT:
-                TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
-                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
-                return
-
-            if args["task_type"] == TaskType.COMPARE_METADATA_PROPERTIES:
-                input_manager.compare_metadata_properties(
-                    args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
+            handler = pre_validation_handlers.get(task_type)
+            if handler:
+                TaskManager.call_handler(
+                    handler,
+                    args=args,
+                    input_manager=input_manager,
+                    output_manager=output_manager,
+                    task_id=task_id,
+                    produce_graphics=produce_graphics,
                 )
                 return
 
             is_data_valid = TaskManager.handle_input_data_audit(args, input_manager, output_manager, True)
+
             if not is_data_valid:
                 output_manager.add_error(
                     "No task run",
@@ -350,21 +375,18 @@ class TaskManager:
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
-            if args["task_type"] == TaskType.HERD_INITIALIZATION:
-                args["init_herd"] = True
-                TaskManager.handle_herd_initializaition(args, output_manager)
-                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
-
-            if args["task_type"] == TaskType.SIMULATION_SINGLE_RUN:
-                if args["input_patch"]:
-                    Utility.deep_merge(input_manager.pool, args["input_patch"])
-                TaskManager.handle_single_simulation_run(args, output_manager)
-                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
-
-            if args["task_type"] == TaskType.POST_PROCESSING:
-                TaskManager.handle_post_processing(
-                    args, input_manager, output_manager, task_id, produce_graphics, True, True
+            handler = post_validation_handlers.get(task_type)
+            if handler:
+                TaskManager.call_handler(
+                    handler,
+                    args=args,
+                    input_manager=input_manager,
+                    output_manager=output_manager,
+                    task_id=task_id,
+                    produce_graphics=produce_graphics,
                 )
+                return
+
         except Exception as e:
             info_map.update(args)
             output_manager.add_error(
@@ -407,7 +429,7 @@ class TaskManager:
 
     @staticmethod
     def handle_input_data_audit(
-        args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
+            args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, eager_termination: bool
     ) -> bool:
         """Validates input data saves metadata properties to CSV."""
         info_map = {
@@ -433,13 +455,13 @@ class TaskManager:
 
     @staticmethod
     def handle_post_processing(
-        args: Dict[str, Any],
-        input_manager: InputManager,
-        output_manager: OutputManager,
-        task_id: str,
-        produce_graphics: bool = False,
-        save_results: bool = False,
-        load_pool_from_file: bool = False,
+            args: Dict[str, Any],
+            input_manager: InputManager,
+            output_manager: OutputManager,
+            task_id: str,
+            produce_graphics: bool = False,
+            save_results: bool = False,
+            load_pool_from_file: bool = False,
     ) -> None:
         """
         Handles post-processing tasks based on specified arguments.
@@ -509,3 +531,55 @@ class TaskManager:
 
         output_manager.add_variable("random_seed", random_seed, info_map)
         output_manager.add_log("Random seed used", f"Seeded libaries with {random_seed=}", info_map)
+
+    @staticmethod
+    def _input_data_audit_tasks(
+            args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any,
+            produce_grahics: bool
+    ) -> None:
+        TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+
+    @staticmethod
+    def _compare_metadata_properties_tasks(args: Dict[str, Any], input_manager: InputManager,
+                                           output_manager: OutputManager, task_id: Any,
+                                           produce_grahics: bool) -> None:
+        """Handler for all methods related to metadata property comparison."""
+        input_manager.compare_metadata_properties(
+            args["properties_file_path"], args["comparison_properties_file_path"], args["logs_directory"]
+        )
+
+    @staticmethod
+    def _herd_init_tasks(
+            args: Dict[str, Any], input_manager: InputManager, output_manager: OutputManager, task_id: Any,
+            produce_grahics: bool
+    ) -> None:
+        """Handler for all methods related to herd initialization."""
+        args["init_herd"] = True
+        TaskManager.handle_herd_initializaition(args, output_manager)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+
+    @staticmethod
+    def _simulation_engine_run_tasks(
+            args: Dict[str, Any],
+            input_manager: InputManager,
+            output_manager: OutputManager,
+            task_id: Any,
+            produce_graphics: bool,
+    ) -> None:
+        """Handler for all methods related to simulation run."""
+        if args["input_patch"]:
+            Utility.deep_merge(input_manager.pool, args["input_patch"])
+        TaskManager.handle_single_simulation_run(args, output_manager)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
+
+    @staticmethod
+    def _postprocessing_tasks(
+            args: Dict[str, Any],
+            input_manager: InputManager,
+            output_manager: OutputManager,
+            task_id: Any,
+            produce_graphics: bool,
+    ) -> None:
+        """Handler for all methods related to postprocessing."""
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True, True)
