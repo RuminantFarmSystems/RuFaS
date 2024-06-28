@@ -1,0 +1,32 @@
+{
+  "files": {
+    "config": {
+      "title": "Config Data",
+      "description": "Configuration file for general simulation parameters.",
+      "path": "input/data/config/end_to_end_testing_config.json",
+      "type": "json",
+      "properties": "config_properties"
+    },
+    "weather": {
+      "title": "Weather data",
+      "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
+      "path": "input/data/weather/barnyard_weather.csv",
+      "type": "csv",
+      "properties": "weather_properties"
+    },
+    "end_to_end_testing_results": {
+      "title": "End to end test results",
+      "path": "input/data/end_to_end_testing_results/end_to_end_results.json",
+      "type": "json",
+      "properties": "end_to_end_test_results_properties"
+    },
+    "properties": {
+      "title": "Metadata Properties",
+      "description": "The properties of input data.",
+      "path": "input/metadata/properties/default.json",
+      "type": "json",
+      "properties": "NA"
+    }
+  },
+  "cross-validation": {}
+}
