@@ -371,7 +371,8 @@ class ReportGenerator:
         missing_references = []
 
         for ref in references:
-            if not any(re.fullmatch(ref, report_name) for report_name in self.reports):
+            escaped_ref = re.escape(ref)
+            if not any(re.fullmatch(escaped_ref, report_name) for report_name in self.reports):
                 missing_references.append(ref)
 
         if missing_references:
@@ -397,8 +398,9 @@ class ReportGenerator:
 
         matched_reports = {}
         for pattern in regex_patterns:
+            escaped_pattern = re.escape(pattern)
             for report_name in self.reports:
-                if re.fullmatch(pattern, report_name):
+                if re.fullmatch(escaped_pattern, report_name):
                     matched_reports[report_name] = self.reports[report_name]
         return matched_reports
 
@@ -471,7 +473,11 @@ class ReportGenerator:
             horizontally_aggregated = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
-            aggregate_report = {"hor_agg": horizontally_aggregated}
+            if filter_content.get("display_units", True):
+                units = re.search(r"\(.*\)", next(iter(report_data)))
+                aggregate_report = {units.group(0): horizontally_aggregated}
+            else:
+                aggregate_report = {"hor_agg": horizontally_aggregated}
 
         elif vertical_agg_key:
             vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
@@ -483,7 +489,11 @@ class ReportGenerator:
             if has_dict_variables or has_multiple_columns:
                 aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
             else:
-                aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+                if filter_content.get("display_units", True):
+                    units = re.search(r"\(.*\)", next(iter(report_data)))
+                    aggregate_report = {units.group(0): list(vertically_aggregated.values())[0]}
+                else:
+                    aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
 
         return aggregate_report
 
