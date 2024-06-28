@@ -103,6 +103,22 @@ for analysis in config_json['analyses']: # noqa
             threethings.rename({0: "interaction_effects",
                                threethings.columns[-1]: "total_effects"},
                                axis=1, inplace=True)
+        elif (sampler == "morris"):
+            mu = new_whole_output_pd["mu:" + input]
+            total_effects = new_whole_output_pd["mu_star:" + input]
+            sigma = new_whole_output_pd["sigma:" + input]
+            mu_st_conf = new_whole_output_pd["mu_st_conf:" + input]
+            threethings = pd.concat([mu, total_effects, sigma, mu_st_conf], axis=1)
+            threethings.rename(
+                {
+                    threethings.columns[0]: "mu",
+                    threethings.columns[1]: "total_effects",
+                    threethings.columns[2]: "sigma",
+                    threethings.columns[3]: "mu_st_conf",
+                },
+                axis=1,
+                inplace=True,
+            )
 
         newcols = []
         for rowname in row_names[1:]:
@@ -136,7 +152,7 @@ for analysis in config_json['analyses']: # noqa
     for output in outputs_to_collate:
 
         just_output = pd.DataFrame(new_whole_output_pd.loc[output])
-        MEnames = [name for name in column_names if "ME:" in name or "S1:" in name]
+        MEnames = [name for name in column_names if "ME:" in name or "S1:" in name or "mu_star" in name]
         temp_output = just_output.loc[MEnames]
 
         # get the input column starts with ME:
@@ -156,9 +172,12 @@ for analysis in config_json['analyses']: # noqa
                 IEtable = just_output.loc[IEnames_temp]
                 interaction_effects.append(IEtable.sum(axis=0).values[0])
                 total_effects.append(interaction_effects[-1] + just_output.loc[MEname].values[0])
-            else:
+            elif sampler == "sobol" or sampler == "saltelli":
                 total_effects.append(just_output.loc[MEname.replace("S1:", "ST:")].values[0])
                 interaction_effects.append(total_effects[-1] - just_output.loc[MEname].values)
+            else:
+                total_effects.append(just_output.loc[MEname].values[0])
+                interaction_effects.append(just_output.loc[MEname.replace("mu_star:", "sigma:")].values[0])
 
         inteffs = pd.DataFrame(interaction_effects)
         inteffs.index = temp_output.index
@@ -178,7 +197,8 @@ for analysis in config_json['analyses']: # noqa
         bounds2 = []
         newcols = []
         for input_name in input_names:
-            input_reformatted = input_name.replace(" ", ".").replace("ME:", "").replace("S1:", "")
+            input_reformatted = input_name.replace(" ", ".").replace("ME:", "").replace("S1:", "").replace("mu_star:",
+                                                                                                           "")
             if input_reformatted in variable_names:
                 idx = variable_names.index(input_reformatted)
                 bounds2.append(bounds[idx])
@@ -193,7 +213,8 @@ for analysis in config_json['analyses']: # noqa
         newcols_pd = pd.DataFrame(newcols)
         bounds2_pd = pd.DataFrame(bounds2)
         bounds2_pd.rename({0: "input_min", 1: "input_max"}, axis=1, inplace=True)
-        bounds2_pd.index = output_temp.index
+        bounds2_pd.index = output_temp.index[0:len(bounds2)]  # TODO
+        # the previous line might need to be reverted to remove the info in hard brackets
         newcols_pd.index = output_temp.index
         output_pd = pd.concat([bounds2_pd, output_temp, newcols_pd], axis=1)
         output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)

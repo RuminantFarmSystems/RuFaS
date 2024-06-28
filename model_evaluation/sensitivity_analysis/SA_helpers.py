@@ -11,13 +11,17 @@ from typing import List, Dict, Any
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 from SALib.sample import sobol as sobol_sampler
-from SALib.analyze import sobol as sobol_analyzer
+from SALib.sample import morris as morris_sampler
 from SALib.analyze import ff as ff_analyzer
+from SALib.analyze import sobol as sobol_analyzer
+from SALib.analyze import morris as morris_analyzer
+
 # from SALib.test_functions import Ishigami
-from sklearn import datasets, linear_model
-from sklearn.metrics import mean_squared_error, r2_score
+# from sklearn import datasets, linear_model
+# from sklearn.metrics import mean_squared_error, r2_score
 import statsmodels.api as sm
-from scipy import stats
+# from scipy import stats
+
 
 def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
     """
@@ -38,7 +42,7 @@ def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
 
 def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[Any]:
     """
-    This reformats the output of the ff_sobol function
+    This reformats the output of the sobol function
     Forces into something easier to parse into csvs for printing
     This will place the main effects and interaction effects into grouped columns in a single dataframe
     """
@@ -61,6 +65,30 @@ def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[
     )
     len(rowvalues)
     rowvalues[21]
+
+    analysis_out = [colnames, rowvalues]
+    return analysis_out
+
+
+def rewrite_morris_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[Any]:
+    """
+    This reformats the output of the morris function
+    Forces into something easier to parse into csvs for printing
+    This will place the main effects and interaction effects into grouped columns in a single dataframe
+    """
+    intnames = p["names"]
+    colnames = (
+        ["mu:" + x for x in intnames]
+        + ["mu_star:" + x for x in intnames]
+        + ["sigma:" + str(x) for x in intnames]
+        + ["mu_st_conf:" + str(x) for x in intnames]
+    )
+    rowvalues = (
+        list(analysis["mu"])
+        + list(analysis["mu_star"])
+        + list(analysis["sigma"])
+        + list(analysis["mu_st_conf"])
+    )
 
     analysis_out = [colnames, rowvalues]
     return analysis_out
@@ -100,7 +128,7 @@ def collate_outputs(basedirectory: str,
 def analyze_it(
     task_specified: Dict[str, Any],
     parsed_SA_input_variables: Dict[str, Any],
-    sampled_values: np.ndarray[Any],
+    sampled_values: np.ndarray[Any, Any],
     output_to_analyze: List[float],
 ) -> List[Any]:
     print_analysis = False
@@ -111,13 +139,22 @@ def analyze_it(
                                           seed=task_specified["random_seed"]
                                           )
         analyzed_formatted = rewrite_sobol_analysis(analyzed, parsed_SA_input_variables)
-    elif task_specified["sampler"] == "saltelli_sobol":
+    elif task_specified["sampler"] == "saltelli":
         analyzed = sobol_analyzer.analyze(parsed_SA_input_variables,
                                           np.array(output_to_analyze),
                                           print_to_console=print_analysis,
                                           seed=task_specified["random_seed"]
                                           )
         analyzed_formatted = rewrite_sobol_analysis(analyzed, parsed_SA_input_variables)
+    elif task_specified["sampler"] == "morris":
+        analyzed = morris_analyzer.analyze(
+            parsed_SA_input_variables,
+            sampled_values,
+            np.array(output_to_analyze),
+            print_to_console=print_analysis,
+            seed=task_specified["random_seed"],
+        )
+        analyzed_formatted = rewrite_morris_analysis(analyzed, parsed_SA_input_variables)
     else:
         analyzed = ff_analyzer.analyze(
             parsed_SA_input_variables,
@@ -145,6 +182,12 @@ def get_sampled_values(task_to_analyze: Dict[str, Any],
             parsed_SA_input_variables,
             task_to_analyze["saltelli_number"],
             skip_values=task_to_analyze["saltelli_skip"],
+        )
+    elif task_to_analyze["sampler"] == "morris":
+        sampled_values = morris_sampler.sample(
+            parsed_SA_input_variables,
+            task_to_analyze["saltelli_number"],
+            seed=task_to_analyze["random_seed"],
         )
     else:
         sampled_values = fractional_factorial_sampler.sample(
