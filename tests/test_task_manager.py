@@ -244,6 +244,7 @@ def test_task(
     task_type: TaskType,
     pre_validate: bool,
 ) -> None:
+    """Tests that all available tasks were able to be mapped and run"""
     args = {
         "task_type": task_type,
         "log_verbosity": LogVerbosity.LOGS,
@@ -278,6 +279,7 @@ def test_task(
 
 
 def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
+    """Tests that all compare metadata properties tasks were handled"""
     args = {
         "properties_file_path": Path("fake/properties/path"),
         "comparison_properties_file_path": Path("fake/comparison/properties/path"),
@@ -302,6 +304,7 @@ def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
 
 
 def test_herd_init_tasks() -> None:
+    """Tests that all herd initialization tasks were handled"""
     args = {
         "log_verbosity": "logs",
         "exclude_info_maps": False,
@@ -330,6 +333,7 @@ def test_herd_init_tasks() -> None:
 
 @pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
 def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) -> None:
+    """Tests that all simulation engine run tasks were handled"""
     args = {
         "log_verbosity": "logs",
         "exclude_info_maps": False,
@@ -369,6 +373,7 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) 
 
 @pytest.mark.parametrize("produce_graphics", [True, False])
 def test_postprocessing_tasks(produce_graphics: bool) -> None:
+    """Tests that all postprocessing tasks were handled"""
     args = {
         "log_verbosity": "logs",
         "exclude_info_maps": False,
@@ -391,6 +396,7 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
 
 
 def test_call_handler():
+    """Tests that wrapper handler function were handled"""
     args = {
         "log_verbosity": "logs",
         "exclude_info_maps": False,
@@ -426,6 +432,7 @@ def test_call_handler():
 
 
 def test_input_data_audit_tasks() -> None:
+    """Tests that all input data audit tasks were handled"""
     args = {
         "log_verbosity": LogVerbosity.LOGS,
         "exclude_info_maps": False,
