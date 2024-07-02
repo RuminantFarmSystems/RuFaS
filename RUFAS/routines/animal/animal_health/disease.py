@@ -7,6 +7,7 @@ class Disease(ABC):
     """
     Class representing disease simulation.
     """
+
     def __init__(self) -> None:
         # im.get_data(disease_config)
         # self.baseline_incidence_rate = disease_config.user_input_incedence_rate or 0.0
