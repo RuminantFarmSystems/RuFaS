@@ -77,7 +77,7 @@ class Weather:
                     mean_air_temperature=weather_file["avg"][i],
                     max_air_temperature=weather_file["high"][i],
                     precipitation=weather_file["precip"][i],
-                    irrigation=weather_file["irrigation"][i]
+                    irrigation=weather_file["irrigation"][i],
                 )
                 self.weather_data[date_key] = conditions
 
@@ -210,7 +210,7 @@ class Weather:
 
     @staticmethod
     def _calculate_average_annual_temperature(
-            daily_average_temperatures: list[float],
+        daily_average_temperatures: list[float],
     ) -> float:
         """
         Calculates the average annual air temperature based on the daily average air temperatures.
