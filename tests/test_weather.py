@@ -209,33 +209,30 @@ def test_get_current_day_conditions_error(
                 1,
                 [
                     CurrentDayConditions(
-                        incoming_light=1.0,
-                        min_air_temperature=1.1,
-                        mean_air_temperature=1.2,
-                        max_air_temperature=1.3,
-                        precipitation=1.4,
-                        irrigation=1.5,
-                        annual_mean_air_temperature=15.0,
+                        incoming_light=1,
+                        min_air_temperature=1,
+                        mean_air_temperature=1,
+                        max_air_temperature=1,
+                        precipitation=1,
+                        irrigation=1,
                         daylength=15.6,
                     ),
                     CurrentDayConditions(
-                        incoming_light=2.0,
-                        min_air_temperature=2.1,
-                        mean_air_temperature=2.2,
-                        max_air_temperature=2.3,
-                        precipitation=2.4,
-                        irrigation=2.5,
-                        annual_mean_air_temperature=15.0,
+                        incoming_light=2,
+                        min_air_temperature=2,
+                        mean_air_temperature=2,
+                        max_air_temperature=2,
+                        precipitation=2,
+                        irrigation=2,
                         daylength=15.6,
                     ),
                     CurrentDayConditions(
-                        incoming_light=3.0,
-                        min_air_temperature=3.1,
-                        mean_air_temperature=3.2,
-                        max_air_temperature=3.3,
-                        precipitation=3.4,
-                        irrigation=3.5,
-                        annual_mean_air_temperature=15.0,
+                        incoming_light=3,
+                        min_air_temperature=3,
+                        mean_air_temperature=3,
+                        max_air_temperature=3,
+                        precipitation=3,
+                        irrigation=3,
                         daylength=15.6,
                     ),
                 ],
@@ -251,19 +248,12 @@ def test_get_conditions_series(
         expected: list[CurrentDayConditions],
 ) -> None:
     """Tests that series of CurrentDayConditions are created correctly."""
-    setattr(mock_time, "current_simulation_year", 2)
-    setattr(mock_time, "current_julian_day", 2)
-    setattr(mock_time, "simulation_day", 5)
-    setattr(mock_time, "end_year_int", 2024)
-    date_conversion = mocker.patch.object(Utility, "convert_ordinal_date_to_month_date", return_value=date(2023, 1, 2))
-    time_series_gen = mocker.patch.object(Utility, "generate_time_series", wraps=Utility.generate_time_series)
+    setattr(mock_time, "current_date", datetime(2023, 9, 25))
     daylength = mocker.patch.object(CurrentDayConditions, "determine_daylength", return_value=15.6)
 
     actual = mock_weather.get_conditions_series(mock_time, start, end)
 
     assert actual == expected
-    date_conversion.call_count == len(expected)
-    time_series_gen.assert_called_once()
     assert daylength.call_count == len(expected)
 
 

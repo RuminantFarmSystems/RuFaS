@@ -143,48 +143,16 @@ class Weather:
 
         """
         condition_list = []
+        latitude = self._get_latitude()
+
         for i in range(starting_offset, ending_offset+1):
-            date = time.start_date + datetime.timedelta(days=starting_offset)
+            date = time.current_date + datetime.timedelta(days=i)
+            daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude,
+                                                                 date.year)
+            self.weather_data[date].daylength = daylength
             condition_list.append(self.weather_data[date])
 
         return condition_list
-
-        # current_date = Utility.convert_ordinal_date_to_month_date(time.current_calendar_year, time.current_julian_day)
-        # date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
-        #
-        # starting_year_index = time.current_simulation_year - (current_date.year - date_series[0].year)
-        # starting_day_index = date_series[0].toordinal() - date(date_series[0].year, 1, 1).toordinal() + 1
-        # ending_year_index = time.current_simulation_year + (date_series[-1].year - current_date.year)
-        # ending_day_index = date_series[-1].toordinal() - date(date_series[-1].year, 1, 1).toordinal() + 1
-        # conditions_series = []
-        # for year in range(starting_year_index, ending_year_index + 1):
-        #     if starting_year_index == ending_year_index:
-        #         start_day = starting_day_index
-        #         end_day = ending_day_index
-        #     elif year == starting_year_index:
-        #         start_day = starting_day_index
-        #         end_day = len(self.__mean_daily_temperature[year]) - 1
-        #     elif year == ending_year_index:
-        #         start_day = 0
-        #         end_day = ending_day_index
-        #     else:
-        #         start_day = 0
-        #         end_day = len(self.__mean_daily_temperature[year]) - 1
-        #
-        #     for day in range(start_day, end_day + 1):
-        #         daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, time.start_year_int + year)
-        #         conditions = CurrentDayConditions(
-        #             incoming_light=self.__radiation[year - 1][day - 1],
-        #             min_air_temperature=self.__min_daily_temperature[year - 1][day - 1],
-        #             mean_air_temperature=self.__mean_daily_temperature[year - 1][day - 1],
-        #             max_air_temperature=self.__max_daily_temperature[year - 1][day - 1],
-        #             annual_mean_air_temperature=self.__mean_annual_temperature,
-        #             precipitation=self.__precipitation[year - 1][day - 1],
-        #             irrigation=self.__irrigation[year - 1][day - 1],
-        #             daylength=daylength,
-        #         )
-        #         conditions_series.append(conditions)
-        # return conditions_series
 
     def record_weather(self, time: Time) -> None:
         """
