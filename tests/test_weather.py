@@ -146,7 +146,7 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
                 precipitation=1,
                 irrigation=1,
                 daylength=10.0,
-                annual_mean_air_temperature=77
+                annual_mean_air_temperature=77,
             ),
             datetime(2023, 9, 24),
         ),
@@ -161,7 +161,7 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
                 precipitation=2,
                 irrigation=2,
                 daylength=10.0,
-                annual_mean_air_temperature=77
+                annual_mean_air_temperature=77,
             ),
             datetime(2023, 9, 25),
         ),
@@ -234,7 +234,7 @@ def test_get_current_day_conditions_error(
                     precipitation=1,
                     irrigation=1,
                     daylength=15.6,
-                    annual_mean_air_temperature=77
+                    annual_mean_air_temperature=77,
                 ),
                 CurrentDayConditions(
                     incoming_light=2,
@@ -244,7 +244,7 @@ def test_get_current_day_conditions_error(
                     precipitation=2,
                     irrigation=2,
                     daylength=15.6,
-                    annual_mean_air_temperature=77
+                    annual_mean_air_temperature=77,
                 ),
                 CurrentDayConditions(
                     incoming_light=3,
@@ -254,7 +254,7 @@ def test_get_current_day_conditions_error(
                     precipitation=3,
                     irrigation=3,
                     daylength=15.6,
-                    annual_mean_air_temperature=77
+                    annual_mean_air_temperature=77,
                 ),
             ],
         )
