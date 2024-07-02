@@ -13,8 +13,10 @@ class AnimalHealth:
         if animal_health_status.status == DiseaseOutcomes.REMAIN_DISEASED:
             Disease.immediate_effect()
 
-        elif not animal_health_status.status == DiseaseOutcomes.REMAIN_DISEASED and \
-                not animal_health_status.status == DiseaseOutcomes.RECOVERY:
+        elif (
+            not animal_health_status.status == DiseaseOutcomes.REMAIN_DISEASED
+            and not animal_health_status.status == DiseaseOutcomes.RECOVERY
+        ):
             for disease in self.diseases:
                 animal_at_risk = disease.assess_disease_risk()
                 if animal_at_risk:
