@@ -198,6 +198,27 @@ class Time:
         actual_date = self.start_date + datetime.timedelta(days=simulation_day - 1)
         return actual_date
 
+    @staticmethod
+    def convert_year_jday_date(year: int, day: int) -> datetime:
+        """
+        Converts the year and its day of the year to a datetime object
+
+        Parameters
+        ----------
+        year: int
+            Year of the date.
+        day: int
+            Number of days into the year.
+
+        Returns
+        -------
+        datetime
+            The date time object from the provided inputs
+
+        """
+        first_day_of_year = datetime.datetime(year, 1, 1)
+        return first_day_of_year + datetime.timedelta(days=day - 1)
+
     def __str__(self) -> str:
         return (
             f"Year: {self.current_simulation_year}, Day: {self.current_julian_day}. "
