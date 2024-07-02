@@ -274,10 +274,7 @@ class ReportGenerator:
             If the value of 'horizontal_first' in the report filter is not a boolean.
         """
 
-        if "horizontal_first" not in filter_content:
-            return False
-
-        horizontal_first = filter_content["horizontal_first"]
+        horizontal_first = filter_content.get("horizontal_first", False)
 
         if not isinstance(horizontal_first, bool):
             raise ValueError(
@@ -630,13 +627,18 @@ class ReportGenerator:
             If the data to be aggregated has different lengths.
         """
 
-        lengths = [len(report_data[key]) for key in loop_list]
+        lengths = [len(report_data[key]) for key in report_data if any(loop_key in key for loop_key in loop_list)]
         if len(set(lengths)) != 1:
             raise ValueError("Can't aggregate data with different lengths")
         max_length = max(lengths)
         aggregated_data: List[float] = []
         for i in range(max_length):
-            temp_data = [report_data[key][i] for key in loop_list]
+            temp_data = [
+                report_data[key][i]
+                for loop_key in loop_list
+                for key in report_data
+                if loop_key in key
+            ]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
         return aggregated_data
