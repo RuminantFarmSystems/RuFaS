@@ -1,3 +1,4 @@
+from typing import Optional
 from RUFAS.routines.animal.animal_health.outcomes import DiseaseOutcomes
 
 
@@ -18,5 +19,5 @@ class AnimalHealthStatus:
         # parity, calving_interval, days_in_preg, other repro status data?
         # other attributes will likely be needed
         self.status: DiseaseOutcomes = DiseaseOutcomes.HEALTHY
-        self.disease_start_date = None
+        self.disease_start_date: Optional[int] = None
         pass
