@@ -151,10 +151,9 @@ class Weather:
         condition_list = []
         latitude = self._get_latitude()
 
-        for i in range(starting_offset, ending_offset+1):
+        for i in range(starting_offset, ending_offset + 1):
             date = time.current_date + datetime.timedelta(days=i)
-            daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude,
-                                                                 date.year)
+            daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude, date.year)
             self.weather_data[date].daylength = daylength
             condition_list.append(self.weather_data[date])
 

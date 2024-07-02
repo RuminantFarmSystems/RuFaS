@@ -45,19 +45,32 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
     mock_weather = Weather({}, mock_time)
-    weather_data = {datetime(2023, 9, 24): CurrentDayConditions(
-        incoming_light=1, min_air_temperature=1,
-        mean_air_temperature=1, max_air_temperature=1,
-        precipitation=1, irrigation=1
-    ), datetime(2023, 9, 25): CurrentDayConditions(
-        incoming_light=2, min_air_temperature=2,
-        mean_air_temperature=2, max_air_temperature=2,
-        precipitation=2, irrigation=2
-    ), datetime(2023, 9, 26): CurrentDayConditions(
-        incoming_light=3, min_air_temperature=3,
-        mean_air_temperature=3, max_air_temperature=3,
-        precipitation=3, irrigation=3
-    )}
+    weather_data = {
+        datetime(2023, 9, 24): CurrentDayConditions(
+            incoming_light=1,
+            min_air_temperature=1,
+            mean_air_temperature=1,
+            max_air_temperature=1,
+            precipitation=1,
+            irrigation=1,
+        ),
+        datetime(2023, 9, 25): CurrentDayConditions(
+            incoming_light=2,
+            min_air_temperature=2,
+            mean_air_temperature=2,
+            max_air_temperature=2,
+            precipitation=2,
+            irrigation=2,
+        ),
+        datetime(2023, 9, 26): CurrentDayConditions(
+            incoming_light=3,
+            min_air_temperature=3,
+            mean_air_temperature=3,
+            max_air_temperature=3,
+            precipitation=3,
+            irrigation=3,
+        ),
+    }
     mock_weather.weather_data = weather_data
 
     return mock_weather
@@ -98,8 +111,7 @@ def test_weather_init(mock_weather_input: dict, mock_time: Time, mocker: MockerF
     ):
         mock_time.start_date = datetime(2023, 11, 1)
         mock_time.end_date = datetime(2023, 11, 5)
-        convert = mocker.patch.object(mock_time, "convert_simulation_day_to_date",
-                                      return_value=datetime(2023, 11, 3))
+        convert = mocker.patch.object(mock_time, "convert_simulation_day_to_date", return_value=datetime(2023, 11, 3))
         Weather(mock_weather_input, mock_time)
         check.assert_called_once()
         add.assert_called_once()
@@ -124,38 +136,42 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
     "day,calendar_year,expected,time",
     [
         (
-                1,
-                1,
-                CurrentDayConditions(
-                    incoming_light=1, min_air_temperature=1,
-                    mean_air_temperature=1, max_air_temperature=1,
-                    precipitation=1, irrigation=1, daylength=10.0
-                ),
-                datetime(2023, 9, 24)
+            1,
+            1,
+            CurrentDayConditions(
+                incoming_light=1,
+                min_air_temperature=1,
+                mean_air_temperature=1,
+                max_air_temperature=1,
+                precipitation=1,
+                irrigation=1,
+                daylength=10.0,
+            ),
+            datetime(2023, 9, 24),
         ),
         (
-                3,
-                1,
-                CurrentDayConditions(
-                    incoming_light=2,
-                    min_air_temperature=2,
-                    mean_air_temperature=2,
-                    max_air_temperature=2,
-                    precipitation=2,
-                    irrigation=2,
-                    daylength=10.0,
-                ),
-                datetime(2023, 9, 25)
+            3,
+            1,
+            CurrentDayConditions(
+                incoming_light=2,
+                min_air_temperature=2,
+                mean_air_temperature=2,
+                max_air_temperature=2,
+                precipitation=2,
+                irrigation=2,
+                daylength=10.0,
+            ),
+            datetime(2023, 9, 25),
         ),
     ],
 )
 def test_get_current_day_conditions(
-        mocker: MockerFixture,
-        mock_weather: Weather,
-        day: int,
-        calendar_year: int,
-        expected: CurrentDayConditions,
-        time: datetime
+    mocker: MockerFixture,
+    mock_weather: Weather,
+    day: int,
+    calendar_year: int,
+    expected: CurrentDayConditions,
+    time: datetime,
 ) -> None:
     """Tests that CurrentDayConditions instances are correctly created by Weather."""
     mocked_time = MagicMock(Time)
@@ -181,12 +197,12 @@ def test_get_current_day_conditions(
     ],
 )
 def test_get_current_day_conditions_error(
-        mocker: MockerFixture,
-        mock_weather: Weather,
-        day: int,
-        calendar_year: int,
-        expected: CurrentDayConditions,
-        time: datetime
+    mocker: MockerFixture,
+    mock_weather: Weather,
+    day: int,
+    calendar_year: int,
+    expected: CurrentDayConditions,
+    time: datetime,
 ) -> None:
     """Tests that error is raised properly when weather does not have data for specified time."""
     mocked_time = MagicMock(Time)
@@ -205,47 +221,47 @@ def test_get_current_day_conditions_error(
     "start,end,expected",
     [
         (
-                -1,
-                1,
-                [
-                    CurrentDayConditions(
-                        incoming_light=1,
-                        min_air_temperature=1,
-                        mean_air_temperature=1,
-                        max_air_temperature=1,
-                        precipitation=1,
-                        irrigation=1,
-                        daylength=15.6,
-                    ),
-                    CurrentDayConditions(
-                        incoming_light=2,
-                        min_air_temperature=2,
-                        mean_air_temperature=2,
-                        max_air_temperature=2,
-                        precipitation=2,
-                        irrigation=2,
-                        daylength=15.6,
-                    ),
-                    CurrentDayConditions(
-                        incoming_light=3,
-                        min_air_temperature=3,
-                        mean_air_temperature=3,
-                        max_air_temperature=3,
-                        precipitation=3,
-                        irrigation=3,
-                        daylength=15.6,
-                    ),
-                ],
+            -1,
+            1,
+            [
+                CurrentDayConditions(
+                    incoming_light=1,
+                    min_air_temperature=1,
+                    mean_air_temperature=1,
+                    max_air_temperature=1,
+                    precipitation=1,
+                    irrigation=1,
+                    daylength=15.6,
+                ),
+                CurrentDayConditions(
+                    incoming_light=2,
+                    min_air_temperature=2,
+                    mean_air_temperature=2,
+                    max_air_temperature=2,
+                    precipitation=2,
+                    irrigation=2,
+                    daylength=15.6,
+                ),
+                CurrentDayConditions(
+                    incoming_light=3,
+                    min_air_temperature=3,
+                    mean_air_temperature=3,
+                    max_air_temperature=3,
+                    precipitation=3,
+                    irrigation=3,
+                    daylength=15.6,
+                ),
+            ],
         )
     ],
 )
 def test_get_conditions_series(
-        mock_weather: Weather,
-        mock_time: Time,
-        mocker: MockerFixture,
-        start: int,
-        end: int,
-        expected: list[CurrentDayConditions],
+    mock_weather: Weather,
+    mock_time: Time,
+    mocker: MockerFixture,
+    start: int,
+    end: int,
+    expected: list[CurrentDayConditions],
 ) -> None:
     """Tests that series of CurrentDayConditions are created correctly."""
     setattr(mock_time, "current_date", datetime(2023, 9, 25))
@@ -258,9 +274,9 @@ def test_get_conditions_series(
 
 
 def test_record_weather(
-        mock_weather: Weather,
-        mock_current_day_conditions: CurrentDayConditions,
-        mock_time: Time,
+    mock_weather: Weather,
+    mock_current_day_conditions: CurrentDayConditions,
+    mock_time: Time,
 ) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
     with (
@@ -281,10 +297,10 @@ def test_record_weather(
     [(["field_1", "field_2"], 34.1, 34.1), ([], None, 43.0723)],
 )
 def test_get_latitude(
-        field_keys: list[str],
-        field_data: float,
-        expected_latitude: float,
-        mock_weather: Weather,
+    field_keys: list[str],
+    field_data: float,
+    expected_latitude: float,
+    mock_weather: Weather,
 ) -> None:
     """Test that Weather correctly gets a latitude from Input Manager or uses the default."""
     with (
