@@ -67,7 +67,6 @@ class Weather:
         start_time = time.start_date
         end_time = time.end_date
         for i in range(len(weather_file["year"])):
-            ## year = weather_file["year"][i]
             jday = weather_file["jday"][i]
             date_key = time.convert_simulation_day_to_date(jday)
 
@@ -82,108 +81,16 @@ class Weather:
 
         self.mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
 
-    # self.im = InputManager()
-        # self.weather_data = {}
-        # current_date = time.start_date
-        # for i in range(len(weather_file["year"])):
-        #     year = weather_file["year"][i]
-        #     jday = weather_file["jday"][i]
-        #     date_key = time.convert_simulation_day_to_date(jday)
-        #     if time.start_date <= date_key <= time.end_date:
-        #         conditions = CurrentDayConditions(
-        #             incoming_light=weather_file["Hday"][i],
-        #             min_air_temperature=weather_file["low"][i],
-        #             mean_air_temperature=weather_file["avg"][i],
-        #             max_air_temperature=weather_file["high"][i],
-        #             precipitation=weather_file["precip"][i],
-        #             irrigation=weather_file["irrigation"][i],
-        #         )
-        #         self.weather_data[date_key] = conditions
-        #     self.check_adequate_weather_data()
-        #
-        # years = time.years
-        # w_start_year = time.start_year_int
-        # w_start_day = time.start_day
-        # start_year = time.start_year_int
-        # start_day = time.start_day
-        #
-        # # initialize data sets
-        # self.__precipitation = []
-        # self.__max_daily_temperature = []
-        # self.__min_daily_temperature = []
-        # self.__mean_daily_temperature = []
-        # self.__radiation = []
-        # self.__irrigation = []
-        # self.__mean_annual_temperature: float = None
-        # self.__latitude: float = self._get_latitude()
-        #
-        # year_length = GeneralConstants.YEAR_LENGTH
-        # leap_year_length = GeneralConstants.LEAP_YEAR_LENGTH
-        #
-        # # calculate the number of days between the beginning of
-        # # the weather file and the next year
-        # if Utility.is_leap_year(w_start_year):
-        #     w_day_offset = leap_year_length - w_start_day
-        # else:
-        #     w_day_offset = year_length - w_start_day
-        #
-        # # calculates the amount of days between the start day of the weather
-        # # file and the start day of the simulation
-        # if start_year == w_start_year:
-        #     days_to_start = start_day - w_start_day
-        # elif start_year == w_start_year + 1:
-        #     days_to_start = w_day_offset + start_day
-        # else:
-        #     days_to_start = w_day_offset + start_day
-        #     temp_year = w_start_year + 1
-        #     while temp_year != start_year:
-        #         if Utility.is_leap_year(temp_year):
-        #             days_to_start += leap_year_length
-        #         else:
-        #             days_to_start += year_length
-        #         temp_year += 1
-        #
-        # # fill the weather arrays with zeros for the size of each year in years[]
-        # for year in years:
-        #     self.__precipitation.append([0.0 for _ in range(len(year))])
-        #     self.__max_daily_temperature.append([0.0 for _ in range(len(year))])
-        #     self.__min_daily_temperature.append([0.0 for _ in range(len(year))])
-        #     self.__mean_daily_temperature.append([0.0 for _ in range(len(year))])
-        #     self.__radiation.append([0.0 for _ in range(len(year))])
-        #     self.__irrigation.append([0.0 for _ in range(len(year))])
-        #
-        # for i in range(len(weather_file["year"])):
-        #     current_year = weather_file["year"][i]
-        #     current_day = weather_file["jday"][i]
-        #
-        #     current_year_index = current_year - start_year
-        #     current_day_index = current_day - 1
-        #
-        #     if not start_year <= current_year <= time.end_year_int:
-        #         continue
-        #     elif current_year == time.end_year_int and current_day > time.end_day:
-        #         break
-        #
-        #     self.__precipitation[current_year_index][current_day_index] = weather_file["precip"][i]
-        #     self.__max_daily_temperature[current_year_index][current_day_index] = weather_file["high"][i]
-        #     self.__min_daily_temperature[current_year_index][current_day_index] = weather_file["low"][i]
-        #     self.__mean_daily_temperature[current_year_index][current_day_index] = weather_file["avg"][i]
-        #     self.__radiation[current_year_index][current_day_index] = weather_file["Hday"][i]
-        #     self.__irrigation[current_year_index][current_day_index] = weather_file["irrigation"][i]
-        #
-        # self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
-        #
-        # info_map = {
-        #     "class": self.__class__.__name__,
-        #     "function": "__init__",
-        #     "prefix": "Weather",
-        # }
-        # om.add_variable(
-        #     "average_annual_temperature",
-        #     self.__mean_annual_temperature,
-        #     dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
-        # )
-        #
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": "__init__",
+            "prefix": "Weather",
+        }
+        om.add_variable(
+            "average_annual_temperature",
+            self.mean_annual_temperature,
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
+        )
 
     def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
         """
@@ -201,20 +108,20 @@ class Weather:
 
         Raises
         ------
-        IndexError
+        KeyError
             While attempting to collect weather conditions that are not contained in the Weather object.
 
         """
         latitude = self._get_latitude()
         daylength = CurrentDayConditions.determine_daylength(time.current_julian_day, latitude,
                                                              time.current_calendar_year)
-        self.weather_data[time.current_date].daylength = daylength
+        try:
+            self.weather_data[time.current_date].daylength = daylength
+        except KeyError:
+            raise KeyError(f"Attempted to get weather conditions for day: {time.current_julian_day},"
+                           f" year: {time.current_calendar_year}.")
 
         return self.weather_data[time.current_date]
-
-    def get_weather(self, time: Time):
-        """Replaces get weather condition"""
-        # Simply a get from the weather dictionary
 
     def get_conditions_series(self, time: Time, starting_offset: int, ending_offset: int) -> list[CurrentDayConditions]:
         """
@@ -223,7 +130,7 @@ class Weather:
         Parameters
         ----------
         time : Time
-            Time instance containing the current time information of the simulation.
+            A time instance containing the current time information of the simulation.
         starting_offset : int
             Number of days before or after the given date to start the weather conditions series.
         ending_offset : int
@@ -235,7 +142,13 @@ class Weather:
             Series of current day conditions in chronological order.
 
         """
-        # TODO: Loop through the requested time range and simply save them in a list
+        condition_list = []
+        for i in range(starting_offset, ending_offset+1):
+            date = time.start_date + datetime.timedelta(days=starting_offset)
+            condition_list.append(self.weather_data[date])
+
+        return condition_list
+
         # current_date = Utility.convert_ordinal_date_to_month_date(time.current_calendar_year, time.current_julian_day)
         # date_series = Utility.generate_time_series(current_date, starting_offset, ending_offset)
         #
@@ -323,7 +236,7 @@ class Weather:
 
     @staticmethod
     def _calculate_average_annual_temperature(
-        daily_average_temperatures: list[float],
+            daily_average_temperatures: list[float],
     ) -> float:
         """
         Calculates the average annual air temperature based on the daily average air temperatures.
