@@ -275,6 +275,8 @@ class ReportGenerator:
         """
 
         horizontal_first = filter_content.get("horizontal_first", False)
+        if not horizontal_first:
+            return False
 
         if not isinstance(horizontal_first, bool):
             raise ValueError(
