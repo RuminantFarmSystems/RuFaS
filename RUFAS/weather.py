@@ -73,9 +73,12 @@ class Weather:
             # Only include dates within the simulation period to save on space
             if start_time <= date_key <= end_time:
                 conditions = CurrentDayConditions(
-                    incoming_light=weather_file["Hday"][i], min_air_temperature=weather_file["low"][i],
-                    mean_air_temperature=weather_file["avg"][i], max_air_temperature=weather_file["high"][i],
-                    precipitation=weather_file["precip"][i], irrigation=weather_file["irrigation"][i]
+                    incoming_light=weather_file["Hday"][i],
+                    min_air_temperature=weather_file["low"][i],
+                    mean_air_temperature=weather_file["avg"][i],
+                    max_air_temperature=weather_file["high"][i],
+                    precipitation=weather_file["precip"][i],
+                    irrigation=weather_file["irrigation"][i],
                 )
                 self.weather_data[date_key] = conditions
 
@@ -113,13 +116,16 @@ class Weather:
 
         """
         latitude = self._get_latitude()
-        daylength = CurrentDayConditions.determine_daylength(time.current_julian_day, latitude,
-                                                             time.current_calendar_year)
+        daylength = CurrentDayConditions.determine_daylength(
+            time.current_julian_day, latitude, time.current_calendar_year
+        )
         try:
             self.weather_data[time.current_date].daylength = daylength
         except KeyError:
-            raise KeyError(f"Attempted to get weather conditions for day: {time.current_julian_day},"
-                           f" year: {time.current_calendar_year}.")
+            raise KeyError(
+                f"Attempted to get weather conditions for day: {time.current_julian_day},"
+                f" year: {time.current_calendar_year}."
+            )
 
         return self.weather_data[time.current_date]
 
@@ -204,7 +210,7 @@ class Weather:
 
     @staticmethod
     def _calculate_average_annual_temperature(
-            daily_average_temperatures: list[float],
+        daily_average_temperatures: list[float],
     ) -> float:
         """
         Calculates the average annual air temperature based on the daily average air temperatures.
