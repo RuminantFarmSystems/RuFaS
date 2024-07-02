@@ -1,15 +1,12 @@
 import datetime
-from typing import List
 
 import numpy as np
 
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.units import MeasurementUnits
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
-from RUFAS.util import Utility
 
 om = OutputManager()
 
@@ -151,7 +148,7 @@ class Weather:
         condition_list = []
         latitude = self._get_latitude()
 
-        for i in range(starting_offset, ending_offset+1):
+        for i in range(starting_offset, ending_offset + 1):
             date = time.current_date + datetime.timedelta(days=i)
             daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude,
                                                                  date.year)

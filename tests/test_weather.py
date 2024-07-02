@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 import pytest
 from pytest_mock.plugin import MockerFixture
 from unittest.mock import MagicMock, patch
@@ -8,7 +8,6 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
-from RUFAS.util import Utility
 
 om = OutputManager()
 
@@ -124,28 +123,28 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
     "day,calendar_year,expected,time",
     [
         (
-                1,
-                1,
-                CurrentDayConditions(
-                    incoming_light=1, min_air_temperature=1,
-                    mean_air_temperature=1, max_air_temperature=1,
-                    precipitation=1, irrigation=1, daylength=10.0
-                ),
-                datetime(2023, 9, 24)
+            1,
+            1,
+            CurrentDayConditions(
+                incoming_light=1, min_air_temperature=1,
+                mean_air_temperature=1, max_air_temperature=1,
+                precipitation=1, irrigation=1, daylength=10.0
+            ),
+            datetime(2023, 9, 24)
         ),
         (
-                3,
-                1,
-                CurrentDayConditions(
-                    incoming_light=2,
-                    min_air_temperature=2,
-                    mean_air_temperature=2,
-                    max_air_temperature=2,
-                    precipitation=2,
-                    irrigation=2,
-                    daylength=10.0,
-                ),
-                datetime(2023, 9, 25)
+            3,
+            1,
+            CurrentDayConditions(
+                incoming_light=2,
+                min_air_temperature=2,
+                mean_air_temperature=2,
+                max_air_temperature=2,
+                precipitation=2,
+                irrigation=2,
+                daylength=10.0,
+            ),
+            datetime(2023, 9, 25)
         ),
     ],
 )
@@ -205,37 +204,37 @@ def test_get_current_day_conditions_error(
     "start,end,expected",
     [
         (
-                -1,
-                1,
-                [
-                    CurrentDayConditions(
-                        incoming_light=1,
-                        min_air_temperature=1,
-                        mean_air_temperature=1,
-                        max_air_temperature=1,
-                        precipitation=1,
-                        irrigation=1,
-                        daylength=15.6,
-                    ),
-                    CurrentDayConditions(
-                        incoming_light=2,
-                        min_air_temperature=2,
-                        mean_air_temperature=2,
-                        max_air_temperature=2,
-                        precipitation=2,
-                        irrigation=2,
-                        daylength=15.6,
-                    ),
-                    CurrentDayConditions(
-                        incoming_light=3,
-                        min_air_temperature=3,
-                        mean_air_temperature=3,
-                        max_air_temperature=3,
-                        precipitation=3,
-                        irrigation=3,
-                        daylength=15.6,
-                    ),
-                ],
+            -1,
+            1,
+            [
+                CurrentDayConditions(
+                    incoming_light=1,
+                    min_air_temperature=1,
+                    mean_air_temperature=1,
+                    max_air_temperature=1,
+                    precipitation=1,
+                    irrigation=1,
+                    daylength=15.6,
+                ),
+                CurrentDayConditions(
+                    incoming_light=2,
+                    min_air_temperature=2,
+                    mean_air_temperature=2,
+                    max_air_temperature=2,
+                    precipitation=2,
+                    irrigation=2,
+                    daylength=15.6,
+                ),
+                CurrentDayConditions(
+                    incoming_light=3,
+                    min_air_temperature=3,
+                    mean_air_temperature=3,
+                    max_air_temperature=3,
+                    precipitation=3,
+                    irrigation=3,
+                    daylength=15.6,
+                ),
+            ],
         )
     ],
 )
