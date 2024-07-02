@@ -2,10 +2,12 @@ from enum import Enum, unique
 
 
 @unique
-class DiseaseOutcome(Enum):
+class DiseaseOutcomes(Enum):
     """
     A list of possible outcomes for animals that have developed a disease.
 
+    HEALTHY : str
+        Animal is healthy.
     DEATH : str
         Animal dies while sick.
     RECOVERY : str
@@ -18,6 +20,7 @@ class DiseaseOutcome(Enum):
 
     """
 
+    HEALTHY = "healthy"
     DEATH = "death"
     RECOVERY = "recovery"
     CULL = "cull"
