@@ -71,6 +71,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
         ),
     }
     mock_weather.weather_data = weather_data
+    mock_weather.mean_annual_temperature = 77
 
     return mock_weather
 
@@ -110,7 +111,7 @@ def test_weather_init(mock_weather_input: dict, mock_time: Time, mocker: MockerF
     ):
         mock_time.start_date = datetime(2023, 11, 1)
         mock_time.end_date = datetime(2023, 11, 5)
-        convert = mocker.patch.object(mock_time, "convert_simulation_day_to_date", return_value=datetime(2023, 11, 3))
+        convert = mocker.patch.object(Time, "convert_year_jday_date", return_value=datetime(2023, 11, 3))
         Weather(mock_weather_input, mock_time)
         check.assert_called_once()
         add.assert_called_once()
@@ -145,6 +146,7 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
                 precipitation=1,
                 irrigation=1,
                 daylength=10.0,
+                annual_mean_air_temperature=77
             ),
             datetime(2023, 9, 24),
         ),
@@ -159,6 +161,7 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
                 precipitation=2,
                 irrigation=2,
                 daylength=10.0,
+                annual_mean_air_temperature=77
             ),
             datetime(2023, 9, 25),
         ),
@@ -231,6 +234,7 @@ def test_get_current_day_conditions_error(
                     precipitation=1,
                     irrigation=1,
                     daylength=15.6,
+                    annual_mean_air_temperature=77
                 ),
                 CurrentDayConditions(
                     incoming_light=2,
@@ -240,6 +244,7 @@ def test_get_current_day_conditions_error(
                     precipitation=2,
                     irrigation=2,
                     daylength=15.6,
+                    annual_mean_air_temperature=77
                 ),
                 CurrentDayConditions(
                     incoming_light=3,
@@ -249,6 +254,7 @@ def test_get_current_day_conditions_error(
                     precipitation=3,
                     irrigation=3,
                     daylength=15.6,
+                    annual_mean_air_temperature=77
                 ),
             ],
         )

@@ -63,9 +63,11 @@ class Weather:
         self.check_adequate_weather_data(weather_file, time)
         start_time = time.start_date
         end_time = time.end_date
+
         for i in range(len(weather_file["year"])):
+            year = weather_file["year"][i]
             jday = weather_file["jday"][i]
-            date_key = time.convert_simulation_day_to_date(jday)
+            date_key = Time.convert_year_jday_date(year, jday)
 
             # Only include dates within the simulation period to save on space
             if start_time <= date_key <= end_time:
@@ -75,7 +77,7 @@ class Weather:
                     mean_air_temperature=weather_file["avg"][i],
                     max_air_temperature=weather_file["high"][i],
                     precipitation=weather_file["precip"][i],
-                    irrigation=weather_file["irrigation"][i],
+                    irrigation=weather_file["irrigation"][i]
                 )
                 self.weather_data[date_key] = conditions
 
@@ -118,6 +120,7 @@ class Weather:
         )
         try:
             self.weather_data[time.current_date].daylength = daylength
+            self.weather_data[time.current_date].annual_mean_air_temperature = self.mean_annual_temperature
         except KeyError:
             raise KeyError(
                 f"Attempted to get weather conditions for day: {time.current_julian_day},"
@@ -152,6 +155,7 @@ class Weather:
             date = time.current_date + datetime.timedelta(days=i)
             daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude, date.year)
             self.weather_data[date].daylength = daylength
+            self.weather_data[date].annual_mean_air_temperature = self.mean_annual_temperature
             condition_list.append(self.weather_data[date])
 
         return condition_list
@@ -206,7 +210,7 @@ class Weather:
 
     @staticmethod
     def _calculate_average_annual_temperature(
-        daily_average_temperatures: list[float],
+            daily_average_temperatures: list[float],
     ) -> float:
         """
         Calculates the average annual air temperature based on the daily average air temperatures.
@@ -279,12 +283,26 @@ class Weather:
 
     @staticmethod
     def check_adequate_weather_data(weather_file: dict, time: Time) -> None:
-        # Iterates through all the date of time
+        """
+        Checks that there is enough weather data to cover the whole simulation time.
+
+        Parameters
+        ----------
+        weather_file: dict
+            A dictionary form of the weather file.
+        time: Time
+            The Time instance containing time configuration information of the simulation.
+
+        Returns
+        -------
+        None
+
+        """
         years_list = weather_file["year"]
         days_list = weather_file["jday"]
         current_date = time.start_date
+
         while current_date != time.end_date:
-            # Checks that the year and jday does match to something
             current_date_year = current_date.timetuple().tm_year
             current_date_jday = current_date.timetuple().tm_yday
             if (current_date_jday in days_list) and (current_date_year in years_list):
