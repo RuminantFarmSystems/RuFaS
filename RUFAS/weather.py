@@ -281,7 +281,7 @@ class Weather:
     def check_adequate_weather_data(weather_file: dict, time: Time) -> None:
         # Iterates through all the date of time
         years_list = weather_file["year"]
-        days_list = weather_file["day"]
+        days_list = weather_file["jday"]
         current_date = time.start_date
         while current_date != time.end_date:
             # Checks that the year and jday does match to something
