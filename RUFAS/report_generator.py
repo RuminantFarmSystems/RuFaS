@@ -134,6 +134,12 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
 }
 
 
+class NoFilterMatchError(ValueError):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+
 class ReportGenerator:
     """
     A class to generate reports based on filtered data and aggregation criteria and store them in a dictionary.
@@ -237,11 +243,11 @@ class ReportGenerator:
                         "info_map": info_map,
                     }
                     event_logs.append(warning_event_log)
-
-        except (KeyError, ValueError) as e:
+        except (KeyError, ValueError, NoFilterMatchError) as e:
+            log_type = "warning" if isinstance(e, NoFilterMatchError) else "error"
             error_type = e.__class__.__name__
             error_event_log = {
-                "error": "report_generation_error",
+                log_type: "report_generation_error",
                 "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
                 "info_map": info_map,
             }
@@ -431,8 +437,9 @@ class ReportGenerator:
         ------
         ValueError
             If there is an error preparing the report data.
-            If the report data is empty.
             If the type of horizontal or vertical aggregation is not supported.
+        NoFilterMatchError
+            If the report data is empty.
         """
 
         try:
@@ -448,7 +455,7 @@ class ReportGenerator:
             raise
 
         if not report_data:
-            raise ValueError(
+            raise NoFilterMatchError(
                 f"filter {filter_content.get('filters')} in {filter_content.get('name')} led to empty report data."
             )
 
