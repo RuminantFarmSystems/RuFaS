@@ -246,7 +246,7 @@ def test_get_current_day_conditions_error(
                     irrigation=2,
                     daylength=15.6,
                     annual_mean_air_temperature=77,
-                    ),
+                ),
                 CurrentDayConditions(
                     incoming_light=3,
                     min_air_temperature=3,
