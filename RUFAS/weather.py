@@ -309,6 +309,4 @@ class Weather:
                 current_date += datetime.timedelta(days=1)
                 continue
             else:
-                raise ValueError(
-                    "Not enough weather data provided to support the duration of simulation period"
-                )
+                raise ValueError("Not enough weather data provided to support the duration of simulation period")
