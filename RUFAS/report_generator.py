@@ -513,7 +513,7 @@ class ReportGenerator:
         str
             The updated key.
         """
-        match = re.search(r"\(.*\)", key)
+        match = re.search(r"\(.*?\)", key)
         if match:
             units = match.group(0)
             base_key = key[:match.start()].strip()
@@ -521,6 +521,26 @@ class ReportGenerator:
         else:
             updated_key = f"{key}_ver_agg"
         return updated_key
+
+    @staticmethod
+    def _extract_units(key: str) -> str:
+        """Extracts the units from a key.
+
+        Parameters
+        ----------
+        key : str
+            The key from which the units are extracted.
+
+        Returns
+        -------
+        str
+            The units or an empty string if no units are found.
+        """
+        match = re.search(r"\(.*?\)", key)
+        if match:
+            return match.group(1)
+        else:
+            return None
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
