@@ -516,7 +516,7 @@ class ReportGenerator:
         match = re.search(r"\(.*?\)", key)
         if match:
             units = match.group(0)
-            base_key = key[:match.start()].strip()
+            base_key = key[: match.start()].strip()
             updated_key = f"{base_key}_ver_agg {units}"
         else:
             updated_key = f"{key}_ver_agg"
@@ -655,12 +655,7 @@ class ReportGenerator:
         max_length = max(lengths)
         aggregated_data: List[float] = []
         for i in range(max_length):
-            temp_data = [
-                report_data[key][i]
-                for loop_key in loop_list
-                for key in report_data
-                if loop_key in key
-            ]
+            temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
         return aggregated_data
@@ -778,10 +773,7 @@ class ReportGenerator:
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
 
-    def _add_var_units(
-        self,
-        report_data: dict[str, List[Any]]
-    ) -> dict[str, List[Any]]:
+    def _add_var_units(self, report_data: dict[str, List[Any]]) -> dict[str, List[Any]]:
         """Adds variable units to variable name for graphing.
 
         Parameters
