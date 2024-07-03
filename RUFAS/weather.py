@@ -15,27 +15,17 @@ class Weather:
     """
     The `Weather` class manages all weather data used to run a single simulation.
 
+    Parameters
+    ----------
+    weather_file : dict[str:List[Any]]
+        The weather dictionary read from the provided weather file.
+
     Attributes
     ----------
-    __precipitation : list
-        Amounts of precipitation that fall on given days (mm).
-    __max_daily_temperature : list
-        Maximum temperatures of days (°C).
-    __min_daily_temperature : list
-        Minimum temperatures of days (°C).
-    __mean_daily_temperature : list
-        Mean temperatures of days (°C).
-    __radiation : list
-        Energy from the sun (MJ/m^2).
-    __irrigation : list
-        Amounts of irrigation applied to fields on given days (mm).
-    __mean_annual_temperature : float
+    weather_data : dict[datetime:CurrentDayCondition]
+        A dictionary that map a date to the corresponding CurrentDayCondition.
+    mean_annual_temperature : int
         Mean of mean daily temperatures over all the weather data used by the simulation (°C).
-
-    Notes
-    -----
-    All attributes besides the mean annual temperature are held as two-dimensional arrays, with the first array being
-    the year, and the second being the day.
 
     """
 
@@ -58,9 +48,9 @@ class Weather:
 
         """
         self.weather_data = {}
-        # current_date = time.start_date
 
         self.check_adequate_weather_data(weather_file, time)
+
         start_time = time.start_date
         end_time = time.end_date
 
@@ -309,6 +299,16 @@ class Weather:
                 current_date += datetime.timedelta(days=1)
                 continue
             else:
+                info_map = {
+                    "class": "Weather",
+                    "function": Weather.check_adequate_weather_data.__name__,
+                }
+                om.add_error(
+                    f"Dumping all logs from main.py because of error '{ValueError}'",
+                    "Not enough weather data provided to support the duration of simulation period",
+                    info_map,
+                )
+                print(om.add_error)
                 raise ValueError(
                     "Not enough weather data provided to support the duration of simulation period"
                 )
