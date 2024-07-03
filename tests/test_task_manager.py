@@ -294,7 +294,7 @@ def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
         mock_input_manager, "compare_metadata_properties", return_value=None
     )
 
-    TaskManager._compare_metadata_properties_tasks(
+    TaskManager._handle_compare_metadata_properties_tasks(
         args, mock_input_manager, mock_output_manager, task_id, produce_graphic
     )
 
@@ -326,7 +326,7 @@ def test_herd_init_tasks() -> None:
         patch.object(TaskManager, "handle_herd_initializaition", return_value=None) as mock_handle_herd_initializaition,
         patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
     ):
-        TaskManager._herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
+        TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
         mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
         mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
 
@@ -357,7 +357,7 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) 
         patch.object(Utility, "deep_merge", return_value=None) as mock_deep_merge,
     ):
 
-        TaskManager._simulation_engine_run_tasks(
+        TaskManager._handle_simulation_engine_run_tasks(
             args, mock_input_manager, mock_output_manager, task_id, produce_graphics
         )
         if input_patch:
@@ -389,7 +389,7 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
     with patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing:
-        TaskManager._postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics)
+        TaskManager._handle_postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics)
         mock_handle_post_processing.assert_called_once_with(
             args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
         )
@@ -453,7 +453,7 @@ def test_input_data_audit_tasks() -> None:
         patch.object(TaskManager, "handle_input_data_audit", return_value=None) as mock_handle_input_data_audit,
         patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
     ):
-        TaskManager._input_data_audit_tasks(args, im, om, task_id, produce_graphic)
+        TaskManager._handle_input_data_audit_tasks(args, im, om, task_id, produce_graphic)
 
         mock_handle_input_data_audit.assert_called_once_with(args, im, om, False)
         mock_handle_post_processing.assert_called_once_with(args, im, om, task_id)

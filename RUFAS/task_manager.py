@@ -326,16 +326,15 @@ class TaskManager:
         }
         task_id = args["task_id"]
         output_manager = OutputManager()
-        print(output_manager)
 
         pre_validation_handlers = {
-            TaskType.INPUT_DATA_AUDIT: TaskManager._input_data_audit_tasks,
-            TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._compare_metadata_properties_tasks,
+            TaskType.INPUT_DATA_AUDIT: TaskManager._handle_input_data_audit_tasks,
+            TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._handle_compare_metadata_properties_tasks,
         }
         post_validation_handlers = {
-            TaskType.HERD_INITIALIZATION: TaskManager._herd_init_tasks,
-            TaskType.SIMULATION_SINGLE_RUN: TaskManager._simulation_engine_run_tasks,
-            TaskType.POST_PROCESSING: TaskManager._postprocessing_tasks,
+            TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
+            TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
+            TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
         }
         try:
             output_manager.run_startup_sequence(
@@ -535,18 +534,19 @@ class TaskManager:
         output_manager.add_log("Random seed used", f"Seeded libaries with {random_seed=}", info_map)
 
     @staticmethod
-    def _input_data_audit_tasks(
+    def _handle_input_data_audit_tasks(
         args: Dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: Any,
         produce_grahics: bool,
     ) -> None:
+        """Handler for all methods related to metadata property comparison."""
         TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
     @staticmethod
-    def _compare_metadata_properties_tasks(
+    def _handle_compare_metadata_properties_tasks(
         args: Dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
@@ -559,7 +559,7 @@ class TaskManager:
         )
 
     @staticmethod
-    def _herd_init_tasks(
+    def _handle_herd_init_tasks(
         args: Dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
@@ -572,7 +572,7 @@ class TaskManager:
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
     @staticmethod
-    def _simulation_engine_run_tasks(
+    def _handle_simulation_engine_run_tasks(
         args: Dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
@@ -586,7 +586,7 @@ class TaskManager:
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
 
     @staticmethod
-    def _postprocessing_tasks(
+    def _handle_postprocessing_tasks(
         args: Dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
