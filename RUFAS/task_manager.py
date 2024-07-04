@@ -327,11 +327,11 @@ class TaskManager:
         task_id = args["task_id"]
         output_manager = OutputManager()
 
-        pre_validation_handlers = {
+        validation_and_comparison_handlers = {
             TaskType.INPUT_DATA_AUDIT: TaskManager._handle_input_data_audit_tasks,
             TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._handle_compare_metadata_properties_tasks,
         }
-        post_validation_handlers = {
+        simulation_and_analysis_handlers = {
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
@@ -351,7 +351,7 @@ class TaskManager:
             input_manager = InputManager(metadata_depth_limit)
             task_type = args.get("task_type")
 
-            handler = pre_validation_handlers.get(task_type)
+            handler = validation_and_comparison_handlers.get(task_type)
             if handler:
                 TaskManager.call_handler(
                     handler,
@@ -376,7 +376,7 @@ class TaskManager:
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
 
-            handler = post_validation_handlers.get(task_type)
+            handler = simulation_and_analysis_handlers.get(task_type)
             if handler:
                 TaskManager.call_handler(
                     handler,
