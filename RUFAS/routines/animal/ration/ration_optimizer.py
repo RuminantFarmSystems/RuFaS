@@ -5,9 +5,9 @@ import numpy as np
 import numpy.typing as npt
 from scipy.optimize import OptimizeResult, minimize
 
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
@@ -16,13 +16,7 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
 
-from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from ....enums import AnimalCombination
-
-import numpy.typing as npt
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 
 om = OutputManager()
 udrm = UserDefinedRationManager()
@@ -965,7 +959,10 @@ class RationOptimizer:
             bnds = []
             bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
 
-        if animal_combination == AnimalCombination.LAC_COW:
+        print(animal_combination)
+        print(str(animal_combination))
+        print(animal_combination.value)
+        if animal_combination is AnimalCombination.LAC_COW:
             return minimize(
                 self.objective,
                 x0,
@@ -1039,7 +1036,7 @@ class RationOptimizer:
         CP_list = self.triple_values_in_list(available_feeds["CP"])
         dRUP_list = self.triple_values_in_list(available_feeds["dRUP"])
 
-        if animal_combination == AnimalCombination.LAC_COW:
+        if animal_combination is AnimalCombination.LAC_COW:
             feed_limit_list = self.triple_values_in_list(
                 available_feeds["lactating_cow_limit"]
             )

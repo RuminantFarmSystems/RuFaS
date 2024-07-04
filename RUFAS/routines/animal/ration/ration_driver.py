@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Literal, Set, Tuple
 
 import scipy
 
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
@@ -127,6 +128,7 @@ class RationManager:
     ) -> None:
         constraints_failed_list = []
         if pen.animal_combination == AnimalCombination.LAC_COW:
+            print("reached!!!")
             failed_constraints = ration_optimizer.find_failed_constraints(
                 solution.x, ration_optimizer.cow_constraints, ration_config
             )
