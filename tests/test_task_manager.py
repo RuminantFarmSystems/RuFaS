@@ -389,7 +389,9 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
     with patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing:
-        TaskManager._handle_postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics)
+        TaskManager._handle_postprocessing_tasks(
+            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+        )
         mock_handle_post_processing.assert_called_once_with(
             args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
         )
