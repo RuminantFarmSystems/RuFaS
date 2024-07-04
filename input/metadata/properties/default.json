@@ -43,43 +43,43 @@
         "type": "number",
         "description": "Number of Calves (head) -- The initial number of pre-weaned calves",
         "default": 8,
-        "minimum": 0
+        "minimum": 2
       },
       "heiferI_num": {
         "type": "number",
         "description": "Number of HeiferI's (head) -- The initial number of heifers that are weaned but not yet bred",
         "default": 44,
-        "minimum": 0
+        "minimum": 2
       },
       "heiferII_num": {
         "type": "number",
         "description": "Number of HeiferII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy",
         "default": 38,
-        "minimum": 0
+        "minimum": 2
       },
       "heiferIII_num_springers": {
         "type": "number",
         "description": "Number of HeiferIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)",
         "default": 5,
-        "minimum": 0
+        "minimum": 2
       },
       "cow_num": {
         "type": "number",
         "description": "Number of Cows (head) -- The initial number of dry and lactating cows.",
         "default": 100,
-        "minimum": 0
-      },
-      "herd_num": {
-        "type": "number",
-        "description": "Herd Number (head) -- The target number of dry and lactating cows on the farm",
-        "default": 100,
-        "minimum": 0
+        "minimum": 6
       },
       "replace_num": {
         "type": "number",
         "description": "Replacements (head) -- Number of replacement animals available in the replacement market",
         "default": 5000,
-        "minimum": 0
+        "minimum": 50
+      },
+      "herd_num": {
+        "type": "number",
+        "description": "Herd Number (head) -- The target number of dry and lactating cows on the farm",
+        "default": 100,
+        "minimum": 6
       },
       "breed": {
         "type": "string",
@@ -4387,8 +4387,7 @@
         },
         "manure_treatment": {
           "type": "string",
-          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
+          "description": "Name of the manure treatment and/or storage used in a manure management scenario. Each named treatment must have a Manure Treatment Config defined, unless the treatment is 'anaerobic digestion and lagoon' or 'anaerobic digestion and lagoon with separator'."
         }
       }
     },
@@ -4506,10 +4505,15 @@
       "type": "array",
       "properties": {
         "type": "object",
+        "name": {
+          "type": "string",
+          "description": "The unique identifier of the manure treatment configuration.",
+          "pattern": "^(?!anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator$)(.*)$"
+        },
         "manure_treatment_type": {
           "type": "string",
           "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting|anaerobic digestion)$"
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|composting|anaerobic digestion)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
           "type": "number",
