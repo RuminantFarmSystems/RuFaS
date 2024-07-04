@@ -69,9 +69,7 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.use_user_defined_ration:
-            ration, ration_vals = cls.get_user_defined_ration(
-                req, pen, available_feeds, animal_grouping_scenario
-            )
+            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
         previous_ration = None
@@ -106,9 +104,7 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(
-                    req, available_feeds, pen.animal_combination, previous_ration
-                )
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 num_reattempts += 1
 
         ration = cls.make_ration_from_solution(available_feeds, solution)
@@ -144,9 +140,7 @@ class RationManager:
             "simulation day": sim_day,
             "reattempt number": num_reattempts,
             "constraints_failed_dict": constraints_failed_list,
-            "ration_attempted": cls.make_ration_from_solution(
-                available_feeds, solution
-            ),
+            "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
             "pen requirements": pen.avg_nutrient_rqmts,
         }
         fail_summary_units = {
@@ -188,10 +182,7 @@ class RationManager:
         float
             Average running milk
         """
-        total_milk_in_pen = sum(
-            animal.estimated_daily_milk_produced
-            for animal in list(pen.animals_in_pen.values())
-        )
+        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in list(pen.animals_in_pen.values()))
         starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
         return starting_milk_average
 
@@ -244,16 +235,12 @@ class RationManager:
             ration[available_feeds["feed_key"][feed_id]] = round(num, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
-        ration_config.price_list = RationOptimizer.triple_values_in_list(
-            available_feeds["price"]
-        )
+        ration_config.price_list = RationOptimizer.triple_values_in_list(available_feeds["price"])
         ration["objective"] = ration_optimizer.objective(solution.x, ration_config)
         return ration
 
     @classmethod
-    def make_solution_from_fixed_ration(
-        cls, ration: Dict[str, float | str]
-    ) -> List[float]:
+    def make_solution_from_fixed_ration(cls, ration: Dict[str, float | str]) -> List[float]:
         """
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_optimizer.py
         Simply puts the value in triplicate, and multiplies by the MEact defined in  ration_config
@@ -269,9 +256,7 @@ class RationManager:
             List of kg fed per animal, in triplicate, to match scipy.OptimizeResult object.
 
         """
-        stripped_ration = {
-            k: ration[k] for k in ration if k not in ["status", "objective"]
-        }
+        stripped_ration = {k: ration[k] for k in ration if k not in ["status", "objective"]}
         solution_from_ration = []
         for key in stripped_ration:
             solution_from_ration.append(stripped_ration[key] / 3)
@@ -353,17 +338,9 @@ class RationManager:
                 )
                 raise
 
-        if (
-            udrm.milk_reduction_maximum == 0.0
-            and udrm.tolerance == 0.0
-            and not solution.success
-        ):
-            ration = UserDefinedRationManager.make_ration_from_user_values(
-                ration_percents, available_feeds, req
-            )
-            ration_vals = ration_optimizer.get_ration_vals(
-                cls.make_solution_from_fixed_ration(ration), ration_config
-            )
+        if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
+            ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
+            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
             return ration, ration_vals
 
         if pen.animal_combination != AnimalCombination.LAC_COW and not solution.success:
@@ -392,9 +369,7 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(
-                    req, available_feeds, pen.animal_combination, previous_ration
-                )
+                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 num_reattempts += 1
                 cls.handle_failed_constraints(
                     num_reattempts=num_reattempts,
@@ -407,12 +382,8 @@ class RationManager:
                 )
 
         if fixed_ration:
-            ration = UserDefinedRationManager.make_ration_from_user_values(
-                ration_percents, available_feeds, req
-            )
-            ration_vals = ration_optimizer.get_ration_vals(
-                cls.make_solution_from_fixed_ration(ration), ration_config
-            )
+            ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
+            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
         else:
             ration = cls.make_ration_from_solution(available_feeds, solution)
             ration_vals = ration_optimizer.get_ration_vals(solution.x, ration_config)
@@ -1250,9 +1221,7 @@ class AvailableFeeds:
         # RuFaS > Docs & Files > Animal Module > Ration Driver Logic
 
         if not self._feed_id_to_list_idx_dict:
-            self._feed_id_to_list_idx_dict = {
-                fid: i for i, fid in enumerate(self.feed_id)
-            }
+            self._feed_id_to_list_idx_dict = {fid: i for i, fid in enumerate(self.feed_id)}
 
         excluded_keys = ["_feed_id_to_list_idx_dict"]
         result = collections.defaultdict(list)
