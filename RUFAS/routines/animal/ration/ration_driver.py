@@ -1,20 +1,22 @@
 import collections
-from typing import Set, Dict, List, Tuple, Literal, Any
+from typing import Any, Dict, List, Literal, Set, Tuple
 
-from RUFAS.units import MeasurementUnits
-from 
+import scipy
+
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_typed_dicts import (
+    AvailableFeedsTypedDict,
+    FeedInfoTypedDict,
+)
 from RUFAS.routines.animal.ration import animal_requirements
+from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
-from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict, FeedInfoTypedDict
-from RUFAS.general_constants import GeneralConstants
-
-import scipy
+from RUFAS.units import MeasurementUnits
 
 udrm = UserDefinedRationManager()
 ration_optimizer = RationOptimizer()
@@ -67,12 +69,15 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.use_user_defined_ration:
-            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
+            ration, ration_vals = cls.get_user_defined_ration(
+                req, pen, available_feeds, animal_grouping_scenario
+            )
             return ration, ration_vals
 
         previous_ration = None
         if hasattr(pen, "ration_per_animal"):
             previous_ration = pen.ration_per_animal
+
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
@@ -82,9 +87,8 @@ class RationManager:
             # safeguard if scipy SLSQP bounds error still occurs after many iterations
             # using previous cycles ration for this pen
             return pen.ration, ration_vals
-        # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-        # GitHub Issue #793
-        if pen.animal_combination == in ["LAC_COW"]:
+
+        if pen.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
                 cls.handle_failed_constraints(
                     num_reattempts=num_reattempts,
@@ -102,7 +106,9 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
+                ) = ration_optimizer.attempt_optimization(
+                    req, available_feeds, pen.animal_combination, previous_ration
+                )
                 num_reattempts += 1
 
         ration = cls.make_ration_from_solution(available_feeds, solution)
@@ -120,7 +126,7 @@ class RationManager:
         info_map: Dict[str, Any],
     ) -> None:
         constraints_failed_list = []
-        if pen.animal_combination.name in ["LAC_COW"]:
+        if pen.animal_combination == AnimalCombination.LAC_COW:
             failed_constraints = ration_optimizer.find_failed_constraints(
                 solution.x, ration_optimizer.cow_constraints, ration_config
             )
@@ -138,7 +144,9 @@ class RationManager:
             "simulation day": sim_day,
             "reattempt number": num_reattempts,
             "constraints_failed_dict": constraints_failed_list,
-            "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
+            "ration_attempted": cls.make_ration_from_solution(
+                available_feeds, solution
+            ),
             "pen requirements": pen.avg_nutrient_rqmts,
         }
         fail_summary_units = {
@@ -169,7 +177,7 @@ class RationManager:
     @staticmethod
     def calc_milk_average(pen) -> float:
         """
-        Calculates average milk produced in a pen.
+        Calculates average milk produced by a cow in a pen.
 
         Parameters
         ----------
@@ -180,7 +188,10 @@ class RationManager:
         float
             Average running milk
         """
-        total_milk_in_pen = sum(animal.estimated_daily_milk_produced for animal in list(pen.animals_in_pen.values()))
+        total_milk_in_pen = sum(
+            animal.estimated_daily_milk_produced
+            for animal in list(pen.animals_in_pen.values())
+        )
         starting_milk_average = total_milk_in_pen / len(pen.animals_in_pen)
         return starting_milk_average
 
@@ -188,8 +199,7 @@ class RationManager:
     def reduce_milk_production(cls, pen, reduction: float) -> None:
         """
         Reduces milk production for all animals in a pen.
-        Only does so if post-reduction production would be above 1.0.
-        Returns running total milk produced in the pen.
+        Only does so if post-reduction production would be above 1.0 KG.
 
         Parameters
         ----------
@@ -199,16 +209,16 @@ class RationManager:
             The kg amount of lactation should be reduced in each loop, per animal
 
         """
-        running_total_milk = 0.0
         for animal in list(pen.animals_in_pen.values()):
             if animal.estimated_daily_milk_produced - reduction > 1.0:
                 animal.estimated_daily_milk_produced -= reduction
                 animal.milk_production_reduction -= reduction
-            running_total_milk += animal.estimated_daily_milk_produced
 
     @classmethod
     def make_ration_from_solution(
-        cls, available_feeds: AvailableFeedsTypedDict, solution: scipy.optimize.OptimizeResult
+        cls,
+        available_feeds: AvailableFeedsTypedDict,
+        solution: scipy.optimize.OptimizeResult,
     ) -> Dict[str, float | str]:
         """
         Generates ration dictionary from scipy result
@@ -230,18 +240,20 @@ class RationManager:
         ration: Dict[str, float | str] = {}
         for feed_id in range(len(available_feeds["feed_id"])):
             i = feed_id * 3
-            num = solution.x[i]
-            num += solution.x[i + 1]
-            num += solution.x[i + 2]
+            num = solution.x[i] + solution.x[i + 1] + solution.x[i + 2]
             ration[available_feeds["feed_key"][feed_id]] = round(num, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
-        ration_config.price_list = RationOptimizer.triple_values_in_list(available_feeds["price"])
+        ration_config.price_list = RationOptimizer.triple_values_in_list(
+            available_feeds["price"]
+        )
         ration["objective"] = ration_optimizer.objective(solution.x, ration_config)
         return ration
 
     @classmethod
-    def make_solution_from_fixed_ration(cls, ration: Dict[str, float | str]) -> List[float]:
+    def make_solution_from_fixed_ration(
+        cls, ration: Dict[str, float | str]
+    ) -> List[float]:
         """
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_optimizer.py
         Simply puts the value in triplicate, and multiplies by the MEact defined in  ration_config
@@ -257,13 +269,14 @@ class RationManager:
             List of kg fed per animal, in triplicate, to match scipy.OptimizeResult object.
 
         """
-        excluded_keys = {"status", "objective"}
+        stripped_ration = {
+            k: ration[k] for k in ration if k not in ["status", "objective"]
+        }
         solution_from_ration = []
-        for key in ration.keys():
-            if key not in excluded_keys:
-                solution_from_ration.append(ration[key] / 3)
-                solution_from_ration.append(ration[key] / 3)
-                solution_from_ration.append(ration[key] / 3)
+        for key in stripped_ration:
+            solution_from_ration.append(stripped_ration[key] / 3)
+            solution_from_ration.append(stripped_ration[key] / 3)
+            solution_from_ration.append(stripped_ration[key] / 3)
         return solution_from_ration
 
     @classmethod
@@ -313,10 +326,9 @@ class RationManager:
         fixed_ration = False
         num_reattempts: int = 0
 
+        previous_ration = None
         if hasattr(pen, "ration_per_animal"):
             previous_ration = pen.ration_per_animal
-        else:
-            previous_ration = None
 
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
@@ -341,15 +353,23 @@ class RationManager:
                 )
                 raise
 
-        if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
-            ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
+        if (
+            udrm.milk_reduction_maximum == 0.0
+            and udrm.tolerance == 0.0
+            and not solution.success
+        ):
+            ration = UserDefinedRationManager.make_ration_from_user_values(
+                ration_percents, available_feeds, req
+            )
+            ration_vals = ration_optimizer.get_ration_vals(
+                cls.make_solution_from_fixed_ration(ration), ration_config
+            )
             return ration, ration_vals
 
-        if pen.animal_combination.name not in ["LAC_COW"] and not solution.success:
+        if pen.animal_combination != AnimalCombination.LAC_COW and not solution.success:
             fixed_ration = True
 
-        if pen.animal_combination.name in ["LAC_COW"] and solution is not None:
+        if pen.animal_combination == AnimalCombination.LAC_COW and solution is not None:
             running_milk_reduction = 0.0
             while not solution.success:
                 running_average_milk = cls.calc_milk_average(pen)
@@ -372,7 +392,9 @@ class RationManager:
                     solution,
                     ration_vals,
                     ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
+                ) = ration_optimizer.attempt_optimization(
+                    req, available_feeds, pen.animal_combination, previous_ration
+                )
                 num_reattempts += 1
                 cls.handle_failed_constraints(
                     num_reattempts=num_reattempts,
@@ -385,8 +407,12 @@ class RationManager:
                 )
 
         if fixed_ration:
-            ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
-            ration_vals = ration_optimizer.get_ration_vals(cls.make_solution_from_fixed_ration(ration), ration_config)
+            ration = UserDefinedRationManager.make_ration_from_user_values(
+                ration_percents, available_feeds, req
+            )
+            ration_vals = ration_optimizer.get_ration_vals(
+                cls.make_solution_from_fixed_ration(ration), ration_config
+            )
         else:
             ration = cls.make_ration_from_solution(available_feeds, solution)
             ration_vals = ration_optimizer.get_ration_vals(solution.x, ration_config)
@@ -444,10 +470,11 @@ class RationReporter:
         }
 
         nutrient_conc: Dict[str, float] = {}
-        ration = ration.copy()
-        for non_numeric_key in ["status", "objective"]:
-            if non_numeric_key in ration:
-                del ration[non_numeric_key]
+        
+        stripped_ration = {
+            k: ration[k] for k in ration if k not in ["status", "objective"]
+        }
+        
         nutrients = [
             "DM",
             "CP",
@@ -465,7 +492,7 @@ class RationReporter:
             "calcium",
         ]
 
-        for key, val in ration.items():
+        for key, val in stripped_ration.items():
             nutrient_amount["dm"] += val
             for nutr in nutrients:
                 # all values on a 100% dry matter basis
@@ -545,10 +572,9 @@ class RationReporter:
             Dictionary of nutrients and energy supplied by a formulated ration.
 
         """
-        ration_ = ration.copy()
-        for non_numeric_key in ["status", "objective"]:
-            if non_numeric_key in ration_:
-                del ration_[non_numeric_key]
+        stripped_ration = {
+            k: ration[k] for k in ration if k not in ["status", "objective"]
+        }
 
         supply_report = {
             "ME": 0.0,
@@ -563,20 +589,20 @@ class RationReporter:
             "forage_NDF": 0.0,
         }
 
-        for key, kg_fed in ration_.items():
-            for item in supply_report:
-                supply_report[item] += eval(
+        for key, kg_fed in stripped_ration.items():
+            for supply_key in supply_report:
+                supply_report[supply_key] += eval(
                     "RationReporter.get_"
-                    + item
+                    + supply_key
                     + "(kg_fed, available_feeds[key], ration_report, body_weight)"
                 )
         supply_report["forage_NDF_percent"] = supply_report["forage_NDF"] / sum(
-            ration_.values()
+            stripped_ration.values()
         )
         supply_report[
             "metabolizable_protein"
         ] = RationReporter.get_metabolizable_protein(
-            ration_, available_feeds, ration_report, body_weight
+            stripped_ration, available_feeds, ration_report, body_weight
         )
 
         return supply_report
@@ -613,13 +639,13 @@ class RationReporter:
         somatic_body_weight = body_weight * 0.96
         if body_weight == 0.0 or TDNtotal == 0.0:
             return 0.0
-        if TDNtotal < (0.035 * body_weight**0.75):
-            DMI_to_maint = 1.0
-        else:
+
+        DMI_to_maint = 1.0
+        if TDNtotal >= (0.035 * body_weight**0.75):
             DMI_to_maint = TDNtotal / (0.035 * somatic_body_weight**0.75)
-        if TDNconc < 60:
-            Discount = 1.0
-        else:
+
+        Discount = 1.0
+        if TDNconc >= 60:
             Discount = (
                 TDNconc - ((0.18 * TDNconc - 10.3) * (DMI_to_maint - 1))
             ) / TDNconc
@@ -856,15 +882,12 @@ class RationReporter:
             Calcium supply of feed item, g.
 
         """
-        if feed_item_info["feed_type"] == "Forage":
-            dCa = 0.3
-        elif feed_item_info["feed_type"] == "Conc":
-            dCa = 0.6
-        elif feed_item_info["feed_type"] == "Mineral":
-            dCa = 0.95
-        else:
-            dCa = 0.0
+        feed_to_dCa_map = {"Forage": 0.3, "Conc": 0.6, "Mineral": 0.95}
+
+        dCa = feed_to_dCa_map.get(feed_item_info["feed_type"], 0.0)
+
         calcium_item = kg_fed * feed_item_info["calcium"] * 0.01 * dCa
+
         return calcium_item
 
     @staticmethod
@@ -894,14 +917,10 @@ class RationReporter:
             Phosphorus supply, g.
 
         """
-        if feed_item_info["feed_type"] == "Forage":
-            dP = 0.64
-        elif feed_item_info["feed_type"] == "Conc":
-            dP = 0.70
-        elif feed_item_info["feed_type"] == "Mineral":
-            dP = 0.80
-        else:
-            dP = 0.0
+        feed_to_dP_map = {"Forage": 0.64, "Conc": 0.70, "Mineral": 0.80}
+
+        dP = feed_to_dP_map.get(feed_item_info["feed_type"], 0.0)
+
         return dP * feed_item_info["phosphorus"] * 0.01 * kg_fed
 
     @staticmethod
@@ -993,10 +1012,11 @@ class RationReporter:
             Forage neutral detergent fiber content of feed item, g.
 
         """
+        forage_NDF_item = 0.0
+
         if feed_item_info["feed_type"] == "Forage":
             forage_NDF_item = feed_item_info["NDF"] * kg_fed
-        else:
-            forage_NDF_item = 0.0
+
         return forage_NDF_item
 
     @staticmethod
@@ -1030,7 +1050,7 @@ class RationReporter:
         TDNtotal = ration_report["nutrient_amount"]["TDN"]
 
         DMI_estimate = sum(ration.values())
-        is_conc = []
+        is_conc: List[float] = []
         for item in ration:
             if available_feeds[item]["feed_type"] == "Conc":
                 is_conc.append(ration[item])
@@ -1040,6 +1060,7 @@ class RationReporter:
         RDP_list = []
         dRUP_diet = []
         counter = 0
+
         for key, kg_fed in ration.items():
             feed_item_info = available_feeds[key]
 
@@ -1229,7 +1250,9 @@ class AvailableFeeds:
         # RuFaS > Docs & Files > Animal Module > Ration Driver Logic
 
         if not self._feed_id_to_list_idx_dict:
-            self._feed_id_to_list_idx_dict = {fid: i for i, fid in enumerate(self.feed_id)}
+            self._feed_id_to_list_idx_dict = {
+                fid: i for i, fid in enumerate(self.feed_id)
+            }
 
         excluded_keys = ["_feed_id_to_list_idx_dict"]
         result = collections.defaultdict(list)
