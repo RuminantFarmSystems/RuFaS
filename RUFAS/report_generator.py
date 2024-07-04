@@ -577,7 +577,9 @@ class ReportGenerator:
             horizontally_aggregated = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
+            # TODO add units returned from apply_horizontal_aggregation to aggregate report ("hor_ver_agg (aggregate units)")
             aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
+            # TODO call self._handle_units(aggregate_report, vertical_aggregator) - might be able to combine these three lines somehow
         else:
             vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
             ver_hor_aggregated = []
@@ -658,7 +660,29 @@ class ReportGenerator:
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
-        return aggregated_data
+        aggregated_units = self._aggregate_units(report_data, aggregator)
+        return aggregated_data, aggregated_units
+
+    def _aggregate_units(self, report_data: Dict[str, List[float]],
+        aggregator: Callable[[List[float]], float],) -> str:
+        """Creates the appropriate units for the associated aggregator function used.
+
+        Parameters
+        ----------
+        report_data : Dict[str, List[float]]
+            The data pool to be aggregated, structured as a dictionary of lists.
+        aggregator : Callable[[List[float]], float]
+            The aggregation function to be used.
+
+        Returns
+        -------
+        str
+            The expected units of aggregating the report data using the accompanying aggregator function.
+        """
+        # Should we have parenthesis around units or do that later?
+        # if average, should only be one key. Return units for that key. Raise warning if multiple keys.
+        # If division, return units for first item / units for second item.
+        # if product, 
 
     def _apply_vertical_aggregation(
         self,
