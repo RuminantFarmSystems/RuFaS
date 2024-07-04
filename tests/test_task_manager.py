@@ -416,7 +416,7 @@ def test_call_handler():
     produce_graphics = False
 
     # Call the call_handler method
-    with patch.object(TaskManager, "_postprocessing_tasks", return_value=None) as mock_handle_post_processing:
+    with patch.object(TaskManager, "_handle_postprocessing_tasks", return_value=None) as mock_handle_post_processing:
         TaskManager.call_handler(
             mock_handle_post_processing,
             args=args,
