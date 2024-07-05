@@ -671,6 +671,7 @@ class Field:
             optimal_mix,
             unmet_nitrogen_demand,
             unmet_phosphorus_demand,
+            0,
             application_depth,
             surface_remainder_fraction,
             year,
