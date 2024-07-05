@@ -2598,12 +2598,13 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
         return_value=None,
     )
     mocker.patch(
-        "RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=False)
+        "RUFAS.routines.animal.ration.ration_driver.udrm",
+        MagicMock(use_user_defined_ration=False),
     )
     mock_pen = mocker.MagicMock()
     delattr(mock_pen, "ration_per_animal")
     mock_pen.animal_combination = mocker.MagicMock()
-    mock_pen.animal_combination.name = "LAC_COW"
+    mock_pen.animal_combination = AnimalCombination.LAC_COW
     mock_pen.ration = None
     mock_animal = mocker.MagicMock()
     mock_body_weight_history = mocker.MagicMock()
@@ -2625,7 +2626,6 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
         ],
     )
     available_feeds = mocker.MagicMock()
-
     mock_find_failed_constraints = mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.find_failed_constraints",
         return_value=mocker.MagicMock(),
