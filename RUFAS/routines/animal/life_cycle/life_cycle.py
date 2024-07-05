@@ -34,7 +34,6 @@ from RUFAS.util import Utility
 # 'bound' is used to restrict the type to only the classes listed in the union.
 GenericAnimal = TypeVar("GenericAnimal", bound=Union[Calf, HeiferI, HeiferII, HeiferIII, Cow])
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -51,6 +50,7 @@ class LifeCycleManager:
             data: life cycle data from the input JSON file
 
         """
+        self.im = InputManager()
         self.avg_calving_to_preg_time = {
             "1": 0.0,
             "2": 0.0,
@@ -184,7 +184,7 @@ class LifeCycleManager:
             A tuple of animal lists for the calves, heiferIs, heiferIIs, heiferIIIs, and cows
 
         """
-        animal_population = im.get_data("runtime_animal_population")
+        animal_population = self.im.get_data("runtime_animal_population")
         self.animal_population = AnimalPopulation(
             calves=list(map(Calf, animal_population["calves"])),
             heiferIs=list(map(HeiferI, animal_population["heiferIs"])),
@@ -300,9 +300,7 @@ class LifeCycleManager:
             sim_day, heiferIIIs, cows, total_animal_num
         )
 
-        total_animal_num = self._cull_cows_and_record_stats(
-            sim_day, cows, calves_born, animals_removed, total_animal_num
-        )
+        total_animal_num = self._evaluate_and_update_cows(sim_day, cows, calves_born, animals_removed, total_animal_num)
         self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, animals_removed, sim_day)
         self._check_if_replacement_heifers_needed(sim_day, heiferIIIs, cows, animals_added)
 
@@ -791,7 +789,7 @@ class LifeCycleManager:
             animals_added.append(replacement)
             self.bought_heifer_num += 1
 
-    def _cull_cows_and_record_stats(
+    def _evaluate_and_update_cows(
         self,
         sim_day: int,
         cows: List[Cow],
@@ -799,17 +797,25 @@ class LifeCycleManager:
         animals_removed: List[Cow],
         total_animal_num: int,
     ) -> int:
-        """Culls cows and records stats.
+        """
+        Culls cows and records stats.
 
-        Args:
-            sim_day: The current simulation day.
-            cows: The list of cows.
-            calves_born: The list of calves born.
-            animals_removed: The list of animals removed from the herd.
-            total_animal_num: The current total number of animals in the herd.
+        Parameters
+        ----------
+        sim_day : int
+            The current simulation day.
+        cows : List[Cow]
+            The list of cows.
+        calves_born : List[Calf]
+            The list of calves born.
+        animals_removed : List[Cow]
+            The list of animals removed from the herd.
+        total_animal_num : int
+            The current total number of animals in the herd.
 
-        Returns:
-            The newly updated total number of animals in the herd.
+        Returns
+        -------
+        int: The newly updated total number of animals in the herd.
 
         """
         calving_interval_avail_num = 0
@@ -819,10 +825,10 @@ class LifeCycleManager:
 
         # cow culling action and stats
         for index, cow in enumerate(cows):
-            _, _, _, culled, new_born = cow.update(sim_day, self.avg_CI)
+            new_born = cow.update(sim_day, self.avg_CI)
 
             # culled cows, calculate slaughter value and record culling reasons
-            if culled:
+            if cow.culled:
                 self._cull_cow(cow, sim_day)
                 animals_removed.append(cow)
                 removed_cows_idx.append(index)

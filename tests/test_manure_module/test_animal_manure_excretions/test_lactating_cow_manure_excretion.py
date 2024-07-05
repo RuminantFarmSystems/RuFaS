@@ -5,13 +5,14 @@ from pytest import approx
 from pytest_mock import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import (
     manure_calculations,
 )
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import (
     methane_mitigation,
 )
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 
 
 @pytest.mark.parametrize(
@@ -97,16 +98,11 @@ def test_lactating_cow_manure_calculations(  # noqa
         + 0.654
         * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
         * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
+        / GeneralConstants.FRACTION_TO_PERCENTAGE
     ) * GeneralConstants.GRAMS_TO_KG
-    urine_nitrogen = (
-        12.0
-        + 0.333
-        * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-        * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-        / 100
-    ) * GeneralConstants.GRAMS_TO_KG
-    # fecal_nitrogen = manure_nitrogen - urine_nitrogen
+    dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
+    fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
+    urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
     organic_matter_intake = dry_matter_intake - ASH_diet_content
     degradable_volatile_solids = (
@@ -119,18 +115,12 @@ def test_lactating_cow_manure_calculations(  # noqa
 
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
-    urine_urea_nitrogen_concentration_lower_bound = 2
-    urine_urea_nitrogen_concentration_upper_bound = 12
-    if urine_urea_nitrogen_concentration < urine_urea_nitrogen_concentration_lower_bound:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_lower_bound
-    elif urine_urea_nitrogen_concentration > urine_urea_nitrogen_concentration_upper_bound:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_upper_bound
-    else:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
-    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (tan_percent_of_urea / 100) * urine_urea_nitrogen_concentration
 
-    potassium = 7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
+
+    potassium = (
+        7.21 * dry_matter_intake + 15944 * potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE - 164.5
+    )
 
     total_phosphorus_excreted = 4.0
     inorganic_phosphorus_fraction = 0.4
@@ -157,7 +147,13 @@ def test_lactating_cow_manure_calculations(  # noqa
         temp = -(starch_to_ADF_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
         methane_emission_original = 45.98 * (1 - math.exp(temp)) / 0.05565
     elif methane_model == "IPCC":
-        soluble_residue = 100 - ASH_concentration - NDF_concentration - CP_concentration - EE_concentration
+        soluble_residue = (
+            GeneralConstants.FRACTION_TO_PERCENTAGE
+            - ASH_concentration
+            - NDF_concentration
+            - CP_concentration
+            - EE_concentration
+        )
         gross_energy_concentration = (
             0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue
         )
@@ -175,7 +171,11 @@ def test_lactating_cow_manure_calculations(  # noqa
             methane_mitigation_additive_amount,
         )
 
-    methane_emission = methane_yield_original * (1 + methane_yield_reduction / 100) * dry_matter_intake
+    methane_emission = (
+        methane_yield_original
+        * (1 + methane_yield_reduction / GeneralConstants.FRACTION_TO_PERCENTAGE)
+        * dry_matter_intake
+    )
 
     # Patching
     mock_nutrient_amounts = {"dm": dry_matter_intake, "ash": ASH_diet_content}
@@ -231,9 +231,7 @@ def test_lactating_cow_manure_calculations(  # noqa
     assert actual_total_phosphorus_excreted == approx(total_phosphorus_excreted)
     assert manure_excretion_values["urea"] == approx(urine_urea_nitrogen_concentration)
     assert manure_excretion_values["urine"] == approx(urine)
-    assert manure_excretion_values["total_ammoniacal_nitrogen_concentration"] == approx(
-        total_ammoniacal_nitrogen_concentration
-    )
+    assert manure_excretion_values["manure_total_ammoniacal_nitrogen"] == approx(manure_total_ammoniacal_nitrogen)
     assert manure_excretion_values["urine_nitrogen"] == approx(urine_nitrogen)
     assert manure_excretion_values["manure_nitrogen"] == approx(manure_nitrogen)
     assert manure_excretion_values["manure_mass"] == approx(total_manure_excreted)

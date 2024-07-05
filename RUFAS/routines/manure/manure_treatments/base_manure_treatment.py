@@ -310,7 +310,7 @@ class BaseManureTreatment(ABC):
         manure_treatment_type : ManureTreatmentType
             The type of manure treatment.
         manure_cover : str
-            The type of cover for the manure. Options are: cover, no cover, and N/A.
+            The type of cover for the manure. Options are: cover, crust, no cover, and N/A.
         manure_nitrogen_kg_N_per_day
             The amount of manure nitrogen entering the manure treatment and storage system (kg N/day).
 

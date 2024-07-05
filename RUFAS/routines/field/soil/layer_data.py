@@ -2,6 +2,7 @@ from dataclasses import dataclass, field, InitVar
 from typing import Optional
 from math import log, exp
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop_and_soil_constants import (
     MEGAGRAMS_TO_KILOGRAMS,
     HECTARES_TO_SQUARE_MILLIMETERS,
@@ -57,28 +58,16 @@ class LayerData:
         Temperature of soil layer on the previous day (degrees C).
     decomposition_temperature_effect : float, optional, default None
         Temperature effect on decomposition factor (unitless) (pseudocode_soil S.6.A.1).
-    percent_organic_carbon_content : float, default 1.2
-        Organic carbon content expressed as percent of soil in this layer (unitless).
-    percent_clay_content : float, default 18.7
-        Clay content expressed as percent of soil in this layer (unitless).
-    percent_sand_content : float, default 14.5
-        Sand content expressed as percent of soil in this layer (unitless).
-    percent_silt_content : float, default 64.5
-        Silt content expressed as percent of soil in this layer (unitless).
-    percent_rock_content : float, default 1
-        Rock content expressed as percent of soil in this layer (unitless).
-    decomposition_moisture_effect : float, default 0.0
-        Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
-    percent_organic_carbon_content : float, default 1.2
-        Organic carbon content expressed as percent of soil in this layer (unitless).
-    percent_clay_content : float, default 18.7
-        Clay content expressed as percent of soil in this layer (unitless).
-    percent_sand_content : float, default 14.5
-        Sand content expressed as percent of soil in this layer (unitless).
-    percent_silt_content : float, default 64.5
-        Silt content expressed as percent of soil in this layer (unitless).
-    percent_rock_content : float, default 1
-        Rock content expressed as percent of soil in this layer (unitless).
+    organic_carbon_fraction : float, default 0.012
+        Organic carbon content expressed as fraction of soil in this layer (unitless).
+    clay_fraction : float, default 0.187
+        Clay content expressed as fraction of soil in this layer (unitless).
+    sand_fraction : float, default 0.145
+        Sand content expressed as fraction of soil in this layer (unitless).
+    silt_fraction : float, default 0.645
+        Silt content expressed as fraction of soil in this layer (unitless).
+    rock_fraction : float, default 0.01
+        Rock content expressed as fraction of soil in this layer (unitless).
     decomposition_moisture_effect : float, default 0.0
         Moisture effect on decomposition factor (unitless) (pseudocode_soil S.6.A.2).
     plant_metabolic_active_carbon_usage : float, default 0.0
@@ -300,11 +289,11 @@ class LayerData:
     decomposition_temperature_effect: Optional[float] = None
 
     # --- Erosion
-    percent_organic_carbon_content: float = 1.2
-    percent_clay_content: float = 18.7
-    percent_sand_content: float = 14.5
-    percent_silt_content: float = 64.5
-    percent_rock_content: float = 1
+    organic_carbon_fraction: float = 0.012
+    clay_fraction: float = 0.187
+    sand_fraction: float = 0.145
+    silt_fraction: float = 0.645
+    rock_fraction: float = 0.01
 
     # --- Decomposition
     decomposition_moisture_effect: float = 0.0
@@ -476,9 +465,9 @@ class LayerData:
             self.initial_labile_inorganic_phosphorus_concentration = 25
 
         self.mean_phosphorus_sorption_parameter = self.calculate_phosphorus_sorption_parameter(
-            self.percent_clay_content,
+            self.clay_fraction,
             self.initial_labile_inorganic_phosphorus_concentration,
-            self.percent_organic_carbon_content,
+            self.organic_carbon_fraction,
         )
 
         initial_active_inorganic_phosphorus_concentration = self.initial_labile_inorganic_phosphorus_concentration * (
@@ -554,7 +543,9 @@ class LayerData:
         )
 
         # SWAT eqn. 3:1.1.2
-        humic_organic_nitrogen_concentration = (10**4) * (self.percent_organic_carbon_content / 14)
+        humic_organic_nitrogen_concentration = (10**4) * (
+            self.organic_carbon_fraction / 14 * GeneralConstants.FRACTION_TO_PERCENTAGE
+        )
 
         initial_active_organic_nitrogen_concentration = (
             humic_organic_nitrogen_concentration * FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
@@ -602,7 +593,7 @@ class LayerData:
             self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
         soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        self.total_soil_carbon_amount = soil_mass_in_kg * (self.percent_organic_carbon_content / 100) / field_size
+        self.total_soil_carbon_amount = soil_mass_in_kg * (self.organic_carbon_fraction) / field_size
 
         if self.top_depth == 0:
             self.active_carbon_amount = 0.02 * self.total_soil_carbon_amount
@@ -683,21 +674,21 @@ class LayerData:
 
     @staticmethod
     def calculate_phosphorus_sorption_parameter(
-        percent_clay_content: float,
+        clay_fraction: float,
         labile_inorganic_phosphorus: float,
-        percent_organic_carbon_content: float,
+        organic_carbon_fraction: float,
     ) -> float:
         """
         Calculates the phosphorus sorption coefficient based on the current soil conditions.
 
         Parameters
         ----------
-        percent_clay_content : float
-            Percent of this soil layer that is clay, expressed in range [0, 100] (unitless).
+        clay_fraction : float
+            Fraction of this soil layer that is clay, expressed in range [0, 1.0] (unitless).
         labile_inorganic_phosphorus : float
             Amount of labile inorganic phosphorus in this soil layer (mg / kg soil).
-        percent_organic_carbon_content : float
-            Percent of this soil layer that is organic carbon, expressed in range [0, 100] (unitless).
+        organic_carbon_fraction : float
+            Fraction of this soil layer that is organic carbon, expressed in range [0, 1.0] (unitless).
 
         Returns
         -------
@@ -715,10 +706,10 @@ class LayerData:
         is used in the SurPhos code (see pminrl.f, line 49).
 
         """
-        adjusted_clay_content = max(10**-8, percent_clay_content)
+        adjusted_clay_content = max(10**-8, (clay_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE))
         first_term = -0.045 * log(adjusted_clay_content)
         second_term = 0.001 * labile_inorganic_phosphorus
-        third_term = 0.035 * percent_organic_carbon_content
+        third_term = 0.035 * organic_carbon_fraction * GeneralConstants.FRACTION_TO_PERCENTAGE
         return max(0.05, min(0.7, first_term + second_term - third_term + 0.43))
 
     @staticmethod
@@ -930,6 +921,7 @@ class LayerData:
         SWAT 2:3.2.1, 2
 
         """
+
         return max(0.0, self.water_content - self.field_capacity_content)
 
     @property
@@ -983,7 +975,7 @@ class LayerData:
         generate a reasonable value close to that.
 
         """
-        return (self.percent_silt_content + self.percent_clay_content) / 100
+        return self.silt_fraction + self.clay_fraction
 
     @property
     def carbon_emissions(self) -> float:

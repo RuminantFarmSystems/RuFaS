@@ -7,27 +7,27 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
-    "nitrates,denitrification_rate,temp_factor,percent_carbon",
+    "nitrates,denitrification_rate,temp_factor,carbon_proportion",
     [
-        (78, 1.4, 0.88, 60),
-        (104.55, 0.33, 0.233, 44.55),
-        (22.12, 0.0, 0.5561, 71.223),
-        (204.445, 3.0, 0.781, 22.334),
-        (0.0, 2.55, 0.1554, 39.112),
+        (78, 1.4, 0.88, 0.60),
+        (104.55, 0.33, 0.233, 0.4455),
+        (22.12, 0.0, 0.5561, 0.71223),
+        (204.445, 3.0, 0.781, 0.22334),
+        (0.0, 2.55, 0.1554, 0.39112),
     ],
 )
 def test_calculate_denitrification_amount(
     nitrates: float,
     denitrification_rate: float,
     temp_factor: float,
-    percent_carbon: float,
+    carbon_proportion: float,
 ) -> None:
     """Tests that the amount of nitrified nitrates is calculated correctly."""
     actual = Denitrification._calculate_denitrification_amount(
-        nitrates, denitrification_rate, temp_factor, percent_carbon
+        nitrates, denitrification_rate, temp_factor, carbon_proportion
     )
     expected_denitrification_factor = max(
-        min(1 - exp(-1 * denitrification_rate * temp_factor * percent_carbon), 1.0), 0.0
+        min(1 - exp(-1 * denitrification_rate * temp_factor * carbon_proportion * 100), 1.0), 0.0
     )
     expected = nitrates * expected_denitrification_factor
     assert actual == expected
@@ -61,7 +61,7 @@ def test_denitrify() -> None:
 
         incorp.denitrify()
 
-        nitrification_amount_calls = [call(35, 1.5, 0.89, 65)] * 3
+        nitrification_amount_calls = [call(35, 1.5, 0.89, 0.65)] * 3
         incorp._calculate_denitrification_amount.assert_has_calls(nitrification_amount_calls)
         for index in [0, 2, 3]:
             assert incorp.data.soil_layers[index].nitrate_content == 20

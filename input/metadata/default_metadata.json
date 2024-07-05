@@ -56,6 +56,13 @@
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
+    "purchased_feed_land_use_change_emissions": {
+      "title": "Land Use Change emissions from purchased feeds",
+      "description": "Purchased feeds land use change emission values used in the EEE module.",
+      "path": "input/data/EEE/full_feeds_land_use_change_emissions.csv",
+      "type": "csv",
+      "properties": "feed_emissions_properties"
+    },
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",

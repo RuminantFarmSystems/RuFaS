@@ -9,6 +9,7 @@ from scipy.stats import truncnorm
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import (
@@ -226,8 +227,6 @@ class HeiferII(HeiferI):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
@@ -252,7 +251,7 @@ class HeiferII(HeiferI):
         nutrient_conc: Dict[str, float] = {},
         metabolizable_energy: float = 15.625,
         previous_DMI: float = 10.0,
-    ):
+    ) -> None:
         """
         Calculates this heiferII's nutrient requirements.
         """
@@ -331,32 +330,34 @@ class HeiferII(HeiferI):
             nutrient_conc=nutrient_conc,
         )
 
-    def phosphorus_rqmts(self, DMI):
+    def phosphorus_rqmts(self, DMI: float) -> None:
         """
         Calculates and sets the animal's phosphorus requirement.
 
-        Args:
-            DMI: the Dry Matter Intake (kg)
+        Parameters
+        ----------
+        DMI : float
+            Dry Matter Intake (kg).
         """
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
-        self.p_maint_feces = 0.0008 * DMI * 1000
+        self.p_maint_feces = 0.0008 * DMI * GeneralConstants.KG_TO_GRAMS
 
         # amount pf P required for urine production (g) (A.1A-F.E.2)
-        p_urine = 0.000002 * self.body_weight * 1000
+        p_urine = 0.000002 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = (
             (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
             * self.daily_growth
             / 0.96
-            * 1000
+            * GeneralConstants.KG_TO_GRAMS
         )
 
         # absorbed P retained for fetal growth (g) (A.1C-F.E.4)
         if self.days_in_preg >= 190:
             exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
             exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * (self.days_in_preg - 1)
-            self.p_gest = (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * 1000
+            self.p_gest = (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * GeneralConstants.KG_TO_GRAMS
             self.p_gest_for_calf += self.p_gest
         else:
             self.p_gest = 0

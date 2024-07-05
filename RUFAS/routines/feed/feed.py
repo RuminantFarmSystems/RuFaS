@@ -7,10 +7,9 @@ from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...enums import AnimalCombination
 import math
 
-im = InputManager()
 om = OutputManager()
 
 udrm = UserDefinedRationManager()
@@ -49,7 +48,8 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-        self.nutrient_standard = im.get_data("config.nutrient_standard")
+        self.im = InputManager()
+        self.nutrient_standard = self.im.get_data("config.nutrient_standard")
         self.nutrient_table = "NASEM_Comp" if self.nutrient_standard == "NASEM" else "NRC_Comp"
 
         self.all_feed_units = self._retrieve_data(data_source="user_feeds", var_names=["rufas_id", "Name", "units"])
@@ -117,7 +117,7 @@ class Feed:
         user_defined_ration_percentage_sum_tolerance = 0.01
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
         udrm.calf_ration = {
             str(dict["feed_type"]): dict["ration_percentage"] for dict in self.user_defined_ration_percentages["calf"]
@@ -206,13 +206,13 @@ class Feed:
                 "storage_type": storage,
             }
             nutrient_dict_units = {
-                "carbon": MeasurementUnits.KILOGRAMS.value,
-                "nitrogen": MeasurementUnits.KILOGRAMS.value,
-                "phosphorus": MeasurementUnits.KILOGRAMS.value,
-                "dry_matter": MeasurementUnits.KILOGRAMS.value,
-                "crude_protein": MeasurementUnits.KILOGRAMS.value,
-                "carbon_loss": MeasurementUnits.KILOGRAMS.value,
-                "crude_protein_loss": MeasurementUnits.KILOGRAMS.value,
+                "carbon": MeasurementUnits.KILOGRAMS,
+                "nitrogen": MeasurementUnits.KILOGRAMS,
+                "phosphorus": MeasurementUnits.KILOGRAMS,
+                "dry_matter": MeasurementUnits.KILOGRAMS,
+                "crude_protein": MeasurementUnits.KILOGRAMS,
+                "carbon_loss": MeasurementUnits.KILOGRAMS,
+                "crude_protein_loss": MeasurementUnits.KILOGRAMS,
             }
             nutrients_dict = {}
             nutrients_dict["carbon"] = self.C
@@ -1201,7 +1201,7 @@ class Feed:
 
         result_list = []
         values = []
-        data = im.get_data(data_source)
+        data = self.im.get_data(data_source)
         if not var_names:
             var_names = list(data.keys())
 

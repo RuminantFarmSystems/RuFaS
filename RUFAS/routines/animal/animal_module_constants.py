@@ -49,12 +49,6 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE: str = "slurry storage outdoor"
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
-    URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND: float = 2
-    """The lower bound of the urine urea nitrogen concentration."""
-
-    URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND: float = 12
-    """The upper bound of the urine urea nitrogen concentration."""
-
     DAILY_MILK_VARIATION_MEAN: float = 0
     """Mean of the daily milk production variation from the estimated milk production, kg/day"""
 
@@ -75,6 +69,14 @@ class AnimalModuleConstants:
 
     MINIMUM_DAILY_DMI_RATIO: float = 0.01
     """Minimum estimated DMI (kg/day), as a percentage of body_weight in kg"""
+
+    MINIMUM_DMI_LACT: float = 2.0
+    """Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation,
+    the mimimum DMI is 3.94 kg/day (Reed et al. 2015)"""
+
+    MINIMUM_DMI_DRY: float = 2.0
+    """Minimum estimated DMI for dry cows, kg/day. Note that in the dataset used to generate the equation,
+    the minimum DMI is 7.1 kg/day (Appuhamy 2018)"""
 
     MINIMUM_PHOSPHORUS: float = 0.0
     """Minimum phosphorus estimate, g/day"""

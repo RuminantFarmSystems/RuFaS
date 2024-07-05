@@ -4,6 +4,7 @@ from typing import Tuple
 
 import math
 
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
@@ -69,7 +70,10 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             The minimum treatment volume, m^3.
 
         """
-        return self.wastewater_volume * self.storage_time_period
+        if isinstance(self.storage_time_period, int):
+            return self.wastewater_volume * self.storage_time_period
+        else:
+            return 0.0
 
     @property
     def total_pit_volume(self) -> float:
@@ -142,11 +146,17 @@ class SlurryStorageOutdoor(BaseManureTreatment):
     def pit_surface_area(self) -> float:
         """Calculate the surface area of the pit.
 
+        The surface area is calculated as the product of the number of animals in the pen
+        and the DEFAULT_STORAGE_AREA_PER_ANIMAL constant.
+
         Returns:
             The surface area of the pit, m^2.
 
         """
-        return self.pit_width * self.pit_length
+        if self._current_pen is not None and self._current_pen.num_animals is not None:
+            return self._current_pen.num_animals * GasEmissionConstants.DEFAULT_STORAGE_AREA_PER_ANIMAL
+        else:
+            return 0
 
     @property
     def pit_volume(self) -> float:
@@ -181,6 +191,26 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         return self.freeboard_input * self.pit_surface_area
+
+    def _adjust_final_manure_volume(self, current_day_final_manure_volume: float) -> float:
+        """
+        Adjust the final manure volume to account for the precipitation and the storage time period.
+
+        Parameters
+        ----------
+        current_day_final_manure_volume : float
+            The final manure volume for the current simulation day (:math:`m^3`).
+
+        Returns
+        -------
+        float
+            The adjusted final manure volume.
+
+        """
+        if self.config.manure_cover in [ManureCoverEnum.NO_COVER.value, ManureCoverEnum.CRUST.value]:
+            return current_day_final_manure_volume + self.precipitation_volume
+        else:
+            return current_day_final_manure_volume
 
     def calc_methane_emission(
         self,
@@ -227,7 +257,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         num_animals: int,
         accumulated_manure_volume: float,
         accumulated_manure_total_ammoniacal_nitrogen: float,
-    ) -> Tuple[float, float]:
+    ) -> float:
         """Calculates the ammonia emission from the outdoor slurry storage treatment system.
 
         Parameters
@@ -243,9 +273,8 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         Returns
         -------
-        Tuple[float, float]
-            A tuple of the ammonia emission from the outdoor slurry storage in kg and the accumulated total ammoniacal
-            nitrogen in the treatment system after the ammonia emission is calculated, kg.
+        float
+            The ammonia emission from the outdoor slurry storage in kg.
 
         """
         ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
@@ -268,7 +297,11 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         daily_input = self._current_manure_treatment_daily_input
-        daily_output = self._initialize_daily_output_during_update(daily_input)
+        if daily_input:
+            daily_output = self._initialize_daily_output_during_update(daily_input)
+        adjusted_daily_final_manure_volume = self._adjust_final_manure_volume(daily_output.daily_final_manure_volume)
+        daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
+
         self._adjust_accumulated_output(daily_output)
 
         # fmt: off

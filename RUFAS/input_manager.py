@@ -2,10 +2,11 @@ import json
 import os
 import re
 from copy import deepcopy
+from deepdiff import DeepDiff
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Tuple, Sequence
+from typing import Any, Dict, List, Union, Callable, Sequence
 
 import pandas as pd
 
@@ -13,6 +14,16 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 om = OutputManager()
+
+"""
+Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
+"""
+FIXABLE_INPUT_DATA_TYPES: set[str] = {"string", "number", "bool"}
+
+"""
+Set enumerating the input data formats the Input Manager can accept.
+"""
+VALID_INPUT_TYPES: set[str] = {"json", "csv"}
 
 ADDRESS_TO_INPUTS = "files"
 
@@ -66,18 +77,19 @@ class InputManager:
 
     __instance = None
 
-    def __new__(cls) -> "InputManager":
+    def __new__(cls, metadata_depth_limit: int | None = None) -> "InputManager":
         if not hasattr(cls, "instance"):
             cls.instance = super(InputManager, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self) -> None:
+    def __init__(self, metadata_depth_limit: int | None = None) -> None:
         if InputManager.__instance is None:
             InputManager.__instance = self
             self.__metadata: Dict[str, Any] = {}
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
+        self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
     def meta_data(self) -> Dict[str, Any]:
@@ -99,13 +111,13 @@ class InputManager:
         """The setter method for __pool"""
         self.__pool = incoming_pool
 
-    def start_data_processing(self, metadata_path: str, eager_termination: bool = True) -> bool:
+    def start_data_processing(self, metadata_path: Path, eager_termination: bool = True) -> bool:
         """
         Starts the pipeline for organizing metadata and input data processing.
 
         Parameters
         ----------
-        metadata_path : str
+        metadata_path : Path
             File path to the metadata.
         eager_termination : bool, default=True
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
@@ -117,17 +129,19 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
+        self._validate_metadata()
         self._load_properties()
+        self._validate_properties()
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
-    def _load_metadata(self, metadata_path: str) -> None:
+    def _load_metadata(self, metadata_path: Path) -> None:
         """
         Loads metadata from json file to IM metadata dict.
 
         Parameters
         ----------
-        metadata_path : str
+        metadata_path : Path
             The path to the metadata file.
 
         Raises
@@ -178,13 +192,13 @@ class InputManager:
             "function": self._load_properties.__name__,
         }
         try:
-            properties_path = self.__metadata["files"]["properties"]["path"]
+            properties_path = Path(self.__metadata["files"]["properties"]["path"])
             om.add_log(
                 "load_properties_attempt",
                 f"Attempting to load properties from {properties_path}",
                 info_map,
             )
-            if not os.path.exists(properties_path):
+            if not properties_path.exists():
                 raise FileNotFoundError(f"Properties file not found at {properties_path}")
 
             del self.__metadata["files"]["properties"]
@@ -206,13 +220,13 @@ class InputManager:
             om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
             raise
 
-    def _load_data_from_json(self, file_path: str) -> Dict[str, Any]:
+    def _load_data_from_json(self, file_path: Path) -> Dict[str, Any]:
         """
         Loads data from input json file.
 
         Parameters
         ----------
-        file_path : str
+        file_path : Path
             Path to the input file to load.
 
         Returns
@@ -243,13 +257,13 @@ class InputManager:
         except Exception as e:
             raise e
 
-    def _load_data_from_csv(self, file_path: str) -> Dict[str, Any]:
+    def _load_data_from_csv(self, file_path: Path) -> Dict[str, Any]:
         """
         Loads data from input csv file.
 
         Parameters
         ----------
-        file_path : str
+        file_path : Path
             Path to the input file to load.
 
         Returns
@@ -308,11 +322,11 @@ class InputManager:
 
         """
 
-        data_type_to_loader_map: Dict[str, Callable[[str], Dict[str, Any]]] = {
+        data_type_to_loader_map: Dict[str, Callable[[Path], Dict[str, Any]]] = {
             "json": self._load_data_from_json,
             "csv": self._load_data_from_csv,
         }
-
+        valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
 
@@ -326,108 +340,31 @@ class InputManager:
 
             properties_blob_key = file_details["properties"]
             metadata_properties = self.__metadata["properties"][properties_blob_key]
-            (
-                input_data,
-                missing_required_property_keys,
-                property_keys_with_default_values,
-            ) = self._add_default_values_to_missing_inputs(input_data, metadata_properties)
-            self._log_missing_keys(missing_required_property_keys, property_keys_with_default_values)
-            filtered_input_data = self._filter_input_data_by_metadata(input_data, metadata_properties)
+
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 variable_properties = metadata_properties[metadata_property]
                 is_element_acceptable = self._validate_input_by_type(
                     variable_path=[metadata_property],
                     variable_properties=variable_properties,
-                    input_data=filtered_input_data,
+                    input_data=input_data,
                     eager_termination=eager_termination,
                     properties_blob_key=properties_blob_key,
                     elements_counter=self.elements_counter,
-                    called_during_initialization=False,
+                    called_during_initialization=True,
                 )
 
+                valid_data = valid_data and is_element_acceptable
+
                 if is_element_acceptable:
-                    validated_data[metadata_property] = filtered_input_data[metadata_property]
+                    validated_data[metadata_property] = input_data[metadata_property]
                 elif eager_termination:
                     return False
 
             if validated_data:
                 self.__pool[file_blob_key] = validated_data
 
-        return self.elements_counter.invalid_elements == 0
-
-    def _filter_input_array_data_by_metadata(
-        self, input_array_data: List[Any], metadata_properties: Dict[str, Any]
-    ) -> List[Any]:
-        """
-        Filter input array data based on provided metadata properties.
-
-        Parameters:
-        -----------
-        input_array_data : List[Any]
-            The input array data to be filtered.
-        metadata_properties : Dict[str, Any]
-            The dictionary containing metadata properties used as a filter for input_array_data.
-        """
-        if len(input_array_data) == 0:
-            return input_array_data
-
-        filtered_array_data: List[Dict[str, Any] | List[Any] | (int | float | str | bool)] = []
-
-        for array_element in input_array_data:
-            if isinstance(array_element, dict):
-                nested_input_dict_data: Dict[str, Any] = self._filter_input_data_by_metadata(
-                    array_element, metadata_properties["properties"]
-                )
-                if nested_input_dict_data:
-                    filtered_array_data.append(nested_input_dict_data)
-            elif isinstance(array_element, list):
-                nested_input_array_data: List[Any] = self._filter_input_array_data_by_metadata(
-                    array_element, metadata_properties["properties"]
-                )
-                if nested_input_array_data:
-                    filtered_array_data.append(nested_input_array_data)
-            elif isinstance(array_element, (int | float | str | bool)):
-                filtered_array_data.append(array_element)
-
-        return filtered_array_data
-
-    def _filter_input_data_by_metadata(
-        self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Filter input data dictionary based on provided metadata properties.
-
-        This function removes key-value pairs from the input data dictionary (input_data) if
-        the corresponding keys are not present in the metadata properties dictionary
-        (metadata_properties). Nested dictionaries are processed recursively.
-
-        Parameters:
-        -----------
-        input_data : dict
-            The input data dictionary to be filtered.
-
-        metadata_properties : Dict[str, Any]
-            The dictionary containing metadata properties used as a filter for input_data.
-        """
-        filtered_input_data: Dict[str, Any] = {}
-        for key, value in input_data.items():
-            if key in metadata_properties:
-                if isinstance(metadata_properties[key], dict) and isinstance(value, dict):
-                    nested_input_data: Dict[str, Any] = self._filter_input_data_by_metadata(
-                        value, metadata_properties[key]
-                    )
-                    if nested_input_data:
-                        filtered_input_data[key] = nested_input_data
-                elif isinstance(metadata_properties[key], dict) and isinstance(value, list):
-                    array_input_data: List[Any] = self._filter_input_array_data_by_metadata(
-                        value, metadata_properties[key]
-                    )
-                    filtered_input_data[key] = array_input_data
-                else:
-                    filtered_input_data[key] = value
-
-        return filtered_input_data
+        return valid_data
 
     def _get_variable_modifiability(self, variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
         """
@@ -533,7 +470,7 @@ class InputManager:
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(
-        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool = False
+        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -561,14 +498,9 @@ class InputManager:
         """
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
-            om.add_error(
-                "Missing required data",
-                f"Key {var_name} not found in data. A value is required for to update variable during runtime.",
-                info_map,
-            )
-            raise KeyError(
-                f"Key {var_name} not found in data. A value is required for to update variable " "during runtime."
-            )
+            error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
+            om.add_error("Missing required data", error_msg, info_map)
+            raise KeyError(error_msg)
 
         if self._is_input_required_upon_initialization(variable_name=var_name, variable_properties=variable_properties):
             om.add_error(
@@ -588,212 +520,6 @@ class InputManager:
             info_map,
         )
 
-    def _log_missing_keys(
-        self, missing_required_property_keys: List[str], property_keys_with_default_values: List[Tuple[str, Any]]
-    ) -> None:
-        """
-        Logs warnings and errors for missing required properties and properties where default values were applied.
-
-        Notes
-        -----
-        This method aims at providing feedback on the integrity of the data after attempting to fill
-        in missing values based on the schema's default specifications. It serves two main purposes:
-        1. Informing about the absence of required properties that could not be resolved due to
-        a lack of default values.
-        2. Keeping track of those properties for which default values were applied, as this can be
-        useful for debugging and understanding how the data was modified.
-
-        Parameters
-        ----------
-        missing_required_property_keys : List[str]
-            A list of keys for required properties that were not provided in the input data.
-        property_keys_with_default_values : List[Tuple[str, Any]]
-            A list of tuples, each containing a property key and the default value that was applied to it.
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._log_missing_keys.__name__,
-        }
-        if missing_required_property_keys:
-            for key in missing_required_property_keys:
-                om.add_error(
-                    "Validation: missing required property keys",
-                    f"Missing required property key: {key}.",
-                    info_map,
-                )
-        if property_keys_with_default_values:
-            for key, value in property_keys_with_default_values:
-                om.add_warning(
-                    "Validation: missing required property keys",
-                    f"Default value used for required property key that was missing: {key} => {value}.",
-                    info_map,
-                )
-
-    def _add_default_values_to_missing_inputs(
-        self, input_data: Dict[str, Any], metadata_properties: Dict[str, Any]
-    ) -> Tuple[Dict[str, Any], List[str], List[Tuple[str, Any]]]:
-        """
-        Recursively adds default values to missing properties in the input data based on metadata properties.
-
-        Notes
-        -----
-        This method is designed to check that all necessary data is present within a given input structure,
-        applying defaults where explicit values are not provided. It supports deeply nested structures through
-        recursion, handling both objects and arrays. It is very important to note that the method does not
-        validate if the default values are semantically correct. It only checks if the input data is complete
-        and fills in missing values with defaults where necessary.
-
-        The method iterates through each key in the metadata properties, checking for its presence in the input data.
-        If a key is missing and a default value is specified, that default is added to the input data. For nested
-        objects and arrays, the method recursively calls itself, adjusting the path to reflect the nested structure.
-        This approach allows for detailed tracking of missing properties and the application of defaults at any depth
-        of the input data structure. For arrays, a separate helper method, `_add_default_values_to_array_inputs`,
-        is used to handle the specific nuances associated with array elements, including nested arrays
-        and objects within arrays.
-
-        Parameters
-        ----------
-        input_data : Dict[str, Any]
-            The input data for which defaults need to be filled.
-        metadata_properties : Dict[str, Any]
-            The metadata properties defining defaults and data types.
-
-        Returns
-        -------
-        Tuple[Dict[str, Any], List[str], List[Tuple[str, Any]]]
-            A tuple containing:
-            - The updated input data with defaults added.
-            - A list of missing required property keys.
-            - A list of tuples where each tuple is a property key and its default value that was added.
-        """
-
-        missing_required_property_keys: List[str] = []
-        property_keys_with_default_values: List[Tuple[str, Any]] = []
-        for property_key, property_details in metadata_properties.items():
-            if property_key in ["type", "description", "default"]:
-                continue
-            if property_key not in input_data:
-                if "default" in property_details:
-                    input_data[property_key] = property_details["default"]
-                    property_keys_with_default_values.append((property_key, property_details["default"]))
-                else:
-                    missing_required_property_keys.append(property_key)
-                    continue
-
-            if property_details["type"] == "object":
-                nested_input_data = input_data[property_key]
-                nested_metadata_properties = metadata_properties[property_key]
-                (
-                    input_data[property_key],
-                    nested_missing_required_property_keys,
-                    nested_property_keys_with_default_values,
-                ) = self._add_default_values_to_missing_inputs(
-                    nested_input_data,
-                    nested_metadata_properties,
-                )
-                missing_required_property_keys.extend(
-                    [f"{property_key}.{key}" for key in nested_missing_required_property_keys]
-                )
-                property_keys_with_default_values.extend(
-                    [(f"{property_key}.{key}", value) for key, value in nested_property_keys_with_default_values]
-                )
-
-            elif property_details["type"] == "array":
-                (
-                    input_data[property_key],
-                    nested_missing_required_property_keys,
-                    nested_property_keys_with_default_values,
-                ) = self._add_default_values_to_array_inputs(
-                    input_data,
-                    property_key,
-                    property_details,
-                )
-                missing_required_property_keys.extend(nested_missing_required_property_keys)
-                property_keys_with_default_values.extend(nested_property_keys_with_default_values)
-
-        return input_data, missing_required_property_keys, property_keys_with_default_values
-
-    def _add_default_values_to_array_inputs(
-        self,
-        input_data: Dict[str, Any],
-        property_key: str,
-        property_details: Dict[str, Any],
-    ) -> Tuple[List[Any], List[str], List[Tuple[str, Any]]]:
-        """
-        Processes an array property to add default values to its elements based on metadata properties.
-
-        Notes
-        -----
-        Handling default values for arrays can be tricky due to their potential to nest and contain various
-        types of elements (objects, other arrays, or simple types). This method specifically addresses these challenges,
-        checking that each element within the array is appropriately processed according to its type,
-        as defined in the metadata properties.
-
-        The method first checks if the array is empty and if a default value should be applied at the array level.
-        It then iterates through each element of the array. Based on the element's type (object, array, or simple type),
-        it either calls `_add_default_values_to_missing_inputs` for nested objects or itself recursively for nested
-        arrays, applying default values as specified in the metadata. This allows for deep traversal of nested arrays
-        and objects. If the elements of the array have simple types, the method simply adds the default value to the
-        element if it is missing.
-
-        Parameters
-        ----------
-        input_data : Dict[str, Any]
-            The input data containing the array to be processed.
-        property_key : str
-            The key associated with the array in the input data.
-        property_details : Dict[str, Any]
-            The metadata properties for the array elements, including type and defaults.
-
-        Returns
-        -------
-        Tuple[List[Any], List[str], List[Tuple[str, Any]]]
-            A tuple containing:
-            - The updated array with defaults added to its elements.
-            - A list of paths to missing required properties within the array elements.
-            - A list of tuples where each tuple is a property path and its default value that was added.
-        """
-
-        missing_required_property_keys: List[str] = []
-        property_keys_with_default_values: List[Tuple[str, Any]] = []
-        nested_metadata_properties = property_details["properties"]
-        nested_input_data = input_data[property_key]
-        updated_array = []
-
-        if len(nested_input_data) == 0:
-            if "default" in nested_metadata_properties:
-                nested_input_data = [nested_metadata_properties["default"]]
-                property_keys_with_default_values.append((f"{property_key}[0]", nested_metadata_properties["default"]))
-            else:
-                missing_required_property_keys.append(f"{property_key}[0]")
-
-        for idx, element in enumerate(nested_input_data):
-            if nested_metadata_properties["type"] == "array":
-                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_array_inputs(
-                    {f"{property_key}[{idx}]": element},
-                    f"{property_key}[{idx}]",
-                    nested_metadata_properties,
-                )
-                updated_array.append(element)
-                missing_required_property_keys.extend(nested_missing_keys)
-                property_keys_with_default_values.extend(nested_keys_with_default)
-
-            elif nested_metadata_properties["type"] == "object":
-                element, nested_missing_keys, nested_keys_with_default = self._add_default_values_to_missing_inputs(
-                    element, nested_metadata_properties
-                )
-                updated_array.append(element)
-                missing_required_property_keys.extend([f"{property_key}[{idx}].{key}" for key in nested_missing_keys])
-                property_keys_with_default_values.extend(
-                    [(f"{property_key}[{idx}].{key}", value) for key, value in nested_keys_with_default]
-                )
-
-            else:
-                updated_array.append(element)
-
-        return updated_array, missing_required_property_keys, property_keys_with_default_values
-
     def _validate_input_by_type(
         self,
         variable_properties: Dict[str, Any],
@@ -802,7 +528,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -828,61 +554,60 @@ class InputManager:
         -------
         bool
             True if the input data is valid, False otherwise.
+
+        Raises
+        ------
+        KeyError
+            If the variable's properties does not specify a "type".
+
+        Notes
+        -----
+        Fixing invalid data will only be attempted if the data is a "simple" type (i.e. a string, bool or number).
+
         """
 
         if "type" not in variable_properties:
             raise KeyError(f"Missing 'type' key in {variable_properties}")
         data_type = variable_properties["type"]
 
-        primitive_data_type_to_validator_map: Dict[str, Callable[[Dict[str, Any], str, Any, str], bool]] = {
-            "string": self._string_type_validator,
-            "number": self._num_type_validator,
-            "bool": self._bool_type_validator,
-        }
-
-        complex_type_to_validator_map: Dict[
+        type_to_validator_map: Dict[
             str, Callable[[List[int | str], Dict[str, Any], Dict[str, Any], bool, str, "ElementsCounter", bool], bool]
         ] = {
             "array": self._array_type_validator,
             "object": self._object_type_validator,
+            "string": self._string_type_validator,
+            "number": self._number_type_validator,
+            "bool": self._bool_type_validator,
         }
 
-        if data_type not in primitive_data_type_to_validator_map and data_type not in complex_type_to_validator_map:
+        if data_type not in type_to_validator_map:
             raise ValueError(
                 f"The metadata type of the element '{self._convert_variable_path_to_str(variable_path)}' "
-                f"is not valid. Supported types are: {primitive_data_type_to_validator_map.keys()}, "
-                f"{complex_type_to_validator_map.keys()}"
+                f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
-        elif data_type in primitive_data_type_to_validator_map:
-            variable_path_str = self._convert_variable_path_to_str(variable_path)
-            input_data_value = self._extract_value_by_key_list(input_data, variable_path)
-            is_valid = primitive_data_type_to_validator_map[data_type](
-                variable_properties,
-                variable_path_str,
-                input_data_value,
-                properties_blob_key,
-            )
-            if is_valid:
-                elements_counter.increment(ElementState.VALID)
-                return True
-            is_fixed = self._fix_data(variable_properties, variable_path, input_data, properties_blob_key)
-            if is_fixed:
-                elements_counter.increment(ElementState.FIXED)
-                return True
-            elements_counter.increment(ElementState.INVALID)
-            return False
+        is_valid = type_to_validator_map[data_type](
+            variable_path,
+            variable_properties,
+            input_data,
+            eager_termination,
+            properties_blob_key,
+            elements_counter,
+            called_during_initialization,
+        )
 
-        else:
-            return complex_type_to_validator_map[data_type](
-                variable_path,
-                variable_properties,
-                input_data,
-                eager_termination,
-                properties_blob_key,
-                elements_counter,
-                called_during_initialization,
-            )
+        if data_type not in FIXABLE_INPUT_DATA_TYPES:
+            return is_valid
+
+        if is_valid:
+            elements_counter.increment(ElementState.VALID)
+            return True
+        is_fixed = self._fix_data(variable_properties, variable_path, input_data, properties_blob_key)
+        if is_fixed:
+            elements_counter.increment(ElementState.FIXED)
+            return True
+        elements_counter.increment(ElementState.INVALID)
+        return False
 
     def _validate_array_container_properties(
         self,
@@ -961,7 +686,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type array.
@@ -981,7 +706,7 @@ class InputManager:
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
-            Boolean variable indicating whether the function is being called during initialization
+            Boolean variable indicating whether the function is being called during initialization.
 
         Returns
         -------
@@ -989,7 +714,13 @@ class InputManager:
             True if the input data element is valid or fixable, False otherwise.
         """
 
-        array_value = self._extract_value_by_key_list(input_data, variable_path)
+        array_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and array_value is None:
+            return True
+
         if not self._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
@@ -1019,7 +750,7 @@ class InputManager:
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-        called_during_initialization: bool = False,
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type object.
@@ -1039,14 +770,24 @@ class InputManager:
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
 
         Returns
         -------
         bool
             True if the input data element is valid or fixable, False otherwise.
-        """
 
-        object_value = self._extract_value_by_key_list(input_data, variable_path)
+        Notes
+        -----
+        This method will look for and delete any keys in the input data that do not have properties specified for them
+        in the metadata properties.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._object_type_validator.__name__}
+
+        object_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
@@ -1056,7 +797,6 @@ class InputManager:
                 "Validation: object is not a dictionary",
                 f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
-                {"class": self.__class__.__name__, "function": self._object_type_validator.__name__},
             )
             return False
 
@@ -1076,29 +816,53 @@ class InputManager:
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
                 return False
+
+        extraneous_keys = [key for key in object_value.keys() if key not in variable_properties.keys()]
+        for key in extraneous_keys:
+            om.add_warning(
+                "Validation: object contains extraneous data",
+                f"Variable: '{variable_path_str}' contains data at key '{key}' that is not specified in the metadata "
+                f"properties. {properties_violation_message}",
+                info_map,
+            )
+            del object_value[key]
+
         return is_whole_object_acceptable
 
-    def _num_type_validator(
+    def _number_type_validator(
         self,
+        variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        var_name: str,
-        input_data_value: Union[int, float],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
         properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data number element."""
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
+        variable_path_str = self._convert_variable_path_to_str(variable_path)
+
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._num_type_validator.__name__,
+            "function": self._number_type_validator.__name__,
         }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
+
         if type(input_data_value) is not float and type(input_data_value) is not int:
             warning_string = "Validation: value is not a number"
             warning_message = (
-                f"Variable: '{var_name}' has value: {input_data_value}, is type: "
+                f"Variable: '{variable_path_str}' has value: {input_data_value}, is type: "
                 f"{type(input_data_value)}. {properties_violation_message}"
             )
             om.add_warning(warning_string, warning_message, info_map)
@@ -1108,7 +872,7 @@ class InputManager:
             if not is_in_range:
                 warning_name = "Validation: value less than minimum"
                 warning_message = (
-                    f"Variable: '{var_name}' has value: {input_data_value}, less than minimum value: "
+                    f"Variable: '{variable_path_str}' has value: {input_data_value}, less than minimum value: "
                     f"{minimum_value: .2f}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
@@ -1118,7 +882,7 @@ class InputManager:
             if not is_in_range:
                 warning_name = "Validation: value greater than maximum"
                 warning_string = (
-                    f"Variable: '{var_name}' has value: {input_data_value}, greater than maximum value: "
+                    f"Variable: '{variable_path_str}' has value: {input_data_value}, greater than maximum value: "
                     f"{maximum_value: .2f}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_string, info_map)
@@ -1128,12 +892,23 @@ class InputManager:
 
     def _string_type_validator(
         self,
+        variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        var_name: str,
-        input_data_value: str,
+        input_data: Dict[str, Any],
+        eager_termination: bool,
         properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data string element."""
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
+        variable_path_str = self._convert_variable_path_to_str(variable_path)
         info_map = {
             "class": self.__class__.__name__,
             "function": self._string_type_validator.__name__,
@@ -1141,10 +916,11 @@ class InputManager:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
+
         if type(input_data_value) is not str:
             warning_name = "Validation: string variable is not a string"
             warning_message = (
-                f"Variable: '{var_name}' has value: {input_data_value}, is type: "
+                f"Variable: '{variable_path_str}' has value: {input_data_value}, is type: "
                 f"{type(input_data_value)}. {properties_violation_message}"
             )
             om.add_warning(warning_name, warning_message, info_map)
@@ -1156,7 +932,7 @@ class InputManager:
             if not is_valid_string:
                 warning_name = "Validation: string variable does not match pattern"
                 warning_message = (
-                    f"Variable: '{var_name}' has value: '{input_data_value}', does not match pattern: "
+                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', does not match pattern: "
                     f"{pattern_check}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
@@ -1169,7 +945,7 @@ class InputManager:
             if not is_valid_string:
                 warning_name = "Validation: string length less than minimum"
                 warning_message = (
-                    f"Variable: '{var_name}' has value: '{input_data_value}', length is less than "
+                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
@@ -1179,7 +955,7 @@ class InputManager:
             if not is_valid_string:
                 warning_name = "Validation: string length greater than maximum"
                 warning_message = (
-                    f"Variable: '{var_name}' has value: '{input_data_value}', length is greater than "
+                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', length is greater than "
                     f"maximum length: {maximum_length}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
@@ -1189,29 +965,39 @@ class InputManager:
 
     def _bool_type_validator(
         self,
+        variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        var_name: str,
-        input_data_value: bool,
+        input_data: Dict[str, Any],
+        eager_termination: bool,
         properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data bool element."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._bool_type_validator.__name__,
-        }
+        input_data_value = self._extract_input_data_by_key_list(
+            input_data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and input_data_value is None:
+            return True
+
+        variable_path_str = self._convert_variable_path_to_str(variable_path)
+
+        info_map = {"class": self.__class__.__name__, "function": self._bool_type_validator.__name__}
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
+
         if type(input_data_value) is not bool:
             warning_name = "Validation: bool variable is not a bool"
             warning_message = (
-                f"Variable: '{var_name}' has value: '{input_data_value}', is type: "
+                f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
                 f"'{type(input_data_value)}'. {properties_violation_message}"
             )
             om.add_warning(warning_name, warning_message, info_map)
             return False
 
-        return input_data_value in (True, False)
+        return True
 
     def _extract_value_by_key_list(
         self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]
@@ -1279,6 +1065,54 @@ class InputManager:
             else:
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}")
         return input_data
+
+    def _extract_input_data_by_key_list(
+        self,
+        input_data: List[Any] | Dict[str, Any],
+        variable_path: Sequence[str | int],
+        variable_properties: Dict[str, Any],
+        called_during_initialization: bool,
+    ) -> Any:
+        """
+        Extracts a value from the input data based on a specified path and handles missing data by calling
+        InputManager._log_missing_data().
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data if found.
+            None if not found.
+
+        Notes
+        -----
+        This function navigates through the given input data (which can be a list or a dictionary) following the path
+        specified in `variable_path`. If the path leads to a value, it is returned.
+        If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
+        the variable name by finding the last string element in the `variable_path` array and handles this missing data
+        by calling InputManager._log_missing_data().
+        """
+        result = None
+        try:
+            result = self._extract_value_by_key_list(input_data, variable_path)
+        except KeyError:
+            var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
+            self._log_missing_data(
+                variable_properties=variable_properties,
+                var_name=var_name,
+                called_during_initialization=called_during_initialization,
+            )
+        return result
 
     def _convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
         """
@@ -1353,7 +1187,7 @@ class InputManager:
 
         element_path = ".".join([str(element) for element in element_hierarchy])
         properties_violation_message = (
-            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+            f"Violates properties defined in metadata properties section '{properties_blob_key}'."
         )
         if "default" not in variable_properties.keys():
             error_message = (
@@ -1363,9 +1197,13 @@ class InputManager:
             om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
             return False
 
-        original_invalid_value = variable_parent[element_hierarchy[-1]]
+        if type(variable_parent) is list:
+            original_invalid_value = variable_parent[element_hierarchy[-1]]
+        else:
+            original_invalid_value = variable_parent.get(element_hierarchy[-1])
+
         warning_message = (
-            f"Variable: '{element_path}' has value: {original_invalid_value}. " f"{properties_violation_message}"
+            f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
         )
         om.add_warning("Validation: invalid data found", warning_message, info_map)
 
@@ -2006,8 +1844,570 @@ class InputManager:
 
         """
         file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
-        file_path = os.path.join(path, file_name)
+        file_path = path / file_name
+        om.create_directory(path)
         om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+
+    def _validate_metadata(self) -> None:
+        """Checks that top-level metadata has valid and required keys and values."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_metadata.__name__,
+        }
+        metadata_files = self.__metadata[ADDRESS_TO_INPUTS]
+        required_keys = {"path", "type", "properties"}
+        optional_keys = {"title", "description"}
+        valid_keys = required_keys | optional_keys
+        for key, data in metadata_files.items():
+            if missing_keys := (required_keys - data.keys()):
+                om.add_error(
+                    "Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'", info_map
+                )
+                raise ValueError
+            if invalid_keys := (data.keys() - valid_keys):
+                om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
+                raise ValueError
+
+            if data["type"] not in VALID_INPUT_TYPES:
+                om.add_error(
+                    "Metadata Validation",
+                    f"Invalid type '{data['type']}' in '{key}'. Expected one option from {VALID_INPUT_TYPES}",
+                    info_map,
+                )
+                raise ValueError
+
+            if not os.path.isfile(data["path"]):
+                om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
+                raise ValueError
+
+            if data["properties"] is None or data["properties"] == "":
+                om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
+                raise ValueError
+
+        om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
+
+    def _validate_properties(self) -> None:
+        """Iteratively traverses the metadata properties to check the max depth and routes
+        properties to be validated by type.
+
+        Raises
+        ------
+        ValueError
+            - If the depth of the metadata exceeds the metadata_depth_limit.
+            - If the properties' 'type' value is neither in the type_to_validator_map keys,
+            nor is None.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_properties.__name__,
+        }
+
+        stack: list[tuple[dict[str, Any], int, list[str]]] = [(self.__metadata["properties"], 0, [])]
+        current_max_depth: int = 0
+        deepest_path: list[str] = []
+
+        type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], None]] = {
+            "number": self._metadata_number_validator,
+            "array": self._metadata_array_validator,
+            "bool": self._metadata_bool_validator,
+            "string": self._metadata_string_validator,
+            "object": self._metadata_object_validator,
+        }
+        while stack:
+            current_obj, depth, path = stack.pop()
+
+            if depth > self.metadata_depth_limit:
+                om.add_error(
+                    "Max metadata depth exceeded.",
+                    f"Metadata depth exceeds maximum allowed depth of {self.metadata_depth_limit} at path {path}",
+                    info_map,
+                )
+                raise ValueError(
+                    f"Metadata depth exceeds maximum allowed depth of {self.metadata_depth_limit} at path {path}"
+                )
+
+            if depth > current_max_depth:
+                current_max_depth = depth
+                deepest_path = path
+
+            if isinstance(current_obj, dict):
+                for key, value in current_obj.items():
+                    if isinstance(value, dict):
+                        stack.append((value, depth + 1, path + [key]))
+                        value_type = value.get("type")
+                        if value_type in type_to_validator_map:
+                            type_to_validator_map[value_type](path + [key], value)
+                        else:
+                            if value_type is not None:
+                                om.add_error(
+                                    "Properties value type error",
+                                    f"'type' value not in {type_to_validator_map.keys()}",
+                                    info_map,
+                                )
+                                raise ValueError(f"Properties 'type' value not in {list(type_to_validator_map.keys())}")
+
+        om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
+        om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
+
+    def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates number type properties in metadata."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._metadata_number_validator.__name__,
+        }
+        required_number_property_keys = {"type"}
+        optional_number_property_keys = {"description", "minimum", "maximum", "default", "nullable"}
+        self._validate_metadata_properties_keys(
+            required_number_property_keys, optional_number_property_keys, value, key_path
+        )
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
+        nullable = value.get("nullable", False)
+        if default is None and not nullable:
+            om.add_error(
+                "Invalid metadata default number value.",
+                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.",
+                info_map,
+            )
+            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.")
+        if default is not None:
+            if not isinstance(default, (int, float)) and not has_no_default:
+                om.add_error(
+                    "Invalid metadata default number value.",
+                    f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
+                    info_map,
+                )
+                raise ValueError(f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.")
+        minimum = value.get("minimum")
+        maximum = value.get("maximum")
+        if minimum is not None and not isinstance(minimum, (int, float)):
+            om.add_error(
+                "Invalid metadata number properties minimum.",
+                f"Invalid 'minimum' for '{key_path}': Expected a number but got {type(minimum)}.",
+                info_map,
+            )
+            raise ValueError(f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}.")
+        if maximum is not None and not isinstance(maximum, (int, float)):
+            om.add_error(
+                "Invalid metadata number properties maximum.",
+                f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.",
+                info_map,
+            )
+            raise ValueError(f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.")
+        if maximum is not None and minimum is not None and maximum < minimum:
+            om.add_error(
+                "Invalid range of acceptable numbers.",
+                f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
+                f"greater than 'maximum' value {maximum}",
+                info_map,
+            )
+            raise ValueError(
+                f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
+                f"greater than 'maximum' value {maximum}"
+            )
+        if default is not None and not has_no_default:
+            if minimum is not None and default < minimum:
+                om.add_error(
+                    "Invalid metadata default.",
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is less than 'minimum' {minimum}",
+                    info_map,
+                )
+                raise ValueError(
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is " f"less than 'minimum' {minimum}"
+                )
+            if maximum is not None and default > maximum:
+                om.add_error(
+                    "Invalid metadata default.",
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is greater than 'maximum' {maximum}",
+                    info_map,
+                )
+                raise ValueError(
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is " f"greater than 'maximum' {maximum}"
+                )
+
+    def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates string type properties in metadata."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._metadata_string_validator.__name__,
+        }
+        required_str_property_keys = {"type"}
+        optional_str_property_keys = {"description", "pattern", "default", "nullable"}
+        self._validate_metadata_properties_keys(required_str_property_keys, optional_str_property_keys, value, key_path)
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
+        nullable = value.get("nullable", False)
+        if default is None and not nullable:
+            om.add_error(
+                "Invalid metadata default string value.",
+                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
+                info_map,
+            )
+            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
+        if default is not None and not has_no_default:
+            if not isinstance(default, str):
+                om.add_error(
+                    "Invalid metadata default string value.",
+                    f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
+                    info_map,
+                )
+                raise ValueError(f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}")
+        pattern = value.get("pattern")
+        if pattern is not None and not isinstance(pattern, str):
+            om.add_error(
+                "Invalid metadata string properties pattern.",
+                f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
+                info_map,
+            )
+            raise ValueError(f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}")
+        try:
+            if pattern is not None:
+                re.compile(pattern)
+        except re.error:
+            om.add_error(
+                "Invalid metadata string properties pattern.",
+                f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern.",
+                info_map,
+            )
+            raise ValueError(
+                f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern."
+            )
+        if default != "" and default is not None and not has_no_default:
+            if pattern is not None and not re.match(pattern, default):
+                om.add_error(
+                    "Invalid metadata default string value.",
+                    f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
+                    f"match pattern {pattern}",
+                    info_map,
+                )
+                raise ValueError(
+                    f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
+                    f"match pattern {pattern}"
+                )
+
+    def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates bool type properties in metadata."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._metadata_bool_validator.__name__,
+        }
+        required_bool_property_keys = {"type"}
+        optional_bool_property_keys = {"description", "default", "nullable"}
+        self._validate_metadata_properties_keys(
+            required_bool_property_keys, optional_bool_property_keys, value, key_path
+        )
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
+        nullable = value.get("nullable", False)
+        if default is None and not nullable:
+            om.add_error(
+                "Invalid metadata default bool value.",
+                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
+                info_map,
+            )
+            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
+        if default is not None and not isinstance(default, bool) and not has_no_default:
+            om.add_error(
+                "Invalid metadata default bool value.",
+                f"Invalid 'default' for '{key_path}': Expected a bool but got {type(default)}",
+                info_map,
+            )
+            raise ValueError(f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}")
+
+    def _metadata_array_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates array type properties in metadata."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._metadata_array_validator.__name__,
+        }
+        required_array_property_keys = {"type", "properties"}
+        optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
+        self._validate_metadata_properties_keys(
+            required_array_property_keys, optional_array_property_keys, value, key_path
+        )
+        minimum_length = value.get("minimum_length")
+        maximum_length = value.get("maximum_length")
+        if minimum_length is not None and not isinstance(minimum_length, (int, float)):
+            om.add_error(
+                "Invalid metadata default array minimum length.",
+                f"Invalid 'minimum_length' for '{key_path}': Expected a number but got {type(minimum_length)}",
+                info_map,
+            )
+            raise ValueError(
+                f"Invalid 'minimum_length' for '{key_path}': " f"Expected a number but got {type(minimum_length)}"
+            )
+        if maximum_length is not None and not isinstance(maximum_length, (int, float)):
+            om.add_error(
+                "Invalid metadata default array maximum length.",
+                f"Invalid 'maximum_length' for '{key_path}': Expected a number but got {type(maximum_length)}",
+                info_map,
+            )
+            raise ValueError(
+                f"Invalid 'maximum_length' for '{key_path}': " f"Expected a number but got {type(maximum_length)}"
+            )
+        if maximum_length is not None and minimum_length is not None and maximum_length < minimum_length:
+            om.add_error(
+                "Invalid metadata array length range.",
+                f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
+                f"greater than 'maximum_length' value {maximum_length}",
+                info_map,
+            )
+            raise ValueError(
+                f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
+                f"greater than 'maximum_length' value {maximum_length}"
+            )
+
+    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates object type properties in metadata."""
+        required_object_property_keys = {"type"}
+        optional_object_property_keys = {"description"}
+        self._validate_metadata_properties_keys(
+            required_object_property_keys, optional_object_property_keys, value, key_path
+        )
+
+    def _validate_metadata_properties_keys(
+        self,
+        required_properties_keys: set[str],
+        optional_properties_keys: set[str],
+        properties: dict[str, Any],
+        path: list[str],
+    ) -> None:
+        """Validates that keys in the metadata properties sections."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._validate_metadata_properties_keys.__name__,
+        }
+        if missing_required_keys := required_properties_keys - properties.keys():
+            om.add_error(
+                "Metadata Validation",
+                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
+                f" keys are {sorted(required_properties_keys)}.",
+                info_map,
+            )
+            raise ValueError(
+                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
+                f" keys are {sorted(required_properties_keys)}."
+            )
+        property_type = properties.get("type", "Unknown type")
+        valid_properties_keys = required_properties_keys.union(optional_properties_keys)
+        if property_type == "object":
+            if not (set(properties.keys()) - valid_properties_keys):
+                om.add_error(
+                    "Metadata Validation",
+                    f"No unique keys for {path}. At least one unique key is expected.",
+                    info_map,
+                )
+                raise ValueError(f"No unique keys for {path}. At least one unique key is expected.")
+            return
+        if invalid_keys := set(properties.keys()) - valid_properties_keys:
+            om.add_error(
+                "Metadata Validation",
+                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                f" keys are {sorted(valid_properties_keys)}.",
+                info_map,
+            )
+            raise ValueError(
+                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                f" keys are {sorted(valid_properties_keys)}."
+            )
+
+    def save_metadata_properties(self, output_dir: Path) -> None:
+        """
+        Saves metadata properties in CSV format.
+
+        Parameters
+        ----------
+        output_dir : Path
+            The path to the output directory where the metadata properties CSV will be saved.
+
+        Raises
+        ------
+        FileNotFoundError
+            If the file cannot be saved at the specified path.
+        PermissionError
+            If the user does not have permission to save the file at the specified path.
+        OSError
+            For any other unexpected error that occurs while trying to save the CSV.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.save_metadata_properties.__name__,
+        }
+        records = self._parse_metadata_properties(self.__metadata["properties"])
+        df = pd.DataFrame(records)
+        path_to_save = output_dir / om.generate_file_name("InputManager_metadata_properties", extension="csv")
+        om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
+        try:
+            om.create_directory(output_dir)
+            df.to_csv(path_to_save, index=False)
+            om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
+        except FileNotFoundError as fnfe:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
+            raise fnfe
+        except PermissionError as pe:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
+            raise pe
+        except OSError as e:
+            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
+            raise e
+
+    def _parse_metadata_properties(
+        self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
+    ) -> List[Dict[str, Any]]:
+        """
+        Recursively traverse through the metadata properties dictionary
+        to flatten it by creating a record for each entry.
+
+        Parameters
+        ----------
+        data : Dict[str, Any]
+            The metadata properties data to be parsed.
+        prefix : str, optional
+            The data record prefix, by default ''.
+        sep : str, optional
+            The separator used between parts of the data entry names, by default '_'.
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            A list of flattened data entries from the json file.
+        """
+        records = []
+        for property_key, property_value in data.items():
+            if isinstance(property_value, dict):
+                for nested_key, nested_value in property_value.items():
+                    if isinstance(nested_value, dict):
+                        if self._check_property_type_primitive(nested_value):
+                            name = (
+                                prefix + sep + property_key + sep + nested_key
+                                if prefix
+                                else property_key + sep + nested_key
+                            )
+                            nested_value["description"] = nested_value.get(
+                                "description",
+                                property_value.get("properties", {}).get("description", "No description available"),
+                            )
+                            record = self._create_record(nested_value, name)
+                            records.append(record)
+                        else:
+                            records.extend(
+                                self._parse_metadata_properties(
+                                    nested_value,
+                                    prefix + sep + property_key if prefix else property_key + sep + nested_key,
+                                    sep,
+                                )
+                            )
+                    elif self._check_property_type_primitive(property_value):
+                        name = prefix + sep + property_key
+                        record = self._create_record(property_value, name)
+                        records.append(record)
+                        break
+                    elif property_value.get("type") == "object":
+                        self._parse_metadata_properties(property_value, prefix + sep + property_key, sep)
+
+        return records
+
+    def _check_property_type_primitive(self, property: Dict[str, Any]) -> bool:
+        """Checks whether the property's "type" is primitive or an array of primitive types."""
+        if property.get("type") in ["bool", "string", "number"]:
+            return True
+        elif property.get("type") == "array":
+            if property.get("properties", {}).get("type") in ["bool", "string", "number"]:
+                return True
+        return False
+
+    def _create_record(self, data_entry: Dict[str, Any], name: str) -> Dict[str, Any]:
+        """Assembles a record to a specific format to match the columns of the CSV to which it will eventually be added.
+
+        Parameters
+        ----------
+        data_entry : Dict[str, Any]
+            The data entry from the json file to be converted into the record format.
+        name : str
+            The name to be used for the record.
+
+        Returns
+        -------
+        Dict[str, Any]
+            A dictionary of the data entry converted to the record format.
+        """
+        properties_index = name.find("_properties") + len("_properties")
+        properties_group = name[:properties_index]
+        name = name[properties_index + 1 :]
+        return {
+            "properties_group": properties_group,
+            "name": name,
+            "type": data_entry.get("type", ""),
+            "description": data_entry.get("description", ""),
+            "pattern": data_entry.get("pattern", ""),
+            "default": data_entry.get("default", ""),
+            "maximum": data_entry.get("maximum", ""),
+            "minimum": data_entry.get("minimum", ""),
+        }
+
+    def compare_metadata_properties(
+        self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
+    ) -> None:
+        """
+        Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.compare_metadata_properties.__name__,
+        }
+        om.create_directory(output_directory)
+        self._load_metadata(properties_file_path)
+        properties1 = deepcopy(self.meta_data)
+        self.meta_data = {}
+        self._load_metadata(comparison_properties_file_path)
+        properties2 = self.meta_data
+
+        diff = DeepDiff(properties1, properties2, ignore_order=True, verbose_level=2)
+
+        first_file_path = os.path.basename(str(properties_file_path))
+        second_file_path = os.path.basename(str(comparison_properties_file_path))
+        file_name = f"diff_results_{first_file_path}_vs_{second_file_path}"
+
+        try:
+            om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
+            with open(f"{str(output_directory)}/{file_name}.txt", "w") as file:
+                file.write(
+                    f"Comparing changes going from '{properties_file_path}'"
+                    f" to '{comparison_properties_file_path}'\n\n"
+                )
+
+                if diff == {}:
+                    file.write("There were no differences found between these two properties files.")
+
+                else:
+                    sections = {
+                        "dictionary_item_added": "Items added:\n",
+                        "dictionary_item_removed": "Items removed:\n",
+                        "values_changed": "Values changed:\n",
+                    }
+                    for key, heading in sections.items():
+                        if key in diff:
+                            file.write(heading)
+                            for sub_key, value in diff[key].items():
+                                file.write(f"{sub_key}: {value}\n")
+                            file.write("\n")
+
+            om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
+
+        except PermissionError:
+            om.add_error(
+                "Permission error in saving file",
+                f"Permission denied when trying to write to {file_name}.txt.",
+                info_map,
+            )
+            raise
+        except OSError as e:
+            om.add_error(
+                "Unexpected error in saving file",
+                f"An unexpected OS error occurred: {e}",
+                info_map,
+            )
+            raise
 
 
 class ElementState(Enum):
