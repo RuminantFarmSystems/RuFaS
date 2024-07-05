@@ -4387,8 +4387,7 @@
         },
         "manure_treatment": {
           "type": "string",
-          "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting)$"
+          "description": "Name of the manure treatment and/or storage used in a manure management scenario. Each named treatment must have a Manure Treatment Config defined, unless the treatment is 'anaerobic digestion and lagoon' or 'anaerobic digestion and lagoon with separator'."
         }
       }
     },
@@ -4506,10 +4505,15 @@
       "type": "array",
       "properties": {
         "type": "object",
+        "name": {
+          "type": "string",
+          "description": "The unique identifier of the manure treatment configuration.",
+          "pattern": "^(?!anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator$)(.*)$"
+        },
         "manure_treatment_type": {
           "type": "string",
           "description": "Manure Treatment Methods -- Select the Manure Treatment Methods.",
-          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator|composting|anaerobic digestion)$"
+          "pattern": "^(slurry storage underfloor|slurry storage outdoor|open lots|compost bedded pack barn|anaerobic lagoon|composting|anaerobic digestion)$"
         },
         "total_solids_removal_efficiency_for_treatment": {
           "type": "number",
