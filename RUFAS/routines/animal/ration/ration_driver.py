@@ -127,7 +127,6 @@ class RationManager:
             failed_constraints = ration_optimizer.find_failed_constraints(
                 solution.x, ration_optimizer.cow_constraints, ration_config
             )
-            print("reached!!!")
         else:
             failed_constraints = ration_optimizer.find_failed_constraints(
                 solution.x, ration_optimizer.heifer_constraints, ration_config
