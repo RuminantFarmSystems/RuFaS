@@ -274,7 +274,7 @@
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
       "phosphorus_removal_efficiency_for_treatment": 0.00,
       "potassium_removal_efficiency_for_treatment": 0.00,
-      "storage_time_period": 180,
+      "storage_time_period": 365,
       "freeboard_input": 0.3048,
       "manure_cover": "crust"
     },
@@ -321,7 +321,7 @@
       "hydraulic_retention_time": 365,
       "sludge_accumulation_period": 10.0,
       "sludge_accumulation_volume_fraction": 0.00251,
-      "storage_time_period": 180,
+      "storage_time_period": 365,
       "freeboard_input": 0.3048
     },
     {
