@@ -1647,7 +1647,8 @@ def test_initialize_herd_init_herd_true_save_animals_true(
 
     mock_animal_base_set_config = mocker.patch("RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_config")
     mock_animal_base_set_lactation_curve_parameters = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_lactation_curve_parameters")
+        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_lactation_curve_parameters"
+    )
     mock_animal_base_set_nutrient_list = mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list"
     )
@@ -1721,7 +1722,8 @@ def test_initialize_herd_init_herd_true_save_animals_false(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list"
     )
     mock_animal_base_set_lactation_curve_parameters = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_lactation_curve_parameters")
+        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_lactation_curve_parameters"
+    )
 
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = False
@@ -1738,7 +1740,6 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_animal_base_set_config.assert_called_once()
     mock_animal_base_set_nutrient_list.assert_called_once_with("NASEM")
     mock_animal_base_set_lactation_curve_parameters.assert_called_once()
-
 
     mock_herd_factory._generate_animals.assert_called_once()
     mock_herd_factory._initialize_herd_from_data.assert_not_called()
@@ -1784,7 +1785,8 @@ def test_initialize_herd_init_herd_false(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list"
     )
     mock_animal_base_set_lactation_curve_parameters = mocker.patch(
-        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_lactation_curve_parameters")
+        "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_lactation_curve_parameters"
+    )
 
     mock_herd_factory.init_herd = False
     mock_herd_factory.save_animals = False
