@@ -281,16 +281,23 @@ class Cow(HeiferIII):
         Currently only set up for wood model.
         """
         if self.lactation_curve == "wood":
+
+            parity_key = self.parity_index
+            # this is a temporary fix for the negative parity_index issue
+            #'parity_key' should not be needed if self.parity_index is always an int between 0 and 2
+            if parity_key < 0:
+                parity_key = 0
+
             self.wood_l = self.determine_param_value(
-                AnimalBase.config["wood_l"][self.breed_index][self.parity_index],
+                AnimalBase.lactation_parameters[parity_key + 1][0],
                 AnimalBase.config["wood_l_std"][self.breed_index][self.parity_index],
             )
             self.wood_m = self.determine_param_value(
-                AnimalBase.config["wood_m"][self.breed_index][self.parity_index],
+                AnimalBase.lactation_parameters[parity_key + 1][1],
                 AnimalBase.config["wood_m_std"][self.breed_index][self.parity_index],
             )
             self.wood_n = self.determine_param_value(
-                AnimalBase.config["wood_n"][self.breed_index][self.parity_index],
+                AnimalBase.lactation_parameters[parity_key + 1][2],
                 AnimalBase.config["wood_n_std"][self.breed_index][self.parity_index],
             )
 

@@ -357,8 +357,10 @@ class HerdFactory:
         function also optionally saves the generated herd data into a JSON file.
         The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.
         """
-        AnimalBase.set_config(AnimalManager.get_animal_config(self.im.get_data("animal.animal_config")))
-        AnimalBase.set_nutrient_list(Feed(self.im.get_data("feed")).nutrient_rqmts)
+        AnimalBase.set_config(AnimalManager.get_animal_config(im.get_data("animal.animal_config")))
+        AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
+        AnimalBase.set_lactation_curve_parameters()
+
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:

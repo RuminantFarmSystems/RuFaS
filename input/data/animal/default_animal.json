@@ -1,69 +1,75 @@
 {
-  "herd_information": {
-    "calf_num": 8,
-    "heiferI_num": 44,
-    "heiferII_num": 38,
-    "heiferIII_num_springers": 5,
-    "cow_num": 100,
-    "replace_num": 500,
-    "herd_num": 100,
-    "breed": "HO"
-  },
-  "herd_initialization": {
-    "initial_animal_num": 10000,
-    "simulation_days": 5000
-  },
-  "animal_config": {
-    "management_decisions": {
-      "breeding_start_day_h": 380,
-      "heifer_repro_method": "ED",
-      "cow_repro_method": "ED-TAI",
-      "semen_type": "conventional",
-      "days_in_preg_when_dry": 218,
-      "heifer_repro_cull_time": 500,
-      "do_not_breed_time": 185,
-      "cull_milk_production": 30,
-      "cow_times_milked_per_day": 3,
-	    "milk_fat_percent": 4,
-	    "milk_protein_percent": 3.2
-    },
-    "farm_level": {
-      "calf": {
-        "male_calf_rate_sexed_semen": 0.1,
-        "male_calf_rate_conventional_semen": 0.53,
-        "keep_female_calf_rate": 1,
-        "wean_day": 60,
-        "wean_length": 7,
-        "milk_type": "whole"
-      },
-      "repro": {
-        "voluntary_waiting_period": 50,
-        "conception_rate_decrease": 0.026,
-        "decrease_conception_rate_in_rebreeding": false,
-        "decrease_conception_rate_by_parity": false,
-        "avg_gestation_len": 276,
-        "std_gestation_len": 6,
-        "prefresh_day": 21,
-        "calving_interval": 400,
-        "heifers": {
-            "estrus_detection_rate": 0.9,
-            "estrus_conception_rate": 0.6,
-            "repro_sub_protocol": "5dCG2P",
-            "repro_sub_properties": {
-                "conception_rate": 0.6,
-                "estrus_detection_rate": 0.9
-            }
-        },
-        "cows": {
-            "estrus_detection_rate": 0.6,
-            "ED_conception_rate": 0.5,
-            "presynch_program": "Double OvSynch",
-            "presynch_program_start_day": 50,
-            "ovsynch_program": "OvSynch 56",
-            "ovsynch_program_start_day": 64,
-            "ovsynch_program_conception_rate": 0.6,
-            "resynch_program": "TAIafterPD"
-        }
+	"herd_information": {
+		"calf_num": 8,
+		"heiferI_num": 44,
+		"heiferII_num": 38,
+		"heiferIII_num_springers": 5,
+		"cow_num": 100,
+		"replace_num": 500,
+		"herd_num": 100,
+		"breed": "HO",
+		"parity_percentages": [
+			0.386,
+			0.281,
+			0.333
+		],
+		"annual_milk_yield_lbs": null
+	},
+	"herd_initialization": {
+		"initial_animal_num": 10000,
+		"simulation_days": 5000
+	},
+	"animal_config": {
+		"management_decisions": {
+			"breeding_start_day_h": 380,
+			"heifer_repro_method": "ED",
+			"cow_repro_method": "ED-TAI",
+			"semen_type": "conventional",
+			"days_in_preg_when_dry": 218,
+			"heifer_repro_cull_time": 500,
+			"do_not_breed_time": 185,
+			"cull_milk_production": 30,
+			"cow_times_milked_per_day": 3,
+			"milk_fat_percent": 4,
+			"milk_protein_percent": 3.2
+		},
+		"farm_level": {
+			"calf": {
+				"male_calf_rate_sexed_semen": 0.1,
+				"male_calf_rate_conventional_semen": 0.53,
+				"keep_female_calf_rate": 1,
+				"wean_day": 60,
+				"wean_length": 7,
+				"milk_type": "whole"
+			},
+			"repro": {
+				"voluntary_waiting_period": 50,
+				"conception_rate_decrease": 0.026,
+				"decrease_conception_rate_in_rebreeding": false,
+				"decrease_conception_rate_by_parity": false,
+				"avg_gestation_len": 276,
+				"std_gestation_len": 6,
+				"prefresh_day": 21,
+				"calving_interval": 400,
+				"heifers": {
+					"estrus_detection_rate": 0.9,
+					"estrus_conception_rate": 0.6,
+					"repro_sub_protocol": "5dCG2P",
+					"repro_sub_properties": {
+						"conception_rate": 0.6,
+						"estrus_detection_rate": 0.9
+					}
+				},
+				"cows": {
+					"estrus_detection_rate": 0.6,
+					"ED_conception_rate": 0.5,
+					"presynch_program": "Double OvSynch",
+					"presynch_program_start_day": 50,
+					"ovsynch_program": "OvSynch 56",
+					"ovsynch_program_start_day": 64,
+					"ovsynch_program_conception_rate": 0.6,
+					"resynch_program": "TAIafterPD"
+				}
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
@@ -72,7 +78,7 @@
 				"birth_weight_std_je": 1,
 				"target_heifer_preg_day": 399,
 				"mature_body_weight_avg": 740.1,
-        		"mature_body_weight_std": 73.5
+				"mature_body_weight_std": 73.5
 			}
 		},
 		"from_literature": {
@@ -83,7 +89,6 @@
 				"preg_loss_rate_2": 0.096,
 				"preg_check_day_3": 200,
 				"preg_loss_rate_3": 0.017,
-
 				"avg_estrus_cycle_return": 23,
 				"std_estrus_cycle_return": 6,
 				"avg_estrus_cycle_heifer": 21,
@@ -94,12 +99,42 @@
 				"std_estrus_cycle_after_pgf": 2
 			},
 			"milking": {
-				"wood_l": [[16.13, 23.61, 23.81], [14.07, 19.26, 19.21]],
-				"wood_m": [[0.235, 0.227, 0.244], [0.186, 0.173, 0.190]],
-				"wood_n": [[0.0019, 0.0032, 0.0036], [0.0021, 0.0028, 0.0032]],
-				"wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
-				"wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
-				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
+				"wood_l_std": [
+					[
+						0.28,
+						0.54,
+						0.51
+					],
+					[
+						0.39,
+						0.49,
+						0.47
+					]
+				],
+				"wood_m_std": [
+					[
+						0.0046,
+						0.0064,
+						0.0060
+					],
+					[
+						0.0076,
+						0.0071,
+						0.0069
+					]
+				],
+				"wood_n_std": [
+					[
+						3.77e-5,
+						5.82e-5,
+						5.54e-5
+					],
+					[
+						6.60e-5,
+						6.69e-5,
+						6.53e-5
+					]
+				]
 			},
 			"culling": {
 				"cull_day_count": [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530],

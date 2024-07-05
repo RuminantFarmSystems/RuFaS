@@ -1,0 +1,265 @@
+{
+	"adjustment_dict": {
+		"parity": [
+			{
+				"parity": "1",
+				"adjustments":[-4.18, -0.37, -9.31]
+			},
+			{
+				"parity": "2",
+				"adjustments":[2.16, -1.20, 2.66]
+			},
+			{
+				"parity": "3",
+				"adjustments":[2.02, 1.57, 6.65]
+			}
+		],
+		"year": [
+			{
+				"year": "2006",
+				"adjustments": [-0.37, 0.72, 0.83]
+
+			},
+			{
+				"year": "2007",
+				"adjustments": [-0.59, 1.00, 1.23]
+
+			},
+			{
+				"year": "2008",
+				"adjustments": [-0.31, 0.47, 0.98]
+
+			},
+			{
+				"year": "2009",
+				"adjustments": [-0.24, 0.24, 0.60]
+
+			},
+			{
+				"year": "2010",
+				"adjustments": [-0.11, -0.14, 0.31]
+
+			},
+			{
+				"year": "2011",
+				"adjustments": [0.10, -0.58, -0.56]
+
+			},
+			{
+				"year": "2012",
+				"adjustments": [0.33, -0.71, -0.83]
+
+			},
+			{
+				"year": "2013",
+				"adjustments": [0.27, -0.51, -0.73]
+
+			},
+			{
+				"year": "2014",
+				"adjustments": [0.12, 0.069, -0.37]
+
+			},
+			{
+				"year": "2015",
+				"adjustments": [0.28, -0.12, -0.68]
+
+			},
+			{
+				"year": "2016",
+				"adjustments": [0.52, -0.44, -0.78]
+
+			}
+		],
+		"month": [
+			{
+				"month": "January",
+				"adjustments": [-0.46, 1.81, 3.13]
+			},
+			{
+				"month": "February",
+				"adjustments": [0.18, 0.76, 2.43]
+			},
+			{
+				"month": "March",
+				"adjustments": [1.05, -0.77, 1.04]
+			},
+			{
+				"month": "April",
+				"adjustments": [1.58, -2.03, -0.56]
+			},
+			{
+				"month": "May",
+				"adjustments": [1.49, -2.47, -1.95]
+			},
+			{
+				"month": "June",
+				"adjustments": [0.74, -2.01, -2.75]
+			},
+			{
+				"month": "July",
+				"adjustments": [-0.41, -0.81, -2.68]
+			},
+			{
+				"month": "August",
+				"adjustments": [-0.96, 0.11, -2.06]
+			},
+			{
+				"month": "September",
+				"adjustments": [-1.08, 0.78, -1.08]
+			},
+			{
+				"month": "October",
+				"adjustments": [-0.85, 1.20, 0.27]
+			},
+			{
+				"month": "November",
+				"adjustments": [-0.63, 1.45, 1.51]
+			},
+			{
+				"month": "December",
+				"adjustments": [-0.65, 1.98, 2.70]
+			}	
+		],
+		"region": [
+			{
+				"region": "Appalachian",
+				"adjustments": [-0.22, -0.042, -0.89]
+
+			},
+			{
+				"region": "Corn Belt",
+				"adjustments": [0.55, -0.58, -1.12]
+
+			},
+			{
+				"region": "Delta",
+				"adjustments": [-2.56, 0.59, 1.47]
+
+			},
+			{
+				"region": "Lake",
+				"adjustments": [0.61, -0.40, -0.64]
+
+			},
+			{
+				"region": "Mountain",
+				"adjustments": [-0.96, 3.13, 1.50]
+
+			},
+			{
+				"region": "Northeast",
+				"adjustments": [1.04, -1.99, -1.13]
+
+			},
+			{
+				"region": "Northern Plains",
+				"adjustments": [-0.26, 0.19, -0.79]
+
+			},
+			{
+				"region": "New York",
+				"adjustments": [0.67, -1.21, -0.45]
+
+			},
+			{
+				"region": "Pennsylvania",
+				"adjustments": [1.15, -0.96, 0.06]
+
+			},
+			{
+				"region": "Southeast",
+				"adjustments": [-2.00, 2.59, 2.60]
+
+			},
+			{
+				"region": "Southern Plains",
+				"adjustments": [-0.51, -1.02, -0.93]
+
+			},
+			{
+				"region": "West Coast",
+				"adjustments": [1.09, 0.53, 0.52]
+
+			},
+			{
+				"region": "Wisconsin",
+				"adjustments": [1.4, -0.83, -0.2]
+
+			}
+		],
+		"milking_frequency": [
+			{
+				"milking_frequency": "2x/d",
+				"adjustments": [-0.74, 0.090, 0.15]
+			},
+			{
+				"milking_frequency": "3x/d",
+				"adjustments": [0.74, -0.090, -0.15]
+			}
+		]
+	},
+	"fips_region": [
+		{"code": 1, "region": "Southeast"},
+		{"code": 2, "region": "None"},
+		{"code": 3, "region": "None"},
+		{"code": 4, "region": "Mountain"},
+		{"code": 5, "region": "Delta"},
+		{"code": 6, "region": "West Coast"},
+		{"code": 7, "region": "None"},
+		{"code": 8, "region": "Mountain"},
+		{"code": 9, "region": "Northeast"},
+		{"code": 10, "region": "Northeast"},
+		{"code": 11, "region": "None"},
+		{"code": 12, "region": "Southeast"},
+		{"code": 13, "region": "Southeast"},
+		{"code": 14, "region": "None"},
+		{"code": 15, "region": "None"},
+		{"code": 16, "region": "Mountain"},
+		{"code": 17, "region": "Corn Belt"},
+		{"code": 18, "region": "Corn Belt"},
+		{"code": 19, "region": "Corn Belt"},
+		{"code": 20, "region": "Northern Plains"},
+		{"code": 21, "region": "Appalachian"},
+		{"code": 22, "region": "Delta"},
+		{"code": 23, "region": "Northeast"},
+		{"code": 24, "region": "Northeast"},
+		{"code": 25, "region": "Northeast"},
+		{"code": 26, "region": "Lake"},
+		{"code": 27, "region": "Lake"},
+		{"code": 28, "region": "Delta"},
+		{"code": 29, "region": "Corn Belt"},
+		{"code": 30, "region": "Mountain"},
+		{"code": 31, "region": "Northern Plains"},
+		{"code": 32, "region": "Mountain"},
+		{"code": 33, "region": "Northeast"},
+		{"code": 34, "region": "Northeast"},
+		{"code": 35, "region": "Mountain"},
+		{"code": 36, "region": "New York"},
+		{"code": 37, "region": "Appalachian"},
+		{"code": 38, "region": "Northern Plains"},
+		{"code": 39, "region": "Corn Belt"},
+		{"code": 40, "region": "Southern Plains"},
+		{"code": 41, "region": "West Coast"},
+		{"code": 42, "region": "Pennsylvania"},
+		{"code": 43, "region": "None"},
+		{"code": 44, "region": "Northeast"},
+		{"code": 45, "region": "Southeast"},
+		{"code": 46, "region": "Northern Plains"},
+		{"code": 47, "region": "Appalachian"},
+		{"code": 48, "region": "Southern Plains"},
+		{"code": 49, "region": "Mountain"},
+		{"code": 50, "region": "Northeast"},
+		{"code": 51, "region": "Appalachian"},
+		{"code": 52, "region": "None"},
+		{"code": 53, "region": "West Coast"},
+		{"code": 54, "region": "Appalachian"},
+		{"code": 55, "region": "Wisconsin"},
+		{"code": 56, "region": "Mountain"}
+	],
+	"parity_milk_adjustments": {
+		"parity2_MilkYield305_adjustment": 1632,
+		"parity3_MilkYield305_adjustment": 2196
+	}, 
+	"assumed_milking_cow_percentage": 0.8356
+}
