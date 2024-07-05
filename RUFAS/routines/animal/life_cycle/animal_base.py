@@ -65,20 +65,17 @@ class AnimalBase:
                 print(category)
                 adjustment_applied = False
                 x = 0
-                while (x<len(adjustment_dict[category]) and (not adjustment_applied)):
+                while x < len(adjustment_dict[category]) and (not adjustment_applied):
                     if adjustment_dict[category][x][category] == farm_specific[category]:
                         parameter_a += adjustment_dict[category][x]["adjustments"][0]
                         parameter_b += adjustment_dict[category][x]["adjustments"][1] * 1e-2
                         parameter_c += adjustment_dict[category][x]["adjustments"][2] * 1e-4
                         adjustment_applied = True
-                        
+
                         print(adjustment_dict[category][x][category])
                         print(farm_specific[category])
 
-                    x = x+1
-
-            
-
+                    x = x + 1
 
         # for category in [lactation_group, year, month, region, milking_frequency]:
         #     if category:
@@ -117,16 +114,15 @@ class AnimalBase:
         FIPS_state_code = None
         if FIPS_code != None:
             FIPS_state_code = int(FIPS_code / 1000)
-        region= None
+        region = None
         if FIPS_state_code != None:
             for code_region in region_dict:
                 if code_region["code"] == FIPS_state_code:
-                    region= code_region["region"]
+                    region = code_region["region"]
                     print(str(FIPS_state_code))
                     print(region)
                     print(code_region["code"])
                     print(code_region["region"])
-                    
 
         annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
