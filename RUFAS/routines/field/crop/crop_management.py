@@ -179,7 +179,6 @@ class CropManagement:
 
         try:
             fraction_cut = self.data.cut_biomass / self.data.biomass
-            print("A")
             self.data.biomass -= self.data.cut_biomass
             self._recalculate_biomass_distribution(roots_harvested)
 

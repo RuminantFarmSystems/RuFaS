@@ -562,7 +562,7 @@ def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
     crop._recalculate_biomass_distribution = MagicMock()
     crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
 
-    patch_for_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+    patch_for_add_warning = mocker.patch("tests.soil_crop_tests.crop_tests.test_crop_management.om.add_warning")
     crop.cut_crop(0.5)
     crop.determine_biomass_cut_from_whole_plant.assert_called_once()
     info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
