@@ -1,5 +1,6 @@
 import pytest
 from mock.mock import MagicMock, patch, PropertyMock
+from pytest_mock import MockerFixture
 from RUFAS.units import MeasurementUnits
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -543,7 +544,7 @@ def test_distribute_residue_nutrients(
     assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
 
 
-def test_cut_crop_zero_division() -> None:
+def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
     """Ensure that the crop cutting routines have division error"""
     # setup
     data = CropData(
@@ -562,14 +563,14 @@ def test_cut_crop_zero_division() -> None:
     crop._recalculate_biomass_distribution = MagicMock()
     crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
 
-    with patch("RUFAS.output_manager.OutputManager.add_warning") as add:
-        crop.cut_crop(0.5)
-        crop.determine_biomass_cut_from_whole_plant.assert_called_once()
-        info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
-        warning_name = "Zero division error in crop management"
-        warning_message = (
-            f"A zero division error occurred in the harvesting process of crop management when calculating "
-            f"fraction cut."
-            f"The variable 'biomass' in CropData has an invalid value: '0'. "
-        )
-        add.assert_called_once_with(warning_name, warning_message, info_map)
+    patch_for_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+    crop.cut_crop(0.5)
+    crop.determine_biomass_cut_from_whole_plant.assert_called_once()
+    info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
+    warning_name = "Zero division error in crop management"
+    warning_message = (
+        f"A zero division error occurred in the harvesting process of crop management when calculating "
+        f"fraction cut."
+        f"The variable 'biomass' in CropData has an invalid value: '0'. "
+    )
+    patch_for_add_warning.assert_called_once_with(warning_name, warning_message, info_map)
