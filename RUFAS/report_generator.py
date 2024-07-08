@@ -577,9 +577,7 @@ class ReportGenerator:
             horizontally_aggregated, aggregate_units = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
-            # TODO add units returned from apply_horizontal_aggregation to aggregate report ("hor_ver_agg (aggregate units)")
-            aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
-            # TODO call self._handle_units(aggregate_report, vertical_aggregator) - might be able to combine these three lines somehow
+            aggregate_report = {f"hor_ver_agg_{aggregate_units}": [vertical_aggregator(horizontally_aggregated)]}
         else:
             vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
             ver_hor_aggregated = []
@@ -663,8 +661,7 @@ class ReportGenerator:
         aggregated_units = self._aggregate_units(report_data, aggregator)
         return aggregated_data, aggregated_units
 
-    def _aggregate_units(self, report_data: Dict[str, List[float]],
-        aggregator: Callable[[List[float]], float],) -> str:
+    def _aggregate_units(self, report_data: Dict[str, List[float]], aggregator: Callable[[List[float]], float],) -> str:
         """Creates the appropriate units for the associated aggregator function used.
 
         Parameters
@@ -679,23 +676,29 @@ class ReportGenerator:
         str
             The expected units of aggregating the report data using the accompanying aggregator function.
         """
-        # if average, should only be one key. Return units for that key. Raise warning if multiple keys.
-        if aggregator == "average":
-            if len(0 > report_data.keys() > 1):
-                raise ValueError
-            else:
-                units = self._extract_units(next(iter(report_data)))
-                return units
+        if len(report_data) >= 2:
+            first_key, second_key = list(report_data.keys())[:2]
+            first_key_units = self._extract_units(first_key)
+            second_key_units = self._extract_units(second_key)
+        else:
+            return self._extract_units(next(iter(report_data)))
+
         if aggregator == "division":
-            # check if 2 keys for report data?
-            numerator_key, denominator_key = list(report_data.keys())[:2]
-            numerator_key_units = self._extract_units(numerator_key)
-            denominator_key_units = self._extract_units(denominator_key)
-        # Should we have parenthesis around units or do that later? Add now, rethink later.
-        # If division, return units for first item / units for second item.
-        # if product, we need to check if the units are the same (e.g. kg * kg = kg^2) or if num/denom
-        # (e.g. kg * gal/kg = gal)
-        # if sum, sd, substraction, make sure units are the same.
+            if not any("unitless" in s for s in [first_key_units, second_key_units]):
+                aggregate_units = f"({first_key_units} / {second_key_units})"
+                return aggregate_units
+            else:
+                return first_key_units if "unitless" in second_key_units else second_key_units
+        if aggregator == "product":
+            if not any("unitless" in s for s in [first_key_units, second_key_units]):
+                aggregate_units = f"({first_key_units} {second_key_units})"
+                return aggregate_units
+            else:
+                return first_key_units if "unitless" in second_key_units else second_key_units
+        if aggregator == "sum" or aggregator == "subtraction":
+            if first_key_units != second_key_units:
+                raise ValueError
+        return first_key_units
 
     def _apply_vertical_aggregation(
         self,
