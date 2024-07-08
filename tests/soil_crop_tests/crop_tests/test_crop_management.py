@@ -568,8 +568,8 @@ def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
     info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
     warning_name = "Zero division error in crop management"
     warning_message = (
-        f"A zero division error occurred in the harvesting process of crop management when calculating "
-        f"fraction cut."
-        f"The variable 'biomass' in CropData has an invalid value: '0'. "
+        "A zero division error occurred in the harvesting process of crop management when calculating "
+        "fraction cut."
+        "The variable 'biomass' in CropData has an invalid value: '0'. "
     )
     patch_for_add_warning.assert_called_once_with(warning_name, warning_message, info_map)
