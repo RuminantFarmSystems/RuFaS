@@ -109,7 +109,6 @@ def test_weather_init(mock_weather_input: dict, mock_time: Time, mocker: MockerF
         patch("RUFAS.output_manager.OutputManager.add_variable") as add,
         patch("RUFAS.weather.Weather._calculate_average_annual_temperature") as avg,
     ):
-        print(add)
         mock_time.start_date = datetime(2023, 11, 1)
         mock_time.end_date = datetime(2023, 11, 5)
         convert = mocker.patch.object(Time, "convert_year_jday_date", return_value=datetime(2023, 11, 3))
@@ -185,7 +184,6 @@ def test_get_current_day_conditions(
     latitude = mocker.patch("RUFAS.weather.Weather._get_latitude", return_value=20)
 
     actual = mock_weather.get_current_day_conditions(mocked_time)
-    print(actual)
 
     assert actual == expected
     latitude.assert_called_once()
