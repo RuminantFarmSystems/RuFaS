@@ -1,5 +1,6 @@
 import pytest
 from mock.mock import MagicMock, patch, PropertyMock
+from pytest_mock import MockerFixture
 from RUFAS.units import MeasurementUnits
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -540,3 +541,35 @@ def test_distribute_residue_nutrients(
         pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
     )
     assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
+
+
+def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
+    """Ensure that the crop cutting routines have division error"""
+    # setup
+    data = CropData(
+        harvest_index=3,
+        biomass=0,
+        leaf_area_index=2.3,
+        accumulated_heat_units=1.1,
+        optimal_nitrogen_fraction=0.09,
+        optimal_phosphorus_fraction=0.02,
+        yield_nitrogen_fraction=0.12,
+        yield_phosphorus_fraction=0.0092,
+        above_ground_biomass=75.0,
+    )
+
+    crop = CropManagement(data)
+    crop._recalculate_biomass_distribution = MagicMock()
+    crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
+
+    patch_for_add_warning = mocker.patch("tests.soil_crop_tests.crop_tests.test_crop_management.om.add_warning")
+    crop.cut_crop(0.5)
+    crop.determine_biomass_cut_from_whole_plant.assert_called_once()
+    info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
+    warning_name = "Zero division error in crop management"
+    warning_message = (
+        "A zero division error occurred in the harvesting process of crop management when calculating "
+        "fraction cut."
+        "The variable 'biomass' in CropData has an invalid value: '0'. "
+    )
+    patch_for_add_warning.assert_called_once_with(warning_name, warning_message, info_map)

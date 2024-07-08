@@ -1,7 +1,7 @@
 [![Flake8](https://img.shields.io/badge/Flake8-passed-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Pytest](https://img.shields.io/badge/Pytest-passed-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Coverage](https://img.shields.io/badge/Coverage-94%25-green)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Mypy](https://img.shields.io/badge/Mypy-3515%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Pytest](https://img.shields.io/badge/Pytest-failed-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Coverage](https://img.shields.io/badge/Coverage-%25-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Mypy](https://img.shields.io/badge/Mypy-3518%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-the-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
