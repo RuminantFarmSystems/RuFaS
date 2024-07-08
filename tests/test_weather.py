@@ -342,14 +342,14 @@ def test_check_adequate_weather_data(weather_file: dict, mock_weather: Weather) 
 @pytest.mark.parametrize("weather_file", [{"year": [2023], "jday": [267]}])
 def test_check_adequate_weather_data_error(weather_file: dict, mocker: MockerFixture) -> None:
     """Checks that check_adequate_weather_data works correctly when there's insufficient weather data"""
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add:
-        mocked_time = MagicMock(Time)
-        setattr(mocked_time, "current_date", datetime(2023, 9, 24))
-        setattr(mocked_time, "start_date", datetime(2023, 9, 24))
-        setattr(mocked_time, "end_date", datetime(2023, 9, 26))
+    patch_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mocked_time = MagicMock(Time)
+    setattr(mocked_time, "current_date", datetime(2023, 9, 24))
+    setattr(mocked_time, "start_date", datetime(2023, 9, 24))
+    setattr(mocked_time, "end_date", datetime(2023, 9, 26))
 
     try:
         Weather.check_adequate_weather_data(weather_file, mocked_time)
-        add.assert_called_once()
+        patch_add_error.assert_called_once()
     except ValueError as e:
         assert e.args[0] == "Not enough weather data provided to support the duration of simulation period"
