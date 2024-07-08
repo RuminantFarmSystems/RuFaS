@@ -169,7 +169,6 @@ class CropManagement:
             raise ValueError(
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
-
         roots_harvested = self.data.harvest_index > 1.0
         if not roots_harvested:
             self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index
@@ -180,37 +179,40 @@ class CropManagement:
 
         try:
             fraction_cut = self.data.cut_biomass / self.data.biomass
+            print("A")
+            self.data.biomass -= self.data.cut_biomass
+            self._recalculate_biomass_distribution(roots_harvested)
+
+            self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
+            self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
+
+            self.data.dry_matter_yield_collected = self.data.cut_biomass * collected_fraction
+            self.data.wet_yield_collected =\
+                self.data.dry_matter_yield_collected / (self.data.dry_matter_percentage / 100)
+
+            self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)
+
+            if self.data.do_harvest_index_override:
+                self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
+                self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * self.data.wet_yield_collected
+                self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
+                self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
+            else:
+                self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.dry_matter_yield_collected
+                self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.dry_matter_yield_collected
+                self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
+                self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
+
         except ZeroDivisionError:
             info_map = {"class": self.__class__.__name__, "function": self.cut_crop.__name__}
-            warning_name = "Harvesting in crop management causes zero division error"
+            warning_name = "Zero division error in crop management"
             warning_message = (
                 f"A zero division error occurred in the harvesting process of crop management when calculating "
                 f"fraction cut."
                 f"The variable 'biomass' in CropData has an invalid value: '{self.data.biomass}'. "
             )
+
             om.add_warning(warning_name, warning_message, info_map)
-
-        self.data.biomass -= self.data.cut_biomass
-        self._recalculate_biomass_distribution(roots_harvested)
-
-        self.data.leaf_area_index = self.data.leaf_area_index * (1 - fraction_cut)
-        self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
-
-        self.data.dry_matter_yield_collected = self.data.cut_biomass * collected_fraction
-        self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (self.data.dry_matter_percentage / 100)
-
-        self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)
-
-        if self.data.do_harvest_index_override:
-            self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
-            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * self.data.wet_yield_collected
-            self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
-            self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
-        else:
-            self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.dry_matter_yield_collected
-            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.dry_matter_yield_collected
-            self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
-            self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
 
     def _recalculate_biomass_distribution(self, roots_harvested: bool) -> None:
         """

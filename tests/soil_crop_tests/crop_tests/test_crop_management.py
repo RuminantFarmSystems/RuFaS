@@ -160,13 +160,13 @@ def test_determine_harvest_index(harvest, heat_frac, water_def):
     ],
 )
 def test_manage_harvest(
-    mock_time: Time,
-    mock_feed_manager: FeedManager,
-    harvest_op: HarvestOperation,
-    field_name: str,
-    field_size: float,
-    soil_data: SoilData,
-    killed: bool,
+        mock_time: Time,
+        mock_feed_manager: FeedManager,
+        harvest_op: HarvestOperation,
+        field_name: str,
+        field_size: float,
+        soil_data: SoilData,
+        killed: bool,
 ) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     crop = CropManagement()
@@ -284,12 +284,12 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
     ],
 )
 def test_recalculate_biomass_distribution(
-    roots_harvested: bool,
-    cut_biomass: float,
-    biomass: float,
-    expected_surface_biomass: float,
-    expected_root_biomass: float,
-    expected_root_fraction: float,
+        roots_harvested: bool,
+        cut_biomass: float,
+        biomass: float,
+        expected_surface_biomass: float,
+        expected_root_biomass: float,
+        expected_root_fraction: float,
 ) -> None:
     """Tests that biomass is correctly redistributed after a harvest event."""
     crop = CropData(
@@ -316,12 +316,12 @@ def test_recalculate_biomass_distribution(
     ],
 )
 def test_store_harvested_crop(
-    mock_time: Time,
-    mock_feed_manager: FeedManager,
-    mock_alfalfa_silage_data: AlfalfaSilage,
-    field_size: float,
-    wet_yield_collected: float,
-    expected_fresh_mass: float,
+        mock_time: Time,
+        mock_feed_manager: FeedManager,
+        mock_alfalfa_silage_data: AlfalfaSilage,
+        field_size: float,
+        wet_yield_collected: float,
+        expected_fresh_mass: float,
 ) -> None:
     mock_alfalfa_silage_data.wet_yield_collected = wet_yield_collected
     crop_management = CropManagement(crop_data=mock_alfalfa_silage_data)
@@ -360,15 +360,15 @@ def test_store_harvested_crop(
     ],
 )
 def test_record_yield(
-    field_name: str,
-    field_size: float,
-    species: CropSpecies,
-    year: int,
-    day: int,
-    mass: float,
-    dry_mass: float,
-    nitrogen: float,
-    phosphorus: float,
+        field_name: str,
+        field_size: float,
+        species: CropSpecies,
+        year: int,
+        day: int,
+        mass: float,
+        dry_mass: float,
+        nitrogen: float,
+        phosphorus: float,
 ) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
@@ -438,12 +438,12 @@ def test_record_yield(
     ],
 )
 def test_transfer_residue(
-    root_biomass: float,
-    residue: float,
-    killed: bool,
-    expected_root_depth: float,
-    expected_surface_residue: float,
-    expected_root_residue: float,
+        root_biomass: float,
+        residue: float,
+        killed: bool,
+        expected_root_depth: float,
+        expected_surface_residue: float,
+        expected_root_residue: float,
 ) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
     soil."""
@@ -474,41 +474,41 @@ def test_transfer_residue(
     "root_depth,n,p,expected_n,expected_p,",
     [
         (
-            100.0,
-            40.0,
-            20.0,
-            [24.0, 6.0, 10.0],
-            [12.0, 3.0, 5.0],
+                100.0,
+                40.0,
+                20.0,
+                [24.0, 6.0, 10.0],
+                [12.0, 3.0, 5.0],
         ),
         (
-            45.0,
-            40.0,
-            20.0,
-            [28.888888, 11.111111, 0.0],
-            [14.444444, 5.555555, 0.0],
+                45.0,
+                40.0,
+                20.0,
+                [28.888888, 11.111111, 0.0],
+                [14.444444, 5.555555, 0.0],
         ),
         (
-            50.0,
-            40.0,
-            20.0,
-            [28.0, 12, 0.0],
-            [14.0, 6.0, 0.0],
+                50.0,
+                40.0,
+                20.0,
+                [28.0, 12, 0.0],
+                [14.0, 6.0, 0.0],
         ),
         (
-            10.0,
-            50.0,
-            22.0,
-            [50.0, 0.0, 0.0],
-            [22.0, 0.0, 0.0],
+                10.0,
+                50.0,
+                22.0,
+                [50.0, 0.0, 0.0],
+                [22.0, 0.0, 0.0],
         ),
     ],
 )
 def test_distribute_residue_nutrients(
-    root_depth: float,
-    n: float,
-    p: float,
-    expected_n: list[float],
-    expected_p: list[float],
+        root_depth: float,
+        n: float,
+        p: float,
+        expected_n: list[float],
+        expected_p: list[float],
 ) -> None:
     """Tests that residue nutrients are correctly partitioned between the nutrient pools in a soil profile."""
     crop_data = CropData(
@@ -537,6 +537,39 @@ def test_distribute_residue_nutrients(
 
     assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
     assert (
-        pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
+            pytest.approx(
+                soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
     )
     assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
+
+
+def test_cut_crop_zero_division() -> None:
+    """Ensure that the crop cutting routines have division error"""
+    # setup
+    data = CropData(
+        harvest_index=3,
+        biomass=0,
+        leaf_area_index=2.3,
+        accumulated_heat_units=1.1,
+        optimal_nitrogen_fraction=0.09,
+        optimal_phosphorus_fraction=0.02,
+        yield_nitrogen_fraction=0.12,
+        yield_phosphorus_fraction=0.0092,
+        above_ground_biomass=75.0,
+    )
+
+    crop = CropManagement(data)
+    crop._recalculate_biomass_distribution = MagicMock()
+    crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
+
+    with patch("RUFAS.output_manager.OutputManager.add_warning") as add:
+        crop.cut_crop(0.5)
+        crop.determine_biomass_cut_from_whole_plant.assert_called_once()
+        info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
+        warning_name = "Zero division error in crop management"
+        warning_message = (
+            f"A zero division error occurred in the harvesting process of crop management when calculating "
+            f"fraction cut."
+            f"The variable 'biomass' in CropData has an invalid value: '0'. "
+        )
+        add.assert_called_once_with(warning_name, warning_message, info_map)
