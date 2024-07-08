@@ -308,5 +308,4 @@ class Weather:
                     "Not enough weather data provided to support the duration of simulation period",
                     info_map,
                 )
-                print(om.add_error)
                 raise ValueError("Not enough weather data provided to support the duration of simulation period")
