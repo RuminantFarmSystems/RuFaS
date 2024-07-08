@@ -111,7 +111,7 @@ def test_weather_init(mock_weather_input: dict, mock_time: Time, mocker: MockerF
     ):
         mock_time.start_date = datetime(2023, 11, 1)
         mock_time.end_date = datetime(2023, 11, 5)
-        convert = mocker.patch.object(Time, "convert_year_jday_date", return_value=datetime(2023, 11, 3))
+        convert = mocker.patch.object(Time, "convert_year_jday_to_date", return_value=datetime(2023, 11, 3))
         Weather(mock_weather_input, mock_time)
         check.assert_called_once()
         add.assert_called_once()

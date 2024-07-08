@@ -57,7 +57,7 @@ class Weather:
         for i in range(len(weather_file["year"])):
             year = weather_file["year"][i]
             jday = weather_file["jday"][i]
-            date_key = Time.convert_year_jday_date(year, jday)
+            date_key = Time.convert_year_jday_to_date(year, jday)
 
             # Only include dates within the simulation period to save on space
             if start_time <= date_key <= end_time:
