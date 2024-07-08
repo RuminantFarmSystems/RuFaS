@@ -1,9 +1,10 @@
-from dataclasses import dataclass, InitVar
+from dataclasses import dataclass, InitVar, field
 from typing import List, Optional
 from math import inf
 from copy import deepcopy
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.manure_pool import ManurePool
 
 
 @dataclass(kw_only=True)
@@ -129,48 +130,6 @@ class SoilData:
         Number of days since phosphorus was applied to the field via fertilizer.
     rain_events_after_fertilizer_application : int, default 0
         Number of rain events that have occurred since phosphorus was applied to the field via fertilizer.
-    machine_manure_dry_mass : float, default 0
-        The dry weight equivalent of manure mass on the field that was applied by machine (kg).
-    machine_manure_applied_mass : float, default 0
-        The dry weight equivalent of the most recent application of manure applied by machine (kg).
-    machine_manure_field_coverage : float, default 0
-        Fraction of the field that is covered by machine-applied manure, between [0, 1] (unitless).
-    machine_manure_moisture_factor : float, default 0
-        Fraction representing the current moisture level of the machine-applied manure on the field, between [0, 0.9]
-        (unitless).
-    machine_water_extractable_inorganic_phosphorus : float, default 0
-        Amount of water extractable inorganic phosphorus on the field that was applied by machine (kg).
-    machine_water_extractable_organic_phosphorus : float, default 0
-        Amount of water extractable organic phosphorus on the field that was applied by machine (kg).
-    machine_stable_inorganic_phosphorus : float, default 0
-        Amount of stable inorganic phosphorus on the field that was applied by machine (kg).
-    machine_stable_organic_phosphorus : float, default 0
-        Amount of stable organic phosphorus on the field that was applied by machine (kg).
-    machine_organic_phosphorus_runoff : float, default 0.0
-        Amount of organic phosphorus from machine-applied manure dissolved in and removed by runoff (kg).
-    machine_inorganic_phosphorus_runoff : float, default 0.0
-        Amount of inorganic phosphorus from machine-applied manure dissolved in and removed by runoff (kg).
-    grazing_manure_dry_mass : float, default 0
-        The dry weight equivalent of manure mass on the field that was applied by grazers (kg).
-    grazing_manure_applied_mass : float, default 0
-        The dry weight equivalent of the most recent application of manure applied by grazers (kg).
-    grazing_manure_field_coverage : float, default 0
-        Fraction of the field that is covered by grazing-applied manure, between [0, 1] (unitless).
-    grazing_manure_moisture_factor : float, default 0
-        Fraction representing the current moisture level of the grazing-applied manure on the field, between [0, 0.9]
-        (unitless).
-    grazing_water_extractable_inorganic_phosphorus : float, default 0
-        Amount of water extractable inorganic phosphorus on the field that was applied by grazing (kg).
-    grazing_water_extractable_organic_phosphorus : float, default 0
-        Amount of water extractable organic phosphorus on the field that was applied by grazing (kg).
-    grazing_stable_inorganic_phosphorus : float, default 0
-        Amount of stable inorganic phosphorus on the field that was applied by grazing (kg).
-    grazing_stable_organic_phosphorus : float, default 0
-        Amount of stable organic phosphorus on the field that was applied by grazing (kg).
-    grazing_organic_phosphorus_runoff : float, default 0.0
-        Amount of organic phosphorus from grazing manure dissolved in and removed by runoff (kg).
-    grazing_inorganic_phosphorus_runoff : float, default 0.0
-        Amount of inorganic phosphorus from grazing manure dissolved in and removed by runoff (kg).
     soil_phosphorus_runoff : float, default 0.0
         Amount of phosphorus removed from the surface soil layer by runoff (kg / ha).
     nitrate_runoff : float, default 0.0
@@ -282,28 +241,9 @@ class SoilData:
     days_since_application: int = 0
     rain_events_after_fertilizer_application: int = 0
 
-    # ---- Manure (Phosphorus Cycling)
-    machine_manure_dry_mass: float = 0
-    machine_manure_applied_mass: float = 0
-    machine_manure_field_coverage: float = 0
-    machine_manure_moisture_factor: float = 0
-    machine_water_extractable_inorganic_phosphorus: float = 0
-    machine_water_extractable_organic_phosphorus: float = 0
-    machine_stable_inorganic_phosphorus: float = 0
-    machine_stable_organic_phosphorus: float = 0
-    machine_organic_phosphorus_runoff: float = 0.0
-    machine_inorganic_phosphorus_runoff: float = 0.0
-
-    grazing_manure_dry_mass: float = 0
-    grazing_manure_applied_mass: float = 0
-    grazing_manure_field_coverage: float = 0
-    grazing_manure_moisture_factor: float = 0
-    grazing_water_extractable_inorganic_phosphorus: float = 0
-    grazing_water_extractable_organic_phosphorus: float = 0
-    grazing_stable_inorganic_phosphorus: float = 0
-    grazing_stable_organic_phosphorus: float = 0
-    grazing_organic_phosphorus_runoff: float = 0.0
-    grazing_inorganic_phosphorus_runoff: float = 0.0
+    # ---- Manure pools (Phosphorus Cycling)
+    machine_manure: ManurePool = field(default_factory=ManurePool)
+    grazing_manure: ManurePool = field(default_factory=ManurePool)
 
     soil_phosphorus_runoff: float = 0.0
 
