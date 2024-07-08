@@ -180,13 +180,16 @@ class CropManagement:
 
         try:
             fraction_cut = self.data.cut_biomass / self.data.biomass
-        except ZeroDivisionError as e:
+        except ZeroDivisionError:
             info_map = {"class": self.__class__.__name__, "function": self.cut_crop.__name__}
             warning_name = "Harvesting in crop management causes zero division error"
             warning_message = (
-                f"Variable: biomass in CropData has value: '{self.data.biomass}"
+                f"A zero division error occurred in the harvesting process of crop management when calculating "
+                f"fraction cut."
+                f"The variable 'biomass' in CropData has an invalid value: '{self.data.biomass}'. "
             )
             om.add_warning(warning_name, warning_message, info_map)
+
         self.data.biomass -= self.data.cut_biomass
         self._recalculate_biomass_distribution(roots_harvested)
 
