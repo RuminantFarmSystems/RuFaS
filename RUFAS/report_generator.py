@@ -688,8 +688,9 @@ class ReportGenerator:
                 return units
         if aggregator == "division":
             # check if 2 keys for report data?
-            first_key, second_key = list(report_data.keys())[:2]
-            first_key_units = 
+            numerator_key, denominator_key = list(report_data.keys())[:2]
+            numerator_key_units = self._extract_units(numerator_key)
+            denominator_key_units = self._extract_units(denominator_key)
         # Should we have parenthesis around units or do that later? Add now, rethink later.
         # If division, return units for first item / units for second item.
         # if product, we need to check if the units are the same (e.g. kg * kg = kg^2) or if num/denom
