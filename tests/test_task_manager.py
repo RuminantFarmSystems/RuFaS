@@ -270,12 +270,10 @@ def test_task(
 
     if pre_validate:
         mock_handler.assert_called_once()
-        # print(mock_handler.call_args)
     else:
         mock_handle_input_data_audit.assert_called_once()
         mock_set_random_seed.assert_called_once()
         mock_handler.assert_called_once()
-        # print(mock_handler.call_args)
 
 
 def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
@@ -426,8 +424,6 @@ def test_call_handler():
             produce_graphics=produce_graphics,
         )
 
-        # Verify that the handler was called with the correct filtered arguments
-        print(mock_handle_post_processing.call_args)
         mock_handle_post_processing.assert_called_once_with(
             args, mock_input_manager, mock_output_manager, task_id, produce_graphics
         )
