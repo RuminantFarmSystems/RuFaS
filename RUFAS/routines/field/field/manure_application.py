@@ -185,7 +185,7 @@ class ManureApplication:
 
         is_liquid_manure = dry_matter_fraction <= 0.15
 
-        if is_liquid_manure:   # liquid
+        if is_liquid_manure:  # liquid
             wet_rate = self._determine_wet_rate_factor(
                 surface_dry_matter_mass, dry_matter_fraction, field_coverage, field_size
             )

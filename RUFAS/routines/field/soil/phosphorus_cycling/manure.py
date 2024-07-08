@@ -394,9 +394,9 @@ class Manure:
                 temperature_factor,
             )
             self.data.machine_manure.manure_moisture_factor += change_in_machine_manure_moisture
-            self.data.machine_manure.manure_moisture_factor = min(0.9,
-                                                                  max(self.data.machine_manure.manure_moisture_factor,
-                                                                      0.0))
+            self.data.machine_manure.manure_moisture_factor = min(
+                0.9, max(self.data.machine_manure.manure_moisture_factor, 0.0)
+            )
 
         if self.data.grazing_manure.manure_dry_mass > 0 and self.data.grazing_manure.manure_field_coverage > 0:
             change_in_grazing_manure_moisture = self._determine_moisture_change(
@@ -407,9 +407,9 @@ class Manure:
                 temperature_factor,
             )
             self.data.grazing_manure.manure_moisture_factor += change_in_grazing_manure_moisture
-            self.data.grazing_manure.manure_moisture_factor = min(0.9,
-                                                                  max(self.data.grazing_manure.manure_moisture_factor,
-                                                                      0.0))
+            self.data.grazing_manure.manure_moisture_factor = min(
+                0.9, max(self.data.grazing_manure.manure_moisture_factor, 0.0)
+            )
 
     def _determine_decomposed_surface_manure(self, temperature_factor: float) -> Dict[str, float]:
         """
