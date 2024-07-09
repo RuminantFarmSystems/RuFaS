@@ -6,7 +6,7 @@ from deepdiff import DeepDiff
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Sequence
+from typing import Any, Dict, List, Union, Callable, Sequence, Tuple
 
 import pandas as pd
 
@@ -1716,14 +1716,32 @@ class InputManager:
 
         return True
 
-    def _prepare_data(self, variable_name, input_data, properties_blob_key):
+    def _prepare_data(self, variable_name: str, input_data: dict,
+                      properties_blob_key: str) -> Tuple[List[str], Dict[str, Any], Dict[str, Any]]:
         """
         Prepare data and metadata properties for validation.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        input_data : Dict[str, Any]
+            The data associated with the variable that needs validation and addition to the pool.
+        properties_blob_key : str
+            The key in the metadata properties against which the data is validated.
+
+        Returns
+        -------
+        Tuple[List[str], Dict[str, Any], Dict[str, Any]]
+            Prepared element hierarchy, data, and metadata properties.
+
         """
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
             data = self._set_nested_value({}, element_hierarchy[1:], input_data)
+            print(data)
             element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
+            print(element_hierarchy)
             metadata_properties = reduce(
                 lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
             )
