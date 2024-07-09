@@ -38,7 +38,7 @@ def test_input_manager_singleton() -> None:
 
 @pytest.fixture
 def input_manager_original_method_states(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> Dict[str, Callable]:
     """Fixture to store original methods of InputManager"""
     return {
@@ -153,8 +153,8 @@ def test_load_properties_unexpected_error(mock_input_manager: InputManager, mock
 def test_load_metadata(mock_input_manager: InputManager) -> None:
     """Unit test for function _load_metadata in file input_manager.py"""
     with patch(
-        "builtins.open",
-        mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}'),
+            "builtins.open",
+            mock_open(read_data='{"dummy_key1": "dummy_value1", "dummy_key2": "dummy_value2"}'),
     ):
         with patch("RUFAS.output_manager.OutputManager.add_log") as add_log:
             mock_input_manager._load_metadata("path/dummy_metadata.json")
@@ -178,7 +178,7 @@ def test_load_metadata_raises_exception(mock_input_manager: InputManager) -> Non
 
 
 def test_load_data_from_json(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with valid json file in file input_manager.py"""
     dummy_data = {"files": {"dummy_data_file": {"path": "dummy_data.json", "type": "json"}}}
@@ -194,7 +194,7 @@ def test_load_data_from_json(
 
 
 def test_load_data_from_json_missing_file_raises_error(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with missing json file in file input_manager.py"""
     with patch("builtins.open", side_effect=FileNotFoundError):
@@ -205,7 +205,7 @@ def test_load_data_from_json_missing_file_raises_error(
 
 
 def test_load_data_from_json_invalid_data_raises_error(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with invalid json data in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data="invalid_json_data")):
@@ -216,7 +216,7 @@ def test_load_data_from_json_invalid_data_raises_error(
 
 
 def test_load_data_from_csv(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_csv with valid csv file in file input_manager.py"""
     dummy_csv_data = "key1,key2\na,1\nb,2\n"
@@ -231,7 +231,7 @@ def test_load_data_from_csv(
 
 
 def test_load_data_from_csv_missing_file_raises_error(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_csv with missing csv file in file input_manager.py"""
     with patch("builtins.open", side_effect=FileNotFoundError):
@@ -242,7 +242,7 @@ def test_load_data_from_csv_missing_file_raises_error(
 
 
 def test_load_data_from_csv_invalid_data_raises_error(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function _load_data_from_json with invalid json data in file input_manager.py"""
     with patch("builtins.open", mock_open(read_data="invalid_csv_data")):
@@ -254,8 +254,8 @@ def test_load_data_from_csv_invalid_data_raises_error(
 
 
 def test_start_data_processing(
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function start_data_processing in file input_manager.py"""
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
@@ -299,8 +299,8 @@ def mock_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 
 
 def test_populate_pool_valid(
-    mock_metadata: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        mock_metadata: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for valid data for function _populate_pool in file input_manager.py"""
 
@@ -329,8 +329,8 @@ def test_populate_pool_valid(
 
 
 def test_populate_pool_invalid(
-    mock_metadata: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        mock_metadata: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
 
@@ -360,8 +360,8 @@ def test_populate_pool_invalid(
 
 
 def test_populate_pool_partial_invalid(
-    mock_metadata: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        mock_metadata: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data for function _populate_pool in file input_manager.py"""
 
@@ -394,8 +394,8 @@ def test_populate_pool_partial_invalid(
 
 
 def test_populate_pool_eager_termination(
-    mock_metadata: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        mock_metadata: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for invalid data with eager termination for function
     _populate_pool in file input_manager.py"""
@@ -423,8 +423,8 @@ def test_populate_pool_eager_termination(
 
 
 def test_populate_pool_raises_keyerror(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Unit test for invalid data file type for function _populate_pool in file input_manager.py"""
     mock_input_manager.meta_data = {
@@ -464,10 +464,10 @@ def test_populate_pool_raises_keyerror(
     ],
 )
 def test_bool_type_validator(
-    input_data_value: bool,
-    dummy_variable_properties: Dict[str, Any],
-    expected_result: bool,
-    mocker: MockerFixture,
+        input_data_value: bool,
+        dummy_variable_properties: Dict[str, Any],
+        expected_result: bool,
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for function _bool_type_validator in file input_manager.py
@@ -522,11 +522,11 @@ def test_bool_type_validator(
     ],
 )
 def test_number_type_validator(
-    dummy_value: int,
-    dummy_variable_properties: Dict[str, int],
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mocker: MockerFixture,
+        dummy_value: int,
+        dummy_variable_properties: Dict[str, int],
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function _number_type_validator in file input_manager.py"""
 
@@ -566,10 +566,10 @@ def test_number_type_validator(
         ("cow", {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}, True, 0),
         ("cow", {"pattern": r".{3}", "minimum_length": 1}, True, 0),
         (
-            "COW",
-            {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5},
-            False,
-            1,
+                "COW",
+                {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5},
+                False,
+                1,
         ),
         ("cow", {"minimum_length": 1, "maximum_length": 5}, True, 0),
         ("cow", {"minimum_length": 5}, False, 1),
@@ -580,12 +580,12 @@ def test_number_type_validator(
     ],
 )
 def test_string_type_validator(
-    dummy_value: int,
-    dummy_variable_properties: Dict[str, int],
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
+        dummy_value: int,
+        dummy_variable_properties: Dict[str, int],
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for _string_type_validator function in file input_manager.py"""
     var_path: list[str | int] = ["dummy_var_path"]
@@ -835,62 +835,62 @@ def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]
     "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
     [
         (
-            {
-                "type": "array",
-                "default": [1, 2, 3, 4, 5],
-                "minimum_length": 5,
-                "maximum_length": 10,
-            },
-            ["element1"],
-            [1, 2, 3, 4, 5],
-            True,
-            2,
+                {
+                    "type": "array",
+                    "default": [1, 2, 3, 4, 5],
+                    "minimum_length": 5,
+                    "maximum_length": 10,
+                },
+                ["element1"],
+                [1, 2, 3, 4, 5],
+                True,
+                2,
         ),
         (
-            {
-                "type": "array",
-                "default": [],
-                "minimum_length": 0,
-                "maximum_length": 5,
-            },
-            ["element2"],
-            [],
-            True,
-            2,
+                {
+                    "type": "array",
+                    "default": [],
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                ["element2"],
+                [],
+                True,
+                2,
         ),
         (
-            {
-                "type": "array",
-                "default": [1, 2, 3, 4, 5],
-                "minimum_length": 5,
-                "maximum_length": 10,
-            },
-            ["element3"],
-            [1, 2, 3, 4, 5],
-            True,
-            2,
+                {
+                    "type": "array",
+                    "default": [1, 2, 3, 4, 5],
+                    "minimum_length": 5,
+                    "maximum_length": 10,
+                },
+                ["element3"],
+                [1, 2, 3, 4, 5],
+                True,
+                2,
         ),
         (
-            {
-                "type": "array",
-                "default": [1, 2, 3],
-                "minimum_length": 2,
-                "maximum_length": 5,
-            },
-            ["element4", "element5"],
-            [1, 2, 3],
-            True,
-            2,
+                {
+                    "type": "array",
+                    "default": [1, 2, 3],
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                ["element4", "element5"],
+                [1, 2, 3],
+                True,
+                2,
         ),
     ],
 )
 def test_fix_array_type_fixable_data(
-    dummy_variable_properties: Dict[str, Any],
-    dummy_element_hierarchy: List[str],
-    expected_value: List[Any],
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+        dummy_variable_properties: Dict[str, Any],
+        dummy_element_hierarchy: List[str],
+        expected_value: List[Any],
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
 
@@ -915,53 +915,53 @@ def test_fix_array_type_fixable_data(
     "dummy_variable_properties, dummy_element_hierarchy, expected_result, expected_warning_call_count",
     [
         (
-            {
-                "type": "array",
-                "minimum_length": 5,
-                "maximum_length": 10,
-            },
-            ["element6"],
-            False,
-            0,
+                {
+                    "type": "array",
+                    "minimum_length": 5,
+                    "maximum_length": 10,
+                },
+                ["element6"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "array",
-                "minimum_length": 0,
-                "maximum_length": 5,
-            },
-            ["element7"],
-            False,
-            0,
+                {
+                    "type": "array",
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                ["element7"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "array",
-                "minimum_length": 2,
-                "maximum_length": 5,
-            },
-            ["element8"],
-            False,
-            0,
+                {
+                    "type": "array",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                ["element8"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "array",
-                "minimum_length": 2,
-                "maximum_length": 5,
-            },
-            ["element9", "element10"],
-            False,
-            0,
+                {
+                    "type": "array",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                ["element9", "element10"],
+                False,
+                0,
         ),
     ],
 )
 def test_fix_array_type_critical_data(
-    dummy_variable_properties: Dict[str, Any],
-    dummy_element_hierarchy: List[str],
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+        dummy_variable_properties: Dict[str, Any],
+        dummy_element_hierarchy: List[str],
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
 
@@ -1001,72 +1001,72 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
     "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
     [
         (
-            {
-                "type": "str",
-                "default": "cow",
-                "pattern": r"cow",
-                "minimum_length": 1,
-                "maximum_length": 5,
-            },
-            ["element1"],
-            "cow",
-            True,
-            2,
+                {
+                    "type": "str",
+                    "default": "cow",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                ["element1"],
+                "cow",
+                True,
+                2,
         ),
         (
-            {
-                "type": "str",
-                "default": "",
-                "minimum_length": 0,
-                "maximum_length": 5,
-            },
-            ["element2"],
-            "",
-            True,
-            2,
+                {
+                    "type": "str",
+                    "default": "",
+                    "minimum_length": 0,
+                    "maximum_length": 5,
+                },
+                ["element2"],
+                "",
+                True,
+                2,
         ),
         (
-            {
-                "type": "str",
-                "default": "cow",
-                "pattern": r"cow",
-                "minimum_length": 2,
-                "maximum_length": 5,
-            },
-            ["element3"],
-            "cow",
-            True,
-            2,
+                {
+                    "type": "str",
+                    "default": "cow",
+                    "pattern": r"cow",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                ["element3"],
+                "cow",
+                True,
+                2,
         ),
         (
-            {
-                "type": "str",
-                "default": "cow",
-                "pattern": r"cow",
-                "minimum_length": 2,
-                "maximum_length": 5,
-            },
-            ["element4", "element5"],
-            "cow",
-            True,
-            2,
+                {
+                    "type": "str",
+                    "default": "cow",
+                    "pattern": r"cow",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                ["element4", "element5"],
+                "cow",
+                True,
+                2,
         ),
     ],
 )
 def test_fix_string_type_fixable_data(
-    dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
-    expected_value: str,
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+        dummy_variable_properties: dict[str, Any],
+        dummy_element_hierarchy: list[str],
+        expected_value: str,
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_string_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
 
-    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,):
+    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning, ):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
             dummy_element_hierarchy,
@@ -1107,57 +1107,57 @@ def test_fix_string_type_csv_data(mock_input_manager: InputManager) -> None:
     "dummy_variable_properties, dummy_element_hierarchy, expected_result, expected_warning_call_count",
     [
         (
-            {
-                "type": "str",
-                "pattern": r"cow",
-                "minimum_length": 1,
-                "maximum_length": 5,
-            },
-            ["element6"],
-            False,
-            0,
+                {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                ["element6"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "str",
-                "pattern": r"cow",
-                "minimum_length": 1,
-                "maximum_length": 5,
-            },
-            ["element7"],
-            False,
-            0,
+                {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                ["element7"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "str",
-                "pattern": r"cow",
-                "minimum_length": 1,
-                "maximum_length": 5,
-            },
-            ["element8"],
-            False,
-            0,
+                {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 1,
+                    "maximum_length": 5,
+                },
+                ["element8"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "str",
-                "pattern": r"cow",
-                "minimum_length": 2,
-                "maximum_length": 5,
-            },
-            ["element9", "element10"],
-            False,
-            0,
+                {
+                    "type": "str",
+                    "pattern": r"cow",
+                    "minimum_length": 2,
+                    "maximum_length": 5,
+                },
+                ["element9", "element10"],
+                False,
+                0,
         ),
     ],
 )
 def test_fix_string_type_critical_data(
-    dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+        dummy_variable_properties: dict[str, Any],
+        dummy_element_hierarchy: list[str],
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
 
@@ -1197,62 +1197,62 @@ def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
     "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
     [
         (
-            {
-                "type": "number",
-                "default": 5,
-                "minimum": 0,
-                "maximum": 10,
-            },
-            ["element1"],
-            5,
-            True,
-            2,
+                {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                ["element1"],
+                5,
+                True,
+                2,
         ),
         (
-            {
-                "type": "number",
-                "default": 0,
-                "minimum": 0,
-                "maximum": 10,
-            },
-            ["element2"],
-            0,
-            True,
-            2,
+                {
+                    "type": "number",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                ["element2"],
+                0,
+                True,
+                2,
         ),
         (
-            {
-                "type": "number",
-                "default": 5,
-                "minimum": 1,
-                "maximum": 10,
-            },
-            ["element3"],
-            5,
-            True,
-            2,
+                {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 1,
+                    "maximum": 10,
+                },
+                ["element3"],
+                5,
+                True,
+                2,
         ),
         (
-            {
-                "type": "number",
-                "default": 5,
-                "minimum": 0,
-                "maximum": 10,
-            },
-            ["element4", "element5"],
-            5,
-            True,
-            2,
+                {
+                    "type": "number",
+                    "default": 5,
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                ["element4", "element5"],
+                5,
+                True,
+                2,
         ),
     ],
 )
 def test_fix_number_type_fixable_data(
-    dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
-    expected_value: str,
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+        dummy_variable_properties: dict[str, Any],
+        dummy_element_hierarchy: list[str],
+        expected_value: str,
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
 
@@ -1277,54 +1277,54 @@ def test_fix_number_type_fixable_data(
     "dummy_variable_properties, dummy_element_hierarchy, expected_result, " "expected_warning_call_count",
     [
         (
-            {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 10,
-            },
-            ["element6"],
-            False,
-            0,
+                {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                ["element6"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 10,
-            },
-            ["element7"],
-            False,
-            0,
+                {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                ["element7"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "number",
-                "minimum": 1,
-                "maximum": 10,
-            },
-            ["element8"],
-            False,
-            0,
+                {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 10,
+                },
+                ["element8"],
+                False,
+                0,
         ),
         (
-            {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 10,
-            },
-            ["element9", "element10"],
-            False,
-            0,
+                {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                },
+                ["element9", "element10"],
+                False,
+                0,
         ),
     ],
 )
 def test_fix_number_type_critical_data(
-    dummy_variable_properties: dict[str, Any],
-    dummy_element_hierarchy: list[str],
-    expected_result: bool,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
-    mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
+        dummy_variable_properties: dict[str, Any],
+        dummy_element_hierarchy: list[str],
+        expected_result: bool,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
+        mock_metadata_for_fix_data: Dict[str, Dict[str, Any]],
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
 
@@ -1384,26 +1384,26 @@ def mock_pool_for_get_data(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
         ("module2.submodule1.nested_module1.nested_var1", "dummyvalue3"),
         ("module2.submodule1.nested_module1.nested_var2", "dummyvalue4"),
         (
-            "module1",
-            {
-                "integer_var": 5,
-                "float_var": 0.5,
-                "string_var": "dummyvalue1",
-                "boolean_var": True,
-                "integer_array_var": [1, 2, 3],
-                "float_array_var": [0.1, 0.2, 3.14159],
-                "string_array_var": ["1", "2", "3", "4", "5"],
-                "boolean_array_var": [True, False],
-                "submodule1": {"nested_var": "dummyvalue2"},
-            },
+                "module1",
+                {
+                    "integer_var": 5,
+                    "float_var": 0.5,
+                    "string_var": "dummyvalue1",
+                    "boolean_var": True,
+                    "integer_array_var": [1, 2, 3],
+                    "float_array_var": [0.1, 0.2, 3.14159],
+                    "string_array_var": ["1", "2", "3", "4", "5"],
+                    "boolean_array_var": [True, False],
+                    "submodule1": {"nested_var": "dummyvalue2"},
+                },
         ),
     ],
 )
 def test_get_data_with_valid_key(
-    dummy_data_path: str,
-    mock_pool_for_get_data: Dict[str, Dict[str, Any]],
-    expected_result: Any,
-    mocker: MockerFixture,
+        dummy_data_path: str,
+        mock_pool_for_get_data: Dict[str, Dict[str, Any]],
+        expected_result: Any,
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for get_data function in file input_manager.py with a valid data_path key"""
 
@@ -1428,10 +1428,10 @@ def test_get_data_with_valid_key(
     ],
 )
 def test_get_data_returns_none(
-    dummy_data_path: str,
-    error_key: str,
-    mock_pool_for_get_data: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        dummy_data_path: str,
+        error_key: str,
+        mock_pool_for_get_data: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for function get_data raising an exception in file input_manager.py"""
 
@@ -1522,137 +1522,137 @@ def mock_pool_for_get_metadata(mocker: MockerFixture) -> Dict[str, Dict[str, Any
     [
         ("properties.dummy_animal_properties.herd_information.calf_num.default", 8, 0),
         (
-            "properties.dummy_animal_properties.herd_information.calf_num",
-            {
-                "type": "number",
-                "description": "Number of Calves (head)",
-                "default": 8,
-                "minimum": 0,
-            },
-            0,
+                "properties.dummy_animal_properties.herd_information.calf_num",
+                {
+                    "type": "number",
+                    "description": "Number of Calves (head)",
+                    "default": 8,
+                    "minimum": 0,
+                },
+                0,
         ),
         (
-            "properties.dummy_animal_properties.herd_information.cow_repro_method.type",
-            "string",
-            0,
+                "properties.dummy_animal_properties.herd_information.cow_repro_method.type",
+                "string",
+                0,
         ),
         (
-            "properties.dummy_animal_properties.herd_information.cow_repro_method.pattern",
-            "^{TAI|ED|ED-TAI}$",
-            0,
+                "properties.dummy_animal_properties.herd_information.cow_repro_method.pattern",
+                "^{TAI|ED|ED-TAI}$",
+                0,
         ),
         (
-            "properties.dummy_animal_properties.herd_information.simulate_animals.type",
-            "boolean",
-            0,
+                "properties.dummy_animal_properties.herd_information.simulate_animals.type",
+                "boolean",
+                0,
         ),
         (
-            "properties.dummy_animal_properties.herd_information.dummy_cow_array",
-            {
-                "type": "array",
-                "description": "dummy array for testing purposes",
-                "default": [1, 2, 3, 4],
-                "maximum_length": 7,
-            },
-            0,
+                "properties.dummy_animal_properties.herd_information.dummy_cow_array",
+                {
+                    "type": "array",
+                    "description": "dummy array for testing purposes",
+                    "default": [1, 2, 3, 4],
+                    "maximum_length": 7,
+                },
+                0,
         ),
         (
-            "properties.dummy_crop_properties.crop_species.description",
-            "Name of the crop being grown.",
-            0,
+                "properties.dummy_crop_properties.crop_species.description",
+                "Name of the crop being grown.",
+                0,
         ),
         ("properties.dummy_crop_properties.harvest_years.type", "array", 0),
         (
-            "properties.dummy_crop_properties.harvest_years",
-            {
-                "type": "array",
-                "description": "Calendar years in which the harvesting occurs",
-                "minimum_length": 0,
-                "default": [],
-                "properties": {"type": "number", "minimum": 1},
-            },
-            0,
+                "properties.dummy_crop_properties.harvest_years",
+                {
+                    "type": "array",
+                    "description": "Calendar years in which the harvesting occurs",
+                    "minimum_length": 0,
+                    "default": [],
+                    "properties": {"type": "number", "minimum": 1},
+                },
+                0,
         ),
         ("properties.dummy_crop_properties.pattern_skip.minimum", 0, 0),
         (
-            "properties.dummy_crop_properties.simulate_crops",
-            {
-                "type": "boolean",
-                "description": "Dummy boolean variable for testing",
-                "default": False,
-            },
-            0,
+                "properties.dummy_crop_properties.simulate_crops",
+                {
+                    "type": "boolean",
+                    "description": "Dummy boolean variable for testing",
+                    "default": False,
+                },
+                0,
         ),
         (
-            "properties",
-            {
-                "dummy_animal_properties": {
-                    "type": "object",
-                    "description": "Animal data",
-                    "herd_information": {
+                "properties",
+                {
+                    "dummy_animal_properties": {
                         "type": "object",
-                        "description": "Herd Demographics",
-                        "calf_num": {
-                            "type": "number",
-                            "description": "Number of Calves (head)",
-                            "default": 8,
-                            "minimum": 0,
+                        "description": "Animal data",
+                        "herd_information": {
+                            "type": "object",
+                            "description": "Herd Demographics",
+                            "calf_num": {
+                                "type": "number",
+                                "description": "Number of Calves (head)",
+                                "default": 8,
+                                "minimum": 0,
+                            },
+                            "cow_repro_method": {
+                                "type": "string",
+                                "description": "Cow Reproductive Program (select one)",
+                                "default": "ED",
+                                "pattern": "^{TAI|ED|ED-TAI}$",
+                            },
+                            "simulate_animals": {
+                                "type": "boolean",
+                                "description": "Whether or not to simulate animals during the simulation",
+                                "default": True,
+                            },
+                            "dummy_cow_array": {
+                                "type": "array",
+                                "description": "dummy array for testing purposes",
+                                "default": [1, 2, 3, 4],
+                                "maximum_length": 7,
+                            },
                         },
-                        "cow_repro_method": {
+                    },
+                    "dummy_crop_properties": {
+                        "crop_species": {
                             "type": "string",
-                            "description": "Cow Reproductive Program (select one)",
-                            "default": "ED",
-                            "pattern": "^{TAI|ED|ED-TAI}$",
+                            "description": "Name of the crop being grown.",
+                            "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$",
                         },
-                        "simulate_animals": {
-                            "type": "boolean",
-                            "description": "Whether or not to simulate animals during the simulation",
-                            "default": True,
-                        },
-                        "dummy_cow_array": {
+                        "harvest_years": {
                             "type": "array",
-                            "description": "dummy array for testing purposes",
-                            "default": [1, 2, 3, 4],
-                            "maximum_length": 7,
+                            "description": "Calendar years in which the harvesting occurs",
+                            "minimum_length": 0,
+                            "default": [],
+                            "properties": {"type": "number", "minimum": 1},
+                        },
+                        "pattern_skip": {
+                            "type": "number",
+                            "description": "Number of years to be skipped between schedule repetitions.",
+                            "minimum": 0,
+                            "default": 0,
+                        },
+                        "simulate_crops": {
+                            "type": "boolean",
+                            "description": "Dummy boolean variable for testing",
+                            "default": False,
                         },
                     },
                 },
-                "dummy_crop_properties": {
-                    "crop_species": {
-                        "type": "string",
-                        "description": "Name of the crop being grown.",
-                        "pattern": "^{generic|corn|spring_wheat|winter_wheat|cereal_rye|spring_barley}$",
-                    },
-                    "harvest_years": {
-                        "type": "array",
-                        "description": "Calendar years in which the harvesting occurs",
-                        "minimum_length": 0,
-                        "default": [],
-                        "properties": {"type": "number", "minimum": 1},
-                    },
-                    "pattern_skip": {
-                        "type": "number",
-                        "description": "Number of years to be skipped between schedule repetitions.",
-                        "minimum": 0,
-                        "default": 0,
-                    },
-                    "simulate_crops": {
-                        "type": "boolean",
-                        "description": "Dummy boolean variable for testing",
-                        "default": False,
-                    },
-                },
-            },
-            0,
+                0,
         ),
     ],
 )
 def test_get_metadata_with_valid_key(
-    dummy_metadata_path: str,
-    mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
-    expected_result: Any,
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+        dummy_metadata_path: str,
+        mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+        expected_result: Any,
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for get_metadata function in file input_manager.py with a valid metadata_path key"""
 
@@ -1669,39 +1669,39 @@ def test_get_metadata_with_valid_key(
     "dummy_metadata_path, expected_error_parent_address, expected_error_invalid_key, expected_warning_call_count",
     [
         (
-            "dummy_animal_properties.herd_information.calf_num.dummy_key",
-            "dummy_animal_properties.herd_information.calf_num",
-            "dummy_key",
-            1,
+                "dummy_animal_properties.herd_information.calf_num.dummy_key",
+                "dummy_animal_properties.herd_information.calf_num",
+                "dummy_key",
+                1,
         ),
         (
-            "dummy_animal_properties.herd_information.dummy_key",
-            "dummy_animal_properties.herd_information",
-            "dummy_key",
-            1,
+                "dummy_animal_properties.herd_information.dummy_key",
+                "dummy_animal_properties.herd_information",
+                "dummy_key",
+                1,
         ),
         (
-            "dummy_crop_properties.crop_species.dummy_key",
-            "dummy_crop_properties.crop_species",
-            "dummy_key",
-            1,
+                "dummy_crop_properties.crop_species.dummy_key",
+                "dummy_crop_properties.crop_species",
+                "dummy_key",
+                1,
         ),
         ("dummy_crop_properties.dummy_key", "dummy_crop_properties", "dummy_key", 1),
         (
-            "dummy_crop_properties.pattern_skip.dummy_key",
-            "dummy_crop_properties.pattern_skip",
-            "dummy_key",
-            1,
+                "dummy_crop_properties.pattern_skip.dummy_key",
+                "dummy_crop_properties.pattern_skip",
+                "dummy_key",
+                1,
         ),
     ],
 )
 def test_get_metadata_raises_exception(
-    dummy_metadata_path: str,
-    expected_error_parent_address: str,
-    expected_error_invalid_key: str,
-    mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
-    expected_warning_call_count: int,
-    mock_input_manager: InputManager,
+        dummy_metadata_path: str,
+        expected_error_parent_address: str,
+        expected_error_invalid_key: str,
+        mock_pool_for_get_metadata: Dict[str, Dict[str, Any]],
+        expected_warning_call_count: int,
+        mock_input_manager: InputManager,
 ) -> None:
     """Unit test for function get_metadata raising an exception in file input_manager.py"""
 
@@ -1713,16 +1713,16 @@ def test_get_metadata_raises_exception(
 
         error_message = key_error.value.__str__().strip("'")
         assert (
-            error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
-            f'"{expected_error_parent_address}" does not have attribute '
-            f'"{expected_error_invalid_key}".'
+                error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
+                                 f'"{expected_error_parent_address}" does not have attribute '
+                                 f'"{expected_error_invalid_key}".'
         )
         assert add_error.call_count == expected_warning_call_count
 
 
 def test_get_data_by_properties_no_data(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Tests that error is handled properly when get_metadata() raises KeyError."""
     mock_input_manager.get_metadata = MagicMock(side_effect=KeyError)
@@ -1740,34 +1740,34 @@ def test_get_data_by_properties_no_data(
     "data,expected_keys",
     [
         (
-            {
-                "key_1": {"properties": "properties_1"},
-                "key_2": {"properties": "properties_2"},
-                "key_3": {"properties": "target_properties"},
-                "key_4": {"properties": "target_properties"},
-                "key_5": {"properties": "target_properties"},
-            },
-            ["key_3", "key_4", "key_5"],
+                {
+                    "key_1": {"properties": "properties_1"},
+                    "key_2": {"properties": "properties_2"},
+                    "key_3": {"properties": "target_properties"},
+                    "key_4": {"properties": "target_properties"},
+                    "key_5": {"properties": "target_properties"},
+                },
+                ["key_3", "key_4", "key_5"],
         ),
         (
-            {
-                "key_1": {"properties": "target_properties"},
-                "key_2": {"properties": "value"},
-                "key_3": {"properties": "target_properties"},
-                "key_4": {"properties": "properties_4"},
-                "key_5": {"properties": "properties_5"},
-            },
-            ["key_1", "key_3"],
+                {
+                    "key_1": {"properties": "target_properties"},
+                    "key_2": {"properties": "value"},
+                    "key_3": {"properties": "target_properties"},
+                    "key_4": {"properties": "properties_4"},
+                    "key_5": {"properties": "properties_5"},
+                },
+                ["key_1", "key_3"],
         ),
         ({"key_1": {"properties": "value"}, "key_2": {"properties": "value"}, "key_3": {"properties": "value"}}, []),
         ({}, []),
     ],
 )
 def test_get_data_keys_by_properties(
-    data: dict[str, dict[str, str]],
-    expected_keys: list[str],
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        data: dict[str, dict[str, str]],
+        expected_keys: list[str],
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test that Input Manager gets data keys by properties correctly."""
     mock_input_manager.get_metadata = MagicMock(return_value=data)
@@ -1793,9 +1793,9 @@ def test_flush_pool(mock_input_manager: InputManager) -> None:
 
 @pytest.mark.parametrize("properties_blob_key", ["properties1", "properties2"])
 def test_metadata_properties_exist(
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    mock_metadata: Dict[str, Dict[str, Any]],
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        mock_metadata: Dict[str, Dict[str, Any]],
 ) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata
 
@@ -1807,7 +1807,7 @@ def test_metadata_properties_exist(
 
 
 def test_metadata_properties_exist_no_metadata(
-    mock_input_manager: InputManager,
+        mock_input_manager: InputManager,
 ) -> None:
     mock_input_manager._InputManager__metadata = {}
 
@@ -1823,10 +1823,10 @@ def test_metadata_properties_exist_no_metadata(
     [("variable1", "propertiesA"), ("variable2", "propertiesB")],
 )
 def test_metadata_properties_exists_invalid_properties_blob_key(
-    variable_name: str,
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    mock_metadata: Dict[str, Dict[str, Any]],
+        variable_name: str,
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        mock_metadata: Dict[str, Dict[str, Any]],
 ) -> None:
     mock_input_manager._InputManager__metadata = mock_metadata
 
@@ -1879,100 +1879,100 @@ def mock_metadata_for_add_variable_to_pool() -> Dict[str, Dict[str, Any]]:
     "variable_name, data, properties_blob_key, starting_im_pool",
     [
         (
-            "dict_data",
-            {
-                "int": 0,
-                "str": "",
-                "float": 0.0,
-                "int_array": [0, 1, 2],
-                "float_array": [0.0, 1.1, 2.2],
-                "str_arr": ["example_str1", "example_str2", "example_str3"],
-            },
-            "dict_data",
-            {},
+                "dict_data",
+                {
+                    "int": 0,
+                    "str": "",
+                    "float": 0.0,
+                    "int_array": [0, 1, 2],
+                    "float_array": [0.0, 1.1, 2.2],
+                    "str_arr": ["example_str1", "example_str2", "example_str3"],
+                },
+                "dict_data",
+                {},
         ),
         (
-            "array_of_int_data",
-            {"array_of_int_data": [0, 1, 2]},
-            "array_of_int_data",
-            {},
+                "array_of_int_data",
+                {"array_of_int_data": [0, 1, 2]},
+                "array_of_int_data",
+                {},
         ),
         (
-            "array_of_float_data",
-            {"array_of_float_data": [0.0, 1.1, 2.2]},
-            "array_of_float_data",
-            {},
+                "array_of_float_data",
+                {"array_of_float_data": [0.0, 1.1, 2.2]},
+                "array_of_float_data",
+                {},
         ),
         (
-            "array_of_str_data",
-            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-            "array_of_str_data",
-            {},
+                "array_of_str_data",
+                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+                "array_of_str_data",
+                {},
         ),
         (
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-            "array_of_dict_data",
-            {},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+                "array_of_dict_data",
+                {},
         ),
         (
-            "dict_of_array_data",
-            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-            "dict_of_array_data",
-            {},
+                "dict_of_array_data",
+                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+                "dict_of_array_data",
+                {},
         ),
         (
-            "dict_data",
-            {
-                "int": 0,
-                "str": "",
-                "float": 0.0,
-                "int_array": [0, 1, 2],
-                "float_array": [0.0, 1.1, 2.2],
-                "str_arr": ["example_str1", "example_str2", "example_str3"],
-            },
-            "dict_data",
-            {"dict_data": {"1": 1}},
+                "dict_data",
+                {
+                    "int": 0,
+                    "str": "",
+                    "float": 0.0,
+                    "int_array": [0, 1, 2],
+                    "float_array": [0.0, 1.1, 2.2],
+                    "str_arr": ["example_str1", "example_str2", "example_str3"],
+                },
+                "dict_data",
+                {"dict_data": {"1": 1}},
         ),
         (
-            "array_of_int_data",
-            {"array_of_int_data": [0, 1, 2]},
-            "array_of_int_data",
-            {"array_of_int_data": [-1, 0, 1]},
+                "array_of_int_data",
+                {"array_of_int_data": [0, 1, 2]},
+                "array_of_int_data",
+                {"array_of_int_data": [-1, 0, 1]},
         ),
         (
-            "array_of_float_data",
-            {"array_of_float_data": [0.0, 1.1, 2.2]},
-            "array_of_float_data",
-            {"array_of_float_data": [-1.0, 0.0, 1.0]},
+                "array_of_float_data",
+                {"array_of_float_data": [0.0, 1.1, 2.2]},
+                "array_of_float_data",
+                {"array_of_float_data": [-1.0, 0.0, 1.0]},
         ),
         (
-            "array_of_str_data",
-            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-            "array_of_str_data",
-            {"array_of_str_data": ["a", "b", "c"]},
+                "array_of_str_data",
+                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+                "array_of_str_data",
+                {"array_of_str_data": ["a", "b", "c"]},
         ),
         (
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
         ),
         (
-            "dict_of_array_data",
-            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-            "dict_of_array_data",
-            {"dict_of_array_data": {"a": [1, 2, 3]}},
+                "dict_of_array_data",
+                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+                "dict_of_array_data",
+                {"dict_of_array_data": {"a": [1, 2, 3]}},
         ),
     ],
 )
 def test_add_variable_to_pool_valid(
-    variable_name: str,
-    data: Any,
-    properties_blob_key: str,
-    starting_im_pool: Dict[str, Any],
-    mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        variable_name: str,
+        data: Any,
+        properties_blob_key: str,
+        starting_im_pool: Dict[str, Any],
+        mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """Unit test for add_variable_to_pool() method in file input_manager.py with valid data."""
 
@@ -1981,6 +1981,31 @@ def test_add_variable_to_pool_valid(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
+    # Capture the original method
+    original_add_to_pool = input_manager._add_to_pool
+    original_check_modifiability = input_manager._check_modifiability
+    original_validate_data = input_manager._validate_data
+    orginal_prepare_data = input_manager._prepare_data
+
+    def side_effect_add_pool(*args, **kwargs):
+        return original_add_to_pool(*args, **kwargs)
+
+    def side_effect_check_modifiability(*args, **kwargs):
+        return original_check_modifiability(*args, **kwargs)
+
+    def side_effect_validate_data(*args, **kwargs):
+        return original_validate_data(*args, **kwargs)
+
+    def side_effect_prepare_data(*args, **kwargs):
+        return orginal_prepare_data(*args, **kwargs)
+
+    patch_add = mocker.patch("RUFAS.input_manager.InputManager._add_to_pool", side_effect=side_effect_add_pool)
+    patch_check = mocker.patch("RUFAS.input_manager.InputManager._check_modifiability",
+                               side_effect=side_effect_check_modifiability)
+    patch_validate = mocker.patch("RUFAS.input_manager.InputManager._validate_data",
+                                  side_effect=side_effect_validate_data)
+    patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data",
+                                                  side_effect=side_effect_prepare_data)
     expected_add_warning_count = 1 if starting_im_pool else 0
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
     patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
@@ -1999,106 +2024,110 @@ def test_add_variable_to_pool_valid(
     assert patch_for_add_error.call_count == 0
     assert variable_name in input_manager.pool
     assert input_manager.get_data(variable_name) == data
+    patch_add.assert_called_once()
+    patch_check.assert_called_once()
+    patch_validate.assert_called_once()
+    patch_prepare.assert_called_once()
 
 
 @pytest.mark.parametrize(
     "variable_name, data, properties_blob_key, starting_im_pool",
     [
         (
-            "dict_data",
-            {
-                "int": 0,
-                "str": "",
-                "float": 0.0,
-                "int_array": [0, 1, 2],
-                "float_array": [0.0, 1.1, 2.2],
-                "str_arr": ["example_str1", "example_str2", "example_str3"],
-            },
-            "dict_data",
-            {},
+                "dict_data",
+                {
+                    "int": 0,
+                    "str": "",
+                    "float": 0.0,
+                    "int_array": [0, 1, 2],
+                    "float_array": [0.0, 1.1, 2.2],
+                    "str_arr": ["example_str1", "example_str2", "example_str3"],
+                },
+                "dict_data",
+                {},
         ),
         (
-            "array_of_int_data",
-            {"array_of_int_data": [0, 1, 2]},
-            "array_of_int_data",
-            {},
+                "array_of_int_data",
+                {"array_of_int_data": [0, 1, 2]},
+                "array_of_int_data",
+                {},
         ),
         (
-            "array_of_float_data",
-            {"array_of_float_data": [0.0, 1.1, 2.2]},
-            "array_of_float_data",
-            {},
+                "array_of_float_data",
+                {"array_of_float_data": [0.0, 1.1, 2.2]},
+                "array_of_float_data",
+                {},
         ),
         (
-            "array_of_str_data",
-            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-            "array_of_str_data",
-            {},
+                "array_of_str_data",
+                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+                "array_of_str_data",
+                {},
         ),
         (
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-            "array_of_dict_data",
-            {},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+                "array_of_dict_data",
+                {},
         ),
         (
-            "dict_of_array_data",
-            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-            "dict_of_array_data",
-            {},
+                "dict_of_array_data",
+                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+                "dict_of_array_data",
+                {},
         ),
         (
-            "dict_data",
-            {
-                "int": 0,
-                "str": "",
-                "float": 0.0,
-                "int_array": [0, 1, 2],
-                "float_array": [0.0, 1.1, 2.2],
-                "str_arr": ["example_str1", "example_str2", "example_str3"],
-            },
-            "dict_data",
-            {"dict_data": {"1": 1}},
+                "dict_data",
+                {
+                    "int": 0,
+                    "str": "",
+                    "float": 0.0,
+                    "int_array": [0, 1, 2],
+                    "float_array": [0.0, 1.1, 2.2],
+                    "str_arr": ["example_str1", "example_str2", "example_str3"],
+                },
+                "dict_data",
+                {"dict_data": {"1": 1}},
         ),
         (
-            "array_of_int_data",
-            {"array_of_int_data": [0, 1, 2]},
-            "array_of_int_data",
-            {"array_of_int_data": [-1, 0, 1]},
+                "array_of_int_data",
+                {"array_of_int_data": [0, 1, 2]},
+                "array_of_int_data",
+                {"array_of_int_data": [-1, 0, 1]},
         ),
         (
-            "array_of_float_data",
-            {"array_of_float_data": [0.0, 1.1, 2.2]},
-            "array_of_float_data",
-            {"array_of_float_data": [-1.0, 0.0, 1.0]},
+                "array_of_float_data",
+                {"array_of_float_data": [0.0, 1.1, 2.2]},
+                "array_of_float_data",
+                {"array_of_float_data": [-1.0, 0.0, 1.0]},
         ),
         (
-            "array_of_str_data",
-            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-            "array_of_str_data",
-            {"array_of_str_data": ["a", "b", "c"]},
+                "array_of_str_data",
+                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+                "array_of_str_data",
+                {"array_of_str_data": ["a", "b", "c"]},
         ),
         (
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
         ),
         (
-            "dict_of_array_data",
-            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-            "dict_of_array_data",
-            {"dict_of_array_data": {"a": [1, 2, 3]}},
+                "dict_of_array_data",
+                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+                "dict_of_array_data",
+                {"dict_of_array_data": {"a": [1, 2, 3]}},
         ),
     ],
 )
 def test_add_variable_to_pool_invalid(
-    variable_name: str,
-    data: Any,
-    properties_blob_key: str,
-    starting_im_pool: Dict[str, Any],
-    mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        variable_name: str,
+        data: Any,
+        properties_blob_key: str,
+        starting_im_pool: Dict[str, Any],
+        mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for add_variable_to_pool() method in file input_manager.py with invalid data.
@@ -2138,100 +2167,100 @@ def test_add_variable_to_pool_invalid(
     "variable_name, data, properties_blob_key, starting_im_pool",
     [
         (
-            "dict_data",
-            {
-                "int": 0,
-                "str": "",
-                "float": 0.0,
-                "int_array": [0, 1, 2],
-                "float_array": [0.0, 1.1, 2.2],
-                "str_arr": ["example_str1", "example_str2", "example_str3"],
-            },
-            "dict_data",
-            {},
+                "dict_data",
+                {
+                    "int": 0,
+                    "str": "",
+                    "float": 0.0,
+                    "int_array": [0, 1, 2],
+                    "float_array": [0.0, 1.1, 2.2],
+                    "str_arr": ["example_str1", "example_str2", "example_str3"],
+                },
+                "dict_data",
+                {},
         ),
         (
-            "array_of_int_data",
-            {"array_of_int_data": [0, 1, 2]},
-            "array_of_int_data",
-            {},
+                "array_of_int_data",
+                {"array_of_int_data": [0, 1, 2]},
+                "array_of_int_data",
+                {},
         ),
         (
-            "array_of_float_data",
-            {"array_of_float_data": [0.0, 1.1, 2.2]},
-            "array_of_float_data",
-            {},
+                "array_of_float_data",
+                {"array_of_float_data": [0.0, 1.1, 2.2]},
+                "array_of_float_data",
+                {},
         ),
         (
-            "array_of_str_data",
-            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-            "array_of_str_data",
-            {},
+                "array_of_str_data",
+                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+                "array_of_str_data",
+                {},
         ),
         (
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-            "array_of_dict_data",
-            {},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+                "array_of_dict_data",
+                {},
         ),
         (
-            "dict_of_array_data",
-            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-            "dict_of_array_data",
-            {},
+                "dict_of_array_data",
+                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+                "dict_of_array_data",
+                {},
         ),
         (
-            "dict_data",
-            {
-                "int": 0,
-                "str": "",
-                "float": 0.0,
-                "int_array": [0, 1, 2],
-                "float_array": [0.0, 1.1, 2.2],
-                "str_arr": ["example_str1", "example_str2", "example_str3"],
-            },
-            "dict_data",
-            {"dict_data": {"1": 1}},
+                "dict_data",
+                {
+                    "int": 0,
+                    "str": "",
+                    "float": 0.0,
+                    "int_array": [0, 1, 2],
+                    "float_array": [0.0, 1.1, 2.2],
+                    "str_arr": ["example_str1", "example_str2", "example_str3"],
+                },
+                "dict_data",
+                {"dict_data": {"1": 1}},
         ),
         (
-            "array_of_int_data",
-            {"array_of_int_data": [0, 1, 2]},
-            "array_of_int_data",
-            {"array_of_int_data": [-1, 0, 1]},
+                "array_of_int_data",
+                {"array_of_int_data": [0, 1, 2]},
+                "array_of_int_data",
+                {"array_of_int_data": [-1, 0, 1]},
         ),
         (
-            "array_of_float_data",
-            {"array_of_float_data": [0.0, 1.1, 2.2]},
-            "array_of_float_data",
-            {"array_of_float_data": [-1.0, 0.0, 1.0]},
+                "array_of_float_data",
+                {"array_of_float_data": [0.0, 1.1, 2.2]},
+                "array_of_float_data",
+                {"array_of_float_data": [-1.0, 0.0, 1.0]},
         ),
         (
-            "array_of_str_data",
-            {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
-            "array_of_str_data",
-            {"array_of_str_data": ["a", "b", "c"]},
+                "array_of_str_data",
+                {"array_of_str_data": ["example_str1", "example_str2", "example_str3"]},
+                "array_of_str_data",
+                {"array_of_str_data": ["a", "b", "c"]},
         ),
         (
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
-            "array_of_dict_data",
-            {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"a": 0}, {"b": 1}, {"c": 2}]},
+                "array_of_dict_data",
+                {"array_of_dict_data": [{"A": -1}, {"B": 0}, {"C": 1}]},
         ),
         (
-            "dict_of_array_data",
-            {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
-            "dict_of_array_data",
-            {"dict_of_array_data": {"a": [1, 2, 3]}},
+                "dict_of_array_data",
+                {"array1": [1, 2, 3], "array2": ["a", "b", "c"], "array3": [0.0, 1.1, 2.2]},
+                "dict_of_array_data",
+                {"dict_of_array_data": {"a": [1, 2, 3]}},
         ),
     ],
 )
 def test_add_variable_to_pool_eager_termination(
-    variable_name: str,
-    data: Any,
-    properties_blob_key: str,
-    starting_im_pool: Dict[str, Any],
-    mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
-    mocker: MockerFixture,
+        variable_name: str,
+        data: Any,
+        properties_blob_key: str,
+        starting_im_pool: Dict[str, Any],
+        mock_metadata_for_add_variable_to_pool: Dict[str, Dict[str, Any]],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for add_variable_to_pool() method in file input_manager.py with eager_termination=True.
@@ -2275,11 +2304,11 @@ def test_add_variable_to_pool_eager_termination(
     ],
 )
 def test_add_dict_variable_to_pool(
-    variable_name: str,
-    data: Dict[str, Any],
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        variable_name: str,
+        data: Dict[str, Any],
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
@@ -2318,11 +2347,11 @@ def test_add_dict_variable_to_pool(
     ],
 )
 def test_add_dict_variable_to_pool_type_error(
-    variable_name: str,
-    data: Dict[str, Any],
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        variable_name: str,
+        data: Dict[str, Any],
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=True)
@@ -2356,11 +2385,11 @@ def test_add_dict_variable_to_pool_type_error(
     ],
 )
 def test_add_dict_variable_to_pool_invalid_data(
-    variable_name: str,
-    data: Dict[str, Any],
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        variable_name: str,
+        data: Dict[str, Any],
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
@@ -2393,8 +2422,8 @@ def test_add_dict_variable_to_pool_invalid_data(
 
 
 def test_add_dict_variable_to_pool_metadata_properties_do_not_exist(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=False)
     mock_input_manager._add_variable_to_pool = MagicMock(return_value=False)
@@ -2431,11 +2460,11 @@ def test_add_dict_variable_to_pool_metadata_properties_do_not_exist(
     ],
 )
 def test_add_tabular_variable_to_pool(
-    variable_name: str,
-    data: Dict[str, List[Any]] | List[Any],
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        variable_name: str,
+        data: Dict[str, List[Any]] | List[Any],
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test for InputManager.add_tabular_variable_to_pool() for valid data"""
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
@@ -2479,11 +2508,11 @@ def test_add_tabular_variable_to_pool(
     ],
 )
 def test_add_tabular_variable_to_pool_type_error(
-    variable_name: str,
-    data: Dict[str, List[Any]] | List[Any],
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        variable_name: str,
+        data: Dict[str, List[Any]] | List[Any],
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test for InputManager.add_tabular_variable_to_pool() for incorrect data type is received"""
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
@@ -2521,11 +2550,11 @@ def test_add_tabular_variable_to_pool_type_error(
     ],
 )
 def test_add_tabular_variable_to_pool_invalid_data(
-    variable_name: str,
-    data: Dict[str, List[Any]] | List[Any],
-    properties_blob_key: str,
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        variable_name: str,
+        data: Dict[str, List[Any]] | List[Any],
+        properties_blob_key: str,
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test for InputManager.add_tabular_variable_to_pool() for invalid data and eager_termination set to False"""
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=True)
@@ -2563,8 +2592,8 @@ def test_add_tabular_variable_to_pool_invalid_data(
 
 
 def test_add_tabular_variable_to_pool_metadata_properties_do_not_exist(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+        mock_input_manager: InputManager,
+        input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Test for InputManager.add_tabular_variable_to_pool() for invalid data and eager_termination set to False"""
     mock_input_manager._metadata_properties_exist = MagicMock(return_value=False)
@@ -2604,10 +2633,10 @@ def test_add_tabular_variable_to_pool_metadata_properties_do_not_exist(
     ],
 )
 def test_get_variable_modifiability(
-    variable_name: str,
-    variable_properties: Dict[str, Any],
-    expected_modifiability: Modifiability,
-    mock_input_manager: InputManager,
+        variable_name: str,
+        variable_properties: Dict[str, Any],
+        expected_modifiability: Modifiability,
+        mock_input_manager: InputManager,
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         actual_modifiability = mock_input_manager._get_variable_modifiability(
@@ -2628,9 +2657,9 @@ def test_get_variable_modifiability(
     ],
 )
 def test_get_variable_modifiability_unknown_modifiability(
-    variable_name: str,
-    variable_properties: Dict[str, Any],
-    mock_input_manager: InputManager,
+        variable_name: str,
+        variable_properties: Dict[str, Any],
+        mock_input_manager: InputManager,
 ) -> None:
     with patch("RUFAS.output_manager.OutputManager.add_warning") as mock_om_add_warning:
         mock_input_manager._get_variable_modifiability(
@@ -2650,10 +2679,10 @@ def test_get_variable_modifiability_unknown_modifiability(
     ],
 )
 def test_log_missing_data_initialization_input_not_required(
-    variable_name: str,
-    variable_properties: Dict[str, Any],
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
+        variable_name: str,
+        variable_properties: Dict[str, Any],
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -2676,10 +2705,10 @@ def test_log_missing_data_initialization_input_not_required(
     ],
 )
 def test_log_missing_data_initialization_key_error(
-    variable_name: str,
-    variable_properties: Dict[str, Any],
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
+        variable_name: str,
+        variable_properties: Dict[str, Any],
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -2703,10 +2732,10 @@ def test_log_missing_data_initialization_key_error(
     ],
 )
 def test_log_missing_data_runtime_key_error(
-    variable_name: str,
-    variable_properties: Dict[str, Any],
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
+        variable_name: str,
+        variable_properties: Dict[str, Any],
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
 ) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -2731,11 +2760,11 @@ def test_log_missing_data_runtime_key_error(
     ],
 )
 def test_set_nested_value(
-    nested_dict: Dict[str, Any],
-    element_hierarchy: List[str],
-    value: Any,
-    expected_result: Dict[str, Any],
-    mock_input_manager: InputManager,
+        nested_dict: Dict[str, Any],
+        element_hierarchy: List[str],
+        value: Any,
+        expected_result: Dict[str, Any],
+        mock_input_manager: InputManager,
 ) -> None:
     actual_result = mock_input_manager._set_nested_value(
         nested_dict=nested_dict, element_hierarchy=element_hierarchy, value=value
@@ -3093,35 +3122,35 @@ def mock_pool_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any] | Li
         ("dict_data_runtime_modifiable.nested_dict.a.b.c.d", {"d": 11}, "dict_data_runtime_modifiable", True, False, 0),
         ("dict_data_runtime_modifiable.nested_dict.A.B.C", {"C": None}, "dict_data_runtime_modifiable", True, False, 0),
         (
-            "dict_data_runtime_unmodifiable.nested_dict.a.b.c.d",
-            {"d": 11},
-            "dict_data_runtime_unmodifiable",
-            False,
-            False,
-            1,
+                "dict_data_runtime_unmodifiable.nested_dict.a.b.c.d",
+                {"d": 11},
+                "dict_data_runtime_unmodifiable",
+                False,
+                False,
+                1,
         ),
         (
-            "dict_data_runtime_unmodifiable.nested_dict.A.B.C",
-            {"C": "CCCCC!"},
-            "dict_data_runtime_unmodifiable",
-            False,
-            False,
-            1,
+                "dict_data_runtime_unmodifiable.nested_dict.A.B.C",
+                {"C": "CCCCC!"},
+                "dict_data_runtime_unmodifiable",
+                False,
+                False,
+                1,
         ),
         ("dict_data_runtime_unmodifiable.nested_dict.a.b.c.d", 10, "dict_data_runtime_unmodifiable", False, True, 0),
         ("dict_data_runtime_unmodifiable.nested_dict.A.B.C", "10", "dict_data_runtime_unmodifiable", False, True, 0),
     ],
 )
 def test_add_variable_to_pool_nested(
-    variable_name: str,
-    data: Dict[str, Any],
-    properties_blob_key: str,
-    is_modifiable_during_runtime: bool,
-    eager_termination: bool,
-    expected_add_warning_call_count: int,
-    mock_metadata_for_add_variable_to_pool_nested: Dict[str, Any],
-    mock_pool_for_add_variable_to_pool_nested: Dict[str, Any],
-    mocker: MockerFixture,
+        variable_name: str,
+        data: Dict[str, Any],
+        properties_blob_key: str,
+        is_modifiable_during_runtime: bool,
+        eager_termination: bool,
+        expected_add_warning_call_count: int,
+        mock_metadata_for_add_variable_to_pool_nested: Dict[str, Any],
+        mock_pool_for_add_variable_to_pool_nested: Dict[str, Any],
+        mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the _add_variable_to_pool method of the InputManager class for nested data.
@@ -3158,8 +3187,8 @@ def test_add_variable_to_pool_nested(
 
 
 def test_dump_get_data_logs(
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
 ) -> None:
     mock_input_manager._InputManager__get_data_logs_pool = {
         "14-Feb-2024_Wed_06-15-56.692523": "InputManager.get_data() gets called for ['a'].",
@@ -3191,7 +3220,7 @@ def test_dump_get_data_logs(
     ],
 )
 def test_check_property_exists_in_pool(
-    mocker: MockerFixture, data_address: str, expected_result: bool, raise_key_error: bool
+        mocker: MockerFixture, data_address: str, expected_result: bool, raise_key_error: bool
 ) -> None:
     """
     Unit test for the check_property_exists_in_pool() method of the InputManager class.
@@ -3216,46 +3245,46 @@ def test_check_property_exists_in_pool(
     [
         # Success cases
         (
-            {
-                "animal": {
-                    "herd_information": {
-                        "calf_num": 8,
-                        "heiferI_num": 44,
-                        "heiferII_num": 38,
-                        "heiferIII_num_springers": 12,
+                {
+                    "animal": {
+                        "herd_information": {
+                            "calf_num": 8,
+                            "heiferI_num": 44,
+                            "heiferII_num": 38,
+                            "heiferIII_num_springers": 12,
+                        }
                     }
-                }
-            },
-            ["animal", "herd_information", "calf_num"],
-            8,
-            None,
+                },
+                ["animal", "herd_information", "calf_num"],
+                8,
+                None,
         ),
         (
-            {
-                "manure_management_scenarios": [
-                    {"bedding_type": "straw", "manure_handler": "manual scraping"},
-                    {"bedding_type": "sawdust", "manure_handler": "flush system"},
-                ]
-            },
-            ["manure_management_scenarios", 0, "bedding_type"],
-            "straw",
-            None,
+                {
+                    "manure_management_scenarios": [
+                        {"bedding_type": "straw", "manure_handler": "manual scraping"},
+                        {"bedding_type": "sawdust", "manure_handler": "flush system"},
+                    ]
+                },
+                ["manure_management_scenarios", 0, "bedding_type"],
+                "straw",
+                None,
         ),
         # Error cases
         (
-            {"animal": {"herd_information": {"calf_num": 8}}},
-            ["animal", "herd_information", "missing_key"],
-            None,
-            KeyError,
+                {"animal": {"herd_information": {"calf_num": 8}}},
+                ["animal", "herd_information", "missing_key"],
+                None,
+                KeyError,
         ),
         ([{"key": "value"}], [0, "nonexistent_key"], None, KeyError),
     ],
 )
 def test_extract_value_by_key_list(
-    input_data: Union[List[Any], Dict[str, Any]],
-    variable_path: List[Union[str, int]],
-    expected: Optional[Any],
-    expected_exception: Optional[Type[Exception]],
+        input_data: Union[List[Any], Dict[str, Any]],
+        variable_path: List[Union[str, int]],
+        expected: Optional[Any],
+        expected_exception: Optional[Type[Exception]],
 ) -> None:
     """
     Unit test for the _extract_value_by_key_list() method of the InputManager class.
@@ -3306,58 +3335,58 @@ def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expe
     [
         # Test case with valid object data
         (
-            ["data", "object"],
-            {"key": {"type": "string"}},
-            {"data": {"object": {"key": "value"}}},
-            False,
-            "blob_key",
-            True,
-            {"key": "value"},
-            True,
+                ["data", "object"],
+                {"key": {"type": "string"}},
+                {"data": {"object": {"key": "value"}}},
+                False,
+                "blob_key",
+                True,
+                {"key": "value"},
+                True,
         ),
         # Test case with invalid object data
         (
-            ["data", "object"],
-            {"key": {"type": "string"}},
-            {"data": {"object": "not_a_dict"}},
-            False,
-            "blob_key",
-            False,
-            "not_a_dict",
-            False,
+                ["data", "object"],
+                {"key": {"type": "string"}},
+                {"data": {"object": "not_a_dict"}},
+                False,
+                "blob_key",
+                False,
+                "not_a_dict",
+                False,
         ),
         (
-            ["data", "object", "nested"],
-            {"nested": {"type": "object", "properties": {"key": {"type": "string"}}}},
-            {"data": {"object": {"nested": {"key": 123}}}},
-            False,
-            "blob_key",
-            False,
-            {"nested": {"key": 123}},
-            False,
+                ["data", "object", "nested"],
+                {"nested": {"type": "object", "properties": {"key": {"type": "string"}}}},
+                {"data": {"object": {"nested": {"key": 123}}}},
+                False,
+                "blob_key",
+                False,
+                {"nested": {"key": 123}},
+                False,
         ),
         (
-            ["data", "early_failure"],
-            {"description": "a description", "key1": {"type": "string"}, "key2": {"type": "integer"}},
-            {"data": {"early_failure": {"key1": "valid", "key2": "not_an_integer"}}},  # key2 fails validation
-            True,
-            "blob_key",
-            False,
-            {"key1": "valid", "key2": "not_an_integer"},
-            False,
+                ["data", "early_failure"],
+                {"description": "a description", "key1": {"type": "string"}, "key2": {"type": "integer"}},
+                {"data": {"early_failure": {"key1": "valid", "key2": "not_an_integer"}}},  # key2 fails validation
+                True,
+                "blob_key",
+                False,
+                {"key1": "valid", "key2": "not_an_integer"},
+                False,
         ),
     ],
 )
 def test_object_type_validator(
-    mocker: MockerFixture,
-    variable_path: List[Union[str, int]],
-    variable_properties: Dict[str, Any],
-    input_data: Dict[str, Any],
-    eager_termination: bool,
-    properties_blob_key: str,
-    expected_result: bool,
-    patch_extract_return: Any,
-    patch_validate_return: bool,
+        mocker: MockerFixture,
+        variable_path: List[Union[str, int]],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        expected_result: bool,
+        patch_extract_return: Any,
+        patch_validate_return: bool,
 ) -> None:
     """
     Unit test for the _object_type_validator() method of the InputManager class.
@@ -3394,7 +3423,7 @@ def test_object_type_validator(
     ],
 )
 def test_object_type_validator_key_removal(
-    mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
+        mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
 ) -> None:
     """Tests that extraneous keys are properly removed by the _object_type_validator in Input Manager."""
     input_manager = InputManager()
@@ -3435,50 +3464,50 @@ def test_object_type_validator_key_removal(
     [
         # Input data is not a list
         (
-            ["data", "array"],
-            {"maximum_length": 5, "minimum_length": 1},
-            "not_a_list",
-            "blob_key",
-            False,
-            "Validation: array container is not a list",
+                ["data", "array"],
+                {"maximum_length": 5, "minimum_length": 1},
+                "not_a_list",
+                "blob_key",
+                False,
+                "Validation: array container is not a list",
         ),
         # Input list's length is less than the specified minimum length
         (
-            ["data", "array"],
-            {"maximum_length": 5, "minimum_length": 2},
-            [1],
-            "blob_key",
-            False,
-            "Validation: array length less than minimum",
+                ["data", "array"],
+                {"maximum_length": 5, "minimum_length": 2},
+                [1],
+                "blob_key",
+                False,
+                "Validation: array length less than minimum",
         ),
         # Input list's length exceeds the specified maximum length
         (
-            ["data", "array"],
-            {"maximum_length": 3, "minimum_length": 1},
-            [1, 2, 3, 4],
-            "blob_key",
-            False,
-            "Validation: array length greater than maximum",
+                ["data", "array"],
+                {"maximum_length": 3, "minimum_length": 1},
+                [1, 2, 3, 4],
+                "blob_key",
+                False,
+                "Validation: array length greater than maximum",
         ),
         # Input list's length is within the specified constraints
         (
-            ["data", "array"],
-            {"maximum_length": 5, "minimum_length": 1},
-            [1, 2, 3],
-            "blob_key",
-            True,
-            None,
+                ["data", "array"],
+                {"maximum_length": 5, "minimum_length": 1},
+                [1, 2, 3],
+                "blob_key",
+                True,
+                None,
         ),
     ],
 )
 def test_validate_array_container_properties(
-    mocker: MockerFixture,
-    variable_path: List[Union[str, int]],
-    variable_properties: Dict[str, Any],
-    input_data: Any,
-    properties_blob_key: str,
-    expected_result: bool,
-    expected_warning: str,
+        mocker: MockerFixture,
+        variable_path: List[Union[str, int]],
+        variable_properties: Dict[str, Any],
+        input_data: Any,
+        properties_blob_key: str,
+        expected_result: bool,
+        expected_warning: str,
 ) -> None:
     """
     Unit test for the _validate_array_container_properties() method of the InputManager class.
@@ -3511,113 +3540,113 @@ def test_validate_array_container_properties(
     [
         # Array extraction returns a non-list
         (
-            ["data", "array"],
-            {"properties": {"type": "integer"}},
-            {},
-            False,
-            "blob_key",
-            None,
-            False,
-            True,
-            False,
+                ["data", "array"],
+                {"properties": {"type": "integer"}},
+                {},
+                False,
+                "blob_key",
+                None,
+                False,
+                True,
+                False,
         ),
         # Array container properties are invalid
         (
-            ["data", "array"],
-            {"properties": {"type": "integer"}},
-            {"data": {"array": [1, 2, 3]}},
-            False,
-            "blob_key",
-            [1, 2, 3],
-            False,
-            True,
-            False,
+                ["data", "array"],
+                {"properties": {"type": "integer"}},
+                {"data": {"array": [1, 2, 3]}},
+                False,
+                "blob_key",
+                [1, 2, 3],
+                False,
+                True,
+                False,
         ),
         # Element validation within the array fails
         (
-            ["data", "array"],
-            {"properties": {"type": "integer"}},
-            {"data": {"array": [1, "two", 3]}},
-            False,
-            "blob_key",
-            [1, "two", 3],
-            True,
-            False,
-            False,
+                ["data", "array"],
+                {"properties": {"type": "integer"}},
+                {"data": {"array": [1, "two", 3]}},
+                False,
+                "blob_key",
+                [1, "two", 3],
+                True,
+                False,
+                False,
         ),
         # Successful validation of all elements
         (
-            ["data", "array"],
-            {"properties": {"type": "integer"}},
-            {"data": {"array": [1, 2, 3]}},
-            False,
-            "blob_key",
-            [1, 2, 3],
-            True,
-            True,
-            True,
+                ["data", "array"],
+                {"properties": {"type": "integer"}},
+                {"data": {"array": [1, 2, 3]}},
+                False,
+                "blob_key",
+                [1, 2, 3],
+                True,
+                True,
+                True,
         ),
         # Eager termination on element validation failure
         (
-            ["data", "array"],
-            {"properties": {"type": "integer"}},
-            {"data": {"array": [1, "two", 3]}},
-            True,
-            "blob_key",
-            [1, "two", 3],
-            True,
-            False,
-            False,
+                ["data", "array"],
+                {"properties": {"type": "integer"}},
+                {"data": {"array": [1, "two", 3]}},
+                True,
+                "blob_key",
+                [1, "two", 3],
+                True,
+                False,
+                False,
         ),
         # Nullable array that is None
         (
-            ["data", "array"],
-            {"properties": {"type": "integer"}, "nullable": True},
-            {"data": {"array": None}},
-            False,
-            "blob_key",
-            None,
-            True,
-            True,
-            True,
+                ["data", "array"],
+                {"properties": {"type": "integer"}, "nullable": True},
+                {"data": {"array": None}},
+                False,
+                "blob_key",
+                None,
+                True,
+                True,
+                True,
         ),
         # Nullable and null data passed
         (
-            ["data", "array"],
-            {"nullable": True},
-            {"data": {"array": None}},
-            True,
-            "blob_key",
-            None,
-            False,
-            False,
-            True,
+                ["data", "array"],
+                {"nullable": True},
+                {"data": {"array": None}},
+                True,
+                "blob_key",
+                None,
+                False,
+                False,
+                True,
         ),
         # Not nullable and null data passed
         (
-            ["data", "array"],
-            {},
-            {"data": {"array": None}},
-            True,
-            "blob_key",
-            None,
-            False,
-            False,
-            False,
+                ["data", "array"],
+                {},
+                {"data": {"array": None}},
+                True,
+                "blob_key",
+                None,
+                False,
+                False,
+                False,
         ),
     ],
 )
 def test_array_type_validator(
-    mocker: MockerFixture,
-    variable_path: List[Union[str, int]],
-    variable_properties: Dict[str, Any],
-    input_data: Dict[str, Any],
-    eager_termination: bool,
-    properties_blob_key: str,
-    patch_extract_return: Any,
-    patch_container_valid: bool,
-    patch_element_valid: bool,
-    expected_result: bool,
+        mocker: MockerFixture,
+        variable_path: List[Union[str, int]],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        patch_extract_return: Any,
+        patch_container_valid: bool,
+        patch_element_valid: bool,
+        expected_result: bool,
 ) -> None:
     """
     Unit test for the _array_type_validator() method of the InputManager class.
@@ -3677,14 +3706,14 @@ def test_array_type_validator(
     ],
 )
 def test_validate_input_by_type(
-    mocker: MockerFixture,
-    data_type: str,
-    input_value: Any,
-    expected_result: bool,
-    validator_return: bool,
-    fixable: bool,
-    fix_attempted: bool,
-    simple_type: bool,
+        mocker: MockerFixture,
+        data_type: str,
+        input_value: Any,
+        expected_result: bool,
+        validator_return: bool,
+        fixable: bool,
+        fix_attempted: bool,
+        simple_type: bool,
 ) -> None:
     """
     Unit test for the _validate_input_by_type method of the InputManager class.
@@ -3801,10 +3830,10 @@ def test_save_metadata_properties(mock_input_manager: InputManager) -> None:
     [(FileNotFoundError, "No such file or directory"), (PermissionError, "Permission denied"), (OSError, "OS error")],
 )
 def test_save_metadata_properties_errors(
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
-    exception: Type[FileNotFoundError | PermissionError | OSError],
-    error_message: str,
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
+        exception: Type[FileNotFoundError | PermissionError | OSError],
+        error_message: str,
 ) -> None:
     output_dir = Path("/example/dir")
     generated_filename = "file.csv"
@@ -3834,43 +3863,44 @@ def test_save_metadata_properties_errors(
     "nested_data, expected_primitive_call_counts, expected_create_record_call_count, expected_results",
     [
         (
-            {
-                "level1": {
-                    "level2": {
-                        "property1": {"type": "string", "value": "Hello"},
-                        "property2": {"type": "number", "value": 42},
-                    },
-                    "description": "Level 1 description",
-                }
-            },
-            {"True": 2, "False": 2},
-            2,
-            [{"mocked": "record"}, {"mocked": "record"}],
+                {
+                    "level1": {
+                        "level2": {
+                            "property1": {"type": "string", "value": "Hello"},
+                            "property2": {"type": "number", "value": 42},
+                        },
+                        "description": "Level 1 description",
+                    }
+                },
+                {"True": 2, "False": 2},
+                2,
+                [{"mocked": "record"}, {"mocked": "record"}],
         ),
         (
-            {
-                "level1": {
-                    "level2": {
-                        "nestedProperty": {
-                            "type": "object",
-                            "innerProperty": {"type": "string", "value": "Nested", "description": "Deep description"},
-                        }
-                    },
-                    "description": "Level 1 description",
-                }
-            },
-            {"True": 2, "False": 3},
-            2,
-            [{"mocked": "record"}],
+                {
+                    "level1": {
+                        "level2": {
+                            "nestedProperty": {
+                                "type": "object",
+                                "innerProperty": {"type": "string", "value": "Nested",
+                                                  "description": "Deep description"},
+                            }
+                        },
+                        "description": "Level 1 description",
+                    }
+                },
+                {"True": 2, "False": 3},
+                2,
+                [{"mocked": "record"}],
         ),
     ],
 )
 def test_parse_metadata_properties(
-    mock_input_manager: InputManager,
-    nested_data: Dict[str, Any],
-    expected_primitive_call_counts: Dict[str, int],
-    expected_create_record_call_count: int,
-    expected_results: List[Dict[str, str]],
+        mock_input_manager: InputManager,
+        nested_data: Dict[str, Any],
+        expected_primitive_call_counts: Dict[str, int],
+        expected_create_record_call_count: int,
+        expected_results: List[Dict[str, str]],
 ) -> None:
     """Tests _parse_metadata_properties() function in InputManager."""
 
@@ -3918,7 +3948,7 @@ def test_parse_metadata_properties(
     ],
 )
 def test_check_property_type_primitive(
-    mock_input_manager: InputManager, property_dict: Dict[str, str], expected_result: bool
+        mock_input_manager: InputManager, property_dict: Dict[str, str], expected_result: bool
 ) -> None:
     """Tests _check_property_type_primitive() function in InputManager."""
     result = mock_input_manager._check_property_type_primitive(property_dict)
@@ -3929,44 +3959,44 @@ def test_check_property_type_primitive(
     "data_entry, name, expected_record",
     [
         (
-            {
-                "type": "string",
-                "description": "A simple string",
-                "pattern": "[A-Za-z]+",
-                "default": "example",
-                "maximum": "",
-                "minimum": "",
-            },
-            "user_details_properties_name",
-            {
-                "properties_group": "user_details_properties",
-                "name": "name",
-                "type": "string",
-                "description": "A simple string",
-                "pattern": "[A-Za-z]+",
-                "default": "example",
-                "maximum": "",
-                "minimum": "",
-            },
+                {
+                    "type": "string",
+                    "description": "A simple string",
+                    "pattern": "[A-Za-z]+",
+                    "default": "example",
+                    "maximum": "",
+                    "minimum": "",
+                },
+                "user_details_properties_name",
+                {
+                    "properties_group": "user_details_properties",
+                    "name": "name",
+                    "type": "string",
+                    "description": "A simple string",
+                    "pattern": "[A-Za-z]+",
+                    "default": "example",
+                    "maximum": "",
+                    "minimum": "",
+                },
         ),
         (
-            {"type": "number", "description": "A simple number"},
-            "config_properties_version",
-            {
-                "properties_group": "config_properties",
-                "name": "version",
-                "type": "number",
-                "description": "A simple number",
-                "pattern": "",
-                "default": "",
-                "maximum": "",
-                "minimum": "",
-            },
+                {"type": "number", "description": "A simple number"},
+                "config_properties_version",
+                {
+                    "properties_group": "config_properties",
+                    "name": "version",
+                    "type": "number",
+                    "description": "A simple number",
+                    "pattern": "",
+                    "default": "",
+                    "maximum": "",
+                    "minimum": "",
+                },
         ),
     ],
 )
 def test_create_record(
-    mock_input_manager: InputManager, data_entry: dict[str, str], name: str, expected_record: dict[str, str]
+        mock_input_manager: InputManager, data_entry: dict[str, str], name: str, expected_record: dict[str, str]
 ) -> None:
     """Tests _create_record() function in InputManager."""
     result = mock_input_manager._create_record(data_entry, name)
@@ -3977,63 +4007,65 @@ def test_create_record(
     "does_file_exist, metadata, expected_exception",
     [
         (
-            True,
-            {"files": {"file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
-            False,
+                True,
+                {"files": {
+                    "file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
+                False,
         ),
         (
-            False,
-            {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}}},
-            True,
+                False,
+                {"files": {
+                    "file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}}},
+                True,
         ),
         (
-            True,
-            {
-                "files": {
-                    "file1": {
-                        "path": "valid/path/to/file1.txt",
-                        "type": "invalid_type",
-                        "properties": "some properties",
+                True,
+                {
+                    "files": {
+                        "file1": {
+                            "path": "valid/path/to/file1.txt",
+                            "type": "invalid_type",
+                            "properties": "some properties",
+                        }
                     }
-                }
-            },
-            True,
+                },
+                True,
         ),
         (True, {"files": {"file1": {"path": "valid/path/to/file1.json", "properties": "some properties"}}}, True),
         (
-            True,
-            {
-                "files": {
-                    "file1": {
-                        "path": "valid/path/to/file1.json",
-                        "type": "json",
-                        "properties": "some properties",
-                        "extra_key": "extra_value",
+                True,
+                {
+                    "files": {
+                        "file1": {
+                            "path": "valid/path/to/file1.json",
+                            "type": "json",
+                            "properties": "some properties",
+                            "extra_key": "extra_value",
+                        }
                     }
-                }
-            },
-            True,
+                },
+                True,
         ),
         (
-            True,
-            {
-                "files": {
-                    "file1": {
-                        "path": "valid/path/to/file1.json",
-                        "type": "json",
-                        "properties": "",
+                True,
+                {
+                    "files": {
+                        "file1": {
+                            "path": "valid/path/to/file1.json",
+                            "type": "json",
+                            "properties": "",
+                        }
                     }
-                }
-            },
-            True,
+                },
+                True,
         ),
     ],
 )
 def test_validate_metadata(
-    mocker: MockerFixture,
-    does_file_exist: bool,
-    metadata: Dict[str, Any],
-    expected_exception: bool,
+        mocker: MockerFixture,
+        does_file_exist: bool,
+        metadata: Dict[str, Any],
+        expected_exception: bool,
 ) -> None:
     mocker.patch("os.path.isfile", return_value=does_file_exist)
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -4056,36 +4088,36 @@ def test_validate_metadata(
     "file_exists, error, file_content, modified_properties, expected_diff",
     [
         (
-            True,
-            None,
-            '{"key1": "value1", "key3": "value3"}',
-            {"key1": "value1_changed", "key3": "value3"},
-            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+                True,
+                None,
+                '{"key1": "value1", "key3": "value3"}',
+                {"key1": "value1_changed", "key3": "value3"},
+                {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
         ),
         (
-            False,
-            OSError,
-            '{"key1": "value1", "key3": "value3"}',
-            {"key1": "value1_changed", "key3": "value3"},
-            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+                False,
+                OSError,
+                '{"key1": "value1", "key3": "value3"}',
+                {"key1": "value1_changed", "key3": "value3"},
+                {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
         ),
         (
-            False,
-            PermissionError,
-            '{"key1": "value1", "key3": "value3"}',
-            {"key1": "value1_changed", "key3": "value3"},
-            {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
+                False,
+                PermissionError,
+                '{"key1": "value1", "key3": "value3"}',
+                {"key1": "value1_changed", "key3": "value3"},
+                {"values_changed": {"root['key1']": {"old_value": "value1", "new_value": "value1_changed"}}},
         ),
         (True, None, '{"key1": "value1", "key2": "value2"}', {"key1": "value1", "key2": "value2"}, {}),
     ],
 )
 def test_compare_metadata_properties(
-    mocker: MockerFixture,
-    file_exists: bool,
-    error: Type[PermissionError | OSError],
-    file_content: str,
-    modified_properties: dict[str, str],
-    expected_diff: dict[str, dict[str, str]],
+        mocker: MockerFixture,
+        file_exists: bool,
+        error: Type[PermissionError | OSError],
+        file_content: str,
+        modified_properties: dict[str, str],
+        expected_diff: dict[str, dict[str, str]],
 ) -> None:
     dummy_properties = {"key1": "value1", "key2": "value2"}
     dummy_properties_modified = modified_properties
@@ -4138,53 +4170,53 @@ def test_compare_metadata_properties(
     [
         ({"properties": {"a": {"type": "number"}}}, 2, 1, ["a"], False, [], ""),
         (
-            {"properties": {"a": {"b": {"type": "array", "properties": {}}}}},
-            3,
-            3,
-            ["a", "b", "properties"],
-            False,
-            [],
-            "",
+                {"properties": {"a": {"b": {"type": "array", "properties": {}}}}},
+                3,
+                3,
+                ["a", "b", "properties"],
+                False,
+                [],
+                "",
         ),
         (
-            {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
-            2,
-            3,
-            ["a", "b", "c"],
-            True,
-            ["Max metadata depth exceeded."],
-            "Metadata depth exceeds maximum allowed depth of 2 at path ['a', 'b', 'c']",
+                {"properties": {"a": {"b": {"c": {"type": "bool"}}}}},
+                2,
+                3,
+                ["a", "b", "c"],
+                True,
+                ["Max metadata depth exceeded."],
+                "Metadata depth exceeds maximum allowed depth of 2 at path ['a', 'b', 'c']",
         ),
         ({"properties": {"a": {"b": {"c": {"type": "string"}}}}}, 3, 3, ["a", "b", "c"], False, [], ""),
         (
-            {"properties": {"a": {"b": {"type": "invalid_type"}}}},
-            3,
-            2,
-            ["a", "b"],
-            True,
-            ["Properties value type error"],
-            "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
+                {"properties": {"a": {"b": {"type": "invalid_type"}}}},
+                3,
+                2,
+                ["a", "b"],
+                True,
+                ["Properties value type error"],
+                "Properties 'type' value not in ['number', 'array', 'bool', 'string', 'object']",
         ),
         (
-            {"properties": {"a": {"b": {"c": {"type": "object", "unique_key": "yes"}}}}},
-            3,
-            3,
-            ["a", "b", "c"],
-            False,
-            [],
-            "",
+                {"properties": {"a": {"b": {"c": {"type": "object", "unique_key": "yes"}}}}},
+                3,
+                3,
+                ["a", "b", "c"],
+                False,
+                [],
+                "",
         ),
     ],
 )
 def test_validate_properties(
-    mocker: MockerFixture,
-    metadata: Dict[str, Any],
-    limit: int,
-    expected_depth: int,
-    expected_path: List[str],
-    should_raise: bool,
-    expected_errors: List[str],
-    expected_err_msg: str,
+        mocker: MockerFixture,
+        metadata: Dict[str, Any],
+        limit: int,
+        expected_depth: int,
+        expected_path: List[str],
+        should_raise: bool,
+        expected_errors: List[str],
+        expected_err_msg: str,
 ) -> None:
     """Tests _validate_properties() function in InputManager."""
     input_manager = InputManager()
@@ -4224,64 +4256,64 @@ def test_validate_properties(
     "key_path,value,error_title,error_msg,should_raise",
     [
         (
-            ["some_key"],
-            {"default": "not_a_number", "minimum": 3, "maximum": 7},
-            "Invalid metadata default number value.",
-            "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>.",
-            True,
+                ["some_key"],
+                {"default": "not_a_number", "minimum": 3, "maximum": 7},
+                "Invalid metadata default number value.",
+                "Invalid 'default' for '['some_key']': Expected a number but got <class 'str'>.",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": 5, "minimum": "not_a_number", "maximum": 7},
-            "Invalid metadata number properties minimum.",
-            "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>.",
-            True,
+                ["some_key"],
+                {"default": 5, "minimum": "not_a_number", "maximum": 7},
+                "Invalid metadata number properties minimum.",
+                "Invalid 'minimum' for '['some_key']': Expected a number but got <class 'str'>.",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": 5, "minimum": 3, "maximum": "not_a_number"},
-            "Invalid metadata number properties maximum.",
-            "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>.",
-            True,
+                ["some_key"],
+                {"default": 5, "minimum": 3, "maximum": "not_a_number"},
+                "Invalid metadata number properties maximum.",
+                "Invalid 'maximum' for '['some_key']': Expected a number but got <class 'str'>.",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": 2, "minimum": 3, "maximum": 7},
-            "Invalid metadata default.",
-            "Invalid 'default' for '['some_key']': 'default' 2 is less than 'minimum' 3",
-            True,
+                ["some_key"],
+                {"default": 2, "minimum": 3, "maximum": 7},
+                "Invalid metadata default.",
+                "Invalid 'default' for '['some_key']': 'default' 2 is less than 'minimum' 3",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": 8, "minimum": 3, "maximum": 7},
-            "Invalid metadata default.",
-            "Invalid 'default' for '['some_key']': 'default' 8 is greater than 'maximum' 7",
-            True,
+                ["some_key"],
+                {"default": 8, "minimum": 3, "maximum": 7},
+                "Invalid metadata default.",
+                "Invalid 'default' for '['some_key']': 'default' 8 is greater than 'maximum' 7",
+                True,
         ),
         (
-            ["some_key"],
-            {"minimum": 5, "maximum": 3},
-            "Invalid range of acceptable numbers.",
-            "Invalid 'range' for key '['some_key']': 'minimum' value 5 is greater than 'maximum' value 3",
-            True,
+                ["some_key"],
+                {"minimum": 5, "maximum": 3},
+                "Invalid range of acceptable numbers.",
+                "Invalid 'range' for key '['some_key']': 'minimum' value 5 is greater than 'maximum' value 3",
+                True,
         ),
         (["some_key"], {"default": 5, "minimum": 3, "maximum": 8}, "", "", False),
         (
-            ["some_key"],
-            {"default": None, "minimum": 3, "maximum": 8},
-            "Invalid metadata default number value.",
-            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'.",
-            True,
+                ["some_key"],
+                {"default": None, "minimum": 3, "maximum": 8},
+                "Invalid metadata default number value.",
+                "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'.",
+                True,
         ),
     ],
 )
 def test_metadata_number_validator(
-    mocker: MockerFixture,
-    key_path: List[str],
-    value: Dict[str, Any],
-    error_title: str,
-    error_msg: str,
-    should_raise: bool,
+        mocker: MockerFixture,
+        key_path: List[str],
+        value: Dict[str, Any],
+        error_title: str,
+        error_msg: str,
+        should_raise: bool,
 ) -> None:
     """Tests metadata_number_validator() method in InputManager"""
     input_manager = InputManager()
@@ -4303,51 +4335,51 @@ def test_metadata_number_validator(
     "key_path,value,error_title,error_msg,should_raise",
     [
         (
-            ["some_key"],
-            {"default": 123, "pattern": None},
-            "Invalid metadata default string value.",
-            "Invalid 'default' for '['some_key']': Expected a string but got <class 'int'>",
-            True,
+                ["some_key"],
+                {"default": 123, "pattern": None},
+                "Invalid metadata default string value.",
+                "Invalid 'default' for '['some_key']': Expected a string but got <class 'int'>",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": "abcdef", "pattern": r"^[0-9]+$"},
-            "Invalid metadata default string value.",
-            "Invalid 'default' for '['some_key']': 'default' value 'abcdef' does not match pattern ^[0-9]+$",
-            True,
+                ["some_key"],
+                {"default": "abcdef", "pattern": r"^[0-9]+$"},
+                "Invalid metadata default string value.",
+                "Invalid 'default' for '['some_key']': 'default' value 'abcdef' does not match pattern ^[0-9]+$",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": None},
-            "Invalid metadata default string value.",
-            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
-            True,
+                ["some_key"],
+                {"default": None},
+                "Invalid metadata default string value.",
+                "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": "abcdef", "pattern": 6789},
-            "Invalid metadata string properties pattern.",
-            "Invalid 'pattern' for '['some_key']': Expected a string but got <class 'int'>",
-            True,
+                ["some_key"],
+                {"default": "abcdef", "pattern": 6789},
+                "Invalid metadata string properties pattern.",
+                "Invalid 'pattern' for '['some_key']': Expected a string but got <class 'int'>",
+                True,
         ),
         (["some_key"], {"default": "12345", "pattern": r"^[0-9]+$"}, "", "", False),
         (["some_key"], {"default": "", "pattern": r"^[0-9]+$"}, "", "", False),
         (
-            ["some_key"],
-            {"default": "abcdef", "pattern": r"["},
-            "Invalid metadata string properties pattern.",
-            "Invalid 'pattern' for '['some_key']': 'pattern' value '[' is not a valid regex pattern.",
-            True,
+                ["some_key"],
+                {"default": "abcdef", "pattern": r"["},
+                "Invalid metadata string properties pattern.",
+                "Invalid 'pattern' for '['some_key']': 'pattern' value '[' is not a valid regex pattern.",
+                True,
         ),
     ],
 )
 def test_metadata_string_validator(
-    mocker: MockerFixture,
-    key_path: List[str],
-    value: Dict[str, Any],
-    error_title: str,
-    error_msg: str,
-    should_raise: bool,
+        mocker: MockerFixture,
+        key_path: List[str],
+        value: Dict[str, Any],
+        error_title: str,
+        error_msg: str,
+        should_raise: bool,
 ) -> None:
     """Tests _metadata_string_validator() method in InputManager"""
     input_manager = InputManager()
@@ -4371,36 +4403,36 @@ def test_metadata_string_validator(
     "key_path,value,error_title,error_msg,should_raise",
     [
         (
-            ["some_key"],
-            {"default": "not_a_bool"},
-            "Invalid metadata default bool value.",
-            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'str'>",
-            True,
+                ["some_key"],
+                {"default": "not_a_bool"},
+                "Invalid metadata default bool value.",
+                "Invalid 'default' for '['some_key']': Expected a bool but got <class 'str'>",
+                True,
         ),
         (
-            ["some_key"],
-            {"default": 1},
-            "Invalid metadata default bool value.",
-            "Invalid 'default' for '['some_key']': Expected a bool but got <class 'int'>",
-            True,
+                ["some_key"],
+                {"default": 1},
+                "Invalid metadata default bool value.",
+                "Invalid 'default' for '['some_key']': Expected a bool but got <class 'int'>",
+                True,
         ),
         (["some_key"], {"default": True}, "", "", False),
         (
-            ["some_key"],
-            {"default": None},
-            "Invalid metadata default bool value.",
-            "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
-            True,
+                ["some_key"],
+                {"default": None},
+                "Invalid metadata default bool value.",
+                "Invalid 'default' for '['some_key']': Value is not nullable and default is 'None'",
+                True,
         ),
     ],
 )
 def test_metadata_bool_validator(
-    mocker: MockerFixture,
-    key_path: List[str],
-    value: Dict[str, Any],
-    error_title: str,
-    error_msg: str,
-    should_raise: bool,
+        mocker: MockerFixture,
+        key_path: List[str],
+        value: Dict[str, Any],
+        error_title: str,
+        error_msg: str,
+        should_raise: bool,
 ) -> None:
     """Tests _metadata_bool_validator() method in InputManager"""
     input_manager = InputManager()
@@ -4424,37 +4456,37 @@ def test_metadata_bool_validator(
     "key_path,value,error_title,error_msg,should_raise",
     [
         (
-            ["some_key"],
-            {"minimum_length": 5, "maximum_length": 3},
-            "Invalid metadata array length range.",
-            "Invalid length 'range' for key '['some_key']': 'minimum_length'"
-            " value 5 is greater than 'maximum_length' value 3",
-            True,
+                ["some_key"],
+                {"minimum_length": 5, "maximum_length": 3},
+                "Invalid metadata array length range.",
+                "Invalid length 'range' for key '['some_key']': 'minimum_length'"
+                " value 5 is greater than 'maximum_length' value 3",
+                True,
         ),
         (
-            ["some_key"],
-            {"minimum_length": "five"},
-            "Invalid metadata default array minimum length.",
-            "Invalid 'minimum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
-            True,
+                ["some_key"],
+                {"minimum_length": "five"},
+                "Invalid metadata default array minimum length.",
+                "Invalid 'minimum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
+                True,
         ),
         (
-            ["some_key"],
-            {"maximum_length": "three"},
-            "Invalid metadata default array maximum length.",
-            "Invalid 'maximum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
-            True,
+                ["some_key"],
+                {"maximum_length": "three"},
+                "Invalid metadata default array maximum length.",
+                "Invalid 'maximum_length' for '['some_key']':" " Expected a number but got <class 'str'>",
+                True,
         ),
         (["some_key"], {"minimum_length": 1, "maximum_length": 5}, "", "", False),
     ],
 )
 def test_metadata_array_validator(
-    mocker: MockerFixture,
-    key_path: List[str],
-    value: Dict[str, Any],
-    error_title: str,
-    error_msg: str,
-    should_raise: bool,
+        mocker: MockerFixture,
+        key_path: List[str],
+        value: Dict[str, Any],
+        error_title: str,
+        error_msg: str,
+        should_raise: bool,
 ) -> None:
     """Tests _metadata_array_validator() method in InputManager"""
     input_manager = InputManager()
@@ -4475,7 +4507,7 @@ def test_metadata_array_validator(
 
 
 def test_metadata_object_validator(
-    mocker: MockerFixture,
+        mocker: MockerFixture,
 ) -> None:
     """Tests _metadata_object_validator() method in InputManager"""
     input_manager = InputManager()
@@ -4491,55 +4523,55 @@ def test_metadata_object_validator(
     [
         ({"id", "type"}, {"id", "name", "type"}, {"type": "num", "id": 123, "name": "example"}, ["root"], False, ""),
         (
-            {"type"},
-            {"type"},
-            {"type": "num", "id": 123},
-            ["root"],
-            True,
-            "Invalid keys ['id'] in num for ['root']. Valid keys are ['type'].",
+                {"type"},
+                {"type"},
+                {"type": "num", "id": 123},
+                ["root"],
+                True,
+                "Invalid keys ['id'] in num for ['root']. Valid keys are ['type'].",
         ),
         (
-            {"id"},
-            set(),
-            {"type": "num", "name": "example"},
-            ["root"],
-            True,
-            "Missing required keys ['id'] for ['root']. Required keys are ['id'].",
+                {"id"},
+                set(),
+                {"type": "num", "name": "example"},
+                ["root"],
+                True,
+                "Missing required keys ['id'] for ['root']. Required keys are ['id'].",
         ),
         (
-            {"id", "type"},
-            {"id", "type"},
-            {"type": "num", "id": 123, "extra": "data"},
-            ["root", "child"],
-            True,
-            "Invalid keys ['extra'] in num for ['root', 'child']. Valid keys are ['id', 'type'].",
+                {"id", "type"},
+                {"id", "type"},
+                {"type": "num", "id": 123, "extra": "data"},
+                ["root", "child"],
+                True,
+                "Invalid keys ['extra'] in num for ['root', 'child']. Valid keys are ['id', 'type'].",
         ),
         (
-            {"id", "type"},
-            {"id", "type"},
-            {"name": "example"},
-            ["root"],
-            True,
-            "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type'].",
+                {"id", "type"},
+                {"id", "type"},
+                {"name": "example"},
+                ["root"],
+                True,
+                "Missing required keys ['id', 'type'] for ['root']. Required keys are ['id', 'type'].",
         ),
         (
-            {"type"},
-            {"type"},
-            {"type": "object"},
-            ["root"],
-            True,
-            "No unique keys for ['root']. At least one unique key is expected.",
+                {"type"},
+                {"type"},
+                {"type": "object"},
+                ["root"],
+                True,
+                "No unique keys for ['root']. At least one unique key is expected.",
         ),
     ],
 )
 def test_validate_metadata_properties_keys(
-    mocker: MockerFixture,
-    required_keys: set[str],
-    valid_keys: set[str],
-    properties: dict[str, Any],
-    path: list[str],
-    should_raise: bool,
-    expected_message: str,
+        mocker: MockerFixture,
+        required_keys: set[str],
+        valid_keys: set[str],
+        properties: dict[str, Any],
+        path: list[str],
+        should_raise: bool,
+        expected_message: str,
 ) -> None:
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
@@ -4754,11 +4786,11 @@ def test_extract_input_data_by_key_list_no_error(mock_input_manager: InputManage
     ],
 )
 def test_extract_input_data_by_key_list_key_error(
-    var_path: List[str | int],
-    var_name: str,
-    called_during_initialization: bool,
-    mock_input_manager: InputManager,
-    mocker: MockerFixture,
+        var_path: List[str | int],
+        var_name: str,
+        called_during_initialization: bool,
+        mock_input_manager: InputManager,
+        mocker: MockerFixture,
 ) -> None:
     dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
     dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
