@@ -2843,6 +2843,7 @@ def mock_cow_args() -> Dict[str, Any]:
         "wood_l": 0,
         "wood_m": 0,
         "wood_n": 0,
+        "is_pregnant": False  # TODO remove if not necessary to fix tests
     }
     return cow_args
 
@@ -2931,7 +2932,8 @@ def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow
         (25.0, 0.24, 0.0035),
     ],
 )
-def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> None:
+def test_set_lactation_curve_params(wood_l: float, wood_m: float, wood_n: float,
+                                    mock_cow_args: Dict[str, Any], mocker: MockerFixture) -> None:
     """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
 
     with patch("numpy.random.normal") as mock_normal:
@@ -2951,6 +2953,9 @@ def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> No
             "wood_n_std": [[0.9, 1.0], [1.1, 1.2]],
         }
 
+        # TODO figure out how to mock this method! It's still trying to call the real method, not  the mocked version
+        mocker.patch.object(mock_cow, "determine_param_value", new_callable=MagicMock, return_value=1.0,)
+        mocker.patch('RUFAS.routines.animal.life_cycle.cow.Cow.determine_param_value', return_value=1.0)
         mock_cow.set_lactation_curve_params()
 
         assert mock_cow.wood_l == wood_l
@@ -2966,7 +2971,8 @@ def test_set_lactation_curve_params(wood_l, wood_m, wood_n, mock_cow_args) -> No
     ],
 )
 def test_calculate_daily_milk_produced(
-    lactation_curve, wood_l, wood_m, wood_n, days_in_milk, expected_milk, mock_cow_args
+    lactation_curve: str, wood_l: float, wood_m: float, wood_n: float, days_in_milk: int, expected_milk: float,
+    mock_cow_args: Dict[str, Any]
 ) -> None:
     """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
     AnimalBase.config = MagicMock()
