@@ -1681,9 +1681,7 @@ class InputManager:
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
             data = self._set_nested_value({}, element_hierarchy[1:], input_data)
-            print(data)
             element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
-            print(element_hierarchy)
             metadata_properties = reduce(
                 lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
             )

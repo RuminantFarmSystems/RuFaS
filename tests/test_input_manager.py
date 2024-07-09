@@ -5007,7 +5007,7 @@ def test_validate_data(
         input_manager,
         "_validate_input_by_type",
         side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
-                    elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None
+            elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None
     )
 
     validated_data = input_manager._validate_data(
@@ -5016,3 +5016,41 @@ def test_validate_data(
 
     assert validated_data == expected_validated_data
     assert mock_validate_input_by_type.call_count == 2
+
+
+@pytest.fixture
+def mock_pool_for_add_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+    return {
+        "module1": {
+            "integer_var": 5,
+            "float_var": 0.5,
+            "string_var": "dummyvalue1",
+            "boolean_var": True,
+            "integer_array_var": [1, 2, 3],
+            "float_array_var": [0.1, 0.2, 3.14159],
+            "string_array_var": ["1", "2", "3", "4", "5"],
+            "boolean_array_var": [True, False],
+            "submodule1": {"nested_var": "dummyvalue2"},
+        },
+        "module2": {
+            "submodule1": {
+                "nested_module1": {
+                    "nested_var1": "dummyvalue3",
+                    "nested_var2": "dummyvalue4",
+                },
+            },
+        },
+    }
+
+
+@pytest.mark.parametrize("variable_name,validated_data,info_map", [
+    ("module1", {"test": "random"}, {})
+])
+def test_add_to_pool(variable_name: str, validated_data: dict, info_map: dict, mocker: MockerFixture,
+                     mock_pool_for_add_pool: Dict[str, Any]) -> None:
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, '_InputManager__pool', mock_pool_for_add_pool)
+    mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+    input_manager._add_to_pool(variable_name, validated_data, info_map)
+    mock_add_warning.assert_called_once()
+    assert input_manager.pool["module1"] == {"test": "random"}
