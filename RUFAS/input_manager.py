@@ -470,7 +470,7 @@ class InputManager:
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(
-        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+            self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -521,14 +521,14 @@ class InputManager:
         )
 
     def _validate_input_by_type(
-        self,
-        variable_properties: Dict[str, Any],
-        variable_path: List[str | int],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            self,
+            variable_properties: Dict[str, Any],
+            variable_path: List[str | int],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -610,11 +610,11 @@ class InputManager:
         return False
 
     def _validate_array_container_properties(
-        self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Any,
-        properties_blob_key: str,
+            self,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Any,
+            properties_blob_key: str,
     ) -> bool:
         """
         Validates the container properties of an array input data element.
@@ -679,14 +679,14 @@ class InputManager:
         return True
 
     def _array_type_validator(
-        self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            self,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type array.
@@ -722,7 +722,7 @@ class InputManager:
             return True
 
         if not self._validate_array_container_properties(
-            variable_path, variable_properties, array_value, properties_blob_key
+                variable_path, variable_properties, array_value, properties_blob_key
         ):
             return False
 
@@ -743,14 +743,14 @@ class InputManager:
         return is_whole_array_acceptable
 
     def _object_type_validator(
-        self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            self,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type object.
@@ -830,14 +830,14 @@ class InputManager:
         return is_whole_object_acceptable
 
     def _number_type_validator(
-        self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            self,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """Validates an input data number element."""
         input_data_value = self._extract_input_data_by_key_list(
@@ -891,14 +891,14 @@ class InputManager:
         return True
 
     def _string_type_validator(
-        self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            self,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """Validates an input data string element."""
         input_data_value = self._extract_input_data_by_key_list(
@@ -964,14 +964,14 @@ class InputManager:
         return True
 
     def _bool_type_validator(
-        self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            self,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """Validates an input data bool element."""
         input_data_value = self._extract_input_data_by_key_list(
@@ -1000,7 +1000,7 @@ class InputManager:
         return True
 
     def _extract_value_by_key_list(
-        self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]
+            self, input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]
     ) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
@@ -1067,11 +1067,11 @@ class InputManager:
         return input_data
 
     def _extract_input_data_by_key_list(
-        self,
-        input_data: List[Any] | Dict[str, Any],
-        variable_path: Sequence[str | int],
-        variable_properties: Dict[str, Any],
-        called_during_initialization: bool,
+            self,
+            input_data: List[Any] | Dict[str, Any],
+            variable_path: Sequence[str | int],
+            variable_properties: Dict[str, Any],
+            called_during_initialization: bool,
     ) -> Any:
         """
         Extracts a value from the input data based on a specified path and handles missing data by calling
@@ -1150,11 +1150,11 @@ class InputManager:
         return ".".join(formatted_path_elems)
 
     def _fix_data(
-        self,
-        variable_properties: Dict[str, Any],
-        element_hierarchy: List[Union[str, int]],
-        input_data: Dict[str, Any],
-        properties_blob_key: str,
+            self,
+            variable_properties: Dict[str, Any],
+            element_hierarchy: List[Union[str, int]],
+            input_data: Dict[str, Any],
+            properties_blob_key: str,
     ) -> bool:
         """
         Attempt to fix the invalid data.
@@ -1521,7 +1521,7 @@ class InputManager:
         return True
 
     def _set_nested_value(
-        self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any
+            self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any
     ) -> Dict[str, Any]:
         """
         Sets a given value within a nested dictionary structure at a specified hierarchical level and returns the
@@ -1580,11 +1580,11 @@ class InputManager:
         return nested_dict
 
     def _add_variable_to_pool(  # noqa: C901
-        self,
-        variable_name: str,
-        input_data: Dict[str, Any],
-        properties_blob_key: str,
-        eager_termination: bool,
+            self,
+            variable_name: str,
+            input_data: Dict[str, Any],
+            properties_blob_key: str,
+            eager_termination: bool,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1627,33 +1627,132 @@ class InputManager:
         validated_data = {}
         elements_counter = ElementsCounter()
 
+        element_hierarchy, data, metadata_properties = self._prepare_data(variable_name, input_data,
+                                                                          properties_blob_key)
+
+        # Prepare data
+        # element_hierarchy = variable_name.split(".")
+        # if len(element_hierarchy) > 1:
+        #     data = self._set_nested_value({}, element_hierarchy[1:], input_data)
+        #
+        #     element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
+        #     metadata_properties = reduce(
+        #         lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
+        #     )
+        #
+        # else:
+        #     data = input_data
+        #     metadata_properties = self.__metadata["properties"][properties_blob_key]
+
+        self._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+        # Check modifibility
+        # if (
+        #     not (
+        #         is_modifiable_during_runtime := self._is_modifiable_during_runtime(
+        #             variable_name=variable_name, variable_properties=metadata_properties
+        #         )
+        #     )
+        #     and eager_termination
+        # ):
+        #     om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+        #     raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
+        # elif not is_modifiable_during_runtime:
+        #     om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+
+        validated_data = self._validate_data(data, metadata_properties, eager_termination, properties_blob_key,
+                                             elements_counter)
+        # validate data
+        # self._check_modifiability(variable_name, metadata_properties, eager_termination)
+        # variable_properties_to_ignore = ["type", "description", "modifiability"]
+        # for metadata_property in metadata_properties.keys():
+        #     if metadata_property in variable_properties_to_ignore:
+        #         continue
+        #     variable_properties = metadata_properties[metadata_property]
+        #     is_element_acceptable = self._validate_input_by_type(
+        #         variable_path=[metadata_property],
+        #         variable_properties=variable_properties,
+        #         input_data=data,
+        #         eager_termination=eager_termination,
+        #         properties_blob_key=properties_blob_key,
+        #         elements_counter=elements_counter,
+        #         called_during_initialization=False,
+        #     )
+        #
+        #     if is_element_acceptable:
+        #         validated_data[metadata_property] = data[metadata_property]
+
+        if validated_data:
+            self._add_to_pool(variable_name, validated_data, info_map)
+            elements_counter += elements_counter
+        # Add to pool
+        # if validated_data:
+        #     if element_hierarchy[0] in self.__pool.keys():
+        #         om.add_warning(
+        #             "Overwriting existing variable",
+        #             f"Variable {variable_name} already exists in " f"InputManager pool, overwriting the old value.",
+        #             info_map,
+        #         )
+        #
+        #     self.__pool[variable_name] = validated_data
+        #     # End
+        #     elements_counter += elements_counter
+
+        # Wrapping up
+        if elements_counter.invalid_elements > 0:
+            om.add_error(
+                "Invalid variable",
+                f"Variable {variable_name} has invalid components. Only successfully validated components are "
+                f"added to InputManager pool during runtime.",
+                info_map,
+            )
+            if eager_termination:
+                raise ValueError(
+                    f"Variable {variable_name} has invalid components. Only successfully validated components are added"
+                    f" to InputManager pool during runtime."
+                )
+            return False
+
+        return True
+
+    def _prepare_data(self, variable_name, input_data, properties_blob_key):
+        """
+        Prepare data and metadata properties for validation.
+        """
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
             data = self._set_nested_value({}, element_hierarchy[1:], input_data)
-
             element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
             metadata_properties = reduce(
                 lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
             )
-
         else:
             data = input_data
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
-        if (
-            not (
-                is_modifiable_during_runtime := self._is_modifiable_during_runtime(
-                    variable_name=variable_name, variable_properties=metadata_properties
-                )
-            )
-            and eager_termination
-        ):
+        return element_hierarchy, data, metadata_properties
+
+    def _check_modifiability(self, variable_name: str, metadata_properties: dict, eager_termination: bool,
+                             info_map: dict) -> None:
+        """
+        Check if the variable is modifiable during runtime.
+        """
+        is_modifiable_during_runtime = self._is_modifiable_during_runtime(
+            variable_name=variable_name, variable_properties=metadata_properties
+        )
+        if not is_modifiable_during_runtime and eager_termination:
             om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
         elif not is_modifiable_during_runtime:
             om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
 
+    def _validate_data(self, data: dict, metadata_properties: dict, eager_termination: bool, properties_blob_key: str,
+                       elements_counter: 'ElementsCounter') -> dict:
+        """
+        Validate input data based on metadata properties.
+        """
+        validated_data = {}
         variable_properties_to_ignore = ["type", "description", "modifiability"]
+
         for metadata_property in metadata_properties.keys():
             if metadata_property in variable_properties_to_ignore:
                 continue
@@ -1671,39 +1770,26 @@ class InputManager:
             if is_element_acceptable:
                 validated_data[metadata_property] = data[metadata_property]
 
-        if validated_data:
-            if element_hierarchy[0] in self.__pool.keys():
-                om.add_warning(
-                    "Overwriting existing variable",
-                    f"Variable {variable_name} already exists in " f"InputManager pool, overwriting the old value.",
-                    info_map,
-                )
+        return validated_data
 
-            self.__pool[variable_name] = validated_data
-            elements_counter += elements_counter
-
-        if elements_counter.invalid_elements > 0:
-            om.add_error(
-                "Invalid variable",
-                f"Variable {variable_name} has invalid components. Only successfully validated components are "
-                f"added to InputManager pool during runtime.",
+    def _add_to_pool(self, variable_name: str, validated_data: dict, info_map: dict) -> None:
+        """
+        Add validated data to the pool.
+        """
+        if variable_name in self.__pool.keys():
+            om.add_warning(
+                "Overwriting existing variable",
+                f"Variable {variable_name} already exists in InputManager pool, overwriting the old value.",
                 info_map,
             )
-            if eager_termination:
-                raise ValueError(
-                    f"Variable {variable_name} has invalid components. Only successfully validated components are added"
-                    f" to InputManager pool during runtime."
-                )
-            return False
-
-        return True
+        self.__pool[variable_name] = validated_data
 
     def add_dict_variable_to_pool(
-        self,
-        variable_name: str,
-        data: Dict[str, Any],
-        properties_blob_key: str,
-        eager_termination: bool,
+            self,
+            variable_name: str,
+            data: Dict[str, Any],
+            properties_blob_key: str,
+            eager_termination: bool,
     ) -> bool:
         """
         Adds a dictionary variable to the InputManager's pool after validating it against metadata.
@@ -1765,11 +1851,11 @@ class InputManager:
             return False
 
     def add_tabular_variable_to_pool(
-        self,
-        variable_name: str,
-        data: Dict[str, List[Any]] | List[Any],
-        properties_blob_key: str,
-        eager_termination: bool,
+            self,
+            variable_name: str,
+            data: Dict[str, List[Any]] | List[Any],
+            properties_blob_key: str,
+            eager_termination: bool,
     ) -> bool:
         """
         Adds a tabular variable to the InputManager's pool after validating it against metadata.
@@ -2166,11 +2252,11 @@ class InputManager:
         )
 
     def _validate_metadata_properties_keys(
-        self,
-        required_properties_keys: set[str],
-        optional_properties_keys: set[str],
-        properties: dict[str, Any],
-        path: list[str],
+            self,
+            required_properties_keys: set[str],
+            optional_properties_keys: set[str],
+            properties: dict[str, Any],
+            path: list[str],
     ) -> None:
         """Validates that keys in the metadata properties sections."""
         info_map = {
@@ -2252,7 +2338,7 @@ class InputManager:
             raise e
 
     def _parse_metadata_properties(
-        self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
+            self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
     ) -> List[Dict[str, Any]]:
         """
         Recursively traverse through the metadata properties dictionary
@@ -2333,7 +2419,7 @@ class InputManager:
         """
         properties_index = name.find("_properties") + len("_properties")
         properties_group = name[:properties_index]
-        name = name[properties_index + 1 :]
+        name = name[properties_index + 1:]
         return {
             "properties_group": properties_group,
             "name": name,
@@ -2346,7 +2432,7 @@ class InputManager:
         }
 
     def compare_metadata_properties(
-        self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
+            self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
     ) -> None:
         """
         Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
