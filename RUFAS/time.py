@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List
+from typing import Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
@@ -29,83 +29,6 @@ class Time:
         Advances the time in the simulation by 1 day.
         """
         self.current_date += datetime.timedelta(days=1)
-
-    @property
-    def years(self) -> List[List[int]]:
-        """
-        Returns a 2D array that consists all simulation days.
-
-        Notes
-        -----
-        This method will be removed once the Weather class refactor is completed.
-        """
-        years: list[list[int]] = []
-
-        for year in range(self.start_year_int, self.end_year_int + 1):
-            year_length = (
-                GeneralConstants.YEAR_LENGTH if not Utility.is_leap_year(year) else GeneralConstants.LEAP_YEAR_LENGTH
-            )
-            if year == self.start_year_int == self.end_year_int:
-                days = [None for _ in range(1, self.start_day)]
-                days += [_ for _ in range(self.start_day, self.end_day + 1)]
-            elif year == self.start_year_int:
-                days = [None for _ in range(1, self.start_day)]
-                days += (_ for _ in range(self.start_day, year_length + 1))
-            elif year == self.end_year_int:
-                days = [_ for _ in range(1, self.end_day + 1)]
-            else:
-                days = [_ for _ in range(1, year_length + 1)]
-
-            years.append(days)
-
-        return years
-
-    @property
-    def start_year_int(self) -> int:
-        """
-        Returns the start calendar year in integer.
-
-        Notes
-        -----
-        This method will be removed once the Weather class refactor is completed.
-        """
-        return self.start_date.year
-
-    @property
-    def start_day(self) -> int:
-        """
-        Returns the start Julian day in integer.
-
-        Notes
-        -----
-        This method will be removed once the Weather class refactor is completed.
-        """
-        start_full_date: list[str] = self.config_data["start_date"].split(":")
-        return int(start_full_date[1])
-
-    @property
-    def end_year_int(self) -> int:
-        """
-        Returns the end calendar year in integer.
-
-        Notes
-        -----
-        This method will be removed once the Weather class refactor is completed.
-        """
-        end_full_date: list[str] = self.config_data["end_date"].split(":")
-        return int(end_full_date[0])
-
-    @property
-    def end_day(self) -> int:
-        """
-        Returns the end Julian day in integer.
-
-        Notes
-        -----
-        This method will be removed once the Weather class refactor is completed.
-        """
-        end_full_date: list[str] = self.config_data["end_date"].split(":")
-        return int(end_full_date[1])
 
     @property
     def year_start_day(self) -> int:
@@ -197,6 +120,27 @@ class Time:
         """
         actual_date = self.start_date + datetime.timedelta(days=simulation_day - 1)
         return actual_date
+
+    @staticmethod
+    def convert_year_jday_to_date(year: int, day: int) -> datetime:
+        """
+        Converts the year and its day of the year to a datetime object
+
+        Parameters
+        ----------
+        year: int
+            Year of the date.
+        day: int
+            Number of days into the year.
+
+        Returns
+        -------
+        datetime
+            The date time object from the provided inputs
+
+        """
+        first_day_of_year = datetime.datetime(year, 1, 1)
+        return first_day_of_year + datetime.timedelta(days=day - 1)
 
     def __str__(self) -> str:
         return (
