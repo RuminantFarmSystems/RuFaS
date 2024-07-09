@@ -190,3 +190,16 @@ def test_str(mock_config: Dict[str, Any], mocker: MockerFixture) -> None:
         time.advance()
 
     assert str(time) == f"Year: {2}, Day: {1}. Simulation Day: {364}"
+
+
+@pytest.mark.parametrize("year,jday,expected", [(2001, 3, datetime.datetime(2001, 1, 3)),
+                                                (2005, 350, datetime.datetime(2005, 12, 16)),
+                                                (2020, 60, datetime.datetime(2020, 2, 29))])
+def test_convert_year_jday_to_date(year: int, jday: int, expected: datetime, mocker: MockerFixture,
+                                   mock_config: Dict[str, Any]) -> None:
+    """Unit test for convert_year_jday_to_date"""
+    mocker.patch("RUFAS.input_manager.InputManager.get_data", return_value=mock_config)
+    time = Time()
+
+    actual = time.convert_year_jday_to_date(year, jday)
+    assert expected == actual
