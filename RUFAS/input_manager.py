@@ -2355,6 +2355,7 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self.compare_metadata_properties.__name__,
         }
+        om.create_directory(output_directory)
         self._load_metadata(properties_file_path)
         properties1 = deepcopy(self.meta_data)
         self.meta_data = {}
