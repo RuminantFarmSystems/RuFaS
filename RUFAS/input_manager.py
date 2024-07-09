@@ -1579,7 +1579,7 @@ class InputManager:
         current_dict_level[element_hierarchy[-1]] = value
         return nested_dict
 
-    def _add_variable_to_pool(  # noqa: C901
+    def _add_variable_to_pool(
         self,
         variable_name: str,
         input_data: Dict[str, Any],
