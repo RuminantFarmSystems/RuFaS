@@ -1713,9 +1713,9 @@ def test_get_metadata_raises_exception(
 
         error_message = key_error.value.__str__().strip("'")
         assert (
-                error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
-                                 f'"{expected_error_parent_address}" does not have attribute '
-                                 f'"{expected_error_invalid_key}".'
+            error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
+                             f'"{expected_error_parent_address}" does not have attribute '
+                             f'"{expected_error_invalid_key}".'
         )
         assert add_error.call_count == expected_warning_call_count
 
