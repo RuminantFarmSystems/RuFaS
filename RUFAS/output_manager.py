@@ -1026,6 +1026,12 @@ class OutputManager(object):
         filter_by_exclusion : bool
             Whether keys in dictionaries should be filtered by exclusion.
 
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]
+            Dictionary containing data from the filtered pool of data, with data from within dictionaries unpacked and
+            separated.
+
         """
         info_map = {
             "class": self.__class__.__name__,
