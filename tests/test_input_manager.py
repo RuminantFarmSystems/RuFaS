@@ -2005,7 +2005,7 @@ def test_add_variable_to_pool_valid(
     patch_validate = mocker.patch("RUFAS.input_manager.InputManager._validate_data",
                                   side_effect=side_effect_validate_data)
     patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data",
-                                                  side_effect=side_effect_prepare_data)
+                                 side_effect=side_effect_prepare_data)
     expected_add_warning_count = 1 if starting_im_pool else 0
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
     patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
