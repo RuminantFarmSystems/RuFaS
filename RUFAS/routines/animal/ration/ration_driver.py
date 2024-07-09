@@ -122,6 +122,37 @@ class RationManager:
         available_feeds: AvailableFeedsTypedDict,
         info_map: Dict[str, Any],
     ) -> None:
+        """
+        Handle and log failed constraints during the ration optimization process.
+
+        This method identifies and logs the constraints that failed during the optimization
+        process for a specific pen of animals. It gathers relevant information about the
+        failed attempt, including the simulation day, the number of reattempts, the failed
+        constraints, the attempted ration, and the pen's nutrient requirements. This
+        information is then added to the output manager via a variable.
+
+        Parameters:
+        -----------
+        num_reattempts : int
+            The number of reattempts made so far.
+        solution : scipy.optimize.OptimizeResult
+            The result of the optimization process.
+        ration_optimizer : RationOptimizer
+            A RationOptimizer object.
+        ration_config : RationConfig
+            A RationConfig object.
+        pen :
+            The pen of animals for which the failed constraints are being handled.
+        available_feeds : AvailableFeedsTypedDict
+            A dictionary of available feeds for ration formulation.
+        info_map : Dict[str, Any]
+            A dictionary containing additional information to be logged with the failed
+            constraints summary.
+
+        Returns:
+        --------
+        None
+        """
         constraints_failed_list = []
         if pen.animal_combination == AnimalCombination.LAC_COW:
             failed_constraints = ration_optimizer.find_failed_constraints(
