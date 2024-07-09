@@ -4997,6 +4997,3 @@ def test_validate_data(
 
     assert validated_data == expected_validated_data
     assert mock_validate_input_by_type.call_count == 2
-
-
-
