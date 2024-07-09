@@ -17,12 +17,12 @@ class Weather:
 
     Parameters
     ----------
-    weather_file : dict[str:List[Any]]
+    weather_file : dict[str, List[Any]]
         The weather dictionary read from the provided weather file.
 
     Attributes
     ----------
-    weather_data : dict[datetime:CurrentDayCondition]
+    weather_data : dict[datetime, CurrentDayCondition]
         A dictionary that map a date to the corresponding CurrentDayCondition.
     mean_annual_temperature : int
         Mean of mean daily temperatures over all the weather data used by the simulation (°C).
@@ -290,13 +290,14 @@ class Weather:
         """
         years_list = weather_file["year"]
         days_list = weather_file["jday"]
-        current_date = time.start_date
+        date_range = (time.end_date - time.start_date).days + 1
 
-        while current_date != time.end_date:
-            current_date_year = current_date.timetuple().tm_year
+        for i in range(date_range):
+            current_date = time.start_date + datetime.timedelta(days=i)
+            current_date_year = current_date.year
             current_date_jday = current_date.timetuple().tm_yday
+
             if (current_date_jday in days_list) and (current_date_year in years_list):
-                current_date += datetime.timedelta(days=1)
                 continue
             else:
                 info_map = {
