@@ -198,9 +198,7 @@ class CropManagement:
         self.data.accumulated_heat_units = self.data.accumulated_heat_units * (1 - fraction_cut)
 
         self.data.dry_matter_yield_collected = self.data.cut_biomass * collected_fraction
-        self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (
-            self.data.dry_matter_percentage / 100
-        )
+        self.data.wet_yield_collected = self.data.dry_matter_yield_collected / (self.data.dry_matter_percentage / 100)
 
         self.data.yield_residue = self.data.cut_biomass * (1 - collected_fraction)
 
