@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, List
+from typing import Dict
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
