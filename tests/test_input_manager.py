@@ -4816,16 +4816,8 @@ def mock_metadata_prepare_data():
     return {
         "properties": {
             "example_blob_key": {
-                "root": {
-                    "nested_property": {
-                        "type": "string",
-                        "description": "An example property"
-                    }
-                },
-                "example_property": {
-                    "type": "string",
-                    "description": "An example property"
-                }
+                "root": {"nested_property": {"type": "string", "description": "An example property"}},
+                "example_property": {"type": "string", "description": "An example property"},
             }
         }
     }
@@ -4841,25 +4833,31 @@ def mock_metadata_prepare_data():
             "example_blob_key",
             ["example_property"],
             {"key": "value"},
-            {'example_property': {'description': 'An example property', 'type': 'string'},
-             'root': {'nested_property': {'description': 'An example property',
-                                          'type': 'string'}}}
+            {
+                "example_property": {"description": "An example property", "type": "string"},
+                "root": {"nested_property": {"description": "An example property", "type": "string"}},
+            },
         ),
         (
             "example_property.root.nested_property",
             {"nested_key": "nested_value"},
             "example_blob_key",
             ["example_property", "root", "nested_property"],
-            {'root': {'nested_property': {'nested_key': 'nested_value'}}},
-            {
-                "type": "string",
-                "description": "An example property"
-            }
+            {"root": {"nested_property": {"nested_key": "nested_value"}}},
+            {"type": "string", "description": "An example property"},
         ),
-    ]
+    ],
 )
-def test_prepare_data(mock_metadata_prepare_data, variable_name, input_data, properties_blob_key,
-                      expected_element_hierarchy, expected_data, expected_metadata_properties, mocker) -> None:
+def test_prepare_data(
+    mock_metadata_prepare_data,
+    variable_name,
+    input_data,
+    properties_blob_key,
+    expected_element_hierarchy,
+    expected_data,
+    expected_metadata_properties,
+    mocker,
+) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
@@ -4873,19 +4871,26 @@ def test_prepare_data(mock_metadata_prepare_data, variable_name, input_data, pro
     assert metadata_properties == expected_metadata_properties
 
 
-@pytest.mark.parametrize("variable_name,metadata_properties,eager_termination,info_map,modifiable",
-                         [
-                             ("test", {"test": 12}, False, {"a": "aa"}, True)
-                         ])
-def test_check_modifiability_valid(variable_name: str, metadata_properties: dict, eager_termination: bool,
-                                   info_map: dict, modifiable: bool, mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
+    [("test", {"test": 12}, False, {"a": "aa"}, True)],
+)
+def test_check_modifiability_valid(
+    variable_name: str,
+    metadata_properties: dict,
+    eager_termination: bool,
+    info_map: dict,
+    modifiable: bool,
+    mocker: MockerFixture,
+) -> None:
     """Unit test for _check_modifiability to ensure right warnings or errors were thrown"""
     input_manager = InputManager()
     patch_om_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     patch_om_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
-    mock_modifiable = mocker.patch("RUFAS.input_manager.InputManager._is_modifiable_during_runtime",
-                                   return_value=modifiable)
+    mock_modifiable = mocker.patch(
+        "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
+    )
 
     input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
 
@@ -4895,18 +4900,25 @@ def test_check_modifiability_valid(variable_name: str, metadata_properties: dict
     patch_om_warning.assert_not_called()
 
 
-@pytest.mark.parametrize("variable_name,metadata_properties,eager_termination,info_map,modifiable",
-                         [
-                             ("test", {"test": 12}, True, {"class": "aa", "function": "bb"}, False)
-                         ])
-def test_check_modifiability_error(variable_name: str, metadata_properties: dict, eager_termination: bool,
-                                   info_map: dict, modifiable: bool, mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
+    [("test", {"test": 12}, True, {"class": "aa", "function": "bb"}, False)],
+)
+def test_check_modifiability_error(
+    variable_name: str,
+    metadata_properties: dict,
+    eager_termination: bool,
+    info_map: dict,
+    modifiable: bool,
+    mocker: MockerFixture,
+) -> None:
     """Unit test for _check_modifiability to ensure right errors were thrown"""
     input_manager = InputManager()
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
-    mock_modifiable = mocker.patch("RUFAS.input_manager.InputManager._is_modifiable_during_runtime",
-                                   return_value=modifiable)
+    mock_modifiable = mocker.patch(
+        "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
+    )
 
     try:
         input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
@@ -4918,18 +4930,25 @@ def test_check_modifiability_error(variable_name: str, metadata_properties: dict
         assert e.args[0] == f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime."
 
 
-@pytest.mark.parametrize("variable_name,metadata_properties,eager_termination,info_map,modifiable",
-                         [
-                             ("test", {"test": 12}, False, {"class": "aa", "function": "bb"}, False)
-                         ])
-def test_check_modifiability_error(variable_name: str, metadata_properties: dict, eager_termination: bool,
-                                   info_map: dict, modifiable: bool, mocker: MockerFixture) -> None:
+@pytest.mark.parametrize(
+    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
+    [("test", {"test": 12}, False, {"class": "aa", "function": "bb"}, False)],
+)
+def test_check_modifiability_error(
+    variable_name: str,
+    metadata_properties: dict,
+    eager_termination: bool,
+    info_map: dict,
+    modifiable: bool,
+    mocker: MockerFixture,
+) -> None:
     """Unit test for _check_modifiability to ensure right warnings were thrown"""
     input_manager = InputManager()
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
-    mock_modifiable = mocker.patch("RUFAS.input_manager.InputManager._is_modifiable_during_runtime",
-                                   return_value=modifiable)
+    mock_modifiable = mocker.patch(
+        "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
+    )
 
     input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
