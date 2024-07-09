@@ -4935,3 +4935,68 @@ def test_check_modifiability_error(variable_name: str, metadata_properties: dict
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
     mock_add_warning.assert_called_once()
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
+
+
+@pytest.fixture
+def elements_counter():
+    return ElementsCounter()
+
+
+@pytest.mark.parametrize(
+    "data,metadata_properties,eager_termination,properties_blob_key,expected_validated_data,expected_invalid_elements",
+    [
+        (
+            {"prop1": "value1", "prop2": "value2"},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {"prop1": "value1", "prop2": "value2"},
+            0,
+        ),
+        (
+            {"prop1": "value1", "prop2": None},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {"prop1": "value1"},
+            1,
+        ),
+        (
+            {"prop1": None, "prop2": None},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {},
+            2,
+        ),
+    ]
+)
+def test_validate_data(
+    mocker: MockerFixture,
+    elements_counter: ElementsCounter,
+    data: dict,
+    metadata_properties: dict,
+    eager_termination: bool,
+    properties_blob_key: str,
+    expected_validated_data: dict,
+    expected_invalid_elements: int,
+) -> None:
+    """Unit test for _validate_data to ensure proper validation"""
+    input_manager = InputManager()
+
+    mock_validate_input_by_type = mocker.patch.object(
+        input_manager,
+        "_validate_input_by_type",
+        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
+                           elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None
+    )
+
+    validated_data = input_manager._validate_data(
+        data, metadata_properties, eager_termination, properties_blob_key, elements_counter
+    )
+
+    assert validated_data == expected_validated_data
+    assert mock_validate_input_by_type.call_count == 2
+
+
+
