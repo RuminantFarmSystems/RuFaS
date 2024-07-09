@@ -98,7 +98,7 @@ class CropManagement:
         self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
         self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
-    def determine_harvest_index(self):
+    def determine_harvest_index(self) -> None:
         """
         Sets the crop's harvest index based on various conditions.
 

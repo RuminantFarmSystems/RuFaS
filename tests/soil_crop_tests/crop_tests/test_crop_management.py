@@ -100,7 +100,7 @@ def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float) -
         (136.5, 1.22),  # arbitrary
     ],
 )
-def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float):
+def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float) -> None:
     """ensure that yield is correctly calculated by determine_yield_from_total_biomass()"""
     frac = 1 / (1 + harv_ind)
     assert CropManagement.determine_biomass_cut_from_whole_plant(bmass, harv_ind) == bmass * (1 - frac)
@@ -132,7 +132,7 @@ def test_kill() -> None:
         (0.85, 0.5, 0.33),  # user-defined, ignore others
     ],
 )
-def test_determine_harvest_index(harvest, heat_frac, water_def):
+def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
     """ensure that the harvest index is properly evaluated"""
     data = CropData(
         user_harvest_index=harvest,
