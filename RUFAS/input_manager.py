@@ -1627,6 +1627,7 @@ class InputManager:
         validated_data = {}
         elements_counter = ElementsCounter()
 
+        # Prepare data
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
             data = self._set_nested_value({}, element_hierarchy[1:], input_data)
@@ -1640,6 +1641,7 @@ class InputManager:
             data = input_data
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
+        # Check modifibility
         if (
             not (
                 is_modifiable_during_runtime := self._is_modifiable_during_runtime(
@@ -1653,6 +1655,7 @@ class InputManager:
         elif not is_modifiable_during_runtime:
             om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
 
+        # validate data
         variable_properties_to_ignore = ["type", "description", "modifiability"]
         for metadata_property in metadata_properties.keys():
             if metadata_property in variable_properties_to_ignore:
@@ -1671,6 +1674,7 @@ class InputManager:
             if is_element_acceptable:
                 validated_data[metadata_property] = data[metadata_property]
 
+        # Add to pool
         if validated_data:
             if element_hierarchy[0] in self.__pool.keys():
                 om.add_warning(
@@ -1680,8 +1684,10 @@ class InputManager:
                 )
 
             self.__pool[variable_name] = validated_data
+            # End
             elements_counter += elements_counter
 
+        # Wrapping up
         if elements_counter.invalid_elements > 0:
             om.add_error(
                 "Invalid variable",
