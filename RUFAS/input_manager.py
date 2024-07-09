@@ -1716,8 +1716,9 @@ class InputManager:
 
         return True
 
-    def _prepare_data(self, variable_name: str, input_data: dict,
-                      properties_blob_key: str) -> Tuple[List[str], Dict[str, Any], Dict[str, Any]]:
+    def _prepare_data(
+        self, variable_name: str, input_data: dict, properties_blob_key: str
+    ) -> Tuple[List[str], Dict[str, Any], Dict[str, Any]]:
         """
         Prepare data and metadata properties for validation.
 
