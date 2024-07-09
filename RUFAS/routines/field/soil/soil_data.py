@@ -315,7 +315,7 @@ class SoilData:
     eroded_active_organic_nitrogen: float = 0.0
 
     # ---- Residue partition (Carbon Cycling)
-    plant_surface_residue = 0
+    plant_surface_residue = 0.0
     plant_root_residue = 0
     plant_residue_lignin_composition: float = 0.17
     plant_lignin_nitrogen_ratio: float = 0
