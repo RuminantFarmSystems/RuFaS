@@ -4500,7 +4500,7 @@ def test_metadata_array_validator(
         mock_validate_properties_keys.assert_called_once()
     else:
         input_manager._metadata_array_validator(key_path, value)
-        mock_add_error.assert_not_called
+        mock_add_error.assert_not_called()
         mock_validate_properties_keys.assert_called_once()
 
 
@@ -4812,7 +4812,7 @@ def test_extract_input_data_by_key_list_key_error(
 
 
 @pytest.fixture
-def mock_metadata_prepare_data():
+def mock_metadata_prepare_data() -> dict[Any, Any]:
     return {
         "properties": {
             "example_blob_key": {
@@ -4855,8 +4855,8 @@ def test_prepare_data(
     properties_blob_key: str,
     expected_element_hierarchy: list[str],
     expected_data: dict[Any, Any],
-    expected_metadata_properties,
-    mocker,
+    expected_metadata_properties: dict[str, Any],
+    mocker: MockerFixture
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
@@ -4957,7 +4957,7 @@ def test_check_modifiability_warning(
 
 
 @pytest.fixture
-def elements_counter():
+def elements_counter() -> ElementsCounter:
     return ElementsCounter()
 
 
@@ -4994,7 +4994,7 @@ def test_validate_data(
     mocker: MockerFixture,
     elements_counter: ElementsCounter,
     data: dict[str, str],
-    metadata_properties: dict[dict[str, str]],
+    metadata_properties: dict[str, Any],
     eager_termination: bool,
     properties_blob_key: str,
     expected_validated_data: dict[str, str],
@@ -5019,7 +5019,7 @@ def test_validate_data(
 
 
 @pytest.fixture
-def mock_pool_for_add_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
+def mock_pool_for_add_pool() -> Dict[str, Dict[str, Any]]:
     return {
         "module1": {
             "integer_var": 5,
@@ -5046,8 +5046,12 @@ def mock_pool_for_add_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 @pytest.mark.parametrize("variable_name,validated_data,info_map", [
     ("module1", {"test": "random"}, {})
 ])
-def test_add_to_pool(variable_name: str, validated_data: dict, info_map: dict[str, Any], mocker: MockerFixture,
+def test_add_to_pool(variable_name: str,
+                     validated_data: dict[str, Any],
+                     info_map: dict[str, Any],
+                     mocker: MockerFixture,
                      mock_pool_for_add_pool: Dict[str, Any]) -> None:
+    """Tests to make sure validated data were added to pool"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, '_InputManager__pool', mock_pool_for_add_pool)
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
