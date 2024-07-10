@@ -50,7 +50,6 @@ class RationOptimizer:
             self.calcium_constraint,
             self.phosphorus_constraint,
             self.protein_constraint_lower,
-            self.protein_constraint_upper,
             self.NDF_constraint_lower,
             self.NDF_constraint_upper,
             self.forage_NDF_constraint,
@@ -660,7 +659,7 @@ class RationOptimizer:
         float
 
         """
-        return (ration_config.MP_requirement * 2 / 1000) - ration_config.MP_supply
+        return (ration_config.MP_requirement * 2) - ration_config.MP_supply
 
     @staticmethod
     def NDF_constraint_lower(
