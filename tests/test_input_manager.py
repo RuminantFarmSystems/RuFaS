@@ -1981,6 +1981,32 @@ def test_add_variable_to_pool_valid(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
+    # Capture the original method
+    original_add_to_pool = input_manager._add_to_pool
+    original_check_modifiability = input_manager._check_modifiability
+    original_validate_data = input_manager._validate_data
+    orginal_prepare_data = input_manager._prepare_data
+
+    def side_effect_add_pool(*args, **kwargs):
+        return original_add_to_pool(*args, **kwargs)
+
+    def side_effect_check_modifiability(*args, **kwargs):
+        return original_check_modifiability(*args, **kwargs)
+
+    def side_effect_validate_data(*args, **kwargs):
+        return original_validate_data(*args, **kwargs)
+
+    def side_effect_prepare_data(*args, **kwargs):
+        return orginal_prepare_data(*args, **kwargs)
+
+    patch_add = mocker.patch("RUFAS.input_manager.InputManager._add_to_pool", side_effect=side_effect_add_pool)
+    patch_check = mocker.patch(
+        "RUFAS.input_manager.InputManager._check_modifiability", side_effect=side_effect_check_modifiability
+    )
+    patch_validate = mocker.patch(
+        "RUFAS.input_manager.InputManager._validate_data", side_effect=side_effect_validate_data
+    )
+    patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", side_effect=side_effect_prepare_data)
     expected_add_warning_count = 1 if starting_im_pool else 0
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
     patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
@@ -1999,6 +2025,10 @@ def test_add_variable_to_pool_valid(
     assert patch_for_add_error.call_count == 0
     assert variable_name in input_manager.pool
     assert input_manager.get_data(variable_name) == data
+    patch_add.assert_called_once()
+    patch_check.assert_called_once()
+    patch_validate.assert_called_once()
+    patch_prepare.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -4470,7 +4500,7 @@ def test_metadata_array_validator(
         mock_validate_properties_keys.assert_called_once()
     else:
         input_manager._metadata_array_validator(key_path, value)
-        mock_add_error.assert_not_called
+        mock_add_error.assert_not_called()
         mock_validate_properties_keys.assert_called_once()
 
 
@@ -4779,3 +4809,252 @@ def test_extract_input_data_by_key_list_key_error(
         var_name=var_name,
         called_during_initialization=called_during_initialization,
     )
+
+
+@pytest.fixture
+def mock_metadata_prepare_data() -> dict[Any, Any]:
+    return {
+        "properties": {
+            "example_blob_key": {
+                "root": {"nested_property": {"type": "string", "description": "An example property"}},
+                "example_property": {"type": "string", "description": "An example property"},
+            }
+        }
+    }
+
+
+@pytest.mark.parametrize(
+    "variable_name,input_data,properties_blob_key,expected_element_hierarchy,"
+    "expected_data,expected_metadata_properties",
+    [
+        (
+            "example_property",
+            {"key": "value"},
+            "example_blob_key",
+            ["example_property"],
+            {"key": "value"},
+            {
+                "example_property": {"description": "An example property", "type": "string"},
+                "root": {"nested_property": {"description": "An example property", "type": "string"}},
+            },
+        ),
+        (
+            "example_property.root.nested_property",
+            {"nested_key": "nested_value"},
+            "example_blob_key",
+            ["example_property", "root", "nested_property"],
+            {"root": {"nested_property": {"nested_key": "nested_value"}}},
+            {"type": "string", "description": "An example property"},
+        ),
+    ],
+)
+def test_prepare_data(
+    mock_metadata_prepare_data: dict[Any, Any],
+    variable_name: str,
+    input_data: dict[Any, Any],
+    properties_blob_key: str,
+    expected_element_hierarchy: list[str],
+    expected_data: dict[Any, Any],
+    expected_metadata_properties: dict[str, Any],
+    mocker: MockerFixture
+) -> None:
+    """Unit test for prepare_data to ensure data were extracted correctly"""
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
+
+    element_hierarchy, data, metadata_properties = input_manager._prepare_data(
+        variable_name, input_data, properties_blob_key
+    )
+
+    assert element_hierarchy == expected_element_hierarchy
+    assert data == expected_data
+    assert metadata_properties == expected_metadata_properties
+
+
+@pytest.mark.parametrize(
+    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
+    [("test", {"test": 12}, False, {"a": "aa"}, True)],
+)
+def test_check_modifiability_valid(
+    variable_name: str,
+    metadata_properties: dict[Any, Any],
+    eager_termination: bool,
+    info_map: dict[Any, Any],
+    modifiable: bool,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for _check_modifiability to ensure right warnings or errors were thrown"""
+    input_manager = InputManager()
+    patch_om_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    patch_om_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+
+    mock_modifiable = mocker.patch(
+        "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
+    )
+
+    input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+
+    mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
+
+    patch_om_error.assert_not_called()
+    patch_om_warning.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
+    [("test", {"test": 12}, True, {"class": "aa", "function": "bb"}, False)],
+)
+def test_check_modifiability_error(
+    variable_name: str,
+    metadata_properties: dict[Any, Any],
+    eager_termination: bool,
+    info_map: dict[Any, Any],
+    modifiable: bool,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for _check_modifiability to ensure right errors were thrown"""
+    input_manager = InputManager()
+    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+
+    mock_modifiable = mocker.patch(
+        "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
+    )
+
+    try:
+        input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+    except PermissionError as e:
+        mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
+
+        mock_add_error.assert_called_once()
+        mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
+        assert e.args[0] == f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime."
+
+
+@pytest.mark.parametrize(
+    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
+    [("test", {"test": 12}, False, {"class": "aa", "function": "bb"}, False)],
+)
+def test_check_modifiability_warning(
+    variable_name: str,
+    metadata_properties: dict[str, int],
+    eager_termination: bool,
+    info_map: dict[str, Any],
+    modifiable: bool,
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for _check_modifiability to ensure right warnings were thrown"""
+    input_manager = InputManager()
+    mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+
+    mock_modifiable = mocker.patch(
+        "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
+    )
+
+    input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+    mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
+    mock_add_warning.assert_called_once()
+    mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
+
+
+@pytest.fixture
+def elements_counter() -> ElementsCounter:
+    return ElementsCounter()
+
+
+@pytest.mark.parametrize(
+    "data,metadata_properties,eager_termination,properties_blob_key,expected_validated_data,expected_invalid_elements",
+    [
+        (
+            {"prop1": "value1", "prop2": "value2"},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {"prop1": "value1", "prop2": "value2"},
+            0,
+        ),
+        (
+            {"prop1": "value1", "prop2": None},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {"prop1": "value1"},
+            1,
+        ),
+        (
+            {"prop1": None, "prop2": None},
+            {"prop1": {"type": "string"}, "prop2": {"type": "string"}},
+            False,
+            "example_blob_key",
+            {},
+            2,
+        ),
+    ]
+)
+def test_validate_data(
+    mocker: MockerFixture,
+    elements_counter: ElementsCounter,
+    data: dict[str, str],
+    metadata_properties: dict[str, Any],
+    eager_termination: bool,
+    properties_blob_key: str,
+    expected_validated_data: dict[str, str],
+    expected_invalid_elements: int,
+) -> None:
+    """Unit test for _validate_data to ensure proper validation"""
+    input_manager = InputManager()
+
+    mock_validate_input_by_type = mocker.patch.object(
+        input_manager,
+        "_validate_input_by_type",
+        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
+        elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None
+    )
+
+    validated_data = input_manager._validate_data(
+        data, metadata_properties, eager_termination, properties_blob_key, elements_counter
+    )
+
+    assert validated_data == expected_validated_data
+    assert mock_validate_input_by_type.call_count == 2
+
+
+@pytest.fixture
+def mock_pool_for_add_pool() -> Dict[str, Dict[str, Any]]:
+    return {
+        "module1": {
+            "integer_var": 5,
+            "float_var": 0.5,
+            "string_var": "dummyvalue1",
+            "boolean_var": True,
+            "integer_array_var": [1, 2, 3],
+            "float_array_var": [0.1, 0.2, 3.14159],
+            "string_array_var": ["1", "2", "3", "4", "5"],
+            "boolean_array_var": [True, False],
+            "submodule1": {"nested_var": "dummyvalue2"},
+        },
+        "module2": {
+            "submodule1": {
+                "nested_module1": {
+                    "nested_var1": "dummyvalue3",
+                    "nested_var2": "dummyvalue4",
+                },
+            },
+        },
+    }
+
+
+@pytest.mark.parametrize("variable_name,validated_data,info_map", [
+    ("module1", {"test": "random"}, {})
+])
+def test_add_to_pool(variable_name: str,
+                     validated_data: dict[str, Any],
+                     info_map: dict[str, Any],
+                     mocker: MockerFixture,
+                     mock_pool_for_add_pool: Dict[str, Any]) -> None:
+    """Tests to make sure validated data were added to pool"""
+    input_manager = InputManager()
+    mocker.patch.object(input_manager, '_InputManager__pool', mock_pool_for_add_pool)
+    mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+    input_manager._add_to_pool(variable_name, validated_data, info_map)
+    mock_add_warning.assert_called_once()
+    assert input_manager.pool["module1"] == {"test": "random"}
