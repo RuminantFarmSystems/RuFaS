@@ -4856,7 +4856,7 @@ def test_prepare_data(
     expected_element_hierarchy: list[str],
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
@@ -4988,7 +4988,7 @@ def elements_counter() -> ElementsCounter:
             {},
             2,
         ),
-    ]
+    ],
 )
 def test_validate_data(
     mocker: MockerFixture,
@@ -5006,8 +5006,10 @@ def test_validate_data(
     mock_validate_input_by_type = mocker.patch.object(
         input_manager,
         "_validate_input_by_type",
-        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
-        elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None
+        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key, elements_counter, called_during_initialization: input_data.get(
+            variable_path[0]
+        )
+        is not None,
     )
 
     validated_data = input_manager._validate_data(
@@ -5043,17 +5045,17 @@ def mock_pool_for_add_pool() -> Dict[str, Dict[str, Any]]:
     }
 
 
-@pytest.mark.parametrize("variable_name,validated_data,info_map", [
-    ("module1", {"test": "random"}, {})
-])
-def test_add_to_pool(variable_name: str,
-                     validated_data: dict[str, Any],
-                     info_map: dict[str, Any],
-                     mocker: MockerFixture,
-                     mock_pool_for_add_pool: Dict[str, Any]) -> None:
+@pytest.mark.parametrize("variable_name,validated_data,info_map", [("module1", {"test": "random"}, {})])
+def test_add_to_pool(
+    variable_name: str,
+    validated_data: dict[str, Any],
+    info_map: dict[str, Any],
+    mocker: MockerFixture,
+    mock_pool_for_add_pool: Dict[str, Any],
+) -> None:
     """Tests to make sure validated data were added to pool"""
     input_manager = InputManager()
-    mocker.patch.object(input_manager, '_InputManager__pool', mock_pool_for_add_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_add_pool)
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
     input_manager._add_to_pool(variable_name, validated_data, info_map)
     mock_add_warning.assert_called_once()
