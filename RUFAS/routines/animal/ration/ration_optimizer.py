@@ -49,7 +49,8 @@ class RationOptimizer:
             self.NEgact_constraint,
             self.calcium_constraint,
             self.phosphorus_constraint,
-            self.protein_constraint,
+            self.protein_constraint_lower,
+            self.protein_constraint_upper,
             self.NDF_constraint_lower,
             self.NDF_constraint_upper,
             self.forage_NDF_constraint,
@@ -531,7 +532,7 @@ class RationOptimizer:
 
     # fmt: off
     @staticmethod
-    def protein_constraint(  # noqa
+    def protein_constraint_lower(  # noqa
         decision_vector: np.ndarray, ration_config: RationConfig
     ) -> float:
         # fmt: on
@@ -641,6 +642,25 @@ class RationOptimizer:
             ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
         )
         return ration_config.MP_supply - (ration_config.MP_requirement / 1000)
+
+    @staticmethod
+    def protein_constraint_upper(decision_vector: np.ndarray,
+                                 ration_config: RationConfig) -> float:
+        """
+        Sets up the upper bound for the protein requirement constraint in the NLP. Uses MP_supply as calculated in
+        protein_constraint_lower.
+
+        Parameters
+        ----------
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+
+        Returns
+        -------
+        float
+
+        """
+        return (ration_config.MP_requirement * 2 / 1000) - ration_config.MP_supply
 
     @staticmethod
     def NDF_constraint_lower(
@@ -944,8 +964,11 @@ class RationOptimizer:
             )
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
-            bnds = []
-            bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
+            # bnds = []
+            bnds = list(zip(
+                [(lim / 3) for lim in ration_config.feed_minimum_list],
+                [(lim / 3) + 0.0001 for lim in ration_config.feed_limit_list]))
+            # bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
 
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
             return minimize(
@@ -1023,14 +1046,16 @@ class RationOptimizer:
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         # GitHub Issue # 793
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["lactating_cow_limit"]
-            )
+            feed_limit_list = self.triple_values_in_list(available_feeds["lactating_cow_limit"])
+            feed_minimum_list = self.triple_values_in_list(available_feeds["lactating_cow_minimum"])
             lactating = True
+        elif str(animal_combination) in ["AnimalCombination.DRY_COW"]:
+            feed_limit_list = self.triple_values_in_list(available_feeds["dry_cow_limit"])
+            feed_minimum_list = self.triple_values_in_list(available_feeds["dry_cow_minimum"])
+            lactating = False
         else:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["dry_cow_limit"]
-            )
+            feed_limit_list = self.triple_values_in_list(available_feeds["dry_cow_limit"])
+            feed_minimum_list = self.triple_values_in_list(available_feeds["dry_cow_minimum"])
             lactating = False
         ration_config = RationConfig(
             price_list,
@@ -1057,6 +1082,7 @@ class RationOptimizer:
             N_B_list,
             CP_list,
             dRUP_list,
+            feed_minimum_list,
             feed_limit_list,
             lactating,
             DMIest__requirement=requirements.DMIest_requirement,
