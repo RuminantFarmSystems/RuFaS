@@ -132,6 +132,9 @@ class RationManager:
                     fail_summary,
                     dict(info_map, **{"units": fail_summary_units}),
                 )
+                if num_reattempts > 20:
+                    print(fail_summary)
+                    print(pen.animal_combination.name)
 
         if solution is not None:
             ration = cls.make_ration_from_solution(available_feeds, solution)
