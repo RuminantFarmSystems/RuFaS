@@ -964,8 +964,11 @@ class RationOptimizer:
             )
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
-            bnds = []
-            bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
+            # bnds = []
+            bnds = list(zip(
+                [(lim / 3) for lim in ration_config.feed_minimum_list],
+                [(lim / 3) + 0.0001 for lim in ration_config.feed_limit_list]))
+            # bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
 
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
             return minimize(
@@ -1043,14 +1046,16 @@ class RationOptimizer:
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         # GitHub Issue # 793
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["lactating_cow_limit"]
-            )
+            feed_limit_list = self.triple_values_in_list(available_feeds["lactating_cow_limit"])
+            feed_minimum_list = self.triple_values_in_list(available_feeds["lactating_cow_minimum"])
             lactating = True
+        elif str(animal_combination) in ["AnimalCombination.DRY_COW"]:
+            feed_limit_list = self.triple_values_in_list(available_feeds["dry_cow_limit"])
+            feed_minimum_list = self.triple_values_in_list(available_feeds["dry_cow_minimum"])
+            lactating = False
         else:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["dry_cow_limit"]
-            )
+            feed_limit_list = self.triple_values_in_list(available_feeds["dry_cow_limit"])
+            feed_minimum_list = self.triple_values_in_list(available_feeds["dry_cow_minimum"])
             lactating = False
         ration_config = RationConfig(
             price_list,
@@ -1077,6 +1082,7 @@ class RationOptimizer:
             N_B_list,
             CP_list,
             dRUP_list,
+            feed_minimum_list,
             feed_limit_list,
             lactating,
             DMIest__requirement=requirements.DMIest_requirement,
