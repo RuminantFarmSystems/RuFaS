@@ -3,6 +3,7 @@ from __future__ import annotations
 import collections
 import json
 import os
+import re
 import sys
 from copy import deepcopy
 from enum import Enum
@@ -1329,29 +1330,46 @@ class OutputManager(object):
 
             if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
-
+            # units = self._extract_var_units(name, variable_data)
+            units = variable_data.get("info_maps")[0]["units"]
+            # print(units)
             is_variable_nested = isinstance(variable_data["values"][0], dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
-                var_list.append(f"{name}{os.linesep}")
+                var_list.append(f"{name} ({units}){os.linesep}")
 
             prefix = name
             if format_option == "block":
-                if f"{name}{os.linesep}" not in var_list:
-                    var_list.append(f"{name}{os.linesep}")
+                if f"{name} ({units}){os.linesep}" not in var_list:
+                    var_list.append(f"{name} ({units}){os.linesep}")
                 prefix = " " * len(name)
-
+            keys_to_ignore = ["units", "timestep", "info_maps", "prefix", "suffix", "data_origin",
+                              "number_animals_in_pen", "simulation_day"]
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
                 if format_option == "inline":
-                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
+                    var_list.append(f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}")
                 elif format_option == "basic":
+                    if isinstance(units, dict):
+                        var_name_match = re.search(r'[^.]+$', name)
+                        var_name = var_name_match.group(0) if var_name_match else ""
+                        var_units = units.get(var_name, "")
+                    else:
+                        var_units = units
                     for key in keys:
-                        var_list.append(f"{name}.{key}{os.linesep}")
+                        if isinstance(units, dict):
+                            # var_name_match = re.search(r'[^.]+$', name)
+                            # var_name = var_name_match.group(0) if var_name_match else ""
+                            var_units = units.get(key, "")
+                        else:
+                            var_units = units
+                        var_list.append(
+                            f"{name}.{key} ({var_units}){os.linesep}"
+                        ) if key not in keys_to_ignore else var_list.append(f"{name}.{key}{os.linesep}")
                 else:
                     for key in keys:
-                        var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
+                        var_list.append(f"{prefix}.{parsable_dict}: {key} ({units}){os.linesep}")
 
         file_path = path / self.generate_file_name("variable_names", "txt")
         self._list_to_file_txt(var_list, file_path)
@@ -1569,3 +1587,27 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+
+    def _extract_var_units(self, var_name: str, variable_data: dict[str, any]) -> str:
+        """Adds variable units to variable name for graphing.
+
+        Parameters
+        ----------
+        filtered_pool : dict[str, List[Any]]
+            The data to be graphed.
+
+        Returns
+        -------
+        Tuple[dict[str, List[Any]], list[dict[str, str | dict[str, str]]]]
+            The updated data with units added and logs if info_maps aren't found to get units.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._extract_var_units.__name__,
+        }
+        var_info_maps = variable_data.get("info_maps", None)
+        if not var_info_maps:
+            self.add_warning("No info maps", "Info maps not available to extract units", info_map)
+            return ""
+        unit_info = var_info_maps[0]["units"]
+        return unit_info
