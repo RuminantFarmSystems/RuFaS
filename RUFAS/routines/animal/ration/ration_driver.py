@@ -132,6 +132,9 @@ class RationManager:
                     fail_summary,
                     dict(info_map, **{"units": fail_summary_units}),
                 )
+                if num_reattempts > 20:
+                    print(fail_summary)
+                    print(pen.animal_combination.name)
 
         if solution is not None:
             ration = cls.make_ration_from_solution(available_feeds, solution)
@@ -1160,6 +1163,10 @@ class AvailableFeeds:
         self.lactating_cow_limit: List[float] = []
         # dry cow feed limits
         self.dry_cow_limit: List[float] = []
+        # lactating cows feed limits
+        self.lactating_cow_minimum: List[float] = []
+        # dry cow feed limits
+        self.dry_cow_minimum: List[float] = []
         # heiferIII limits
         self.heiferIII_limit: List[float] = []
         # heiferII limit
@@ -1209,10 +1216,15 @@ class AvailableFeeds:
             if isinstance(feed["limit"], dict):
                 self.lactating_cow_limit.append(feed["limit"]["lactating_cows"])
                 self.dry_cow_limit.append(feed["limit"]["dry_cows"])
-
             else:
                 self.lactating_cow_limit.append(feed["limit"])
                 self.dry_cow_limit.append(feed["limit"])
+            if isinstance(feed["lower_limit"], dict):
+                self.lactating_cow_limit.append(feed["lower_limit"]["lactating_cows"])
+                self.dry_cow_limit.append(feed["lower_limit"]["dry_cows"])
+            else:
+                self.lactating_cow_minimum.append(feed["lower_limit"])
+                self.dry_cow_minimum.append(feed["lower_limit"])
 
     def get_feed_data_from_feed_ids(self, feed_ids: Set[int]):
         """
