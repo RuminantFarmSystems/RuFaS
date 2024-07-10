@@ -49,7 +49,8 @@ class RationOptimizer:
             self.NEgact_constraint,
             self.calcium_constraint,
             self.phosphorus_constraint,
-            self.protein_constraint,
+            self.protein_constraint_lower,
+            self.protein_constraint_upper,
             self.NDF_constraint_lower,
             self.NDF_constraint_upper,
             self.forage_NDF_constraint,
@@ -531,7 +532,7 @@ class RationOptimizer:
 
     # fmt: off
     @staticmethod
-    def protein_constraint(  # noqa
+    def protein_constraint_lower(  # noqa
         decision_vector: np.ndarray, ration_config: RationConfig
     ) -> float:
         # fmt: on
@@ -641,6 +642,25 @@ class RationOptimizer:
             ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
         )
         return ration_config.MP_supply - (ration_config.MP_requirement / 1000)
+
+    @staticmethod
+    def protein_constraint_upper(decision_vector: np.ndarray,
+                                 ration_config: RationConfig) -> float:
+        """
+        Sets up the upper bound for the protein requirement constraint in the NLP. Uses MP_supply as calculated in
+        protein_constraint_lower.
+
+        Parameters
+        ----------
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+
+        Returns
+        -------
+        float
+
+        """
+        return (ration_config.MP_requirement * 2 / 1000) - ration_config.MP_supply
 
     @staticmethod
     def NDF_constraint_lower(
