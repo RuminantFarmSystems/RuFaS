@@ -206,7 +206,7 @@ def test_handle_end_to_end_testing(
     tester = mocker.patch.object(EndToEndTester, "run_end_to_end_testing")
     add_log = mocker.patch.object(mock_output_manager, "add_log")
 
-    task_manager._handle_end_to_end_testing({}, mock_output_manager)
+    task_manager._handle_end_to_end_testing({}, mocker.MagicMock(), mock_output_manager, "test_task", False)
 
     tester.assert_called_once()
     assert add_log.call_count == 2

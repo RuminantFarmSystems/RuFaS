@@ -426,7 +426,13 @@ class TaskManager:
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
-    def _handle_end_to_end_testing(args: Dict[str, Any], output_manager: OutputManager) -> None:
+    def _handle_end_to_end_testing(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+    ) -> None:
         """Runs end-to-end testing routine."""
         info_map = {"class": TaskManager.__name__, "function": TaskManager._handle_end_to_end_testing.__name__}
 
