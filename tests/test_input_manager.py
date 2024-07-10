@@ -4849,12 +4849,12 @@ def mock_metadata_prepare_data():
     ],
 )
 def test_prepare_data(
-    mock_metadata_prepare_data,
-    variable_name,
-    input_data,
-    properties_blob_key,
-    expected_element_hierarchy,
-    expected_data,
+    mock_metadata_prepare_data: dict[Any, Any],
+    variable_name: str,
+    input_data: dict[Any, Any],
+    properties_blob_key: str,
+    expected_element_hierarchy: list[str],
+    expected_data: dict[Any, Any],
     expected_metadata_properties,
     mocker,
 ) -> None:
@@ -4877,9 +4877,9 @@ def test_prepare_data(
 )
 def test_check_modifiability_valid(
     variable_name: str,
-    metadata_properties: dict,
+    metadata_properties: dict[Any, Any],
     eager_termination: bool,
-    info_map: dict,
+    info_map: dict[Any, Any],
     modifiable: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -4906,9 +4906,9 @@ def test_check_modifiability_valid(
 )
 def test_check_modifiability_error(
     variable_name: str,
-    metadata_properties: dict,
+    metadata_properties: dict[Any, Any],
     eager_termination: bool,
-    info_map: dict,
+    info_map: dict[Any, Any],
     modifiable: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -4936,9 +4936,9 @@ def test_check_modifiability_error(
 )
 def test_check_modifiability_warning(
     variable_name: str,
-    metadata_properties: dict,
+    metadata_properties: dict[str, int],
     eager_termination: bool,
-    info_map: dict,
+    info_map: dict[str, Any],
     modifiable: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -4993,11 +4993,11 @@ def elements_counter():
 def test_validate_data(
     mocker: MockerFixture,
     elements_counter: ElementsCounter,
-    data: dict,
-    metadata_properties: dict,
+    data: dict[str, str],
+    metadata_properties: dict[dict[str, str]],
     eager_termination: bool,
     properties_blob_key: str,
-    expected_validated_data: dict,
+    expected_validated_data: dict[str, str],
     expected_invalid_elements: int,
 ) -> None:
     """Unit test for _validate_data to ensure proper validation"""
@@ -5046,7 +5046,7 @@ def mock_pool_for_add_pool(mocker: MockerFixture) -> Dict[str, Dict[str, Any]]:
 @pytest.mark.parametrize("variable_name,validated_data,info_map", [
     ("module1", {"test": "random"}, {})
 ])
-def test_add_to_pool(variable_name: str, validated_data: dict, info_map: dict, mocker: MockerFixture,
+def test_add_to_pool(variable_name: str, validated_data: dict, info_map: dict[str, Any], mocker: MockerFixture,
                      mock_pool_for_add_pool: Dict[str, Any]) -> None:
     input_manager = InputManager()
     mocker.patch.object(input_manager, '_InputManager__pool', mock_pool_for_add_pool)

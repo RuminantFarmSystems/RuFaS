@@ -1619,6 +1619,7 @@ class InputManager:
             If eager_termination is True and the variable is not modifiable during runtime.
         ValueError
             If eager_termination is True and the variable failed validation.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1658,7 +1659,7 @@ class InputManager:
         return True
 
     def _prepare_data(
-        self, variable_name: str, input_data: dict, properties_blob_key: str
+        self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
     ) -> Tuple[List[str], Dict[str, Any], Dict[str, Any]]:
         """
         Prepare data and metadata properties for validation.
@@ -1692,10 +1693,27 @@ class InputManager:
         return element_hierarchy, data, metadata_properties
 
     def _check_modifiability(
-        self, variable_name: str, metadata_properties: dict, eager_termination: bool, info_map: dict
+        self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool, info_map: dict[str, Any]
     ) -> None:
         """
-        Check if the variable is modifiable during runtime.
+        Prepare data and metadata properties for validation.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        metadata_properties : dict[str, Any]
+            Metadata for each property of a variable, including details like type, description, modifiability,
+            and validation constraints.
+        eager_termination : bool
+            Indicator for the need of eager termination.
+        info_map : dict[str, Any]
+            Information to be reported through the OM.
+
+        Returns
+        -------
+        None
+
         """
         is_modifiable_during_runtime = self._is_modifiable_during_runtime(
             variable_name=variable_name, variable_properties=metadata_properties
@@ -1708,14 +1726,34 @@ class InputManager:
 
     def _validate_data(
         self,
-        data: dict,
-        metadata_properties: dict,
+        data: dict[str, Any],
+        metadata_properties: dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
-    ) -> dict:
+    ) -> dict[str, Any]:
         """
         Validate input data based on metadata properties.
+
+        Parameters
+        ----------
+        data : dict[str, Any]
+            Data to be validated.
+        metadata_properties : dict[str, Any]
+            Metadata for each property of a variable, including details like type, description, modifiability,
+            and validation constraints.
+        eager_termination : bool
+            Indicator for the need of eager termination.
+        properties_blob_key : str
+            The key in the metadata properties against which the data is validated.
+        elements_counter : ElementsCounter
+            An ElementsCounter object to keep track of status of variables.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary of validated data.
+
         """
         validated_data = {}
         variable_properties_to_ignore = ["type", "description", "modifiability"]
@@ -1739,9 +1777,23 @@ class InputManager:
 
         return validated_data
 
-    def _add_to_pool(self, variable_name: str, validated_data: dict, info_map: dict) -> None:
+    def _add_to_pool(self, variable_name: str, validated_data: dict[str, Any], info_map: dict[str, Any]) -> None:
         """
         Add validated data to the pool.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        validated_data : dict[str, Any]
+            A dictionary of validated data.
+        info_map : dict[str, Any]
+            Information to be reported through the OM.
+
+        Returns
+        -------
+        None
+
         """
         if variable_name in self.__pool.keys():
             om.add_warning(
