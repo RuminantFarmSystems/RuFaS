@@ -1,3 +1,4 @@
+import difflib
 import json
 import os
 from copy import deepcopy
@@ -1017,11 +1018,17 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var1.info_maps: test" + os.linesep,
-                "var2.info_maps: map1" + os.linesep,
-                "var2.values: v1" + os.linesep,
-                "var2.values: v2" + os.linesep,
+                "var1 (units1)" + os.linesep,
+                "var1.info_maps: timestamp (units1)" + os.linesep,
+                "var1.info_maps: units" + os.linesep,
+                "var2.info_maps: map1 (units1)" + os.linesep,
+                "var2.info_maps: units" + os.linesep,
+                "var2.values: v1 (units1)" + os.linesep,
+                "var2.values: v2 (units1)" + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                'var3.info_maps: key1 (unit1)' + os.linesep,
+                'var3.info_maps: key2 (unit2)' + os.linesep,
+                'var3.info_maps: units' + os.linesep,
             ],
             False,
             "verbose",
@@ -1029,9 +1036,10 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var2.values: v1" + os.linesep,
-                "var2.values: v2" + os.linesep,
+                "var1 (units1)" + os.linesep,
+                "var2.values: v1 (units1)" + os.linesep,
+                "var2.values: v2 (units1)" + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
             ],
             True,
             "verbose",
@@ -1039,12 +1047,20 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
+                "var1 (units1)" + os.linesep,
                 "var1" + os.linesep,
-                "    .info_maps: test" + os.linesep,
+                "    .info_maps: timestamp (units1)" + os.linesep,
+                "    .info_maps: units" + os.linesep,
                 "var2" + os.linesep,
-                "    .info_maps: map1" + os.linesep,
-                "    .values: v1" + os.linesep,
-                "    .values: v2" + os.linesep,
+                "    .info_maps: map1 (units1)" + os.linesep,
+                "    .info_maps: units" + os.linesep,
+                "    .values: v1 (units1)" + os.linesep,
+                "    .values: v2 (units1)" + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                'var3' + os.linesep,
+                '    .info_maps: key1 (unit1)' + os.linesep,
+                '    .info_maps: key2 (unit2)' + os.linesep,
+                '    .info_maps: units' + os.linesep,
             ],
             False,
             "block",
@@ -1052,10 +1068,13 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
+                "var1 (units1)" + os.linesep,
                 "var1" + os.linesep,
                 "var2" + os.linesep,
-                "    .values: v1" + os.linesep,
-                "    .values: v2" + os.linesep,
+                "    .values: v1 (units1)" + os.linesep,
+                "    .values: v2 (units1)" + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                'var3' + os.linesep,
             ],
             True,
             "block",
@@ -1063,10 +1082,13 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var1.info_maps: ['test']" + os.linesep,
-                "var2.info_maps: ['map1']" + os.linesep,
-                "var2.values: ['v1', 'v2']" + os.linesep,
+                "var1 (units1)" + os.linesep,
+                "var1.info_maps: ['timestamp', 'units']" + os.linesep,
+                "var2.info_maps: ['map1', 'units']" + os.linesep,
+                "var2.values: ['v1', 'v2'] (units1)" + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                "var3.info_maps: ['key1', 'key2', 'units']" + os.linesep,
+
             ],
             False,
             "inline",
@@ -1074,8 +1096,9 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var2.values: ['v1', 'v2']" + os.linesep,
+                "var1 (units1)" + os.linesep,
+                "var2.values: ['v1', 'v2'] (units1)" + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
             ],
             True,
             "inline",
@@ -1083,24 +1106,49 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var2.v1" + os.linesep,
-                "var2.v2" + os.linesep,
+                "var1 (units1)" + os.linesep,
+                "var2.v1 (units1)" + os.linesep,
+                "var2.v2 (units1)" + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
             ],
             True,
             "basic",
         ),
         (
             [
-                "_exclude_info_maps=False, expect info_maps accordingly." + os.linesep,
-                "var1" + os.linesep,
-                "var1.test" + os.linesep,
-                "var2.map1" + os.linesep,
-                "var2.v1" + os.linesep,
-                "var2.v2" + os.linesep,
+                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep,
+                'var1 (units1)' + os.linesep,
+                'var1.timestamp (units1)' + os.linesep,
+                'var1.units' + os.linesep,
+                'var2.map1 (units1)' + os.linesep,
+                'var2.units' + os.linesep,
+                'var2.v1 (units1)' + os.linesep,
+                'var2.v2 (units1)' + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                'var3.key1 (unit1)' + os.linesep,
+                'var3.key2 (unit2)' + os.linesep,
+                'var3.units' + os.linesep,
             ],
             False,
             "basic",
+        ),
+        (
+            [
+                '_exclude_info_maps=False, expect info_maps accordingly.' + os.linesep,
+                'var1 (units1)' + os.linesep,
+                'var1.info_maps: timestamp (units1)' + os.linesep,
+                'var1.info_maps: units' + os.linesep,
+                'var2.info_maps: map1 (units1)' + os.linesep,
+                'var2.info_maps: units' + os.linesep,
+                'var2.values: v1 (units1)' + os.linesep,
+                'var2.values: v2 (units1)' + os.linesep,
+                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                'var3.info_maps: key1 (unit1)' + os.linesep,
+                'var3.info_maps: key2 (unit2)' + os.linesep,
+                'var3.info_maps: units' + os.linesep,
+            ],
+            False,
+            "verbose",
         ),
     ],
 )
@@ -1113,10 +1161,16 @@ def test_dump_variable_names_and_contexts(
 ) -> None:
     """Test case for function dump_variable_names_and_contexts in output_manager.py"""
     mock_variable_pool: Dict[str, Dict[str, List[Any]]] = {
-        "var1": {"values": [1], "info_maps": [{"test": "value1"}, {"test": "value2"}]},
+        "var1": {"values": [1], "info_maps": [{"timestamp": "value1", "units": "units1"},
+                                              {"simulation_day": "value2", "units": "units2"}]},
         "var2": {
             "values": [{"v1": 1, "v2": 1}, {"v1": 2, "v2": 2}],
-            "info_maps": [{"map1": "value1"}, {"map1": "value2"}],
+            "info_maps": [{"map1": "value1", "units": "units1"},
+                          {"map1": "value2", "units": "units2"}],
+        },
+        "var3": {
+            "values": [1],
+            "info_maps": [{"key1": "value1", "key2": "value2", "units": {"key1": "unit1", "key2": "unit2"}}]
         },
     }
     original_variables_pool = mock_output_manager.variables_pool
@@ -1128,6 +1182,13 @@ def test_dump_variable_names_and_contexts(
 
     mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(expected_result, Path("dummy_path", "dummy_name"))
+    actual_result = mock_output_manager._list_to_file_txt.call_args[0][0]
+
+    if actual_result != expected_result:
+        diff = difflib.unified_diff(expected_result, actual_result, fromfile='expected', tofile='actual', lineterm='')
+        print('\n'.join(diff))
+
+    assert actual_result == expected_result, "The actual result differs from the expected result."
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
