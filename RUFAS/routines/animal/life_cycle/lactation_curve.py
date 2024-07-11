@@ -7,7 +7,8 @@ im = InputManager()
 
 class LactationCurve:
     """
-    Class that represents the lacatation curve of the simulated farm. Obtains the necessary inputs from existing data collected in the simulation.
+    Class that represents the lacatation curve of the simulated farm.
+    Obtains the necessary inputs from existing data collected in the simulation.
 
     ...
 
@@ -42,10 +43,10 @@ class LactationCurve:
         region_dict = im.get_data("lactation.fips_region")
         FIPS_code = im.get_data("config.FIPS_county_code")
         FIPS_state_code = None
-        if FIPS_code != None:
+        if FIPS_code is not None:
             FIPS_state_code = int(FIPS_code / 1000)
         self.region = None
-        if FIPS_state_code != None:
+        if FIPS_state_code is not None:
             for code_region in region_dict:
                 if code_region["code"] == FIPS_state_code:
                     self.region = code_region["region"]
@@ -72,7 +73,8 @@ class LactationCurve:
         self, t: float, parameter_a: float, parameter_b: float, parameter_c: float
     ) -> np.float64:
         """
-        Function that represents the milk yield at time t using parameters a, b, and c as the Wood's lactation curve parameters.
+        Function that represents the milk yield at time t using parameters a, b,
+        and c as the Wood's lactation curve parameters.
 
         Parameters
         ----------
@@ -146,7 +148,8 @@ class LactationCurve:
         Returns
         -------
         tuple
-            Tuple of floats containing estimates for Wood's parameters l, m, n, and 305-day milk yield of the lactation group.
+            Tuple of floats containing estimates for Wood's parameters l, m, n,
+            and 305-day milk yield of the lactation group.
         """
         parameter_a = 19.9
         parameter_b = 24.7 * 1e-2
@@ -169,7 +172,7 @@ class LactationCurve:
                 while (
                     x < len(self.adjustment_dict[category])
                     and (not adjustment_applied)
-                    and (farm_specific[category] != None)
+                    and (farm_specific[category] is not None)
                 ):
                     if self.adjustment_dict[category][x][category] == farm_specific[category]:
                         parameter_a += self.adjustment_dict[category][x]["adjustments"][0]
@@ -181,13 +184,8 @@ class LactationCurve:
                         print(farm_specific[category])
 
                     x = x + 1
-        """ for category in [lactation_group, year, month, region, milking_frequency]:
-             if category:
-                 parameter_a += self.adjustment_dict[category][0]
-                 parameter_b += self.adjustment_dict[category][1] * 1e-2
-                 parameter_c += self.adjustment_dict[category][2] * 1e-4"""
 
-        if MY_305d == None:
+        if MY_305d is None:
             MY_305d = self.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
             return parameter_a, parameter_b, parameter_c, MY_305d
 
@@ -213,11 +211,12 @@ class LactationCurve:
         Returns
         -------
         tuple
-            List of floats. Floats represents the 305-day milk yield for lactation group/parity 1, lactation group/parity 2, and lactation group/parity 3, in that order.
+            List of floats. Floats represents the 305-day milk yield for lactation
+            group/parity 1, lactation group/parity 2, and lactation group/parity 3, in that order.
         """
         # calculate lactation group yield
 
-        if self.annual_MY_lbs != None:
+        if self.annual_MY_lbs is not None:
             total_avg_305 = self.annual_MY_lbs * 305 / (365 * self.num_milking_cows * 2.205)
 
             # Extracting percentage distribution for each lactation group
@@ -249,7 +248,8 @@ class LactationCurve:
         Returns
         -------
         tuple
-            List of lists. Each list contains estimates for parameter l, m, n, and 305-day milk yield for the lactation group. The list is ordered by lactation group.
+            List of lists. Each list contains estimates for parameter l, m, n, and
+            305-day milk yield for the lactation group. The list is ordered by lactation group.
         """
         parity1_305, parity2_305, parity3_305 = self.calc_parities()
 
