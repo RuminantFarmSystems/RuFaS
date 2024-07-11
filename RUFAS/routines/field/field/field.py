@@ -639,10 +639,25 @@ class Field:
                 surface_remainder_fraction=surface_remainder_fraction,
                 year=year,
                 day=day,
+                output_name="manure_application",
             )
         else:
             supplied_nitrogen = 0.0
             supplied_phosphorus = 0.0
+
+        self._record_manure_application(
+            dry_matter_mass=0.0,
+            dry_matter_fraction=0.0,
+            field_coverage=field_coverage,
+            nitrogen=requested_nitrogen,
+            phosphorus=requested_phosphorus,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
+            day=day,
+            output_name="manure_request",
+        )
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
@@ -671,6 +686,7 @@ class Field:
             optimal_mix,
             unmet_nitrogen_demand,
             unmet_phosphorus_demand,
+            0,
             application_depth,
             surface_remainder_fraction,
             year,
@@ -688,6 +704,7 @@ class Field:
         surface_remainder_fraction: float,
         year: int,
         day: int,
+        output_name: str,
         potassium: Optional[float] = None,
     ) -> None:
         """
@@ -753,7 +770,7 @@ class Field:
             "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("manure_application", value, info_map)
+        om.add_variable(output_name, value, info_map)
 
     def _add_manure_water(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
         """
