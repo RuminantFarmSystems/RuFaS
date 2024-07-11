@@ -52,20 +52,20 @@ class EmissionsEstimator:
         self.im = InputManager()
 
     def estimate_emissions(self) -> None:
-        (
-            homegrown_feeds,
-            fertilizer_applications,
-            manure_applications,
-            manure_requests
-        ) = self._gather_homegrown_feeds_and_fertilizer_apps()
+        (homegrown_feeds, fertilizer_applications, manure_applications, manure_requests) = (
+            self._gather_homegrown_feeds_and_fertilizer_apps()
+        )
         self._calculate_purchased_feed_emissions(homegrown_feeds)
-        self._calculate_homegrown_feed_emissions(homegrown_feeds, fertilizer_applications, manure_applications, manure_requests)
+        self._calculate_homegrown_feed_emissions(
+            homegrown_feeds, fertilizer_applications, manure_applications, manure_requests
+        )
 
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
         info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions.__name__}
         purchased_feeds = self._gather_ration_feed_totals()
-        (actual_purchased_feed_totals,
-         homegrown_feed_totals) = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
+        (actual_purchased_feed_totals, homegrown_feed_totals) = self._calculate_actual_purchased_feeds(
+            homegrown_feeds, purchased_feeds
+        )
         om.add_variable(
             "actual_purchased_feed_totals",
             actual_purchased_feed_totals,
@@ -236,9 +236,13 @@ class EmissionsEstimator:
         om.add_variable(
             "homegrown_feed_totals",
             homegrown_totals,
-            dict({"class": self.__class__.__name__,
-                  "function": self._calculate_total_homegrown_feed_amounts_by_crop_type.__name__},
-                 **{"units": MeasurementUnits.KILOGRAMS})
+            dict(
+                {
+                    "class": self.__class__.__name__,
+                    "function": self._calculate_total_homegrown_feed_amounts_by_crop_type.__name__,
+                },
+                **{"units": MeasurementUnits.KILOGRAMS},
+            ),
         )
         return homegrown_totals
 
@@ -459,7 +463,7 @@ class EmissionsEstimator:
         field_emissions: dict[str, float],
         fertilizer_applications: dict[str, float],
         manure_applications: dict[str, float],
-        manure_requests: dict[str,float],
+        manure_requests: dict[str, float],
     ) -> list[dict[str, Any]]:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops based on their relative mass.
@@ -488,8 +492,9 @@ class EmissionsEstimator:
                 field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
             )
             crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
-            crop["carbon_stock_change"] = (field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown *
-                                           field_size)
+            crop["carbon_stock_change"] = (
+                field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown * field_size
+            )
             crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
             crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
                 fertilizer_applications["nitrogen"]
