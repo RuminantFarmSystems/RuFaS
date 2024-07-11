@@ -3157,6 +3157,13 @@ def test_add_variable_to_pool_nested(
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
             )
+    elif not is_modifiable_during_runtime:
+        assert not input_manager._add_variable_to_pool(
+                variable_name=variable_name,
+                input_data=data,
+                properties_blob_key=properties_blob_key,
+                eager_termination=eager_termination,
+            )
     else:
         result = input_manager._add_variable_to_pool(
             variable_name=variable_name,
