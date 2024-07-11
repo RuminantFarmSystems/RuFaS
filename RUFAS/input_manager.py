@@ -1626,9 +1626,7 @@ class InputManager:
         validated_data = {}
         elements_counter = ElementsCounter()
 
-        data, metadata_properties = self._prepare_data(
-            variable_name, input_data, properties_blob_key
-        )
+        data, metadata_properties = self._prepare_data(variable_name, input_data, properties_blob_key)
 
         self._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
 
