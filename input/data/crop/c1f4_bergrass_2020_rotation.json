@@ -1,0 +1,20 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "tall_fescue_baleage",
+            "planting_years": [2015],
+            "pattern_repeat": 0,
+            "planting_skip": 5,
+            "harvesting_skip": 0,
+            "planting_days": [121],
+            "harvest_years": [2015, 2015, 2015, 2015, 2016, 2016, 2016, 2016, 2016, 2016, 2017, 2017, 2017, 2017, 2017, 2017, 2018, 2018, 2018, 2018, 2018, 2018, 2019, 2019, 2019, 2019, 2019, 2019, 2020, 2020, 2020, 2020, 2020, 2020],
+            "harvest_days": [171, 206, 239, 291, 120, 151, 186, 221, 256, 291, 120, 151, 186, 221, 256, 291, 120, 151, 186, 221, 256, 291, 120, 151, 186, 221, 256, 291, 120, 151, 186, 221, 256, 291],
+            "harvest_operations": ["harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        }
+
+    ]
+}

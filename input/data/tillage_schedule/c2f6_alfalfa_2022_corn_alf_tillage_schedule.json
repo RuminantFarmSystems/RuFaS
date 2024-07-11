@@ -1,0 +1,15 @@
+{
+    "years": [2011, 2016, 2017, 2018, 2019],
+    "days": [128, 118, 118, 118, 118],
+    "incorporation_fractions": [0.3],
+    "mixing_fractions": [0.3],
+    "tillage_depths": [100],
+    "implements": ["cultivator"],
+    "pattern_repeat": 1,
+    "pattern_skip": 0
+}
+
+
+
+
+

@@ -1,0 +1,19 @@
+{
+  "soil_specification": "soil",
+  "crop_specification": "pntsh 2020 crop data",
+  "fertilizer_management_specification": "pntsh 2020 fertilizer schedule",
+  "manure_management_specification": "pntsh 2020 manure schedule",
+  "tillage_management_specification": "pntsh 2020 tillage schedule",
+  "field_size": 31.2,
+  "absolute_latitude": 29.6168,
+  "longitude": -82.7994,
+  "minimum_daylength": 9.0,
+  "seasonal_high_water_table": false,
+  "watering_amount_in_liters": 0.0,
+  "watering_interval": 0,
+  "supplement_manure_nutrient_deficiencies": false,
+  "simulate_water_stress": true,
+  "simulate_temp_stress": true,
+  "simulate_nitrogen_stress": true,
+  "simulate_phosphorus_stress": true
+}

@@ -1,0 +1,20 @@
+{
+    "available_fertilizer_mixes": [
+        {
+            "name": "4_0_7",
+            "N": 0.36,
+            "P": 0,
+            "K": 0.64
+        }
+    ],
+    "mix_names": ["4_0_7"],
+    "years": [2015],
+    "days": [51],
+    "nitrogen_masses": [1306],
+    "phosphorus_masses": [0],
+    "potassium_masses": [2286],
+    "application_depths": [0.0],
+    "surface_remainder_fractions": [1.0],
+    "pattern_repeat": 6,
+    "pattern_skip": 0
+}
