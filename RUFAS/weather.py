@@ -18,12 +18,12 @@ class Weather:
     Parameters
     ----------
     weather_file : dict[str, List[Any]]
-        The weather dictionary read from the provided weather file.
+        The weather dictionary read from the provided weather input source.
 
     Attributes
     ----------
     weather_data : dict[datetime, CurrentDayCondition]
-        A dictionary that map a date to the corresponding CurrentDayCondition.
+        A dictionary that maps a date to the corresponding CurrentDayCondition.
     mean_annual_temperature : int
         Mean of mean daily temperatures over all the weather data used by the simulation (°C).
 
