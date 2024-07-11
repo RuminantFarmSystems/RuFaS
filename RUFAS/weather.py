@@ -75,9 +75,9 @@ class Weather:
                         "function": "__init__",
                         "prefix": "Weather",
                     }
-                    om.add_warning("Duplicate weather",
-                                   f"duplicate weather data found for the date {date_key}",
-                                   info_map)
+                    om.add_warning(
+                        "Duplicate weather", f"duplicate weather data found for the date {date_key}", info_map
+                    )
                 self.weather_data[date_key] = conditions
 
         self.mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
