@@ -639,24 +639,24 @@ class Field:
                 surface_remainder_fraction=surface_remainder_fraction,
                 year=year,
                 day=day,
-                output_name = "manure_application"
+                output_name="manure_application",
             )
         else:
             supplied_nitrogen = 0.0
             supplied_phosphorus = 0.0
 
         self._record_manure_application(
-            dry_matter_mass= 0.0,
-            dry_matter_fraction= 0.0,
+            dry_matter_mass=0.0,
+            dry_matter_fraction=0.0,
             field_coverage=field_coverage,
-            nitrogen = requested_nitrogen,
+            nitrogen=requested_nitrogen,
             phosphorus=requested_phosphorus,
-            potassium = None,
-            application_depth = application_depth,
-            surface_remainder_fraction = surface_remainder_fraction,
-            year = year,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
             day=day,
-            output_name= "manure_request"
+            output_name="manure_request",
         )
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
@@ -705,7 +705,7 @@ class Field:
         year: int,
         day: int,
         output_name: str,
-        potassium: Optional[float] = None
+        potassium: Optional[float] = None,
     ) -> None:
         """
         Records the amount of manure and related values for an individual manure application.
