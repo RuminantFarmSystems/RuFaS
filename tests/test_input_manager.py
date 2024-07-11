@@ -1983,6 +1983,7 @@ def test_add_variable_to_pool_valid(
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
 
     patch_add = mocker.patch("RUFAS.input_manager.InputManager._add_to_pool", wraps=input_manager._add_to_pool)
+    input_manager._add_to_pool.__name__ = "_add_to_pool"
     patch_check = mocker.patch(
         "RUFAS.input_manager.InputManager._check_modifiability", wraps=input_manager._check_modifiability
     )
