@@ -983,9 +983,14 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
+        },
+        {
+            "name": "Homegrown Feed Totals",
+            "filters": [".*_calculate_total_homegrown_feed_amounts_by_crop_type.homegrown_feed_totals.*"]
         },
 
         {"name": "Homegrown Feed Emissions - Alfalfa Silage",
@@ -1000,7 +1005,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1016,7 +1022,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1032,7 +1039,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1048,7 +1056,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1064,7 +1073,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1080,7 +1090,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1096,7 +1107,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1112,7 +1124,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1128,7 +1141,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1144,7 +1158,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1160,7 +1175,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1176,7 +1192,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1192,7 +1209,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1208,7 +1226,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1224,7 +1243,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1240,7 +1260,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1256,7 +1277,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1272,7 +1294,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1288,7 +1311,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1304,7 +1328,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
@@ -1320,7 +1345,8 @@
                 "phosphorus_fertilizer_embedded_CO2_emissions",
                 "potassium_fertilizer_used",
                 "potassium_fertilizer_embedded_CO2_emissions",
-                "manure_nitrogen_used"
+                "manure_nitrogen_used",
+                "manure_nitrogen_requested"
             ],
             "vertical_aggregation": "sum"
         },
