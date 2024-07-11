@@ -10,11 +10,11 @@ class AnimalHealth:
         # create the list of diseases
 
     def daily_health_routine(self, animal_health_status: AnimalHealthStatus, time: Time) -> None:
-        if animal_health_status.status == DiseaseOutcomes.REMAIN_DISEASED:
+        if animal_health_status.status == DiseaseOutcomes.DISEASED:
             # Disease.immediate_effect()
             pass
 
-        elif animal_health_status.status == DiseaseOutcomes.RECOVERY:
+        elif animal_health_status.status == DiseaseOutcomes.IN_RECOVERY:
             if animal_health_status:  # some way to determine if the animal is in the same life stage when it recovered
                 # Disease.intermediate_effect()
                 pass
