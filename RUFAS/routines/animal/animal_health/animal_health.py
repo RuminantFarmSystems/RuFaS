@@ -14,7 +14,14 @@ class AnimalHealth:
             # Disease.immediate_effect()
             pass
 
-        elif animal_health_status.status not in [DiseaseOutcomes.REMAIN_DISEASED, DiseaseOutcomes.RECOVERY]:
+        elif animal_health_status.status == DiseaseOutcomes.RECOVERY:
+            if animal_health_status:  # some way to determine if the animal is in the same life stage when it recovered
+                # Disease.intermediate_effect()
+                pass
+            else:
+                # Disease.lasting_effect()
+                pass
+        else:
             for disease in self.diseases:
                 animal_at_risk = disease.assess_disease_risk(time, animal_health_status)
                 if animal_at_risk:
@@ -23,10 +30,3 @@ class AnimalHealth:
                     if will_develop_disease:
                         disease_start_date = disease.determine_at_risk_period(animal_health_status)
                         animal_health_status.disease_start_date = disease_start_date
-        elif animal_health_status.status == DiseaseOutcomes.RECOVERY:
-            if animal_health_status:  # some way to determine if the animal is in the same life stage when it recovered
-                # Disease.intermediate_effect()
-                pass
-            else:
-                # Disease.lasting_effect()
-                pass

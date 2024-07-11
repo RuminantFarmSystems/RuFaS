@@ -8,23 +8,23 @@ class DiseaseOutcomes(Enum):
 
     HEALTHY : str
         Animal is healthy.
-    DEATH : str
+    DEAD : str
         Animal dies while sick.
-    RECOVERY : str
+    IN_RECOVERY : str
         Animal is eligible to recover but only after n days.
-    CULL : str
+    CULLED : str
         Animal is removed from the herd (sold).
-    REMAIN_DISEASED : str
+    DISEASED : str
         Animal continues to be afflicted by the disease.
 
 
     """
 
     HEALTHY = "healthy"
-    DEATH = "death"
-    RECOVERY = "recovery"
-    CULL = "cull"
-    REMAIN_DISEASED = "remain_diseased"
+    DEATH = "dead"
+    IN_RECOVERY = "in_recovery"
+    CULL = "culled"
+    DISEASED = "diseased"
 
     def __str__(self) -> str:
         """
