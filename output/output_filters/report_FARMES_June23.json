@@ -971,8 +971,10 @@
       "vertical_aggregation": "sum",
       "slice_start": -365
         },
-
-
+        {
+            "name": "Homegrown Feed Totals",
+            "filters": [".*_calculate_total_homegrown_feed_amounts_by_crop_type.homegrown_feed_totals.*"]
+        },
         {
             "name": "Homegrown Feed Emissions",
             "filters": [".*homegrown_.*_emissions.*"]
@@ -1007,9 +1009,26 @@
             ]
         },
         {
-            "name": "Manure",
+            "name": "Manure Application",
             "filters": [
                 "Field._record_manure_application\\.manure_application\\.field='.*'"
+            ],
+            "variables": [
+                "dry_matter_mass",
+                "dry_matter_fraction",
+                "field_coverage",
+                "surface_remainder_fraction",
+                "application_depth",
+                "nitrogen",
+                "phosphorus",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Manure Application",
+            "filters": [
+                "Field._record_manure_application\\.manure_request\\.field='.*'"
             ],
             "variables": [
                 "dry_matter_mass",
@@ -1038,7 +1057,9 @@
                 "planting_date",
                 "harvest_date",
                 "residue_nitrogen",
-                "yield_residue"
+                "yield_residue",
+                "harvest_year",
+                "field_size"
             ]
         },
         {
