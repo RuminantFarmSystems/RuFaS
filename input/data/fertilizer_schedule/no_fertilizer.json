@@ -1,13 +1,19 @@
 {
-    "available_fertilizer_mixes": [],
-    "mix_names": [],
-    "years": [],
-    "days": [],
-    "nitrogen_masses": [],
-    "phosphorus_masses": [],
-    "potassium_masses": [],
-    "application_depths": [],
-    "surface_remainder_fractions": [],
+    "available_fertilizer_mixes": [ {
+      "name": "0_0_0",
+      "N": 0.0,
+      "P": 0.0,
+      "K": 0.0
+    }
+    ],
+    "mix_names": ["0_0_0"],
+    "years": [1],
+    "days": [1],
+    "nitrogen_masses": [1],
+    "phosphorus_masses": [1],
+    "potassium_masses": [1],
+    "application_depths": [0],
+    "surface_remainder_fractions": [0],
     "pattern_repeat": 0,
     "pattern_skip": 0
 }
