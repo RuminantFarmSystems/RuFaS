@@ -1329,7 +1329,10 @@ class OutputManager(object):
 
             if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
-            units = variable_data.get("info_maps")[0]["units"]
+
+            var_data_info_maps = variable_data.get("info_maps")
+            if var_data_info_maps:
+                units = var_data_info_maps[0]["units"]
             is_variable_nested = isinstance(variable_data["values"][0], dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
