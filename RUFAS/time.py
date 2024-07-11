@@ -124,7 +124,7 @@ class Time:
     @staticmethod
     def convert_year_jday_to_date(year: int, day: int) -> datetime:
         """
-        Converts the year and its day of the year to a datetime object
+        Converts the year and its day of the year to a datetime object.
 
         Parameters
         ----------
