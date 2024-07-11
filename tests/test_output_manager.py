@@ -1,4 +1,3 @@
-import difflib
 import json
 import os
 from copy import deepcopy
@@ -1182,13 +1181,6 @@ def test_dump_variable_names_and_contexts(
 
     mock_output_manager.generate_file_name.assert_called_once_with("variable_names", "txt")
     mock_output_manager._list_to_file_txt.assert_called_once_with(expected_result, Path("dummy_path", "dummy_name"))
-    actual_result = mock_output_manager._list_to_file_txt.call_args[0][0]
-
-    if actual_result != expected_result:
-        diff = difflib.unified_diff(expected_result, actual_result, fromfile='expected', tofile='actual', lineterm='')
-        print('\n'.join(diff))
-
-    assert actual_result == expected_result, "The actual result differs from the expected result."
 
     # Restore original methods
     mock_output_manager.generate_file_name = output_manager_original_method_states["generate_file_name"]
