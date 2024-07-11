@@ -1615,8 +1615,6 @@ class InputManager:
 
         Raises
         -------
-        PermissionError
-            If eager_termination is True and the variable is not modifiable during runtime.
         ValueError
             If eager_termination is True and the variable failed validation.
 
@@ -1628,7 +1626,7 @@ class InputManager:
         validated_data = {}
         elements_counter = ElementsCounter()
 
-        element_hierarchy, data, metadata_properties = self._prepare_data(
+        data, metadata_properties = self._prepare_data(
             variable_name, input_data, properties_blob_key
         )
 
@@ -1639,7 +1637,7 @@ class InputManager:
         )
 
         if validated_data:
-            self._add_to_pool(variable_name, validated_data, info_map)
+            self._add_to_pool(variable_name, validated_data)
             elements_counter += elements_counter
 
         if elements_counter.invalid_elements > 0:
@@ -1660,7 +1658,7 @@ class InputManager:
 
     def _prepare_data(
         self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
-    ) -> Tuple[List[str], Dict[str, Any], Dict[str, Any]]:
+    ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Prepare data and metadata properties for validation.
 
@@ -1690,7 +1688,7 @@ class InputManager:
             data = input_data
             metadata_properties = self.__metadata["properties"][properties_blob_key]
 
-        return element_hierarchy, data, metadata_properties
+        return data, metadata_properties
 
     def _check_modifiability(
         self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool, info_map: dict[str, Any]
@@ -1710,9 +1708,10 @@ class InputManager:
         info_map : dict[str, Any]
             Information to be reported through the OM.
 
-        Returns
-        -------
-        None
+        Raises
+        ------
+        PermissionError
+            If eager_termination is True and the variable is not modifiable during runtime.
 
         """
         is_modifiable_during_runtime = self._is_modifiable_during_runtime(
@@ -1777,7 +1776,7 @@ class InputManager:
 
         return validated_data
 
-    def _add_to_pool(self, variable_name: str, validated_data: dict[str, Any], info_map: dict[str, Any]) -> None:
+    def _add_to_pool(self, variable_name: str, validated_data: dict[str, Any]) -> None:
         """
         Add validated data to the pool.
 
@@ -1787,15 +1786,13 @@ class InputManager:
             The name of the variable to be added to the pool.
         validated_data : dict[str, Any]
             A dictionary of validated data.
-        info_map : dict[str, Any]
-            Information to be reported through the OM.
-
-        Returns
-        -------
-        None
 
         """
         if variable_name in self.__pool.keys():
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._add_to_pool.__name__,
+            }
             om.add_warning(
                 "Overwriting existing variable",
                 f"Variable {variable_name} already exists in InputManager pool, overwriting the old value.",

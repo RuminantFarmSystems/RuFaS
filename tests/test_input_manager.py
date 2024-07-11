@@ -1981,32 +1981,16 @@ def test_add_variable_to_pool_valid(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
-    # Capture the original method
-    original_add_to_pool = input_manager._add_to_pool
-    original_check_modifiability = input_manager._check_modifiability
-    original_validate_data = input_manager._validate_data
-    orginal_prepare_data = input_manager._prepare_data
 
-    def side_effect_add_pool(*args, **kwargs):
-        return original_add_to_pool(*args, **kwargs)
-
-    def side_effect_check_modifiability(*args, **kwargs):
-        return original_check_modifiability(*args, **kwargs)
-
-    def side_effect_validate_data(*args, **kwargs):
-        return original_validate_data(*args, **kwargs)
-
-    def side_effect_prepare_data(*args, **kwargs):
-        return orginal_prepare_data(*args, **kwargs)
-
-    patch_add = mocker.patch("RUFAS.input_manager.InputManager._add_to_pool", side_effect=side_effect_add_pool)
+    patch_add = mocker.patch("RUFAS.input_manager.InputManager._add_to_pool", wraps=input_manager._add_to_pool)
     patch_check = mocker.patch(
-        "RUFAS.input_manager.InputManager._check_modifiability", side_effect=side_effect_check_modifiability
+        "RUFAS.input_manager.InputManager._check_modifiability", wraps=input_manager._check_modifiability
     )
     patch_validate = mocker.patch(
-        "RUFAS.input_manager.InputManager._validate_data", side_effect=side_effect_validate_data
+        "RUFAS.input_manager.InputManager._validate_data", wraps=input_manager._validate_data
     )
-    patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", side_effect=side_effect_prepare_data)
+    patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", wraps=input_manager._prepare_data)
+
     expected_add_warning_count = 1 if starting_im_pool else 0
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
     patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
@@ -4816,7 +4800,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
     return {
         "properties": {
             "example_blob_key": {
-                "root": {"nested_property": {"type": "string", "description": "An example property"}},
+                "object_property": {"nested_property": {"type": "string", "description": "An example property"}},
                 "example_property": {"type": "string", "description": "An example property"},
             }
         }
@@ -4824,26 +4808,24 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
 
 
 @pytest.mark.parametrize(
-    "variable_name,input_data,properties_blob_key,expected_element_hierarchy,"
+    "variable_name,input_data,properties_blob_key,"
     "expected_data,expected_metadata_properties",
     [
         (
             "example_property",
             {"key": "value"},
             "example_blob_key",
-            ["example_property"],
             {"key": "value"},
             {
                 "example_property": {"description": "An example property", "type": "string"},
-                "root": {"nested_property": {"description": "An example property", "type": "string"}},
+                "object_property": {"nested_property": {"description": "An example property", "type": "string"}},
             },
         ),
         (
-            "example_property.root.nested_property",
+            "example_property.object_property.nested_property",
             {"nested_key": "nested_value"},
             "example_blob_key",
-            ["example_property", "root", "nested_property"],
-            {"root": {"nested_property": {"nested_key": "nested_value"}}},
+            {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
             {"type": "string", "description": "An example property"},
         ),
     ],
@@ -4853,7 +4835,6 @@ def test_prepare_data(
     variable_name: str,
     input_data: dict[Any, Any],
     properties_blob_key: str,
-    expected_element_hierarchy: list[str],
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
     mocker: MockerFixture
@@ -4862,11 +4843,10 @@ def test_prepare_data(
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
 
-    element_hierarchy, data, metadata_properties = input_manager._prepare_data(
+    data, metadata_properties = input_manager._prepare_data(
         variable_name, input_data, properties_blob_key
     )
 
-    assert element_hierarchy == expected_element_hierarchy
     assert data == expected_data
     assert metadata_properties == expected_metadata_properties
 
@@ -5043,18 +5023,17 @@ def mock_pool_for_add_pool() -> Dict[str, Dict[str, Any]]:
     }
 
 
-@pytest.mark.parametrize("variable_name,validated_data,info_map", [
-    ("module1", {"test": "random"}, {})
+@pytest.mark.parametrize("variable_name,validated_data", [
+    ("module1", {"test": "random"})
 ])
 def test_add_to_pool(variable_name: str,
                      validated_data: dict[str, Any],
-                     info_map: dict[str, Any],
                      mocker: MockerFixture,
                      mock_pool_for_add_pool: Dict[str, Any]) -> None:
     """Tests to make sure validated data were added to pool"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, '_InputManager__pool', mock_pool_for_add_pool)
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    input_manager._add_to_pool(variable_name, validated_data, info_map)
+    input_manager._add_to_pool(variable_name, validated_data)
     mock_add_warning.assert_called_once()
     assert input_manager.pool["module1"] == {"test": "random"}
