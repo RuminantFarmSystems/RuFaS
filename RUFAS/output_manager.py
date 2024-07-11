@@ -1330,28 +1330,56 @@ class OutputManager(object):
             if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
 
+            var_data_info_maps = variable_data.get("info_maps")
+            if var_data_info_maps:
+                units = var_data_info_maps[0]["units"]
             is_variable_nested = isinstance(variable_data["values"][0], dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
-                var_list.append(f"{name}{os.linesep}")
+                var_list.append(f"{name} ({units}){os.linesep}")
 
             prefix = name
             if format_option == "block":
                 if f"{name}{os.linesep}" not in var_list:
                     var_list.append(f"{name}{os.linesep}")
                 prefix = " " * len(name)
-
+            keys_to_ignore = [
+                "units",
+                "timestep",
+                "info_maps",
+                "prefix",
+                "suffix",
+                "data_origin",
+                "number_animals_in_pen",
+                "simulation_day",
+            ]
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
                 if format_option == "inline":
-                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
-                elif format_option == "basic":
-                    for key in keys:
-                        var_list.append(f"{name}.{key}{os.linesep}")
+                    var_list.append(
+                        f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
+                        if not parsable_dict.endswith("info_maps")
+                        else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
+                    )
                 else:
                     for key in keys:
-                        var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
+                        if isinstance(units, dict):
+                            var_units = units.get(key, "")
+                        else:
+                            var_units = units
+                        if format_option == "basic":
+                            var_list.append(
+                                f"{name}.{key} ({var_units}){os.linesep}"
+                                if key not in keys_to_ignore
+                                else f"{name}.{key}{os.linesep}"
+                            )
+                        else:
+                            var_list.append(
+                                f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
+                                if key not in keys_to_ignore
+                                else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
+                            )
 
         file_path = path / self.generate_file_name("variable_names", "txt")
         self._list_to_file_txt(var_list, file_path)
