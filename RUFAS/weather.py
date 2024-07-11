@@ -69,6 +69,15 @@ class Weather:
                     precipitation=weather_file["precip"][i],
                     irrigation=weather_file["irrigation"][i],
                 )
+                if date_key in self.weather_data.keys():
+                    info_map = {
+                        "class": self.__class__.__name__,
+                        "function": "__init__",
+                        "prefix": "Weather",
+                    }
+                    om.add_warning("Duplicate weather",
+                                   f"duplicate weather data found for the date {date_key}",
+                                   info_map)
                 self.weather_data[date_key] = conditions
 
         self.mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
@@ -138,7 +147,7 @@ class Weather:
             Series of current day conditions in chronological order.
 
         """
-        condition_list = []
+        conditions_list = []
         latitude = self._get_latitude()
 
         for i in range(starting_offset, ending_offset + 1):
@@ -146,9 +155,9 @@ class Weather:
             daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude, date.year)
             self.weather_data[date].daylength = daylength
             self.weather_data[date].annual_mean_air_temperature = self.mean_annual_temperature
-            condition_list.append(self.weather_data[date])
+            conditions_list.append(self.weather_data[date])
 
-        return condition_list
+        return conditions_list
 
     def record_weather(self, time: Time) -> None:
         """
@@ -279,7 +288,7 @@ class Weather:
         Parameters
         ----------
         weather_file: dict
-            A dictionary form of the weather file.
+            File containing weather data.
         time: Time
             The Time instance containing time configuration information of the simulation.
 
@@ -305,7 +314,7 @@ class Weather:
                     "function": Weather.check_adequate_weather_data.__name__,
                 }
                 om.add_error(
-                    f"Dumping all logs from main.py because of error '{ValueError}'",
+                    "Inadequate weather data.",
                     "Not enough weather data provided to support the duration of simulation period",
                     info_map,
                 )
