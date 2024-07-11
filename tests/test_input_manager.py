@@ -4984,9 +4984,8 @@ def test_validate_data(
     mock_validate_input_by_type = mocker.patch.object(
         input_manager,
         "_validate_input_by_type",
-        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key, elements_counter, called_during_initialization: input_data.get(
-            variable_path[0]
-        )
+        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
+        elements_counter, called_during_initialization: input_data.get(variable_path[0])
         is not None,
     )
 
