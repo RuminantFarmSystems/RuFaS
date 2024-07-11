@@ -136,7 +136,7 @@ class Time:
         Returns
         -------
         datetime
-            The date time object from the provided inputs
+            The datetime object from the provided inputs.
 
         """
         first_day_of_year = datetime.datetime(year, 1, 1)
