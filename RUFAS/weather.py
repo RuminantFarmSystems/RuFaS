@@ -18,7 +18,7 @@ class Weather:
     Parameters
     ----------
     weather_file : dict[str, List[Any]]
-        The weather dictionary read from the provided weather file.
+        The weather dictionary read from the provided weather input source.
 
     Attributes
     ----------
