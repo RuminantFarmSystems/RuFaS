@@ -4868,12 +4868,13 @@ def test_check_modifiability_valid(
         "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
     )
 
-    input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+    result = input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
 
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
 
     patch_om_error.assert_not_called()
     patch_om_warning.assert_not_called()
+    assert result
 
 
 @pytest.mark.parametrize(
@@ -4926,10 +4927,11 @@ def test_check_modifiability_warning(
         "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
     )
 
-    input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+    result = input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
     mock_add_warning.assert_called_once()
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
+    assert not result
 
 
 @pytest.fixture

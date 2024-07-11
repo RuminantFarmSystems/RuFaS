@@ -1628,7 +1628,10 @@ class InputManager:
 
         data, metadata_properties = self._prepare_data(variable_name, input_data, properties_blob_key)
 
-        self._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+        modifiable = self._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+
+        if not modifiable:
+            return modifiable
 
         validated_data = self._validate_data(
             data, metadata_properties, eager_termination, properties_blob_key, elements_counter
@@ -1690,7 +1693,7 @@ class InputManager:
 
     def _check_modifiability(
         self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool, info_map: dict[str, Any]
-    ) -> None:
+    ) -> bool:
         """
         Prepare data and metadata properties for validation.
 
@@ -1720,6 +1723,8 @@ class InputManager:
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
         elif not is_modifiable_during_runtime:
             om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            return False
+        return True
 
     def _validate_data(
         self,
