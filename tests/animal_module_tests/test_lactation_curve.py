@@ -1,12 +1,9 @@
 import pytest
 import numpy as np
-from typing import Any, Dict
-from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
 from scipy.integrate import quad
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
-from RUFAS.input_manager import InputManager
 
 
 @pytest.fixture
@@ -66,16 +63,6 @@ def lactation_curve_fixture(mocker: MockerFixture) -> LactationCurve:
             {"milking_frequency": "3x/d", "adjustments": [0.74, -0.090, -0.15]},
         ],
     }
-    """lact.region_dict = 
-    lact.year = 
-    lact.region 
-    lact.annual_MY_lbs
-    lact.parity_percentages
-    lact.num_milking_cows
-    lact.milking_freq
-    lact.parity2_MilkYield305_adj
-    lact.parity3_MilkYield305_adj
-    lact.adjustment_dict"""
     return lact
 
 
@@ -122,55 +109,39 @@ def test_calc_integral_wood_curve(lactation_curve_fixture: LactationCurve):
 
 
 def test_get_wood_parameters_305dNone(mocker: MockerFixture, lactation_curve_fixture: LactationCurve):
-    """Unit test for function get_wood_parameters in file routines/animal/life_cycle/lactation_curve.py when MY_305 is None"""
+    """Unit test for function get_wood_parameters in file routines/animal/life_cycle/lactation_curve.py
+    when MY_305 is None"""
 
     # Arrange
-    # mock t and animalBase.get_t_values()
-    # mock adjustment_dict and im.get_data
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.calc_integral_wood_curve",
         return_value=305.00,
     )
-    # mock_lact_curve = LactationCurve()
-    # param_a_mock = MagicMock()
-    # param_b_mock = MagicMock()
-    # param_c_mock = MagicMock()
     mock_lactation_group = MagicMock()
     mock_year = MagicMock()
     mock_month = MagicMock()
     mock_region = MagicMock()
     mock_milking_freq = MagicMock()
     mock_MY_305d = 305.00
-    # mock_lact_curve.calc_integral_wood_curve = MagicMock(return_value=305.00)
 
     # Act
-    # actual_param_a, actual_param_b, actual_param_c,
     _, _, _, actual_305d = lactation_curve_fixture.get_wood_parameters(
         mock_lactation_group, mock_year, mock_month, mock_region, mock_milking_freq, None
     )
 
     # Assert
-    # assert actual_param_a == param_a_mock
-    # assert actual_param_b == param_b_mock
-    # assert actual_param_c == param_c_mock
-    # mock_lact_curve.calc_integral_wood_curve.assert_called_once()
     assert actual_305d == mock_MY_305d
 
 
 def test_get_wood_parameters_305d(mocker: MockerFixture, lactation_curve_fixture: LactationCurve):
-    """Unit test for function get_wood_parameters in file routines/animal/life_cycle/lactation_curve.py when MY_305 is not None"""
+    """Unit test for function get_wood_parameters in file routines/animal/life_cycle/lactation_curve.py
+    when MY_305 is not None"""
 
     # Arrange
-    # mock t and animalBase.get_t_values()
-    # mock adjustment_dict and im.get_data
     mocker.patch(
         "RUFAS.routines.animal.life_cycle.lactation_curve.LactationCurve.calc_integral_wood_curve",
         return_value=305.00,
     )
-    # lact_curve_mock = LactationCurve()
-    # param_a_mock = MagicMock()
-    # param_b_mock = MagicMock()
-    # param_c_mock = MagicMock()
     lactation_group_mock = MagicMock()
     year_mock = MagicMock()
     month_mock = MagicMock()
@@ -179,7 +150,6 @@ def test_get_wood_parameters_305d(mocker: MockerFixture, lactation_curve_fixture
     MY_305d_mock = 305.00
 
     # Act
-    # actual_param_a, actual_param_b, actual_param_c,
     _, _, _, actual_305d = lactation_curve_fixture.get_wood_parameters(
         lactation_group_mock, year_mock, month_mock, region_mock, milking_freq_mock, "50000"
     )
@@ -189,7 +159,8 @@ def test_get_wood_parameters_305d(mocker: MockerFixture, lactation_curve_fixture
 
 
 def test_get_wood_param_adjust_params(mocker: MockerFixture, lactation_curve_fixture: LactationCurve):
-    """Unit test for adjustments to parameters l,m,n in function get_wood_parameters in file routines/animal/life_cycle/lactation_curve.py"""
+    """Unit test for adjustments to parameters l,m,n in function get_wood_parameters
+    in file routines/animal/life_cycle/lactation_curve.py"""
 
     # Arrange
     mocker.patch(
@@ -210,7 +181,8 @@ def test_get_wood_param_adjust_params(mocker: MockerFixture, lactation_curve_fix
 
 
 def test_calc_parities_annual_MY(mocker: MockerFixture, lactation_curve_fixture: LactationCurve):
-    """Unit test for function calc_parities in file routines/animal/life_cycle/lactation_curve.py when annual milk yield is not None"""
+    """Unit test for function calc_parities in file routines/animal/life_cycle/lactation_curve.py
+    when annual milk yield is not None"""
 
     # Arrange
     lactation_curve_fixture.annual_MY_lbs = mocker.MagicMock()
@@ -223,13 +195,14 @@ def test_calc_parities_annual_MY(mocker: MockerFixture, lactation_curve_fixture:
     actual_parity1_305, actual_parity2_305, actual_parity3_305 = lactation_curve_fixture.calc_parities()
 
     # Assert
-    assert actual_parity1_305 != None
-    assert actual_parity2_305 != None
-    assert actual_parity3_305 != None
+    assert actual_parity1_305 is not None
+    assert actual_parity2_305 is not None
+    assert actual_parity3_305 is not None
 
 
 def test_calc_parities_annual_MY_None(lactation_curve_fixture: LactationCurve):
-    """Unit test for function calc_parities in file routines/animal/life_cycle/lactation_curve.py when annual milk yield is None"""
+    """Unit test for function calc_parities in file routines/animal/life_cycle/lactation_curve.py
+    when annual milk yield is None"""
 
     # Arrange
     lactation_curve_fixture.annual_MY_lbs = None
@@ -238,9 +211,9 @@ def test_calc_parities_annual_MY_None(lactation_curve_fixture: LactationCurve):
     actual_parity1_305, actual_parity2_305, actual_parity3_305 = lactation_curve_fixture.calc_parities()
 
     # Assert
-    assert actual_parity1_305 == None
-    assert actual_parity2_305 == None
-    assert actual_parity3_305 == None
+    assert actual_parity1_305 is None
+    assert actual_parity2_305 is None
+    assert actual_parity3_305 is None
 
 
 def test_set_lactation_curve_parameters(mocker: MockerFixture, lactation_curve_fixture: LactationCurve):
