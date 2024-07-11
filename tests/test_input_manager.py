@@ -1987,9 +1987,7 @@ def test_add_variable_to_pool_valid(
     patch_check = mocker.patch(
         "RUFAS.input_manager.InputManager._check_modifiability", wraps=input_manager._check_modifiability
     )
-    patch_validate = mocker.patch(
-        "RUFAS.input_manager.InputManager._validate_data", wraps=input_manager._validate_data
-    )
+    patch_validate = mocker.patch("RUFAS.input_manager.InputManager._validate_data", wraps=input_manager._validate_data)
     patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", wraps=input_manager._prepare_data)
 
     expected_add_warning_count = 1 if starting_im_pool else 0
@@ -4809,8 +4807,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
 
 
 @pytest.mark.parametrize(
-    "variable_name,input_data,properties_blob_key,"
-    "expected_data,expected_metadata_properties",
+    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties",
     [
         (
             "example_property",
@@ -4838,15 +4835,13 @@ def test_prepare_data(
     properties_blob_key: str,
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
 
-    data, metadata_properties = input_manager._prepare_data(
-        variable_name, input_data, properties_blob_key
-    )
+    data, metadata_properties = input_manager._prepare_data(variable_name, input_data, properties_blob_key)
 
     assert data == expected_data
     assert metadata_properties == expected_metadata_properties
@@ -4969,7 +4964,7 @@ def elements_counter() -> ElementsCounter:
             {},
             2,
         ),
-    ]
+    ],
 )
 def test_validate_data(
     mocker: MockerFixture,
@@ -4987,8 +4982,10 @@ def test_validate_data(
     mock_validate_input_by_type = mocker.patch.object(
         input_manager,
         "_validate_input_by_type",
-        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
-        elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None
+        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key, elements_counter, called_during_initialization: input_data.get(
+            variable_path[0]
+        )
+        is not None,
     )
 
     validated_data = input_manager._validate_data(
@@ -5024,16 +5021,13 @@ def mock_pool_for_add_pool() -> Dict[str, Dict[str, Any]]:
     }
 
 
-@pytest.mark.parametrize("variable_name,validated_data", [
-    ("module1", {"test": "random"})
-])
-def test_add_to_pool(variable_name: str,
-                     validated_data: dict[str, Any],
-                     mocker: MockerFixture,
-                     mock_pool_for_add_pool: Dict[str, Any]) -> None:
+@pytest.mark.parametrize("variable_name,validated_data", [("module1", {"test": "random"})])
+def test_add_to_pool(
+    variable_name: str, validated_data: dict[str, Any], mocker: MockerFixture, mock_pool_for_add_pool: Dict[str, Any]
+) -> None:
     """Tests to make sure validated data were added to pool"""
     input_manager = InputManager()
-    mocker.patch.object(input_manager, '_InputManager__pool', mock_pool_for_add_pool)
+    mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_add_pool)
     mock_add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
     input_manager._add_to_pool(variable_name, validated_data)
     mock_add_warning.assert_called_once()
