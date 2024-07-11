@@ -1,9 +1,9 @@
 {
-  "parallel_workers": 4,
+  "parallel_workers": 6,
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json",
+      "metadata_file_path": "input/metadata/FARMES_fakefarm1_wcrops_metadata.json",
       "output_prefix": "default",
       "log_verbosity": "errors",
       "random_seed": 42
