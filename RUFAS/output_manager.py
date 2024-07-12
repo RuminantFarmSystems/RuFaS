@@ -1327,17 +1327,17 @@ class OutputManager(object):
 
             parsable_dicts = []
 
+            var_data_info_maps = {}
             if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
+                var_data_info_maps = variable_data.get("info_maps")
 
-            var_data_info_maps = variable_data.get("info_maps")
-            if var_data_info_maps:
-                units = var_data_info_maps[0]["units"]
+            units = var_data_info_maps[0]["units"] if var_data_info_maps else ""
             is_variable_nested = isinstance(variable_data["values"][0], dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
-                var_list.append(f"{name} ({units}){os.linesep}")
+                var_list.append(f"{name} ({units}){os.linesep}" if units else f"{name}{os.linesep}")
 
             prefix = name
             if format_option == "block":
@@ -1359,7 +1359,7 @@ class OutputManager(object):
                 if format_option == "inline":
                     var_list.append(
                         f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
-                        if not parsable_dict.endswith("info_maps")
+                        if not parsable_dict.endswith("info_maps") and units
                         else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
                     )
                 else:
@@ -1371,13 +1371,13 @@ class OutputManager(object):
                         if format_option == "basic":
                             var_list.append(
                                 f"{name}.{key} ({var_units}){os.linesep}"
-                                if key not in keys_to_ignore
+                                if key not in keys_to_ignore and var_units
                                 else f"{name}.{key}{os.linesep}"
                             )
                         else:
                             var_list.append(
                                 f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
-                                if key not in keys_to_ignore
+                                if key not in keys_to_ignore and var_units
                                 else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
                             )
 
