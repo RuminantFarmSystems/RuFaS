@@ -57,7 +57,7 @@ class Hay(Storage):
         float
             The diameter of the hay bale (meters).
         """
-        pass
+        return 1.5
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
