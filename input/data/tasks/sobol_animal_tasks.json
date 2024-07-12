@@ -1,15 +1,15 @@
 {
-    "parallel_workers": 6,
+    "parallel_workers": 1,
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "sobol_1k_128",
+        "output_prefix": "TEST2",
         "log_verbosity": "errors",
         "sampler": "sobol",
-        "saltelli_number": 128,
+        "saltelli_number": 256,
         "saltelli_skip": 2048,
-        "SA_load_balancing_start": 0.9,
-        "SA_load_balancing_stop": 1,
+        "SA_load_balancing_start": 0.0,
+        "SA_load_balancing_stop": 0.01,
         "random_seed": 42,
         "SA_input_variables": [
           {
@@ -225,13 +225,13 @@
           },
           {
             "variable_name": "animal.animal_config.from_literature.repro.preg_check_day_2",
-            "lower_bound": 60,
+            "lower_bound": 61,
             "upper_bound": 120,
             "data_type":"int"
           },
           {
             "variable_name": "animal.animal_config.from_literature.repro.preg_check_day_3",
-            "lower_bound": 120,
+            "lower_bound": 121,
             "upper_bound": 240,
             "data_type":"int"
           },
@@ -304,89 +304,28 @@
             "data_type":"int"
           },
   
-          
+
           {
-            "variable_name": "animal.animal_config.from_literature.culling.feet_leg_cull.probability",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.injury_cull.probability",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.mastitis_cull.probability",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.disease_cull.probability",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.udder_cull.probability",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.unknown_cull.probability",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
+            "variable_name": "animal.animal_config.from_literature.milking.wood_l.0.0",
+            "lower_bound": 5,
+            "upper_bound": 75,
+            "data_type": "float"
           },
-          
           {
-            "variable_name": "animal.animal_config.from_literature.culling.feet_leg_cull.cull_day_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.injury_cull.cull_day_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.mastitis_cull.cull_day_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.disease_cull.cull_day_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.udder_cull.cull_day_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.unknown_cull.cull_day_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
+            "variable_name": "animal.animal_config.from_literature.milking.wood_l.0.1",
+            "lower_bound": 5,
+            "upper_bound": 75,
+            "data_type": "float"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.milking.wood_l.0.2",
+            "lower_bound": 5,
+            "upper_bound": 75,
+            "data_type": "float"
           },
           
           
-          {
-            "variable_name": "animal.animal_config.from_literature.culling.parity_death_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.parity_cull_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },{
-            "variable_name": "animal.animal_config.from_literature.culling.death_day_prob",
-            "lower_bound": 0,
-            "upper_bound": 1,
-            "data_type":"float"
-          },
-  
+          
           {
             "variable_name": "animal.animal_config.from_literature.life_cycle.still_birth_rate",
             "lower_bound": 0,
