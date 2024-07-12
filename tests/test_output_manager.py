@@ -1035,10 +1035,10 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1 (units1)" + os.linesep,
-                "var2.values: v1 (units1)" + os.linesep,
-                "var2.values: v2 (units1)" + os.linesep,
-                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                "var1" + os.linesep,
+                "var2.values: v1" + os.linesep,
+                "var2.values: v2" + os.linesep,
+                "var3" + os.linesep,
             ],
             True,
             "verbose",
@@ -1067,12 +1067,10 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1 (units1)" + os.linesep,
                 "var1" + os.linesep,
                 "var2" + os.linesep,
-                "    .values: v1 (units1)" + os.linesep,
-                "    .values: v2 (units1)" + os.linesep,
-                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                "    .values: v1" + os.linesep,
+                "    .values: v2" + os.linesep,
                 "var3" + os.linesep,
             ],
             True,
@@ -1094,9 +1092,9 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1 (units1)" + os.linesep,
-                "var2.values: ['v1', 'v2'] (units1)" + os.linesep,
-                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                "var1" + os.linesep,
+                "var2.values: ['v1', 'v2']" + os.linesep,
+                "var3" + os.linesep,
             ],
             True,
             "inline",
@@ -1104,10 +1102,10 @@ def test_report_variables_usage_counts(mocker: MockerFixture) -> None:
         (
             [
                 "_exclude_info_maps=True, expect info_maps accordingly." + os.linesep,
-                "var1 (units1)" + os.linesep,
-                "var2.v1 (units1)" + os.linesep,
-                "var2.v2 (units1)" + os.linesep,
-                "var3 ({'key1': 'unit1', 'key2': 'unit2'})" + os.linesep,
+                "var1" + os.linesep,
+                "var2.v1" + os.linesep,
+                "var2.v2" + os.linesep,
+                "var3" + os.linesep,
             ],
             True,
             "basic",
