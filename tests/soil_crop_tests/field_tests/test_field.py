@@ -1691,6 +1691,7 @@ def test_execute_manure_application(
                     surface_remainder_fraction=remainder,
                     year=year,
                     day=day,
+                    output_name="manure_application"
                 )
 
             if fertilizer_applied and not supplement:
@@ -1708,6 +1709,7 @@ def test_execute_manure_application(
                     "100_0_0",
                     expected_unmet_nitrogen,
                     expected_unmet_phosphorus,
+                    0,
                     depth,
                     remainder,
                     year,
@@ -1724,6 +1726,7 @@ def test_execute_manure_application(
                     "expected_optimal_mix",
                     expected_unmet_nitrogen,
                     expected_unmet_phosphorus,
+                    0,
                     depth,
                     remainder,
                     year,
@@ -1817,6 +1820,7 @@ def test_execute_manure_application_with_invalid_args(
             dry_matter_fraction=0.66,
             field_coverage=0.8,
             nitrogen=50.0,
+            output_name="manure_application",
             phosphorus=50.0,
             potassium=None,
             application_depth=expected_depth,
@@ -2003,16 +2007,17 @@ def test_record_manure_application(
         return_value=10.0,
     ) as clay:
         field._record_manure_application(
-            dry_mass,
-            dry_fraction,
-            coverage,
-            nitrogen,
-            phosphorus,
-            depth,
-            remainder,
-            year,
-            day,
-            potassium,
+            dry_matter_mass=dry_mass,
+            dry_matter_fraction=dry_fraction,
+            field_coverage=coverage,
+            nitrogen=nitrogen,
+            phosphorus=phosphorus,
+            application_depth=depth,
+            surface_remainder_fraction=remainder,
+            year=year,
+            day=day,
+            potassium=potassium,
+            output_name="manure_application",
         )
 
         clay.assert_called_once()
