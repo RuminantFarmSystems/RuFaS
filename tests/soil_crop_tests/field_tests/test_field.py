@@ -1692,7 +1692,7 @@ def test_execute_manure_application(
                         surface_remainder_fraction=remainder,
                         year=year,
                         day=day,
-                        output_name="manure_application"
+                        output_name="manure_application",
                     ),
                     mocker.call(
                         dry_matter_mass=0.0,
@@ -1705,8 +1705,8 @@ def test_execute_manure_application(
                         surface_remainder_fraction=remainder,
                         year=year,
                         day=day,
-                        output_name="manure_request"
-                    )
+                        output_name="manure_request",
+                    ),
                 ]
                 field._record_manure_application.assert_has_calls(expected_record_manure_application_calls)
 
@@ -1856,12 +1856,10 @@ def test_execute_manure_application_with_invalid_args(
                 surface_remainder_fraction=expected_remainder,
                 year=2000,
                 day=133,
-                output_name="manure_request"
-            )
+                output_name="manure_request",
+            ),
         ]
-        patched_recorder.assert_has_calls(
-            expected_record_manure_application_calls
-        )
+        patched_recorder.assert_has_calls(expected_record_manure_application_calls)
         patched_optimizer.assert_not_called()
         patched_fertilizer_applicator.assert_not_called()
 
