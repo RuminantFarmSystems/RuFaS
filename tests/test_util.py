@@ -335,8 +335,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             math.nan,
-            True,
             False,
+            True,
             {
                 "a": {
                     "values": ["a", "a", "a", "b", "c", math.nan],
@@ -382,8 +382,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             math.nan,
-            False,
             True,
+            False,
             {
                 "a": {
                     "values": ["a", math.nan, math.nan, "b", "c", "c"],
@@ -418,8 +418,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             None,
-            False,
             True,
+            False,
             {
                 "a": {
                     "values": ["a", "a", "a"],
@@ -451,8 +451,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             8,
-            True,
             False,
+            True,
             {
                 "a": {
                     "values": ["a", "b"],
@@ -476,8 +476,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             "fill",
-            False,
             True,
+            False,
             {
                 "a": {
                     "values": ["a", "fill", "b"],
@@ -505,8 +505,8 @@ def test_flatten_keys_to_nested_structure_dict_w_list() -> None:
                 },
             },
             math.pi,
-            False,
-            False,
+            True,
+            True,
             {
                 "a": {
                     "values": ["a", math.pi, "b"],
@@ -529,7 +529,7 @@ def test_expand_data_temporally(
 ) -> None:
     """Tests the utility method expand_data_temporally."""
     actual = Utility.expand_data_temporally(
-        data_to_pad, fill_value=fill_value, fill_gap_values=gap_pad, fill_end_values=end_pad
+        data_to_pad, fill_value=fill_value, use_fill_value_in_gaps=gap_pad, use_fill_value_at_end=end_pad
     )
 
     assert actual == expected

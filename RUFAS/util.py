@@ -88,8 +88,8 @@ class Utility:
     def expand_data_temporally(
         data_to_expand: dict[str, dict[str, list[Any]]],
         fill_value: Any = np.nan,
-        fill_gap_values: bool = False,
-        fill_end_values: bool = False,
+        use_fill_value_in_gaps: bool = True,
+        use_fill_value_at_end: bool = True,
     ) -> dict[str, dict[str, list[Any]]]:
         """
         Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
@@ -103,12 +103,12 @@ class Utility:
         fill_value : Any, default numpy.nan
             Value that is used to pad the front of the data values, and optionally the values in between original values
             and after the last original value.
-        fill_gap_values : bool, default False
-            If true, values between known data points are expanded with the last known value from the data set. If
-            false, values between known data points are filled with `fill_value`.
-        fill_end_values : bool, default False
-            If true, values after last known data point are padded with the last known value from the data set. If
-            false, values after the last known data point are filled with `fill_value`.
+        use_fill_value_in_gaps : bool, default True
+            If false, values between known data points are expanded with the last known value from the data set. If
+            true, values between known data points are filled with `fill_value`.
+        use_fill_value_at_end : bool, default True
+            If false, values after last known data point are padded with the last known value from the data set. If
+            true, values after the last known data point are filled with `fill_value`.
 
         Returns
         -------
@@ -158,7 +158,7 @@ class Utility:
             last_value = (fill_value, {"simulation_day": 0, "units": original_units})
             for day in range(first_day, last_day_of_original_data + 1):
                 if day in indexed_data.keys():
-                    last_value = indexed_data[day] if fill_gap_values else (fill_value, indexed_data[day][1])
+                    last_value = indexed_data[day] if not use_fill_value_in_gaps else (fill_value, indexed_data[day][1])
                     expanded_variable_data["values"].append(indexed_data[day][0])
                     expanded_variable_data["info_maps"].append(indexed_data[day][1])
                     expanded_variable_data["info_maps"][-1]["simulation_day"] = day
@@ -167,7 +167,7 @@ class Utility:
                     expanded_variable_data["info_maps"].append(last_value[1].copy())
                     expanded_variable_data["info_maps"][-1]["simulation_day"] = day
 
-            tail_fill_value = indexed_data[last_day_of_original_data][0] if fill_end_values else fill_value
+            tail_fill_value = indexed_data[last_day_of_original_data][0] if not use_fill_value_at_end else fill_value
             for day in range(last_day_of_original_data + 1, last_day + 1):
                 expanded_variable_data["values"].append(tail_fill_value)
                 expanded_variable_data["info_maps"].append({"simulation_day": day, "units": original_units})
