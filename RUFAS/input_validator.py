@@ -220,8 +220,9 @@ class InputValidator:
         }
         required_str_property_keys = {"type"}
         optional_str_property_keys = {"description", "pattern", "default", "nullable"}
-        InputValidator._validate_metadata_properties_keys(required_str_property_keys, optional_str_property_keys,
-                                                          value, key_path)
+        InputValidator._validate_metadata_properties_keys(
+            required_str_property_keys, optional_str_property_keys, value, key_path
+        )
         default = value.get("default", "No default")
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
@@ -311,7 +312,7 @@ class InputValidator:
         om = OutputManager()
         info_map = {
             "class": InputValidator.__class__.__name__,
-            "function": InputValidator._metadata_array_validator.__name__
+            "function": InputValidator._metadata_array_validator.__name__,
         }
         required_array_property_keys = {"type", "properties"}
         optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
