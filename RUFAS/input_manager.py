@@ -6,7 +6,7 @@ from deepdiff import DeepDiff
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Sequence
+from typing import Any, Dict, List, Union, Callable, Sequence, Tuple
 
 import pandas as pd
 
@@ -1579,7 +1579,7 @@ class InputManager:
         current_dict_level[element_hierarchy[-1]] = value
         return nested_dict
 
-    def _add_variable_to_pool(  # noqa: C901
+    def _add_variable_to_pool(
         self,
         variable_name: str,
         input_data: Dict[str, Any],
@@ -1615,10 +1615,9 @@ class InputManager:
 
         Raises
         -------
-        PermissionError
-            If eager_termination is True and the variable is not modifiable during runtime.
         ValueError
             If eager_termination is True and the variable failed validation.
+
         """
         info_map = {
             "class": self.__class__.__name__,
@@ -1627,59 +1626,19 @@ class InputManager:
         validated_data = {}
         elements_counter = ElementsCounter()
 
-        element_hierarchy = variable_name.split(".")
-        if len(element_hierarchy) > 1:
-            data = self._set_nested_value({}, element_hierarchy[1:], input_data)
+        data, metadata_properties = self._prepare_data(variable_name, input_data, properties_blob_key)
 
-            element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
-            metadata_properties = reduce(
-                lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
-            )
+        modifiable = self._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
 
-        else:
-            data = input_data
-            metadata_properties = self.__metadata["properties"][properties_blob_key]
+        if not modifiable:
+            return modifiable
 
-        if (
-            not (
-                is_modifiable_during_runtime := self._is_modifiable_during_runtime(
-                    variable_name=variable_name, variable_properties=metadata_properties
-                )
-            )
-            and eager_termination
-        ):
-            om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
-            raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
-        elif not is_modifiable_during_runtime:
-            om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
-
-        variable_properties_to_ignore = ["type", "description", "modifiability"]
-        for metadata_property in metadata_properties.keys():
-            if metadata_property in variable_properties_to_ignore:
-                continue
-            variable_properties = metadata_properties[metadata_property]
-            is_element_acceptable = self._validate_input_by_type(
-                variable_path=[metadata_property],
-                variable_properties=variable_properties,
-                input_data=data,
-                eager_termination=eager_termination,
-                properties_blob_key=properties_blob_key,
-                elements_counter=elements_counter,
-                called_during_initialization=False,
-            )
-
-            if is_element_acceptable:
-                validated_data[metadata_property] = data[metadata_property]
+        validated_data = self._validate_data(
+            data, metadata_properties, eager_termination, properties_blob_key, elements_counter
+        )
 
         if validated_data:
-            if element_hierarchy[0] in self.__pool.keys():
-                om.add_warning(
-                    "Overwriting existing variable",
-                    f"Variable {variable_name} already exists in " f"InputManager pool, overwriting the old value.",
-                    info_map,
-                )
-
-            self.__pool[variable_name] = validated_data
+            self._add_to_pool(variable_name, validated_data)
             elements_counter += elements_counter
 
         if elements_counter.invalid_elements > 0:
@@ -1697,6 +1656,152 @@ class InputManager:
             return False
 
         return True
+
+    def _prepare_data(
+        self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
+    ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """
+        Prepare data and metadata properties for validation.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        input_data : Dict[str, Any]
+            The data associated with the variable that needs validation and addition to the pool.
+        properties_blob_key : str
+            The key in the metadata properties against which the data is validated.
+
+        Returns
+        -------
+        Tuple[List[str], Dict[str, Any], Dict[str, Any]]
+            Prepared element hierarchy, data, and metadata properties.
+
+        """
+        element_hierarchy = variable_name.split(".")
+        if len(element_hierarchy) > 1:
+            data = self._set_nested_value({}, element_hierarchy[1:], input_data)
+            element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
+            metadata_properties = reduce(
+                lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
+            )
+        else:
+            data = input_data
+            metadata_properties = self.__metadata["properties"][properties_blob_key]
+
+        return data, metadata_properties
+
+    def _check_modifiability(
+        self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool, info_map: dict[str, Any]
+    ) -> bool:
+        """
+        Checks whether a variable is allowed to be modified at runtime.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        metadata_properties : dict[str, Any]
+            Metadata for each property of a variable, including details like type, description, modifiability,
+            and validation constraints.
+        eager_termination : bool
+            Indicator for the need of eager termination.
+        info_map : dict[str, Any]
+            Information to be reported through the OM.
+
+        Raises
+        ------
+        PermissionError
+            If eager_termination is True and the variable is not modifiable during runtime.
+
+        """
+        is_modifiable_during_runtime = self._is_modifiable_during_runtime(
+            variable_name=variable_name, variable_properties=metadata_properties
+        )
+        if not is_modifiable_during_runtime and eager_termination:
+            om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
+        elif not is_modifiable_during_runtime:
+            om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            return False
+        return True
+
+    def _validate_data(
+        self,
+        data: dict[str, Any],
+        metadata_properties: dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+    ) -> dict[str, Any]:
+        """
+        Validate input data based on metadata properties.
+
+        Parameters
+        ----------
+        data : dict[str, Any]
+            Data to be validated.
+        metadata_properties : dict[str, Any]
+            Metadata for each property of a variable, including details like type, description, modifiability,
+            and validation constraints.
+        eager_termination : bool
+            Indicator for the need of eager termination.
+        properties_blob_key : str
+            The key in the metadata properties against which the data is validated.
+        elements_counter : ElementsCounter
+            An ElementsCounter object to keep track of status of variables.
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary of validated data.
+
+        """
+        validated_data = {}
+        variable_properties_to_ignore = ["type", "description", "modifiability"]
+
+        for metadata_property in metadata_properties.keys():
+            if metadata_property in variable_properties_to_ignore:
+                continue
+            variable_properties = metadata_properties[metadata_property]
+            is_element_acceptable = self._validate_input_by_type(
+                variable_path=[metadata_property],
+                variable_properties=variable_properties,
+                input_data=data,
+                eager_termination=eager_termination,
+                properties_blob_key=properties_blob_key,
+                elements_counter=elements_counter,
+                called_during_initialization=False,
+            )
+
+            if is_element_acceptable:
+                validated_data[metadata_property] = data[metadata_property]
+
+        return validated_data
+
+    def _add_to_pool(self, variable_name: str, validated_data: dict[str, Any]) -> None:
+        """
+        Add validated data to the pool.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable to be added to the pool.
+        validated_data : dict[str, Any]
+            A dictionary of validated data.
+
+        """
+        if variable_name in self.__pool.keys():
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._add_to_pool.__name__,
+            }
+            om.add_warning(
+                "Overwriting existing variable",
+                f"Variable {variable_name} already exists in InputManager pool, overwriting the old value.",
+                info_map,
+            )
+        self.__pool[variable_name] = validated_data
 
     def add_dict_variable_to_pool(
         self,
