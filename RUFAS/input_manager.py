@@ -1628,7 +1628,7 @@ class InputManager:
 
         data, metadata_properties = self._prepare_data(variable_name, input_data, properties_blob_key)
 
-        modifiable = self._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+        modifiable = self._check_modifiability(variable_name, metadata_properties, eager_termination)
 
         if not modifiable:
             return modifiable
@@ -1691,9 +1691,9 @@ class InputManager:
 
         return data, metadata_properties
 
-    def _check_modifiability(
-        self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool, info_map: dict[str, Any]
-    ) -> bool:
+    def _check_modifiability(self, variable_name: str,
+                             metadata_properties: dict[str, Any],
+                             eager_termination: bool) -> bool:
         """
         Checks whether a variable is allowed to be modified at runtime.
 
@@ -1706,8 +1706,11 @@ class InputManager:
             and validation constraints.
         eager_termination : bool
             Indicator for the need of eager termination.
-        info_map : dict[str, Any]
-            Information to be reported through the OM.
+
+        Returns
+        -------
+        bool
+            Indicator for whether the data is modifiable.
 
         Raises
         ------
@@ -1715,6 +1718,10 @@ class InputManager:
             If eager_termination is True and the variable is not modifiable during runtime.
 
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._add_variable_to_pool.__name__,
+        }
         is_modifiable_during_runtime = self._is_modifiable_during_runtime(
             variable_name=variable_name, variable_properties=metadata_properties
         )

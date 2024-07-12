@@ -4855,14 +4855,13 @@ def test_prepare_data(
 
 
 @pytest.mark.parametrize(
-    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
-    [("test", {"test": 12}, False, {"a": "aa"}, True)],
+    "variable_name,metadata_properties,eager_termination,modifiable",
+    [("test", {"test": 12}, False, True)],
 )
 def test_check_modifiability_valid(
     variable_name: str,
     metadata_properties: dict[Any, Any],
     eager_termination: bool,
-    info_map: dict[Any, Any],
     modifiable: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -4875,7 +4874,7 @@ def test_check_modifiability_valid(
         "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
     )
 
-    result = input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+    result = input_manager._check_modifiability(variable_name, metadata_properties, eager_termination)
 
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
 
@@ -4885,14 +4884,13 @@ def test_check_modifiability_valid(
 
 
 @pytest.mark.parametrize(
-    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
-    [("test", {"test": 12}, True, {"class": "aa", "function": "bb"}, False)],
+    "variable_name,metadata_properties,eager_termination,modifiable",
+    [("test", {"test": 12}, True, False)],
 )
 def test_check_modifiability_error(
     variable_name: str,
     metadata_properties: dict[Any, Any],
     eager_termination: bool,
-    info_map: dict[Any, Any],
     modifiable: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -4905,7 +4903,7 @@ def test_check_modifiability_error(
     )
 
     try:
-        input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+        input_manager._check_modifiability(variable_name, metadata_properties, eager_termination)
     except PermissionError as e:
         mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
 
@@ -4915,14 +4913,13 @@ def test_check_modifiability_error(
 
 
 @pytest.mark.parametrize(
-    "variable_name,metadata_properties,eager_termination,info_map,modifiable",
-    [("test", {"test": 12}, False, {"class": "aa", "function": "bb"}, False)],
+    "variable_name,metadata_properties,eager_termination,modifiable",
+    [("test", {"test": 12}, False, False)],
 )
 def test_check_modifiability_warning(
     variable_name: str,
     metadata_properties: dict[str, int],
     eager_termination: bool,
-    info_map: dict[str, Any],
     modifiable: bool,
     mocker: MockerFixture,
 ) -> None:
@@ -4934,7 +4931,7 @@ def test_check_modifiability_warning(
         "RUFAS.input_manager.InputManager._is_modifiable_during_runtime", return_value=modifiable
     )
 
-    result = input_manager._check_modifiability(variable_name, metadata_properties, eager_termination, info_map)
+    result = input_manager._check_modifiability(variable_name, metadata_properties, eager_termination)
     mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
     mock_add_warning.assert_called_once()
     assert not result
@@ -4990,10 +4987,10 @@ def test_validate_data(
     mock_validate_input_by_type = mocker.patch.object(
         input_manager,
         "_validate_input_by_type",
-        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key, elements_counter, called_during_initialization: input_data.get(
-            variable_path[0]
-        )
-        is not None,
+        side_effect=lambda variable_path, variable_properties,
+        input_data, eager_termination, properties_blob_key, elements_counter,
+        called_during_initialization: input_data.get(variable_path[0])
+        is not None
     )
 
     validated_data = input_manager._validate_data(
