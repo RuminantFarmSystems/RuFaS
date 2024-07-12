@@ -83,7 +83,7 @@ class EmissionsEstimator:
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
-    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
         """
         Gathers the yields that were harvested and fertilizer applications that were applied in the last 365 days of the
         simulation.
@@ -246,7 +246,9 @@ class EmissionsEstimator:
         )
         return homegrown_totals
 
-    def _calculate_actual_purchased_feed_emissions(self, actual_purchased_feeds: dict[str, float]) -> dict[str, float]:
+    def _calculate_actual_purchased_feed_emissions(
+            self, actual_purchased_feeds: dict[str, float],
+    ) -> tuple[dict[str, float], dict[str, float]]:
         """Calculates the emissions from feeds that were actually purchased during the simulation."""
 
         county_code = self.im.get_data("config.FIPS_county_code")
