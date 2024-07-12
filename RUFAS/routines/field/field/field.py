@@ -645,19 +645,19 @@ class Field:
             supplied_nitrogen = 0.0
             supplied_phosphorus = 0.0
 
-        self._record_manure_application(
-            dry_matter_mass=0.0,
-            dry_matter_fraction=0.0,
-            field_coverage=field_coverage,
-            nitrogen=requested_nitrogen,
-            phosphorus=requested_phosphorus,
-            potassium=None,
-            application_depth=application_depth,
-            surface_remainder_fraction=surface_remainder_fraction,
-            year=year,
-            day=day,
-            output_name="manure_request",
-        )
+            self._record_manure_application(
+                dry_matter_mass=0.0,
+                dry_matter_fraction=0.0,
+                field_coverage=field_coverage,
+                nitrogen=requested_nitrogen,
+                phosphorus=requested_phosphorus,
+                potassium=None,
+                application_depth=application_depth,
+                surface_remainder_fraction=surface_remainder_fraction,
+                year=year,
+                day=day,
+                output_name="manure_request",
+            )
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
