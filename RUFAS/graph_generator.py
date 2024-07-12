@@ -427,9 +427,9 @@ class GraphGenerator:
                 "omit_legend_prefix",
                 "omit_legend_suffix",
                 "display_units",
-                "pad_data",
-                "fill_gap_values",
-                "fill_end_values",
+                "expand_data",
+                "use_fill_value_in_gaps",
+                "use_fill_value_at_end",
             ]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
