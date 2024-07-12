@@ -1695,7 +1695,7 @@ class InputManager:
         self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool, info_map: dict[str, Any]
     ) -> bool:
         """
-        Prepare data and metadata properties for validation.
+        Checks whether a variable is allowed to be modified at runtime.
 
         Parameters
         ----------
