@@ -2277,7 +2277,7 @@ def test_energy_activity_rqmts() -> None:
 
 def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
     """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py,
-        using cow constraints"""
+    using cow constraints"""
     mock_ration_optimizer = mocker.MagicMock()
     mock_cow_constraint1 = mocker.MagicMock()
     mock_cow_constraint2 = mocker.MagicMock()
@@ -2364,7 +2364,7 @@ def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
 
 def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
     """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py,
-        using heifer constraints"""
+    using heifer constraints"""
     mock_heifer_ration_optimizer = mocker.MagicMock()
     mock_heifer_constraint1 = mocker.MagicMock()
     mock_heifer_constraint2 = mocker.MagicMock()
