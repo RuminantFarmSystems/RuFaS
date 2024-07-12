@@ -247,7 +247,8 @@ class EmissionsEstimator:
         return homegrown_totals
 
     def _calculate_actual_purchased_feed_emissions(
-            self, actual_purchased_feeds: dict[str, float],
+        self,
+        actual_purchased_feeds: dict[str, float],
     ) -> tuple[dict[str, float], dict[str, float]]:
         """Calculates the emissions from feeds that were actually purchased during the simulation."""
 

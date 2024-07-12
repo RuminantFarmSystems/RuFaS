@@ -1691,7 +1691,7 @@ def test_execute_manure_application(
                     surface_remainder_fraction=remainder,
                     year=year,
                     day=day,
-                    output_name="manure_application"
+                    output_name="manure_application",
                 )
 
             if fertilizer_applied and not supplement:
