@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+import re
 from typing import Dict, Any, Callable
 
 from RUFAS.output_manager import OutputManager
@@ -84,15 +85,64 @@ class InputValidator:
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
 
-    def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
-        """Validates number type properties in metadata."""
+    @staticmethod
+    def _validate_metadata_properties_keys(
+        required_properties_keys: set[str],
+        optional_properties_keys: set[str],
+        properties: dict[str, Any],
+        path: list[str],
+    ) -> None:
+        """Validates that keys in the metadata properties sections."""
+        om = OutputManager()
         info_map = {
-            "class": self.__class__.__name__,
-            "function": self._metadata_number_validator.__name__,
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._validate_metadata_properties_keys.__name__,
+        }
+        if missing_required_keys := required_properties_keys - properties.keys():
+            om.add_error(
+                "Metadata Validation",
+                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
+                f" keys are {sorted(required_properties_keys)}.",
+                info_map,
+            )
+            raise ValueError(
+                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
+                f" keys are {sorted(required_properties_keys)}."
+            )
+        property_type = properties.get("type", "Unknown type")
+        valid_properties_keys = required_properties_keys.union(optional_properties_keys)
+        if property_type == "object":
+            if not (set(properties.keys()) - valid_properties_keys):
+                om.add_error(
+                    "Metadata Validation",
+                    f"No unique keys for {path}. At least one unique key is expected.",
+                    info_map,
+                )
+                raise ValueError(f"No unique keys for {path}. At least one unique key is expected.")
+            return
+        if invalid_keys := set(properties.keys()) - valid_properties_keys:
+            om.add_error(
+                "Metadata Validation",
+                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                f" keys are {sorted(valid_properties_keys)}.",
+                info_map,
+            )
+            raise ValueError(
+                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                f" keys are {sorted(valid_properties_keys)}."
+            )
+
+    @staticmethod
+    def _metadata_number_validator(key_path: list[str], value: dict[str, Any]) -> None:
+        """Validates number type properties in metadata."""
+        om = OutputManager()
+        info_map = {
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._metadata_number_validator.__name__,
         }
         required_number_property_keys = {"type"}
         optional_number_property_keys = {"description", "minimum", "maximum", "default", "nullable"}
-        self._validate_metadata_properties_keys(
+        InputValidator._validate_metadata_properties_keys(
             required_number_property_keys, optional_number_property_keys, value, key_path
         )
         default = value.get("default", "No default")
@@ -160,15 +210,18 @@ class InputValidator:
                     f"Invalid 'default' for '{key_path}': 'default' {default} is " f"greater than 'maximum' {maximum}"
                 )
 
-    def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+    @staticmethod
+    def _metadata_string_validator(key_path: list[str], value: dict[str, Any]) -> None:
         """Validates string type properties in metadata."""
+        om = OutputManager()
         info_map = {
-            "class": self.__class__.__name__,
-            "function": self._metadata_string_validator.__name__,
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._metadata_string_validator.__name__,
         }
         required_str_property_keys = {"type"}
         optional_str_property_keys = {"description", "pattern", "default", "nullable"}
-        self._validate_metadata_properties_keys(required_str_property_keys, optional_str_property_keys, value, key_path)
+        InputValidator._validate_metadata_properties_keys(required_str_property_keys, optional_str_property_keys,
+                                                          value, key_path)
         default = value.get("default", "No default")
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
@@ -220,17 +273,20 @@ class InputValidator:
                     f"match pattern {pattern}"
                 )
 
-    def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+    @staticmethod
+    def _metadata_bool_validator(key_path: list[str], value: dict[str, Any]) -> None:
         """Validates bool type properties in metadata."""
+        om = OutputManager()
         info_map = {
-            "class": self.__class__.__name__,
-            "function": self._metadata_bool_validator.__name__,
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._metadata_bool_validator.__name__,
         }
         required_bool_property_keys = {"type"}
         optional_bool_property_keys = {"description", "default", "nullable"}
-        self._validate_metadata_properties_keys(
+        InputValidator._validate_metadata_properties_keys(
             required_bool_property_keys, optional_bool_property_keys, value, key_path
         )
+
         default = value.get("default", "No default")
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
@@ -249,15 +305,17 @@ class InputValidator:
             )
             raise ValueError(f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}")
 
-    def _metadata_array_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+    @staticmethod
+    def _metadata_array_validator(key_path: list[str], value: dict[str, Any]) -> None:
         """Validates array type properties in metadata."""
+        om = OutputManager()
         info_map = {
-            "class": self.__class__.__name__,
-            "function": self._metadata_array_validator.__name__,
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._metadata_array_validator.__name__
         }
         required_array_property_keys = {"type", "properties"}
         optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
-        self._validate_metadata_properties_keys(
+        InputValidator._validate_metadata_properties_keys(
             required_array_property_keys, optional_array_property_keys, value, key_path
         )
         minimum_length = value.get("minimum_length")
@@ -292,17 +350,19 @@ class InputValidator:
                 f"greater than 'maximum_length' value {maximum_length}"
             )
 
-    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
+    @staticmethod
+    def _metadata_object_validator(key_path: list[str], value: dict[str, Any]) -> None:
         """Validates object type properties in metadata."""
         required_object_property_keys = {"type"}
         optional_object_property_keys = {"description"}
-        self._validate_metadata_properties_keys(
+        InputValidator._validate_metadata_properties_keys(
             required_object_property_keys, optional_object_property_keys, value, key_path
         )
 
     @staticmethod
     def _validate_metadata(metadata: Dict[str, Any]) -> None:
         """Checks that top-level metadata has valid and required keys and values."""
+        om = OutputManager()
         info_map = {
             "class": InputValidator.__class__.__name__,
             "function": InputValidator._validate_metadata.__name__,
