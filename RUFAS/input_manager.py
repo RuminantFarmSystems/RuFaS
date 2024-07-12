@@ -1691,9 +1691,9 @@ class InputManager:
 
         return data, metadata_properties
 
-    def _check_modifiability(self, variable_name: str,
-                             metadata_properties: dict[str, Any],
-                             eager_termination: bool) -> bool:
+    def _check_modifiability(
+        self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool
+    ) -> bool:
         """
         Checks whether a variable is allowed to be modified at runtime.
 
