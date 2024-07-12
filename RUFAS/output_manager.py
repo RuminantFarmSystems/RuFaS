@@ -982,11 +982,11 @@ class OutputManager(object):
         )
 
         if filter_content.get("expand_data", False):
-            fill_gap_values = filter_content.get("fill_gap_values", False)
-            fill_end_values = filter_content.get("fill_end_values", False)
+            use_fill_value_in_gaps = filter_content.get("use_fill_value_in_gaps", True)
+            use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
             try:
                 results = Utility.expand_data_temporally(
-                    results, fill_gap_values=fill_gap_values, fill_end_values=fill_end_values
+                    results, use_fill_value_in_gaps=use_fill_value_in_gaps, use_fill_value_at_end=use_fill_value_at_end
                 )
             except (TypeError, ValueError) as e:
                 error_title = f"Error {e} raised when padding data"
