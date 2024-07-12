@@ -2276,7 +2276,8 @@ def test_energy_activity_rqmts() -> None:
 
 
 def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
-    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py, using cow constraints"""
+    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py,
+        using cow constraints"""
     mock_ration_optimizer = mocker.MagicMock()
     mock_cow_constraint1 = mocker.MagicMock()
     mock_cow_constraint2 = mocker.MagicMock()
@@ -2332,7 +2333,7 @@ def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
         "function": "handle_failed_constraints",
     }
 
-    actual = RationManager.handle_failed_constraints(
+    RationManager.handle_failed_constraints(
         4,
         mock_solution,
         mock_ration_optimizer,
@@ -2362,7 +2363,8 @@ def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
 
 
 def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
-    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py, using heifer constraints"""
+    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py,
+        using heifer constraints"""
     mock_heifer_ration_optimizer = mocker.MagicMock()
     mock_heifer_constraint1 = mocker.MagicMock()
     mock_heifer_constraint2 = mocker.MagicMock()
@@ -2425,7 +2427,7 @@ def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
         "function": "handle_failed_constraints",
     }
 
-    actual = RationManager.handle_failed_constraints(
+    RationManager.handle_failed_constraints(
         2,
         mock_heifer_solution,
         mock_heifer_ration_optimizer,

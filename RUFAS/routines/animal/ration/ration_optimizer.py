@@ -5,7 +5,6 @@ import numpy as np
 import numpy.typing as npt
 from scipy.optimize import OptimizeResult, minimize
 
-from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants

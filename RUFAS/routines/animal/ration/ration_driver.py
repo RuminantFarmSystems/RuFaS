@@ -473,11 +473,11 @@ class RationReporter:
         }
 
         nutrient_conc: Dict[str, float] = {}
-        
+
         stripped_ration = {
             k: ration[k] for k in ration if k not in ["status", "objective"]
         }
-        
+
         nutrients = [
             "DM",
             "CP",
