@@ -1327,7 +1327,7 @@ class OutputManager(object):
 
             parsable_dicts = []
 
-            var_data_info_maps = {}
+            var_data_info_maps: list[Any] | None = []
             if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
                 var_data_info_maps = variable_data.get("info_maps")
