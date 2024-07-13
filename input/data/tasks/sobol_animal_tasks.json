@@ -1,29 +1,17 @@
 {
-    "parallel_workers": 1,
+    "parallel_workers": 6,
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "TEST2",
+        "output_prefix": "animal_S256",
         "log_verbosity": "errors",
         "sampler": "sobol",
         "saltelli_number": 256,
         "saltelli_skip": 2048,
         "SA_load_balancing_start": 0.0,
-        "SA_load_balancing_stop": 0.01,
+        "SA_load_balancing_stop": 0.25,
         "random_seed": 42,
         "SA_input_variables": [
-          {
-            "variable_name": "animal.herd_information.calf_num",
-            "lower_bound": 2,
-            "upper_bound": 100,
-            "data_type":"int"
-          },
-          {
-            "variable_name": "animal.herd_information.cow_num",
-            "lower_bound": 6,
-            "upper_bound": 1000,
-            "data_type":"int"
-          },
           {
             "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
             "lower_bound": 270,
@@ -195,7 +183,7 @@
           {
             "variable_name": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho",
             "lower_bound": 0.5,
-            "upper_bound": 12,
+            "upper_bound": 7,
             "data_type":"float"
           },
           {
