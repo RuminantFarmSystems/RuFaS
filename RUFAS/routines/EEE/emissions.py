@@ -63,9 +63,7 @@ class EmissionsEstimator:
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
         info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions.__name__}
         purchased_feeds = self._gather_ration_feed_totals()
-        actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(
-            homegrown_feeds, purchased_feeds
-        )
+        actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
         om.add_variable(
             "actual_purchased_feed_totals",
             actual_purchased_feed_totals,
