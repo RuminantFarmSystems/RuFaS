@@ -1,10 +1,12 @@
 from deepdiff import DeepDiff
 from enum import Enum
 from functools import partial
+import json
 import multiprocessing
 import numpy
 from pathlib import Path
 import random
+import re
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 import traceback
@@ -438,26 +440,46 @@ class TaskManager:
         """Runs end-to-end testing routine."""
         info_map = {"class": TaskManager.__name__, "function": TaskManager._handle_end_to_end_testing.__name__}
 
+        TaskManager._setup_end_to_end_testing_environment()
+
         output_manager.add_log("Starting end-to-end testing simulation", "", info_map)
-        # end_to_end_tester = EndToEndTester()
-        # end_to_end_tester.run_end_to_end_testing()
+
         TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
 
         output_manager.add_log("Completed end-to-end testing simulation", "", info_map)
 
-    @staticmethod
-    def _compare_simulation_outputs_to_expected_outputs(
-        input_manager: InputManager, output_manager: OutputManager
-    ) -> None:
-        """Compares outputs from a simulation to the results expected for that simulation."""
-        actual_results = output_manager.filter_variables_pool({"name": "End-to-end testing results", "filters": [".*"]})
-        expected_results = input_manager.get_data("end_to_end_testing_results")
+        TaskManager._compare_simulation_outputs_to_expected_outputs()
 
-        diff = DeepDiff(actual_results, expected_results, ignore_order=True, verbose_level=2)
+    @staticmethod
+    def _setup_end_to_end_testing_environment() -> None:
+        """Creates a filter that will be used to collect the results of a simulation in an end-to-end testing run."""
+        with open("output/output_filters/json_end_to_end_testing_filter.txt", "w") as e_to_e_filter_file:
+            e_to_e_filter_file.write(".*")
+
+    @staticmethod
+    def _compare_simulation_outputs_to_expected_outputs() -> None:
+        """Compares outputs from a simulation to the results expected for that simulation."""
+        path_to_actual_results = None
+        for path in Path("output/JSONs/").iterdir():
+            matches = re.match(
+                "output/JSONs/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*", str(path)
+            )
+            if matches:
+                path_to_actual_results = path
+                break
+        else:
+            print("Could not find actual end-to-end testing results. End-to-end testing failed.")
+            return
+        with open(path_to_actual_results) as results:
+            actual_results = json.load(results)
+        with open("input/data/end_to_end_testing_results/end_to_end_results.json", "r") as e_to_e_results:
+            expected_results = json.load(e_to_e_results)
+
+        diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
         results_path = Path("output/end_to_end_testing_results")
         results_path.mkdir(parents=True, exist_ok=True)
-        with open(f"{results_path}/end_to_end_testing_results.txt") as results_file:
+        with open(f"{results_path}/end_to_end_results.txt", "w") as results_file:
             if diff == {}:
                 results_file.write("No differences found between actual and expected outputs.\n")
                 results_file.write("End-to-end testing successful.\n")
@@ -468,7 +490,7 @@ class TaskManager:
                 sections = {
                     "values_changed": "Differing results:\n",
                     "dictionary_item_added": "Actual results contain unexpected items:\n",
-                    "dictionary_item_removed": "\nActual results missing items:\n",
+                    "dictionary_item_removed": "Actual results missing items:\n",
                 }
                 for k, v in sections.items():
                     if k in diff:
@@ -476,6 +498,8 @@ class TaskManager:
                         for item, value in diff[k].items():
                             results_file.write(f"{item}: {value}\n")
                         results_file.write("\n")
+
+        Path("output/output_filters/json_end_to_end_testing_filter.txt").unlink(missing_ok=True)
 
     @staticmethod
     def handle_input_data_audit(
