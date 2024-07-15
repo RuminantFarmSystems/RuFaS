@@ -63,7 +63,7 @@ class EmissionsEstimator:
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
         info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions.__name__}
         purchased_feeds = self._gather_ration_feed_totals()
-        (actual_purchased_feed_totals, homegrown_feed_totals) = self._calculate_actual_purchased_feeds(
+        actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(
             homegrown_feeds, purchased_feeds
         )
         om.add_variable(
@@ -118,7 +118,7 @@ class EmissionsEstimator:
         manure_request_filter = {
             "name": "Manure Applications",
             "descriptions": "Collects all manure applications that occurred in the simulation.",
-            "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
+            "filters": ["Field._execute_manure_application\\.manure_request\\.field='.*'"],
             "variables": [".*"],
         }
         manure_requests = om.filter_variables_pool(manure_request_filter)
@@ -223,7 +223,7 @@ class EmissionsEstimator:
 
             actual_purchased_feeds[feed_id] = amount
 
-        return actual_purchased_feeds, homegrown_totals
+        return actual_purchased_feeds
 
     def _calculate_total_homegrown_feed_amounts_by_crop_type(
         self, homegrown_feeds: list[dict[str, Any]]
