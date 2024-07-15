@@ -7,6 +7,7 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     CUBIC_MILLIMETERS_TO_LITERS,
     MILLIGRAMS_TO_KILOGRAMS,
 )
+from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 
@@ -303,15 +304,19 @@ def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size
 def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: float) -> None:
     """Tests that the update subroutine for phosphorus pools in Manure correctly calls methods and sets attributes."""
     data = SoilData(
-        machine_manure_dry_mass=1000,
-        machine_manure_field_coverage=0.86,
+        machine_manure=ManurePool(
+            manure_dry_mass=1000,
+            manure_field_coverage=0.86,
+            water_extractable_inorganic_phosphorus=200,
+            water_extractable_organic_phosphorus=90,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=800,
+            manure_field_coverage=0.78,
+            water_extractable_inorganic_phosphorus=125,
+            water_extractable_organic_phosphorus=70,
+        ),
         field_size=area,
-        machine_water_extractable_inorganic_phosphorus=200,
-        machine_water_extractable_organic_phosphorus=90,
-        grazing_manure_dry_mass=800,
-        grazing_manure_field_coverage=0.78,
-        grazing_water_extractable_inorganic_phosphorus=125,
-        grazing_water_extractable_organic_phosphorus=70,
     )
     incorp = Manure(data)
 
@@ -335,16 +340,16 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
     incorp._determine_phosphorus_leached_from_surface.assert_has_calls(leached_calls)
     infiltrated_calls = [call(25, area), call(25, area), call(25, area), call(25, area)]
     incorp._add_infiltrated_phosphorus_to_soil.assert_has_calls(infiltrated_calls)
-    assert incorp.data.machine_water_extractable_organic_phosphorus == 30
-    assert incorp.data.machine_water_extractable_inorganic_phosphorus == 30
-    assert incorp.data.machine_organic_phosphorus_runoff == 20
-    assert incorp.data.machine_inorganic_phosphorus_runoff == 20
+    assert incorp.data.machine_manure.water_extractable_organic_phosphorus == 30
+    assert incorp.data.machine_manure.water_extractable_inorganic_phosphorus == 30
+    assert incorp.data.machine_manure.organic_phosphorus_runoff == 20
+    assert incorp.data.machine_manure.inorganic_phosphorus_runoff == 20
     assert incorp.data.annual_runoff_machine_manure_organic_phosphorus == 20
     assert incorp.data.annual_runoff_machine_manure_inorganic_phosphorus == 20
-    assert incorp.data.grazing_water_extractable_organic_phosphorus == 30
-    assert incorp.data.grazing_water_extractable_inorganic_phosphorus == 30
-    assert incorp.data.grazing_organic_phosphorus_runoff == 20
-    assert incorp.data.grazing_inorganic_phosphorus_runoff == 20
+    assert incorp.data.grazing_manure.water_extractable_organic_phosphorus == 30
+    assert incorp.data.grazing_manure.water_extractable_inorganic_phosphorus == 30
+    assert incorp.data.grazing_manure.organic_phosphorus_runoff == 20
+    assert incorp.data.grazing_manure.inorganic_phosphorus_runoff == 20
     assert incorp.data.annual_runoff_grazing_manure_organic_phosphorus == 20
     assert incorp.data.annual_runoff_grazing_manure_inorganic_phosphorus == 20
 
