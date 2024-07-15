@@ -339,8 +339,8 @@ class EmissionsEstimator:
             aggregated_manure_apps[field_name]["phosphorus"] += app["phosphorus"]
 
         aggregated_manure_requests = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
-        for app in manure_requests:
-            field_name = app["field_name"]
+        for request in manure_requests:
+            field_name = request["field_name"]
             aggregated_manure_requests[field_name]["nitrogen"] += app["nitrogen"]
             aggregated_manure_requests[field_name]["phosphorus"] += app["phosphorus"]
 
