@@ -236,13 +236,11 @@ class EmissionsEstimator:
         om.add_variable(
             "homegrown_feed_totals",
             homegrown_totals,
-            dict(
-                {
-                    "class": self.__class__.__name__,
-                    "function": self._calculate_total_homegrown_feed_amounts_by_crop_type.__name__,
-                },
-                **{"units": MeasurementUnits.KILOGRAMS},
-            ),
+            {
+                "class": self.__class__.__name__,
+                "function": self._calculate_total_homegrown_feed_amounts_by_crop_type.__name__,
+                "units": MeasurementUnits.KILOGRAMS,
+            },
         )
         return homegrown_totals
 
