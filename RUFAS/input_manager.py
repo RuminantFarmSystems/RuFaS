@@ -582,7 +582,7 @@ class InputManager:
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{self._convert_variable_path_to_str(variable_path)}' "
+                f"The metadata type of the element '{self.convert_variable_path_to_str(variable_path)}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
@@ -643,7 +643,7 @@ class InputManager:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
         if not isinstance(input_data, list):
             om.add_warning(
                 "Validation: array container is not a list",
@@ -788,7 +788,7 @@ class InputManager:
         object_value = self._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
-        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
@@ -847,7 +847,7 @@ class InputManager:
         if variable_properties.get("nullable", False) and input_data_value is None:
             return True
 
-        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
 
         info_map = {
             "class": self.__class__.__name__,
@@ -908,7 +908,7 @@ class InputManager:
         if variable_properties.get("nullable", False) and input_data_value is None:
             return True
 
-        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
         info_map = {
             "class": self.__class__.__name__,
             "function": self._string_type_validator.__name__,
@@ -981,7 +981,7 @@ class InputManager:
         if variable_properties.get("nullable", False) and input_data_value is None:
             return True
 
-        variable_path_str = self._convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
 
         info_map = {"class": self.__class__.__name__, "function": self._bool_type_validator.__name__}
         properties_violation_message = (
@@ -1114,7 +1114,8 @@ class InputManager:
             )
         return result
 
-    def _convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
+    @staticmethod
+    def convert_variable_path_to_str(variable_path: List[str | int]) -> str:
         """
         Converts a list of keys (int or str) into a string representation of the path to a variable.
 
@@ -1132,12 +1133,12 @@ class InputManager:
         --------
         >>> input_manager = InputManager()
         >>> var_path = ["animal", "herd_information", "calf_num"]
-        >>> input_manager._convert_variable_path_to_str(var_path)
+        >>> InputManager.convert_variable_path_to_str(var_path)
         'animal.herd_information.calf_num'
 
         >>> input_manager = InputManager()
         >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
-        >>> input_manager._convert_variable_path_to_str(var_path)
+        >>> InputManager.convert_variable_path_to_str(var_path)
         'manure_management_scenarios.[0].bedding_type'
         """
 
