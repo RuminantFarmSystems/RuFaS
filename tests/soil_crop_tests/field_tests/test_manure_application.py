@@ -179,11 +179,7 @@ def test_apply_solid_machine_manure(
 ) -> None:
     """Tests that manure with greater than 15% solid matter content is added to the field correctly."""
 
-    machine_manure_pool = ManurePool(
-        manure_dry_mass=3000,
-        manure_moisture_factor=0.65,
-        manure_field_coverage=0.77
-    )
+    machine_manure_pool = ManurePool(manure_dry_mass=3000, manure_moisture_factor=0.65, manure_field_coverage=0.77)
     data = SoilData(
         machine_manure=machine_manure_pool,
         field_size=1.1,
@@ -226,7 +222,8 @@ def test_apply_solid_machine_manure(
     assert incorp.data.machine_manure.water_extractable_inorganic_phosphorus == phosphorus_mass * weiP_frac * remainder
     assert incorp.data.machine_manure.water_extractable_organic_phosphorus == phosphorus_mass * 0.05 * remainder
     assert (
-        incorp.data.machine_manure.stable_inorganic_phosphorus == phosphorus_mass * expected_stable_inorganic_frac * remainder
+        incorp.data.machine_manure.stable_inorganic_phosphorus
+        == phosphorus_mass * expected_stable_inorganic_frac * remainder
     )
     assert (
         pytest.approx(incorp.data.machine_manure.stable_organic_phosphorus)
@@ -281,11 +278,7 @@ def test_apply_liquid_machine_manure(
     """Tests that when manure slurry is added it correctly adds phosphorus to soil surface and subsurface pools, and
     sets surface pool characteristics.
     """
-    machine_manure_pool = ManurePool(
-        manure_dry_mass=1000,
-        manure_moisture_factor=0.8,
-        manure_field_coverage=0.9
-    )
+    machine_manure_pool = ManurePool(manure_dry_mass=1000, manure_moisture_factor=0.8, manure_field_coverage=0.9)
     data = SoilData(
         machine_manure=machine_manure_pool,
         field_size=area,
@@ -563,11 +556,7 @@ def test_apply_grazing_manure(
     field_size: float,
 ) -> None:
     """Tests that the grazing manure related attributes are correctly updated when grazing manure is applied."""
-    grazing_manure_pool = ManurePool(
-        manure_dry_mass=4000,
-        manure_moisture_factor=0.75,
-        manure_field_coverage=0.6
-    )
+    grazing_manure_pool = ManurePool(manure_dry_mass=4000, manure_moisture_factor=0.75, manure_field_coverage=0.6)
     data = SoilData(
         grazing_manure=grazing_manure_pool,
         field_size=field_size,
@@ -613,38 +602,10 @@ def test_apply_grazing_manure(
     "ammonium_frac,organic_frac,weiP_frac,source_animal,should_fail",
     [
         (1000, 0.75, 200, 0.85, 0.0, 1.0, 1.835, 0.11, 0.55, 0.01, 0.5, None, False),
-        (
-            2000,
-            0.44,
-            103.5,
-            0.88,
-            0.0,
-            1.0,
-            0.8898,
-            0.14,
-            0.44,
-            0.06,
-            0.25,
-            "SWINE",
-            False
-        ),
+        (2000, 0.44, 103.5, 0.88, 0.0, 1.0, 0.8898, 0.14, 0.44, 0.06, 0.25, "SWINE", False),
         (2500, 0.08, 175, 0.79, 50.0, 0.92, 3.4453, 0.33, 0.39, 0.09, 1.8, None, True),
         # New test case to cover the line
-        (
-            1500,
-            0.60,
-            150,
-            0.75,
-            10.0,
-            0.9,
-            2.5,
-            0.25,
-            0.15,
-            0.2,
-            None,
-            "CATTLE",
-            False
-        ),
+        (1500, 0.60, 150, 0.75, 10.0, 0.9, 2.5, 0.25, 0.15, 0.2, None, "CATTLE", False),
     ],
 )
 def test_apply_machine_manure(
