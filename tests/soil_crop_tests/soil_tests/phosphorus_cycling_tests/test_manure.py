@@ -371,14 +371,18 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         return_value=-1.0,
     ) as mocked_determine_moisture_change:
         data1 = SoilData(
-            machine_manure_dry_mass=1000,
-            machine_manure_field_coverage=0.86,
-            machine_manure_moisture_factor=0.5,
-            machine_manure_applied_mass=1100,
-            grazing_manure_dry_mass=800,
-            grazing_manure_field_coverage=0.76,
-            grazing_manure_moisture_factor=0.6,
-            grazing_manure_applied_mass=900,
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
             field_size=1.1,
         )
         incorp1 = Manure(data1)
@@ -390,8 +394,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
             call(rain, 0.6, 800, 900, temp_factor),
         ]
         mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
-        assert incorp1.data.machine_manure_moisture_factor == 0.0
-        assert incorp1.data.grazing_manure_moisture_factor == 0.0
+        assert incorp1.data.machine_manure.manure_moisture_factor == 0.0
+        assert incorp1.data.grazing_manure.manure_moisture_factor == 0.0
 
     # Case 2: calculated moisture factor is greater than upper bound
     with patch(
@@ -400,14 +404,18 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         return_value=1.0,
     ) as mocked_determine_moisture_change:
         data2 = SoilData(
-            machine_manure_dry_mass=1000,
-            machine_manure_field_coverage=0.86,
-            machine_manure_moisture_factor=0.5,
-            machine_manure_applied_mass=1100,
-            grazing_manure_dry_mass=800,
-            grazing_manure_field_coverage=0.76,
-            grazing_manure_moisture_factor=0.6,
-            grazing_manure_applied_mass=900,
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
             field_size=1.1,
         )
         incorp2 = Manure(data2)
@@ -419,8 +427,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
             call(rain, 0.6, 800, 900, temp_factor),
         ]
         mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
-        assert incorp2.data.machine_manure_moisture_factor == 0.9
-        assert incorp2.data.grazing_manure_moisture_factor == 0.9
+        assert incorp2.data.machine_manure.manure_moisture_factor == 0.9
+        assert incorp2.data.grazing_manure.manure_moisture_factor == 0.9
 
     # Case 3: calculated moisture factor is not reset due to being out of bounds
     with patch(
@@ -429,14 +437,18 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         return_value=0.1,
     ) as mocked_determine_moisture_change:
         data3 = SoilData(
-            machine_manure_dry_mass=1000,
-            machine_manure_field_coverage=0.86,
-            machine_manure_moisture_factor=0.5,
-            machine_manure_applied_mass=1100,
-            grazing_manure_dry_mass=800,
-            grazing_manure_field_coverage=0.76,
-            grazing_manure_moisture_factor=0.6,
-            grazing_manure_applied_mass=900,
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
             field_size=1.1,
         )
         incorp3 = Manure(data3)
@@ -448,8 +460,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
             call(rain, 0.6, 800, 900, temp_factor),
         ]
         mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
-        assert incorp3.data.machine_manure_moisture_factor == 0.6
-        assert incorp3.data.grazing_manure_moisture_factor == 0.7
+        assert incorp3.data.machine_manure.manure_moisture_factor == 0.6
+        assert incorp3.data.grazing_manure.manure_moisture_factor == 0.7
 
 
 @pytest.mark.parametrize(
