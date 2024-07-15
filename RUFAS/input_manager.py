@@ -429,7 +429,7 @@ class InputManager:
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(
-            self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -1548,7 +1548,7 @@ class InputManager:
         return True
 
     def _set_nested_value(
-            self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any
+        self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any
     ) -> Dict[str, Any]:
         """
         Sets a given value within a nested dictionary structure at a specified hierarchical level and returns the
@@ -1607,11 +1607,11 @@ class InputManager:
         return nested_dict
 
     def _add_variable_to_pool(
-            self,
-            variable_name: str,
-            input_data: Dict[str, Any],
-            properties_blob_key: str,
-            eager_termination: bool,
+        self,
+        variable_name: str,
+        input_data: Dict[str, Any],
+        properties_blob_key: str,
+        eager_termination: bool,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1685,7 +1685,7 @@ class InputManager:
         return True
 
     def _prepare_data(
-            self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
+        self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
     ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Prepare data and metadata properties for validation.
@@ -1719,7 +1719,7 @@ class InputManager:
         return data, metadata_properties
 
     def _check_modifiability(
-            self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool
+        self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool
     ) -> bool:
         """
         Checks whether a variable is allowed to be modified at runtime.
@@ -1761,12 +1761,12 @@ class InputManager:
         return True
 
     def _validate_data(
-            self,
-            data: dict[str, Any],
-            metadata_properties: dict[str, Any],
-            eager_termination: bool,
-            properties_blob_key: str,
-            elements_counter: "ElementsCounter",
+        self,
+        data: dict[str, Any],
+        metadata_properties: dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
     ) -> dict[str, Any]:
         """
         Validate input data based on metadata properties.
@@ -1838,11 +1838,11 @@ class InputManager:
         self.__pool[variable_name] = validated_data
 
     def add_dict_variable_to_pool(
-            self,
-            variable_name: str,
-            data: Dict[str, Any],
-            properties_blob_key: str,
-            eager_termination: bool,
+        self,
+        variable_name: str,
+        data: Dict[str, Any],
+        properties_blob_key: str,
+        eager_termination: bool,
     ) -> bool:
         """
         Adds a dictionary variable to the InputManager's pool after validating it against metadata.
@@ -1904,11 +1904,11 @@ class InputManager:
             return False
 
     def add_tabular_variable_to_pool(
-            self,
-            variable_name: str,
-            data: Dict[str, List[Any]] | List[Any],
-            properties_blob_key: str,
-            eager_termination: bool,
+        self,
+        variable_name: str,
+        data: Dict[str, List[Any]] | List[Any],
+        properties_blob_key: str,
+        eager_termination: bool,
     ) -> bool:
         """
         Adds a tabular variable to the InputManager's pool after validating it against metadata.
@@ -2393,7 +2393,7 @@ class InputManager:
             raise e
 
     def _parse_metadata_properties(
-            self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
+        self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
     ) -> List[Dict[str, Any]]:
         """
         Recursively traverse through the metadata properties dictionary
@@ -2474,7 +2474,7 @@ class InputManager:
         """
         properties_index = name.find("_properties") + len("_properties")
         properties_group = name[:properties_index]
-        name = name[properties_index + 1:]
+        name = name[properties_index + 1 :]
         return {
             "properties_group": properties_group,
             "name": name,
@@ -2487,7 +2487,7 @@ class InputManager:
         }
 
     def compare_metadata_properties(
-            self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
+        self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
     ) -> None:
         """
         Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
