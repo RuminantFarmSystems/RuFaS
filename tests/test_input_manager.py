@@ -482,7 +482,7 @@ def test_bool_type_validator(
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=input_data_value)
-    patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
+    patch_path_to_str = mocker.patch.object(InputManager, "convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
@@ -538,7 +538,7 @@ def test_number_type_validator(
     unused_bool_input = False
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     patch_extract = mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=dummy_value)
-    patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
+    patch_path_to_str = mocker.patch.object(InputManager, "convert_variable_path_to_str", return_value="dummy_name")
 
     with patch("RUFAS.input_manager.om.add_warning") as add_warning:
         result = input_manager._number_type_validator(
@@ -594,9 +594,7 @@ def test_string_type_validator(
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(mock_input_manager, "_extract_input_data_by_key_list", return_value=dummy_value)
-    patch_path_to_str = mocker.patch.object(
-        mock_input_manager, "_convert_variable_path_to_str", return_value="dummy_name"
-    )
+    patch_path_to_str = mocker.patch.object(InputManager, "convert_variable_path_to_str", return_value="dummy_name")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     result = mock_input_manager._string_type_validator(
@@ -3310,11 +3308,8 @@ def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expe
     Unit test for the _convert_variable_path_to_str() method of the InputManager class.
     """
 
-    # Arrange
-    input_manager = InputManager()
-
     # Act
-    result = input_manager._convert_variable_path_to_str(variable_path)
+    result = InputManager.convert_variable_path_to_str(variable_path)
 
     # Assert
     assert result == expected
@@ -3420,7 +3415,7 @@ def test_object_type_validator_key_removal(
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=data)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
-    mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy path")
+    mocker.patch.object(InputManager, "convert_variable_path_to_str", return_value="dummy path")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
     mock_elements_counter = mocker.MagicMock()
     variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
@@ -3720,7 +3715,7 @@ def test_validate_input_by_type(
     elements_counter = mocker.MagicMock()
 
     mocker.patch.object(input_manager, "_extract_value_by_key_list", return_value=input_value)
-    mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="path.to.variable")
+    mocker.patch.object(InputManager, "convert_variable_path_to_str", return_value="path.to.variable")
     patch_for_fix_data = mocker.patch.object(input_manager, "_fix_data", return_value=fixable)
 
     validator_mock = mocker.patch.object(input_manager, f"_{data_type}_type_validator", return_value=validator_return)
