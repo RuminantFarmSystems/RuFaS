@@ -1,6 +1,6 @@
+import math
 from typing import Dict, List
 
-import math
 import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
@@ -158,13 +158,17 @@ class AnimalRequirements:
         stats_args = [default_percentile] if calc_method == "percentile" else []
 
         for attribute_name, arg in attr_names_to_args_map.items():
-            setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
+            setattr(
+                self,
+                attribute_name,
+                calc_method_to_function_map[calc_method](arg, *stats_args),
+            )
 
     def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
-        populates the corresponding class variables.
+        populates the corresponding class variables.s
 
         Parameters
         ----------
@@ -232,7 +236,12 @@ class AnimalRequirements:
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
-    def recalculate_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def recalculate_requirements(
+        self,
+        pen,
+        animal_grouping_scenario,
+        requirements_lists: Dict[str, List[int]],
+    ):
         """
         Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -337,7 +346,12 @@ class AnimalRequirements:
             requirements_lists["BW"].append(animal.body_weight)
         return requirements_lists
 
-    def use_existing_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def use_existing_requirements(
+        self,
+        pen,
+        animal_grouping_scenario,
+        requirements_lists: Dict[str, List[int]],
+    ):
         """
         Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -1883,7 +1897,7 @@ class AnimalRequirements:
                 net_energy_activity = distance * 0.00035 * body_weight
             elif housing == "Grazing":
                 nonpasturekgDMI: float = 1.0
-                net_energy_activity = distance * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
+                net_energy_activity = distance * body_weight * 0.75 * (600 - 12 * nonpasturekgDMI) / 600
             else:
                 net_energy_activity = 0.0
             return net_energy_activity
