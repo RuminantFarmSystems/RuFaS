@@ -128,7 +128,7 @@ class ManureApplication:
         inorganic_nitrogen_fraction: float,
         ammonium_fraction: float,
         organic_nitrogen_fraction: float,
-        water_extractable_inorganic_phosphorus_fraction: float = None,
+        water_extractable_inorganic_phosphorus_fraction: float | None = None,
         source_animal: str = None,
     ) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
