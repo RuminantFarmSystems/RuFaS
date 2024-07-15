@@ -1,0 +1,1160 @@
+{
+    "multiple": [
+
+        {
+            "name": "Calves",
+            "filters": ["AnimalModuleReporter.report_daily_animal_population.num_calves"],
+            "vertical_aggregation": "average",
+            "slice_start": -365
+           },
+        {
+            "name": "Heifers",
+            "filters": ["AnimalModuleReporter.report_daily_animal_population.num_(heiferIs|heiferIIs|heiferIIIs)"],
+            "vertical_aggregation": "average",
+            "horizontal_aggregation":"sum",
+            "horizontal_first": true,
+            "slice_start": -365
+           },
+           {
+            "name": "Dry cows",
+            "filters": ["AnimalModuleReporter.report_daily_animal_population.num_dry_cows"],
+            "vertical_aggregation": "average",
+            "slice_start": -365
+           },
+           {
+            "name": "Milking cows",
+            "filters": ["AnimalModuleReporter.report_daily_animal_population.num_lactating_cows"],
+            "vertical_aggregation": "average",
+            "slice_start": -365
+           },
+           {
+            "name": "Total cows",
+            "filters": [
+                "AnimalModuleReporter.report_daily_animal_population.num_cows_total"
+            ],
+            "vertical_aggregation": "average",
+            "slice_start": -365
+           },
+           {
+            "name": "# Growing",
+            "filters": [
+                "AnimalModuleReporter.report_daily_animal_population.num_(heiferIs|heiferIIs)"
+            ],
+            "vertical_aggregation": "average",
+            "horizontal_aggregation": "sum",
+            "slice_start": -365
+           },
+           {
+            "name": "# Close-up",
+            "filters": [
+                "AnimalModuleReporter.report_daily_animal_population.num_(heiferIIIs|dry_cows)"
+            ],
+            "vertical_aggregation": "average",
+            "horizontal_aggregation": "sum",
+            "slice_start": -365
+           },
+           {
+            "name": "Total milk, kg",
+            "filters": ["AnimalModuleReporter.report_life_cycle_manager_data.daily_milk_production"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+           },
+           {
+            "name": "Milk per cow/d, kg",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.daily_milk_production",
+                "AnimalModuleReporter.report_daily_animal_population.num_lactating_cows"
+            ],
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.daily_milk_production",
+                "AnimalModuleReporter.report_daily_animal_population.num_lactating_cows"
+            ],
+            "horizontal_first": true,
+            "vertical_aggregation": "average",
+            "slice_start": -365
+           },
+           {
+            "name": "% milk fat",
+            "filters": ["AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_fat_percent"],
+            "constants": {
+                "By 100": 100
+            },
+            "vertical_aggregation": "average",
+            "horizontal_aggregation": "division",
+            "slice_start": -365
+        },
+        {
+            "name": "% milk protein",
+            "filters": ["AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_protein_percent"],
+            "constants": {
+                "By 100": 100
+            },
+            "vertical_aggregation": "average",
+            "horizontal_aggregation": "division",
+            "slice_start": -365
+        },
+        {
+            "name": "Milk fat, kg",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_fat_kg"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Milk protein, kg",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.herd_milk_protein_kg"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "weighted fat value",
+            "cross_references": [
+                "Milk fat, kg_ver_agg"
+            ],
+            "constants": {
+                "fat weight": 12.2
+            },
+            "horizontal_aggregation": "product"
+        },
+        {
+            "name": "weighted protein value",
+            "cross_references": [
+                "Milk protein, kg_ver_agg"
+            ],
+            "constants": {
+                "protein weight": 7.7
+            },
+            "horizontal_aggregation": "product"
+        },
+        {
+            "name": "weighted milk value",
+            "cross_references": [
+                "Total milk, kg_ver_agg"
+            ],
+            "constants": {
+                "milk weight": 0.25
+            },
+            "horizontal_aggregation": "product"
+        },
+        {
+            "name": "Herd FPCM, kg",
+            "cross_references": [
+                "weighted fat value_hor_agg",
+                "weighted protein value_hor_agg",
+                "weighted milk value_hor_agg"
+            ],
+            "horizontal_aggregation": "sum"
+        },
+        {
+            "name": "Cow FPCM/d, kg",
+            "cross_references":[
+                "Herd FPCM, kg_hor_agg",
+                "Milking cows_ver_agg"
+            ],
+            "constants": {
+                "Days per year": 365
+            },
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "Herd FPCM, kg_hor_agg",
+                "Milking cows_ver_agg",
+                "Days per year"
+            ]
+        },
+           {
+            "name": "Calves sold",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.sold_calf_num"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Heifers sold repro culls",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferII_num"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Heifers sold oversupply",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.sold_heiferIII_oversupply_num"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Heifers sold",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.sold_(heiferII|heiferIII_oversupply)_num"
+            ],
+            "horizontal_aggregation": "sum",
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+
+        {
+            "name": "Cows sold",
+            "filters": [
+                "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.sold_cows_sold_count"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Low production: cow sales",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.cull_reason_stats"
+            ],
+            "variables": ["culled for low production"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Cow herd exits",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.cow_herd_exit_num"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Heifers bought",
+            "filters": [
+                "AnimalModuleReporter.report_life_cycle_manager_data.bought_heifer_num"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+           },
+           {
+            "name": "% herd turnover",
+            "cross_references": [
+                "Cow herd exits_ver_agg",
+                "Total cows_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+           },
+        {
+            "name": "Lact cow DMI, kg",
+            "filters": [
+                "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_.*_LAC_COW"
+            ],
+            "variables": ["dry_matter_intake_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Total herd DMI, kg",
+            "filters": [
+                "^AnimalModuleReporter.report_daily_ration.*"
+            ],
+            "variables": ["dry_matter_intake_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Lact cow DMI/cow/d, kg",
+            "cross_references": [
+                "Lact cow DMI, kg_dry_matter_intake_total_ver_agg",
+                "Milking cows_ver_agg"
+            ],
+            "constants": {
+                "Days per year": 365
+            },
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "Lact cow DMI, kg_dry_matter_intake_total_ver_agg",
+                "Milking cows_ver_agg",
+                "Days per year"
+            ]
+        },
+        {
+            "name": "Total calf bw sold, kg",
+            "filters": [
+                "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.sold_calves_sold_weight"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Avg calf bw sold, kg",
+            "cross_references": [
+                "Total calf bw sold, kg_ver_agg",
+                "Calves sold_ver_agg"
+            ],
+            "horizontal_aggregation": "division"
+        },
+            {
+                "name": "Total heiferII bw sold, kg",
+                "filters": [
+                    "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.heiferII_sold_weight"
+                ],
+                "vertical_aggregation": "sum",
+                "slice_start": -365
+            },
+            {
+                "name": "Avg heiferII bw sold, kg",
+                "cross_references": [
+                    "Total heiferII bw sold, kg_ver_agg",
+                    "Heifers sold repro culls_ver_agg"
+                ],
+                "horizontal_aggregation": "division"
+            },
+            {
+                "name": "Total heiferIII bw sold, kg",
+                "filters": [
+                    "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.heiferIII_sold_weight"
+                ],
+                "vertical_aggregation": "sum",
+                "slice_start": -365
+            },
+            {
+                "name": "Avg heiferIII bw sold, kg",
+                "cross_references": [
+                    "Total heiferIII bw sold, kg_ver_agg",
+                    "Heifers sold oversupply_ver_agg"
+                ],
+                "horizontal_aggregation": "division"
+            },
+            {
+                "name": "Total cow bw sold, kg",
+                "filters": [
+                    "AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day.sold_cows_sold_weight"
+                ],
+                "vertical_aggregation": "sum",
+                "slice_start": -365
+            },
+            {
+                "name": "Avg cow bw sold, kg",
+                "cross_references": [
+                    "Total cow bw sold, kg_ver_agg",
+                    "Cows sold_ver_agg"
+                ],
+                "horizontal_aggregation": "division"
+            },
+            {
+                "name": "Avg mature bodyweight, kg",
+                "filters": [
+                    "AnimalModuleReporter.report_life_cycle_manager_data.avg_mature_body_weight"
+                ],
+                "vertical_aggregation": "average",
+                "slice_start": -365
+            },
+            {
+                "name": "Total heiferIII bw bought, kg",
+                "cross_references": [
+                    "Heifers bought_ver_agg",
+                    "Avg mature bodyweight, kg_ver_agg"
+                ],
+                "constants": {
+                    "Percent MBW at calving": 0.82
+                },
+                "horizontal_aggregation": "product"
+            },
+            {
+                "name": "Net heiferIII bw sold, kg",
+                "cross_references": [
+                    "Total heiferIII bw sold, kg_ver_agg",
+                    "Total heiferIII bw bought, kg_hor_agg"
+                ],
+                "horizontal_aggregation": "subtraction",
+                "horizontal_order": [
+                    "Total heiferIII bw sold, kg_ver_agg",
+                    "Total heiferIII bw bought, kg_hor_agg"
+                ]
+            },
+            {
+                "name": "NE_g calves sold, MJ",
+                "cross_references": [
+                    "Total calf bw sold, kg_ver_agg"
+                ],
+                "constants": {
+                    "NE_g day old calf": 27.5
+                },
+                "horizontal_aggregation": "product"
+            },
+            {
+                "name": "NE_g heiferIIs sold, MJ",
+                "cross_references": [
+                    "Total heiferII bw sold, kg_ver_agg"
+                ],
+                "constants": {
+                    "NE_g bred heifer": 11
+                },
+                "horizontal_aggregation": "product"
+            },
+            {
+                "name": "NE_g NET heiferIIIs sold, MJ",
+                "cross_references": [
+                    "Net heiferIII bw sold, kg_hor_agg"
+                ],
+                "constants": {
+                    "NE_g bred heifer": 11
+                },
+                "horizontal_aggregation": "product"
+            },
+            {
+                "name": "NE_g cows sold, MJ",
+                "cross_references": [
+                    "Total cow bw sold, kg_ver_agg"
+                ],
+                "constants": {
+                    "NE_g mature animal": 15
+                },
+                "horizontal_aggregation": "product"
+            },
+            {
+                "name": "NE_g all meat sold, MJ",
+                "cross_references": [
+                    "NE_g calves sold, MJ_hor_agg",
+                    "NE_g heiferIIs sold, MJ_hor_agg",
+                    "NE_g NET heiferIIIs sold, MJ_hor_agg",
+                    "NE_g cows sold, MJ_hor_agg"
+                ],
+                "horizontal_aggregation": "sum"
+            },
+            {
+                "name": "NE_l all milk sold, MJ",
+                "cross_references": [
+                    "Herd FPCM, kg_hor_agg"
+                ],
+                "constants": {
+                    "NE_l FPCM": 3.1
+                },
+                "horizontal_aggregation": "product"
+            },
+            {
+                "name": "total NE milk and meat",
+                "cross_references": [
+                    "NE_g all meat sold, MJ_hor_agg",
+                    "NE_l all milk sold, MJ_hor_agg"
+                ],
+                "horizontal_aggregation": "sum"
+            },
+            {
+                "name": "milk allocation factor",
+                "cross_references": [
+                    "NE_l all milk sold, MJ_hor_agg",
+                    "total NE milk and meat_hor_agg"
+                ],
+                "horizontal_aggregation": "division",
+                "horizontal_order":  [
+                    "NE_l all milk sold, MJ_hor_agg",
+                    "total NE milk and meat_hor_agg"
+                ]
+            },
+        {
+                "name": "Housing methane by pen, kg",
+                "filters": [
+                    "^ManureHandlerDailyOutput_Pen_.*housing_methane"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Housing ammonia by pen, kg",
+                "filters": [
+                    "^ManureHandlerDailyOutput_Pen_.*housing_ammonia"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Total housing methane, kg",
+                "filters": [
+                    "^ManureHandlerDailyOutput_Pen_.*housing_methane"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Total housing ammonia, kg",
+                "filters": [
+                    "^ManureHandlerDailyOutput_Pen_.*housing_ammonia"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+        {
+                "name": "Storage methane by pen, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_methane"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Total storage methane, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_methane"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+        {
+                "name": "Storage ammonia by pen, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_ammonia"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Total storage ammonia, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_ammonia"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Total herd manure methane, kg",
+                "cross_references": [
+                    "Total housing methane, kg_ver_hor_agg",
+                    "Total storage methane, kg_ver_hor_agg"
+                ],
+                "horizontal_aggregation": "sum"
+            },
+            {
+                "name": "Total manure ammonia, kg",
+                "cross_references": [
+                    "Total housing ammonia, kg_ver_hor_agg",
+                    "Total storage ammonia, kg_ver_hor_agg"
+                ],
+                "horizontal_aggregation": "sum"
+            },
+        {
+                "name": "Manure nitrous oxide (storage) by pen, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_nitrous_oxide.*"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Total manure nitrous oxide (storage), kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_nitrous_oxide.*"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Total manure biogas, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*biogas$"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+        {
+            "name": "Reception Pit Total VS by Pen, kg/yr",
+            "filters": ["^ReceptionPitDailyOutput_Pen_.*.liquid_manure_total_volatile_solids"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365},
+        {
+            "name": "Post Separator Liquid Total VS by Pen, kg/yr",
+        "filters": ["SeparatorDailyOutput_Pen_.*.liquid_manure_total_volatile_solids"],
+         "vertical_aggregation": "sum",
+        "slice_start": -365},
+         {
+            "name": "Manure nitrous oxide, calves, kg",
+            "filters": [
+                "^ManureTreatmentDailyOutput_Pen_.*_CALF.storage_nitrous_oxide"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Manure nitrous oxide, growing heifers, kg",
+            "filters": [
+                "^ManureTreatmentDailyOutput_Pen_.*_GROWING.storage_nitrous_oxide"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Manure nitrous oxide, close-ups, kg",
+            "filters": [
+                "^ManureTreatmentDailyOutput_Pen_.*_CLOSE_UP.storage_nitrous_oxide"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Manure nitrous oxide, lact cows, kg",
+            "filters": [
+                "^ManureTreatmentDailyOutput_Pen_.*_LAC_COW.storage_nitrous_oxide"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name":"Lact cow manure N2O kg/cow/d",
+            "cross_references": [
+                "Manure nitrous oxide, lact cows, kg_ver_hor_agg",
+                "Milking cows_ver_agg"
+            ],
+            "constants": {
+                "days per year": 365
+            },
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "Manure nitrous oxide, lact cows, kg_ver_hor_agg",
+                "Milking cows_ver_agg",
+                "days per year"
+            ]
+        },
+        {
+            "name": "total herd manure N2O, kg",
+            "filters": [
+                "^ManureTreatmentDailyOutput_Pen_.*.storage_nitrous_oxide"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Herd manure N2O per FPCM, kg/kg",
+            "cross_references": [
+                "total herd manure N2O, kg_ver_hor_agg",
+                "Herd FPCM, kg_hor_agg"
+            ],
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "total herd manure N2O, kg_ver_hor_agg",
+                "Herd FPCM, kg_hor_agg"
+            ]
+        },
+        {
+            "name": "Manure nh3, calves, kg",
+            "filters": [
+                "^ManureHandlerDailyOutput_Pen_.*_CALF.housing_ammonia",
+                "^ManureTreatmentDailyOutput_Pen_.*_CALF.storage_ammonia"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Manure nh3, growing heifers, kg",
+            "filters": [
+                "^ManureHandlerDailyOutput_Pen_.*_GROWING.housing_ammonia",
+                "^ManureTreatmentDailyOutput_Pen_.*_GROWING.storage_ammonia"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Manure nh3, close-ups, kg",
+            "filters": [
+                "^ManureHandlerDailyOutput_Pen_.*_CLOSE_UP.housing_ammonia",
+                "^ManureTreatmentDailyOutput_Pen_.*_CLOSE_UP.storage_ammonia"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Manure nh3, lact cows, kg",
+            "filters": [
+                "^ManureHandlerDailyOutput_Pen_.*_LAC_COW.housing_ammonia",
+                "^ManureTreatmentDailyOutput_Pen_.*_LAC_COW.storage_ammonia"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+
+        {
+            "name":"Lact cow manure nh3 kg/cow/d",
+            "cross_references": [
+                "Manure nh3, lact cows, kg_ver_hor_agg",
+                "Milking cows_ver_agg"
+            ],
+            "constants": {
+                "days per year": 365
+            },
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "Manure nh3, lact cows, kg_ver_hor_agg",
+                "Milking cows_ver_agg",
+                "days per year"
+            ]
+        },
+        {
+            "name": "total herd manure nh3, kg",
+            "filters": [
+                "^ManureHandlerDailyOutput_Pen_.*.housing_ammonia",
+                "^ManureTreatmentDailyOutput_Pen_.*.storage_ammonia"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Herd manure nh3 per FPCM, kg/kg",
+            "cross_references": [
+                "total herd manure nh3, kg_ver_hor_agg",
+                "Herd FPCM, kg_hor_agg"
+            ],
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "total herd manure nh3, kg_ver_hor_agg",
+                "Herd FPCM, kg_hor_agg"
+            ]
+        },
+        {
+            "name": "CALF enteric methane, kg",
+            "filters": [
+                "AnimalModuleInputToManureModule_Pen_.*_CALF.enteric_methane_kg"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "GROWING enteric methane, kg",
+            "filters": [
+                "AnimalModuleInputToManureModule_Pen_.*_GROWING.enteric_methane_kg"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "CLOSE-UP enteric methane, kg",
+            "filters": [
+                "AnimalModuleInputToManureModule_Pen_.*_CLOSE_UP.enteric_methane_kg"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "LAC-COW enteric methane, kg",
+            "filters": [
+                "AnimalModuleInputToManureModule_Pen_.*_LAC_COW.enteric_methane_kg"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name":"Lact cow enteric methane kg/cow/d",
+            "cross_references": [
+                "LAC-COW enteric methane, kg_ver_hor_agg",
+                "Milking cows_ver_agg"
+            ],
+            "constants": {
+                "days per year": 365
+            },
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "LAC-COW enteric methane, kg_ver_hor_agg",
+                "Milking cows_ver_agg",
+                "days per year"
+            ]
+        },
+        {
+            "name": "total herd enteric methane, kg",
+            "filters": [
+                "AnimalModuleInputToManureModule_Pen_.*.enteric_methane_kg"
+            ],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "horizontal_first": false,
+            "slice_start": -365
+        },
+        {
+            "name": "Herd enteric CH4 per FPCM, kg/kg",
+            "cross_references": [
+                "total herd enteric methane, kg_ver_hor_agg",
+                "Herd FPCM, kg_hor_agg"
+            ],
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "total herd enteric methane, kg_ver_hor_agg",
+                "Herd FPCM, kg_hor_agg"
+            ]
+        },
+        {
+            "name": "Calf purchased feed emissions, kg",
+            "filters": [
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_CALF"
+            ],
+            "variables": ["feed_emissions_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Growing purchased feed emissions, kg",
+            "filters": [
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_GROWING"
+            ],
+            "variables": ["feed_emissions_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Close up purchased feed emissions, kg",
+            "filters": [
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_CLOSE_UP"
+            ],
+            "variables": ["feed_emissions_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Lact cow purchased feed emissions, kg",
+            "filters": [
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_LAC_COW"
+            ],
+            "variables": ["feed_emissions_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name":"Lact cow feed CO2 kg/cow/d",
+            "cross_references": [
+                "Lact cow purchased feed emissions, kg_feed_emissions_total_ver_agg",
+                "Milking cows_ver_agg"
+            ],
+            "constants": {
+                "days per year": 365
+            },
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "Lact cow purchased feed emissions, kg_feed_emissions_total_ver_agg",
+                "Milking cows_ver_agg",
+                "days per year"
+            ]
+        },
+        {
+            "name": "Total herd feed CO2, kg",
+            "filters": [
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*"
+            ],
+            "variables": ["feed_emissions_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Herd feed CO2 per FPCM, kg/kg",
+            "cross_references": [
+                "Total herd feed CO2, kg_feed_emissions_total_ver_agg",
+                "Herd FPCM, kg_hor_agg"
+            ],
+            "horizontal_aggregation": "division",
+            "horizontal_order": [
+                "Total herd feed CO2, kg_feed_emissions_total_ver_agg",
+                "Herd FPCM, kg_hor_agg"
+            ]
+        },
+      {
+            "name": "DMI by feed",
+            "filters": [
+                "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"
+            ],
+            "variables": [".*"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+                "name": "Byproducts fed, kg DM",
+                "filters": [
+                    "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"
+                ],
+                "variables": ["byproducts_total"],
+                "vertical_aggregation": "sum",
+                "slice_start": -365
+            },
+            {
+                "name": "Byproducts fed, % of DM",
+                "cross_references": [
+                    "Byproducts fed, kg DM_byproducts_total_ver_agg",
+                    "Total herd DMI, kg_dry_matter_intake_total_ver_agg"
+                ],
+                "horizontal_aggregation": "division",
+                "horizontal_order":[
+                    "Byproducts fed, kg DM_byproducts_total_ver_agg",
+                    "Total herd DMI, kg_dry_matter_intake_total_ver_agg"
+                ]
+            },
+        {
+            "name": "Total Feed emissions-including LUC",
+            "filters": [
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*"
+            ],
+            "variables": ["feed_emissions_total"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Total Feed emissions by feed-including LUC",
+            "filters": [
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*"
+            ],
+            "variables": [".*"],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+      "name": "Total Feed LUC emissions",
+      "filters": [
+        "AnimalModuleReporter.report_daily_feed_emissions.land_use_change_feed_emissions_.*"
+      ],
+      "variables": ["feed_emissions_total"],
+      "vertical_aggregation": "sum",
+      "slice_start": -365
+        },
+        {
+            "name": "Total Feed emissions-excluding LUC",
+            "cross_references": [
+                "Total Feed emissions-including LUC_feed_emissions_total_ver_agg",
+                "Total Feed LUC emissions_feed_emissions_total_ver_agg"
+            ],
+            "horizontal_aggregation": "subtraction",
+            "horizontal_order": [
+                "Total Feed emissions-including LUC_feed_emissions_total_ver_agg",
+                "Total Feed LUC emissions_feed_emissions_total_ver_agg"
+            ]
+        },
+        {
+      "name": "LUC emissions by feed",
+      "filters": [
+        "AnimalModuleReporter.report_daily_feed_emissions.land_use_change_feed_emissions_.*"
+      ],
+      "variables": [".*"],
+      "vertical_aggregation": "sum",
+      "slice_start": -365
+        },
+        {
+            "name": "Homegrown Feed Totals",
+            "filters": [".*_calculate_total_homegrown_feed_amounts_by_crop_type.homegrown_feed_totals.*"]
+        },
+        {
+            "name": "Homegrown Feed Emissions",
+            "filters": [".*homegrown_.*_emissions.*"]
+        },
+         {
+            "name": "Fertilizer",
+            "filters": [
+                "Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"
+            ],
+            "variables": [
+                "mass",
+                "nitrogen",
+                "phosphorus",
+                "application_depth",
+                "surface_remainder_fraction",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Tillage",
+            "filters": [
+                "TillageApplication._record_tillage\\.tillage_record\\.field='.*'"
+            ],
+            "variables": [
+                "tillage_depth",
+                "incorporation_fraction",
+                "mixing_fraction",
+                "implement",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Manure Application",
+            "filters": [
+                "Field._record_manure_application\\.manure_application\\.field='.*'"
+            ],
+            "variables": [
+                "dry_matter_mass",
+                "dry_matter_fraction",
+                "field_coverage",
+                "surface_remainder_fraction",
+                "application_depth",
+                "nitrogen",
+                "phosphorus",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Manure Application",
+            "filters": [
+                "Field._execute_manure_application\\.manure_request\\.field='.*'"
+            ],
+            "variables": [
+                "nitrogen",
+                "phosphorus",
+                "day",
+                "year"
+            ]
+        },
+        {
+            "name": "Yield",
+            "filters": [
+                "CropManagement._record_yield.harvest_yield.field='*'"
+            ],
+            "variables": [
+                "crop",
+                "wet_yield",
+                "dry_yield",
+                "nitrogen",
+                "phosphorus",
+                "harvest_index",
+                "planting_date",
+                "harvest_date",
+                "residue_nitrogen",
+                "yield_residue",
+                "harvest_year",
+                "field_size"
+            ]
+        },
+        {
+            "name": "Total eroded sediment",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.eroded_sediment.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Phosphorus Runoff",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.soil_phosphorus_runoff.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Fertilizer P Runoff",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.runoff_fertilizer_phosphorus.field='.*'"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Nitrate Percolate",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.percolated_nitrates.field='.*',layer='3'"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Soil CO2 emissions",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.profile_carbon_emissions.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Soil N2O emissions",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field=.*,layer=.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "Soil NH3 emissions",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.ammonia_emissions.field=.*,layer=.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -365
+        },
+        {
+            "name": "profile_carbon_total-1",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field=.*"
+            ],
+            "slice_start": -1
+        },
+        {
+            "name": "profile_carbon_total-365",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field=.*"
+            ],
+            "slice_start": -365,
+            "slice_end": -364
+        },
+        {
+            "name": "Phosphorus Runoff prior year",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.soil_phosphorus_runoff.field.*"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -730,
+            "slice_end": -365
+        },
+        {
+            "name": "Fertilizer P Runoff Previous Year",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.runoff_fertilizer_phosphorus.field='.*'"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -730,
+            "slice_end": -365
+        },
+        {
+            "name": "Nitrate Percolate prior year",
+            "filters": [
+                "FieldDataReporter.send_daily_variables.percolated_nitrates.field='.*',layer='3'"
+            ],
+            "vertical_aggregation": "sum",
+            "slice_start": -730,
+            "slice_end": -365
+        }
+    ]
+}
+
