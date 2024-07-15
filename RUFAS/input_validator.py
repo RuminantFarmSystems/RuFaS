@@ -2,9 +2,9 @@ import os
 from enum import Enum
 import re
 from functools import reduce
-from typing import Dict, Any, Callable, List, Union
+from typing import Dict, Any, Callable, List, Union, Sequence
 
-from RUFAS.input_manager import InputManager
+from RUFAS.input_manager import InputManager, Modifiability
 from RUFAS.output_manager import OutputManager
 
 """
@@ -89,10 +89,10 @@ class InputValidator:
 
     @staticmethod
     def _validate_metadata_properties_keys(
-        required_properties_keys: set[str],
-        optional_properties_keys: set[str],
-        properties: dict[str, Any],
-        path: list[str],
+            required_properties_keys: set[str],
+            optional_properties_keys: set[str],
+            properties: dict[str, Any],
+            path: list[str],
     ) -> None:
         """Validates that keys in the metadata properties sections."""
         om = OutputManager()
@@ -402,17 +402,16 @@ class InputValidator:
 
         om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
 
-
-# Validate input by type related
+    # Validate input by type related
     @staticmethod
     def _validate_input_by_type(
-        variable_properties: Dict[str, Any],
-        variable_path: List[str | int],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            variable_properties: Dict[str, Any],
+            variable_path: List[str | int],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -457,11 +456,11 @@ class InputValidator:
         type_to_validator_map: Dict[
             str, Callable[[List[int | str], Dict[str, Any], Dict[str, Any], bool, str, "ElementsCounter", bool], bool]
         ] = {
-            "array": self._array_type_validator,
-            "object": self._object_type_validator,
-            "string": self._string_type_validator,
-            "number": self._number_type_validator,
-            "bool": self._bool_type_validator,
+            "array": InputValidator._array_type_validator,
+            "object": InputValidator._object_type_validator,
+            "string": InputValidator._string_type_validator,
+            "number": InputValidator._number_type_validator,
+            "bool": InputValidator._bool_type_validator,
         }
 
         if data_type not in type_to_validator_map:
@@ -495,10 +494,10 @@ class InputValidator:
 
     @staticmethod
     def _validate_array_container_properties(
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Any,
-        properties_blob_key: str,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Any,
+            properties_blob_key: str,
     ) -> bool:
         """
         Validates the container properties of an array input data element.
@@ -563,14 +562,14 @@ class InputValidator:
         return True
 
     def _array_type_validator(
-        self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            self,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type array.
@@ -606,7 +605,7 @@ class InputValidator:
             return True
 
         if not self._validate_array_container_properties(
-            variable_path, variable_properties, array_value, properties_blob_key
+                variable_path, variable_properties, array_value, properties_blob_key
         ):
             return False
 
@@ -628,13 +627,13 @@ class InputValidator:
 
     @staticmethod
     def _object_type_validator(
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type object.
@@ -671,7 +670,7 @@ class InputValidator:
         info_map = {"class": InputValidator.__class__.__name__,
                     "function": InputValidator._object_type_validator.__name__}
 
-        object_value = self._extract_input_data_by_key_list(
+        object_value = InputValidator._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
         variable_path_str = InputManager.convert_variable_path_to_str(variable_path)
@@ -717,17 +716,17 @@ class InputValidator:
 
     @staticmethod
     def _number_type_validator(
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """Validates an input data number element."""
         om = OutputManager()
-        input_data_value = self._extract_input_data_by_key_list(
+        input_data_value = InputValidator._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
 
@@ -779,17 +778,17 @@ class InputValidator:
 
     @staticmethod
     def _string_type_validator(
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """Validates an input data string element."""
         om = OutputManager()
-        input_data_value = self._extract_input_data_by_key_list(
+        input_data_value = InputValidator._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
 
@@ -853,17 +852,17 @@ class InputValidator:
 
     @staticmethod
     def _bool_type_validator(
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
-        called_during_initialization: bool,
+            variable_path: List[str | int],
+            variable_properties: Dict[str, Any],
+            input_data: Dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
+            called_during_initialization: bool,
     ) -> bool:
         """Validates an input data bool element."""
         om = OutputManager()
-        input_data_value = self._extract_input_data_by_key_list(
+        input_data_value = InputValidator._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
 
@@ -891,10 +890,10 @@ class InputValidator:
 
     @staticmethod
     def _fix_data(
-        variable_properties: Dict[str, Any],
-        element_hierarchy: List[Union[str, int]],
-        input_data: Dict[str, Any],
-        properties_blob_key: str,
+            variable_properties: Dict[str, Any],
+            element_hierarchy: List[Union[str, int]],
+            input_data: Dict[str, Any],
+            properties_blob_key: str,
     ) -> bool:
         """
         Attempt to fix the invalid data.
@@ -957,6 +956,256 @@ class InputValidator:
         )
         om.add_warning("Validation: data fixed", warning_message, info_map)
         return True
+
+    @staticmethod
+    def _extract_value_by_key_list(input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+        """
+        Extracts a value from a nested list or dictionary using a list of keys (int or str).
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data.
+
+        Raises
+        ------
+        KeyError
+            If the value cannot be extracted from the input data using the provided variable path.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "animal": {
+        ...         "herd_information": {
+        ...             "calf_num": 8,
+        ...             "heiferI_num": 44,
+        ...             "heiferII_num": 38,
+        ...             "heiferIII_num_springers": 12
+        ...         }
+        ...     }
+        ... }
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> InputValidator._extract_value_by_key_list(example_data, var_path)
+        8
+
+        >>> input_manager = InputManager()
+        >>> example_data = {
+        ...     "manure_management_scenarios": [
+        ...         {
+        ...             "bedding_type": "straw",
+        ...             "manure_handler": "manual scraping"
+        ...         },
+        ...         {
+        ...             "bedding_type": "sawdust",
+        ...             "manure_handler": "flush system"
+        ...         }
+        ...     ]
+        ... }
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> InputValidator._extract_value_by_key_list(example_data, var_path)
+        'straw'
+        """
+
+        for key in variable_path:
+            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
+                input_data = input_data[int(key)]
+            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
+                input_data = input_data[key]
+            else:
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
+        return input_data
+
+    @staticmethod
+    def _extract_input_data_by_key_list(
+            input_data: List[Any] | Dict[str, Any],
+            variable_path: Sequence[str | int],
+            variable_properties: Dict[str, Any],
+            called_during_initialization: bool,
+    ) -> Any:
+        """
+        Extracts a value from the input data based on a specified path and handles missing data by calling
+        InputManager._log_missing_data().
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data if found.
+            None if not found.
+
+        Notes
+        -----
+        This function navigates through the given input data (which can be a list or a dictionary) following the path
+        specified in `variable_path`. If the path leads to a value, it is returned.
+        If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
+        the variable name by finding the last string element in the `variable_path` array and handles this missing data
+        by calling InputManager._log_missing_data().
+        """
+        result = None
+        try:
+            result = InputValidator._extract_value_by_key_list(input_data, variable_path)
+        except KeyError:
+            var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
+            InputValidator._log_missing_data(
+                variable_properties=variable_properties,
+                var_name=var_name,
+                called_during_initialization=called_during_initialization,
+            )
+        return result
+
+    @staticmethod
+    def _log_missing_data(variable_properties: Dict[str, Any],
+                          var_name: str,
+                          called_during_initialization: bool
+                          ) -> None:
+        """
+        Handles logging for missing data for a variable, logging errors or warnings based on the context of
+        initialization or runtime updates.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            Properties of the variable, potentially including its modifiability status.
+        var_name : str
+            The name of the variable with missing data.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization
+
+        Raises
+        ------
+        KeyError
+            Raised if the missing data is deemed necessary, either during initialization or for a runtime update.
+
+        Notes
+        -----
+        This function determines if it's being called during the initialization phase and checks if the missing variable
+        data is required at this stage using '_is_input_required_upon_initialization'. If required, it logs an error and
+        raises a KeyError. If not, it logs a warning.
+        """
+        om = OutputManager()
+        info_map = {"class": InputValidator.__class__.__name__, "function": InputValidator._log_missing_data.__name__}
+        if not called_during_initialization:
+            error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
+            om.add_error("Missing required data", error_msg, info_map)
+            raise KeyError(error_msg)
+
+        if InputValidator._is_input_required_upon_initialization(
+                variable_name=var_name, variable_properties=variable_properties):
+            om.add_error(
+                "Missing required data",
+                f"Key {var_name} not found in input data. Input value is required for this "
+                "variable upon program initialization.",
+                info_map,
+            )
+            raise KeyError(
+                f"Key {var_name} not found in input data. Input value is required for this "
+                "variable upon program initialization."
+            )
+        om.add_warning(
+            "Validation: key not found in input data -- input not required upon initialization",
+            f"Key {var_name} not found in input data. Input value is not required for this "
+            "variable upon program initialization, setting the variable value to None.",
+            info_map,
+        )
+
+    @staticmethod
+    def _is_input_required_upon_initialization(variable_name: str,
+                                               variable_properties: Dict[str, Any]) -> bool:
+        """
+        Determines whether a variable requires an input value upon initialization based on its modifiability status.
+
+        This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
+        variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
+        modifiability status is either 'REQUIRED_AND_LOCKED' or 'REQUIRED_AND_UNLOCKED', indicating that the variable
+        must be initialized with a value.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable being evaluated for its initialization requirements.
+        variable_properties : Dict[str, Any]
+            A dictionary containing the properties of the variable, which should include its modifiability status among
+            others.
+
+        Returns
+        -------
+        bool
+            True if the variable's modifiability status necessitates an input value upon initialization,
+            False otherwise.
+        """
+        variable_modifiability = InputValidator._get_variable_modifiability(
+            variable_name=variable_name, variable_properties=variable_properties
+        )
+        return variable_modifiability in Modifiability.get_required_during_initialization()
+
+    @staticmethod
+    def _get_variable_modifiability(variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
+        """
+        Determines the modifiability status of a variable based on its properties and returns the corresponding enum
+        value.
+
+        Notes
+        -----
+        This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
+        empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
+        correspond to any enum members, a KeyError is raised after logging the error. If 'modifiability' is absent or
+        its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable for which the modifiability status is being determined. Used for error logging.
+        variable_properties : Dict[str, Any]
+            A dictionary containing the properties of the variable, containing the desired 'modifiability' property.
+
+        Returns
+        -------
+        Modifiability
+            An enum member representing the variable's modifiability status.
+
+        Raises
+        ------
+        KeyError
+            If 'modifiability' in `variable_properties` does not match any enum member in Modifiability. The error
+            message includes the invalid modifiability value and suggests valid values.
+        """
+        om = OutputManager()
+        info_map = {
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._get_variable_modifiability.__name__,
+        }
+
+        default = "UNREQUIRED UNLOCKED"
+        modifiability = variable_properties.get("modifiability", default)
+
+        try:
+            return Modifiability.__getitem__("_".join(modifiability.strip().upper().split()))
+        except KeyError:
+            om.add_warning(
+                "Unknown modifiability entry",
+                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability should be "
+                f"one of {Modifiability.values()}. Using the default value: {default}",
+                info_map,
+            )
+            return Modifiability.__getitem__("_".join(default.strip().upper().split()))
 
 
 class ElementState(Enum):
