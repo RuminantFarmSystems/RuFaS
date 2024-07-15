@@ -3,7 +3,8 @@ import re
 from functools import reduce
 from typing import Dict, Any, Callable, List, Union, Sequence
 
-from RUFAS.input_manager import InputManager, Modifiability, ElementsCounter, ElementState
+from RUFAS.elements import ElementState
+from RUFAS.modifiability import Modifiability
 from RUFAS.output_manager import OutputManager
 
 """
@@ -464,7 +465,7 @@ class InputValidator:
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{InputManager.convert_variable_path_to_str(variable_path)}' "
+                f"The metadata type of the element '{InputValidator.convert_variable_path_to_str(variable_path)}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
@@ -525,7 +526,7 @@ class InputValidator:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-        variable_path_str = InputManager.convert_variable_path_to_str(variable_path)
+        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
         if not isinstance(input_data, list):
             om.add_warning(
                 "Validation: array container is not a list",
@@ -674,7 +675,7 @@ class InputValidator:
         object_value = InputValidator._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
-        variable_path_str = InputManager.convert_variable_path_to_str(variable_path)
+        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
@@ -734,7 +735,7 @@ class InputValidator:
         if variable_properties.get("nullable", False) and input_data_value is None:
             return True
 
-        variable_path_str = InputManager.convert_variable_path_to_str(variable_path)
+        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
 
         info_map = {
             "class": InputValidator.__class__.__name__,
@@ -796,7 +797,7 @@ class InputValidator:
         if variable_properties.get("nullable", False) and input_data_value is None:
             return True
 
-        variable_path_str = InputManager.convert_variable_path_to_str(variable_path)
+        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
         info_map = {
             "class": InputValidator.__class__.__name__,
             "function": InputValidator._string_type_validator.__name__,
@@ -870,7 +871,7 @@ class InputValidator:
         if variable_properties.get("nullable", False) and input_data_value is None:
             return True
 
-        variable_path_str = InputManager.convert_variable_path_to_str(variable_path)
+        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
 
         info_map = {
             "class": InputValidator.__class__.__name__,
@@ -1142,3 +1143,105 @@ class InputValidator:
                 info_map,
             )
             return Modifiability.__getitem__("_".join(default.strip().upper().split()))
+
+    @staticmethod
+    def convert_variable_path_to_str(variable_path: List[str | int]) -> str:
+        """
+        Converts a list of keys (int or str) into a string representation of the path to a variable.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        str
+            A string representation of the path to a variable.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> InputValidator.convert_variable_path_to_str(var_path)
+        'animal.herd_information.calf_num'
+
+        >>> input_manager = InputManager()
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> InputValidator.convert_variable_path_to_str(var_path)
+        'manure_management_scenarios.[0].bedding_type'
+        """
+
+        formatted_path_elems = []
+        for raw_path_elem in variable_path:
+            if isinstance(raw_path_elem, int) or (isinstance(raw_path_elem, str) and raw_path_elem.isdigit()):
+                formatted_path_elems.append(f"[{raw_path_elem}]")
+            else:
+                formatted_path_elems.append(f"{raw_path_elem}")
+        return ".".join(formatted_path_elems)
+
+    @staticmethod
+    def extract_value_by_key_list(input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+        """
+        Extracts a value from a nested list or dictionary using a list of keys (int or str).
+
+        Parameters
+        ----------
+        input_data : List[Any] | Dict[str, Any]
+            The input data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the input data.
+
+        Returns
+        -------
+        Any
+            The value extracted from the input data.
+
+        Raises
+        ------
+        KeyError
+            If the value cannot be extracted from the input data using the provided variable path.
+
+        Examples
+        --------
+        >>> input_manager = InputValidator()
+        >>> example_data = {
+        ...     "animal": {
+        ...         "herd_information": {
+        ...             "calf_num": 8,
+        ...             "heiferI_num": 44,
+        ...             "heiferII_num": 38,
+        ...             "heiferIII_num_springers": 12
+        ...         }
+        ...     }
+        ... }
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> InputValidator.extract_value_by_key_list(example_data, var_path)
+        8
+
+        >>> input_manager = InputValidator()
+        >>> example_data = {
+        ...     "manure_management_scenarios": [
+        ...         {
+        ...             "bedding_type": "straw",
+        ...             "manure_handler": "manual scraping"
+        ...         },
+        ...         {
+        ...             "bedding_type": "sawdust",
+        ...             "manure_handler": "flush system"
+        ...         }
+        ...     ]
+        ... }
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> InputValidator.extract_value_by_key_list(example_data, var_path)
+        'straw'
+        """
+
+        for key in variable_path:
+            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
+                input_data = input_data[int(key)]
+            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
+                input_data = input_data[key]
+            else:
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
+        return input_data

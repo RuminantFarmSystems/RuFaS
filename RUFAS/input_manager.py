@@ -1,14 +1,15 @@
 import json
 import os
 from copy import deepcopy
-from deepdiff import DeepDiff
-from enum import Enum
 from functools import reduce
 from pathlib import Path
 from typing import Any, Dict, List, Callable, Sequence, Tuple
 
 import pandas as pd
+from deepdiff import DeepDiff
 
+from RUFAS.elements import ElementsCounter
+from RUFAS.modifiability import Modifiability
 from RUFAS.input_validator import InputValidator
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
@@ -26,48 +27,6 @@ Set enumerating the input data formats the Input Manager can accept.
 VALID_INPUT_TYPES: set[str] = {"json", "csv"}
 
 ADDRESS_TO_INPUTS = "files"
-
-
-class Modifiability(Enum):
-    """
-    Enum class representing the modifiability status of a variable.
-
-    This Enum defines various levels of modifiability for a variable, indicating whether a variable is required at
-    initialization and if it can be modified during runtime.
-
-    Attributes
-    ----------
-    REQUIRED_LOCKED : str
-        Indicates the variable must be initialized with a value and cannot be modified thereafter.
-    REQUIRED_UNLOCKED : str
-        Indicates the variable must be initialized with a value but can be modified during runtime.
-    UNREQUIRED_UNLOCKED : str
-        Indicates the variable does not need to be initialized with a value and can be modified during runtime.
-    """
-
-    REQUIRED_LOCKED: str = "required locked"
-    REQUIRED_UNLOCKED: str = "required unlocked"
-    UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
-
-    @classmethod
-    def values(cls) -> List[str]:
-        """
-        Provides a list of the string values of the enum members.
-
-        Returns
-        -------
-        List[str]
-            A list containing the string values of the enum members.
-        """
-        return list(map(lambda c: c.value, cls))
-
-    @classmethod
-    def get_required_during_initialization(cls) -> List["Modifiability"]:
-        return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
-
-    @classmethod
-    def get_modifiable_at_runtime(cls) -> List["Modifiability"]:
-        return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
 class InputManager:
@@ -470,7 +429,7 @@ class InputManager:
         return variable_modifiability in Modifiability.get_modifiable_at_runtime()
 
     def _log_missing_data(
-        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+            self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -1114,42 +1073,42 @@ class InputManager:
     #             called_during_initialization=called_during_initialization,
     #         )
     #     return result
-
-    @staticmethod
-    def convert_variable_path_to_str(variable_path: List[str | int]) -> str:
-        """
-        Converts a list of keys (int or str) into a string representation of the path to a variable.
-
-        Parameters
-        ----------
-        variable_path : List[str | int]
-            A list of keys to be used to extract the value from the input data.
-
-        Returns
-        -------
-        str
-            A string representation of the path to a variable.
-
-        Examples
-        --------
-        >>> input_manager = InputManager()
-        >>> var_path = ["animal", "herd_information", "calf_num"]
-        >>> InputManager.convert_variable_path_to_str(var_path)
-        'animal.herd_information.calf_num'
-
-        >>> input_manager = InputManager()
-        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
-        >>> InputManager.convert_variable_path_to_str(var_path)
-        'manure_management_scenarios.[0].bedding_type'
-        """
-
-        formatted_path_elems = []
-        for raw_path_elem in variable_path:
-            if isinstance(raw_path_elem, int) or (isinstance(raw_path_elem, str) and raw_path_elem.isdigit()):
-                formatted_path_elems.append(f"[{raw_path_elem}]")
-            else:
-                formatted_path_elems.append(f"{raw_path_elem}")
-        return ".".join(formatted_path_elems)
+    #
+    # @staticmethod
+    # def convert_variable_path_to_str(variable_path: List[str | int]) -> str:
+    #     """
+    #     Converts a list of keys (int or str) into a string representation of the path to a variable.
+    #
+    #     Parameters
+    #     ----------
+    #     variable_path : List[str | int]
+    #         A list of keys to be used to extract the value from the input data.
+    #
+    #     Returns
+    #     -------
+    #     str
+    #         A string representation of the path to a variable.
+    #
+    #     Examples
+    #     --------
+    #     >>> input_manager = InputManager()
+    #     >>> var_path = ["animal", "herd_information", "calf_num"]
+    #     >>> InputManager.convert_variable_path_to_str(var_path)
+    #     'animal.herd_information.calf_num'
+    #
+    #     >>> input_manager = InputManager()
+    #     >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+    #     >>> InputManager.convert_variable_path_to_str(var_path)
+    #     'manure_management_scenarios.[0].bedding_type'
+    #     """
+    #
+    #     formatted_path_elems = []
+    #     for raw_path_elem in variable_path:
+    #         if isinstance(raw_path_elem, int) or (isinstance(raw_path_elem, str) and raw_path_elem.isdigit()):
+    #             formatted_path_elems.append(f"[{raw_path_elem}]")
+    #         else:
+    #             formatted_path_elems.append(f"{raw_path_elem}")
+    #     return ".".join(formatted_path_elems)
 
     # def _fix_data(
     #     self,
@@ -1271,7 +1230,7 @@ class InputManager:
 
         element_hierarchy = data_address.split(".")
         try:
-            data_value = InputManager.extract_value_by_key_list(self.__pool, element_hierarchy)
+            data_value = InputValidator.extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
@@ -1280,71 +1239,71 @@ class InputManager:
 
         return None
 
-    @staticmethod
-    def extract_value_by_key_list(input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
-        """
-        Extracts a value from a nested list or dictionary using a list of keys (int or str).
-
-        Parameters
-        ----------
-        input_data : List[Any] | Dict[str, Any]
-            The input data containing the value to be extracted.
-        variable_path : List[str | int]
-            A list of keys to be used to extract the value from the input data.
-
-        Returns
-        -------
-        Any
-            The value extracted from the input data.
-
-        Raises
-        ------
-        KeyError
-            If the value cannot be extracted from the input data using the provided variable path.
-
-        Examples
-        --------
-        >>> input_manager = InputManager()
-        >>> example_data = {
-        ...     "animal": {
-        ...         "herd_information": {
-        ...             "calf_num": 8,
-        ...             "heiferI_num": 44,
-        ...             "heiferII_num": 38,
-        ...             "heiferIII_num_springers": 12
-        ...         }
-        ...     }
-        ... }
-        >>> var_path = ["animal", "herd_information", "calf_num"]
-        >>> InputManager.extract_value_by_key_list(example_data, var_path)
-        8
-
-        >>> input_manager = InputManager()
-        >>> example_data = {
-        ...     "manure_management_scenarios": [
-        ...         {
-        ...             "bedding_type": "straw",
-        ...             "manure_handler": "manual scraping"
-        ...         },
-        ...         {
-        ...             "bedding_type": "sawdust",
-        ...             "manure_handler": "flush system"
-        ...         }
-        ...     ]
-        ... }
-        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
-        >>> InputManager.extract_value_by_key_list(example_data, var_path)
-        'straw'
-        """
-
-        for key in variable_path:
-            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
-                input_data = input_data[int(key)]
-            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
-                input_data = input_data[key]
-            else:
-                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
-        return input_data
+    # @staticmethod
+    # def extract_value_by_key_list(input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+    #     """
+    #     Extracts a value from a nested list or dictionary using a list of keys (int or str).
+    #
+    #     Parameters
+    #     ----------
+    #     input_data : List[Any] | Dict[str, Any]
+    #         The input data containing the value to be extracted.
+    #     variable_path : List[str | int]
+    #         A list of keys to be used to extract the value from the input data.
+    #
+    #     Returns
+    #     -------
+    #     Any
+    #         The value extracted from the input data.
+    #
+    #     Raises
+    #     ------
+    #     KeyError
+    #         If the value cannot be extracted from the input data using the provided variable path.
+    #
+    #     Examples
+    #     --------
+    #     >>> input_manager = InputManager()
+    #     >>> example_data = {
+    #     ...     "animal": {
+    #     ...         "herd_information": {
+    #     ...             "calf_num": 8,
+    #     ...             "heiferI_num": 44,
+    #     ...             "heiferII_num": 38,
+    #     ...             "heiferIII_num_springers": 12
+    #     ...         }
+    #     ...     }
+    #     ... }
+    #     >>> var_path = ["animal", "herd_information", "calf_num"]
+    #     >>> InputManager.extract_value_by_key_list(example_data, var_path)
+    #     8
+    #
+    #     >>> input_manager = InputManager()
+    #     >>> example_data = {
+    #     ...     "manure_management_scenarios": [
+    #     ...         {
+    #     ...             "bedding_type": "straw",
+    #     ...             "manure_handler": "manual scraping"
+    #     ...         },
+    #     ...         {
+    #     ...             "bedding_type": "sawdust",
+    #     ...             "manure_handler": "flush system"
+    #     ...         }
+    #     ...     ]
+    #     ... }
+    #     >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+    #     >>> InputManager.extract_value_by_key_list(example_data, var_path)
+    #     'straw'
+    #     """
+    #
+    #     for key in variable_path:
+    #         if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
+    #             input_data = input_data[int(key)]
+    #         elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
+    #             input_data = input_data[key]
+    #         else:
+    #             raise KeyError(f"There is an error at key {key} in the path {variable_path}")
+    #     return input_data
 
     def check_property_exists_in_pool(self, data_address: str) -> bool:
         """
@@ -1378,7 +1337,7 @@ class InputManager:
 
         variable_path = data_address.split(".")
         try:
-            InputManager.extract_value_by_key_list(self.__pool, variable_path)
+            InputValidator.extract_value_by_key_list(self.__pool, variable_path)
             return True
         except KeyError:
             return False
@@ -1589,7 +1548,7 @@ class InputManager:
         return True
 
     def _set_nested_value(
-        self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any
+            self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any
     ) -> Dict[str, Any]:
         """
         Sets a given value within a nested dictionary structure at a specified hierarchical level and returns the
@@ -1648,11 +1607,11 @@ class InputManager:
         return nested_dict
 
     def _add_variable_to_pool(
-        self,
-        variable_name: str,
-        input_data: Dict[str, Any],
-        properties_blob_key: str,
-        eager_termination: bool,
+            self,
+            variable_name: str,
+            input_data: Dict[str, Any],
+            properties_blob_key: str,
+            eager_termination: bool,
     ) -> bool:
         """
         Adds a variable to the pool after validating its data against specified metadata properties.
@@ -1726,7 +1685,7 @@ class InputManager:
         return True
 
     def _prepare_data(
-        self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
+            self, variable_name: str, input_data: dict[str, Any], properties_blob_key: str
     ) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         """
         Prepare data and metadata properties for validation.
@@ -1760,7 +1719,7 @@ class InputManager:
         return data, metadata_properties
 
     def _check_modifiability(
-        self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool
+            self, variable_name: str, metadata_properties: dict[str, Any], eager_termination: bool
     ) -> bool:
         """
         Checks whether a variable is allowed to be modified at runtime.
@@ -1802,12 +1761,12 @@ class InputManager:
         return True
 
     def _validate_data(
-        self,
-        data: dict[str, Any],
-        metadata_properties: dict[str, Any],
-        eager_termination: bool,
-        properties_blob_key: str,
-        elements_counter: "ElementsCounter",
+            self,
+            data: dict[str, Any],
+            metadata_properties: dict[str, Any],
+            eager_termination: bool,
+            properties_blob_key: str,
+            elements_counter: "ElementsCounter",
     ) -> dict[str, Any]:
         """
         Validate input data based on metadata properties.
@@ -1879,11 +1838,11 @@ class InputManager:
         self.__pool[variable_name] = validated_data
 
     def add_dict_variable_to_pool(
-        self,
-        variable_name: str,
-        data: Dict[str, Any],
-        properties_blob_key: str,
-        eager_termination: bool,
+            self,
+            variable_name: str,
+            data: Dict[str, Any],
+            properties_blob_key: str,
+            eager_termination: bool,
     ) -> bool:
         """
         Adds a dictionary variable to the InputManager's pool after validating it against metadata.
@@ -1945,11 +1904,11 @@ class InputManager:
             return False
 
     def add_tabular_variable_to_pool(
-        self,
-        variable_name: str,
-        data: Dict[str, List[Any]] | List[Any],
-        properties_blob_key: str,
-        eager_termination: bool,
+            self,
+            variable_name: str,
+            data: Dict[str, List[Any]] | List[Any],
+            properties_blob_key: str,
+            eager_termination: bool,
     ) -> bool:
         """
         Adds a tabular variable to the InputManager's pool after validating it against metadata.
@@ -2434,7 +2393,7 @@ class InputManager:
             raise e
 
     def _parse_metadata_properties(
-        self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
+            self, data: Dict[str, Any], prefix: str = "", sep: str = "_"
     ) -> List[Dict[str, Any]]:
         """
         Recursively traverse through the metadata properties dictionary
@@ -2515,7 +2474,7 @@ class InputManager:
         """
         properties_index = name.find("_properties") + len("_properties")
         properties_group = name[:properties_index]
-        name = name[properties_index + 1 :]
+        name = name[properties_index + 1:]
         return {
             "properties_group": properties_group,
             "name": name,
@@ -2528,7 +2487,7 @@ class InputManager:
         }
 
     def compare_metadata_properties(
-        self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
+            self, properties_file_path: Path, comparison_properties_file_path: Path, output_directory: Path
     ) -> None:
         """
         Compares two metadata properties json files using the DeepDiff package and saves the results in a text file.
@@ -2590,130 +2549,3 @@ class InputManager:
                 info_map,
             )
             raise
-
-
-class ElementState(Enum):
-    """
-    An enumeration of the states an input data element can be in during validation. An element cannot
-    be in more than one state at a time.
-
-    Attributes
-    ----------
-    VALID : int
-        The element is valid.
-    INVALID : int
-        The element is invalid and cannot be fixed.
-    FIXED : int
-        The element is invalid initially but has been fixed.
-    """
-
-    VALID = "valid"
-    INVALID = "invalid"
-    FIXED = "fixed"
-
-
-class ElementsCounter:
-    """
-    A class to keep track of the number of elements in each state during validation.
-
-    Attributes
-    ----------
-    valid_elements : int
-        The number of valid elements.
-    invalid_elements : int
-        The number of invalid elements.
-    fixed_elements : int
-        The number of fixed elements.
-    """
-
-    def __init__(self) -> None:
-        self.valid_elements = 0
-        self.invalid_elements = 0
-        self.fixed_elements = 0
-
-    def update(self, state: ElementState, value: int) -> None:
-        """
-        Updates the count of elements in a given state.
-
-        Parameters
-        ----------
-        state : ElementState
-            The state of the element.
-        value : int
-            The value by which the count should be updated.
-
-        Raises
-        ------
-        ValueError
-            If the state is not one of the valid states.
-        """
-        if state == ElementState.VALID:
-            self.valid_elements += value
-        elif state == ElementState.INVALID:
-            self.invalid_elements += value
-        elif state == ElementState.FIXED:
-            self.fixed_elements += value
-        else:
-            raise ValueError(f"Invalid state: {state}")
-
-    def increment(self, state: ElementState) -> None:
-        """
-        Increments the count of elements in a given state by one.
-
-        Parameters
-        ----------
-        state : ElementState
-            The state of the element.
-        """
-
-        self.update(state, 1)
-
-    def reset(self) -> None:
-        """
-        Resets the counts of all element states to zero.
-        """
-
-        self.valid_elements = 0
-        self.invalid_elements = 0
-        self.fixed_elements = 0
-
-    def total_elements(self) -> int:
-        """
-        Returns the total number of elements by adding the counts of valid, invalid, and fixed elements.
-        """
-        return self.valid_elements + self.invalid_elements + self.fixed_elements
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the ElementsCounter object.
-        """
-
-        return str(
-            {
-                "valid_elements": self.valid_elements,
-                "invalid_elements": self.invalid_elements,
-                "fixed_elements": self.fixed_elements,
-                "total_elements": self.total_elements(),
-            }
-        )
-
-    def __add__(self, other: "ElementsCounter") -> "ElementsCounter":
-        """
-        Adds the counts of two ElementsCounter objects together.
-
-        Parameters
-        ----------
-        other : ElementsCounter
-            The other ElementsCounter object to be added.
-
-        Returns
-        -------
-        ElementsCounter
-            A new ElementsCounter object with the counts of the two objects added together.
-        """
-
-        new_counter = ElementsCounter()
-        new_counter.valid_elements = self.valid_elements + other.valid_elements
-        new_counter.invalid_elements = self.invalid_elements + other.invalid_elements
-        new_counter.fixed_elements = self.fixed_elements + other.fixed_elements
-        return new_counter
