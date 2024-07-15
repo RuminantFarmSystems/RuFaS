@@ -582,29 +582,6 @@ class Field:
             phosphorus=requested_phosphorus,
             manure_type=requested_manure_type,
         )
-        manure_request_units = {
-            "nitrogen": MeasurementUnits.KILOGRAMS,
-            "phosphorus": MeasurementUnits.KILOGRAMS,
-            "day": MeasurementUnits.ORDINAL_DAY,
-            "year": MeasurementUnits.CALENDAR_YEAR,
-            "field_size": MeasurementUnits.HECTARE,
-            "field_name": MeasurementUnits.UNITLESS,
-        }
-        manure_request_info_map = {
-            "class": self.__class__.__name__,
-            "function": self._execute_manure_application.__name__,
-            "suffix": f"field='{self.field_data.name}'",
-            "units": manure_request_units,
-        }
-        manure_request_values = {
-            "nitrogen": requested_nitrogen,
-            "phosphorus": requested_phosphorus,
-            "day": day,
-            "year": year,
-            "field_size": self.field_data.field_size,
-            "field_name": self.field_data.name,
-        }
-        om.add_variable("manure_request", manure_request_values, manure_request_info_map)
 
         manure_supplied = self.manure_supplier.request_nutrients(nutrient_request)
 
@@ -667,6 +644,20 @@ class Field:
         else:
             supplied_nitrogen = 0.0
             supplied_phosphorus = 0.0
+
+        self._record_manure_application(
+            dry_matter_mass=0.0,
+            dry_matter_fraction=0.0,
+            field_coverage=field_coverage,
+            nitrogen=requested_nitrogen,
+            phosphorus=requested_phosphorus,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
+            day=day,
+            output_name="manure_request",
+        )
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)

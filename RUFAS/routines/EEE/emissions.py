@@ -116,7 +116,7 @@ class EmissionsEstimator:
         manure_request_filter = {
             "name": "Manure Applications",
             "descriptions": "Collects all manure applications that occurred in the simulation.",
-            "filters": ["Field._execute_manure_application\\.manure_request\\.field='.*'"],
+            "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
             "variables": [".*"],
         }
         manure_requests = om.filter_variables_pool(manure_request_filter)
