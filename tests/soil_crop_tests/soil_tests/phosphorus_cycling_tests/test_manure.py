@@ -482,10 +482,14 @@ def test_determine_decomposed_surface_manure(
 ) -> None:
     """Tests that the correct changes in mass and field coverage of machine and grazer applied manure are calculated."""
     data = SoilData(
-        machine_manure_dry_mass=800,
-        machine_manure_field_coverage=0.85,
-        grazing_manure_dry_mass=500,
-        grazing_manure_field_coverage=0.44,
+        machine_manure=ManurePool(
+            manure_dry_mass=800,
+            manure_field_coverage=0.85,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=500,
+            manure_field_coverage=0.44,
+        ),
         field_size=1.1,
     )
     incorp = Manure(data)
@@ -495,30 +499,30 @@ def test_determine_decomposed_surface_manure(
     observed = incorp._determine_decomposed_surface_manure(temp_factor)
 
     expected_machine_mass_decomp = min(
-        max(0.0, incorp.data.machine_manure_dry_mass * 0.5),
-        incorp.data.machine_manure_dry_mass,
+        max(0.0, incorp.data.machine_manure.manure_dry_mass * 0.5),
+        incorp.data.machine_manure.manure_dry_mass,
     )
     expected_machine_coverage_decomp = min(
         max(
             0.0,
             expected_machine_mass_decomp
-            / incorp.data.machine_manure_dry_mass
-            * incorp.data.machine_manure_field_coverage,
+            / incorp.data.machine_manure.manure_dry_mass
+            * incorp.data.machine_manure.manure_field_coverage,
         ),
-        incorp.data.machine_manure_field_coverage,
+        incorp.data.machine_manure.manure_field_coverage,
     )
     expected_grazing_mass_decomp = min(
-        max(0.0, incorp.data.grazing_manure_dry_mass * 0.5),
-        incorp.data.grazing_manure_dry_mass,
+        max(0.0, incorp.data.grazing_manure.manure_dry_mass * 0.5),
+        incorp.data.grazing_manure.manure_dry_mass,
     )
     expected_grazing_coverage_decomp = min(
         max(
             0.0,
             expected_grazing_mass_decomp
-            / incorp.data.grazing_manure_dry_mass
-            * incorp.data.grazing_manure_field_coverage,
+            / incorp.data.grazing_manure.manure_dry_mass
+            * incorp.data.grazing_manure.manure_field_coverage,
         ),
-        incorp.data.grazing_manure_field_coverage,
+        incorp.data.grazing_manure.manure_field_coverage,
     )
 
     incorp._determine_dry_matter_decomposition_rate.assert_called_once_with(temp_factor)
