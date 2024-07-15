@@ -664,12 +664,10 @@ def test_apply_machine_manure(
             source_animal=source_animal,
         )
 
-        expected_weiP_frac = weiP_frac
         if weiP_frac is None:
             incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.assert_called_once_with(
                 source_animal
             )
-            expected_weiP_frac = 0.25
         else:
             incorp._determine_water_extractable_inorganic_phosphorus_fraction_by_animal.assert_not_called()
 
