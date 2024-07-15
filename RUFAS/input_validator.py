@@ -22,7 +22,7 @@ ADDRESS_TO_INPUTS = "files"
 class InputValidator:
 
     @staticmethod
-    def _validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> None:
+    def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> None:
         """Iteratively traverses the metadata properties to check the max depth and routes
         properties to be validated by type.
 
@@ -36,7 +36,7 @@ class InputValidator:
         om = OutputManager()
         info_map = {
             "class": InputValidator.__class__.__name__,
-            "function": InputValidator._validate_properties.__name__,
+            "function": InputValidator.validate_properties.__name__,
         }
 
         stack: list[tuple[dict[str, Any], int, list[str]]] = [(metadata["properties"], 0, [])]
@@ -362,12 +362,12 @@ class InputValidator:
         )
 
     @staticmethod
-    def _validate_metadata(metadata: Dict[str, Any]) -> None:
+    def validate_metadata(metadata: Dict[str, Any]) -> None:
         """Checks that top-level metadata has valid and required keys and values."""
         om = OutputManager()
         info_map = {
             "class": InputValidator.__class__.__name__,
-            "function": InputValidator._validate_metadata.__name__,
+            "function": InputValidator.validate_metadata.__name__,
         }
         metadata_files = metadata[ADDRESS_TO_INPUTS]
         required_keys = {"path", "type", "properties"}
@@ -403,7 +403,7 @@ class InputValidator:
 
     # Validate input by type related
     @staticmethod
-    def _validate_input_by_type(
+    def validate_input_by_type(
             variable_properties: Dict[str, Any],
             variable_path: List[str | int],
             input_data: Dict[str, Any],
@@ -610,7 +610,7 @@ class InputValidator:
 
         is_whole_array_acceptable = True
         for index, element in enumerate(array_value):
-            is_element_acceptable = self._validate_input_by_type(
+            is_element_acceptable = self.validate_input_by_type(
                 variable_properties["properties"],
                 variable_path + [index],
                 input_data,
@@ -690,7 +690,7 @@ class InputValidator:
         for key in variable_properties.keys():
             if key in ["type", "description", "default"]:
                 continue
-            is_element_acceptable = InputValidator._validate_input_by_type(
+            is_element_acceptable = InputValidator.validate_input_by_type(
                 variable_properties[key],
                 variable_path + [key],
                 input_data,
@@ -961,72 +961,6 @@ class InputValidator:
         return True
 
     @staticmethod
-    def _extract_value_by_key_list(input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
-        """
-        Extracts a value from a nested list or dictionary using a list of keys (int or str).
-
-        Parameters
-        ----------
-        input_data : List[Any] | Dict[str, Any]
-            The input data containing the value to be extracted.
-        variable_path : List[str | int]
-            A list of keys to be used to extract the value from the input data.
-
-        Returns
-        -------
-        Any
-            The value extracted from the input data.
-
-        Raises
-        ------
-        KeyError
-            If the value cannot be extracted from the input data using the provided variable path.
-
-        Examples
-        --------
-        >>> input_manager = InputManager()
-        >>> example_data = {
-        ...     "animal": {
-        ...         "herd_information": {
-        ...             "calf_num": 8,
-        ...             "heiferI_num": 44,
-        ...             "heiferII_num": 38,
-        ...             "heiferIII_num_springers": 12
-        ...         }
-        ...     }
-        ... }
-        >>> var_path = ["animal", "herd_information", "calf_num"]
-        >>> InputValidator._extract_value_by_key_list(example_data, var_path)
-        8
-
-        >>> input_manager = InputManager()
-        >>> example_data = {
-        ...     "manure_management_scenarios": [
-        ...         {
-        ...             "bedding_type": "straw",
-        ...             "manure_handler": "manual scraping"
-        ...         },
-        ...         {
-        ...             "bedding_type": "sawdust",
-        ...             "manure_handler": "flush system"
-        ...         }
-        ...     ]
-        ... }
-        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
-        >>> InputValidator._extract_value_by_key_list(example_data, var_path)
-        'straw'
-        """
-
-        for key in variable_path:
-            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
-                input_data = input_data[int(key)]
-            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
-                input_data = input_data[key]
-            else:
-                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
-        return input_data
-
-    @staticmethod
     def _extract_input_data_by_key_list(
             input_data: List[Any] | Dict[str, Any],
             variable_path: Sequence[str | int],
@@ -1064,7 +998,7 @@ class InputValidator:
         """
         result = None
         try:
-            result = InputValidator._extract_value_by_key_list(input_data, variable_path)
+            result = InputManager.extract_value_by_key_list(input_data, variable_path)
         except KeyError:
             var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
             InputValidator._log_missing_data(
