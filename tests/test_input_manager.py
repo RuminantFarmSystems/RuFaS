@@ -594,9 +594,7 @@ def test_string_type_validator(
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(mock_input_manager, "_extract_input_data_by_key_list", return_value=dummy_value)
-    patch_path_to_str = mocker.patch.object(
-        InputManager, "convert_variable_path_to_str", return_value="dummy_name"
-    )
+    patch_path_to_str = mocker.patch.object(InputManager, "convert_variable_path_to_str", return_value="dummy_name")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     result = mock_input_manager._string_type_validator(

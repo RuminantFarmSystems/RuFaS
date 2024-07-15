@@ -667,8 +667,10 @@ class InputValidator:
 
         """
         om = OutputManager()
-        info_map = {"class": InputValidator.__class__.__name__,
-                    "function": InputValidator._object_type_validator.__name__}
+        info_map = {
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._object_type_validator.__name__,
+        }
 
         object_value = InputValidator._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
@@ -871,8 +873,10 @@ class InputValidator:
 
         variable_path_str = InputManager.convert_variable_path_to_str(variable_path)
 
-        info_map = {"class": InputValidator.__class__.__name__,
-                    "function": InputValidator._bool_type_validator.__name__}
+        info_map = {
+            "class": InputValidator.__class__.__name__,
+            "function": InputValidator._bool_type_validator.__name__,
+        }
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
