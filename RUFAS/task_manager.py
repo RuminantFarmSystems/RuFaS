@@ -1,3 +1,4 @@
+from deepdiff import DeepDiff
 from enum import Enum
 from functools import partial
 import multiprocessing
@@ -11,7 +12,7 @@ from typing import Any, Dict, List, Tuple, Callable
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
-from RUFAS.end_to_end_tester import EndToEndTester
+# from RUFAS.end_to_end_tester import EndToEndTester
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
@@ -436,10 +437,44 @@ class TaskManager:
         """Runs end-to-end testing routine."""
         info_map = {"class": TaskManager.__name__, "function": TaskManager._handle_end_to_end_testing.__name__}
 
-        output_manager.add_log("Starting end-to-end testing", "", info_map)
-        end_to_end_tester = EndToEndTester()
-        end_to_end_tester.run_end_to_end_testing()
-        output_manager.add_log("Completed end-to-end testing", "", info_map)
+        output_manager.add_log("Starting end-to-end testing simulation", "", info_map)
+        # end_to_end_tester = EndToEndTester()
+        # end_to_end_tester.run_end_to_end_testing()
+        TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
+
+        output_manager.add_log("Completed end-to-end testing simulation", "", info_map)
+
+    @staticmethod
+    def _compare_simulation_outputs_to_expected_outputs(
+        input_manager: InputManager, output_manager: OutputManager
+    ) -> None:
+        """Compares outputs from a simulation to the results expected for that simulation."""
+        actual_results = output_manager.filter_variables_pool({"name": "End-to-end testing results", "filters": [".*"]})
+        expected_results = input_manager.get_data("end_to_end_testing_results")
+
+        diff = DeepDiff(actual_results, expected_results, ignore_order=True, verbose_level=2)
+
+        results_path = Path("output/end_to_end_testing_results")
+        results_path.mkdir(parents=True, exist_ok=True)
+        with open(f"{results_path}/end_to_end_testing_results.txt") as results_file:
+            if diff == {}:
+                results_file.write("No differences found between actual and expected outputs.\n")
+                results_file.write("End-to-end testing successful.\n")
+            else:
+                results_file.write("Differences found between actual and expected outputs.\n")
+                results_file.write("End-to-end testing unsuccessful.\n\n")
+
+                sections = {
+                    "values_changed": "Differing results:\n",
+                    "dictionary_item_added": "Actual results contain unexpected items:\n",
+                    "dictionary_item_removed": "\nActual results missing items:\n",
+                }
+                for k, v in sections.items():
+                    if k in diff:
+                        results_file.write(v)
+                        for item, value in diff[k].items():
+                            results_file.write(f"{item}: {value}\n")
+                        results_file.write("\n")
 
     @staticmethod
     def handle_input_data_audit(
