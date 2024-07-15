@@ -582,6 +582,29 @@ class Field:
             phosphorus=requested_phosphorus,
             manure_type=requested_manure_type,
         )
+        manure_request_units = {
+            "nitrogen": MeasurementUnits.KILOGRAMS,
+            "phosphorus": MeasurementUnits.KILOGRAMS,
+            "day": MeasurementUnits.ORDINAL_DAY,
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
+        }
+        manure_request_info_map = {
+            "class": self.__class__.__name__,
+            "function": self._execute_manure_application.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+            "units": manure_request_units,
+        }
+        manure_request_values = {
+            "nitrogen": requested_nitrogen,
+            "phosphorus": requested_phosphorus,
+            "day": day,
+            "year": year,
+            "field_size": self.field_data.field_size,
+            "field_name": self.field_data.name,
+        }
+        om.add_variable("manure_request", manure_request_values, manure_request_info_map)
 
         manure_supplied = self.manure_supplier.request_nutrients(nutrient_request)
 
@@ -639,6 +662,7 @@ class Field:
                 surface_remainder_fraction=surface_remainder_fraction,
                 year=year,
                 day=day,
+                output_name="manure_application",
             )
         else:
             supplied_nitrogen = 0.0
@@ -671,6 +695,7 @@ class Field:
             optimal_mix,
             unmet_nitrogen_demand,
             unmet_phosphorus_demand,
+            0,
             application_depth,
             surface_remainder_fraction,
             year,
@@ -688,6 +713,7 @@ class Field:
         surface_remainder_fraction: float,
         year: int,
         day: int,
+        output_name: str,
         potassium: Optional[float] = None,
     ) -> None:
         """
@@ -753,7 +779,7 @@ class Field:
             "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("manure_application", value, info_map)
+        om.add_variable(output_name, value, info_map)
 
     def _add_manure_water(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
         """
