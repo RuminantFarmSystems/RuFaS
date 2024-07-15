@@ -402,6 +402,7 @@ class InputValidator:
 
         om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
 
+
 # Validate input by type related
     @staticmethod
     def _validate_input_by_type(
@@ -976,6 +977,7 @@ class ElementState(Enum):
     VALID = "valid"
     INVALID = "invalid"
     FIXED = "fixed"
+
 
 class ElementsCounter:
     """
