@@ -89,10 +89,10 @@ class InputValidator:
 
     @staticmethod
     def _validate_metadata_properties_keys(
-            required_properties_keys: set[str],
-            optional_properties_keys: set[str],
-            properties: dict[str, Any],
-            path: list[str],
+        required_properties_keys: set[str],
+        optional_properties_keys: set[str],
+        properties: dict[str, Any],
+        path: list[str],
     ) -> None:
         """Validates that keys in the metadata properties sections."""
         om = OutputManager()
@@ -405,13 +405,13 @@ class InputValidator:
     # Validate input by type related
     @staticmethod
     def _validate_input_by_type(
-            variable_properties: Dict[str, Any],
-            variable_path: List[str | int],
-            input_data: Dict[str, Any],
-            eager_termination: bool,
-            properties_blob_key: str,
-            elements_counter: "ElementsCounter",
-            called_during_initialization: bool,
+        variable_properties: Dict[str, Any],
+        variable_path: List[str | int],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -494,10 +494,10 @@ class InputValidator:
 
     @staticmethod
     def _validate_array_container_properties(
-            variable_path: List[str | int],
-            variable_properties: Dict[str, Any],
-            input_data: Any,
-            properties_blob_key: str,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Any,
+        properties_blob_key: str,
     ) -> bool:
         """
         Validates the container properties of an array input data element.
@@ -562,14 +562,14 @@ class InputValidator:
         return True
 
     def _array_type_validator(
-            self,
-            variable_path: List[str | int],
-            variable_properties: Dict[str, Any],
-            input_data: Dict[str, Any],
-            eager_termination: bool,
-            properties_blob_key: str,
-            elements_counter: "ElementsCounter",
-            called_during_initialization: bool,
+        self,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type array.
@@ -605,7 +605,7 @@ class InputValidator:
             return True
 
         if not self._validate_array_container_properties(
-                variable_path, variable_properties, array_value, properties_blob_key
+            variable_path, variable_properties, array_value, properties_blob_key
         ):
             return False
 
@@ -627,13 +627,13 @@ class InputValidator:
 
     @staticmethod
     def _object_type_validator(
-            variable_path: List[str | int],
-            variable_properties: Dict[str, Any],
-            input_data: Dict[str, Any],
-            eager_termination: bool,
-            properties_blob_key: str,
-            elements_counter: "ElementsCounter",
-            called_during_initialization: bool,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """
         Validates an input data element of type object.
@@ -718,13 +718,13 @@ class InputValidator:
 
     @staticmethod
     def _number_type_validator(
-            variable_path: List[str | int],
-            variable_properties: Dict[str, Any],
-            input_data: Dict[str, Any],
-            eager_termination: bool,
-            properties_blob_key: str,
-            elements_counter: "ElementsCounter",
-            called_during_initialization: bool,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data number element."""
         om = OutputManager()
@@ -780,13 +780,13 @@ class InputValidator:
 
     @staticmethod
     def _string_type_validator(
-            variable_path: List[str | int],
-            variable_properties: Dict[str, Any],
-            input_data: Dict[str, Any],
-            eager_termination: bool,
-            properties_blob_key: str,
-            elements_counter: "ElementsCounter",
-            called_during_initialization: bool,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data string element."""
         om = OutputManager()
@@ -854,13 +854,13 @@ class InputValidator:
 
     @staticmethod
     def _bool_type_validator(
-            variable_path: List[str | int],
-            variable_properties: Dict[str, Any],
-            input_data: Dict[str, Any],
-            eager_termination: bool,
-            properties_blob_key: str,
-            elements_counter: "ElementsCounter",
-            called_during_initialization: bool,
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        input_data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
     ) -> bool:
         """Validates an input data bool element."""
         om = OutputManager()
@@ -894,10 +894,10 @@ class InputValidator:
 
     @staticmethod
     def _fix_data(
-            variable_properties: Dict[str, Any],
-            element_hierarchy: List[Union[str, int]],
-            input_data: Dict[str, Any],
-            properties_blob_key: str,
+        variable_properties: Dict[str, Any],
+        element_hierarchy: List[Union[str, int]],
+        input_data: Dict[str, Any],
+        properties_blob_key: str,
     ) -> bool:
         """
         Attempt to fix the invalid data.
@@ -1029,10 +1029,10 @@ class InputValidator:
 
     @staticmethod
     def _extract_input_data_by_key_list(
-            input_data: List[Any] | Dict[str, Any],
-            variable_path: Sequence[str | int],
-            variable_properties: Dict[str, Any],
-            called_during_initialization: bool,
+        input_data: List[Any] | Dict[str, Any],
+        variable_path: Sequence[str | int],
+        variable_properties: Dict[str, Any],
+        called_during_initialization: bool,
     ) -> Any:
         """
         Extracts a value from the input data based on a specified path and handles missing data by calling
@@ -1076,10 +1076,9 @@ class InputValidator:
         return result
 
     @staticmethod
-    def _log_missing_data(variable_properties: Dict[str, Any],
-                          var_name: str,
-                          called_during_initialization: bool
-                          ) -> None:
+    def _log_missing_data(
+        variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+    ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
         initialization or runtime updates.
@@ -1112,7 +1111,8 @@ class InputValidator:
             raise KeyError(error_msg)
 
         if InputValidator._is_input_required_upon_initialization(
-                variable_name=var_name, variable_properties=variable_properties):
+            variable_name=var_name, variable_properties=variable_properties
+        ):
             om.add_error(
                 "Missing required data",
                 f"Key {var_name} not found in input data. Input value is required for this "
@@ -1131,8 +1131,7 @@ class InputValidator:
         )
 
     @staticmethod
-    def _is_input_required_upon_initialization(variable_name: str,
-                                               variable_properties: Dict[str, Any]) -> bool:
+    def _is_input_required_upon_initialization(variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
         Determines whether a variable requires an input value upon initialization based on its modifiability status.
 
