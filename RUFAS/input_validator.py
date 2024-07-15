@@ -999,7 +999,7 @@ class InputValidator:
         """
         result = None
         try:
-            result = InputManager.extract_value_by_key_list(input_data, variable_path)
+            result = InputValidator.extract_value_by_key_list(input_data, variable_path)
         except KeyError:
             var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
             InputValidator._log_missing_data(

@@ -10,7 +10,10 @@ from mock import MagicMock, Mock, mock_open, patch
 from mock.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
+from RUFAS.input_manager import InputManager
+from RUFAS.elements import ElementState
+from RUFAS.elements import ElementsCounter
+from RUFAS.modifiability import Modifiability
 
 
 @pytest.fixture
