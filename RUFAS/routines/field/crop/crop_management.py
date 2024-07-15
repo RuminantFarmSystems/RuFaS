@@ -78,7 +78,7 @@ class CropManagement:
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.calendar_year, time.day)
+        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
     # ---- Sub Methods ----
@@ -98,7 +98,7 @@ class CropManagement:
         self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
         self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
-    def determine_harvest_index(self):
+    def determine_harvest_index(self) -> None:
         """
         Sets the crop's harvest index based on various conditions.
 
@@ -169,7 +169,6 @@ class CropManagement:
             raise ValueError(
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
-
         roots_harvested = self.data.harvest_index > 1.0
         if not roots_harvested:
             self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index
@@ -177,7 +176,21 @@ class CropManagement:
             self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(
                 self.data.biomass, self.data.harvest_index
             )
-        fraction_cut = self.data.cut_biomass / self.data.biomass
+
+        try:
+            fraction_cut = self.data.cut_biomass / self.data.biomass
+        except ZeroDivisionError:
+            info_map = {"class": self.__class__.__name__, "function": self.cut_crop.__name__}
+            warning_name = "Zero division error in crop management"
+            warning_message = (
+                f"A zero division error occurred in the harvesting process of crop management when calculating "
+                f"fraction cut."
+                f"The variable 'biomass' in CropData has an invalid value: '{self.data.biomass}'. "
+            )
+
+            om.add_warning(warning_name, warning_message, info_map)
+            return None
+
         self.data.biomass -= self.data.cut_biomass
         self._recalculate_biomass_distribution(roots_harvested)
 

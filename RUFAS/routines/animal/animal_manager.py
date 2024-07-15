@@ -37,7 +37,6 @@ from RUFAS.weather import Weather
 from ...enums import AnimalCombination
 from ...data_structures.pen_manure_data import PenManureData
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -56,6 +55,7 @@ class AnimalManager:
         AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
         AnimalCombination.GROWING_AND_CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
     }
+    ANIMAL_GROUPING_SCENARIO: AnimalGroupingScenario
 
     @classmethod
     def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
@@ -115,10 +115,11 @@ class AnimalManager:
             Instance of the PurchasedFeedEmissionsEstimator class.
 
         """
-        config_data: Dict[str, Any] = im.get_data("config")
+        self.im = InputManager()
+        config_data: Dict[str, Any] = self.im.get_data("config")
 
         # simulation length, days
-        self.sim_length = time.simulation_length
+        self.sim_length = time.simulation_length_days
 
         # day in the simulation
         self.simulation_day = 1
@@ -378,24 +379,43 @@ class AnimalManager:
             pen.horizontal_dist_to_parlor for pen in self.all_pens
         )
 
-    def calc_nutrient_rqmts(self, feed: Feed, current_temperature: float) -> None:
+    def calc_nutrient_rqmts(
+        self,
+        calves: List[Calf],
+        heiferIs: List[HeiferI],
+        heiferIIs: List[HeiferII],
+        heiferIIIs: List[HeiferIII],
+        cows: List[Cow],
+        feed: Feed,
+        current_temperature: float,
+    ) -> None:
         """
         Calls each animal's method to calculate its nutrient requirements.
 
         Parameters
         ----------
+        calves : List[Calf],
+            List of calves.
+        heiferIs : List[HeiferI],
+            List of heifer Is.
+        heiferIIs : List[HeiferII],
+            List of heifer IIs.
+        heiferIIIs : List[HeiferIII],
+            List of heifer IIIs.
+        cows : List[Cow]
+            List of cows.
         feed : Feed
             Instance of the Feed class.
         current_temperature : float
             The temperature on the current day.
 
         """
-        for calf in self.calves:
+        for calf in calves:
             calf.calc_nutrient_rqmts(feed, current_temperature)
 
-        for heiferI in self.heiferIs:
-            latest_pen = heiferI.pen_history[-1].pen
-            heiferI.set_nutrient_rqmts(
+        for heifer in heiferIs + heiferIIs + heiferIIIs:
+            latest_pen = heifer.pen_history[-1].pen
+            heifer.set_nutrient_rqmts(
                 current_temperature,
                 self.ANIMAL_GROUPING_SCENARIO,
                 nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
@@ -403,45 +423,29 @@ class AnimalManager:
                 previous_DMI=self.all_pens[latest_pen].dry_matter_intake,
             )
 
-        for heiferII in self.heiferIIs:
-            latest_pen = heiferII.pen_history[-1].pen
-            heiferII.set_nutrient_rqmts(
-                current_temperature,
-                self.ANIMAL_GROUPING_SCENARIO,
-                nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
-                metabolizable_energy=self.all_pens[latest_pen].MEdiet,
-                previous_DMI=self.all_pens[latest_pen].dry_matter_intake,
-            )
-
-        for heiferIII in self.heiferIIIs:
-            latest_pen = heiferIII.pen_history[-1].pen
-            heiferIII.set_nutrient_rqmts(
-                current_temperature,
-                self.ANIMAL_GROUPING_SCENARIO,
-                nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
-                metabolizable_energy=self.all_pens[latest_pen].MEdiet,
-                previous_DMI=self.all_pens[latest_pen].dry_matter_intake,
-            )
-
-        for cow in self.cows:
+        for cow in cows:
             latest_pen = cow.pen_history[-1].pen
             cow.set_nutrient_rqmts(
                 self.ANIMAL_GROUPING_SCENARIO,
                 nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
             )
 
-    def reset_milk_production_reduction(self) -> None:
+    def reset_milk_production_reduction(self, pen: Pen) -> None:
         """
-        Resets reduction value for milk production to 0.0 for all animals in all pens
+        Resets reduction value for milk production to 0.0 for all animals in the given pen.
 
         The milk_production_reduction attribute is a value generated in ration_driver.py,
             in cases where a ration cannot be formulated such that it meets animal requirements
 
+        Parameters
+        ----------
+        pen : Pen
+            Pen object.
+
         """
-        for pen in self.all_pens:
-            if pen.animal_combination.name == "LAC_COW" or pen.animal_combination.name == "CLOSE_UP":
-                for animal in list(pen.animals_in_pen.values()):
-                    animal.milk_production_reduction = 0.0
+        if pen.animal_combination.name == "LAC_COW" or pen.animal_combination.name == "CLOSE_UP":
+            for animal in list(pen.animals_in_pen.values()):
+                animal.milk_production_reduction = 0.0
 
     def fully_update_animal_to_pen_id_map(self) -> None:
         """
@@ -968,16 +972,6 @@ class AnimalManager:
             else:
                 pen.reset_manure()
 
-    def calc_avg_growth(self) -> None:
-        """
-        Calls each pen's method to calculate the average growth of animals in
-        the pen. This is part of the routines that happen every
-        ration interval.
-        """
-
-        for pen in self.all_pens:
-            pen.calc_avg_growth()
-
     def sum_daily_milk(self, cows: List[Cow]) -> float:
         """
         sums the daily milk production across all cows
@@ -1098,7 +1092,7 @@ class AnimalManager:
             animals = self.animals_by_type[animal_type]
             self.phosphorus_concentration_by_animal_class[animal_type] = self._calc_phosphorus_concentration(animals)
 
-    def _calc_ration_at_interval(self, feed: Feed) -> None:
+    def _handle_pen_ration(self, feed: Feed, pen: Pen) -> None:
         """
         Calculate the ration for each pen at the given interval and update the
         ration for each animal in the pen.
@@ -1110,54 +1104,56 @@ class AnimalManager:
 
         Parameters
         ----------
-        feed
+        feed : Feed
             Instance of the Feed class
+        pen : Pen
+            Instance of Pen class.
 
         """
         available_feeds = ration_driver.AvailableFeeds()
         available_feeds.feed_nutrients(feed)
-        for pen in self.all_pens:
-            if pen.is_populated:
-                pen.subset_class_feeds(feed)
-                pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
+        if not pen.is_populated:
+            return
+        pen.subset_class_feeds(feed)
+        pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
 
-                ration_per_animal = {}
-                ration_vals = {}
+        ration_per_animal: Dict[str, float | str] = {}
+        ration_vals = {}
 
-                while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
-                    if pen.animal_combination == AnimalCombination.CALF:
-                        ration_per_animal = CalfRationManager.optimize()
-                        ration_vals = {"ME_total": 0}
-                    else:
-                        ration_per_animal, ration_vals = RationManager.formulate_ration(
-                            pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
-                        )
+        while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
+            if pen.animal_combination == AnimalCombination.CALF:
+                ration_per_animal = CalfRationManager.optimize()
+                ration_vals = {"ME_total": 0}
+            else:
+                ration_per_animal, ration_vals = RationManager.formulate_ration(
+                    pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
+                )
 
-                # recording ration nutrition information in pen
-                nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
-                pen.ration_nutrient_amount = nutrient_amount
-                pen.ration_nutrient_conc = nutrient_conc
-                pen.MEdiet = ration_vals["ME_total"]
-                pen.dry_matter_intake = nutrient_amount["dm"]
+        # recording ration nutrition information in pen
+        nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
+        pen.ration_nutrient_amount = nutrient_amount
+        pen.ration_nutrient_conc = nutrient_conc
+        pen.MEdiet = ration_vals["ME_total"]
+        pen.dry_matter_intake = nutrient_amount["dm"]
 
-                ration_report = {}
-                ration_report["nutrient_amount"] = nutrient_amount
-                ration_report["nutrient_conc"] = nutrient_conc
+        ration_report = {}
+        ration_report["nutrient_amount"] = nutrient_amount
+        ration_report["nutrient_conc"] = nutrient_conc
 
-                for animal in list(pen.animals_in_pen.values()):
-                    animal.set_ration(ration_per_animal, nutrient_amount["dm"])
-                    animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
+        for animal in list(pen.animals_in_pen.values()):
+            animal.set_ration(ration_per_animal, nutrient_amount["dm"])
+            animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
 
-                ration_per_pen = {}
-                num_animals = len(pen.animals_in_pen)
-                for key in ration_per_animal:
-                    if key == "status":
-                        ration_per_pen[key] = ration_per_animal[key]
-                    else:  # feeds and price
-                        ration_per_pen[key] = ration_per_animal[key] * num_animals
+        ration_per_pen = {}
+        num_animals = len(pen.animals_in_pen)
+        for key in ration_per_animal:
+            if key == "status":
+                ration_per_pen[key] = ration_per_animal[key]
+            else:
+                ration_per_pen[key] = ration_per_animal[key] * num_animals
 
-                pen.ration = ration_per_pen
-                pen.ration_per_animal = ration_per_animal  # Important
+        pen.ration = ration_per_pen
+        pen.ration_per_animal = ration_per_animal
 
     @classmethod
     def _get_animal_types_in_pen(cls, pen: Pen) -> Set[AnimalType]:
@@ -1489,7 +1485,8 @@ class AnimalManager:
         """
         if self.simulate_animals:
             if self.end_ration_interval():
-                self.reset_milk_production_reduction()
+                for pen in self.all_pens:
+                    self.reset_milk_production_reduction(pen)
             current_conditions = weather.get_current_day_conditions(time)
             current_temperature = current_conditions.mean_air_temperature
             animals_snapshot_before_update = self._get_animals_snapshot()
@@ -1529,11 +1526,6 @@ class AnimalManager:
 
             self._record_animal_counts()
             self._record_culling_stats()
-            if time.is_last_day_of_simulation:
-                self._record_animal_events(self.cows)
-                self._record_animal_events(self.heiferIIs)
-                self._record_heiferIIs_conception_rate()
-                self._record_cows_conception_rate()
 
             self.calc_p_rqmts()
             self.daily_p_update()
@@ -1541,17 +1533,12 @@ class AnimalManager:
             self.record_pen_history()
 
             if self.end_ration_interval():
-                self.reset_milk_production_reduction()
-                self.calc_nutrient_rqmts(feed, current_temperature)
                 self.clear_pens()
                 self.allocate_animals_to_pens()
-                self._calc_ration_at_interval(feed)
-                AnimalModuleReporter.report_ration_interval_data(self.all_pens, feed, self.simulation_day)
-                self.calc_avg_growth()
-                for pen in self.all_pens:
-                    if pen.animal_combination.name == "LAC_COW":
-                        for animal in list(pen.animals_in_pen.values()):
-                            animal.update_milk_production_history(self.simulation_day)
+
+            for pen in self.all_pens:
+                if pen.needs_ration_formulation or self.end_ration_interval():
+                    self.reformulate_ration_single_pen(pen, current_temperature, feed)
 
             manure_excretions_output_data = {}
             for pen in self.all_pens:
@@ -1560,31 +1547,6 @@ class AnimalManager:
 
             self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
             AnimalModuleReporter.report_daily_reports(self, feed.available_feeds)
-
-    def _record_animal_events(self, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow]) -> None:
-        """
-        Record the events of the animals.
-
-        Parameters
-        ----------
-        animals : list[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-            A list of animals.
-
-        Returns
-        -------
-        None
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._record_animal_events.__name__,
-        }
-        for animal in animals:
-            om.add_variable(
-                f"{animal.__class__.__name__}_{animal.id}_day_{self.simulation_day}",
-                animal.events,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-            )
 
     def _record_animal_counts(self) -> None:
         """
@@ -1641,129 +1603,6 @@ class AnimalManager:
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
 
-    def _record_heiferIIs_conception_rate(self) -> None:
-        """
-        Record the conception rate of heiferIIs.
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._record_heiferIIs_conception_rate.__name__,
-        }
-        om.add_variable(
-            "heiferII_total_num_ai_performed",
-            HeiferII.stats["num_ai_performed"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_total_num_successful_conceptions",
-            HeiferII.stats["num_successful_conceptions"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        heiferII_overall_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions"] / HeiferII.stats["num_ai_performed"])
-            if HeiferII.stats["num_ai_performed"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_overall_conception_rate",
-            heiferII_overall_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-        om.add_variable(
-            "heiferII_num_ai_performed_in_ED",
-            HeiferII.stats["num_ai_performed_in_ED"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_num_successful_conceptions_in_ED",
-            HeiferII.stats["num_successful_conceptions_in_ED"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        ed_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions_in_ED"] / HeiferII.stats["num_ai_performed_in_ED"])
-            if HeiferII.stats["num_ai_performed_in_ED"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_ED_conception_rate",
-            ed_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-        om.add_variable(
-            "heiferII_num_ai_performed_in_TAI",
-            HeiferII.stats["num_ai_performed_in_TAI"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_num_successful_conceptions_in_TAI",
-            HeiferII.stats["num_successful_conceptions_in_TAI"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        tai_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions_in_TAI"] / HeiferII.stats["num_ai_performed_in_TAI"])
-            if HeiferII.stats["num_ai_performed_in_TAI"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_TAI_conception_rate",
-            tai_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-        om.add_variable(
-            "heiferII_num_ai_performed_in_SynchED",
-            HeiferII.stats["num_ai_performed_in_SynchED"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "heiferII_num_successful_conceptions_in_SynchED",
-            HeiferII.stats["num_successful_conceptions_in_SynchED"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        synch_ed_conception_rate = (
-            (HeiferII.stats["num_successful_conceptions_in_SynchED"] / HeiferII.stats["num_ai_performed_in_SynchED"])
-            if HeiferII.stats["num_ai_performed_in_SynchED"] > 0
-            else 0
-        )
-        om.add_variable(
-            "heiferII_SynchED_conception_rate",
-            synch_ed_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
-    def _record_cows_conception_rate(self) -> None:
-        """
-        Record the conception rate of cows.
-        """
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self._record_cows_conception_rate.__name__,
-        }
-        om.add_variable(
-            "cow_total_num_ai_performed",
-            Cow.stats["num_ai_performed"],
-            dict(info_map, **{"units": MeasurementUnits.ARTIFICIAL_INSEMINATIONS}),
-        )
-        om.add_variable(
-            "cow_total_num_successful_conceptions",
-            Cow.stats["num_successful_conceptions"],
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS}),
-        )
-        cow_overall_conception_rate = (
-            (Cow.stats["num_successful_conceptions"] / Cow.stats["num_ai_performed"])
-            if Cow.stats["num_ai_performed"] > 0
-            else 0
-        )
-        om.add_variable(
-            "cow_overall_conception_rate",
-            cow_overall_conception_rate,
-            dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
-        )
-
     def _record_culling_stats(self) -> None:
         """
         Record the culling stats of cows.
@@ -1818,3 +1657,28 @@ class AnimalManager:
             sum(self.life_cycle_manager.cull_reason_stats_range.values()),
             dict(info_map, **{"units": MeasurementUnits.ANIMALS}),
         )
+
+    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
+        """
+        Reformulates ration for a single pen.
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen that requires ration reformulation.
+        current_temperature : float
+            Current temperature.
+        """
+        calves = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "Calf"]
+        heiferIs = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "HeiferI"]
+        heiferIIs = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "HeiferII"]
+        heiferIIIs = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "HeiferIII"]
+        cows = [animal for animal in pen.animals_in_pen.values() if type(animal).__name__ == "Cow"]
+        self.reset_milk_production_reduction(pen)
+        self.calc_nutrient_rqmts(calves, heiferIs, heiferIIs, heiferIIIs, cows, feed, current_temperature)
+        self._handle_pen_ration(feed, pen)
+        AnimalModuleReporter.report_ration_interval_data(pen, feed, self.simulation_day)
+        pen.calc_avg_growth()
+        if pen.animal_combination.name == "LAC_COW":
+            for animal in list(pen.animals_in_pen.values()):
+                animal.update_milk_production_history(self.simulation_day)

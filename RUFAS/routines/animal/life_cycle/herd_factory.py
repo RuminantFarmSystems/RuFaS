@@ -18,7 +18,6 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
-im = InputManager()
 om = OutputManager()
 
 
@@ -63,14 +62,15 @@ class HerdFactory:
             The directory path where the animal data JSON files will be saved if
             save_animals is True.
         """
+        self.im = InputManager()
         self.init_herd = init_herd
         self.save_animals = save_animals
         self.save_animals_path = save_animals_path
 
-        self.breed = im.get_data("animal.herd_information.breed")
-        self.CI = im.get_data("animal.animal_config.farm_level.repro.calving_interval")
-        self.initial_animal_num = im.get_data("animal.herd_initialization.initial_animal_num")
-        self.simulation_days = im.get_data("animal.herd_initialization.simulation_days")
+        self.breed = self.im.get_data("animal.herd_information.breed")
+        self.CI = self.im.get_data("animal.animal_config.farm_level.repro.calving_interval")
+        self.initial_animal_num = self.im.get_data("animal.herd_initialization.initial_animal_num")
+        self.simulation_days = self.im.get_data("animal.herd_initialization.simulation_days")
 
         self.pre_animal_population = AnimalPopulation(
             calves=[],
@@ -241,7 +241,7 @@ class HerdFactory:
 
     def _initialize_herd_from_data(self) -> AnimalPopulation:
         """Function to initialize an AnimalPopulation object from input data"""
-        herd_data = im.get_data("animal_population")
+        herd_data = self.im.get_data("animal_population")
         calves = list(
             map(
                 self._init_animal_from_data,
@@ -340,7 +340,7 @@ class HerdFactory:
             "cow": "animal.herd_information.cow_num",
             "replacement": "animal.herd_information.replace_num",
         }
-        animal_num = im.get_data(ANIMAL_NUM_KEY[animal_type])
+        animal_num = self.im.get_data(ANIMAL_NUM_KEY[animal_type])
 
         post_animals = []
         random_choices = random.choices(list(range(len(pre_animals))), k=animal_num)
@@ -357,8 +357,8 @@ class HerdFactory:
         function also optionally saves the generated herd data into a JSON file.
         The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.
         """
-        AnimalBase.set_config(AnimalManager.get_animal_config(im.get_data("animal.animal_config")))
-        AnimalBase.set_nutrient_list(Feed(im.get_data("feed")).nutrient_rqmts)
+        AnimalBase.set_config(AnimalManager.get_animal_config(self.im.get_data("animal.animal_config")))
+        AnimalBase.set_nutrient_list(Feed(self.im.get_data("feed")).nutrient_rqmts)
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
@@ -373,7 +373,7 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
-        im.add_dict_variable_to_pool(
+        self.im.add_dict_variable_to_pool(
             variable_name="runtime_animal_population",
             data=self.post_animal_population.__repr__(),
             properties_blob_key="animal_population_properties",
