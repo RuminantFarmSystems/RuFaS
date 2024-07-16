@@ -36,7 +36,7 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator.validate_properties.__name__,
         }
 
@@ -97,7 +97,7 @@ class InputValidator:
         """Validates that keys in the metadata properties sections."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._validate_metadata_properties_keys.__name__,
         }
         if missing_required_keys := required_properties_keys - properties.keys():
@@ -139,7 +139,7 @@ class InputValidator:
         """Validates number type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._metadata_number_validator.__name__,
         }
         required_number_property_keys = {"type"}
@@ -217,7 +217,7 @@ class InputValidator:
         """Validates string type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._metadata_string_validator.__name__,
         }
         required_str_property_keys = {"type"}
@@ -281,7 +281,7 @@ class InputValidator:
         """Validates bool type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._metadata_bool_validator.__name__,
         }
         required_bool_property_keys = {"type"}
@@ -313,7 +313,7 @@ class InputValidator:
         """Validates array type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._metadata_array_validator.__name__,
         }
         required_array_property_keys = {"type", "properties"}
@@ -668,7 +668,7 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._object_type_validator.__name__,
         }
 
@@ -684,6 +684,7 @@ class InputValidator:
                 "Validation: object is not a dictionary",
                 f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
+                info_map
             )
             return False
 
