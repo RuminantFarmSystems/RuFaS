@@ -1,10 +1,13 @@
-import pandas as pd
-import numpy as np
 import math
+from typing import List
+
+import numpy as np
+import numpy.typing as npt
+import pandas as pd
 from scipy.stats import percentileofscore
 
 
-def norm(x):
+def norm(x: List[int | float]) -> npt.NDArray[np.float64 | np.int64]:
     """
     Helper function to normalize a list of values and return that normalized
     list.
@@ -12,15 +15,15 @@ def norm(x):
     Args:
         x: A list of values
     """
-    x = np.array(x)
-    if max(x) != min(x):
-        normalized = (x - min(x)) / (max(x) - min(x))
+    x_array = np.array(x)
+    if max(x_array) != min(x_array):
+        normalized = (x_array - min(x_array)) / (max(x_array) - min(x_array))
         return normalized
     else:
-        return x
+        return x_array
 
 
-def percentile_list(original_list):
+def percentile_list(original_list: List[int | float]) -> List[int | float]:
     """
     Helper function that returns a list of percentiles corresponding
     to its matching value in the original list.
@@ -76,7 +79,9 @@ def grouping(cow_list, pens, stocking_density):
     # Use the various nutrition requirement variables to create and assign a
     # percentile value to each cow
     # Grouping By Ranking Methodology
-    rank_data = cow_nutr_df[["DNED_req", "DMPD_req", "milk_avg"]]  # Rank data frame to create percentile vector
+    rank_data = cow_nutr_df[
+        ["DNED_req", "DMPD_req", "milk_avg"]
+    ]  # Rank data frame to create percentile vector
     rank_data = rank_data.dropna()
 
     DNED_req = rank_data["DNED_req"].to_list()
@@ -95,7 +100,9 @@ def grouping(cow_list, pens, stocking_density):
     rank_data.insert(n + 2, "sc_milk", sc_milk)
 
     # Sum standard nutrient requirement values
-    std = rank_data[["sc_DNED", "sc_DMPD", "sc_milk"]].sum(axis=1, skipna=True).to_list()
+    std = (
+        rank_data[["sc_DNED", "sc_DMPD", "sc_milk"]].sum(axis=1, skipna=True).to_list()
+    )
     rank_data.insert(n + 3, "std", std)
 
     # Create a nutrient requirement percentile vector (with respect to all cows)
@@ -116,7 +123,9 @@ def grouping(cow_list, pens, stocking_density):
     key = 0
     for pen in pens:
         # filling pens based on input stocking density
-        index[key] = (round(pen.num_stalls * stocking_density + 0.5) / num_cows) + index[(key - 1)]
+        index[key] = (
+            round(pen.num_stalls * stocking_density + 0.5) / num_cows
+        ) + index[(key - 1)]
         if index[key] > 1:
             index[key] = 1
         key += 1
@@ -129,7 +138,8 @@ def grouping(cow_list, pens, stocking_density):
     for i in range(len(percentile)):
         key = 0
         while percentile[i] <= index[key - 1] or (
-            percentile[i] > index[key] and not math.isclose(percentile[i], index[key], rel_tol=1e-09)
+            percentile[i] > index[key]
+            and not math.isclose(percentile[i], index[key], rel_tol=1e-09)
         ):
             key += 1
         pen_assignment.append(key)
@@ -150,7 +160,10 @@ def grouping(cow_list, pens, stocking_density):
     pen_assignment = pen_data["pen_assignment"].to_list()
     cow = pen_data["cow"].to_list()
     for i in range(len(pen_assignment)):
-        if i != (len(pen_assignment) - 1) and pen_assignment[i] != pen_assignment[i + 1]:
+        if (
+            i != (len(pen_assignment) - 1)
+            and pen_assignment[i] != pen_assignment[i + 1]
+        ):
             separating_index.append(i + 1)
     separating_index.append(len(pen_assignment))
 
