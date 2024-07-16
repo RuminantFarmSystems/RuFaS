@@ -550,7 +550,11 @@ class GraphGenerator:
             plot_function(indices_list, values_tuple)
         else:
             for value in data.values():
-                plot_function(value)
+                import numpy as np
+                series = np.array(value, dtype=np.float32)
+                mask = ~np.isnan(series)
+                indices = np.arange(len(series))
+                plot_function(indices[mask], series[mask])
 
     def _customize_graph(self, fig: Figure, customization_details: Dict[str, Any]) -> None:
         """
