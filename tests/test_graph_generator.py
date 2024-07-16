@@ -427,7 +427,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: Mocker
     assert masker.call_count == 2
 
 
-def test_mask_values(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+def test_mask_values(graph_generator: GraphGenerator) -> None:
     """Tests _mask_values in the GraphGenerator."""
     values_one = [1, 2, 3, 4]
 
