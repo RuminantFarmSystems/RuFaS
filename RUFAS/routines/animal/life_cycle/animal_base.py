@@ -181,7 +181,7 @@ class AnimalBase:
 
     def update_pen_history(
         self, curr_pen: int, curr_day: int, classes_in_pen: Set[str]
-    ):
+    ) -> None:
         """
         Updates the animal's pen history by either appending to the existing
         history if the animal is in a different pen than it was the last time

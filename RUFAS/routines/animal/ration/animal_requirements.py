@@ -168,7 +168,7 @@ class AnimalRequirements:
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
-        populates the corresponding class variables.s
+        populates the corresponding class variables.
 
         Parameters
         ----------
