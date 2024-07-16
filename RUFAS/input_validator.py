@@ -367,7 +367,7 @@ class InputValidator:
         """Checks that top-level metadata has valid and required keys and values."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator.validate_metadata.__name__,
         }
         metadata_files = metadata[ADDRESS_TO_INPUTS]
@@ -520,7 +520,7 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._validate_array_container_properties.__name__,
         }
         properties_violation_message = (
@@ -739,7 +739,7 @@ class InputValidator:
         variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
 
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._number_type_validator.__name__,
         }
         minimum_value = variable_properties.get("minimum")
@@ -800,7 +800,7 @@ class InputValidator:
 
         variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._string_type_validator.__name__,
         }
         properties_violation_message = (
@@ -875,7 +875,7 @@ class InputValidator:
         variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
 
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._bool_type_validator.__name__,
         }
         properties_violation_message = (
@@ -924,7 +924,7 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._fix_data.__name__,
         }
 
@@ -1039,7 +1039,7 @@ class InputValidator:
         raises a KeyError. If not, it logs a warning.
         """
         om = OutputManager()
-        info_map = {"class": InputValidator.__class__.__name__, "function": InputValidator._log_missing_data.__name__}
+        info_map = {"class": InputValidator.__name__, "function": InputValidator._log_missing_data.__name__}
         if not called_during_initialization:
             error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
             om.add_error("Missing required data", error_msg, info_map)
@@ -1127,7 +1127,7 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__class__.__name__,
+            "class": InputValidator.__name__,
             "function": InputValidator._get_variable_modifiability.__name__,
         }
 
