@@ -436,7 +436,7 @@ def test_mask_values(graph_generator: GraphGenerator) -> None:
     assert list(actual_indices) == [0, 1, 2, 3]
     assert list(actual_values) == [1, 2, 3, 4]
 
-    values_two = [np.NaN, 8, 9, np.NaN, np.NaN]
+    values_two = [np.nan, 8, 9, np.nan, np.nan]
 
     actual_indices, actual_values = graph_generator._mask_values(values_two)
 
