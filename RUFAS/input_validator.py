@@ -3,7 +3,7 @@ import re
 from functools import reduce
 from typing import Dict, Any, Callable, List, Union, Sequence
 
-from RUFAS.elements import ElementState
+from RUFAS.elements import ElementState, ElementsCounter
 from RUFAS.modifiability import Modifiability
 from RUFAS.output_manager import OutputManager
 
@@ -561,8 +561,8 @@ class InputValidator:
                 return False
         return True
 
+    @staticmethod
     def _array_type_validator(
-        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         input_data: Dict[str, Any],
@@ -597,21 +597,21 @@ class InputValidator:
             True if the input data element is valid or fixable, False otherwise.
         """
 
-        array_value = self._extract_input_data_by_key_list(
+        array_value = InputValidator._extract_input_data_by_key_list(
             input_data, variable_path, variable_properties, called_during_initialization
         )
 
         if variable_properties.get("nullable", False) and array_value is None:
             return True
 
-        if not self._validate_array_container_properties(
+        if not InputValidator._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
             return False
 
         is_whole_array_acceptable = True
         for index, element in enumerate(array_value):
-            is_element_acceptable = self.validate_input_by_type(
+            is_element_acceptable = InputValidator .validate_input_by_type(
                 variable_properties["properties"],
                 variable_path + [index],
                 input_data,
@@ -632,7 +632,7 @@ class InputValidator:
         input_data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
-        elements_counter: "ElementsCounter",
+        elements_counter: ElementsCounter,
         called_during_initialization: bool,
     ) -> bool:
         """
