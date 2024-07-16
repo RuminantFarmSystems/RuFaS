@@ -1,7 +1,7 @@
 [![Flake8](https://img.shields.io/badge/Flake8-failed-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Pytest](https://img.shields.io/badge/Pytest-failed-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Coverage](https://img.shields.io/badge/Coverage-%25-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Mypy](https://img.shields.io/badge/Mypy-3545%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Pytest](https://img.shields.io/badge/Pytest-passed-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Mypy](https://img.shields.io/badge/Mypy-3496%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 
 
 
