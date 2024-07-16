@@ -168,9 +168,7 @@ class AnimalBase:
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
-    def update_pen_history(
-        self, curr_pen: int, curr_day: int, classes_in_pen: Set[str]
-    ) -> None:
+    def update_pen_history(self, curr_pen: int, curr_day: int, classes_in_pen: Set[str]) -> None:
         """
         Updates the animal's pen history by either appending to the existing
         history if the animal is in a different pen than it was the last time
