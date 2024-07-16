@@ -26,7 +26,7 @@ class ManurePool:
 
     """
 
-    def __init__(self, 
+    def __init__(self,
                  manure_dry_mass=0.0,
                  manure_applied_mass=0.0,
                  manure_field_coverage=0.0,
