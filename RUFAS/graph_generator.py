@@ -433,7 +433,7 @@ class GraphGenerator:
                 "expand_data",
                 "use_fill_value_in_gaps",
                 "use_fill_value_at_end",
-                "mask_values"
+                "mask_values",
             ]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
