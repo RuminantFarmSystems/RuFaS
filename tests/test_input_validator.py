@@ -59,9 +59,9 @@ def test_bool_type_validator(
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(
-        InputValidator, "_extract_input_data_by_key_list", return_value=input_data_value)
-    patch_path_to_str = mocker.patch.object(
-        InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
+        InputValidator, "_extract_input_data_by_key_list", return_value=input_data_value
+    )
+    patch_path_to_str = mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
@@ -115,10 +115,8 @@ def test_number_type_validator(
     dummy_properties_key = "dummy_variable_properties"
     unused_bool_input = False
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
-    patch_extract = mocker.patch.object(
-        InputValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
-    patch_path_to_str = mocker.patch.object(
-        InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
+    patch_extract = mocker.patch.object(InputValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
     result = InputValidator._number_type_validator(
@@ -172,10 +170,8 @@ def test_string_type_validator(
     dummy_input_data = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
-    patch_extract = mocker.patch.object(
-        InputValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
-    patch_path_to_str = mocker.patch.object(
-        InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
+    patch_extract = mocker.patch.object(InputValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     result = InputValidator._string_type_validator(
@@ -254,7 +250,7 @@ def test_fix_array_type_fixable_data(
     expected_value: List[Any],
     expected_result: bool,
     expected_warning_call_count: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
 
@@ -325,7 +321,7 @@ def test_fix_array_type_critical_data(
     dummy_element_hierarchy: List[str],
     expected_result: bool,
     expected_warning_call_count: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
 
@@ -424,7 +420,7 @@ def test_fix_string_type_fixable_data(
     expected_value: str,
     expected_result: bool,
     expected_warning_call_count: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
 
@@ -522,7 +518,7 @@ def test_fix_string_type_critical_data(
     dummy_element_hierarchy: list[str],
     expected_result: bool,
     expected_warning_call_count: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
 
@@ -688,7 +684,7 @@ def test_fix_number_type_critical_data(
     dummy_element_hierarchy: list[str],
     expected_result: bool,
     expected_warning_call_count: int,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
 
@@ -1239,14 +1235,12 @@ def test_validate_input_by_type_key_error() -> None:
     [
         (
             True,
-            {"files": {
-                "file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
+            {"files": {"file1": {"path": "valid/path/to/file1.csv", "type": "csv", "properties": "some properties"}}},
             False,
         ),
         (
             False,
-            {"files": {
-                "file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}}},
+            {"files": {"file1": {"path": "valid/path/to/file1.json", "type": "json", "properties": "some properties"}}},
             True,
         ),
         (
@@ -1465,7 +1459,8 @@ def test_metadata_number_validator(
     """Tests metadata_number_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys")
+        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+    )
     info_map = {"class": "InputValidator", "function": "_metadata_number_validator"}
     if should_raise:
         with pytest.raises(ValueError):
@@ -1531,7 +1526,8 @@ def test_metadata_string_validator(
     """Tests _metadata_string_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys")
+        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+    )
     info_map = {"class": "InputValidator", "function": "_metadata_string_validator"}
 
     if should_raise:
@@ -1584,7 +1580,8 @@ def test_metadata_bool_validator(
     """Tests _metadata_bool_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys")
+        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+    )
     info_map = {"class": "InputValidator", "function": "_metadata_bool_validator"}
 
     if should_raise:
@@ -1638,7 +1635,8 @@ def test_metadata_array_validator(
     """Tests _metadata_array_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys")
+        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+    )
     info_map = {"class": "InputValidator", "function": "_metadata_array_validator"}
 
     if should_raise:
@@ -1658,7 +1656,8 @@ def test_metadata_object_validator(
 ) -> None:
     """Tests _metadata_object_validator() method in InputManager"""
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys")
+        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+    )
     key_path = ["path", "cow"]
     value = {"type": "object", "description": "cow", "cow": {"data_about_cow": 17}}
     InputValidator._metadata_object_validator(key_path, value)
@@ -1786,10 +1785,7 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     ],
 )
 def test_extract_input_data_by_key_list_key_error(
-    var_path: List[str | int],
-    var_name: str,
-    called_during_initialization: bool,
-    mocker: MockerFixture
+    var_path: List[str | int], var_name: str, called_during_initialization: bool, mocker: MockerFixture
 ) -> None:
     """Unit tests for making sure data were extracted when error occurs"""
     dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}

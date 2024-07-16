@@ -64,7 +64,7 @@ def input_manager_original_method_states(
         "save_metadata_properties": mock_input_manager.save_metadata_properties,
         "_parse_metadata_properties": mock_input_manager._parse_metadata_properties,
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
-        "_create_record": mock_input_manager._create_record
+        "_create_record": mock_input_manager._create_record,
     }
 
 
@@ -1010,8 +1010,8 @@ def test_get_metadata_raises_exception(
         error_message = key_error.value.__str__().strip("'")
         assert (
             error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
-                             f'"{expected_error_parent_address}" does not have attribute '
-                             f'"{expected_error_invalid_key}".'
+            f'"{expected_error_parent_address}" does not have attribute '
+            f'"{expected_error_invalid_key}".'
         )
         assert add_error.call_count == expected_warning_call_count
 
@@ -2607,8 +2607,7 @@ def test_save_metadata_properties_errors(
                     "level2": {
                         "nestedProperty": {
                             "type": "object",
-                            "innerProperty": {"type": "string", "value": "Nested",
-                                              "description": "Deep description"},
+                            "innerProperty": {"type": "string", "value": "Nested", "description": "Deep description"},
                         }
                     },
                     "description": "Level 1 description",
@@ -3184,8 +3183,7 @@ def mock_pool_for_add_pool() -> Dict[str, Dict[str, Any]]:
 
 @pytest.mark.parametrize("variable_name,validated_data", [("module1", {"test": "random"})])
 def test_add_to_pool(
-    variable_name: str, validated_data: dict[str, Any], mocker: MockerFixture,
-    mock_pool_for_add_pool: Dict[str, Any]
+    variable_name: str, validated_data: dict[str, Any], mocker: MockerFixture, mock_pool_for_add_pool: Dict[str, Any]
 ) -> None:
     """Tests to make sure validated data were added to pool"""
     input_manager = InputManager()
