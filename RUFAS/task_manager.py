@@ -440,7 +440,7 @@ class TaskManager:
         """Runs end-to-end testing routine."""
         info_map = {"class": TaskManager.__name__, "function": TaskManager._handle_end_to_end_testing.__name__}
 
-        TaskManager._setup_end_to_end_testing_environment()
+        TaskManager._setup_end_to_end_testing_environment(output_manager)
 
         output_manager.add_log("Starting end-to-end testing simulation", "", info_map)
 
@@ -448,17 +448,30 @@ class TaskManager:
 
         output_manager.add_log("Completed end-to-end testing simulation", "", info_map)
 
-        TaskManager._compare_simulation_outputs_to_expected_outputs()
+        TaskManager._compare_simulation_outputs_to_expected_outputs(output_manager)
 
     @staticmethod
-    def _setup_end_to_end_testing_environment() -> None:
+    def _setup_end_to_end_testing_environment(output_manager: OutputManager) -> None:
         """Creates a filter that will be used to collect the results of a simulation in an end-to-end testing run."""
         with open("output/output_filters/json_end_to_end_testing_filter.txt", "w") as e_to_e_filter_file:
             e_to_e_filter_file.write(".*")
+        info_map = {
+            "class": TaskManager.__class__.__name__,
+            "function": TaskManager._setup_end_to_end_testing_environment.__name__,
+        }
+        output_manager.add_log(
+            "Wrote end-to-end testing filter.",
+            "End-to-end testing filter written to 'json_end_to_end_testing_filter.txt'.",
+            info_map,
+        )
 
     @staticmethod
-    def _compare_simulation_outputs_to_expected_outputs() -> None:
+    def _compare_simulation_outputs_to_expected_outputs(output_manager: OutputManager) -> None:
         """Compares outputs from a simulation to the results expected for that simulation."""
+        info_map = {
+            "class": TaskManager.__class__.__name__,
+            "function": TaskManager._compare_simulation_outputs_to_expected_outputs.__name__,
+        }
         path_to_actual_results = None
         for path in Path("output/JSONs/").iterdir():
             matches = re.match(
@@ -468,7 +481,9 @@ class TaskManager:
                 path_to_actual_results = path
                 break
         else:
-            print("Could not find actual end-to-end testing results. End-to-end testing failed.")
+            output_manager.add_error(
+                "Could not find actual end-to-end testing results.", "End-to-end testing failed.", info_map
+            )
             return
         with open(path_to_actual_results) as results:
             actual_results = json.load(results)
@@ -477,9 +492,10 @@ class TaskManager:
 
         diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
-        results_path = Path("output/end_to_end_testing_results")
-        results_path.mkdir(parents=True, exist_ok=True)
-        with open(f"{results_path}/end_to_end_results.txt", "w") as results_file:
+        results_dir = Path("output/end_to_end_testing_results")
+        results_dir.mkdir(parents=True, exist_ok=True)
+        results_path = Path(f"{results_dir}/end_to_end_results.txt")
+        with open(results_path, "w") as results_file:
             if diff == {}:
                 results_file.write("No differences found between actual and expected outputs.\n")
                 results_file.write("End-to-end testing successful.\n")
@@ -498,8 +514,11 @@ class TaskManager:
                         for item, value in diff[k].items():
                             results_file.write(f"{item}: {value}\n")
                         results_file.write("\n")
+        output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
 
-        Path("output/output_filters/json_end_to_end_testing_filter.txt").unlink(missing_ok=True)
+        testing_filter = Path("output/output_filters/json_end_to_end_testing_filter.txt")
+        testing_filter.unlink(missing_ok=True)
+        output_manager.add_log("End-to-end testing filter removed", f"Removed {testing_filter}.", info_map)
 
     @staticmethod
     def handle_input_data_audit(
