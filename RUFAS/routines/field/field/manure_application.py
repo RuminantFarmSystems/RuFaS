@@ -167,6 +167,14 @@ class ManureApplication:
         ValueError
             If the water extractable inorganic phosphorus fraction is not inside the range [0.0, 0.95].
 
+        Notes
+        -----
+        When manure is applied that contains 15% or less solid matter, the slurry immediately infiltrates the soil. The
+        SurPhos theoretical documentation states that "the model assumes slurry liquid immediately infiltrates into soil
+        and adds 60% of all manure P to corresponding soil P pools", but is handled differently in the actual SurPhos
+        implementation. The actual SurPhos code contains experimental new features that Pete Vadas was working with when
+        the Fortran code was sent to the RuFaS team.
+
         """
         if water_extractable_inorganic_phosphorus_fraction is not None:
             if not 0.0 <= water_extractable_inorganic_phosphorus_fraction <= 0.95:
@@ -185,13 +193,13 @@ class ManureApplication:
 
         is_liquid_manure = dry_matter_fraction <= 0.15
 
-        if is_liquid_manure:  # liquid
+        if is_liquid_manure:
             wet_rate = self._determine_wet_rate_factor(
                 surface_dry_matter_mass, dry_matter_fraction, field_coverage, field_size
             )
             soil_infiltration = self._determine_infiltration_factor(wet_rate)
             surface_retention = 1.0 - soil_infiltration
-        else:  # solid
+        else:
             surface_retention = 1.0
 
         water_extractable_organic_phosphorus_fraction = 0.05
