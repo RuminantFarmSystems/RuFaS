@@ -35,6 +35,156 @@
       "default": false
     }
   },
+  "end_to_end_testing_input_properties": {
+    "reusable_values": {
+      "fresh_mass": {
+        "type": "number"
+      },
+      "dry_matter_digestibility": {
+        "type": "number"
+      }
+    },
+    "hay_values": {
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
+      }
+    },
+    "baleage_values": {
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
+      }
+    },
+    "grain_values": {
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
+      }
+    },
+    "silage_values": {
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
+      }
+    }
+  },
   "animal_properties": {
     "herd_information": {
       "type": "object",

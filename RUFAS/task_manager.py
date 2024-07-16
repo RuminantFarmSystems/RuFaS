@@ -487,7 +487,7 @@ class TaskManager:
             return
         with open(path_to_actual_results) as results:
             actual_results = json.load(results)
-        with open("input/data/end_to_end_testing_results/end_to_end_results.json", "r") as e_to_e_results:
+        with open("input/data/end_to_end_testing/end_to_end_results.json", "r") as e_to_e_results:
             expected_results = json.load(e_to_e_results)
 
         diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
