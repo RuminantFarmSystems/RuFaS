@@ -611,7 +611,7 @@ class InputValidator:
 
         is_whole_array_acceptable = True
         for index, element in enumerate(array_value):
-            is_element_acceptable = InputValidator .validate_input_by_type(
+            is_element_acceptable = InputValidator.validate_input_by_type(
                 variable_properties["properties"],
                 variable_path + [index],
                 input_data,
@@ -684,7 +684,7 @@ class InputValidator:
                 "Validation: object is not a dictionary",
                 f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
-                info_map
+                info_map,
             )
             return False
 
