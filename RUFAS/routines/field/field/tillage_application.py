@@ -145,13 +145,9 @@ class TillageApplication:
         )
 
         self._remove_amount_incorporated(self.soil_data.machine_manure, "manure_dry_mass", incorporation_fraction)
-        self._remove_amount_incorporated(
-            self.soil_data.machine_manure, "manure_field_coverage", incorporation_fraction
-        )
+        self._remove_amount_incorporated(self.soil_data.machine_manure, "manure_field_coverage", incorporation_fraction)
         self._remove_amount_incorporated(self.soil_data.grazing_manure, "manure_dry_mass", incorporation_fraction)
-        self._remove_amount_incorporated(
-            self.soil_data.grazing_manure, "manure_field_coverage", incorporation_fraction
-        )
+        self._remove_amount_incorporated(self.soil_data.grazing_manure, "manure_field_coverage", incorporation_fraction)
 
         pools_to_till_in_soil = [
             "labile_inorganic_phosphorus_content",
@@ -288,7 +284,8 @@ class TillageApplication:
 
         """
         data_container_is_correct_type = (
-            isinstance(data_container, SoilData) or isinstance(data_container, FieldData)
+            isinstance(data_container, SoilData)
+            or isinstance(data_container, FieldData)
             or isinstance(data_container, ManurePool)
         )
         if not data_container_is_correct_type:

@@ -26,17 +26,19 @@ class ManurePool:
 
     """
 
-    def __init__(self,
-                 manure_dry_mass=0.0,
-                 manure_applied_mass=0.0,
-                 manure_field_coverage=0.0,
-                 manure_moisture_factor=0.0,
-                 water_extractable_inorganic_phosphorus=0.0,
-                 water_extractable_organic_phosphorus=0.0,
-                 stable_inorganic_phosphorus=0.0,
-                 stable_organic_phosphorus=0.0,
-                 organic_phosphorus_runoff=0.0,
-                 inorganic_phosphorus_runoff=0.0):
+    def __init__(
+        self,
+        manure_dry_mass=0.0,
+        manure_applied_mass=0.0,
+        manure_field_coverage=0.0,
+        manure_moisture_factor=0.0,
+        water_extractable_inorganic_phosphorus=0.0,
+        water_extractable_organic_phosphorus=0.0,
+        stable_inorganic_phosphorus=0.0,
+        stable_organic_phosphorus=0.0,
+        organic_phosphorus_runoff=0.0,
+        inorganic_phosphorus_runoff=0.0,
+    ):
         self.manure_dry_mass = manure_dry_mass
         self.manure_applied_mass = manure_applied_mass
         self.manure_field_coverage = manure_field_coverage
