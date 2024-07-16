@@ -14,21 +14,21 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 
 
 @pytest.mark.parametrize(
-    "data,manure_type,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed",
+    "field_size,container_type,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed",
     [
         (
-            SoilData(field_size=1.5),
-            "machine_manure",
+            1.5,
+            "manure_pool",
             "water_extractable_inorganic_phosphorus",
             23,
             0.35,
-            23,
-            0.0,
+            14.95,
+            8.05,
         ),
-        (FieldData(), "", "current_residue", 45, 0.22, 35.1, 9.9),
+        (None, "field", "current_residue", 45, 0.22, 35.1, 9.9),
         (
-            SoilData(field_size=0.43),
-            "",
+            0.43,
+            "soil",
             "available_phosphorus_pool",
             13.55,
             0.49,
@@ -38,8 +38,8 @@ from RUFAS.routines.manure.manure_manager import ManureManager
     ],
 )
 def test_remove_amount_incorporated(
-    data: object,
-    manure_type: str,
+    field_size: float,
+    container_type: str,
     attr_name: str,
     attr_value: float,
     incorp_frac: float,
@@ -47,10 +47,19 @@ def test_remove_amount_incorporated(
     expected_removed: float,
 ) -> None:
     """Tests that correct amount is removed and returned from the specified pool."""
-    setattr(data, attr_name, attr_value)
+    if container_type == "field":
+        data_container = FieldData()
+    else:
+        soil_data = SoilData(field_size=field_size)
+        if container_type == "manure_pool":
+            data_container = soil_data.machine_manure
+        else:
+            data_container = soil_data
 
-    actual_removed = TillageApplication._remove_amount_incorporated(data, manure_type, attr_name, incorp_frac)
-    actual_remaining = getattr(data, attr_name)
+    setattr(data_container, attr_name, attr_value)
+
+    actual_removed = TillageApplication._remove_amount_incorporated(data_container, attr_name, incorp_frac)
+    actual_remaining = getattr(data_container, attr_name)
 
     assert pytest.approx(actual_removed) == expected_removed
     assert pytest.approx(actual_remaining) == expected_remaining
@@ -69,7 +78,7 @@ def test_remove_amount_incorporated(
 def test_remove_amount_incorporated_error(data: object, expected: str) -> None:
     """Test that errors are handled correctly when removing material from soil surface."""
     with pytest.raises(TypeError) as e:
-        TillageApplication._remove_amount_incorporated(data, "", "test", 0.5)
+        TillageApplication._remove_amount_incorporated(data, "test", 0.5)
     assert (
         str(e.value) == f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
         f"'{expected}'."

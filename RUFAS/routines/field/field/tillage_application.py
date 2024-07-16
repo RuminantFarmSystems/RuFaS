@@ -1,5 +1,6 @@
 from typing import Optional
 
+from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.units import MeasurementUnits
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -121,7 +122,7 @@ class TillageApplication:
         ]
         for pool in non_manure_phosphorus_pools:
             total_phosphorus_incorporated += self._remove_amount_incorporated(
-                self.soil_data, "", pool, incorporation_fraction
+                self.soil_data, pool, incorporation_fraction
             )
         manure_phosphorus_pools = [
             "water_extractable_inorganic_phosphorus",
@@ -130,26 +131,26 @@ class TillageApplication:
             "stable_organic_phosphorus",
         ]
         manure_pool_types = [
-            "grazing_manure",
-            "machine_manure",
+            self.soil_data.grazing_manure,
+            self.soil_data.machine_manure,
         ]
         for manure_pool_type in manure_pool_types:
             for pool in manure_phosphorus_pools:
                 total_phosphorus_incorporated += self._remove_amount_incorporated(
-                    self.soil_data, manure_pool_type, pool, incorporation_fraction
+                    manure_pool_type, pool, incorporation_fraction
                 )
 
         self.soil_data.soil_layers[0].add_to_labile_phosphorus(
             total_phosphorus_incorporated, self.field_data.field_size
         )
 
-        self._remove_amount_incorporated(self.soil_data, "machine_manure", "manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data.machine_manure, "manure_dry_mass", incorporation_fraction)
         self._remove_amount_incorporated(
-            self.soil_data, "machine_manure", "manure_field_coverage", incorporation_fraction
+            self.soil_data.machine_manure, "manure_field_coverage", incorporation_fraction
         )
-        self._remove_amount_incorporated(self.soil_data, "grazing_manure", "manure_dry_mass", incorporation_fraction)
+        self._remove_amount_incorporated(self.soil_data.grazing_manure, "manure_dry_mass", incorporation_fraction)
         self._remove_amount_incorporated(
-            self.soil_data, "grazing_manure", "manure_field_coverage", incorporation_fraction
+            self.soil_data.grazing_manure, "manure_field_coverage", incorporation_fraction
         )
 
         pools_to_till_in_soil = [
@@ -251,7 +252,7 @@ class TillageApplication:
 
     @staticmethod
     def _remove_amount_incorporated(
-        data_container: object, manure_type: str, attribute_name: str, incorporation_fraction: float
+        data_container: object, attribute_name: str, incorporation_fraction: float
     ) -> float:
         """
         Calculates amount incorporated from soil surface pools into the soil profile.
@@ -259,9 +260,7 @@ class TillageApplication:
         Parameters
         ----------
         data_container : object
-            Instance of FieldData or SoilData containing the soil surface pool to be removed from.
-        manure_type : str
-            Name of the manure pool instance.
+            Instance of FieldData, SoilData, or a ManurePool containing the soil surface pool to be removed from.
         attribute_name : str
             attribute of the manure pool instance from which to get the data.
         incorporation_fraction : float
@@ -288,23 +287,20 @@ class TillageApplication:
         pool being removed from.
 
         """
-        data_container_is_correct_type = isinstance(data_container, SoilData) or isinstance(data_container, FieldData)
+        data_container_is_correct_type = (
+            isinstance(data_container, SoilData) or isinstance(data_container, FieldData)
+            or isinstance(data_container, ManurePool)
+        )
         if not data_container_is_correct_type:
             raise TypeError(
                 f"Expected object containing data to be type 'SoilData' or 'FieldData', received type "
                 f"'{type(data_container)}'."
             )
-        if manure_type:
-            manure_pool = getattr(data_container, manure_type)
-            amount_in_pool = getattr(manure_pool, attribute_name)
-            amount_removed = amount_in_pool * incorporation_fraction
-            remaining_amount_in_pool = amount_in_pool - amount_removed
-            setattr(manure_pool, attribute_name, remaining_amount_in_pool)
-        else:
-            amount_in_pool = getattr(data_container, attribute_name)
-            amount_removed = amount_in_pool * incorporation_fraction
-            remaining_amount_in_pool = amount_in_pool - amount_removed
-            setattr(data_container, attribute_name, remaining_amount_in_pool)
+
+        amount_in_pool = getattr(data_container, attribute_name)
+        amount_removed = amount_in_pool * incorporation_fraction
+        remaining_amount_in_pool = amount_in_pool - amount_removed
+        setattr(data_container, attribute_name, remaining_amount_in_pool)
         return amount_removed
 
     def _record_tillage(

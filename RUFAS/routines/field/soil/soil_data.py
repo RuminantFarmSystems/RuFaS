@@ -158,7 +158,10 @@ class SoilData:
         Root depth of the crop harvested (mm).
     crop_yield_nitrogen : float, default 0
         Nitrogen contained in the harvested yield (kg/ha).
-
+    machine_manure : ManurePool
+        A ManurePool instance holding data for machine-applied manure.
+    grazing_manure : ManurePool
+        A ManurePool instance holding data for grazing-applied manure
     """
 
     # ID variables
