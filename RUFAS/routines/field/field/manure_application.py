@@ -48,7 +48,7 @@ class ManureApplication:
         be tracked.
     """
 
-    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
+    def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None) -> None:
         self.data = soil_data or SoilData(field_size=field_size)
 
     def apply_grazing_manure(
@@ -102,9 +102,9 @@ class ManureApplication:
             dry_matter_fraction,
             application_field_coverage,
         )
-        self.data.grazing_manure.manure_dry_mass = new_vals.get("new_dry_matter_mass")
-        self.data.grazing_manure.manure_moisture_factor = new_vals.get("new_moisture_factor")
-        self.data.grazing_manure.manure_field_coverage = new_vals.get("new_field_coverage")
+        self.data.grazing_manure.manure_dry_mass = new_vals.get("new_dry_matter_mass", 0.0)
+        self.data.grazing_manure.manure_moisture_factor = new_vals.get("new_moisture_factor", 0.0)
+        self.data.grazing_manure.manure_field_coverage = new_vals.get("new_field_coverage", 0.0)
         self.data.grazing_manure.manure_applied_mass = dry_matter_mass
 
         self._add_nitrogen_to_soil_layer(
@@ -129,7 +129,7 @@ class ManureApplication:
         ammonium_fraction: float,
         organic_nitrogen_fraction: float,
         water_extractable_inorganic_phosphorus_fraction: float | None = None,
-        source_animal: str = None,
+        source_animal: str | None = None,
     ) -> None:
         """This method takes a new application of machine-applied manure phosphorus and adds it to the existing pool to
             be tracked.
@@ -242,6 +242,7 @@ class ManureApplication:
                 total_phosphorus_mass * stable_organic_phosphorus_fraction * soil_infiltration * 0.95
             )
             mass_to_add_to_labile_P *= surface_remainder_fraction
+
             self.data.soil_layers[0].add_to_labile_phosphorus(mass_to_add_to_labile_P, field_size)
 
             mass_to_add_to_active_P = (
@@ -266,9 +267,9 @@ class ManureApplication:
             adjusted_field_coverage,
         )
 
-        self.data.machine_manure.manure_dry_mass = new_vals.get("new_dry_matter_mass")
-        self.data.machine_manure.manure_moisture_factor = new_vals.get("new_moisture_factor")
-        self.data.machine_manure.manure_field_coverage = new_vals.get("new_field_coverage")
+        self.data.machine_manure.manure_dry_mass = new_vals.get("new_dry_matter_mass", 0.0)
+        self.data.machine_manure.manure_moisture_factor = new_vals.get("new_moisture_factor", 0.0)
+        self.data.machine_manure.manure_field_coverage = new_vals.get("new_field_coverage", 0.0)
 
         if is_liquid_manure:
             top_layer_mass = surface_retention * surface_dry_matter_mass
@@ -652,7 +653,7 @@ class ManureApplication:
 
     @staticmethod
     def _determine_water_extractable_inorganic_phosphorus_fraction_by_animal(
-        animal_type: str,
+        animal_type: str | None,
     ) -> float:
         """
 
