@@ -1388,7 +1388,6 @@ def test_update_body_weight_history(cow_fixture: AnimalBase) -> None:
         cow_fixture.update_body_weight_history(sim_day)
     # asserts for each update
     for idx, history in enumerate(histories):
-        print(idx, history)
         assert cow_fixture.body_weight_history[idx].simulation_day == history[0]
         assert cow_fixture.body_weight_history[idx].days_born == history[1]
         assert cow_fixture.body_weight_history[idx].body_weight == history[2]
@@ -3007,8 +3006,11 @@ def test_report_ration() -> None:
 
 def dummy_constraint(x: npt.NDArray[np.int16], _: MagicMock):
     return np.sum(x) - 10
-    # This dummy constraint checks if the difference of the sum of x and 10
-    #  which is_constraint_violated() then handles
+    # This dummy constraint returns the difference of the sum of x and 10
+    #  which is_constraint_violated() then handles to return whether or not a constraint
+    #  has been violated. The two constraints will either check to see whether the
+    #  aforementioned difference is 0, in the case of an equality constraint, or greater
+    #  than 0, in the case of an inequality constraint.
 
 
 @pytest.mark.parametrize(
@@ -3671,8 +3673,6 @@ def test_get_DE(
         return_value=0.5,
     )
     actual = RationReporter.get_DE(kg_fed, feed_item_info, ration_report, body_weight)
-    print(actual)
-    print(expected)
     assert np.isclose(actual, expected, rtol=1e-3)
 
 
@@ -3711,10 +3711,10 @@ def test_get_DE(
     ],
 )
 def test_get_ME(
-    kg_fed: int,
-    feed_item_info: Dict[str, str | int],
-    ration_report: str,
-    body_weight: str,
+    kg_fed: float,
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
+    body_weight: float,
     expected: float,
     mocker: MockerFixture,
 ) -> None:
@@ -3736,10 +3736,10 @@ def test_get_ME(
     ],
 )
 def test_get_NE_maintenance_and_activity(
-    kg_fed: int,
-    feed_item_info: Dict[str, str | bool],
-    ration_report: str,
-    body_weight: str,
+    kg_fed: float,
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
+    body_weight: float,
     expected: float,
     mocker: MockerFixture,
 ) -> None:
@@ -3802,10 +3802,10 @@ def test_get_NE_maintenance_and_activity(
     ],
 )
 def test_get_NE_lactation(
-    kg_fed: int,
-    feed_item_info: Dict[str, str | bool | int],
-    ration_report: str,
-    body_weight: str,
+    kg_fed: float,
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
+    body_weight: float,
     expected: float,
     mocker: MockerFixture,
 ) -> None:
@@ -3865,10 +3865,10 @@ def test_get_NE_lactation(
     ],
 )
 def test_get_NE_growth(
-    kg_fed: int,
-    feed_item_info: Dict[str, str | bool],
-    ration_report: str,
-    body_weight: str,
+    kg_fed: float,
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
+    body_weight: float,
     expected: float,
     mocker: MockerFixture,
 ) -> None:
@@ -3917,10 +3917,10 @@ def test_get_NE_growth(
     ],
 )
 def test_get_calcium(
-    kg_fed: int,
-    feed_item_info: Dict[str, str | int],
-    ration_report: str,
-    body_weight: str,
+    kg_fed: float,
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
+    body_weight: float,
     expected: float,
 ) -> None:
     """Unit test for function get_Calcium in file routines/animal/ration/ration_driver.py"""
@@ -3964,10 +3964,10 @@ def test_get_calcium(
     ],
 )
 def test_get_phosphorus(
-    kg_fed: int,
-    feed_item_info: Dict[str, str | int],
-    ration_report: str,
-    body_weight: str,
+    kg_fed: float,
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
+    body_weight: float,
     expected: float,
 ) -> None:
     """Unit test for function get_phosphorus in file routines/animal/ration/ration_driver.py"""
@@ -4009,8 +4009,8 @@ def test_get_fat(
 )
 def test_get_fat_percentage(
     kg_fed: int,
-    feed_item_info: Dict[str, int],
-    ration_report: Dict[str, Dict[str, int]],
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
     body_weight: float,
     expected: float,
 ) -> None:
@@ -4037,10 +4037,10 @@ def test_get_fat_percentage(
     ],
 )
 def test_get_forage_NDF(
-    kg_fed: int,
-    feed_item_info: Dict[str, str | int],
-    ration_report: str,
-    body_weight: str,
+    kg_fed: float,
+    feed_item_info: FeedInfoTypedDict,
+    ration_report: Dict[str, Dict[str, float]],
+    body_weight: float,
     expected: float,
 ) -> None:
     """Unit test for function get_forage_NDF in file routines/animal/ration/ration_driver.py"""
@@ -4164,5 +4164,4 @@ def test_get_metabolizable_protein(
     actual = RationReporter.get_metabolizable_protein(
         ration, mock_avail_feeds, ration_report, body_weight
     )
-    assert np.isclose(actual, expected, rtol=1e-3)
     assert np.isclose(actual, expected, rtol=1e-3)

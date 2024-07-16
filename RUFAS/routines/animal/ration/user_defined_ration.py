@@ -88,12 +88,17 @@ class UserDefinedRationManager(object):
         ration = {}
         for feed_id in range(len(available_feeds["feed_id"])):
             if available_feeds["feed_key"][feed_id] in ration_percents:
-                ingredient_percentage = ration_percents[available_feeds["feed_key"][feed_id]]
-                ingredient_as_proportion = ingredient_percentage / 100 * req.DMIest_requirement
-                ration[available_feeds["feed_key"][feed_id]] = round(ingredient_as_proportion, 6)
+                ingredient_percentage = ration_percents[
+                    available_feeds["feed_key"][feed_id]
+                ]
+                ingredient_as_proportion = (
+                    ingredient_percentage / 100 * req.DMIest_requirement
+                )
+                ration[available_feeds["feed_key"][feed_id]] = round(
+                    ingredient_as_proportion, 6
+                )
             else:
                 ration[available_feeds["feed_key"][feed_id]] = 0.0
         ration["status"] = "Optimal"
         ration["objective"] = 0.0
-        return ration
         return ration
