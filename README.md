@@ -5,6 +5,7 @@
 
 
 
+
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-the-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
