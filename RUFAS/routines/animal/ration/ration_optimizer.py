@@ -947,6 +947,10 @@ class RationOptimizer:
             bnds = []
             bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
 
+        for i in range(0, len(x0)):
+            if x0[i] < bnds[i][0] or x0[i] > bnds[i][1]:
+                x0[i] = np.clip(x0[i], bnds[i][0], bnds[i][1])
+
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
             return minimize(
                 self.objective,
