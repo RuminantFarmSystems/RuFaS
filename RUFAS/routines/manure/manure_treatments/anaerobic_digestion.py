@@ -77,7 +77,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             * GeneralConstants.LITERS_TO_CUBIC_METERS
         )
         # MS.3.B.7R
-        methane_generation_volume = GasEmissionsCalculator.methane_volume_via_Chen_equation(
+        methane_generation_volume = GasEmissionsCalculator.CSTR_methane_volume(
             manure_total_volatile_solids=(
                 self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
             )

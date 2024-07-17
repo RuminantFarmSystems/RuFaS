@@ -434,29 +434,18 @@ def test_convert_tempC_to_tempK() -> None:
     assert actual == expected
 
 
-def test_methane_volume_via_Chen_equation() -> None:
-    """Tests _methane_volume_via_Chen_equation() in calculator.py."""
+def test_CSTR_methane_volume() -> None:
+    """Tests CSTR_methane_volume() in calculator.py."""
 
     # Arrange
     VS_total = 10.0
-    hydraulic_retention_time = 20
+    
     expected = (
-        GasEmissionConstants.METHANE_POTENTIAL_Go
-        * (
-            1
-            - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-            / (
-                hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
-                + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                - 1
-            )
-        )
-        * VS_total
-        * GeneralConstants.GRAMS_TO_KG
+                GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * VS_total
     )
 
     # Act
-    actual = GasEmissionsCalculator.methane_volume_via_Chen_equation(VS_total, hydraulic_retention_time)
+    actual = GasEmissionsCalculator.CSTR_methane_volume(VS_total)
 
     # Assert
     assert actual == expected

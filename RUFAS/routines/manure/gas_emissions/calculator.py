@@ -779,14 +779,15 @@ class GasEmissionsCalculator:
         return temperature_celsius + 273.15
 
     @classmethod
-    def methane_volume_via_Chen_equation(
+    def CSTR_methane_volume(
         cls, manure_total_volatile_solids: float, 
     ) -> float:
-        """Calculates CH4 generation volume using the Chen-Hashimoto equation.
+        """Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor. 
 
         Args:
+            GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION: is the achievable emission of methane during 
+                anaerobic digestion (kg :math:`CH_4`/kg VS). 
             manure_total_volatile_solids: total volatile solids, kg.
-            hydraulic_retention_time: hydraulic retention time, days.
 
         Returns:
             CH4 generation volume, m^3.
