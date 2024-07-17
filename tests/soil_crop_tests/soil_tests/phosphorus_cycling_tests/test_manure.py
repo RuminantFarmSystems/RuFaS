@@ -7,6 +7,7 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     CUBIC_MILLIMETERS_TO_LITERS,
     MILLIGRAMS_TO_KILOGRAMS,
 )
+from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 
@@ -303,15 +304,19 @@ def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size
 def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: float) -> None:
     """Tests that the update subroutine for phosphorus pools in Manure correctly calls methods and sets attributes."""
     data = SoilData(
-        machine_manure_dry_mass=1000,
-        machine_manure_field_coverage=0.86,
+        machine_manure=ManurePool(
+            manure_dry_mass=1000,
+            manure_field_coverage=0.86,
+            water_extractable_inorganic_phosphorus=200,
+            water_extractable_organic_phosphorus=90,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=800,
+            manure_field_coverage=0.78,
+            water_extractable_inorganic_phosphorus=125,
+            water_extractable_organic_phosphorus=70,
+        ),
         field_size=area,
-        machine_water_extractable_inorganic_phosphorus=200,
-        machine_water_extractable_organic_phosphorus=90,
-        grazing_manure_dry_mass=800,
-        grazing_manure_field_coverage=0.78,
-        grazing_water_extractable_inorganic_phosphorus=125,
-        grazing_water_extractable_organic_phosphorus=70,
     )
     incorp = Manure(data)
 
@@ -335,16 +340,16 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
     incorp._determine_phosphorus_leached_from_surface.assert_has_calls(leached_calls)
     infiltrated_calls = [call(25, area), call(25, area), call(25, area), call(25, area)]
     incorp._add_infiltrated_phosphorus_to_soil.assert_has_calls(infiltrated_calls)
-    assert incorp.data.machine_water_extractable_organic_phosphorus == 30
-    assert incorp.data.machine_water_extractable_inorganic_phosphorus == 30
-    assert incorp.data.machine_organic_phosphorus_runoff == 20
-    assert incorp.data.machine_inorganic_phosphorus_runoff == 20
+    assert incorp.data.machine_manure.water_extractable_organic_phosphorus == 30
+    assert incorp.data.machine_manure.water_extractable_inorganic_phosphorus == 30
+    assert incorp.data.machine_manure.organic_phosphorus_runoff == 20
+    assert incorp.data.machine_manure.inorganic_phosphorus_runoff == 20
     assert incorp.data.annual_runoff_machine_manure_organic_phosphorus == 20
     assert incorp.data.annual_runoff_machine_manure_inorganic_phosphorus == 20
-    assert incorp.data.grazing_water_extractable_organic_phosphorus == 30
-    assert incorp.data.grazing_water_extractable_inorganic_phosphorus == 30
-    assert incorp.data.grazing_organic_phosphorus_runoff == 20
-    assert incorp.data.grazing_inorganic_phosphorus_runoff == 20
+    assert incorp.data.grazing_manure.water_extractable_organic_phosphorus == 30
+    assert incorp.data.grazing_manure.water_extractable_inorganic_phosphorus == 30
+    assert incorp.data.grazing_manure.organic_phosphorus_runoff == 20
+    assert incorp.data.grazing_manure.inorganic_phosphorus_runoff == 20
     assert incorp.data.annual_runoff_grazing_manure_organic_phosphorus == 20
     assert incorp.data.annual_runoff_grazing_manure_inorganic_phosphorus == 20
 
@@ -366,14 +371,18 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         return_value=-1.0,
     ) as mocked_determine_moisture_change:
         data1 = SoilData(
-            machine_manure_dry_mass=1000,
-            machine_manure_field_coverage=0.86,
-            machine_manure_moisture_factor=0.5,
-            machine_manure_applied_mass=1100,
-            grazing_manure_dry_mass=800,
-            grazing_manure_field_coverage=0.76,
-            grazing_manure_moisture_factor=0.6,
-            grazing_manure_applied_mass=900,
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
             field_size=1.1,
         )
         incorp1 = Manure(data1)
@@ -385,8 +394,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
             call(rain, 0.6, 800, 900, temp_factor),
         ]
         mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
-        assert incorp1.data.machine_manure_moisture_factor == 0.0
-        assert incorp1.data.grazing_manure_moisture_factor == 0.0
+        assert incorp1.data.machine_manure.manure_moisture_factor == 0.0
+        assert incorp1.data.grazing_manure.manure_moisture_factor == 0.0
 
     # Case 2: calculated moisture factor is greater than upper bound
     with patch(
@@ -395,14 +404,18 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         return_value=1.0,
     ) as mocked_determine_moisture_change:
         data2 = SoilData(
-            machine_manure_dry_mass=1000,
-            machine_manure_field_coverage=0.86,
-            machine_manure_moisture_factor=0.5,
-            machine_manure_applied_mass=1100,
-            grazing_manure_dry_mass=800,
-            grazing_manure_field_coverage=0.76,
-            grazing_manure_moisture_factor=0.6,
-            grazing_manure_applied_mass=900,
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
             field_size=1.1,
         )
         incorp2 = Manure(data2)
@@ -414,8 +427,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
             call(rain, 0.6, 800, 900, temp_factor),
         ]
         mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
-        assert incorp2.data.machine_manure_moisture_factor == 0.9
-        assert incorp2.data.grazing_manure_moisture_factor == 0.9
+        assert incorp2.data.machine_manure.manure_moisture_factor == 0.9
+        assert incorp2.data.grazing_manure.manure_moisture_factor == 0.9
 
     # Case 3: calculated moisture factor is not reset due to being out of bounds
     with patch(
@@ -424,14 +437,18 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
         return_value=0.1,
     ) as mocked_determine_moisture_change:
         data3 = SoilData(
-            machine_manure_dry_mass=1000,
-            machine_manure_field_coverage=0.86,
-            machine_manure_moisture_factor=0.5,
-            machine_manure_applied_mass=1100,
-            grazing_manure_dry_mass=800,
-            grazing_manure_field_coverage=0.76,
-            grazing_manure_moisture_factor=0.6,
-            grazing_manure_applied_mass=900,
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
             field_size=1.1,
         )
         incorp3 = Manure(data3)
@@ -443,8 +460,8 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
             call(rain, 0.6, 800, 900, temp_factor),
         ]
         mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
-        assert incorp3.data.machine_manure_moisture_factor == 0.6
-        assert incorp3.data.grazing_manure_moisture_factor == 0.7
+        assert incorp3.data.machine_manure.manure_moisture_factor == 0.6
+        assert incorp3.data.grazing_manure.manure_moisture_factor == 0.7
 
 
 @pytest.mark.parametrize(
@@ -465,10 +482,14 @@ def test_determine_decomposed_surface_manure(
 ) -> None:
     """Tests that the correct changes in mass and field coverage of machine and grazer applied manure are calculated."""
     data = SoilData(
-        machine_manure_dry_mass=800,
-        machine_manure_field_coverage=0.85,
-        grazing_manure_dry_mass=500,
-        grazing_manure_field_coverage=0.44,
+        machine_manure=ManurePool(
+            manure_dry_mass=800,
+            manure_field_coverage=0.85,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=500,
+            manure_field_coverage=0.44,
+        ),
         field_size=1.1,
     )
     incorp = Manure(data)
@@ -478,30 +499,30 @@ def test_determine_decomposed_surface_manure(
     observed = incorp._determine_decomposed_surface_manure(temp_factor)
 
     expected_machine_mass_decomp = min(
-        max(0.0, incorp.data.machine_manure_dry_mass * 0.5),
-        incorp.data.machine_manure_dry_mass,
+        max(0.0, incorp.data.machine_manure.manure_dry_mass * 0.5),
+        incorp.data.machine_manure.manure_dry_mass,
     )
     expected_machine_coverage_decomp = min(
         max(
             0.0,
             expected_machine_mass_decomp
-            / incorp.data.machine_manure_dry_mass
-            * incorp.data.machine_manure_field_coverage,
+            / incorp.data.machine_manure.manure_dry_mass
+            * incorp.data.machine_manure.manure_field_coverage,
         ),
-        incorp.data.machine_manure_field_coverage,
+        incorp.data.machine_manure.manure_field_coverage,
     )
     expected_grazing_mass_decomp = min(
-        max(0.0, incorp.data.grazing_manure_dry_mass * 0.5),
-        incorp.data.grazing_manure_dry_mass,
+        max(0.0, incorp.data.grazing_manure.manure_dry_mass * 0.5),
+        incorp.data.grazing_manure.manure_dry_mass,
     )
     expected_grazing_coverage_decomp = min(
         max(
             0.0,
             expected_grazing_mass_decomp
-            / incorp.data.grazing_manure_dry_mass
-            * incorp.data.grazing_manure_field_coverage,
+            / incorp.data.grazing_manure.manure_dry_mass
+            * incorp.data.grazing_manure.manure_field_coverage,
         ),
-        incorp.data.grazing_manure_field_coverage,
+        incorp.data.grazing_manure.manure_field_coverage,
     )
 
     incorp._determine_dry_matter_decomposition_rate.assert_called_once_with(temp_factor)
@@ -539,12 +560,16 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
 
     # Case 2: manure in pools, not fully assimilated
     data2 = SoilData(
-        machine_manure_dry_mass=100,
-        machine_manure_field_coverage=0.55,
-        machine_manure_moisture_factor=0.77,
-        grazing_manure_dry_mass=80,
-        grazing_manure_field_coverage=0.4,
-        grazing_manure_moisture_factor=0.83,
+        machine_manure=ManurePool(
+            manure_dry_mass=100,
+            manure_field_coverage=0.55,
+            manure_moisture_factor=0.77,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=80,
+            manure_field_coverage=0.4,
+            manure_moisture_factor=0.83,
+        ),
         field_size=1.1,
     )
     incorp2 = Manure(data2)
@@ -571,12 +596,16 @@ def test_determine_assimilated_surface_manure(temp_factor: float, area: float) -
 
     # Case 3: manure in pools, all of it should be assimilated
     data3 = SoilData(
-        machine_manure_dry_mass=75,
-        machine_manure_field_coverage=0.88,
-        machine_manure_moisture_factor=0.80,
-        grazing_manure_dry_mass=95,
-        grazing_manure_field_coverage=0.85,
-        grazing_manure_moisture_factor=0.79,
+        machine_manure=ManurePool(
+            manure_dry_mass=75,
+            manure_field_coverage=0.88,
+            manure_moisture_factor=0.80,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=95,
+            manure_field_coverage=0.85,
+            manure_moisture_factor=0.79,
+        ),
         field_size=1.1,
     )
     incorp3 = Manure(data3)
@@ -654,37 +683,41 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     assert incorp1._determine_mineralized_surface_phosphorus.call_count == 6
     incorp1._determine_assimilated_surface_manure.assert_called_once_with(0.32, area)
     assert incorp1._determine_assimilated_phosphorus_amount.call_count == 8
-    assert incorp1.data.machine_manure_dry_mass == 0
-    assert incorp1.data.machine_manure_field_coverage == 0.0
-    assert incorp1.data.machine_stable_organic_phosphorus == 0
-    assert incorp1.data.machine_stable_inorganic_phosphorus == 0
-    assert incorp1.data.machine_water_extractable_organic_phosphorus == 0
-    assert incorp1.data.machine_water_extractable_inorganic_phosphorus == 0
-    assert incorp1.data.grazing_manure_dry_mass == 0
-    assert pytest.approx(incorp1.data.grazing_manure_field_coverage) == 0.0
-    assert incorp1.data.grazing_stable_organic_phosphorus == 0
-    assert incorp1.data.grazing_stable_inorganic_phosphorus == 0
-    assert incorp1.data.grazing_water_extractable_organic_phosphorus == 0
-    assert incorp1.data.grazing_water_extractable_inorganic_phosphorus == 0
+    assert incorp1.data.machine_manure.manure_dry_mass == 0
+    assert incorp1.data.machine_manure.manure_field_coverage == 0.0
+    assert incorp1.data.machine_manure.stable_organic_phosphorus == 0
+    assert incorp1.data.machine_manure.stable_inorganic_phosphorus == 0
+    assert incorp1.data.machine_manure.water_extractable_organic_phosphorus == 0
+    assert incorp1.data.machine_manure.water_extractable_inorganic_phosphorus == 0
+    assert incorp1.data.grazing_manure.manure_dry_mass == 0
+    assert pytest.approx(incorp1.data.grazing_manure.manure_field_coverage) == 0.0
+    assert incorp1.data.grazing_manure.stable_organic_phosphorus == 0
+    assert incorp1.data.grazing_manure.stable_inorganic_phosphorus == 0
+    assert incorp1.data.grazing_manure.water_extractable_organic_phosphorus == 0
+    assert incorp1.data.grazing_manure.water_extractable_inorganic_phosphorus == 0
     incorp1._add_infiltrated_phosphorus_to_soil.assert_called_once_with(0, area)
 
     # Case 2: sum of amounts decomposed and assimilated are less than what is on the field
     data2 = SoilData(
-        machine_manure_dry_mass=300,
-        machine_manure_field_coverage=0.91,
+        machine_manure=ManurePool(
+            manure_dry_mass=300,
+            manure_field_coverage=0.91,
+            manure_moisture_factor=0.74,
+            stable_organic_phosphorus=20,
+            stable_inorganic_phosphorus=21,
+            water_extractable_organic_phosphorus=22,
+            water_extractable_inorganic_phosphorus=23,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=200,
+            manure_field_coverage=0.83,
+            manure_moisture_factor=0.66,
+            stable_organic_phosphorus=10,
+            stable_inorganic_phosphorus=11,
+            water_extractable_organic_phosphorus=12,
+            water_extractable_inorganic_phosphorus=13,
+        ),
         field_size=area,
-        machine_manure_moisture_factor=0.74,
-        machine_stable_organic_phosphorus=20,
-        machine_stable_inorganic_phosphorus=21,
-        machine_water_extractable_organic_phosphorus=22,
-        machine_water_extractable_inorganic_phosphorus=23,
-        grazing_manure_dry_mass=200,
-        grazing_manure_field_coverage=0.83,
-        grazing_manure_moisture_factor=0.66,
-        grazing_stable_organic_phosphorus=10,
-        grazing_stable_inorganic_phosphorus=11,
-        grazing_water_extractable_organic_phosphorus=12,
-        grazing_water_extractable_inorganic_phosphorus=13,
     )
     incorp2 = Manure(data2)
 
@@ -726,37 +759,41 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     assert incorp2._determine_mineralized_surface_phosphorus.call_count == 6
     incorp2._determine_assimilated_surface_manure.assert_called_once_with(0.35, area)
     assert incorp2._determine_assimilated_phosphorus_amount.call_count == 8
-    assert incorp2.data.machine_manure_dry_mass == 150
-    assert incorp2.data.machine_manure_field_coverage == 0.54
-    assert incorp2.data.machine_stable_organic_phosphorus == 15
-    assert incorp2.data.machine_stable_inorganic_phosphorus == 16
-    assert incorp2.data.machine_water_extractable_organic_phosphorus == 17 + 0.75
-    assert incorp2.data.machine_water_extractable_inorganic_phosphorus == 21 + 8.25
-    assert incorp2.data.grazing_manure_dry_mass == 90
-    assert pytest.approx(incorp2.data.grazing_manure_field_coverage) == 0.57
-    assert incorp2.data.grazing_stable_organic_phosphorus == 5
-    assert incorp2.data.grazing_stable_inorganic_phosphorus == 6
-    assert incorp2.data.grazing_water_extractable_organic_phosphorus == 7 + 0.75
-    assert incorp2.data.grazing_water_extractable_inorganic_phosphorus == 11 + 8.25
+    assert incorp2.data.machine_manure.manure_dry_mass == 150
+    assert incorp2.data.machine_manure.manure_field_coverage == 0.54
+    assert incorp2.data.machine_manure.stable_organic_phosphorus == 15
+    assert incorp2.data.machine_manure.stable_inorganic_phosphorus == 16
+    assert incorp2.data.machine_manure.water_extractable_organic_phosphorus == 17 + 0.75
+    assert incorp2.data.machine_manure.water_extractable_inorganic_phosphorus == 21 + 8.25
+    assert incorp2.data.grazing_manure.manure_dry_mass == 90
+    assert pytest.approx(incorp2.data.grazing_manure.manure_field_coverage) == 0.57
+    assert incorp2.data.grazing_manure.stable_organic_phosphorus == 5
+    assert incorp2.data.grazing_manure.stable_inorganic_phosphorus == 6
+    assert incorp2.data.grazing_manure.water_extractable_organic_phosphorus == 7 + 0.75
+    assert incorp2.data.grazing_manure.water_extractable_inorganic_phosphorus == 11 + 8.25
     incorp2._add_infiltrated_phosphorus_to_soil.assert_called_once_with(16, area)
 
     # Case 3: more manure/phosphorus is decomposed and assimilated than there is on the field.
     data3 = SoilData(
-        machine_manure_dry_mass=50,
-        machine_manure_field_coverage=0.19,
+        machine_manure=ManurePool(
+            manure_dry_mass=50,
+            manure_field_coverage=0.19,
+            manure_moisture_factor=0.35,
+            stable_organic_phosphorus=2.0,
+            stable_inorganic_phosphorus=2.1,
+            water_extractable_organic_phosphorus=2.2,
+            water_extractable_inorganic_phosphorus=2.3,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=38,
+            manure_field_coverage=0.12,
+            manure_moisture_factor=0.59,
+            stable_organic_phosphorus=1.0,
+            stable_inorganic_phosphorus=1.1,
+            water_extractable_organic_phosphorus=1.2,
+            water_extractable_inorganic_phosphorus=1.3,
+        ),
         field_size=area,
-        machine_manure_moisture_factor=0.35,
-        machine_stable_organic_phosphorus=2.0,
-        machine_stable_inorganic_phosphorus=2.1,
-        machine_water_extractable_organic_phosphorus=2.2,
-        machine_water_extractable_inorganic_phosphorus=2.3,
-        grazing_manure_dry_mass=38,
-        grazing_manure_field_coverage=0.12,
-        grazing_manure_moisture_factor=0.59,
-        grazing_stable_organic_phosphorus=1.0,
-        grazing_stable_inorganic_phosphorus=1.1,
-        grazing_water_extractable_organic_phosphorus=1.2,
-        grazing_water_extractable_inorganic_phosphorus=1.3,
     )
     incorp3 = Manure(data3)
 
@@ -798,16 +835,16 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     assert incorp3._determine_mineralized_surface_phosphorus.call_count == 6
     incorp3._determine_assimilated_surface_manure.assert_called_once_with(0.37, area)
     assert incorp3._determine_assimilated_phosphorus_amount.call_count == 8
-    assert incorp3.data.machine_manure_dry_mass == 0
-    assert incorp3.data.machine_manure_field_coverage == 0.0
-    assert incorp3.data.machine_stable_organic_phosphorus == 0
-    assert incorp3.data.machine_stable_inorganic_phosphorus == 0
-    assert incorp3.data.machine_water_extractable_organic_phosphorus == 0.5
-    assert incorp3.data.machine_water_extractable_inorganic_phosphorus == 2 + 2 + 1.5
-    assert incorp3.data.grazing_manure_dry_mass == 0
-    assert pytest.approx(incorp3.data.grazing_manure_field_coverage) == 0.0
-    assert incorp3.data.grazing_stable_organic_phosphorus == 0
-    assert incorp3.data.grazing_stable_inorganic_phosphorus == 0
-    assert incorp3.data.grazing_water_extractable_organic_phosphorus == 0.5
-    assert incorp3.data.grazing_water_extractable_inorganic_phosphorus == 2 + 2 + 1.5
+    assert incorp3.data.machine_manure.manure_dry_mass == 0
+    assert incorp3.data.machine_manure.manure_field_coverage == 0.0
+    assert incorp3.data.machine_manure.stable_organic_phosphorus == 0
+    assert incorp3.data.machine_manure.stable_inorganic_phosphorus == 0
+    assert incorp3.data.machine_manure.water_extractable_organic_phosphorus == 0.5
+    assert incorp3.data.machine_manure.water_extractable_inorganic_phosphorus == 2 + 2 + 1.5
+    assert incorp3.data.grazing_manure.manure_dry_mass == 0
+    assert pytest.approx(incorp3.data.grazing_manure.manure_field_coverage) == 0.0
+    assert incorp3.data.grazing_manure.stable_organic_phosphorus == 0
+    assert incorp3.data.grazing_manure.stable_inorganic_phosphorus == 0
+    assert incorp3.data.grazing_manure.water_extractable_organic_phosphorus == 0.5
+    assert incorp3.data.grazing_manure.water_extractable_inorganic_phosphorus == 2 + 2 + 1.5
     incorp3._add_infiltrated_phosphorus_to_soil.assert_called_once_with(24, area)
