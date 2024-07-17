@@ -2743,23 +2743,28 @@ def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> N
 
 
 def test_filter_saved_pools(
-    mock_output_manager: OutputManager, tmpdir, output_manager_original_method_states: Dict[str, Callable],
-    mocker: MockerFixture
+    mock_output_manager: OutputManager,
+    tmpdir,
+    output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ):
-    mocker.patch.object(mock_output_manager, "filter_variables_pool",
-                        side_effect=[
-                            {
-                                "a": {"values": [0, 1, 2], "info_maps": [{}, {}, {}]},
-                                "b": {"values": ["a", "b", "c"], "info_maps": [{}, {}, {}]},
-                                "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
-                            },
-                            {
-                                "a": {"values": [3, 4, 5], "info_maps": [{}, {}, {}]},
-                                "b": {"values": ["d", "e", "f"], "info_maps": [{}, {}, {}]},
-                                "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
-                            },
-                            {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
-                        ])
+    mocker.patch.object(
+        mock_output_manager,
+        "filter_variables_pool",
+        side_effect=[
+            {
+                "a": {"values": [0, 1, 2], "info_maps": [{}, {}, {}]},
+                "b": {"values": ["a", "b", "c"], "info_maps": [{}, {}, {}]},
+                "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
+            },
+            {
+                "a": {"values": [3, 4, 5], "info_maps": [{}, {}, {}]},
+                "b": {"values": ["d", "e", "f"], "info_maps": [{}, {}, {}]},
+                "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
+            },
+            {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
+        ],
+    )
 
     mocker.patch.object(mock_output_manager, "load_variables_pool_from_file")
 
@@ -2784,8 +2789,9 @@ def test_filter_saved_pools(
 
 
 def test_run_startup_sequence_clear_output_directory(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable],
-    mocker: MockerFixture
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
     mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
@@ -2824,8 +2830,9 @@ def test_run_startup_sequence_clear_output_directory(
 
 
 def test_run_startup_sequence_not_clear_output_directory(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable],
-    mocker: MockerFixture
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
     mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
