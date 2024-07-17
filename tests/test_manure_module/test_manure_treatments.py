@@ -95,8 +95,8 @@ def test_manure_treatment_daily_output() -> None:
         "solid_manure_non_water_extractable_organic_phosphorus": 30.0,
         "solid_manure_potassium": 31.0,
         "solid_manure_daily_mass": 32.0,
-        "biogas": 33.0,
-        "biogas_energy_content": 34.0,
+        "methane_generation_mass": 33.0,
+        "methane_energy_content": 34.0,
         "methane_generation_volume": 35.0,
         "heating_input_energy": 36.0,
         "evaporated_water": 37.0,
@@ -170,8 +170,8 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_non_water_extractable_organic_phosphorus=30.0,
         solid_manure_potassium=31.0,
         solid_manure_daily_mass=32.0,
-        biogas=33.0,
-        biogas_energy_content=34.0,
+        methane_generation_mass=33.0,
+        methane_energy_content=34.0,
         methane_generation_volume=35.0,
         heating_input_energy=36.0,
         evaporated_water=37.0,
@@ -212,8 +212,8 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_non_water_extractable_organic_phosphorus=127.0,
         solid_manure_potassium=128.0,
         solid_manure_daily_mass=129.0,
-        biogas=130.0,
-        biogas_energy_content=131.0,
+        methane_generation_mass=130.0,
+        methane_energy_content=131.0,
         methane_generation_volume=132.0,
         heating_input_energy=133.0,
         evaporated_water=134.0,
@@ -258,8 +258,8 @@ def test_manure_treatment_daily_output_add() -> None:
         solid_manure_non_water_extractable_inorganic_phosphorus=155.0,
         solid_manure_non_water_extractable_organic_phosphorus=157.0,
         solid_manure_potassium=159.0,
-        biogas=163.0,
-        biogas_energy_content=165.0,
+        methane_generation_mass=163.0,
+        methane_energy_content=165.0,
         methane_generation_volume=167.0,
         heating_input_energy=169.0,
         evaporated_water=171.0,
@@ -325,8 +325,8 @@ def test_manure_treatment_daily_output_clone() -> None:
         solid_manure_non_water_extractable_organic_phosphorus=30.0,
         solid_manure_potassium=31.0,
         solid_manure_daily_mass=32.0,
-        biogas=33.0,
-        biogas_energy_content=34.0,
+        methane_generation_mass=33.0,
+        methane_energy_content=34.0,
         methane_generation_volume=35.0,
         heating_input_energy=36.0,
         evaporated_water=37.0,
@@ -2264,33 +2264,33 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     )
 
     methane_generation_volume = 200.0
-    patch_for_calc_methane_volume_via_Chen_equation = mocker.patch(
+    patch_for_CSTR_methane_volume = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_digestion."
-        "GasEmissionsCalculator.methane_volume_via_Chen_equation",
+        "GasEmissionsCalculator.CSTR_methane_volume",
         return_value=methane_generation_volume,
     )
 
-    biogas_energy_content = 500.0
-    patch_for_calc_biogas_energy_content = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_digestion." "GasEmissionsCalculator.biogas_energy_content",
-        return_value=biogas_energy_content,
+    methane_energy_content = 500.0
+    patch_for_calc_methane_energy_content = mocker.patch(
+        "RUFAS.routines.manure.manure_treatments.anaerobic_digestion." "GasEmissionsCalculator.methane_energy_content",
+        return_value=methane_energy_content,
     )
 
-    expected_biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
+    expected_methane_generation_mass = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
     expected_VSd = liquid_manure_total_degradable_volatile_solids - (
-        expected_biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        expected_methane_generation_mass * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
     )
     expected_VSnd = liquid_manure_total_non_degradable_volatile_solids
     expected_total_VS = expected_VSd + expected_VSnd
     expected_total_solids = liquid_manure_total_solids - (
-        expected_biogas * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+        expected_methane_generation_mass * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
     )
 
     expected_heating_input_energy = (
         specific_input_energy * daily_final_manure_volume * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
     expected_evaporated_water = evaporation_fraction * daily_final_manure_volume
-    expected_biogas_energy_content = biogas_energy_content
+    expected_methane_energy_content = methane_energy_content
     expected_minimum_digester_volume = daily_final_manure_volume * hydraulic_retention_time
     expected_top_cover_volume = expected_minimum_digester_volume * top_cover_volume_fraction
 
@@ -2307,18 +2307,18 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     )
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     patch_for_calc_specific_input_energy.assert_called_once_with(average_temperature_celsius, moisture_content)
-    patch_for_calc_methane_volume_via_Chen_equation.assert_called_once_with(
+    patch_for_CSTR_methane_volume.assert_called_once_with(
         manure_total_degradable_volatile_solids=(
             mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
         ),
         hydraulic_retention_time=hydraulic_retention_time,
     )
-    patch_for_calc_biogas_energy_content.assert_called_once_with(methane_volume=methane_generation_volume)
+    patch_for_calc_methane_energy_content.assert_called_once_with(methane_volume=methane_generation_volume)
 
-    assert actual_anaerobic_digestion_daily_output.biogas == approx(expected_biogas)
+    assert actual_anaerobic_digestion_daily_output.methane_generation_mass == approx(expected_methane_generation_mass)
     assert actual_anaerobic_digestion_daily_output.heating_input_energy == approx(expected_heating_input_energy)
     assert actual_anaerobic_digestion_daily_output.evaporated_water == approx(expected_evaporated_water)
-    assert actual_anaerobic_digestion_daily_output.biogas_energy_content == approx(expected_biogas_energy_content)
+    assert actual_anaerobic_digestion_daily_output.methane_energy_content == approx(expected_methane_energy_content)
     assert actual_anaerobic_digestion_daily_output.minimum_digester_volume == approx(expected_minimum_digester_volume)
     assert actual_anaerobic_digestion_daily_output.top_cover_volume == approx(expected_top_cover_volume)
     assert actual_anaerobic_digestion_daily_output.methane_generation_volume == approx(methane_generation_volume)
@@ -2538,7 +2538,7 @@ def test_anaerobic_digestion_and_lagoon_daily_update_helper(manure_separator_exi
         manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock()),
     )
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
-    mock_anaerobic_digestion_daily_output.biogas = 1.0
+    mock_anaerobic_digestion_daily_output.methane_generation_mass = 1.0
     patch_for_create_anaerobic_digestion_daily_output = mocker.patch.object(
         anaerobic_digestion_and_lagoon,
         "_create_anaerobic_digestion_daily_output",

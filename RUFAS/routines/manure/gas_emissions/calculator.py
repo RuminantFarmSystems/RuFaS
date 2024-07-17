@@ -799,14 +799,14 @@ class GasEmissionsCalculator:
         )
 
     @classmethod
-    def biogas_energy_content(cls, methane_volume: float) -> float:
-        """Calculates biogas energy content.
+    def methane_energy_content(cls, methane_volume: float) -> float:
+        """Calculates energy content of methane in anaerobic digester biogas.
 
         Args:
             methane_volume: Methane generation volume, m^3.
 
         Returns:
-            Biogas energy content, MJ.
+            Methane energy content, MJ.
 
         """
         return methane_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
