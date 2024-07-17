@@ -627,7 +627,7 @@ class RationOptimizer:
         ))
         # [A.Cow.E.14]-[A.Heifer.E.14]
         # Dietary RUP (kg)
-        ration_config.RUP_diet = sum(
+        ration_config.RUP_diet = 1000 * sum(
             np.multiply(
                 decision_vector,
                 np.multiply(
@@ -643,7 +643,7 @@ class RationOptimizer:
         )
         if ration_config.BW > 600:
             ration_config.MP_requirement
-        return ration_config.MP_supply - (ration_config.MP_requirement / 1000)
+        return ration_config.MP_supply - (ration_config.MP_requirement)
 
     @staticmethod
     def protein_constraint_upper(decision_vector: np.ndarray,
@@ -967,10 +967,14 @@ class RationOptimizer:
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
             # bnds = []
+            # bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
             bnds = list(zip(
                 [(lim / 3) for lim in ration_config.feed_minimum_list],
-                [(lim / 3) + 0.0001 for lim in ration_config.feed_limit_list]))
-            # bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
+                [(lim / 3) for lim in ration_config.feed_limit_list]))
+
+        for i in range(0, len(x0)):
+            if x0[i] < bnds[i][0] or x0[i] > bnds[i][1]:
+                x0[i] = np.clip(x0[i], bnds[i][0], bnds[i][1])
 
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
             return minimize(
