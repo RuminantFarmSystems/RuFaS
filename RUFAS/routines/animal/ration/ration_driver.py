@@ -132,6 +132,7 @@ class RationManager:
                     fail_summary,
                     dict(info_map, **{"units": fail_summary_units}),
                 )
+                # TODO remove if statement below before, replace with error
                 if num_reattempts > 20:
                     print(fail_summary)
                     print(pen.animal_combination.name)
@@ -1113,7 +1114,7 @@ class RationReporter:
             1000 * 0.13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet)
         )
 
-        MP_supply = MP_bact + sum(RUP_diet) * 0.0001 + 0.4 * 11.8 * DMI_estimate
+        MP_supply = MP_bact + sum(RUP_diet) * 0.1 + 0.4 * 11.8 * DMI_estimate
         return float(MP_supply)
 
 
