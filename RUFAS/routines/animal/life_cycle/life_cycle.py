@@ -309,7 +309,7 @@ class LifeCycleManager:
         self._calculate_cull_reason_stats_percent()
         self._calculate_percent_cow_per_parity()
 
-        self.daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in cows)
+        self.daily_milk_production = max(1.0, sum(cow.estimated_daily_milk_produced for cow in cows))
         self.dry_cows_daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in cows if not cow.milking)
         self.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if cow.milking)
         self.herd_milk_fat_percent = (self.herd_milk_fat_kg / self.daily_milk_production) * 100
