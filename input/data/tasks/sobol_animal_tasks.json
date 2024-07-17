@@ -3,13 +3,13 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "animal_S256",
+        "output_prefix": "test-9-animal_S256",
         "log_verbosity": "errors",
-        "sampler": "sobol",
+        "sampler": "fractional_factorial",
         "saltelli_number": 256,
         "saltelli_skip": 2048,
-        "SA_load_balancing_start": 0.0,
-        "SA_load_balancing_stop": 0.25,
+        "SA_load_balancing_start": 0.25,
+        "SA_load_balancing_stop": 1,
         "random_seed": 42,
         "SA_input_variables": [
           {
@@ -20,13 +20,13 @@
           },
           {
             "variable_name": "animal.animal_config.management_decisions.days_in_preg_when_dry",
-            "lower_bound": 0,
+            "lower_bound": 1,
             "upper_bound": 300,
             "data_type":"int"
           },
           {
             "variable_name": "animal.animal_config.management_decisions.heifer_repro_cull_time",
-            "lower_bound": 0,
+            "lower_bound": 270,
             "upper_bound": 1000,
             "data_type":"int"
           },
@@ -44,7 +44,7 @@
           },
           {
             "variable_name": "animal.animal_config.management_decisions.cow_times_milked_per_day",
-            "lower_bound": 0,
+            "lower_bound": 1,
             "upper_bound": 6,
             "data_type":"int"
           },
@@ -74,7 +74,7 @@
           },
           {
             "variable_name": "animal.animal_config.farm_level.calf.wean_day",
-            "lower_bound": 0,
+            "lower_bound": 1,
             "upper_bound": 120,
             "data_type":"int"
           },
@@ -116,7 +116,7 @@
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.calving_interval",
-            "lower_bound": 0,
+            "lower_bound": 1,
             "upper_bound": 800,
             "data_type":"int"
           },
@@ -346,12 +346,6 @@
             "lower_bound": 0.1,
             "upper_bound": 100,
             "data_type":"float"
-          },
-          {
-            "variable_name": "animal.pen_information.3.number_of_stalls",
-            "lower_bound": 100,
-            "upper_bound": 2000,
-            "data_type":"int"
           },
           {
             "variable_name": "animal.pen_information.3.max_stocking_density",
