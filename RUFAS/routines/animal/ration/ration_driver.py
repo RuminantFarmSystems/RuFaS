@@ -87,6 +87,8 @@ class RationManager:
                 if failed_constraints:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
+                if num_reattempts > 10:
+                    raise ValueError("Catastrophic ration formulation error: can't formulate for lactating cows.")
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
                 req.set_requirements(pen, animal_grouping_scenario, True)
@@ -138,8 +140,10 @@ class RationManager:
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen
-        else:
+        elif pen.ration != {}:
             return pen.ration, ration_vals
+        else:
+            raise ValueError("Catastrophic ration formulation error: can't formulate; no previous ration available.")
 
     @staticmethod
     def calc_milk_average(pen) -> float:
