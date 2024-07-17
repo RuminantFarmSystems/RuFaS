@@ -3,7 +3,7 @@
     "end_to_end_testing_inputs": {
       "title": "Input data for end-to-end testing",
       "description": "Data used for some of the configuration in end-to-end testing.",
-      "path": "input/data/end_to_end_testing/end_to_end_results.json",
+      "path": "input/data/end_to_end_testing/end_to_end_inputs.json",
       "type": "json",
       "properties": "end_to_end_testing_input_properties"
     },
