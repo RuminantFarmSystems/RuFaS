@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
+import numpy as np
 import pandas as pd
 
 from RUFAS.graph_generator import GraphGenerator
@@ -982,11 +983,12 @@ class OutputManager(object):
         )
 
         if filter_content.get("expand_data", False):
+            fill_value = filter_content.get("fill_value", np.nan)
             use_fill_value_in_gaps = filter_content.get("use_fill_value_in_gaps", True)
             use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
             try:
                 results = Utility.expand_data_temporally(
-                    results, use_fill_value_in_gaps=use_fill_value_in_gaps, use_fill_value_at_end=use_fill_value_at_end
+                    results, fill_value=fill_value, use_fill_value_in_gaps=use_fill_value_in_gaps, use_fill_value_at_end=use_fill_value_at_end
                 )
             except (TypeError, ValueError) as e:
                 error_title = f"Error {e} raised when padding data"

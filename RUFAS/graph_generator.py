@@ -431,6 +431,7 @@ class GraphGenerator:
                 "omit_legend_suffix",
                 "display_units",
                 "expand_data",
+                "fill_value",
                 "use_fill_value_in_gaps",
                 "use_fill_value_at_end",
                 "mask_values",
