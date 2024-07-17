@@ -2721,7 +2721,7 @@ def test_save_current_variable_pool(
 
     dummy_file_path = Path.joinpath(output_manager.saved_pool_chunks_path, "dummy_file.json")
     mock_dict_to_file_json.assert_called_once_with(
-        data_dict=dummy_variable_pool, path=dummy_file_path, minify_output_file=False
+        data_dict=dummy_variable_pool, path=dummy_file_path, minify_output_file=True
     )
 
     log_message = f"Saved the current variable pool to {dummy_file_path}"
