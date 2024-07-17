@@ -117,7 +117,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         
         new_daily_output.daily_final_manure_volume = (
             self._current_manure_treatment_daily_input.liquid_manure_daily_volume
-            - (new_daily_output.biogas / 990)
+            - (AD_VS_destruction / ManureConstants.SLURRY_MANURE_DENSITY)
         )
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
