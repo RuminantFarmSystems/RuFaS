@@ -1,5 +1,5 @@
 import collections
-from typing import Set, Dict, List, Tuple, Literal
+from typing import Set, Dict, List, Tuple, Literal, Any
 
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
@@ -32,7 +32,7 @@ class RationManager:
 
     @classmethod
     def formulate_ration(
-        cls, pen, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario
+        cls, pen: Any, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario: Any
     ) -> Tuple[Dict[str, float | str], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
@@ -80,6 +80,11 @@ class RationManager:
         if pen.animal_combination.name in ["LAC_COW"]:
             while not solution.success:
                 num_reattempts += 1
+                if num_reattempts > 20:
+                    solution.success = True
+                    # solution = None
+                    # ration_vals = {"ME_total": pen.MEdiet}
+                    break
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
                     solution.x, ration_optimizer.cow_constraints, ration_config
@@ -138,8 +143,11 @@ class RationManager:
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen
+        elif pen.ration != {}:
+            return pen.ration, {"ME_total": pen.MEdiet}
         else:
-            return pen.ration, ration_vals
+            raise KeyError("Catastrophic ration formulation error: can't formulate; no previous ration available.")
+
 
     @staticmethod
     def calc_milk_average(pen) -> float:
