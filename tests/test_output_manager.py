@@ -1716,7 +1716,7 @@ def test_filter_variables_pool_complex(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     mock_variables_pool_complex: Dict[str, str],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Test case for pattern pool with regex patterns and exclude keyword with
     function filter_variables_pool in output_manager.py"""
