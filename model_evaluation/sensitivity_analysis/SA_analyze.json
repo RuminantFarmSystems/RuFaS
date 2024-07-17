@@ -1,10 +1,10 @@
 {
     "analyses": [
         {
-            "input_file": "input/data/tasks/sobol1k_tasks.json",
-            "output_path": "D:/RUFAS/sobol_1k/",
+            "input_file": "input/data/tasks/sobol_animal_tasks.json",
+            "output_path": "output/",
             "report_name": "report_SA",
-            "only_inputs": false,
+            "only_inputs": true,
             "plot_whole_new": false,
             "inputs_to_collate": [
                 "animal animal_config management_decisions breeding_start_day_h",
@@ -29,7 +29,7 @@
             "input_file": "input/data/tasks/may6_ff.json",
             "output_path": "C:/Users/jw2574/SA_outputs/",
             "report_name": "report_SA",
-            "only_inputs": false,
+            "only_inputs": true,
             "plot_whole_new": false,
             "inputs_to_collate": [
                 "animal animal_config management_decisions breeding_start_day_h",
