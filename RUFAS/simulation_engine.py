@@ -10,6 +10,7 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
+from .routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
@@ -182,3 +183,11 @@ class SimulationEngine:
         feeds_info = self.im.get_data("end_to_end_testing_inputs")
         if not feeds_info:
             return
+
+        reusable_values = feeds_info["reusable_values"]
+        reusable_values.update({"harvest_time": self.time, "storage_time": self.time})
+        hay_values = feeds_info["hay_values"]
+        hay_values.update(
+            {"category": CropCategory(hay_values["category"]), "type": CropType(hay_values["crop_type"])}, **reusable_values
+        )
+
