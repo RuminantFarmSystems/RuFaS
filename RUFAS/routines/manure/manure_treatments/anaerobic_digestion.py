@@ -82,7 +82,7 @@ class AnaerobicDigestion(BaseManureTreatment):
                 self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
             )
         )
-        biogas_energy_content = GasEmissionsCalculator.biogas_energy_content(methane_volume=methane_generation_volume)
+        methane_energy_content = GasEmissionsCalculator.methane_energy_content(methane_volume=methane_generation_volume)
         # MS.3.B.2
         minimum_digester_volume = daily_final_manure_volume * self.config.hydraulic_retention_time
         # MS.3.B.3
@@ -92,10 +92,10 @@ class AnaerobicDigestion(BaseManureTreatment):
             self._current_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen * ManureConstants.AD_TAN_INCREASE_FACTOR, 
             self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         )
-        new_daily_output.biogas = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
+        new_daily_output.methane_generation_mass = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
         AD_carbon_dioxide = (methane_generation_volume * 
                              GasEmissionConstants.AD_CARBON_DIOXIDE_TO_METHANE_RATIO) * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
-        AD_VS_destruction = new_daily_output.biogas + AD_carbon_dioxide
+        AD_VS_destruction = new_daily_output.methane_generation_mass + AD_carbon_dioxide
         
         new_daily_output.liquid_manure_total_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_solids
@@ -121,7 +121,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
-        new_daily_output.biogas_energy_content = biogas_energy_content
+        new_daily_output.methane_energy_content = methane_energy_content
         new_daily_output.minimum_digester_volume = minimum_digester_volume
         new_daily_output.top_cover_volume = top_cover_volume
         new_daily_output.methane_generation_volume = methane_generation_volume

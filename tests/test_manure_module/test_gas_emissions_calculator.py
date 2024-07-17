@@ -451,15 +451,15 @@ def test_CSTR_methane_volume() -> None:
     assert actual == expected
 
 
-def test_biogas_energy_content() -> None:
-    """Tests biogas_energy_content() in calculator.py."""
+def test_methane_energy_content() -> None:
+    """Tests methane_energy_content() in calculator.py."""
 
     # Arrange
     CH4_volume = 10.0
     expected = CH4_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     # Act
-    actual = GasEmissionsCalculator.biogas_energy_content(CH4_volume)
+    actual = GasEmissionsCalculator.methane_energy_content(CH4_volume)
 
     # Assert
     assert actual == expected
