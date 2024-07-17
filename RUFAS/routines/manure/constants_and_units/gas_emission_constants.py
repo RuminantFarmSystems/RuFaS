@@ -137,18 +137,6 @@ class GasEmissionConstants:
     total solids that are volatile Default is set to 0.68.
     """
 
-    CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH: float = 3.1
-    """
-    Chen-Hashimoto kinetic constant (unitless). This constant is used in the
-    Chen-Hashimoto equation to model the kinetic behaviour of the anaerobic digestion process.
-    """
-
-    SPECIFIC_GROWTH_RATE: float = 0.637
-    """
-    Specific growth rate (:math:`\\mu`m). This represents the rate at which the microbial population
-    in the anaerobic digestion process increases.
-    """
-
     HOUSING_HSC = 260.0  # s/m
     """
     Default housing specific constant (s/m). This constant may be used in calculations
