@@ -1839,14 +1839,14 @@ def test_save_results(
     mocker.patch.object(mock_output_manager, "_load_filter_file_content", return_value=filter_content)
     filter_files = ["csv_input_filepath1.txt", "graph_input_filepath2.txt", "json_input_filepath3.txt"]
     mocker.patch.object(mock_output_manager, "_list_filter_files_in_dir", return_value=filter_files)
-    mock_output_manager._exclude_info_maps = MagicMock(return_value={})
+    mock_exclude_info_maps = mocker.patch.object(mock_output_manager, "_exclude_info_maps", return_value={})
     route_save_functions = mocker.patch.object(mock_output_manager, "_route_save_functions")
     add_error = mocker.patch.object(mock_output_manager, "add_error")
     mock_output_manager.time = MagicMock()
     mock_output_manager.chunkification = chunkification
-    mock_output_manager._save_current_variable_pool = MagicMock()
-    mock_output_manager._sort_saved_chunk_files = MagicMock()
-    mock_output_manager.filter_saved_pools = MagicMock(return_value={})
+    mock_save_current_variable_pool = mocker.patch.object(mock_output_manager, "_save_current_variable_pool")
+    mock_sort_saved_chunk_files = mocker.patch.object(mock_output_manager, "_sort_saved_chunk_files")
+    mock_filter_saved_pools = mocker.patch.object(mock_output_manager, "filter_saved_pools", return_value={})
 
     # Act
     mock_output_manager.save_results(
@@ -1855,15 +1855,15 @@ def test_save_results(
 
     # Assert
     if is_faulty:
-        mock_output_manager._exclude_info_maps.assert_not_called()
+        mock_exclude_info_maps.assert_not_called()
         route_save_functions.assert_not_called()
         assert add_error.call_count == len(filter_files)
     else:
         add_error.assert_not_called()
         if exclude_info_maps:
-            mock_output_manager._exclude_info_maps.assert_has_calls([call({}), call({}), call({})])
+            mock_exclude_info_maps.assert_has_calls([call({}), call({}), call({})])
         else:
-            mock_output_manager._exclude_info_maps.assert_not_called()
+            mock_exclude_info_maps.assert_not_called()
         route_save_functions.assert_has_calls(
             [
                 call(
@@ -1879,16 +1879,9 @@ def test_save_results(
             ]
         )
         if chunkification:
-            mock_output_manager._save_current_variable_pool.assert_called_once()
-            mock_output_manager._sort_saved_chunk_files.assert_called()
-            mock_output_manager.filter_saved_pools.assert_called()
-
-    mock_output_manager._exclude_info_maps = output_manager_original_method_states["_exclude_info_maps"]
-    mock_output_manager._save_current_variable_pool = output_manager_original_method_states[
-        "_save_current_variable_pool"
-    ]
-    mock_output_manager._sort_saved_chunk_files = output_manager_original_method_states["_sort_saved_chunk_files"]
-    mock_output_manager.filter_saved_pools = output_manager_original_method_states["filter_saved_pools"]
+            mock_save_current_variable_pool.assert_called_once()
+            mock_sort_saved_chunk_files.assert_called()
+            mock_filter_saved_pools.assert_called()
 
 
 @pytest.mark.parametrize(
@@ -2750,25 +2743,25 @@ def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> N
 
 
 def test_filter_saved_pools(
-    mock_output_manager: OutputManager, tmpdir, output_manager_original_method_states: Dict[str, Callable]
+    mock_output_manager: OutputManager, tmpdir, output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture
 ):
-    mock_output_manager.filter_variables_pool = MagicMock(
-        side_effect=[
-            {
-                "a": {"values": [0, 1, 2], "info_maps": [{}, {}, {}]},
-                "b": {"values": ["a", "b", "c"], "info_maps": [{}, {}, {}]},
-                "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
-            },
-            {
-                "a": {"values": [3, 4, 5], "info_maps": [{}, {}, {}]},
-                "b": {"values": ["d", "e", "f"], "info_maps": [{}, {}, {}]},
-                "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
-            },
-            {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
-        ]
-    )
+    mocker.patch.object(mock_output_manager, "filter_variables_pool",
+                        side_effect=[
+                            {
+                                "a": {"values": [0, 1, 2], "info_maps": [{}, {}, {}]},
+                                "b": {"values": ["a", "b", "c"], "info_maps": [{}, {}, {}]},
+                                "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
+                            },
+                            {
+                                "a": {"values": [3, 4, 5], "info_maps": [{}, {}, {}]},
+                                "b": {"values": ["d", "e", "f"], "info_maps": [{}, {}, {}]},
+                                "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
+                            },
+                            {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
+                        ])
 
-    mock_output_manager.load_variables_pool_from_file = MagicMock()
+    mocker.patch.object(mock_output_manager, "load_variables_pool_from_file")
 
     list_of_dumped_files = [
         tmpdir.join("saved_pool_1_dummy_timestamp.json").write("File 1 content"),
@@ -2789,22 +2782,18 @@ def test_filter_saved_pools(
 
     assert result == expected
 
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
-        "load_variables_pool_from_file"
-    ]
-
 
 def test_run_startup_sequence_clear_output_directory(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture
 ) -> None:
-    mock_output_manager.print_credits = MagicMock()
-    mock_output_manager.flush_pools = MagicMock()
-    mock_output_manager.set_exclude_info_maps_flag = MagicMock()
-    mock_output_manager.set_log_verbose = MagicMock()
-    mock_output_manager.set_metadata_prefix = MagicMock()
-    mock_output_manager.create_directory = MagicMock()
-    mock_output_manager.clear_output_dir = MagicMock()
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
+    mock_set_exclude_info_maps_flag = mocker.patch.object(mock_output_manager, "set_exclude_info_maps_flag")
+    mock_set_log_verbose = mocker.patch.object(mock_output_manager, "set_log_verbose")
+    mock_set_metadata_prefix = mocker.patch.object(mock_output_manager, "set_metadata_prefix")
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    mock_clear_output_dir = mocker.patch.object(mock_output_manager, "clear_output_dir")
 
     dummy_verbosity: LogVerbosity = LogVerbosity.LOGS
     dummy_exclude_info_maps: bool = False
@@ -2825,33 +2814,26 @@ def test_run_startup_sequence_clear_output_directory(
         dummy_task_id,
     )
 
-    mock_output_manager.print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
-    mock_output_manager.flush_pools.assert_called_once()
-    mock_output_manager.set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
-    mock_output_manager.set_log_verbose.assert_called_once_with(dummy_verbosity)
-    mock_output_manager.set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
-    mock_output_manager.create_directory.assert_called_once_with(dummy_output_directory)
-    mock_output_manager.clear_output_dir.assert_called_once_with(dummy_variables_file_path, dummy_output_directory)
-
-    mock_output_manager.print_credits = output_manager_original_method_states["print_credits"]
-    mock_output_manager.flush_pools = output_manager_original_method_states["flush_pools"]
-    mock_output_manager.set_exclude_info_maps_flag = output_manager_original_method_states["set_exclude_info_maps_flag"]
-    mock_output_manager.set_log_verbose = output_manager_original_method_states["set_log_verbose"]
-    mock_output_manager.set_metadata_prefix = output_manager_original_method_states["set_metadata_prefix"]
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
+    mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_flush_pools.assert_called_once()
+    mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
+    mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
+    mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
+    mock_create_directory.assert_called_once_with(dummy_output_directory)
+    mock_clear_output_dir.assert_called_once_with(dummy_variables_file_path, dummy_output_directory)
 
 
 def test_run_startup_sequence_not_clear_output_directory(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture
 ) -> None:
-    mock_output_manager.print_credits = MagicMock()
-    mock_output_manager.flush_pools = MagicMock()
-    mock_output_manager.set_exclude_info_maps_flag = MagicMock()
-    mock_output_manager.set_log_verbose = MagicMock()
-    mock_output_manager.set_metadata_prefix = MagicMock()
-    mock_output_manager.create_directory = MagicMock()
-    mock_output_manager.clear_output_dir = MagicMock()
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
+    mock_set_exclude_info_maps_flag = mocker.patch.object(mock_output_manager, "set_exclude_info_maps_flag")
+    mock_set_log_verbose = mocker.patch.object(mock_output_manager, "set_log_verbose")
+    mock_set_metadata_prefix = mocker.patch.object(mock_output_manager, "set_metadata_prefix")
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    mock_clear_output_dir = mocker.patch.object(mock_output_manager, "clear_output_dir")
 
     dummy_verbosity: LogVerbosity = LogVerbosity.LOGS
     dummy_exclude_info_maps: bool = False
@@ -2872,18 +2854,10 @@ def test_run_startup_sequence_not_clear_output_directory(
         dummy_task_id,
     )
 
-    mock_output_manager.print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
-    mock_output_manager.flush_pools.assert_called_once()
-    mock_output_manager.set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
-    mock_output_manager.set_log_verbose.assert_called_once_with(dummy_verbosity)
-    mock_output_manager.set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
-    mock_output_manager.create_directory.assert_called_once_with(dummy_output_directory)
-    mock_output_manager.clear_output_dir.assert_not_called()
-
-    mock_output_manager.print_credits = output_manager_original_method_states["print_credits"]
-    mock_output_manager.flush_pools = output_manager_original_method_states["flush_pools"]
-    mock_output_manager.set_exclude_info_maps_flag = output_manager_original_method_states["set_exclude_info_maps_flag"]
-    mock_output_manager.set_log_verbose = output_manager_original_method_states["set_log_verbose"]
-    mock_output_manager.set_metadata_prefix = output_manager_original_method_states["set_metadata_prefix"]
-    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
-    mock_output_manager.clear_output_dir = output_manager_original_method_states["clear_output_dir"]
+    mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_flush_pools.assert_called_once()
+    mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
+    mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
+    mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
+    mock_create_directory.assert_called_once_with(dummy_output_directory)
+    mock_clear_output_dir.assert_not_called()
