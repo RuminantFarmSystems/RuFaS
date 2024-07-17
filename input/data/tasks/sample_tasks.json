@@ -1,6 +1,7 @@
 {
   "parallel_workers": 4,
   "tasks": [
+
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",

@@ -228,6 +228,7 @@ class Field:
         mix_name: str,
         requested_nitrogen: float,
         requested_phosphorus: float,
+        requested_potassium: float,
         application_depth: float,
         surface_remainder_fraction: float,
         year: int,
@@ -244,6 +245,8 @@ class Field:
             Minimum amount of nitrogen to be included in this fertilizer application (kg).
         requested_phosphorus : float
             Minimum amount of phosphorus to be included in this fertilizer application (kg).
+        requested_potassium : float
+            Minimum amount of potassium to be included in this fertilizer application (kg).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -267,14 +270,14 @@ class Field:
         without applying any fertilizer.
 
         """
-        if requested_nitrogen == requested_phosphorus == 0.0:
+        if requested_nitrogen == requested_phosphorus == requested_potassium == 0.0:
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._execute_fertilizer_application.__name__,
                 "suffix": f"field='{self.field_data.name}'",
                 "date": {"year": year, "day": day},
             }
-            log_message = "Tried to apply fertilizer with no nitrogen or phosphorus requested."
+            log_message = "Tried to apply fertilizer with no nitrogen, phosphorus, or potassium requested."
             om.add_log("fertilizer_application_log", log_message, info_map)
             return
 
@@ -310,6 +313,7 @@ class Field:
             potassium_fraction,
             requested_nitrogen,
             requested_phosphorus,
+            requested_potassium,
         )
         total_mass_applied = fertilizer_applied.get("total_mass")
         phosphorus_applied = fertilizer_applied.get("phosphorus_mass")
@@ -386,6 +390,7 @@ class Field:
                 mix_values["K"],
                 requested_nitrogen,
                 requested_phosphorus,
+                0.0,
             )
             total_mass = fertilizer_application["total_mass"]
             if total_mass == 0.0:
@@ -402,6 +407,7 @@ class Field:
         potassium_fraction: float,
         requested_nitrogen: float,
         requested_phosphorus: float,
+        requested_potassium: float,
     ) -> Dict[str, float]:
         """
         Determines the total mass of a specific fertilizer mix needed to meet the specified nutrient requirements.
@@ -418,6 +424,8 @@ class Field:
             Minimum mass of nitrogen to be included in fertilizer application (kg)
         requested_phosphorus : float
             Minimum mass of phosphorus to be included in fertilizer application (kg)
+        reqested_potassium : float
+            Minimum mass of potassium to be included in fertilizer application (kg)
 
         Returns
         -------
@@ -427,8 +435,9 @@ class Field:
         """
         minimum_mass_for_nitrogen = 0 if nitrogen_fraction == 0 else (requested_nitrogen / nitrogen_fraction)
         minimum_mass_for_phosphorus = 0 if phosphorus_fraction == 0 else (requested_phosphorus / phosphorus_fraction)
+        minimum_mass_for_potassium = 0 if potassium_fraction == 0 else (requested_potassium / potassium_fraction)
 
-        total_mass = max(minimum_mass_for_nitrogen, minimum_mass_for_phosphorus)
+        total_mass = max(minimum_mass_for_nitrogen, minimum_mass_for_phosphorus, minimum_mass_for_potassium)
         nitrogen_mass = total_mass * nitrogen_fraction
         phosphorus_mass = total_mass * phosphorus_fraction
         potassium_mass = total_mass * potassium_fraction
@@ -486,6 +495,7 @@ class Field:
             "year": MeasurementUnits.CALENDAR_YEAR,
             "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
@@ -505,6 +515,7 @@ class Field:
             "year": year,
             "day": day,
             "field_size": self.field_data.field_size,
+            "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
         om.add_variable("fertilizer_application", value, info_map)
@@ -628,10 +639,25 @@ class Field:
                 surface_remainder_fraction=surface_remainder_fraction,
                 year=year,
                 day=day,
+                output_name="manure_application",
             )
         else:
             supplied_nitrogen = 0.0
             supplied_phosphorus = 0.0
+
+        self._record_manure_application(
+            dry_matter_mass=0.0,
+            dry_matter_fraction=0.0,
+            field_coverage=field_coverage,
+            nitrogen=requested_nitrogen,
+            phosphorus=requested_phosphorus,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
+            day=day,
+            output_name="manure_request",
+        )
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
@@ -660,6 +686,7 @@ class Field:
             optimal_mix,
             unmet_nitrogen_demand,
             unmet_phosphorus_demand,
+            0,
             application_depth,
             surface_remainder_fraction,
             year,
@@ -677,6 +704,7 @@ class Field:
         surface_remainder_fraction: float,
         year: int,
         day: int,
+        output_name: str,
         potassium: Optional[float] = None,
     ) -> None:
         """
@@ -718,6 +746,7 @@ class Field:
             "day": MeasurementUnits.ORDINAL_DAY,
             "year": MeasurementUnits.CALENDAR_YEAR,
             "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
         info_map = {
@@ -738,9 +767,10 @@ class Field:
             "day": day,
             "year": year,
             "field_size": self.field_data.field_size,
+            "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("manure_application", value, info_map)
+        om.add_variable(output_name, value, info_map)
 
     def _add_manure_water(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
         """
@@ -822,7 +852,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def _check_crop_planting_schedule(self, time) -> None:
+    def _check_crop_planting_schedule(self, time: Time) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -837,7 +867,7 @@ class Field:
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def _check_fertilizer_application_schedule(self, time) -> None:
+    def _check_fertilizer_application_schedule(self, time: Time) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
@@ -853,13 +883,14 @@ class Field:
                 event.mix_name,
                 event.nitrogen_mass,
                 event.phosphorus_mass,
+                event.potassium_mass,
                 event.depth,
                 event.surface_remainder_fraction,
                 event.year,
                 event.day,
             )
 
-    def _check_tillage_schedule(self, time) -> None:
+    def _check_tillage_schedule(self, time: Time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -876,11 +907,11 @@ class Field:
                 event.incorporation_fraction,
                 event.mixing_fraction,
                 event.implement,
-                time.calendar_year,
-                time.day,
+                time.current_calendar_year,
+                time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time) -> None:
+    def _check_manure_application_schedule(self, time: Time) -> None:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -958,7 +989,7 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: List[BaseFieldManagementEvent], time
+        all_events: List[BaseFieldManagementEvent], time: Time
     ) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
@@ -995,7 +1026,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
         Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
         list of current crops.
@@ -1042,16 +1073,16 @@ class Field:
             crop = self._make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
-        crop.data.planting_year = time.calendar_year
-        crop.data.planting_day = time.day
+        crop.data.planting_year = time.current_calendar_year
+        crop.data.planting_day = time.current_julian_day
 
         self.crops.append(crop)
 
         self._record_planting(
             use_heat_scheduled_harvesting,
             crop.data.species,
-            time.calendar_year,
-            time.day,
+            time.current_calendar_year,
+            time.current_julian_day,
         )
 
     def _record_planting(
@@ -1135,7 +1166,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._harvest_crop.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"day": time.day, "year": time.calendar_year},
+            "date": {"day": time.current_julian_day, "year": time.current_calendar_year},
         }
         if len(crops_to_be_harvested) > 1:
             om.add_warning(
@@ -1299,7 +1330,7 @@ class Field:
         it will allow subject-matter experts to more easily experiment with different orders.
 
         """
-        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.day)
+        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.current_julian_day)
 
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
         self.soil.soil_temp.daily_soil_temperature_update(
@@ -1337,7 +1368,7 @@ class Field:
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def _cycle_water(self, current_conditions: CurrentDayConditions, time) -> None:
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
         Allow water to cycle through the field.
 
@@ -1371,8 +1402,8 @@ class Field:
         watering_amount = self._determine_watering_amount(
             rainfall=current_conditions.rainfall,
             manure_water=manure_water,
-            year=time.year,
-            day=time.day,
+            year=time.current_simulation_year,
+            day=time.current_julian_day,
             irrigation=current_conditions.irrigation,
         )
         total_water = current_conditions.rainfall + watering_amount + manure_water

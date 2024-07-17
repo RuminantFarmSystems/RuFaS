@@ -5,7 +5,7 @@ from typing import Optional
 
 from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from ....data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 
@@ -155,7 +155,7 @@ class PenManure:
             urine=animal_manure["urine"],
             urine_nitrogen=animal_manure["urine_nitrogen"],
             urine_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"],
-            manure_total_ammoniacal_nitrogen=animal_manure["urine_nitrogen"],
+            manure_total_ammoniacal_nitrogen=animal_manure["manure_total_ammoniacal_nitrogen"],
             nitrogen=animal_manure["manure_nitrogen"],
             manure_mass=animal_manure["manure_mass"],
             total_solids=animal_manure["total_solids"],

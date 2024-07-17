@@ -1,5 +1,6 @@
 import pytest
 from mock.mock import MagicMock, patch, PropertyMock
+from pytest_mock import MockerFixture
 from RUFAS.units import MeasurementUnits
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -99,7 +100,7 @@ def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float) -
         (136.5, 1.22),  # arbitrary
     ],
 )
-def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float):
+def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float) -> None:
     """ensure that yield is correctly calculated by determine_yield_from_total_biomass()"""
     frac = 1 / (1 + harv_ind)
     assert CropManagement.determine_biomass_cut_from_whole_plant(bmass, harv_ind) == bmass * (1 - frac)
@@ -131,7 +132,7 @@ def test_kill() -> None:
         (0.85, 0.5, 0.33),  # user-defined, ignore others
     ],
 )
-def test_determine_harvest_index(harvest, heat_frac, water_def):
+def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
     """ensure that the harvest index is properly evaluated"""
     data = CropData(
         user_harvest_index=harvest,
@@ -199,7 +200,9 @@ def test_manage_harvest(
             kill.assert_called_once()
             store_crop.assert_not_called()
 
-        record_yield.assert_called_once_with(field_name, field_size, mock_time.calendar_year, mock_time.day)
+        record_yield.assert_called_once_with(
+            field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
+        )
         transfer_residue.assert_called_once_with(soil_data, killed)
 
 
@@ -387,12 +390,12 @@ def test_record_yield(
         "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
         "harvest_index": MeasurementUnits.UNITLESS,
-        "planting_date": {
-            "year": MeasurementUnits.CALENDAR_YEAR,
-            "day": MeasurementUnits.ORDINAL_DAY,
-        },
-        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+        "planting_year": MeasurementUnits.CALENDAR_YEAR,
+        "planting_day": MeasurementUnits.ORDINAL_DAY,
+        "harvest_year": MeasurementUnits.CALENDAR_YEAR,
+        "harvest_day": MeasurementUnits.ORDINAL_DAY,
         "field_size": MeasurementUnits.HECTARE,
+        "field_name": MeasurementUnits.UNITLESS,
     }
 
     expected_info_map = {
@@ -407,11 +410,14 @@ def test_record_yield(
         "dry_yield": dry_mass,
         "nitrogen": nitrogen,
         "phosphorus": phosphorus,
-        "planting_date": {"year": 1995, "day": 100},
+        "planting_year": 1995,
+        "planting_day": 100,
         "yield_residue": crop_manager.data.yield_residue,
         "harvest_index": crop_manager.data.harvest_index,
-        "harvest_date": {"year": year, "day": day},
+        "harvest_year": year,
+        "harvest_day": day,
         "field_size": field_size,
+        "field_name": field_name,
     }
 
     with patch.object(om, "add_variable") as add_variable:
@@ -535,3 +541,35 @@ def test_distribute_residue_nutrients(
         pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
     )
     assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
+
+
+def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
+    """Ensure that the crop cutting routines have division error"""
+    # setup
+    data = CropData(
+        harvest_index=3,
+        biomass=0,
+        leaf_area_index=2.3,
+        accumulated_heat_units=1.1,
+        optimal_nitrogen_fraction=0.09,
+        optimal_phosphorus_fraction=0.02,
+        yield_nitrogen_fraction=0.12,
+        yield_phosphorus_fraction=0.0092,
+        above_ground_biomass=75.0,
+    )
+
+    crop = CropManagement(data)
+    crop._recalculate_biomass_distribution = MagicMock()
+    crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
+
+    patch_for_add_warning = mocker.patch("tests.soil_crop_tests.crop_tests.test_crop_management.om.add_warning")
+    crop.cut_crop(0.5)
+    crop.determine_biomass_cut_from_whole_plant.assert_called_once()
+    info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
+    warning_name = "Zero division error in crop management"
+    warning_message = (
+        "A zero division error occurred in the harvesting process of crop management when calculating "
+        "fraction cut."
+        "The variable 'biomass' in CropData has an invalid value: '0'. "
+    )
+    patch_for_add_warning.assert_called_once_with(warning_name, warning_message, info_map)
