@@ -519,6 +519,9 @@ class RationOptimizer:
                 ration_config.dP_list.append(0.80)
             else:
                 ration_config.dP_list.append(0.0)
+
+        requirement_to_use = max(ration_config.P_requirement_process, ration_config.P_requirement)
+
         return float(sum(
             np.multiply(
                 decision_vector,
@@ -527,7 +530,7 @@ class RationOptimizer:
                     ration_config.dP_list,
                 ),
             )
-        ) - (ration_config.P_requirement * GeneralConstants.GRAMS_TO_KG))
+        ) - (requirement_to_use * GeneralConstants.GRAMS_TO_KG))
 
     # fmt: off
     @staticmethod
@@ -1042,6 +1045,7 @@ class RationOptimizer:
             requirements.MP_requirement,
             requirements.Ca_requirement,
             requirements.P_requirement,
+            requirements.P_requirement_process,
             TDN_list,
             DE_list,
             EE_list,

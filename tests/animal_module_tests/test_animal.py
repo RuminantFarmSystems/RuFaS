@@ -265,6 +265,9 @@ def test_set_requirements(mocker: MockerFixture) -> None:
             "P_requirement": [
                 8,
             ],
+            "P_requirement_process": [
+                8,
+            ],
             "DMIest_requirement": [
                 9,
             ],
@@ -292,6 +295,7 @@ def test_set_requirements(mocker: MockerFixture) -> None:
             "MP_requirement": [7, 7],
             "Ca_requirement": [8, 8],
             "P_requirement": [9, 9],
+            "P_requirement_process": [9, 9],
             "DMIest_requirement": [10, 10],
             "BW": [11, 11],
             "milk": [12, 12],
@@ -331,6 +335,7 @@ def test_recalculate_requirements() -> None:
         animal_list[i].MP_requirement = i
         animal_list[i].Ca_requirement = i
         animal_list[i].P_requirement = i
+        animal_list[i].p_req = 1
         animal_list[i].DMIest_requirement = i
         animal_list[i].body_weight = i
         animal_list[i].estimated_daily_milk_produced = i
@@ -358,6 +363,7 @@ def test_recalculate_requirements() -> None:
         "MP_requirement": [],
         "Ca_requirement": [],
         "P_requirement": [],
+        "P_requirement_process": [],
         "DMIest_requirement": [],
         "BW": [],
         "milk": [],
@@ -373,6 +379,7 @@ def test_recalculate_requirements() -> None:
         "MP_requirement": [1, 1, 1, 1, 1],
         "Ca_requirement": [1, 1, 1, 1, 1],
         "P_requirement": [1, 1, 1, 1, 1],
+        "P_requirement_process": [1, 1, 1, 1, 1],
         "DMIest_requirement": [1, 1, 1, 1, 1],
         "BW": [0, 1, 2, 3, 4],
         "milk": [4],
@@ -421,6 +428,7 @@ def test_use_existing_requirements() -> None:
         animal_list[i].MP_requirement = i
         animal_list[i].Ca_requirement = i
         animal_list[i].P_requirement = i
+        animal_list[i].p_req = i
         animal_list[i].DMIest_requirement = i
         animal_list[i].body_weight = i
         animal_list[i].estimated_daily_milk_produced = i
@@ -440,6 +448,7 @@ def test_use_existing_requirements() -> None:
         "MP_requirement": [],
         "Ca_requirement": [],
         "P_requirement": [],
+        "P_requirement_process": [],
         "DMIest_requirement": [],
         "BW": [],
         "milk": [],
@@ -455,6 +464,7 @@ def test_use_existing_requirements() -> None:
         "MP_requirement": [0, 1],
         "Ca_requirement": [0, 1],
         "P_requirement": [0, 1],
+        "P_requirement_process": [0, 1],
         "DMIest_requirement": [0, 1],
         "BW": [0, 1],
         "milk": [1],
@@ -487,6 +497,7 @@ def mock_ration_config() -> MagicMock:
     ration_config.MP_requirement = 6.0
     ration_config.C_requirement = 7.0
     ration_config.P_requirement = 8.0
+    ration_config.P_requirement_process = 8.0
     ration_config.TDN_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.DE_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
     ration_config.DEact_list = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
@@ -539,6 +550,7 @@ def mock_random_ration_config() -> MagicMock:
     ration_config.MP_requirement = 2.207
     ration_config.C_requirement = 3.205
     ration_config.P_requirement = 1.17
+    ration_config.P_requirement_process = 1.17
     ration_config.TDN_list = [2.976, 0.19, 3.855, 4.415, 3.181, 4.065]
     ration_config.DE_list = [1.374, 4.783, 2.642, 4.42, 2.522, 2.397]
     ration_config.EE_list = [4.314, 4.227, 3.704, 4.897, 0.49, 1.59]
@@ -1568,6 +1580,7 @@ def test_attempt_optimization(
     requirements.MP_requirement = 6.0
     requirements.Ca_requirement = 7.0
     requirements.P_requirement = 8.0
+    requirements.P_requirement_process = 8.5
     requirements.avg_BW = 9.0
     requirements.DMIest_requirement = 10.0
 
@@ -1585,6 +1598,7 @@ def test_attempt_optimization(
         6.0,
         7.0,
         8.0,
+        8.5,
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -1625,6 +1639,7 @@ def test_attempt_optimization(
         6.0,
         7.0,
         8.0,
+        8.5,
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
         [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -2712,6 +2727,7 @@ def test_calc_pen_requirements() -> None:
         [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
+        [1, 2, 3],
         "mean",
     )
     attributelist = [
@@ -2732,6 +2748,7 @@ def test_calc_pen_requirements() -> None:
     for attribute in attributelist:
         assert getattr(req, attribute) == 2
     req.calc_pen_requirements(
+        [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
         [1, 2, 3],
