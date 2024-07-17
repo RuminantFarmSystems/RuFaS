@@ -16,7 +16,8 @@ from RUFAS.routines.animal.manure.general_manure import (
     get_default_animal_manure_excretions,
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...enums import AnimalCombination
+from ...data_structures.pen_manure_data import PenManureData
 
 om = OutputManager()
 
@@ -266,7 +267,7 @@ class Pen:
         self._manure_dict_template = AnimalManureExcretions(
             urea=0.0,
             urine=0.0,
-            total_ammoniacal_nitrogen_concentration=0.0,
+            manure_total_ammoniacal_nitrogen=0.0,
             urine_nitrogen=0.0,
             manure_nitrogen=0.0,
             manure_mass=0.0,
@@ -324,6 +325,21 @@ class Pen:
 
         """
         return len(self.animals_in_pen) > 0
+
+    @property
+    def needs_ration_formulation(self) -> bool:
+        """
+        Returns whether pen needs a ration formulated.
+
+        This is currently written to cover the case in which a ration was not formulated due to the pen being empty,
+         but was populated in subsequent days.
+
+        Returns
+        -------
+        bool
+            True if pen needs ration formulation.
+        """
+        return not self.ration and self.is_populated
 
     def set_avg_nutrient_rqmts(self, avg_nutrient_rqmts: Dict[str, float]) -> None:
         """
@@ -494,7 +510,7 @@ class Pen:
         self.dry_total = self._copy_manure_template()
         self.lactating_total = self._copy_manure_template()
 
-    def calc_avg_growth(self):
+    def calc_avg_growth(self) -> None:
         """
         Calculates the average growth of the animals in the pen.
         """
@@ -577,13 +593,15 @@ class Pen:
         self.animals_in_pen = {}
         self.avg_p_animal = 0
 
-    def subset_class_feeds(self, feed):
+    def subset_class_feeds(self, feed) -> None:
         """
         Subsets the feed_ids list to appropriately include the feeds necessary for that pen object,
         based on the animal type(s) that are currently in the pen.
 
-        Args:
-            feed: an object of the Feed class
+        Parameters
+        ----------
+        feed : Feed
+            An object of the Feed class.
         """
 
         self.allocated_feeds = feed.input_feed_combinations[self.animal_combination]
@@ -909,3 +927,29 @@ class Pen:
         """
         del self.animals_in_pen[animal_id]
         self.ration = self._calc_new_ration(len(self.animals_in_pen))
+
+    def _count_lactating_cows(self) -> int:
+        """Returns the count of lactating cows currently held in this pen."""
+        if self.animal_combination is not AnimalCombination.LAC_COW:
+            return 0
+        num_lac_cows = len([animal for animal in self.animals_in_pen.values() if type(animal) is Cow])
+        return num_lac_cows
+
+    def get_manure_data(self) -> PenManureData:
+        """Packages manure data from this pen."""
+        return PenManureData(
+            id=self.id,
+            num_animals=len(self.animals_in_pen),
+            classes_in_pen=self.classes_in_pen,
+            animal_combination=self.animal_combination,
+            housing_type=self.housing_type,
+            pen_type=self.pen_type,
+            bedding_type=self.bedding_type,
+            manure_handler=self.manure_handling,
+            manure_separator=self.manure_separator,
+            manure_separator_after_digestion=self.manure_separator_after_digestion,
+            manure_treatment=self.manure_storage,
+            manure=self.manure,
+            num_lactating_cows=self._count_lactating_cows(),
+            num_stalls=self.num_stalls,
+        )
