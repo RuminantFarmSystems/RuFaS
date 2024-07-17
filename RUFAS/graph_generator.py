@@ -6,6 +6,8 @@ from typing import Dict, List, Any, Callable, Optional, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
+import numpy.typing as npt
 from matplotlib.figure import Axes, Figure
 
 from RUFAS.util import Utility
@@ -221,7 +223,8 @@ class GraphGenerator:
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
 
-            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()))
+            mask_values = graph_details.get("mask_values", False)
+            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()), mask_values)
             if graph_details.get("title"):
                 corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
                 graph_details["title"] = corrected_graph_title
@@ -422,7 +425,16 @@ class GraphGenerator:
         optional_graph_filter_keys = (
             list(FIGURE_SETTERS.keys())
             + list(AXES_SETTERS.keys())
-            + ["variables", "omit_legend_prefix", "omit_legend_suffix", "display_units"]
+            + [
+                "variables",
+                "omit_legend_prefix",
+                "omit_legend_suffix",
+                "display_units",
+                "expand_data",
+                "use_fill_value_in_gaps",
+                "use_fill_value_at_end",
+                "mask_values",
+            ]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
         info_map = {
@@ -514,6 +526,7 @@ class GraphGenerator:
         graph_type: str | list[str],
         data: Dict[str, List[int | float]],
         selected_variables: Optional[List[str]] = None,
+        mask_values: bool = False,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -527,6 +540,9 @@ class GraphGenerator:
         selected_variables : Optional[List[str]]
             If it is present and the data is a list of dicts,
             it selects the variables to be plotted.
+        mask_values : bool, default False
+            Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
+            values.
 
         Raises
         ------
@@ -542,7 +558,32 @@ class GraphGenerator:
             plot_function(indices_list, values_tuple)
         else:
             for value in data.values():
-                plot_function(value)
+                if not mask_values:
+                    plot_function(value)
+                else:
+                    indices, masked_values = self._mask_values(value)
+                    plot_function(indices, masked_values)
+
+    def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
+        """
+        Masks values to remove None and NaN values.
+
+        Parameters
+        ----------
+        values : list[Any]
+            List of data to be masked.
+
+        Returns
+        -------
+        tuple[NDArray[Any], NDArray[np.float32]]
+            Tuple of NumPy arrays, the first containing the indices of the masked data and the second containing the
+            actual masked data.
+
+        """
+        np_values = np.array(values)
+        mask = ~np.isnan(np_values)
+        indices = np.arange(len(np_values))
+        return (indices[mask], np_values[mask])
 
     def _customize_graph(self, fig: Figure, customization_details: Dict[str, Any]) -> None:
         """
