@@ -1716,6 +1716,7 @@ def test_filter_variables_pool_complex(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
     mock_variables_pool_complex: Dict[str, str],
+    mocker: MockerFixture
 ) -> None:
     """Test case for pattern pool with regex patterns and exclude keyword with
     function filter_variables_pool in output_manager.py"""
@@ -1738,15 +1739,16 @@ def test_filter_variables_pool_complex(
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
     # unpacking pool error
-    filter_content: Dict[str, Any] = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": False, "variables": "a"}
-    expected_result: Dict[str, OutputManager.pool_element_type] = {
+    filter_content = {"filters": ["^DummyClass1.*"], "filter_by_exclusion": False, "variables": "a"}
+    expected_result = {
         "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
         "a": {"values": ["A", "AA", "AAA"]},
     }
-    mock_output_manager.add_error = MagicMock()
+
+    mock_add_error = mocker.patch.object(mock_output_manager, "add_error")
     with freeze_time("2023-12-12 13:34:42"):
         actual: Dict[str, OutputManager.pool_element_type] = mock_output_manager.filter_variables_pool(filter_content)
-    mock_output_manager.add_error.assert_has_calls(
+    mock_add_error.assert_has_calls(
         [
             call(
                 "Unpacking Pool Error",
@@ -1781,14 +1783,14 @@ def test_filter_variables_pool_complex(
     assert actual == expected_result
 
     # use_filter_name in dict data
-    filter_content: Dict[str, Any] = {
+    filter_content = {
         "name": "test_case_3",
         "filters": ["^DummyClass1.*"],
         "filter_by_exclusion": False,
         "use_name": False,
         "variables": ["a", "b", "c"],
     }
-    expected_result: Dict[str, OutputManager.pool_element_type] = {
+    expected_result = {
         "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
         "a": {"values": ["A", "AA", "AAA"]},
         "b": {"values": [1.0, 2.0, 3.0]},
@@ -1798,8 +1800,6 @@ def test_filter_variables_pool_complex(
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
     mock_output_manager.variables_pool = {}
 
 
