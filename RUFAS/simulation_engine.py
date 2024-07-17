@@ -177,13 +177,13 @@ class SimulationEngine:
         self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
+        self._setup_stored_feeds()
 
     def _setup_stored_feeds(self) -> None:
         """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
         feeds_info = self.im.get_data("end_to_end_testing_inputs")
         if not feeds_info:
             return
-
         reusable_values = feeds_info["reusable_values"]
         reusable_values.update({"harvest_time": self.time, "storage_time": self.time})
         hay_values = feeds_info["hay_values"]

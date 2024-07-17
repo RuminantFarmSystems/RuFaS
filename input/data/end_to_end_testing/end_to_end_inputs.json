@@ -5,7 +5,7 @@
     },
     "hay_values": {
         "category": "Alfalfa",
-        "type": "Alfalfa",
+        "crop_type": "Alfalfa",
         "dry_matter_percentage": 88.136,
         "lignin": 6.643,
         "crude_protein_percent": 20.745,
@@ -18,7 +18,7 @@
     },
     "baleage_values":{
         "category": "Small grain",
-        "type": "Rye",
+        "crop_type": "Rye",
         "dry_matter_percentage": 34.881,
         "lignin": 4.932,
         "crude_protein_percent": 14.434,
@@ -31,7 +31,7 @@
     },
     "grain_values": {
         "category": "Soy",
-        "type": "Grain",
+        "crop_type": "Grain",
         "dry_matter_percentage": 89.105,
         "lignin": 1.516,
         "crude_protein_percent": 39.98,
@@ -44,7 +44,7 @@
     },
     "silage_values": {
         "category": "Corn",
-        "type": "Silage",
+        "crop_type": "Silage",
         "dry_matter_percentage": 35.361,
         "lignin": 3.054,
         "crude_protein_percent": 7.707,

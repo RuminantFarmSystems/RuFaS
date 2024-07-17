@@ -37,6 +37,7 @@
   },
   "end_to_end_testing_input_properties": {
     "reusable_values": {
+      "type": "object",
       "fresh_mass": {
         "type": "number"
       },
@@ -45,6 +46,7 @@
       }
     },
     "hay_values": {
+      "type": "object",
       "category": {
         "type": "string"
       },
@@ -80,6 +82,7 @@
       }
     },
     "baleage_values": {
+      "type": "object",
       "category": {
         "type": "string"
       },
@@ -115,6 +118,7 @@
       }
     },
     "grain_values": {
+      "type": "object",
       "category": {
         "type": "string"
       },
@@ -150,6 +154,7 @@
       }
     },
     "silage_values": {
+      "type": "object",
       "category": {
         "type": "string"
       },
