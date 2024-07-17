@@ -36,19 +36,19 @@
     "purchased_feeds": [
         {
             "purchased_feed": 2,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.17
         },
         {
             "purchased_feed": 44,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.5
         },
         {
             "purchased_feed": 51,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.01
         },
         {
             "purchased_feed": 94,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.01
         },
         {
             "purchased_feed": 100,
@@ -60,7 +60,7 @@
         },
         {
             "purchased_feed": 167,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 1.0
         },
         {
             "purchased_feed": 176,
@@ -68,11 +68,11 @@
         },
         {
             "purchased_feed": 202,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.82
         },
         {
             "purchased_feed": 216,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.44
         },
         {
             "purchased_feed": 231,
@@ -80,7 +80,7 @@
         },
         {
             "purchased_feed": 234,
-            "purchased_feed_cost": 0.1
+            "purchased_feed_cost": 0.05
         }
     ],
     "farm_grown_feeds": [
