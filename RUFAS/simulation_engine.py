@@ -10,13 +10,13 @@ from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from .routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 from .routines.EEE.EEE_manager import EEEManager
+import cProfile
 
 om = OutputManager()
 
@@ -103,6 +103,8 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+        print(self.time.current_date)
+        self.feed_manager.process_degradations(self.weather, self.time)
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
@@ -177,17 +179,8 @@ class SimulationEngine:
         self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
-        self._setup_stored_feeds()
 
-    def _setup_stored_feeds(self) -> None:
-        """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
         feeds_info = self.im.get_data("end_to_end_testing_inputs")
         if not feeds_info:
             return
-        reusable_values = feeds_info["reusable_values"]
-        reusable_values.update({"harvest_time": self.time, "storage_time": self.time})
-        hay_values = feeds_info["hay_values"]
-        hay_values.update(
-            {"category": CropCategory(hay_values["category"]), "type": CropType(hay_values["crop_type"])}, **reusable_values
-        )
-
+        self.feed_manager.setup_stored_feeds(feeds_info, self.time)
