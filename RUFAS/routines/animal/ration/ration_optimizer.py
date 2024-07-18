@@ -941,7 +941,6 @@ class RationOptimizer:
             x0 = []
             prev_ration = previous_ration.copy()
             for key, value in prev_ration.items():
-                value = int(value)
                 if key not in ["status", "objective"]:
                     x0.append(value / 3)
                     x0.append(value / 3)
@@ -1109,7 +1108,7 @@ class RationOptimizer:
 
     @staticmethod
     def is_constraint_violated(
-        solution_x: npt.NDArray[np.float32],
+        solution_x: npt.NDArray[np.float64],
         constraint: Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str],
         ration_config: RationConfig
     ) -> bool:
@@ -1141,7 +1140,7 @@ class RationOptimizer:
 
     @staticmethod
     def find_failed_constraints(
-        solution_x: npt.NDArray[np.float32],
+        solution_x: npt.NDArray[np.float64],
         constraints: List[Dict[str, Callable[[Any, Any], float]]],
         ration_config: RationConfig
     ) -> List[Dict[str, Callable[[Any, Any], float]]]:
