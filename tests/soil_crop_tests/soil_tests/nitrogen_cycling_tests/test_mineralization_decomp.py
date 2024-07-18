@@ -18,7 +18,7 @@ def test_calculate_residue_nutrient_ratio(carbon: float, organic: float, inorgan
         expected = inf
     else:
         expected = carbon / (organic + inorganic)
-    assert observed == expected
+    assert observed == expected_AR.pt
 
 
 @pytest.mark.parametrize("ratio,constant", [(1.334, 25), (0.4465, 25), (0.234, 200), (0, 200), (inf, 25)])
