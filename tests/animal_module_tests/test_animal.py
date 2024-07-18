@@ -3997,5 +3997,5 @@ def test_get_metabolizable_protein(mocker: MockerFixture, mock_available_feeds: 
         return_value=1,
     )
     expected = 174.76685
-    actual = RationReporter.get_metabolizable_protein(ration, available_feeds, ration_report, body_weight)
+    actual = RationReporter.get_metabolizable_protein(ration, mock_avail_feeds, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
