@@ -115,6 +115,7 @@ class RationConfig:
         N_B__list: list[float] = [],
         CP__list: list[float] = [],
         dRUP__list: list[float] = [],
+        feed_minimum__list: list[float] = [],
         feed_limit__list: list[float] = [],
         lactating_: bool = False,
         DMIest__requirement: float = 0.0,
@@ -210,6 +211,7 @@ class RationConfig:
         self.N_B_list = N_B__list
         self.CP_list = CP__list
         self.dRUP_list = dRUP__list
+        self.feed_minimum_list = feed_minimum__list
         self.feed_limit_list = feed_limit__list
         self.lactating = lactating_
         self.DMIest_requirement = DMIest__requirement
