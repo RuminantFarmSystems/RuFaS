@@ -460,7 +460,7 @@ class TaskManager:
             "function": TaskManager._setup_end_to_end_testing_environment.__name__,
         }
         output_manager.add_log(
-            "Wrote end-to-end testing filter.",
+            "Wrote end-to-end testing filter",
             "End-to-end testing filter written to 'json_end_to_end_testing_filter.txt'.",
             info_map,
         )
