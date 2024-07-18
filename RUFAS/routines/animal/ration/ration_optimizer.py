@@ -1,21 +1,20 @@
-import numpy as np
 import random
-from scipy.optimize import minimize, OptimizeResult
-from typing import Callable, Dict, List, Tuple, Any
+from typing import Any, Callable, Dict, List, Tuple
 
+import numpy as np
+import numpy.typing as npt
+from scipy.optimize import OptimizeResult, minimize
+
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
-
-from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from ....enums import AnimalCombination
-
-import numpy.typing as npt
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 
 om = OutputManager()
 udrm = UserDefinedRationManager()
@@ -36,12 +35,14 @@ class RationOptimizer:
 
     def __init__(self) -> None:
         """initializes RationOptimizer object"""
+
         self.constraint_functions: List[Callable[[Any, Any], float]] = []
         self.cow_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
         self.heifer_constraints: List[Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str] | str] = []
 
     def set_constraints(self, arguments: Tuple[RationConfig]) -> None:
         # establishing the constraints of the NLP
+
         self.constraint_functions = [
             self.total_energy,
             self.NEmact_constraint,
@@ -91,7 +92,7 @@ class RationOptimizer:
         return tripled_list
 
     @staticmethod
-    def objective(decision_vector: np.ndarray, ration_config: RationConfig) -> float:
+    def objective(decision_vector: npt.NDArray[np.float64], ration_config: RationConfig) -> float:
         """
         Sets up the objective function in the optimize function for the non-linear
         program. Whenever the paramert x is used, it refers to the "decision vetor
@@ -118,7 +119,7 @@ class RationOptimizer:
     # fmt: off
     @staticmethod
     def total_energy(  # noqa
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
@@ -257,7 +258,7 @@ class RationOptimizer:
     # fmt: off
     @staticmethod
     def NEmact_constraint(  # noqa
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
@@ -354,7 +355,7 @@ class RationOptimizer:
 
     @staticmethod
     def NEl_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the lactation and pregnancy requirements
@@ -401,7 +402,7 @@ class RationOptimizer:
 
     @staticmethod
     def NEgact_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the growth requirements satisfied by each
@@ -445,7 +446,7 @@ class RationOptimizer:
 
     @staticmethod
     def calcium_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the calcium requirements satisfied by each
@@ -489,7 +490,7 @@ class RationOptimizer:
 
     @staticmethod
     def phosphorus_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for the phosphorus requirements satisfied by each
@@ -533,7 +534,7 @@ class RationOptimizer:
     # fmt: off
     @staticmethod
     def protein_constraint_lower(  # noqa
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
@@ -664,7 +665,7 @@ class RationOptimizer:
 
     @staticmethod
     def NDF_constraint_lower(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
@@ -694,7 +695,7 @@ class RationOptimizer:
 
     @staticmethod
     def NDF_constraint_upper(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for each feed to instill an overall NDF percent
@@ -724,7 +725,7 @@ class RationOptimizer:
 
     @staticmethod
     def forage_NDF_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for only FORAGES to instill a NDF percent across
@@ -769,7 +770,7 @@ class RationOptimizer:
 
     @staticmethod
     def fat_constraint(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Sets up the RHS multipliers for each feed to instill an overall fat percent
@@ -797,7 +798,7 @@ class RationOptimizer:
 
     @staticmethod
     def DMI_constraint_lower(
-        decision_vector: np.ndarray, ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
@@ -822,7 +823,7 @@ class RationOptimizer:
 
     @staticmethod
     def DMI_constraint_upper(
-        decision_vector: np.ndarray | List[float], ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64] | List[float], ration_config: RationConfig
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
@@ -847,7 +848,7 @@ class RationOptimizer:
 
     @staticmethod
     def get_ration_vals(
-        decision_vector: np.ndarray | List[float], ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64] | List[float], ration_config: RationConfig
     ) -> Dict[str, float]:
         """
         Function that calculates and retrieves ration values used throughout the
@@ -1126,7 +1127,7 @@ class RationOptimizer:
 
     @staticmethod
     def is_constraint_violated(
-        solution_x: npt.NDArray,
+        solution_x: npt.NDArray[np.float64],
         constraint: Dict[str, Callable[[Any, Any], float] | Tuple[RationConfig] | str],
         ration_config: RationConfig
     ) -> bool:
@@ -1158,7 +1159,7 @@ class RationOptimizer:
 
     @staticmethod
     def find_failed_constraints(
-        solution_x: npt.NDArray,
+        solution_x: npt.NDArray[np.float64],
         constraints: List[Dict[str, Callable[[Any, Any], float]]],
         ration_config: RationConfig
     ) -> List[Dict[str, Callable[[Any, Any], float]]]:
