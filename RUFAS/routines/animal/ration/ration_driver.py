@@ -132,6 +132,10 @@ class RationManager:
                     fail_summary,
                     dict(info_map, **{"units": fail_summary_units}),
                 )
+                # TODO remove if statement below before, replace with error
+                if num_reattempts > 20:
+                    print(fail_summary)
+                    print(pen.animal_combination.name)
 
         if solution is not None:
             ration = cls.make_ration_from_solution(available_feeds, solution)
@@ -1098,8 +1102,9 @@ class RationReporter:
         RDP_diet = []
         RUP_diet = []
         for i, kg_fed in enumerate(ration.values()):
-            RDP_diet.append(RDP_list[i] * kg_fed * 0.01)
-            RUP_diet.append(kg_fed * RUP_list[i] * dRUP_diet[i])
+            RDP_diet.append(GeneralConstants.KG_TO_GRAMS * RDP_list[i] * kg_fed * GeneralConstants.PERCENTAGE_TO_FRACTION)
+            RUP_diet.append(GeneralConstants.KG_TO_GRAMS * kg_fed * RUP_list[i] * GeneralConstants.PERCENTAGE_TO_FRACTION * 
+                            dRUP_diet[i] * GeneralConstants.PERCENTAGE_TO_FRACTION)
 
         TDN_total_actual = TDNtotal * RationReporter.get_TDN_discount(
             ration_report, body_weight
@@ -1107,10 +1112,10 @@ class RationReporter:
 
         # MP bact calcs
         MP_bact = 0.64 * min(
-            1000 * 0.13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet)
+            GeneralConstants.KG_TO_GRAMS * 0.13 * TDN_total_actual, 0.85 * sum(RDP_diet)
         )
 
-        MP_supply = MP_bact + sum(RUP_diet) * 0.0001 + 0.4 * 11.8 * DMI_estimate
+        MP_supply = MP_bact + sum(RUP_diet) + 0.4 * 11.8 * DMI_estimate
         return float(MP_supply)
 
 
@@ -1160,6 +1165,10 @@ class AvailableFeeds:
         self.lactating_cow_limit: List[float] = []
         # dry cow feed limits
         self.dry_cow_limit: List[float] = []
+        # lactating cows feed limits
+        self.lactating_cow_minimum: List[float] = []
+        # dry cow feed limits
+        self.dry_cow_minimum: List[float] = []
         # heiferIII limits
         self.heiferIII_limit: List[float] = []
         # heiferII limit
@@ -1209,10 +1218,15 @@ class AvailableFeeds:
             if isinstance(feed["limit"], dict):
                 self.lactating_cow_limit.append(feed["limit"]["lactating_cows"])
                 self.dry_cow_limit.append(feed["limit"]["dry_cows"])
-
             else:
                 self.lactating_cow_limit.append(feed["limit"])
                 self.dry_cow_limit.append(feed["limit"])
+            if isinstance(feed["lower_limit"], dict):
+                self.lactating_cow_limit.append(feed["lower_limit"]["lactating_cows"])
+                self.dry_cow_limit.append(feed["lower_limit"]["dry_cows"])
+            else:
+                self.lactating_cow_minimum.append(feed["lower_limit"])
+                self.dry_cow_minimum.append(feed["lower_limit"])
 
     def get_feed_data_from_feed_ids(self, feed_ids: Set[int]):
         """
