@@ -10,7 +10,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/default_config.json",
+      "path": "input/data/config/end_to_end_testing_config.json",
       "type": "json",
       "properties": "config_properties"
     },
@@ -31,7 +31,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
-      "path": "input/data/crop/default_rotation.json",
+      "path": "input/data/crop/no_crop.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
