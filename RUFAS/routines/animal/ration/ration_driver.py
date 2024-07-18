@@ -1113,9 +1113,11 @@ class RationReporter:
         RDP_diet = []
         RUP_diet = []
         for i, kg_fed in enumerate(ration.values()):
-            RDP_diet.append(GeneralConstants.KG_TO_GRAMS * RDP_list[i] * kg_fed * GeneralConstants.PERCENTAGE_TO_FRACTION)
-            RUP_diet.append(GeneralConstants.KG_TO_GRAMS * kg_fed * RUP_list[i] * GeneralConstants.PERCENTAGE_TO_FRACTION * 
-                            dRUP_diet[i] * GeneralConstants.PERCENTAGE_TO_FRACTION)
+            RDP_diet.append(GeneralConstants.KG_TO_GRAMS * RDP_list[i]
+                            * kg_fed * GeneralConstants.PERCENTAGE_TO_FRACTION)
+            RUP_diet.append(GeneralConstants.KG_TO_GRAMS * kg_fed
+                            * RUP_list[i] * GeneralConstants.PERCENTAGE_TO_FRACTION
+                            * dRUP_diet[i] * GeneralConstants.PERCENTAGE_TO_FRACTION)
 
         TDN_total_actual = TDNtotal * RationReporter.get_TDN_discount(
             ration_report, body_weight
