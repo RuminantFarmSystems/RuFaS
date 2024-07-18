@@ -7,6 +7,7 @@ from enum import Enum
 from functools import reduce
 from pathlib import Path
 from typing import Any, Dict, List, Union, Callable, Sequence, Tuple
+
 # set nested values
 # _parse_metadata_properties
 # _prepare_data
