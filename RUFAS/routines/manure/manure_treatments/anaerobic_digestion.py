@@ -113,8 +113,6 @@ class AnaerobicDigestion(BaseManureTreatment):
             self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
         )
         
-        
-        
         new_daily_output.daily_final_manure_volume = (
             self._current_manure_treatment_daily_input.liquid_manure_daily_volume
             - (AD_VS_destruction / ManureConstants.SLURRY_MANURE_DENSITY)
