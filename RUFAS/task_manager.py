@@ -9,6 +9,7 @@ import random
 import re
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
+import shutil
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
@@ -453,15 +454,17 @@ class TaskManager:
     @staticmethod
     def _setup_end_to_end_testing_environment(output_manager: OutputManager) -> None:
         """Creates a filter that will be used to collect the results of a simulation in an end-to-end testing run."""
-        with open("output/output_filters/json_end_to_end_testing_filter.txt", "w") as e_to_e_filter_file:
-            e_to_e_filter_file.write(".*")
+        # with open("output/output_filters/json_end_to_end_testing_filter.txt", "w") as e_to_e_filter_file:
+        #     e_to_e_filter_file.write(".*")
+        shutil.copy2('input/data/end_to_end_testing/json_end_to_end_testing_filter.txt', 'output/output_filters')
+
         info_map = {
             "class": TaskManager.__class__.__name__,
             "function": TaskManager._setup_end_to_end_testing_environment.__name__,
         }
         output_manager.add_log(
-            "Wrote end-to-end testing filter",
-            "End-to-end testing filter written to 'json_end_to_end_testing_filter.txt'.",
+            "Created end-to-end testing filter",
+            "End-to-end testing filter 'output/output_filters/json_end_to_end_testing_filter.txt' created.",
             info_map,
         )
 
@@ -507,13 +510,16 @@ class TaskManager:
                     "values_changed": "Differing results:\n",
                     "dictionary_item_added": "Actual results contain unexpected items:\n",
                     "dictionary_item_removed": "Actual results missing items:\n",
+                    "iterable_item_added": "Actual results contain unexpected items:\n",
+                    "iterable_item_removed": "Actual results missing items:\n",
                 }
                 for k, v in sections.items():
-                    if k in diff:
-                        results_file.write(v)
-                        for item, value in diff[k].items():
-                            results_file.write(f"{item}: {value}\n")
-                        results_file.write("\n")
+                    if k not in diff:
+                        continue
+                    results_file.write(v)
+                    for item, value in diff[k].items():
+                        results_file.write(f"{item}: {value}\n")
+                    results_file.write("\n")
         output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
 
         testing_filter = Path("output/output_filters/json_end_to_end_testing_filter.txt")

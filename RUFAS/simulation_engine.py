@@ -85,7 +85,7 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
-        EEEManager.estimate_all()
+        # EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         om.add_log("Simulation complete", "Simulation Completed.", info_map)
