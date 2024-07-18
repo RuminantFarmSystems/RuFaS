@@ -191,22 +191,26 @@ class FeedManager:
 
         hay_values = feeds_info["hay_values"]
         hay_values.update(
-            {"category": CropCategory(hay_values["category"]), "type": CropType(hay_values["crop_type"])}, **reusable_values
+            {"category": CropCategory(hay_values["category"]), "type": CropType(hay_values["crop_type"])},
+            **reusable_values,
         )
         del hay_values["crop_type"]
         baleage_values = feeds_info["baleage_values"]
         baleage_values.update(
-            {"category": CropCategory(baleage_values["category"]), "type": CropType(baleage_values["crop_type"])}, **reusable_values
+            {"category": CropCategory(baleage_values["category"]), "type": CropType(baleage_values["crop_type"])},
+            **reusable_values,
         )
         del baleage_values["crop_type"]
         grain_values = feeds_info["grain_values"]
         grain_values.update(
-            {"category": CropCategory(grain_values["category"]), "type": CropType(grain_values["crop_type"])}, **reusable_values
+            {"category": CropCategory(grain_values["category"]), "type": CropType(grain_values["crop_type"])},
+            **reusable_values,
         )
         del grain_values["crop_type"]
         silage_values = feeds_info["silage_values"]
         silage_values.update(
-            {"category": CropCategory(silage_values["category"]), "type": CropType(silage_values["crop_type"])}, **reusable_values
+            {"category": CropCategory(silage_values["category"]), "type": CropType(silage_values["crop_type"])},
+            **reusable_values,
         )
         del silage_values["crop_type"]
 

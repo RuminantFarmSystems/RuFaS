@@ -16,7 +16,6 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 from .routines.EEE.EEE_manager import EEEManager
-import cProfile
 
 om = OutputManager()
 
