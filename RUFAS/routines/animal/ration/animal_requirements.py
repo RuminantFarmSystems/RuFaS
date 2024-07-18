@@ -1,6 +1,6 @@
+import math
 from typing import Dict, List
 
-import math
 import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
@@ -163,7 +163,11 @@ class AnimalRequirements:
         stats_args = [default_percentile] if calc_method == "percentile" else []
 
         for attribute_name, arg in attr_names_to_args_map.items():
-            setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
+            setattr(
+                self,
+                attribute_name,
+                calc_method_to_function_map[calc_method](arg, *stats_args),
+            )
 
     def set_requirements(self, pen, animal_grouping_scenario, recalc: bool) -> None:
         """
@@ -1897,7 +1901,7 @@ class AnimalRequirements:
                 net_energy_activity = distance * 0.00035 * body_weight
             elif housing == "Grazing":
                 nonpasturekgDMI: float = 1.0
-                net_energy_activity = distance * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
+                net_energy_activity = distance * body_weight * 0.75 * (600 - 12 * nonpasturekgDMI) / 600
             else:
                 net_energy_activity = 0.0
             return net_energy_activity

@@ -230,7 +230,8 @@ def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: s
 
     """
     animal_requirements = AnimalRequirements()
-    animal_requirements.calc_pen_requirements(*argument_lists, stat_method)
+
+    animal_requirements.calc_pen_requirements(*argument_lists, calc_method=stat_method)
 
     attr_list = [
         "NEmaint_requirement",
