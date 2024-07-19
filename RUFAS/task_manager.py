@@ -9,14 +9,12 @@ import random
 import re
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
-import shutil
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 
-# from RUFAS.end_to_end_tester import EndToEndTester
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
@@ -441,8 +439,6 @@ class TaskManager:
         """Runs end-to-end testing routine."""
         info_map = {"class": TaskManager.__name__, "function": TaskManager._handle_end_to_end_testing.__name__}
 
-        TaskManager._setup_end_to_end_testing_environment(output_manager)
-
         output_manager.add_log("Starting end-to-end testing simulation", "", info_map)
 
         TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
@@ -450,23 +446,6 @@ class TaskManager:
         output_manager.add_log("Completed end-to-end testing simulation", "", info_map)
 
         TaskManager._compare_simulation_outputs_to_expected_outputs(output_manager)
-
-    @staticmethod
-    def _setup_end_to_end_testing_environment(output_manager: OutputManager) -> None:
-        """Creates a filter that will be used to collect the results of a simulation in an end-to-end testing run."""
-        # with open("output/output_filters/json_end_to_end_testing_filter.txt", "w") as e_to_e_filter_file:
-        #     e_to_e_filter_file.write(".*")
-        shutil.copy2('input/data/end_to_end_testing/json_end_to_end_testing_filter.txt', 'output/output_filters')
-
-        info_map = {
-            "class": TaskManager.__class__.__name__,
-            "function": TaskManager._setup_end_to_end_testing_environment.__name__,
-        }
-        output_manager.add_log(
-            "Created end-to-end testing filter",
-            "End-to-end testing filter 'output/output_filters/json_end_to_end_testing_filter.txt' created.",
-            info_map,
-        )
 
     @staticmethod
     def _compare_simulation_outputs_to_expected_outputs(output_manager: OutputManager) -> None:
@@ -500,11 +479,12 @@ class TaskManager:
         results_path = Path(f"{results_dir}/end_to_end_results.txt")
         with open(results_path, "w") as results_file:
             if diff == {}:
-                results_file.write("No differences found between actual and expected outputs.\n")
                 results_file.write("End-to-end testing successful.\n")
+                results_file.write("No differences found between actual and expected outputs.\n")
+                output_manager.add_log("End-to-end testing successful", "", info_map)
             else:
-                results_file.write("Differences found between actual and expected outputs.\n")
-                results_file.write("End-to-end testing unsuccessful.\n\n")
+                results_file.write("End-to-end testing unsuccessful.\n")
+                results_file.write("Differences found between actual and expected outputs.\n\n")
 
                 sections = {
                     "values_changed": "Differing results:\n",
@@ -520,11 +500,10 @@ class TaskManager:
                     for item, value in diff[k].items():
                         results_file.write(f"{item}: {value}\n")
                     results_file.write("\n")
-        output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
 
-        testing_filter = Path("output/output_filters/json_end_to_end_testing_filter.txt")
-        testing_filter.unlink(missing_ok=True)
-        output_manager.add_log("End-to-end testing filter removed", f"Removed {testing_filter}.", info_map)
+                output_manager.add_log("End-to-end testing unsuccessful", "", info_map)
+
+        output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
 
     @staticmethod
     def handle_input_data_audit(
