@@ -5,6 +5,7 @@
       "task_type": "END_TO_END_TESTING",
       "metadata_file_path": "input/metadata/end_to_end_testing_metadata.json",
       "output_prefix": "end-to-end-testing",
+      "filters_directory": "input/data/end_to_end_testing",
       "log_verbosity": "logs",
       "exclude_info_maps": true,
       "random_seed": 42
