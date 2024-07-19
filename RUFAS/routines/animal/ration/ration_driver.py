@@ -222,7 +222,7 @@ class RationManager:
             ration[available_feeds["feed_key"][feed_id]] = round(num, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
-        ration_config.price_list = RationOptimizer.triple_values_in_list(available_feeds["price"])
+        ration_config.price_list = available_feeds["price"]
         ration["objective"] = ration_optimizer.objective(solution.x, ration_config)
         return ration
 
@@ -247,9 +247,7 @@ class RationManager:
         solution_from_ration = []
         for key in ration.keys():
             if key not in excluded_keys:
-                solution_from_ration.append(ration[key] / 3)
-                solution_from_ration.append(ration[key] / 3)
-                solution_from_ration.append(ration[key] / 3)
+                solution_from_ration.append(ration[key])
         return solution_from_ration
 
     @classmethod

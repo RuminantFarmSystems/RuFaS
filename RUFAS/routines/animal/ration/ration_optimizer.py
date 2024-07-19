@@ -66,31 +66,6 @@ class RationOptimizer:
         ]
 
     @staticmethod
-    def triple_values_in_list(input_list: List[Any]) -> List[Any]:
-        """
-        Helper function that takes an input of a list and returns that list with
-        each value occuring a total of 3 times consecutively. This method is
-        required for matching the decision variables to one of the three energy
-        constraints.
-
-        Parameters
-        ----------
-        input_list : List[Any]
-            A list of values.
-
-        Returns
-        -------
-        List[Any]
-
-        """
-        tripled_list = []
-        for i in input_list:
-            tripled_list.append(i)
-            tripled_list.append(i)
-            tripled_list.append(i)
-        return tripled_list
-
-    @staticmethod
     def objective(decision_vector: npt.NDArray[np.float64], ration_config: RationConfig) -> float:
         """
         Sets up the objective function in the optimize function for the non-linear
@@ -889,7 +864,7 @@ class RationOptimizer:
                 * (1 + udr_tolerance)
                 * (DMIest * 1.1 + 0.0001)
             )
-            targetbounds = (max(0.0, target_lower / 3), target_upper / 3)
+            targetbounds = (max(0.0, target_lower), target_upper)
             tribounds.append(targetbounds)
             tribounds.append(targetbounds)
             tribounds.append(targetbounds)
@@ -931,9 +906,7 @@ class RationOptimizer:
             prev_ration = previous_ration.copy()
             for key, value in prev_ration.items():
                 if key not in ["status", "objective"]:
-                    x0.append(value / 3)
-                    x0.append(value / 3)
-                    x0.append(value / 3)
+                    x0.append(value)
         else:
             n = len(ration_config.price_list)
             x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
@@ -946,7 +919,7 @@ class RationOptimizer:
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
             bnds = []
-            bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
+            bnds = [(0, lim + 0.0001) for lim in ration_config.feed_limit_list]
 
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
             return minimize(
@@ -1006,32 +979,28 @@ class RationOptimizer:
             RationCofig object.
 
         """
-        price_list = self.triple_values_in_list(available_feeds["price"])
-        TDN_list = self.triple_values_in_list(available_feeds["TDN"])
-        DE_list = self.triple_values_in_list(available_feeds["DE"])
-        EE_list = self.triple_values_in_list(available_feeds["EE"])
-        is_fat_list = self.triple_values_in_list(available_feeds["is_fat"])
-        calcium_list = self.triple_values_in_list(available_feeds["calcium"])
-        phosphorus_list = self.triple_values_in_list(available_feeds["phosphorus"])
-        NDF_list = self.triple_values_in_list(available_feeds["NDF"])
-        feed_type_list = self.triple_values_in_list(available_feeds["feed_type"])
-        is_wetforage_list = self.triple_values_in_list(available_feeds["is_wetforage"])
-        Kd_list = self.triple_values_in_list(available_feeds["Kd"])
-        N_A_list = self.triple_values_in_list(available_feeds["N_A"])
-        N_B_list = self.triple_values_in_list(available_feeds["N_B"])
-        CP_list = self.triple_values_in_list(available_feeds["CP"])
-        dRUP_list = self.triple_values_in_list(available_feeds["dRUP"])
+        price_list = available_feeds["price"]
+        TDN_list = available_feeds["TDN"]
+        DE_list = available_feeds["DE"]
+        EE_list = available_feeds["EE"]
+        is_fat_list = available_feeds["is_fat"]
+        calcium_list = available_feeds["calcium"]
+        phosphorus_list = available_feeds["phosphorus"]
+        NDF_list = available_feeds["NDF"]
+        feed_type_list = available_feeds["feed_type"]
+        is_wetforage_list = available_feeds["is_wetforage"]
+        Kd_list = available_feeds["Kd"]
+        N_A_list = available_feeds["N_A"]
+        N_B_list = available_feeds["N_B"]
+        CP_list = available_feeds["CP"]
+        dRUP_list = available_feeds["dRUP"]
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         # GitHub Issue # 793
         if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["lactating_cow_limit"]
-            )
+            feed_limit_list = available_feeds["lactating_cow_limit"]
             lactating = True
         else:
-            feed_limit_list = self.triple_values_in_list(
-                available_feeds["dry_cow_limit"]
-            )
+            feed_limit_list = available_feeds["dry_cow_limit"]
             lactating = False
         ration_config = RationConfig(
             price_list,
