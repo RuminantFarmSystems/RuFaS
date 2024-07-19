@@ -85,7 +85,7 @@ class SimulationEngine:
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
             )
-        # EEEManager.estimate_all()
+        EEEManager.estimate_all()
         t_end_sim = timer.time()
 
         om.add_log("Simulation complete", "Simulation Completed.", info_map)
@@ -102,8 +102,8 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        print(self.time.current_date)
-        self.feed_manager.process_degradations(self.weather, self.time)
+        if self.run_end_to_end_testing and self.time.current_julian_day % 15 == 0:
+            self.feed_manager.process_degradations(self.weather, self.time)
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
@@ -179,7 +179,8 @@ class SimulationEngine:
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
 
-        feeds_info = self.im.get_data("end_to_end_testing_inputs")
-        if not feeds_info:
+        run_end_to_end_testing = self.im.get_data("end_to_end_testing_inputs")
+        if not run_end_to_end_testing:
             return
-        self.feed_manager.setup_stored_feeds(feeds_info, self.time)
+        self.feed_manager.setup_stored_feeds(run_end_to_end_testing, self.time)
+        self.run_end_to_end_testing = True
