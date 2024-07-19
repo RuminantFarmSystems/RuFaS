@@ -182,6 +182,7 @@ class SimulationEngine:
 
         run_end_to_end_testing = self.im.get_data("end_to_end_testing_inputs")
         if not run_end_to_end_testing:
+            self.run_end_to_end_testing = False
             return
         self.feed_manager.setup_stored_feeds(run_end_to_end_testing, self.time)
         self.run_end_to_end_testing = True
