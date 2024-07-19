@@ -14,7 +14,6 @@ from typing import Any, Dict, List, Tuple, Callable
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
-
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
@@ -467,7 +466,7 @@ class TaskManager:
                 "Could not find actual end-to-end testing results.", "End-to-end testing failed.", info_map
             )
             return
-        with open(path_to_actual_results) as results:
+        with open(path_to_actual_results, "r") as results:
             actual_results = json.load(results)
         with open("input/data/end_to_end_testing/end_to_end_results.json", "r") as e_to_e_results:
             expected_results = json.load(e_to_e_results)
@@ -476,7 +475,7 @@ class TaskManager:
 
         results_dir = Path("output/end_to_end_testing_results")
         results_dir.mkdir(parents=True, exist_ok=True)
-        results_path = Path(f"{results_dir}/end_to_end_results.txt")
+        results_path = Path(f"{results_dir}/end_to_end_test_results.txt")
         with open(results_path, "w") as results_file:
             if diff == {}:
                 results_file.write("End-to-end testing successful.\n")

@@ -102,7 +102,8 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        if self.run_end_to_end_testing and self.time.current_julian_day % 15 == 0:
+        process_degradations_today = self.time.current_julian_day % 15 == 0
+        if self.run_end_to_end_testing and process_degradations_today:
             self.feed_manager.process_degradations(self.weather, self.time)
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
