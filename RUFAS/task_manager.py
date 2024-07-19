@@ -500,7 +500,7 @@ class TaskManager:
                         results_file.write(f"{item}: {value}\n")
                     results_file.write("\n")
 
-                output_manager.add_log("End-to-end testing unsuccessful", "", info_map)
+                output_manager.add_warning("End-to-end testing unsuccessful", "", info_map)
 
         output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
 
