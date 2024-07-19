@@ -2249,12 +2249,12 @@ def ration_optimizer(mock_cow_constraints: MagicMock, mock_heifer_constraints: M
             AnimalCombination.LAC_COW,
             [1, 1, 1, 1, 1, 1],
             [
-                (0, 0.3334333333333333),
-                (0, 0.6667666666666666),
                 (0, 1.0001),
-                (0, 1.3334333333333332),
-                (0, 1.6667666666666667),
                 (0, 2.0001),
+                (0, 3.0001),
+                (0, 4.0001),
+                (0, 5.0001),
+                (0, 6.0001),
             ],
             lazy_fixture("mock_cow_constraints"),
         ),
@@ -2263,12 +2263,12 @@ def ration_optimizer(mock_cow_constraints: MagicMock, mock_heifer_constraints: M
             AnimalCombination.GROWING,
             [1, 1, 1, 1, 1, 1],
             [
-                (0, 0.3334333333333333),
-                (0, 0.6667666666666666),
                 (0, 1.0001),
-                (0, 1.3334333333333332),
-                (0, 1.6667666666666667),
                 (0, 2.0001),
+                (0, 3.0001),
+                (0, 4.0001),
+                (0, 5.0001),
+                (0, 6.0001),
             ],
             lazy_fixture("mock_heifer_constraints"),
         ),
@@ -2329,15 +2329,14 @@ def test_ration_optimizer_optimize_with_prev_ration(
     is_udr = False
     animal_combination = "AnimalCombination.GROWING"
     expected_bounds = [
-        (0, 0.3334333333333333),
-        (0, 0.6667666666666666),
         (0, 1.0001),
-        (0, 1.3334333333333332),
-        (0, 1.6667666666666667),
         (0, 2.0001),
+        (0, 3.0001),
+        (0, 4.0001),
+        (0, 5.0001),
+        (0, 6.0001),
     ]
-    expected_constraints = mock_heifer_constraints
-    prev_ration = {"a": 3, "b": 6}
+    prev_ration = {"a": 3.0, "b": 6.0}
     expected_x0 = [3.0, 6.0]
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(is_udr=is_udr))
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
@@ -2352,7 +2351,7 @@ def test_ration_optimizer_optimize_with_prev_ration(
         expected_x0,
         method="SLSQP",
         bounds=expected_bounds,
-        constraints=expected_constraints,
+        constraints=mock_heifer_constraints,
         args=(mock_ration_config,),
     )
 
@@ -2630,7 +2629,7 @@ def test_make_ration_from_solution(
 
     # make a mocked solution object - the critical component being the x
     mock_solution = MagicMock()
-    mock_solution.x = [1, 1, 1, 2, 2, 2, 3, 3, 3]
+    mock_solution.x = [3.0, 6.0, 9.0]
     predicted = {"100": 3, "200": 6, "300": 9, "status": "Optimal", "objective": 0.0}
 
     mock_avail_feeds = mock_available_feeds
@@ -2644,28 +2643,24 @@ def test_make_ration_from_solution(
 @pytest.mark.parametrize(
     "test_ration, expected",
     [
-        ({"2": 3.0, "4": 6.0, "status": True, "objective": False}, [1, 1, 1, 2, 2, 2]),
+        ({"2": 3.0, "4": 6.0, "status": True, "objective": False}, [3.0, 6.0]),
         (
             {"2": 3.0, "status": True, "objective": False},
-            [
-                1,
-                1,
-                1,
-            ],
+            [3.0],
         ),
         (
             {
                 "2": 3.0,
                 "4": 6.0,
             },
-            [1, 1, 1, 2, 2, 2],
+            [3.0, 6.0],
         ),
         (
             {
                 "2": 3.0,
                 "4": 12.0,
             },
-            [1, 1, 1, 4, 4, 4],
+            [3.0, 12.0],
         ),
     ],
 )

@@ -215,10 +215,8 @@ class RationManager:
         """
         ration: Dict[str, float | str] = {}
         for feed_id in range(len(available_feeds["feed_id"])):
-            i = feed_id * 3
+            i = feed_id
             num = solution.x[i]
-            num += solution.x[i + 1]
-            num += solution.x[i + 2]
             ration[available_feeds["feed_key"][feed_id]] = round(num, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
