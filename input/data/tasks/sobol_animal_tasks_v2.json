@@ -1,0 +1,360 @@
+{
+    "parallel_workers": 4,
+    "tasks": [
+      {
+        "task_type": "SENSITIVITY_ANALYSIS",
+        "output_prefix": "test-10-animal_S256",
+        "log_verbosity": "errors",
+        "sampler": "fractional_factorial",
+        "saltelli_number": 256,
+        "saltelli_skip": 2048,
+        "SA_load_balancing_start": 0.25,
+        "SA_load_balancing_stop": 1,
+        "random_seed": 42,
+        "SA_input_variables": [
+          {
+            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+            "lower_bound": 270,
+            "upper_bound": 730,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.management_decisions.days_in_preg_when_dry",
+            "lower_bound": 1,
+            "upper_bound": 300,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.management_decisions.heifer_repro_cull_time",
+            "lower_bound": 740,
+            "upper_bound": 1000,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.management_decisions.do_not_breed_time",
+            "lower_bound": 30,
+            "upper_bound": 400,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.management_decisions.cull_milk_production",
+            "lower_bound": 0,
+            "upper_bound": 60,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.management_decisions.cow_times_milked_per_day",
+            "lower_bound": 1,
+            "upper_bound": 6,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.management_decisions.milk_fat_percent",
+            "lower_bound": 1,
+            "upper_bound": 6,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.management_decisions.milk_protein_percent",
+            "lower_bound": 1,
+            "upper_bound": 6,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.calf.male_calf_rate_conventional_semen",
+            "lower_bound": 0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.calf.keep_female_calf_rate",
+            "lower_bound": 0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.calf.wean_day",
+            "lower_bound": 1,
+            "upper_bound": 120,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.calf.wean_length",
+            "lower_bound": 1,
+            "upper_bound": 28,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.voluntary_waiting_period",
+            "lower_bound": 0,
+            "upper_bound": 120,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.conception_rate_decrease",
+            "lower_bound": 0.0,
+            "upper_bound": 0.1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.avg_gestation_len",
+            "lower_bound": 240,
+            "upper_bound": 320,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.std_gestation_len",
+            "lower_bound": 0,
+            "upper_bound": 18,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.prefresh_day",
+            "lower_bound": 0,
+            "upper_bound": 60,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.calving_interval",
+            "lower_bound": 1,
+            "upper_bound": 800,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.heifers.estrus_detection_rate",
+            "lower_bound": 0.0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.heifers.estrus_conception_rate",
+            "lower_bound": 0.0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.heifers.repro_sub_properties.conception_rate",
+            "lower_bound": 0.0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.heifers.repro_sub_properties.estrus_detection_rate",
+            "lower_bound": 0.0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
+            "lower_bound": 0.0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
+            "lower_bound": 0.0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.cows.presynch_program_start_day",
+            "lower_bound": 0,
+            "upper_bound": 120,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.cows.ovsynch_program_start_day",
+            "lower_bound": 0,
+            "upper_bound": 120,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate",
+            "lower_bound": 0.0,
+            "upper_bound": 1,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.bodyweight.birth_weight_avg_ho",
+            "lower_bound": 8,
+            "upper_bound": 80,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.bodyweight.birth_weight_std_ho",
+            "lower_bound": 0.5,
+            "upper_bound": 7,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.bodyweight.target_heifer_preg_day",
+            "lower_bound": 270,
+            "upper_bound": 760,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.bodyweight.mature_body_weight_avg",
+            "lower_bound": 400,
+            "upper_bound": 1500,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.farm_level.bodyweight.mature_body_weight_std",
+            "lower_bound": 1,
+            "upper_bound": 150,
+            "data_type":"float"
+          },
+          
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.preg_check_day_1",
+            "lower_bound": 1,
+            "upper_bound": 60,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.preg_check_day_2",
+            "lower_bound": 61,
+            "upper_bound": 120,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.preg_check_day_3",
+            "lower_bound": 121,
+            "upper_bound": 240,
+            "data_type":"int"
+          },
+  
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.preg_loss_rate_1",
+            "lower_bound": 0.0,
+            "upper_bound": 0.1,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.preg_loss_rate_2",
+            "lower_bound": 0.0,
+            "upper_bound": 0.2,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.preg_loss_rate_3",
+            "lower_bound": 0.0,
+            "upper_bound": 0.1,
+            "data_type":"float"
+          },
+          
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.avg_estrus_cycle_return",
+            "lower_bound": 1,
+            "upper_bound": 46,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.std_estrus_cycle_return",
+            "lower_bound": 1,
+            "upper_bound": 12,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.avg_estrus_cycle_heifer",
+            "lower_bound": 7,
+            "upper_bound": 42,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.std_estrus_cycle_heifer",
+            "lower_bound": 1,
+            "upper_bound": 5,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.avg_estrus_cycle_cow",
+            "lower_bound": 7,
+            "upper_bound": 42,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.avg_estrus_cycle_after_pgf",
+            "lower_bound": 1,
+            "upper_bound": 10,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.std_estrus_cycle_cow",
+            "lower_bound": 1,
+            "upper_bound": 8,
+            "data_type":"int"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.repro.std_estrus_cycle_after_pgf",
+            "lower_bound": 1,
+            "upper_bound": 4,
+            "data_type":"int"
+          },
+  
+
+          {
+            "variable_name": "animal.animal_config.from_literature.milking.wood_l.0.0",
+            "lower_bound": 20,
+            "upper_bound": 75,
+            "data_type": "float"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.milking.wood_l.0.1",
+            "lower_bound": 5,
+            "upper_bound": 75,
+            "data_type": "float"
+          },
+          {
+            "variable_name": "animal.animal_config.from_literature.milking.wood_l.0.2",
+            "lower_bound": 5,
+            "upper_bound": 75,
+            "data_type": "float"
+          },
+          
+          
+          
+          {
+            "variable_name": "animal.animal_config.from_literature.life_cycle.still_birth_rate",
+            "lower_bound": 0,
+            "upper_bound": 1,
+            "data_type":"float"
+          },
+  
+          {
+            "variable_name": "animal.ration.formulation_interval",
+            "lower_bound": 14,
+            "upper_bound": 180,
+            "data_type":"int"
+          },{
+            "variable_name": "animal.ration.phosphorus_requirement_buffer",
+            "lower_bound": 0,
+            "upper_bound": 150,
+            "data_type":"int"
+          },
+
+
+
+          {
+            "variable_name": "animal.pen_information.3.vertical_dist_to_milking_parlor",
+            "lower_bound": 0.1,
+            "upper_bound": 10,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.pen_information.3.horizontal_dist_to_milking_parlor",
+            "lower_bound": 0.1,
+            "upper_bound": 100,
+            "data_type":"float"
+          },
+          {
+            "variable_name": "animal.pen_information.3.max_stocking_density",
+            "lower_bound": 0.75,
+            "upper_bound": 2,
+            "data_type":"float"
+          }
+        ]
+      }
+    ]
+  }
+  
