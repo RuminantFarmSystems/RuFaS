@@ -140,102 +140,102 @@ class FieldDataReporter:
             )
             om.add_variable(
                 "machine_manure_dry_mass",
-                field.soil.data.machine_manure_dry_mass,
+                field.soil.data.machine_manure.manure_dry_mass,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "machine_manure_applied_mass",
-                field.soil.data.machine_manure_applied_mass,
+                field.soil.data.machine_manure.manure_applied_mass,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "machine_manure_field_coverage",
-                field.soil.data.machine_manure_field_coverage,
+                field.soil.data.machine_manure.manure_field_coverage,
                 dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
             )
             om.add_variable(
                 "machine_manure_moisture_factor",
-                field.soil.data.machine_manure_moisture_factor,
+                field.soil.data.machine_manure.manure_moisture_factor,
                 dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
             )
             om.add_variable(
                 "machine_water_extractable_inorganic_phosphorus",
-                field.soil.data.machine_water_extractable_inorganic_phosphorus,
+                field.soil.data.machine_manure.water_extractable_inorganic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "machine_water_extractable_organic_phosphorus",
-                field.soil.data.machine_water_extractable_organic_phosphorus,
+                field.soil.data.machine_manure.water_extractable_organic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "machine_stable_inorganic_phosphorus",
-                field.soil.data.machine_stable_inorganic_phosphorus,
+                field.soil.data.machine_manure.stable_inorganic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "machine_stable_organic_phosphorus",
-                field.soil.data.machine_stable_organic_phosphorus,
+                field.soil.data.machine_manure.stable_organic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "machine_organic_phosphorus_runoff",
-                field.soil.data.machine_organic_phosphorus_runoff,
+                field.soil.data.machine_manure.organic_phosphorus_runoff,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "machine_inorganic_phosphorus_runoff",
-                field.soil.data.machine_inorganic_phosphorus_runoff,
+                field.soil.data.machine_manure.inorganic_phosphorus_runoff,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_manure_dry_mass",
-                field.soil.data.grazing_manure_dry_mass,
+                field.soil.data.grazing_manure.manure_dry_mass,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_manure_applied_mass",
-                field.soil.data.grazing_manure_applied_mass,
+                field.soil.data.grazing_manure.manure_applied_mass,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_manure_field_coverage",
-                field.soil.data.grazing_manure_field_coverage,
+                field.soil.data.grazing_manure.manure_field_coverage,
                 dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
             )
             om.add_variable(
                 "grazing_manure_moisture_factor",
-                field.soil.data.grazing_manure_moisture_factor,
+                field.soil.data.grazing_manure.manure_moisture_factor,
                 dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
             )
             om.add_variable(
                 "grazing_water_extractable_inorganic_phosphorus",
-                field.soil.data.grazing_water_extractable_inorganic_phosphorus,
+                field.soil.data.grazing_manure.water_extractable_inorganic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_water_extractable_organic_phosphorus",
-                field.soil.data.grazing_water_extractable_organic_phosphorus,
+                field.soil.data.grazing_manure.water_extractable_organic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_stable_inorganic_phosphorus",
-                field.soil.data.grazing_stable_inorganic_phosphorus,
+                field.soil.data.grazing_manure.stable_inorganic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_stable_organic_phosphorus",
-                field.soil.data.grazing_stable_organic_phosphorus,
+                field.soil.data.grazing_manure.stable_organic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_organic_phosphorus_runoff",
-                field.soil.data.grazing_organic_phosphorus_runoff,
+                field.soil.data.grazing_manure.organic_phosphorus_runoff,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "grazing_inorganic_phosphorus_runoff",
-                field.soil.data.grazing_inorganic_phosphorus_runoff,
+                field.soil.data.grazing_manure.inorganic_phosphorus_runoff,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
