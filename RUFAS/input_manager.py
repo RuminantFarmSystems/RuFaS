@@ -1268,7 +1268,7 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
         }
-
+        print(data_address)
         element_hierarchy = data_address.split(".")
         try:
             data_value = self._extract_value_by_key_list(self.__pool, element_hierarchy)
@@ -1309,7 +1309,7 @@ class InputManager:
         >>> input_manager.check_property_exists_in_pool('animal.herd_information.nonexistent_property')
         False
         """
-
+        print(data_address)
         variable_path = data_address.split(".")
         try:
             self._extract_value_by_key_list(self.__pool, variable_path)
@@ -1682,10 +1682,8 @@ class InputManager:
         """
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
-            print(element_hierarchy[1:])
-            print(input_data)
-            data = self._set_nested_value({}, element_hierarchy[1:], input_data)
-            print(data)
+            flat_key_data = {variable_name.split(".", 1)[1]: input_data}
+            data = Utility.flatten_keys_to_nested_structure(flat_key_data)
             element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
             metadata_properties = reduce(
                 lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
