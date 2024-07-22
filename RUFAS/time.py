@@ -92,6 +92,7 @@ class Time:
             "class": self.__class__.__name__,
             "function": self.record_time.__name__,
             "prefix": "Time",
+            "simulation_day": self.simulation_day,
         }
         om.add_variable("day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(

@@ -598,6 +598,7 @@ class TaskManager:
             "class": TaskManager.__name__,
             "function": TaskManager.set_random_seed.__name__,
             "units": MeasurementUnits.UNITLESS,
+            "simulation_day": 1,
         }
         output_manager.add_log("Random seed received", f"Received {random_seed} as random seed.", info_map)
         if random_seed == 0:
