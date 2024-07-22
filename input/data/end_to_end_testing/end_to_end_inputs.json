@@ -1,0 +1,58 @@
+{
+    "reusable_values": {
+        "fresh_mass": 1000.0,
+        "dry_matter_digestibility": 40.0
+    },
+    "hay_values": {
+        "category": "Alfalfa",
+        "crop_type": "Alfalfa",
+        "dry_matter_percentage": 88.136,
+        "lignin": 6.643,
+        "crude_protein_percent": 20.745,
+        "non_protein_nitrogen": 7.18,
+        "starch": 1.513,
+        "adf": 32.073,
+        "ndf": 41.109,
+        "sugar": 8.97,
+        "ash": 10.762
+    },
+    "baleage_values":{
+        "category": "Small grain",
+        "crop_type": "Rye",
+        "dry_matter_percentage": 34.881,
+        "lignin": 4.932,
+        "crude_protein_percent": 14.434,
+        "non_protein_nitrogen": 8.904,
+        "starch": 1.477,
+        "adf": 38.282,
+        "ndf": 58.026,
+        "sugar": 8.761,
+        "ash": 10.275
+    },
+    "grain_values": {
+        "category": "Soy",
+        "crop_type": "Grain",
+        "dry_matter_percentage": 89.105,
+        "lignin": 1.516,
+        "crude_protein_percent": 39.98,
+        "non_protein_nitrogen": 16.826,
+        "starch": 4.17,
+        "adf": 6.992,
+        "ndf": 11.883,
+        "sugar": 9.0,
+        "ash": 5.31
+    },
+    "silage_values": {
+        "category": "Corn",
+        "crop_type": "Silage",
+        "dry_matter_percentage": 35.361,
+        "lignin": 3.054,
+        "crude_protein_percent": 7.707,
+        "non_protein_nitrogen": 3.996,
+        "starch": 32.867,
+        "adf": 24.332,
+        "ndf": 40.931,
+        "sugar": 2.971,
+        "ash": 3.843
+    }
+}
