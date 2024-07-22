@@ -41,6 +41,9 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
+    run_end_to_end_testing : bool
+        Indicates if a simulation is being run for end-to-end testing. Defaults to False, is set to True if end-to-end
+        testing inputs are found in the Input Manager.
 
     Methods
     -------
@@ -54,6 +57,7 @@ class SimulationEngine:
         """
         self.im = InputManager()
         self.time = Time()
+        self.run_end_to_end_testing = False
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -102,6 +106,9 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+        process_degradations_today = self.time.current_julian_day % 15 == 0
+        if self.run_end_to_end_testing and process_degradations_today:
+            self.feed_manager.process_degradations(self.weather, self.time)
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
@@ -176,3 +183,9 @@ class SimulationEngine:
         self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
+
+        run_end_to_end_testing = self.im.get_data("end_to_end_testing_inputs")
+        if not run_end_to_end_testing:
+            return
+        self.feed_manager.setup_stored_feeds(run_end_to_end_testing, self.time)
+        self.run_end_to_end_testing = True

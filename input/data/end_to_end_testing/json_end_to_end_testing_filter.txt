@@ -1,0 +1,13 @@
+TaskManager.set_random_seed.random_seed
+Weather.*
+Time.*
+ProtectedIndoors.*
+ProtectedWrapped.*
+ProtectedTarped.*
+Unprotected.*
+Baleage.*
+Dry.*
+HighMoisture.*
+Bunker.*
+Pile.*
+Bag.*
