@@ -4629,6 +4629,13 @@
           "description": "Anaerobic Digestion Temperature Celsius -- The temperature of the anaerobic digestion treatment system (degrees Celsius).",
           "default": 0,
           "minimum": 0
+        },
+        "anaerobic_digestion_methane_leakage_fraction": {
+          "type": "number",
+          "description": "Fraction of methane that leaks from an anaerobic digester on a daily basis.",
+          "default": 0.0,
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     }
