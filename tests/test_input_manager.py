@@ -4801,7 +4801,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
                 "example_property": {"description": "An example property", "type": "string"},
                 "object_property": {"nested_property": {"description": "An example property", "type": "string"}},
             },
-            False
+            False,
         ),
         (
             "example_property.object_property.nested_property",
@@ -4809,7 +4809,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
             "example_blob_key",
             {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
             {"type": "string", "description": "An example property"},
-            True
+            True,
         ),
     ],
 )
@@ -4821,13 +4821,14 @@ def test_prepare_data(
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
     mocker: MockerFixture,
-    nested: bool
+    nested: bool,
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
-    mock_flat_to_nested = mocker.patch.object(Utility, "flatten_keys_to_nested_structure",
-                                              wraps=Utility.flatten_keys_to_nested_structure)
+    mock_flat_to_nested = mocker.patch.object(
+        Utility, "flatten_keys_to_nested_structure", wraps=Utility.flatten_keys_to_nested_structure
+    )
 
     data, metadata_properties = input_manager._prepare_data(variable_name, input_data, properties_blob_key)
     if nested:
