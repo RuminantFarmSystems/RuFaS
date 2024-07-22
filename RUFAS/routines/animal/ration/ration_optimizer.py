@@ -640,7 +640,7 @@ class RationOptimizer:
         ration_config.MP_supply = (
             ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
         )
-        return ration_config.MP_supply - (ration_config.MP_requirement / 1000)
+        return ration_config.MP_supply - (ration_config.MP_requirement)
 
     @staticmethod
     def NDF_constraint_lower(
