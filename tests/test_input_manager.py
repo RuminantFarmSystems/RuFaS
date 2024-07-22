@@ -11,6 +11,7 @@ from mock.mock import call
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
+from RUFAS.util import Utility
 
 
 @pytest.fixture
@@ -4789,7 +4790,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
 
 
 @pytest.mark.parametrize(
-    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties",
+    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties,nested",
     [
         (
             "example_property",
@@ -4800,6 +4801,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
                 "example_property": {"description": "An example property", "type": "string"},
                 "object_property": {"nested_property": {"description": "An example property", "type": "string"}},
             },
+            False
         ),
         (
             "example_property.object_property.nested_property",
@@ -4807,6 +4809,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
             "example_blob_key",
             {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
             {"type": "string", "description": "An example property"},
+            True
         ),
     ],
 )
@@ -4818,13 +4821,17 @@ def test_prepare_data(
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
     mocker: MockerFixture,
+    nested: bool
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
+    mock_flat_to_nested = mocker.patch.object(Utility, "flatten_keys_to_nested_structure",
+                                              wraps=Utility.flatten_keys_to_nested_structure)
 
     data, metadata_properties = input_manager._prepare_data(variable_name, input_data, properties_blob_key)
-
+    if nested:
+        mock_flat_to_nested.assert_called_once()
     assert data == expected_data
     assert metadata_properties == expected_metadata_properties
 

@@ -1265,7 +1265,6 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
         }
-        print(data_address)
         element_hierarchy = data_address.split(".")
         try:
             data_value = self._extract_value_by_key_list(self.__pool, element_hierarchy)
@@ -1306,7 +1305,6 @@ class InputManager:
         >>> input_manager.check_property_exists_in_pool('animal.herd_information.nonexistent_property')
         False
         """
-        print(data_address)
         variable_path = data_address.split(".")
         try:
             self._extract_value_by_key_list(self.__pool, variable_path)
