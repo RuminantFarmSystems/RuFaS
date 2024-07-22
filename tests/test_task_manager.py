@@ -197,6 +197,62 @@ def test_handle_post_processing(
         mock_output_manager.dump_all_nondata_pools.assert_not_called()
 
 
+def test_handle_end_to_end_testing(
+    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture
+) -> None:
+    """Test that end-to-end testing is executed correctly."""
+    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
+    compare_outputs = mocker.patch.object(TaskManager, "_compare_simulation_outputs_to_expected_outputs")
+    mock_input_manager = mocker.MagicMock()
+    add_log = mocker.patch.object(mock_output_manager, "add_log")
+
+    task_manager._handle_end_to_end_testing({}, mock_input_manager, mock_output_manager, "test_task", False)
+
+    sim_engine_run_tasks.assert_called_once_with({}, mock_input_manager, mock_output_manager, "test_task", False)
+    compare_outputs.assert_called_once_with(mock_output_manager)
+    assert add_log.call_count == 2
+
+
+@pytest.mark.parametrize("diff,successful", [({}, True), ({"diff": "diff"}, False)])
+def test_compare_simulation_outputs_to_expected_outputs(
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
+    mocker: MockerFixture,
+    diff: dict[str, str],
+    successful: bool,
+) -> None:
+    """Tests _compare_simulation_outputs_to_expected_outputs in TaskManager."""
+    mocker.patch(
+        "pathlib.Path.iterdir",
+        return_value=[
+            Path("not/the/path"),
+            Path("output/JSONs/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.json"),
+            Path("not/the/path/either"),
+        ],
+    )
+    mocked_open = mocker.patch("builtins.open", mocker.mock_open(read_data="file contents"))
+    handle = mocked_open()
+    mocked_load = mocker.patch("json.load", side_effect=[{"a": 1}, {"a": 1}])
+    mocked_deepdiff = mocker.patch("RUFAS.task_manager.DeepDiff", return_value=diff)
+    mocked_mkdir = mocker.patch("pathlib.Path.mkdir")
+    add_log = mocker.patch.object(mock_output_manager, "add_log")
+    add_warning = mocker.patch.object(mock_output_manager, "add_warning")
+
+    task_manager._compare_simulation_outputs_to_expected_outputs(mock_output_manager)
+
+    assert mocked_load.call_count == 2
+    mocked_deepdiff.assert_called_once()
+    mocked_mkdir.assert_called_once()
+    if successful:
+        handle.write.assert_any_call("End-to-end testing successful.\n")
+        assert add_log.call_count == 2
+        assert add_warning.call_count == 0
+    else:
+        handle.write.assert_any_call("End-to-end testing unsuccessful.\n")
+        assert add_log.call_count == 1
+        assert add_warning.call_count == 1
+
+
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_input_data_audit(
     mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool, mocker: MockerFixture
@@ -235,6 +291,7 @@ def test_input_data_audit(
         [TaskType.HERD_INITIALIZATION, False],
         [TaskType.SIMULATION_SINGLE_RUN, False],
         [TaskType.POST_PROCESSING, False],
+        [TaskType.END_TO_END_TESTING, False],
     ],
 )
 def test_task(
@@ -354,7 +411,6 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) 
         patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
         patch.object(Utility, "deep_merge", return_value=None) as mock_deep_merge,
     ):
-
         TaskManager._handle_simulation_engine_run_tasks(
             args, mock_input_manager, mock_output_manager, task_id, produce_graphics
         )

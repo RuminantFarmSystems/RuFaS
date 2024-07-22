@@ -797,6 +797,7 @@ class InputManager:
                 "Validation: object is not a dictionary",
                 f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
+                info_map,
             )
             return False
 
