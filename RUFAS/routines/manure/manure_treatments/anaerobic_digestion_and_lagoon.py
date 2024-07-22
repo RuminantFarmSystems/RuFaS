@@ -103,6 +103,8 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             self._anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
         )
 
-        anaerobic_lagoon_daily_output.methane_generation_mass = self.anaerobic_digestion_daily_output.methane_generation_mass
+        anaerobic_lagoon_daily_output.methane_generation_mass = (
+            self.anaerobic_digestion_daily_output.methane_generation_mass
+        )
 
         return anaerobic_lagoon_daily_output
