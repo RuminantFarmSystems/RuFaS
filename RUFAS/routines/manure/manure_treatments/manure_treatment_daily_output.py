@@ -296,10 +296,10 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     solid_manure_daily_mass: float = 0.0
     solid_manure_daily_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
 
-    methane_generation_mass: float = 0.0  
+    methane_generation_mass: float = 0.0
     methane_generation_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS_PER_DAY
 
-    methane_energy_content: float = 0.0  
+    methane_energy_content: float = 0.0
     methane_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES_PER_CUBIC_METER
 
     methane_generation_volume: float = 0.0

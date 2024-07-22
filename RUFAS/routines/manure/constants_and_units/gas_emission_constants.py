@@ -74,7 +74,7 @@ class GasEmissionConstants:
     (kg/:math:`m^3`).
     """
 
-    AD_CARBON_DIOXIDE_TO_METHANE_RATIO: float = (4 / 6)
+    AD_CARBON_DIOXIDE_TO_METHANE_RATIO: float = 4 / 6
     """
     The volumetric ratio of carbon dioxide to methane generated during anaerobic digestion :math:`m^3`
     """
