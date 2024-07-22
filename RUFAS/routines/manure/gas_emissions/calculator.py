@@ -797,9 +797,26 @@ class GasEmissionsCalculator:
         return GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * manure_total_volatile_solids
 
     @classmethod
-    def CSTR_methane_leakage(cls, generated_methane_volume: float, digester_methane_leakage_fraction: float) -> None:
-        """"""
-        pass
+    def calculate_digester_methane_leakage(
+        cls, generated_methane_volume: float, digester_methane_leakage_fraction: float
+    ) -> float:
+        """
+        Calculates the volume of methane lost from a digester.
+
+        Parameters
+        ----------
+        generated_methane_volume : float
+            Amount of methane generated within the digester, cubic meters.
+        digester_methane_leakage_fraction : float
+            Fraction of generated methane that escapes as leakage.
+
+        Returns
+        -------
+        float
+            Volume of methane lost as leakage, cubic meters.
+
+        """
+        return generated_methane_volume * digester_methane_leakage_fraction
 
     @classmethod
     def methane_energy_content(cls, methane_volume: float) -> float:

@@ -4630,10 +4630,10 @@
           "default": 0,
           "minimum": 0
         },
-        "anaerobic_digestion_methane_leakage_fraction": {
+        "digester_methane_leakage_fraction": {
           "type": "number",
-          "description": "Fraction of methane that leaks from an anaerobic digester on a daily basis.",
-          "default": 0.0,
+          "description": "The fraction of methane generated in the digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system.",
+          "default": 0.01,
           "minimum": 0.0,
           "maximum": 1.0
         }
