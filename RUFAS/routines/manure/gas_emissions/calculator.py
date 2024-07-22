@@ -797,6 +797,11 @@ class GasEmissionsCalculator:
         return GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * manure_total_volatile_solids
 
     @classmethod
+    def CSTR_methane_leakage(cls, generated_methane_volume: float, digester_methane_leakage_fraction: float) -> None:
+        """"""
+        pass
+
+    @classmethod
     def methane_energy_content(cls, methane_volume: float) -> float:
         """Calculates energy content of methane in anaerobic digester biogas.
 
