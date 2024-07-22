@@ -2268,14 +2268,21 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     methane_generation_volume = 200.0
     patch_for_CSTR_methane_volume = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_digestion."
-        "GasEmissionsCalculator.CSTR_methane_volume",
+        "GasEmissionsCalculator.calculate_CSTR_methane_volume",
         return_value=methane_generation_volume,
     )
 
     methane_energy_content = 500.0
     patch_for_calc_methane_energy_content = mocker.patch(
-        "RUFAS.routines.manure.manure_treatments.anaerobic_digestion." "GasEmissionsCalculator.methane_energy_content",
+        "RUFAS.routines.manure.manure_treatments.anaerobic_digestion."
+        "GasEmissionsCalculator.calculate_methane_energy_content",
         return_value=methane_energy_content,
+    )
+
+    patch_for_calc_methane_leakage = mocker.patch.object(
+        GasEmissionsCalculator,
+        "calculate_digester_methane_leakage",
+        wraps=GasEmissionsCalculator.calculate_digester_methane_leakage
     )
 
     expected_methane_generation_mass = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
@@ -2316,6 +2323,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     patch_for_CSTR_methane_volume.assert_called_once_with(
         manure_total_volatile_solids=mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids
     )
+    patch_for_calc_methane_leakage.assert_called_once_with(methane_generation_volume, methane_leak_frac)
     patch_for_calc_methane_energy_content.assert_called_once_with(methane_volume=expected_captured_methane_volume)
 
     assert actual_anaerobic_digestion_daily_output.methane_generation_mass == approx(expected_captured_methane_mass)

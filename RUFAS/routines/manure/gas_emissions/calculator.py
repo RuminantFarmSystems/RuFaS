@@ -779,18 +779,17 @@ class GasEmissionsCalculator:
         return temperature_celsius + 273.15
 
     @classmethod
-    def CSTR_methane_volume(
-        cls,
-        manure_total_volatile_solids: float,
-    ) -> float:
+    def calculate_CSTR_methane_volume(cls, manure_total_volatile_solids: float) -> float:
         """Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor.
 
-        Args:
-            GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION: is the achievable emission of methane during
-                anaerobic digestion (kg :math:`CH_4`/kg VS).
-            manure_total_volatile_solids: total volatile solids, kg.
+        Parameters
+        ----------
+        manure_total_volatile_solids : float
+            Total volatile solids, kg.
 
-        Returns:
+        Returns
+        -------
+        float
             CH4 generation volume, m^3.
 
         """
@@ -819,7 +818,7 @@ class GasEmissionsCalculator:
         return generated_methane_volume * digester_methane_leakage_fraction
 
     @classmethod
-    def methane_energy_content(cls, methane_volume: float) -> float:
+    def calculate_methane_energy_content(cls, methane_volume: float) -> float:
         """Calculates energy content of methane generated in a digester.
 
         Parameters
