@@ -77,7 +77,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             * GeneralConstants.LITERS_TO_CUBIC_METERS
         )
         # MS.3.B.7R
-        total_methane_generation_volume = GasEmissionsCalculator.CSTR_methane_volume(
+        total_methane_generation_volume = GasEmissionsCalculator.calculate_CSTR_methane_volume(
             manure_total_volatile_solids=(
                 self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
             )
@@ -120,7 +120,7 @@ class AnaerobicDigestion(BaseManureTreatment):
             total_methane_generation_volume, self.config.digester_methane_leakage_fraction
         )
         captured_methane_generation_volume = total_methane_generation_volume - methane_leakage
-        captured_methane_energy_content = GasEmissionsCalculator.methane_energy_content(
+        captured_methane_energy_content = GasEmissionsCalculator.calculate_methane_energy_content(
             methane_volume=captured_methane_generation_volume
         )
         captured_methane_generation_mass = captured_methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY

@@ -435,31 +435,39 @@ def test_convert_tempC_to_tempK() -> None:
 
 
 def test_CSTR_methane_volume() -> None:
-    """Tests CSTR_methane_volume() in calculator.py."""
+    """Tests calculate_CSTR_methane_volume() in calculator.py."""
 
     # Arrange
     VS_total = 10.0
-    
-    expected = (
-                GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * VS_total
-    )
+
+    expected = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * VS_total
 
     # Act
-    actual = GasEmissionsCalculator.CSTR_methane_volume(VS_total)
+    actual = GasEmissionsCalculator.calculate_CSTR_methane_volume(VS_total)
 
     # Assert
     assert actual == expected
 
 
+@pytest.mark.parametrize("methane_vol,leakage_frac,expected", [
+    (100.0, 0.01, 1.0), (200.0, 0.05, 10.0), (150.0, 0.13, 19.5)
+])
+def test_calculate_digester_methane_leakage(methane_vol: float, leakage_frac: float, expected: float) -> None:
+    """Tests caculate_digester_methane_leakage() in calculator.py"""
+    actual = GasEmissionsCalculator.calculate_digester_methane_leakage(methane_vol, leakage_frac)
+
+    assert actual == expected
+
+
 def test_methane_energy_content() -> None:
-    """Tests methane_energy_content() in calculator.py."""
+    """Tests calculate_methane_energy_content() in calculator.py."""
 
     # Arrange
     CH4_volume = 10.0
     expected = CH4_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     # Act
-    actual = GasEmissionsCalculator.methane_energy_content(CH4_volume)
+    actual = GasEmissionsCalculator.calculate_methane_energy_content(CH4_volume)
 
     # Assert
     assert actual == expected
