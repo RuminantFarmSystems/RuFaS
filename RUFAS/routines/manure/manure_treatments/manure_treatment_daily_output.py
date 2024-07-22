@@ -168,6 +168,11 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         Amount of methane generated, m^3.
     methane_generation_volume_unit: MeasurementUnits
         Unit for methane_generation_volume.
+    methane_leakage_volume : float, default 0.0
+        Methane generated in a digester that escapes to the atmosphere through unintended leakage and is not collected
+        by the gas capture system, m^3.
+    methane_leakage_volume_unit : MeasurementUnits, default MeasurementUnits.KILOGRAMS
+        Unit of methane leakage volume.
     heating_input_energy: float
         Amount of energy input to the heating system, MJ.
     heating_input_energy_unit: MeasurementUnits
@@ -304,6 +309,9 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
     methane_generation_volume: float = 0.0
     methane_generation_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+
+    methane_leakage_volume : float = 0.0
+    methane_leakage_volume_unit : MeasurementUnits = MeasurementUnits.CUBIC_METERS
 
     heating_input_energy: float = 0.0
     heating_input_energy_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES
