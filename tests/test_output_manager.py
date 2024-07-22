@@ -1,12 +1,12 @@
 import json
 import os
+from collections import Counter
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Union, Type
 
 import pandas as pd
 import pytest
-from freezegun import freeze_time
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
@@ -14,6 +14,7 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
@@ -1401,168 +1402,94 @@ def test_list_filter_files_in_dir(
     mock_output_manager.add_warning = output_manager_original_method_states["add_warning"]
 
 
-def test_filter_variables_pool_include_empty_filter_pattern_pool(
+@pytest.fixture
+def mock_simple_variables_pool() -> Dict[str, OutputManager.pool_element_type]:
+    """Simple variables pool to be used for testing the Output Manager."""
+    return {
+        "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
+        "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+        "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
+    }
+
+
+def returner(arg: Any) -> Any:
+    """Returns whatever arg is passed to this method."""
+    return arg
+
+
+@pytest.mark.parametrize(
+    "filter_content,expected,data_padded",
+    [
+        ({"filters": []}, {}, False),
+        (
+            {"filters": [], "filter_by_exclusion": True, "expand_data": True},
+            {
+                "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
+                "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+                "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
+            },
+            True,
+        ),
+        (
+            {"filters": ["key1", "key2"], "expand_data": True},
+            {
+                "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
+                "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+            },
+            True,
+        ),
+        (
+            {"filters": ["key1", "key2"], "filter_by_exclusion": True},
+            {"key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]}},
+            False,
+        ),
+        (
+            {"filters": ["key1", "key4"], "filter_by_exclusion": False},
+            {"key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]}},
+            False,
+        ),
+        (
+            {"filters": ["key1", "key4"], "slice_start": 1, "filter_by_exclusion": True},
+            {
+                "key2": {"values": ["value5", "value6"], "info_maps": []},
+                "key3": {"values": ["value8", "value9"], "info_maps": []},
+            },
+            False,
+        ),
+        (
+            {"filters": ["key1", "key1"], "slice_end": 1, "filter_by_exclusion": False},
+            {"key1": {"values": ["value1"], "info_maps": [{"key": "val"}]}},
+            False,
+        ),
+        (
+            {"filters": ["key1", "key1"], "filter_by_exclusion": True},
+            {
+                "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+                "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
+            },
+            False,
+        ),
+    ],
+)
+def test_filter_variables_pool(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    mock_simple_variables_pool: Dict[str, OutputManager.pool_element_type],
+    mocker: MockerFixture,
+    filter_content: Dict[str, Any],
+    expected: Dict[str, Dict[str, str]],
+    data_padded: bool,
 ) -> None:
-    """Test case for empty filter pattern pool with function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": "value1",
-        "key2": "value2",
-        "key3": "value3",
-    }
-    filter_content = {"filters": []}
-    expected_result = {}
+    """Tests filter_variables_pool in the OutputManager."""
+    mock_output_manager.variables_pool = mock_simple_variables_pool
+    expand_data_temporally = mocker.patch.object(Utility, "expand_data_temporally", side_effect=returner)
 
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
+    assert mock_output_manager.filter_variables_pool(filter_content) == expected
 
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.variables_pool = {}
-
-
-def test_filter_variables_pool_exclude_empty_filter_pattern_pool(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for exclude keyword in empty filter pattern pool with
-    function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-    filter_content = {"filters": [], "filter_by_exclusion": True}
-    expected_result = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.variables_pool = {}
-
-
-def test_filter_variables_pool_with_matching_filters_in_pattern_pool(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for matching pattern pool with function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-    filter_content = {"filters": ["key1", "key2"]}
-    expected_result = {"key1": {"values": "value1"}, "key2": {"values": "value2"}}
-
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.variables_pool = {}
-
-
-def test_filter_variables_pool_exclude_matching_filters_in_pattern_pool(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for exclude keyword in matching pattern pool with
-    function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-    filter_content = {"filters": ["key1", "key2"], "filter_by_exclusion": True}
-    expected_result = {"key3": {"values": "value3"}}
-
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.variables_pool = {}
-
-
-def test_filter_variables_pool_non_matching_pattern(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for pattern pool with non-matching pattern with
-    function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-    filter_content = {"filters": ["key1", "key4"], "filter_by_exclusion": False}
-    expected_result = {"key1": {"values": "value1"}}
-
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.variables_pool = {}
-
-
-def test_filter_variables_pool_exclude_non_matching_pattern(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for pattern pool with exclude keyword and non-matching pattern with
-    function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-    filter_content = {"filters": ["key1", "key4"], "filter_by_exclusion": True}
-    expected_result = {"key2": {"values": "value2"}, "key3": {"values": "value3"}}
-
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-
-def test_filter_variables_pool_duplicate_patterns(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for pattern pool with duplicate patterns with
-    function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-    filter_content = {"filters": ["key1", "key1"], "filter_by_exclusion": False}
-    expected_result = {"key1": {"values": "value1"}}
-
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
-    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
-    mock_output_manager.variables_pool = {}
-
-
-def test_filter_variables_pool_exclude_duplicate_patterns(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-) -> None:
-    """Test case for pattern pool with duplicate patterns and exclude keyword with
-    function filter_variables_pool in output_manager.py"""
-    mock_output_manager.variables_pool = {
-        "key1": {"values": "value1"},
-        "key2": {"values": "value2"},
-        "key3": {"values": "value3"},
-    }
-    filter_content = {"filters": ["key1", "key1"], "filter_by_exclusion": True}
-    expected_result = {"key2": {"values": "value2"}, "key3": {"values": "value3"}}
-
-    assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
-
-    # Restore original method
+    if data_padded:
+        expand_data_temporally.assert_called_once()
+    else:
+        expand_data_temporally.assert_not_called()
     mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
     mock_output_manager.variables_pool = {}
 
@@ -1738,8 +1665,7 @@ def test_filter_variables_pool_complex(
         "a": {"values": ["A", "AA", "AAA"]},
     }
     mock_output_manager.add_error = MagicMock()
-    with freeze_time("2023-12-12 13:34:42"):
-        actual: Dict[str, OutputManager.pool_element_type] = mock_output_manager.filter_variables_pool(filter_content)
+    actual: Dict[str, OutputManager.pool_element_type] = mock_output_manager.filter_variables_pool(filter_content)
     mock_output_manager.add_error.assert_has_calls(
         [
             call(
@@ -1749,11 +1675,10 @@ def test_filter_variables_pool_complex(
                 "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
-                    "function": "filter_variables_pool",
+                    "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
                     "use_filter_name": False,
-                    "timestamp": "12-Dec-2023_Tue_13-34-42.000000",
                 },
             ),
             call(
@@ -1763,11 +1688,10 @@ def test_filter_variables_pool_complex(
                 "see Wiki for proper setup details.",
                 {
                     "class": "OutputManager",
-                    "function": "filter_variables_pool",
+                    "function": "_parse_filtered_variables",
                     "filter_name": "NO NAME FOUND",
                     "filter_by_exclusion": False,
                     "use_filter_name": False,
-                    "timestamp": "12-Dec-2023_Tue_13-34-42.000000",
                 },
             ),
         ]
@@ -1795,6 +1719,75 @@ def test_filter_variables_pool_complex(
     mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
     mock_output_manager.add_error = output_manager_original_method_states["add_error"]
     mock_output_manager.variables_pool = {}
+
+
+@pytest.mark.parametrize(
+    "pool,vars,exclusion,expected,expected_counter",
+    [
+        (
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "DummyClass1.dummy_fun1.dummy_var2": {
+                    "values": [{"a": "A", "b": 1.0, "c": True}, {"a": "AA", "b": 2.0, "c": True}]
+                },
+                "DummyClass1.dummy_fun2.dummy_var3": {"values": [{"a": "AAA", "b": 3.0, "c": False}]},
+            },
+            ["a"],
+            False,
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "a": {"values": ["A", "AA", "AAA"]},
+            },
+            Counter(
+                {
+                    "DummyClass1.dummy_fun1.dummy_var1": 1,
+                    "DummyClass1.dummy_fun1.dummy_var2.a": 1,
+                    "DummyClass1.dummy_fun2.dummy_var3.a": 1,
+                }
+            ),
+        ),
+        (
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "DummyClass1.dummy_fun1.dummy_var2": {
+                    "values": [{"a": "A", "b": 1.0, "c": True}, {"a": "AA", "b": 2.0, "c": True}]
+                },
+                "DummyClass1.dummy_fun2.dummy_var3": {"values": [{"a": "AAA", "b": 3.0, "c": False}]},
+            },
+            ["a"],
+            True,
+            {
+                "DummyClass1.dummy_fun1.dummy_var1": {"values": ["value1", "value2", "value3"]},
+                "b": {"values": [1.0, 2.0, 3.0]},
+                "c": {"values": [True, True, False]},
+            },
+            Counter(
+                {
+                    "DummyClass1.dummy_fun1.dummy_var1": 1,
+                    "DummyClass1.dummy_fun1.dummy_var2.b": 1,
+                    "DummyClass1.dummy_fun1.dummy_var2.c": 1,
+                    "DummyClass1.dummy_fun2.dummy_var3.b": 1,
+                    "DummyClass1.dummy_fun2.dummy_var3.c": 1,
+                }
+            ),
+        ),
+    ],
+)
+def test_parse_filtered_variables(
+    mock_output_manager: OutputManager,
+    pool: Dict[str, OutputManager.pool_element_type],
+    vars: list[str],
+    exclusion: bool,
+    expected: Dict[str, OutputManager.pool_element_type],
+    expected_counter: Counter,
+) -> None:
+    """Tests _parse_filtered_variables in the Output Manager."""
+    mock_output_manager._variables_usage_counter = Counter()
+
+    actual = mock_output_manager._parse_filtered_variables(pool, vars, "test", False, exclusion)
+
+    assert actual == expected
+    assert mock_output_manager._variables_usage_counter == expected_counter
 
 
 @pytest.mark.parametrize(
