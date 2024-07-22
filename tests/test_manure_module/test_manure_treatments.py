@@ -2243,7 +2243,8 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     ) = 3.5
     mock_manure_treatment_daily_input.liquid_manure_total_solids = liquid_manure_total_solids = 50.0
     anaerobic_digestion._current_manure_treatment_daily_input = mock_manure_treatment_daily_input
-
+    mock_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen = 5.0
+    mock_manure_treatment_daily_input.liquid_manure_nitrogen = 10.0
     moisture_content = 0.5
     patch_for_calc_moisture_content = mocker.patch.object(
         anaerobic_digestion, "_calc_moisture_content", return_value=moisture_content
@@ -2277,14 +2278,16 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     )
 
     expected_methane_generation_mass = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
-    expected_VSd = liquid_manure_total_degradable_volatile_solids - (
-        expected_methane_generation_mass * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
+    expected_carbon_dioxide = (
+        methane_generation_volume
+        * GasEmissionConstants.AD_CARBON_DIOXIDE_TO_METHANE_RATIO
+        * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
     )
+    expected_volatile_solids_destruction = expected_methane_generation_mass + expected_carbon_dioxide
+    expected_VSd = liquid_manure_total_degradable_volatile_solids - expected_volatile_solids_destruction
     expected_VSnd = liquid_manure_total_non_degradable_volatile_solids
     expected_total_VS = expected_VSd + expected_VSnd
-    expected_total_solids = liquid_manure_total_solids - (
-        expected_methane_generation_mass * GasEmissionConstants.AD_METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO
-    )
+    expected_total_solids = liquid_manure_total_solids - expected_volatile_solids_destruction
 
     expected_heating_input_energy = (
         specific_input_energy * daily_final_manure_volume * GeneralConstants.LITERS_TO_CUBIC_METERS
@@ -2308,10 +2311,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     patch_for_calc_specific_input_energy.assert_called_once_with(average_temperature_celsius, moisture_content)
     patch_for_CSTR_methane_volume.assert_called_once_with(
-        manure_total_degradable_volatile_solids=(
-            mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-        ),
-        hydraulic_retention_time=hydraulic_retention_time,
+        manure_total_volatile_solids=mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids
     )
     patch_for_calc_methane_energy_content.assert_called_once_with(methane_volume=methane_generation_volume)
 

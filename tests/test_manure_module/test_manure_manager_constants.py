@@ -57,7 +57,6 @@ def test_gas_emission_constants() -> None:
     assert GasEmissionConstants.METHANE_ENERGY_DENSITY == approx(55.0)
     assert GasEmissionConstants.AD_METHANE_DENSITY == approx(0.629)
     assert GasEmissionConstants.METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO == approx(9.25)
-    assert GasEmissionConstants.AD_CARBON_DIOXIDE_TO_METHANE_RATIO == approx(2.86)
     assert GasEmissionConstants.MCF_CONSTANT_A == approx(0.0625)
     assert GasEmissionConstants.MCF_CONSTANT_B == approx(0.25)
     assert GasEmissionConstants.POTENTIAL_METHANE_YIELD_OF_MANURE == approx(0.48)

@@ -363,6 +363,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         "_get_current_day_average_temperature_in_celsius",
         return_value=current_day_avg_tempC,
     )
+    expected_liquid_manure_nitrogen = N - housing_ammonia_emission
 
     # Act
     manure_handler_daily_output = mock_manure_handler.daily_update(pen=mock_pen, bedding=mock_bedding, sim_day=sim_day)
@@ -389,7 +390,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (
         approx(max(0.0, TAN - housing_ammonia_emission))
     )
-    assert manure_handler_daily_output.liquid_manure_nitrogen == approx(N)
+    assert manure_handler_daily_output.liquid_manure_nitrogen == expected_liquid_manure_nitrogen
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(TS)
     assert manure_handler_daily_output.liquid_manure_total_degradable_volatile_solids == approx(VSd)
     assert manure_handler_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(VSnd)

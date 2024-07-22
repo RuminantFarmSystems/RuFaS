@@ -96,7 +96,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         AD_carbon_dioxide = (methane_generation_volume * 
                              GasEmissionConstants.AD_CARBON_DIOXIDE_TO_METHANE_RATIO) * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
         AD_VS_destruction = new_daily_output.methane_generation_mass + AD_carbon_dioxide
-        
+
         new_daily_output.liquid_manure_total_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_solids
             - AD_VS_destruction
