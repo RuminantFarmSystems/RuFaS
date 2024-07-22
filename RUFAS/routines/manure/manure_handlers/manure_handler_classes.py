@@ -163,12 +163,7 @@ class BaseManureHandler:
                     pen.manure.manure_total_ammoniacal_nitrogen - housing_ammonia_emission,
                 )
             ),
-            liquid_manure_nitrogen=(
-                max(
-                    0.0,
-                    pen.manure.nitrogen - housing_ammonia_emission,
-                )
-            ),
+            liquid_manure_nitrogen=max(0.0, pen.manure.nitrogen - housing_ammonia_emission),
             liquid_manure_total_solids=pen.manure.total_solids,
             liquid_manure_total_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
             liquid_manure_total_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
