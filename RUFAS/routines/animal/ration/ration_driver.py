@@ -1106,8 +1106,8 @@ class RationReporter:
         RDP_diet = []
         RUP_diet = []
         for i, kg_fed in enumerate(ration.values()):
-            RDP_diet.append(RDP_list[i] * kg_fed * 0.01)
-            RUP_diet.append(kg_fed * RUP_list[i] * dRUP_diet[i])
+            RDP_diet.append(GeneralConstants.KG_TO_GRAMS * RDP_list[i] * kg_fed * 0.01)
+            RUP_diet.append(GeneralConstants.KG_TO_GRAMS * kg_fed * RUP_list[i] * dRUP_diet[i])
 
         TDN_total_actual = TDNtotal * RationReporter.get_TDN_discount(
             ration_report, body_weight
@@ -1115,10 +1115,10 @@ class RationReporter:
 
         # MP bact calcs
         MP_bact = 0.64 * min(
-            1000 * 0.13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet)
+            GeneralConstants.KG_TO_GRAMS * 0.13 * TDN_total_actual, 0.85 * sum(RDP_diet)
         )
 
-        MP_supply = MP_bact + sum(RUP_diet) * 0.0001 + 0.4 * 11.8 * DMI_estimate
+        MP_supply = MP_bact + sum(RUP_diet) + 0.4 * 11.8 * DMI_estimate
         return float(MP_supply)
 
 
