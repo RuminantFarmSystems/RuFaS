@@ -18,6 +18,7 @@ from ...enums import AnimalCombination
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.feed import Feed
 
+
 om = OutputManager()
 
 
@@ -787,7 +788,12 @@ class AnimalModuleReporter:
     def report_daily_pen_total(cls, simulation_day: int, pen_list: List[Pen]) -> None:
         classname = AnimalModuleReporter.__name__
         funcname = AnimalModuleReporter.report_daily_pen_total.__name__
-        info_map = {"class": classname, "function": funcname, "units": MeasurementUnits.ANIMALS}
+        info_map = {
+            "class": classname,
+            "function": funcname,
+            "units": MeasurementUnits.ANIMALS,
+            "simulation_day": simulation_day,
+        }
         for pen in pen_list:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
@@ -1165,3 +1171,33 @@ class AnimalModuleReporter:
             cow_overall_conception_rate,
             dict(info_map, **{"units": MeasurementUnits.CONCEPTIONS_PER_SERVICE}),
         )
+
+    @classmethod
+    def report_total_disease_days(cls) -> None:
+        """Adds total animal-days of disease to Output Manager."""
+        pass
+
+    @classmethod
+    def report_disease_incidence(cls) -> None:
+        """Adds disease-incidence data to Output Manager."""
+        pass
+
+    @classmethod
+    def report_lost_milk_production(cls) -> None:
+        """Reports lost milk production due to disease to Output Manager."""
+        pass
+
+    @classmethod
+    def report_feed_efficiency_decreases(cls) -> None:
+        """Reports feed efficiency decreases due to disease to Output Manager."""
+        pass
+
+    @classmethod
+    def report_milk_co2_increases(cls) -> None:
+        """Reports increases in milk kgCO2/kgMilk due to disease to Output Manager."""
+        pass
+
+    @classmethod
+    def report_income_losses(cls) -> None:
+        """Reports losses in income due to disease to Output Manager."""
+        pass

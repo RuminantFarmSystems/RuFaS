@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
+import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.graph_generator import GraphGenerator
@@ -231,7 +232,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     assert mock_log_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()))
+    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()), False)
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
     mock_remove_special_chars.assert_called_once()
@@ -404,7 +405,7 @@ def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
         )
 
 
-def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
+def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
     with patch.dict(
         "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
@@ -413,6 +414,34 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
 
         for value in data.values():
             mock_plot_functions_dict["plot"].assert_any_call(value)
+
+    indices, masked_values = [0, 1, 2, 3], [1, 2, 3, 4]
+    masker = mocker.patch("RUFAS.graph_generator.GraphGenerator._mask_values", return_value=(indices, masked_values))
+    with patch.dict(
+        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
+    ) as mock_plot_functions_dict:
+        graph_generator._draw_graph("plot", data, mask_values=True)
+
+        for value in data.values():
+            mock_plot_functions_dict["plot"].assert_any_call(indices, masked_values)
+    assert masker.call_count == 2
+
+
+def test_mask_values(graph_generator: GraphGenerator) -> None:
+    """Tests _mask_values in the GraphGenerator."""
+    values_one = [1, 2, 3, 4]
+
+    actual_indices, actual_values = graph_generator._mask_values(values_one)
+
+    assert list(actual_indices) == [0, 1, 2, 3]
+    assert list(actual_values) == [1, 2, 3, 4]
+
+    values_two = [np.nan, 8, 9, np.nan, np.nan]
+
+    actual_indices, actual_values = graph_generator._mask_values(values_two)
+
+    assert list(actual_indices) == [1, 2]
+    assert list(actual_values) == [8, 9]
 
 
 @pytest.mark.parametrize(
