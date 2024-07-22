@@ -1,9 +1,12 @@
+from deepdiff import DeepDiff
 from enum import Enum
 from functools import partial
+import json
 import multiprocessing
 import numpy
 from pathlib import Path
 import random
+import re
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 import traceback
@@ -46,7 +49,7 @@ class TaskType(Enum):
 
     def is_multi_run(self) -> bool:
         """Checks if the task type involves multiple runs."""
-        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS, TaskType.END_TO_END_TESTING]
+        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS]
 
 
 class TaskManager:
@@ -209,7 +212,6 @@ class TaskManager:
         task_type_to_expander_map = {
             TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
             TaskType.SENSITIVITY_ANALYSIS: self._expand_sensitivity_analysis_args,
-            TaskType.END_TO_END_TESTING: self._expand_end_to_end_testing_args,
         }
         for multi_run_arg in multi_run_args:
             task_type = multi_run_arg["task_type"]
@@ -289,10 +291,6 @@ class TaskManager:
 
         return single_run_args
 
-    def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Placeholder for expanding end-to-end testing multi-run tasks."""
-        return []
-
     def _run_tasks(
         self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
     ) -> None:
@@ -335,6 +333,7 @@ class TaskManager:
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
+            TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
         }
         try:
             output_manager.run_startup_sequence(
@@ -427,6 +426,83 @@ class TaskManager:
         simulator = SimulationEngine()
         simulator.simulate()
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
+
+    @staticmethod
+    def _handle_end_to_end_testing(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+    ) -> None:
+        """Runs end-to-end testing routine."""
+        info_map = {"class": TaskManager.__name__, "function": TaskManager._handle_end_to_end_testing.__name__}
+
+        output_manager.add_log("Starting end-to-end testing simulation", "", info_map)
+
+        TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
+
+        output_manager.add_log("Completed end-to-end testing simulation", "", info_map)
+
+        TaskManager._compare_simulation_outputs_to_expected_outputs(output_manager)
+
+    @staticmethod
+    def _compare_simulation_outputs_to_expected_outputs(output_manager: OutputManager) -> None:
+        """Compares outputs from a simulation to the results expected for that simulation."""
+        info_map = {
+            "class": TaskManager.__class__.__name__,
+            "function": TaskManager._compare_simulation_outputs_to_expected_outputs.__name__,
+        }
+        path_to_actual_results = None
+        for path in Path("output/JSONs/").iterdir():
+            matches = re.match(
+                "output/JSONs/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*", str(path)
+            )
+            if matches:
+                path_to_actual_results = path
+                break
+        else:
+            output_manager.add_error(
+                "Could not find actual end-to-end testing results.", "End-to-end testing failed.", info_map
+            )
+            return
+        with open(path_to_actual_results, "r") as results:
+            actual_results = json.load(results)
+        with open("input/data/end_to_end_testing/end_to_end_results.json", "r") as e_to_e_results:
+            expected_results = json.load(e_to_e_results)
+
+        diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
+
+        results_dir = Path("output/end_to_end_testing_results")
+        results_dir.mkdir(parents=True, exist_ok=True)
+        results_path = Path(f"{results_dir}/end_to_end_test_results.txt")
+        with open(results_path, "w") as results_file:
+            if diff == {}:
+                results_file.write("End-to-end testing successful.\n")
+                results_file.write("No differences found between actual and expected outputs.\n")
+                output_manager.add_log("End-to-end testing successful", "", info_map)
+            else:
+                results_file.write("End-to-end testing unsuccessful.\n")
+                results_file.write("Differences found between actual and expected outputs.\n\n")
+
+                sections = {
+                    "values_changed": "Differing results:\n",
+                    "dictionary_item_added": "Actual results contain unexpected items:\n",
+                    "dictionary_item_removed": "Actual results missing items:\n",
+                    "iterable_item_added": "Actual results contain unexpected items:\n",
+                    "iterable_item_removed": "Actual results missing items:\n",
+                }
+                for k, v in sections.items():
+                    if k not in diff:
+                        continue
+                    results_file.write(v)
+                    for item, value in diff[k].items():
+                        results_file.write(f"{item}: {value}\n")
+                    results_file.write("\n")
+
+                output_manager.add_warning("End-to-end testing unsuccessful", "", info_map)
+
+        output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
 
     @staticmethod
     def handle_input_data_audit(
