@@ -4,9 +4,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
-from RUFAS.routines.manure.constants_and_units.manure_constants import (
-    ManureConstants,
-)
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import (
     GasEmissionsCalculator,
 )
@@ -78,9 +76,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         # MS.3.B.7R
         total_methane_generation_volume = GasEmissionsCalculator.calculate_CSTR_methane_volume(
-            manure_total_volatile_solids=(
-                self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
-            )
+            manure_total_volatile_solids=self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
         )
         # MS.3.B.2
         minimum_digester_volume = daily_final_manure_volume * self.config.hydraulic_retention_time
