@@ -449,9 +449,9 @@ def test_CSTR_methane_volume() -> None:
     assert actual == expected
 
 
-@pytest.mark.parametrize("methane_vol,leakage_frac,expected", [
-    (100.0, 0.01, 1.0), (200.0, 0.05, 10.0), (150.0, 0.13, 19.5)
-])
+@pytest.mark.parametrize(
+    "methane_vol,leakage_frac,expected", [(100.0, 0.01, 1.0), (200.0, 0.05, 10.0), (150.0, 0.13, 19.5)]
+)
 def test_calculate_digester_methane_leakage(methane_vol: float, leakage_frac: float, expected: float) -> None:
     """Tests caculate_digester_methane_leakage() in calculator.py"""
     actual = GasEmissionsCalculator.calculate_digester_methane_leakage(methane_vol, leakage_frac)
