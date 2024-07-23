@@ -152,8 +152,6 @@ class SoilData:
         Plant lignin to nitrogen ratio (unitless).
     plant_residue_metabolic_fraction : float, default 0
         Plant residue fraction that is metabolic (unitless).
-    total_residue : float, default 0
-        Total amount of soil residue ever added to the field (TODO: needed?).
     crop_root_depth : float, default 0
         Root depth of the crop harvested (mm).
     crop_yield_nitrogen : float, default 0
@@ -263,12 +261,11 @@ class SoilData:
     plant_residue_lignin_composition: float = 0.17
     plant_lignin_nitrogen_ratio: float = 0
     plant_residue_metabolic_fraction: float = 0
-    total_residue: float = 0
     crop_root_depth: float = 0
     crop_yield_nitrogen: float = 0
 
     @property
-    def all_residue(self) -> float:  # TODO: not currently used.
+    def all_residue(self) -> float:
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
         return self.plant_surface_residue + self.plant_root_residue
 
@@ -503,13 +500,6 @@ class SoilData:
         unclamped_water_factor = self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
         clamped_water_factor = min(1.0, max(0.0, unclamped_water_factor))
         return clamped_water_factor
-
-    # TODO: implement method that validates all the values inside the SoilData object, including
-    #   - soil layers all have top depths above bottom depths, top depth of top layer is 0, none of the layers are
-    #       overlapping, etc.
-    #   - soil evaporation adjusted is always less than or equal to maximum soil evaporation
-    #   - potential evapotranspiration adjusted is always less than or equal to maximum evapotranspiration
-    #   - average slope fraction is always in the range 0 to 1 inclusive (I think)
 
     @property
     def profile_bulk_density(self) -> float:
