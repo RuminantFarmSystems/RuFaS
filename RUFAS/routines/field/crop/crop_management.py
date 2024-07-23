@@ -392,23 +392,20 @@ class CropManagement:
         root_residue_mass : float
             Dry matter mass of residue that is roots (kg / ha).
 
-        Notes
-        -----
-        This method ensures that when nutrients are added to soil profile layers via root residue, they are distributed
-        proportionally between layers based on the depth the crop's roots reach.
-
         """
+        surface_layer = soil_data.soil_layers[0]
         surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
-        soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
+        surface_layer.fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
+        surface_layer.labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
 
         subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
-        surface_layer = soil_data.soil_layers[0]
-        surface_root_fraction = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
-        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
-        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
+        root_frac_to_top_depth = self._calculate_root_mass_distribution(surface_layer.top_depth)
+        root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
+        layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
+        surface_layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
+        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
         for layer in soil_data.soil_layers[1:]:
             root_frac_to_top_depth = self._calculate_root_mass_distribution(layer.top_depth)
@@ -423,7 +420,7 @@ class CropManagement:
 
         Parameters
         ----------
-        depth : float
+        bottom_depth : float
             The bottom depth of the soil layer for which the root distribution is being calculated for (mm).
 
         Returns

@@ -40,6 +40,7 @@ def mock_alfalfa_silage_data() -> AlfalfaSilage:
 def crop_manager(mocker: MockerFixture) -> CropManagement:
     return CropManagement()
 
+
 # ---- Test Static Functions ----
 @pytest.mark.parametrize(
     "heatfrac,optimal_index",
@@ -482,33 +483,34 @@ def test_transfer_residue(
             100.0,
             40.0,
             20.0,
-            [24.0, 6.0, 10.0],
-            [12.0, 3.0, 5.0],
+            [20.0, 12.0, 6.0],
+            [11.0, 6.0, 3.0],
         ),
         (
             45.0,
             40.0,
             20.0,
-            [28.888888, 11.111111, 0.0],
-            [14.444444, 5.555555, 0.0],
+            [20.0, 12.0, 6.0],
+            [11.0, 6.0, 3.0],
         ),
         (
             50.0,
             40.0,
             20.0,
-            [28.0, 12, 0.0],
-            [14.0, 6.0, 0.0],
+            [20.0, 12.0, 6.0],
+            [11.0, 6.0, 3.0],
         ),
         (
             10.0,
             50.0,
             22.0,
-            [50.0, 0.0, 0.0],
-            [22.0, 0.0, 0.0],
+            [25.0, 15.0, 7.5],
+            [12.1, 6.6, 3.3],
         ),
     ],
 )
 def test_distribute_residue_nutrients(
+    mocker: MockerFixture,
     root_depth: float,
     n: float,
     p: float,
@@ -523,7 +525,7 @@ def test_distribute_residue_nutrients(
         root_depth=root_depth,
     )
     crop_manager = CropManagement(crop_data)
-
+    mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.0, 0.1, 0.1, 0.7, 0.7, 1.0])
     field_size = 1.0
     top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
     second_soil_layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size)
