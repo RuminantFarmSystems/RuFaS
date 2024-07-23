@@ -44,6 +44,9 @@ class Alfalfa(CropData):
 
     max_root_depth: float = 3_000
 
+    root_distribution_param_da: float = 207.0
+    root_distribution_param_c: float = -1.032
+
 
 @dataclass(kw_only=True)
 class AlfalfaSilage(Alfalfa):
