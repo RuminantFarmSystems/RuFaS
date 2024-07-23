@@ -406,27 +406,18 @@ class CropManagement:
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
         surface_layer = soil_data.soil_layers[0]
-        surface_root_fraction = (
-            (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth
-            if surface_layer.bottom_depth <= self.data.root_depth
-            else max(
-                0.0,
-                (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth,
-            )
-        )
+        surface_root_fraction = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
         surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
         surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
 
         for layer in soil_data.soil_layers[1:]:
-            layer_fraction = (
-                (layer.bottom_depth - layer.top_depth) / self.data.root_depth
-                if layer.bottom_depth <= self.data.root_depth
-                else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
-            )
+            root_frac_to_top_depth = self._calculate_root_mass_distribution(layer.top_depth)
+            root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
+            layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
-    def _calculate_root_mass_distributions(self, bottom_depth: float) -> float:
+    def _calculate_root_mass_distribution(self, bottom_depth: float) -> float:
         """
         Calculates the fraction of total root biomass that is contained within each soil layer.
 
@@ -443,10 +434,29 @@ class CropManagement:
         References
         ----------
         .. [1] Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops Research
-                189 (2016): 68-74.
-        
+                189 (2016): 68-74, equation (2).
+
+        Notes
+        -----
+        If the bottom depth of a soil layer extends past the maximum depth of the roots, then that soil layer contains
+        all of the crop's root mass. If the bottom depth of the soil layer is 0 (i.e. it is the soil surface) then it
+        will not contain any of the crop's root mass.
+
         """
-        pass
+        if bottom_depth >= self.data.max_root_depth:
+            return 1.0
+        if bottom_depth == 0.0:
+            return 0.0
+
+        first_term = 1 / (
+            1 + (bottom_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
+        )
+        second_term = 1 - 1 / (
+            1 + (self.data.max_root_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
+        )
+        third_term = bottom_depth / self.data.max_root_depth
+
+        return first_term + second_term * third_term
 
     # ---- Helper Methods ----
     @staticmethod

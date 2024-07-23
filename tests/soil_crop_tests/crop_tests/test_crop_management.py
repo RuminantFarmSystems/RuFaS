@@ -36,6 +36,10 @@ def mock_alfalfa_silage_data() -> AlfalfaSilage:
     return AlfalfaSilage()
 
 
+@pytest.fixture
+def crop_manager(mocker: MockerFixture) -> CropManagement:
+    return CropManagement()
+
 # ---- Test Static Functions ----
 @pytest.mark.parametrize(
     "heatfrac,optimal_index",
@@ -541,6 +545,32 @@ def test_distribute_residue_nutrients(
         pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
     )
     assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
+
+
+@pytest.mark.parametrize(
+    "d_a,c,max_depth,depth,expected",
+    [
+        (145.0, -1.165, 2000.0, 20.0, 0.0909226),
+        (145.0, -1.165, 2000.0, 200.0, 0.5970718),
+        (145.0, -1.165, 2000.0, 2000.0, 1.0),
+        (145.0, -1.165, 2000.0, 2050.0, 1.0),
+        (116.0, -0.626, 1721.0, 0.0, 0.0),
+        (116.0, -0.626, 1721.0, 10.0, 0.1782675),
+        (116.0, -0.626, 1721.0, 150.0, 0.5537369),
+        (116.0, -0.626, 1721.0, 2000.0, 1.0),
+    ]
+)
+def test_calculate_root_mass_distribution(
+    crop_manager: CropManagement, d_a: float, c: float, max_depth: float, depth: float, expected: float
+) -> None:
+    """Tests _calculate_root_mass_distribution() in CropManagement."""
+    crop_manager.data.root_distribution_param_da = d_a
+    crop_manager.data.root_distribution_param_c = c
+    crop_manager.data.max_root_depth = max_depth
+
+    actual = crop_manager._calculate_root_mass_distribution(depth)
+
+    assert pytest.approx(actual) == expected
 
 
 def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
