@@ -1,5 +1,6 @@
 from math import exp
 from typing import Optional
+from ....general_constants import GeneralConstants
 from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
@@ -361,27 +362,20 @@ class CropManagement:
 
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
-        soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
-        dry_matter_root_biomass = self.data.root_biomass
+        soil_data.plant_residue_lignin_composition = (
+            self.data.lignin_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
         if killed:
-            soil_data.plant_surface_residue = self.data.yield_residue - dry_matter_root_biomass
-            soil_data.plant_root_residue = dry_matter_root_biomass
-            soil_data.crop_root_depth = self.data.root_depth
-            self._distribute_residue_nutrients(
-                soil_data,
-                dry_matter_root_biomass,
-            )
+            self._distribute_residue_nutrients(soil_data)
         else:
-            soil_data.plant_surface_residue = self.data.yield_residue
-            soil_data.plant_root_residue = 0
-            soil_data.crop_root_depth = 0
+            soil_data.soil_layers[0].plant_residue = self.data.yield_residue
             soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
             soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
         self.data.yield_residue = 0.0
         self.data.residue_nitrogen = 0.0
         self.data.residue_phosphorus = 0.0
 
-    def _distribute_residue_nutrients(self, soil_data: SoilData, root_residue_mass: float) -> None:
+    def _distribute_residue_nutrients(self, soil_data: SoilData) -> None:
         """
         Distributes nutrients from plant residue into the soil profile.
 
@@ -394,16 +388,19 @@ class CropManagement:
 
         """
         surface_layer = soil_data.soil_layers[0]
-        surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
+        surface_fraction = (self.data.yield_residue - self.data.root_biomass) / self.data.yield_residue
+        surface_layer.plant_residue = self.data.yield_residue * surface_fraction
         surface_layer.fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
         surface_layer.labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
 
+        subsurface_residue = self.data.yield_residue * (1 - surface_fraction)
         subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
         root_frac_to_top_depth = self._calculate_root_mass_distribution(surface_layer.top_depth)
         root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
         layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
+        surface_layer.plant_residue += subsurface_residue * layer_fraction
         surface_layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
         surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
@@ -411,6 +408,7 @@ class CropManagement:
             root_frac_to_top_depth = self._calculate_root_mass_distribution(layer.top_depth)
             root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
             layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
+            layer.plant_residue = layer_fraction * subsurface_residue * layer_fraction
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
