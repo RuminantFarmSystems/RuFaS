@@ -426,6 +426,28 @@ class CropManagement:
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
+    def _calculate_root_mass_distributions(self, bottom_depth: float) -> float:
+        """
+        Calculates the fraction of total root biomass that is contained within each soil layer.
+
+        Parameters
+        ----------
+        depth : float
+            The bottom depth of the soil layer for which the root distribution is being calculated for (mm).
+
+        Returns
+        -------
+        float
+            Fraction of root biomass that is at or above the passed soil depth (unitless).
+
+        References
+        ----------
+        .. [1] Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops Research
+                189 (2016): 68-74.
+        
+        """
+        pass
+
     # ---- Helper Methods ----
     @staticmethod
     def _determine_potential_harvest_index(heat_fraction: float, optimal_harvest_index: float) -> float:
