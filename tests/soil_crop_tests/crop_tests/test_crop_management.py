@@ -37,7 +37,7 @@ def mock_alfalfa_silage_data() -> AlfalfaSilage:
 
 
 @pytest.fixture
-def crop_manager(mocker: MockerFixture) -> CropManagement:
+def crop_manager() -> CropManagement:
     return CropManagement()
 
 
