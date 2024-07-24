@@ -39,6 +39,7 @@ class MineralizationDecomposition:
         """
         #self._correct_fresh_organic_nitrogen_pools()
         for layer_num in range(len(self.data.soil_layers)):
+
             if self.data.soil_layers[layer_num].temperature <= 0:
                 return
 
@@ -47,21 +48,15 @@ class MineralizationDecomposition:
                 self.data.soil_layers[layer_num].fresh_organic_nitrogen_content,
                 self.data.soil_layers[layer_num].nitrate_content,
             )
-            if layer_num == 0:
-                print("C:N Ration:", carbon_nitrogen_ratio)
             carbon_phosphorus_ratio = self._calculate_residue_nutrient_ratio(
                 self.data.soil_layers[layer_num].total_soil_carbon_amount,
                 self.data.soil_layers[layer_num].fresh_organic_phosphorus_content,
                 self.data.soil_layers[layer_num].labile_inorganic_phosphorus_content,
             )
-            if layer_num == 0:
-                print("C:P Ration:", carbon_phosphorus_ratio)
 
             residue_composition_factor = self._calculate_nutrient_cycling_residue_composition_factor(
                 carbon_nitrogen_ratio, carbon_phosphorus_ratio
             )
-            if layer_num == 0:
-                print("residue comp factor:", residue_composition_factor)
 
             decay_rate_constant = self._calculate_decay_rate_constant(
                 self.data.soil_layers[layer_num].residue_fresh_organic_mineralization_rate,
@@ -69,12 +64,8 @@ class MineralizationDecomposition:
                 self.data.soil_layers[layer_num].nutrient_cycling_temp_factor,
                 self.data.soil_layers[layer_num].nutrient_cycling_water_factor,
             )
-            if layer_num == 0:
-                print("decay_rate_constant", decay_rate_constant)
 
             fresh_organic_nitrogen_removed = decay_rate_constant * self.data.soil_layers[layer_num].fresh_organic_nitrogen_content
-            if layer_num == 0:
-                print("fresh organic N removed:", fresh_organic_nitrogen_removed)
             fresh_organic_nitrogen_removed = min(
                 self.data.soil_layers[layer_num].fresh_organic_nitrogen_content,
                 fresh_organic_nitrogen_removed,
