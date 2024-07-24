@@ -256,8 +256,6 @@ class SoilData:
     eroded_active_organic_nitrogen: float = 0.0
 
     # ---- Residue partition (Carbon Cycling)
-    plant_surface_residue = 0.0
-    plant_root_residue = 0
     plant_residue_lignin_composition: float = 0.17
     plant_lignin_nitrogen_ratio: float = 0
     plant_residue_metabolic_fraction: float = 0
@@ -267,7 +265,7 @@ class SoilData:
     @property
     def all_residue(self) -> float:
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
-        return self.plant_surface_residue + self.plant_root_residue
+        return sum(self.get_vectorized_layer_attribute("plant_residue"))
 
     def __post_init__(self, field_size: float):
         """
@@ -304,7 +302,7 @@ class SoilData:
                     top_depth=0,
                     bottom_depth=20,
                     field_size=field_size,
-                    residue=self.plant_surface_residue,
+                    residue=0.0,
                 ),
                 LayerData(top_depth=20, bottom_depth=50, field_size=field_size),
                 LayerData(top_depth=50, bottom_depth=80, field_size=field_size),
@@ -356,7 +354,7 @@ class SoilData:
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
-        new_top_layer.__post_init__(field_size, self.plant_surface_residue)
+        new_top_layer.__post_init__(field_size, 0.0)
         self.soil_layers[0].top_depth = 20
         self.soil_layers[0].__post_init__(field_size, 0)
         self.soil_layers.insert(0, new_top_layer)

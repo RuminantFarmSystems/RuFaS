@@ -1459,7 +1459,7 @@ class Field:
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
             above_ground_biomass,
-            self.soil.data.plant_surface_residue,
+            self.soil.data.soil_layers[0].plant_residue,
             self.soil.data.snow_content,
             remaining_evapotranspirative_demand,
             weighted_average_transpiration,

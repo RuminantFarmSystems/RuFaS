@@ -111,7 +111,7 @@ class ResiduePartition:
         layer.plant_dry_matter_residue_amount = 0
 
         layer.weighted_residue_dry_matter_lignin_fraction = self._determine_weighted_residue_dry_matter_lignin_fraction(
-            layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
+            layer.soil_dry_matter_residue_amount, 0.0
         )
 
         for layer in self.data.soil_layers[1:]:
@@ -119,7 +119,7 @@ class ResiduePartition:
 
             layer.weighted_residue_dry_matter_lignin_fraction = (
                 self._determine_weighted_residue_dry_matter_lignin_fraction(
-                    layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
+                    layer.soil_dry_matter_residue_amount, 0.0
                 )
             )
 
@@ -146,7 +146,7 @@ class ResiduePartition:
             layer.metabolic_litter_amount = self._determine_soil_metabolic_carbon_amount(
                 layer.metabolic_litter_amount,
                 layer.plant_metabolic_to_soil_carbon_amount,
-                self.data.plant_root_residue,
+                0.0,
                 layer.soil_residue_metabolic_fraction,
                 layer.soil_metabolic_active_carbon_usage,
             )
@@ -170,7 +170,7 @@ class ResiduePartition:
                 layer.structural_carbon_transfer_amount,
                 layer.soil_structural_active_carbon_usage,
                 layer.soil_structural_slow_carbon_usage,
-                self.data.plant_root_residue,
+                0.0,
                 layer.structural_litter_amount,
             )
 
