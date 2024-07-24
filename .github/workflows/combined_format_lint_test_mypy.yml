@@ -164,11 +164,11 @@ jobs:
         if: github.ref != 'refs/heads/dev'
         run: |
           CURRENT_ERRORS=${{ steps.set_current_branch_error_count.outputs.error_count }}
-          DEV_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
+          dev_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
           echo "Current branch mypy errors: $CURRENT_ERRORS"
-          echo "Dev branch mypy errors: $DEV_ERRORS"
-          if [ $CURRENT_ERRORS -gt $DEV_ERRORS ]; then
-            echo "Mypy error count has increased from the dev branch to the current branch ($DEV_ERRORS -> $CURRENT_ERRORS)."
+          echo "dev branch mypy errors: $dev_ERRORS"
+          if [ $CURRENT_ERRORS -gt $dev_ERRORS ]; then
+            echo "Mypy error count has increased from the dev branch to the current branch ($dev_ERRORS -> $CURRENT_ERRORS)."
             exit 1
           else
             echo "No increase in mypy errors found."
@@ -238,13 +238,13 @@ jobs:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
           MY_ERROR_COUNT=${{ steps.set_current_branch_error_count.outputs.error_count }}
-          DEV_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
+          dev_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
           if [ -n "$URL" ]; then
             PYTEST_COVERAGE="Current Coverage: ${{ steps.coverage.outputs.coverage_percentage }}%"
             echo "$PYTEST_COVERAGE"
             MYPY_ERRORS="Mypy errors on ${{ github.head_ref }} branch: $MY_ERROR_COUNT"
-            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on dev branch: $DEV_ERRORS"
-            DIFF=$((MY_ERROR_COUNT - DEV_ERRORS))
+            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on dev branch: $dev_ERRORS"
+            DIFF=$((MY_ERROR_COUNT - dev_ERRORS))
             if [ $DIFF -gt 0 ]; then
               MYPY_ERRORS="$MYPY_ERRORS\n$DIFF more errors on ${{ github.head_ref }} branch"
             elif [ $DIFF -lt 0 ]; then
