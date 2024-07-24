@@ -4,11 +4,11 @@ display_usage() {
     echo "Usage: ./check_changes.sh [BASEBRANCH]"
     echo "For all files that are different between the current branch and BASEBRANCH, lint them with Flake8 and run MyPy on them."
     echo ""
-    echo "With no BASEBRANCH, compare current branch to main."
+    echo "With no BASEBRANCH, compare current branch to dev."
 }
 
 if [ $# -eq 0 ]; then
-    base_branch="main"
+    base_branch="dev"
 elif [ $# -gt 1 ]; then
     display_usage
     exit 1
