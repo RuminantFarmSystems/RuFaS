@@ -2,7 +2,7 @@
 
 REM Check the number of command line arguments.
 IF "%~1"=="" (
-    set "base_branch=main"
+    set "base_branch=dev"
 ) ELSE IF "%~2"=="" (
     set "base_branch=%~1"
 ) ELSE (
@@ -50,5 +50,5 @@ REM Function to display usage.
 echo Usage: check_changes.bat [BASEBRANCH]
 echo For all files that are different between the current branch and BASEBRANCH, lint them with Flake8 and run MyPy on them.
 echo.
-echo With no BASEBRANCH, compare the current branch to main.
+echo With no BASEBRANCH, compare the current branch to dev.
 goto :eof
