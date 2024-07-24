@@ -947,9 +947,6 @@ class RationOptimizer:
             bnds = []
             bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
 
-        print(animal_combination)
-        print(str(animal_combination))
-        print(animal_combination.value)
         if animal_combination is AnimalCombination.LAC_COW:
             return minimize(
                 self.objective,
