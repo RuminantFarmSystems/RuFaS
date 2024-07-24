@@ -486,13 +486,15 @@ class ReportGenerator:
 
             has_dict_variables = filter_content.get("variables") is not None
             has_multiple_columns = len(vertically_aggregated) > 1
-
-            if has_dict_variables or has_multiple_columns:
-                aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
-            else:
-                if filter_content.get("display_units", True):
+            if filter_content.get("display_units", True):
+                if has_dict_variables or has_multiple_columns:
+                    aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
+                else:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
                     aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
+            else:
+                if has_dict_variables or has_multiple_columns:
+                    aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
                 else:
                     aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
 
@@ -615,7 +617,6 @@ class ReportGenerator:
                 else:
                     result_units[unit] = sign * exponent
             return {unit: exp for unit, exp in result_units.items() if exp != 0}
-
         if operation in ['product', 'division']:
             if operation == 'product':
                 combined_numerator = add_units(numerator1, numerator2)
@@ -832,6 +833,11 @@ class ReportGenerator:
             else:
                 return ""
         else:
+            aggregator_key = None
+            for key, function in AGGREGATION_FUNCTIONS.items():
+                if function == aggregator:
+                    aggregator_key = key
+                    break
             first_key, second_key = list(report_data.keys())[:2]
             first_key_numerator_units, first_key_denominator_units = self._extract_units(first_key)
             second_key_numerator_units, second_key_denominator_units = self._extract_units(second_key)
@@ -839,7 +845,7 @@ class ReportGenerator:
                                                                            first_key_denominator_units,
                                                                            second_key_numerator_units,
                                                                            second_key_denominator_units,
-                                                                           aggregator)
+                                                                           aggregator_key)
             stringified_combined_units = self._units_to_string(combined_numerator, combined_denominator)
 
         return stringified_combined_units
