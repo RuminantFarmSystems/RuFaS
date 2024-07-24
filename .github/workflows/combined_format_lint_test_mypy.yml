@@ -97,7 +97,20 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
-          ref: ${{ github.ref }}
+
+      - name: Fetch latest commit SHA
+        id: fetch-latest-sha
+        run: |
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          echo "Branch name: $BRANCH_NAME"
+          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
+          echo "Latest SHA: $LATEST_SHA"
+          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
+
+      - name: Checkout the latest commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.fetch-latest-sha.outputs.sha }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -107,7 +120,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
 
       - name: Lint with flake8
         id: flake8
