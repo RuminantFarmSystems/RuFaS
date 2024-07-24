@@ -7,7 +7,6 @@ from typing import Dict, Any
 
 import numpy as np
 
-from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle import animal_constants as const
@@ -29,7 +28,6 @@ from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 
 om = OutputManager()
-im = InputManager()
 
 
 class MilkProductionHistory:
@@ -185,8 +183,6 @@ class Cow(HeiferIII):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
@@ -221,8 +217,6 @@ class Cow(HeiferIII):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,

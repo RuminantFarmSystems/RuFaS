@@ -1,9 +1,10 @@
 from pathlib import Path
 from freezegun import freeze_time
-from typing import Dict, List
+from typing import Any, Dict, List
 from unittest.mock import patch
 from matplotlib import pyplot as plt
 from mock.mock import MagicMock
+import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.graph_generator import GraphGenerator
@@ -31,7 +32,7 @@ def test_save_graph_successful(graph_generator: GraphGenerator) -> None:
 
             result = graph_generator._save_graph(graph_details, filter_file_name, graphics_dir)
 
-            mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value)
+            mock_savefig.assert_called_once_with(mock_generate_graph_path.return_value, bbox_inches="tight")
             mock_generate_graph_path.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
             assert result == mock_generate_graph_path.return_value
 
@@ -78,23 +79,49 @@ def test_generate_graph_path_no_title(graph_generator: GraphGenerator) -> None:
         assert result == Path(r"graphics/metadata_name_test_filter.png-13-Oct-2023_Fri_11-41-23.png")
 
 
-def test_generate_graph_without_producing_graphics(graph_generator: GraphGenerator) -> None:
+@pytest.mark.parametrize(
+    ["graph_details", "expected_output", "produce_graphics"],
+    [
+        (
+            {"title": "Example Graph"},
+            [
+                {
+                    "error": "Can't plot Example Graph data set",
+                    "message": "'produce_graphics' set to False, no graphs will be produced.",
+                    "info_map": {
+                        "class": "GraphGenerator",
+                        "function": "generate_graph",
+                    },
+                }
+            ],
+            False,
+        ),
+        (
+            {"title": "Quiver Fail Graph", "type": "quiver_key"},
+            [
+                {
+                    "error": "Can't plot Quiver Fail Graph data set",
+                    "message": "Graph type 'quiver_key' not supported at this time.",
+                    "info_map": {
+                        "class": "GraphGenerator",
+                        "function": "generate_graph",
+                    },
+                }
+            ],
+            True,
+        ),
+    ],
+)
+def test_generate_graph_without_producing_graphics(
+    graph_generator: GraphGenerator,
+    graph_details: list[dict[str, str]],
+    expected_output: dict[str, str | dict[str, Any]],
+    produce_graphics: bool,
+) -> None:
+    """Tests function generate_graph when it doesn't produce graphics."""
     filtered_pool = {"dummy_key": {"dummy_data": [1, 2, 3]}}
-    graph_details = {"title": "Example Graph"}
     filter_file_name = "dummy_filter"
     graphics_dir = Path("/tmp")
-    produce_graphics = False
-
-    expected_output = [
-        {
-            "error": "Can't plot Example Graph data set",
-            "message": "'produce_graphics' set to False, no graphs will be produced.",
-            "info_map": {
-                "class": graph_generator.__class__.__name__,
-                "function": "generate_graph",
-            },
-        }
-    ]
 
     result = graph_generator.generate_graph(
         filtered_pool=filtered_pool,
@@ -170,12 +197,15 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
-    mock_log_pool = [{"error": "mock_error_message"}]
-    graph_generator._log_non_numerical_data = MagicMock(return_value=mock_log_pool)
+    mock_non_numerical_log_pool = [{"error": "mock_error_message"}]
+    mock_add_units_log_pool = [{"warning": "mock_warning_message"}]
+    full_mock_pool = mock_non_numerical_log_pool + mock_add_units_log_pool
+    graph_generator._log_non_numerical_data = MagicMock(return_value=mock_non_numerical_log_pool)
+    graph_generator._add_var_units = MagicMock(return_value=({}, mock_add_units_log_pool))
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
-    assert mock_log_pool == graph_generator.generate_graph(
+    assert full_mock_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
     graph_generator._draw_graph.assert_not_called()
@@ -189,20 +219,24 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock(return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
+    updated_pool = {"var1": {"values": [1, 2, 3], "units": "units"}}
+    var_units_logs = []
+    graph_generator._add_var_units = MagicMock(return_value=(updated_pool, var_units_logs))
     prepared_data = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
     mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars")
-    graph_generator._log_non_numerical_data = MagicMock(return_value=mock_log_pool)
-    graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title"}
+    graph_generator._log_non_numerical_data = MagicMock(return_value=[{"log": "mock_log_message"}])
+    graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title", "display_units": True}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
     assert mock_log_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()))
+    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()), False)
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
     mock_remove_special_chars.assert_called_once()
+    graph_generator._add_var_units.assert_called_once_with(filtered_pool, "dummy.graph/title")
 
 
 def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -297,6 +331,18 @@ def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
             True,
             "dummy_prefix.dummy_var.dummy_var2.dummy_var3",
         ),
+        (
+            "dummy_prefix.dummy_method.dummy_var=dummy_value (units)",
+            True,
+            True,
+            "dummy_method (units)",
+        ),
+        (
+            "",
+            False,
+            False,
+            "",
+        ),
     ],
 )
 def test_generate_legend_keys(
@@ -308,6 +354,24 @@ def test_generate_legend_keys(
 ) -> None:
     actual_output = graph_generator._generate_legend_keys(combined_var_input, omit_legend_prefix, omit_legend_suffix)
     assert actual_output == expected_output
+
+
+@pytest.mark.parametrize(
+    "graph_details, prepared_data, expected_legend",
+    [
+        ({"variables": ["Temperature"]}, {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]}, ["Temperature"]),
+        (
+            {"omit_legend_prefix": True, "omit_legend_suffix": True},
+            {"prefix.temp.suffix=suffix": [20, 22, 21]},
+            ["temp"],
+        ),
+        ({}, {"Temperature": [20, 22, 21], "Humidity": [30, 45, 65]}, ["Temperature", "Humidity"]),
+        ({}, {}, []),
+    ],
+)
+def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend):
+    result = graph_generator._set_graph_legend(graph_details, prepared_data)
+    assert result["legend"] == expected_legend
 
 
 def test_draw_graph_exception(graph_generator: GraphGenerator) -> None:
@@ -341,7 +405,7 @@ def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator) -> None:
         )
 
 
-def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
+def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
     with patch.dict(
         "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
@@ -350,6 +414,34 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator) -> None:
 
         for value in data.values():
             mock_plot_functions_dict["plot"].assert_any_call(value)
+
+    indices, masked_values = [0, 1, 2, 3], [1, 2, 3, 4]
+    masker = mocker.patch("RUFAS.graph_generator.GraphGenerator._mask_values", return_value=(indices, masked_values))
+    with patch.dict(
+        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
+    ) as mock_plot_functions_dict:
+        graph_generator._draw_graph("plot", data, mask_values=True)
+
+        for value in data.values():
+            mock_plot_functions_dict["plot"].assert_any_call(indices, masked_values)
+    assert masker.call_count == 2
+
+
+def test_mask_values(graph_generator: GraphGenerator) -> None:
+    """Tests _mask_values in the GraphGenerator."""
+    values_one = [1, 2, 3, 4]
+
+    actual_indices, actual_values = graph_generator._mask_values(values_one)
+
+    assert list(actual_indices) == [0, 1, 2, 3]
+    assert list(actual_values) == [1, 2, 3, 4]
+
+    values_two = [np.nan, 8, 9, np.nan, np.nan]
+
+    actual_indices, actual_values = graph_generator._mask_values(values_two)
+
+    assert list(actual_indices) == [1, 2]
+    assert list(actual_values) == [8, 9]
 
 
 @pytest.mark.parametrize(
@@ -464,3 +556,57 @@ def test_validate_graph_filter(
 
     if expected_length > 0:
         assert expected_message in result[0]["message"]
+
+
+@pytest.mark.parametrize(
+    "filtered_pool, graph_title, expected_output, expected_logs",
+    [
+        (
+            {"wind_speed": {"values": [5, 6], "info_maps": [{"units": {"wind_speed": "m/s"}}]}},
+            "Wind Test",
+            {"wind_speed (m/s)": {"values": [5, 6], "info_maps": [{"units": {"wind_speed": "m/s"}}]}},
+            [],
+        ),
+        (
+            {"wind_speed": {"values": [5, 6], "info_maps": [{"units": {"speed": "m/s"}}]}},
+            "Wind Test",
+            {"wind_speed (not available)": {"values": [5, 6], "info_maps": [{"units": {"speed": "m/s"}}]}},
+            [
+                {
+                    "warning": "Missing unit information",
+                    "message": "Unit for 'wind_speed' not found in units dictionary. Using default 'not available'.",
+                    "info_map": {"class": "GraphGenerator", "function": "_add_var_units"},
+                }
+            ],
+        ),
+        (
+            {"temperature": {"values": [20, 21]}},
+            "Temperature Test",
+            {"temperature": {"values": [20, 21]}},
+            [
+                {
+                    "warning": "Can't add units to variables for graphing Temperature Test",
+                    "message": "'info_maps' unavailable to get units, check setting for exclude_info_maps.",
+                    "info_map": {"class": "GraphGenerator", "function": "_add_var_units"},
+                }
+            ],
+        ),
+        (
+            {"temperature": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]}},
+            "Temperature Test",
+            {"temperature (Celsius)": {"values": [20, 21], "info_maps": [{"units": "Celsius"}]}},
+            [],
+        ),
+    ],
+)
+def test_add_var_units(
+    graph_generator: GraphGenerator,
+    filtered_pool: dict[str, dict[str, list[Any]]],
+    graph_title: str,
+    expected_output: dict[str, dict[str, list[Any]]],
+    expected_logs: list[dict[str, str | dict[str, str]]],
+):
+    """Test for the _add_var_units() method in graph_generator.py"""
+    updated_pool, logs = graph_generator._add_var_units(filtered_pool, graph_title)
+    assert updated_pool == expected_output
+    assert logs == expected_logs

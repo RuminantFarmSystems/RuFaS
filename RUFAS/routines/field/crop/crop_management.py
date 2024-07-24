@@ -78,7 +78,7 @@ class CropManagement:
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.calendar_year, time.day)
+        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
     # ---- Sub Methods ----
@@ -98,7 +98,7 @@ class CropManagement:
         self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
         self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
-    def determine_harvest_index(self):
+    def determine_harvest_index(self) -> None:
         """
         Sets the crop's harvest index based on various conditions.
 
@@ -169,7 +169,6 @@ class CropManagement:
             raise ValueError(
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
-
         roots_harvested = self.data.harvest_index > 1.0
         if not roots_harvested:
             self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index
@@ -177,8 +176,21 @@ class CropManagement:
             self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(
                 self.data.biomass, self.data.harvest_index
             )
-        fraction_cut = self.data.cut_biomass / self.data.biomass
-        self.data.yield_residue = self.data.biomass - self.data.cut_biomass
+
+        try:
+            fraction_cut = self.data.cut_biomass / self.data.biomass
+        except ZeroDivisionError:
+            info_map = {"class": self.__class__.__name__, "function": self.cut_crop.__name__}
+            warning_name = "Zero division error in crop management"
+            warning_message = (
+                f"A zero division error occurred in the harvesting process of crop management when calculating "
+                f"fraction cut."
+                f"The variable 'biomass' in CropData has an invalid value: '{self.data.biomass}'. "
+            )
+
+            om.add_warning(warning_name, warning_message, info_map)
+            return None
+
         self.data.biomass -= self.data.cut_biomass
         self._recalculate_biomass_distribution(roots_harvested)
 
@@ -295,12 +307,12 @@ class CropManagement:
             "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
             "harvest_index": MeasurementUnits.UNITLESS,
-            "planting_date": {
-                "year": MeasurementUnits.CALENDAR_YEAR,
-                "day": MeasurementUnits.ORDINAL_DAY,
-            },
-            "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "planting_year": MeasurementUnits.CALENDAR_YEAR,
+            "planting_day": MeasurementUnits.ORDINAL_DAY,
+            "harvest_year": MeasurementUnits.CALENDAR_YEAR,
+            "harvest_day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
         }
         wet_yield_collected = self.data.wet_yield_collected
         dry_yield_collected = self.data.dry_matter_yield_collected
@@ -320,12 +332,12 @@ class CropManagement:
             "phosphorus": phosphorus_harvested,
             "yield_residue": self.data.yield_residue,
             "harvest_index": self.data.harvest_index,
-            "planting_date": {
-                "year": self.data.planting_year,
-                "day": self.data.planting_day,
-            },
-            "harvest_date": {"year": year, "day": day},
+            "planting_year": self.data.planting_year,
+            "planting_day": self.data.planting_day,
+            "harvest_year": year,
+            "harvest_day": day,
             "field_size": field_size,
+            "field_name": field_name,
         }
         om.add_variable("harvest_yield", value, info_map)
 

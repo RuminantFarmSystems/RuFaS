@@ -1,0 +1,12 @@
+{
+  "parallel_workers": 1,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "Task 2",
+      "log_verbosity": "warnings",
+      "random_seed": 42
+    }
+  ]
+}

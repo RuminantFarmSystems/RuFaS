@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
+import numpy as np
 import pandas as pd
 
 from RUFAS.graph_generator import GraphGenerator
@@ -976,40 +977,103 @@ class OutputManager(object):
         )
 
         selected_variables: List[str] | None = filter_content.get("variables")
+
+        results = self._parse_filtered_variables(
+            filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion
+        )
+
+        if filter_content.get("expand_data", False):
+            fill_value = filter_content.get("fill_value", np.nan)
+            use_fill_value_in_gaps = filter_content.get("use_fill_value_in_gaps", True)
+            use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
+            try:
+                results = Utility.expand_data_temporally(
+                    results,
+                    fill_value=fill_value,
+                    use_fill_value_in_gaps=use_fill_value_in_gaps,
+                    use_fill_value_at_end=use_fill_value_at_end,
+                )
+            except (TypeError, ValueError) as e:
+                error_title = f"Error {e} raised when padding data"
+                error_msg = f"Unable to pad data for variables gathered for {filter_name=}."
+                self.add_error(error_title, error_msg, info_map)
+
         slice_start: int = filter_content.get("slice_start", 0)
         slice_end: int | None = filter_content.get("slice_end")
+        for key in results.keys():
+            if "info_maps" in results[key].keys():
+                results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
+            results[key]["values"] = results[key]["values"][slice_start:slice_end]
 
+        return results
+
+    def _parse_filtered_variables(
+        self,
+        filtered_pool: Dict[str, OutputManager.pool_element_type],
+        selected_variables: List[str] | None,
+        filter_name: str,
+        use_filter_name: bool,
+        filter_by_exclusion: bool,
+    ) -> Dict[str, OutputManager.pool_element_type]:
+        """
+        Unpacks and counts variables that have been filtered out of the Output Manager's variables pool.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, OutputManager.pool_element_type]
+            Variables that have been filtered out of the Output Manager's pool.
+        selected_variables : List[str] | None
+            List of key names to select or exclude from variables containing dictionaries.
+        filter_name : str
+            Name of the filter used to collect variables for the filtered pool.
+        use_filter_name : bool
+            Whether to use the filter name when constructing the key name for data pulled from a dictionary.
+        filter_by_exclusion : bool
+            Whether keys in dictionaries should be filtered by exclusion.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]
+            Dictionary containing data from the filtered pool of data, with data from within dictionaries unpacked and
+            separated.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._parse_filtered_variables.__name__,
+            "filter_name": filter_name,
+            "filter_by_exclusion": filter_by_exclusion,
+            "use_filter_name": use_filter_name,
+        }
         results: Dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
         for key in filtered_pool.keys():
-            sliced_info_maps: List[Dict[str, Any]] = (
-                filtered_pool[key]["info_maps"][slice_start:slice_end] if "info_maps" in filtered_pool[key] else []
+            info_maps: List[Dict[str, Any]] = (
+                filtered_pool[key]["info_maps"] if "info_maps" in filtered_pool[key] else []
             )
-            sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
-            is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
+            data: List[Any] = filtered_pool[key]["values"]
+            is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
-                results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
-                    "values": sliced_data
-                }
+                results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
                 self._variables_usage_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
                     self.add_error(
                         "Unpacking Pool Error",
                         f"Unable to unpack {key=} in the data pool, need a valid `variables` entry for this entry."
-                        f"{is_data_in_dict=}, {selected_variables=}",
+                        f"{is_data_in_dict=}, {selected_variables=}, see Wiki for proper setup details.",
                         info_map,
                     )
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
                     combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
                     if combined_key in results.keys():
-                        results[combined_key].get("info_maps", []).extend(sliced_info_maps)
+                        results[combined_key].get("info_maps", []).extend(info_maps)
                         results[combined_key]["values"].extend(filtered_value)
                     else:
-                        results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
+                        results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {
                             "values": filtered_value
                         }
                     self._variables_usage_counter.update([f"{key}.{filtered_key}"])
@@ -1327,31 +1391,59 @@ class OutputManager(object):
 
             parsable_dicts = []
 
+            var_data_info_maps: list[Any] | None = []
             if not exclude_info_maps and "info_maps" in variable_data:
                 parsable_dicts.append("info_maps")
+                var_data_info_maps = variable_data.get("info_maps")
 
+            units = var_data_info_maps[0]["units"] if var_data_info_maps else ""
             is_variable_nested = isinstance(variable_data["values"][0], dict)
             if is_variable_nested:
                 parsable_dicts.append("values")
             else:
-                var_list.append(f"{name}{os.linesep}")
+                var_list.append(f"{name} ({units}){os.linesep}" if units else f"{name}{os.linesep}")
 
             prefix = name
             if format_option == "block":
                 if f"{name}{os.linesep}" not in var_list:
                     var_list.append(f"{name}{os.linesep}")
                 prefix = " " * len(name)
-
+            keys_to_ignore = [
+                "units",
+                "timestep",
+                "info_maps",
+                "prefix",
+                "suffix",
+                "data_origin",
+                "number_animals_in_pen",
+                "simulation_day",
+            ]
             for parsable_dict in parsable_dicts:
                 keys = variable_data[parsable_dict][0].keys()
                 if format_option == "inline":
-                    var_list.append(f"{name}.{parsable_dict}: {list(keys)}{os.linesep}")
-                elif format_option == "basic":
-                    for key in keys:
-                        var_list.append(f"{name}.{key}{os.linesep}")
+                    var_list.append(
+                        f"{name}.{parsable_dict}: {list(keys)} ({units}){os.linesep}"
+                        if not parsable_dict.endswith("info_maps") and units
+                        else f"{name}.{parsable_dict}: {list(keys)}{os.linesep}"
+                    )
                 else:
                     for key in keys:
-                        var_list.append(f"{prefix}.{parsable_dict}: {key}{os.linesep}")
+                        if isinstance(units, dict):
+                            var_units = units.get(key, "")
+                        else:
+                            var_units = units
+                        if format_option == "basic":
+                            var_list.append(
+                                f"{name}.{key} ({var_units}){os.linesep}"
+                                if key not in keys_to_ignore and var_units
+                                else f"{name}.{key}{os.linesep}"
+                            )
+                        else:
+                            var_list.append(
+                                f"{prefix}.{parsable_dict}: {key} ({var_units}){os.linesep}"
+                                if key not in keys_to_ignore and var_units
+                                else f"{prefix}.{parsable_dict}: {key}{os.linesep}"
+                            )
 
         file_path = path / self.generate_file_name("variable_names", "txt")
         self._list_to_file_txt(var_list, file_path)
