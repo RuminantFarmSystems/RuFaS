@@ -272,6 +272,7 @@ class SoilData:
         """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
         return self.plant_surface_residue + self.plant_root_residue
 
+
     def __post_init__(self, field_size: float):
         """
         This method initializes attributes that either cannot be set to a default above or depend on other
