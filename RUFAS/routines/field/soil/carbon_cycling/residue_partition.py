@@ -118,9 +118,7 @@ class ResiduePartition:
             layer.soil_dry_matter_residue_amount = 0
 
             layer.weighted_residue_dry_matter_lignin_fraction = (
-                self._determine_weighted_residue_dry_matter_lignin_fraction(
-                    layer.soil_dry_matter_residue_amount, 0.0
-                )
+                self._determine_weighted_residue_dry_matter_lignin_fraction(layer.soil_dry_matter_residue_amount, 0.0)
             )
 
             layer.soil_residue_lignin_fraction = self._determine_soil_residue_lignin_fraction(
