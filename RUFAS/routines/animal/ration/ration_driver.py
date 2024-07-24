@@ -80,7 +80,7 @@ class RationManager:
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
-        num_reattempts: int = 0
+        num_attempts: int = 1
 
         if solution is None:
             # safeguard if scipy SLSQP bounds error still occurs after many iterations
@@ -90,7 +90,7 @@ class RationManager:
         if pen.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
                 cls.handle_failed_constraints(
-                    num_reattempts=num_reattempts,
+                    num_attempts=num_attempts,
                     solution=solution,
                     ration_optimizer=ration_optimizer,
                     ration_config=ration_config,
@@ -106,7 +106,7 @@ class RationManager:
                     ration_vals,
                     ration_config,
                 ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
-                num_reattempts += 1
+                num_attempts += 1
 
         ration = cls.make_ration_from_solution(available_feeds, solution)
         return ration, ration_vals
@@ -114,7 +114,7 @@ class RationManager:
     @classmethod
     def handle_failed_constraints(
         cls,
-        num_reattempts: int,
+        num_attempts: int,
         solution: scipy.optimize.OptimizeResult,
         ration_optimizer: RationOptimizer,
         ration_config: RationConfig,
@@ -133,8 +133,8 @@ class RationManager:
 
         Parameters:
         -----------
-        num_reattempts : int
-            The number of reattempts made so far.
+        num_attempts : int
+            The number of ration formulation attempts made so far.
         solution : scipy.optimize.OptimizeResult
             The result of the optimization process.
         ration_optimizer : RationOptimizer
@@ -170,7 +170,7 @@ class RationManager:
         sim_day = animal_list[0].body_weight_history[-1].simulation_day
         fail_summary = {
             "simulation day": sim_day,
-            "reattempt number": num_reattempts,
+            "reattempt number": num_attempts,
             "constraints_failed_dict": constraints_failed_list,
             "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
             "pen requirements": pen.avg_nutrient_rqmts,
@@ -341,7 +341,7 @@ class RationManager:
         }
         ration_percents = UserDefinedRationManager.ration_to_use(pen.animal_combination)
         fixed_ration = False
-        num_reattempts: int = 0
+        num_attempts: int = 1
 
         previous_ration = None
         if hasattr(pen, "ration_per_animal"):
@@ -350,25 +350,6 @@ class RationManager:
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
-        cls.handle_failed_constraints(
-            num_reattempts=num_reattempts,
-            solution=solution,
-            ration_optimizer=ration_optimizer,
-            ration_config=ration_config,
-            pen=pen,
-            available_feeds=available_feeds,
-            info_map=info_map,
-        )
-        if solution is None:
-            if pen.ration:
-                return pen.ration, ration_vals
-            else:
-                om.add_error(
-                    "First ration formulation error",
-                    "Unable to formulate ration, and there is no previous ration to use.",
-                    info_map,
-                )
-                raise
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
@@ -381,6 +362,15 @@ class RationManager:
         if pen.animal_combination == AnimalCombination.LAC_COW and solution is not None:
             running_milk_reduction = 0.0
             while not solution.success:
+                cls.handle_failed_constraints(
+                    num_attempts=num_attempts,
+                    solution=solution,
+                    ration_optimizer=ration_optimizer,
+                    ration_config=ration_config,
+                    pen=pen,
+                    available_feeds=available_feeds,
+                    info_map=info_map,
+                )
                 running_average_milk = cls.calc_milk_average(pen)
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 if (
@@ -402,16 +392,7 @@ class RationManager:
                     ration_vals,
                     ration_config,
                 ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
-                num_reattempts += 1
-                cls.handle_failed_constraints(
-                    num_reattempts=num_reattempts,
-                    solution=solution,
-                    ration_optimizer=ration_optimizer,
-                    ration_config=ration_config,
-                    pen=pen,
-                    available_feeds=available_feeds,
-                    info_map=info_map,
-                )
+                num_attempts += 1
 
         if fixed_ration:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
