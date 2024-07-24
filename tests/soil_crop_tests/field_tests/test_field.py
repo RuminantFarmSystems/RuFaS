@@ -2283,7 +2283,7 @@ def test_cycle_water(
             water_sublimated=1.0,
             snow_content=snow_content,
         )
-        soil_data.plant_surface_residue = surface_residue
+        soil_data.soil_layers[0].plant_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(
             field_proportion=crop_1_proportion,

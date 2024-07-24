@@ -40,6 +40,9 @@ class TallFescue(CropData):
 
     max_root_depth: float = 2_000
 
+    root_distribution_param_da: float = 137.0
+    root_distribution_param_c: float = -1.144
+
 
 @dataclass(kw_only=True)
 class TallFescueSilage(TallFescue):
