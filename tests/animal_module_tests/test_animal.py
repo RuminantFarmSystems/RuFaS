@@ -3360,10 +3360,6 @@ def test_make_user_bounds(
     ration_percents = {"1": 10.0, "2": 20.0}
     predicted = [
         [9, 11],
-        [9, 11],
-        [9, 11],
-        [18, 22],
-        [18, 22],
         [18, 22],
     ]
     result = RationOptimizer.make_user_bounds(ration_percents, 100)
