@@ -111,7 +111,7 @@ class ResiduePartition:
         layer.plant_dry_matter_residue_amount = 0
 
         layer.weighted_residue_dry_matter_lignin_fraction = self._determine_weighted_residue_dry_matter_lignin_fraction(
-            layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
+            layer.soil_dry_matter_residue_amount, 0.0
         )
 
         for layer in self.data.soil_layers[1:]:
@@ -119,7 +119,7 @@ class ResiduePartition:
 
             layer.weighted_residue_dry_matter_lignin_fraction = (
                 self._determine_weighted_residue_dry_matter_lignin_fraction(
-                    layer.soil_dry_matter_residue_amount, self.data.plant_root_residue
+                    layer.soil_dry_matter_residue_amount, 0.0
                 )
             )
 
@@ -146,7 +146,7 @@ class ResiduePartition:
             layer.metabolic_litter_amount = self._determine_soil_metabolic_carbon_amount(
                 layer.metabolic_litter_amount,
                 layer.plant_metabolic_to_soil_carbon_amount,
-                self.data.plant_root_residue,
+                0.0,
                 layer.soil_residue_metabolic_fraction,
                 layer.soil_metabolic_active_carbon_usage,
             )
@@ -170,7 +170,7 @@ class ResiduePartition:
                 layer.structural_carbon_transfer_amount,
                 layer.soil_structural_active_carbon_usage,
                 layer.soil_structural_slow_carbon_usage,
-                self.data.plant_root_residue,
+                0.0,
                 layer.structural_litter_amount,
             )
 
@@ -179,20 +179,13 @@ class ResiduePartition:
         Partitions residue between metabolic and structural pools in all layers of the soil profile.
 
         """
-        if self.data.plant_surface_residue > 0.0:
-            self.data.soil_layers[0].metabolic_litter_amount += (
-                self.data.plant_surface_residue * self.data.plant_residue_metabolic_fraction
-            )
-            self.data.soil_layers[0].structural_litter_amount += self.data.plant_surface_residue * (
-                1 - self.data.plant_residue_metabolic_fraction
-            )
-            self.data.plant_surface_residue = 0.0
-
-        if self.data.plant_root_residue != 0.0 and self.data.crop_root_depth != 0.0:
-            self._add_subsurface_residue(self.data.plant_root_residue, self.data.crop_root_depth)
+        subsurface_plant_residue = self.data.get_vectorized_layer_attribute("plant_residue")
+        if any(subsurface_plant_residue):
+            for layer in self.data.soil_layers:
+                layer.metabolic_litter_amount += self.data.plant_residue_metabolic_fraction * layer.plant_residue
+                layer.structural_litter_amount += (1 - self.data.plant_residue_metabolic_fraction) * layer.plant_residue
+                layer.plant_residue = 0.0
             self._set_soil_structural_litter_decomposition_rate()
-            self.data.plant_root_residue = 0.0
-            self.data.crop_root_depth = 0.0
 
     def _set_soil_structural_litter_decomposition_rate(self) -> None:
         """

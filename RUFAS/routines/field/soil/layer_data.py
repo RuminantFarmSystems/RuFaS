@@ -380,6 +380,7 @@ class LayerData:
     metabolic_litter_amount: float = 0.0
     tillage_fraction: float = 0.0
     structural_carbon_transfer_amount: float = 0.0
+    plant_residue: float = 0.0
     soil_dry_matter_residue_amount: float = 0.0
     plant_dry_matter_residue_amount: float = 0.0
     plant_residue_metabolic_fraction: float = 0.0

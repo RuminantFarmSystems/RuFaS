@@ -361,6 +361,14 @@ class CropData:
         Amount of nitrogen in the residue from this plant (kg/ha).
     residue_phosphorus : float, default 0.0
         Amount of phosphorus in the residue from this plant (kg/ha).
+    root_distribution_param_da: float, default 145.0
+        Empirical root distribution parameter d_a (mm).
+        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
+            Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.
+    root_distribution_param_c: float, default -1.165
+        Empirical root distribution parameter c (unitless).
+        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
+            Research 189 (2016): 68-74, table 1.
     dormancy_loss_fraction : Optional[float], default None
         Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
         goes dormant. Default 0.1 for perennials, 0.3 for trees.
@@ -561,6 +569,8 @@ class CropData:
     yield_phosphorus: Optional[float] = None
     residue_nitrogen: float = 0.0
     residue_phosphorus: float = 0.0
+    root_distribution_param_da: float = 145.0
+    root_distribution_param_c: float = -1.165
 
     # ---- dormancy
     dormancy_loss_fraction: Optional[float] = None

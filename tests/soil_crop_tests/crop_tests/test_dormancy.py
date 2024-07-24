@@ -143,5 +143,5 @@ def test_go_into_dormancy(
             assert incorp.data.leaf_area_index == expected_leaf_area_index
 
             assert soil_data.crop_yield_nitrogen == expected_nitrogen
-            assert soil_data.plant_surface_residue == expected_post_dormancy_residue
+            assert soil_data.soil_layers[0].plant_residue == expected_post_dormancy_residue
             assert soil_data.plant_residue_lignin_composition == incorp.data.lignin_dry_matter_percentage / 100
