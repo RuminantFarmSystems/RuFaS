@@ -532,7 +532,7 @@ def test_determine_soil_dry_matter_residue_amount(
     [
         ([10.0] * 3, 0.5, [5.0] * 3, [5.0] * 3, True),
         ([10.0, 50.0, 30.0], 0.25, [2.5, 12.5, 7.5], [7.5, 37.5, 22.5], True),
-        ([0.0] * 3, 0.4, [0.0] * 3, [0.0] * 3, False)
+        ([0.0] * 3, 0.4, [0.0] * 3, [0.0] * 3, False),
     ],
 )
 def test_add_litter_to_pools(
