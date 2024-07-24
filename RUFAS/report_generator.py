@@ -472,12 +472,11 @@ class ReportGenerator:
         elif horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
             loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
-            horizontally_aggregated = self._apply_horizontal_aggregation(
+            horizontally_aggregated, aggregated_units = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
             if filter_content.get("display_units", True):
-                units = re.search(r"\(.*\)", next(iter(report_data)))
-                aggregate_report = {units.group(0): horizontally_aggregated}
+                aggregate_report = {f"hor_agg_{aggregated_units}": horizontally_aggregated}
             else:
                 aggregate_report = {"hor_agg": horizontally_aggregated}
 
@@ -493,7 +492,7 @@ class ReportGenerator:
             else:
                 if filter_content.get("display_units", True):
                     units = re.search(r"\(.*\)", next(iter(report_data)))
-                    aggregate_report = {units.group(0): list(vertically_aggregated.values())[0]}
+                    aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
                 else:
                     aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
 
@@ -523,7 +522,30 @@ class ReportGenerator:
         return updated_key
 
     @staticmethod
-    def _extract_units(key: str) -> str:
+    def _parse_unit(unit: str) -> dict:
+        """Parses a unit string to handle units with exponents.
+
+        Parameters
+        ----------
+        unit : str
+            A string representing measurement units.
+
+        Returns
+        -------
+        dict
+            A dictionary where the keys are unit names (str) and the values are their exponents (int).
+        """
+        unit_dict = {}
+        for part in unit.split('*'):
+            if '^' in part:
+                u, exp = part.split('^')
+                unit_dict[u.strip()] = int(exp)
+            else:
+                unit_dict[part.strip()] = 1
+        return unit_dict
+
+    @staticmethod
+    def _extract_units(key: str) -> tuple[dict, dict]:
         """Extracts the units from a key.
 
         Parameters
@@ -533,14 +555,132 @@ class ReportGenerator:
 
         Returns
         -------
-        str
-            The units or an empty string if no units are found.
+        tuple[dict, dict]
+            A tuple of the numerator and denominator units. If there is no denominator, the first element of tuple will
+            have the units and the second will be an empty string. If no units are found, it will return a tuple with
+            two empty strings.
         """
-        match = re.search(r"\(.*?\)", key)
+        match = re.search(r'\((.*?)\)', key)
         if match:
-            return match.group(1)
+            units = match.group(1)
+            if '/' in units:
+                numerator, denominator = units.split('/')
+                numerator_units = ReportGenerator._parse_unit(numerator)
+                denominator_units = ReportGenerator._parse_unit(denominator)
+                return numerator_units, denominator_units
+            else:
+                numerator_units = ReportGenerator._parse_unit(units)
+                return numerator_units, {}
         else:
-            return None
+            return {}, {}
+
+    @staticmethod
+    def _combine_units(numerator1: dict, denominator1: dict, numerator2: dict, denominator2: dict, operation: str
+                       ) -> tuple[dict, dict]:
+        """
+        Combines two sets of units (numerator and denominator) based on the specified operation.
+
+        Parameters
+        ----------
+        numerator1 : dict
+            First set of numerator units, where keys are unit names (str) and values are exponents (int).
+        denominator1 : dict
+            First set of denominator units, where keys are unit names (str) and values are exponents (int).
+        numerator2 : dict
+            Second set of numerator units, where keys are unit names (str) and values are exponents (int).
+        denominator2 : dict
+            Second set of denominator units, where keys are unit names (str) and values are exponents (int).
+        operation : str
+            The operation to combine the units. Can be one of 'product', 'division', 'addition', 'subtraction',
+            'average', 'stddev'.
+
+        Returns
+        -------
+        (dict, dict)
+            Two dictionaries representing the combined numerator and denominator units.
+
+        Raises
+        ------
+        ValueError
+            If the operation is addition or subtraction and the units are not the same.
+        """
+
+        def add_units(units1, units2, sign=1):
+            result_units = units1.copy()
+            for unit, exponent in units2.items():
+                if unit == "unitless":
+                    continue
+                if unit in result_units:
+                    result_units[unit] += sign * exponent
+                else:
+                    result_units[unit] = sign * exponent
+            return {unit: exp for unit, exp in result_units.items() if exp != 0}
+
+        if operation in ['product', 'division']:
+            if operation == 'product':
+                combined_numerator = add_units(numerator1, numerator2)
+                combined_denominator = add_units(denominator1, denominator2)
+            elif operation == 'division':
+                combined_numerator = add_units(numerator1, denominator2)
+                combined_denominator = add_units(denominator1, numerator2)
+
+        elif operation in ['sum', 'subtraction', 'average', 'SD']:
+            if numerator1 != numerator2 or denominator1 != denominator2:
+                # TODO add warning to OM instead of raising valueerror
+                raise ValueError("Units must be the same for addition, subtraction, average, and standard deviation.")
+            combined_numerator = numerator1.copy()
+            combined_denominator = denominator1.copy()
+
+        return combined_numerator, combined_denominator
+
+    @staticmethod
+    def _units_to_string(numerator: dict, denominator: dict) -> str:
+        """
+        Converts two dictionaries of units (numerator and denominator) back to a single string format.
+
+        Parameters
+        ----------
+        numerator : dict
+            A dictionary where the keys are unit names (str) and the values are their exponents (int) for the numerator.
+        denominator : dict
+            A dictionary where the keys are unit names (str) and the values are their exponents (int) for the
+            denominator.
+
+        Returns
+        -------
+        str
+            A string representing the units.
+        """
+        numerator_units = []
+        denominator_units = []
+
+        for unit, exponent in numerator.items():
+            if unit == "unitless":
+                continue
+            if exponent == 1:
+                numerator_units.append(unit)
+            else:
+                numerator_units.append(f"{unit}^{exponent}")
+
+        for unit, exponent in denominator.items():
+            if unit == "unitless":
+                continue
+            if exponent == 1:
+                denominator_units.append(unit)
+            else:
+                denominator_units.append(f"{unit}^{exponent}")
+
+        numerator_str = "*".join(numerator_units)
+        denominator_str = "*".join(denominator_units)
+
+        if numerator_str and denominator_str:
+            return f"{numerator_str}/{denominator_str}"
+        elif numerator_str:
+            return numerator_str
+        elif denominator_str:
+            return f"1/{denominator_str}"
+        else:
+            return "unitless"
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
@@ -577,13 +717,20 @@ class ReportGenerator:
             horizontally_aggregated, aggregate_units = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
-            aggregate_report = {f"hor_ver_agg_{aggregate_units}": [vertical_aggregator(horizontally_aggregated)]}
+            if filter_content.get("display_units", True):
+                aggregate_report = {f"hor_ver_agg_{aggregate_units}": [vertical_aggregator(horizontally_aggregated)]}
+            else:
+                aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
         else:
             vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
             ver_hor_aggregated = []
             for elements in zip(*vertically_aggregated.values()):
                 ver_hor_aggregated.append(horizontal_aggregator(list(elements)))
-            aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
+            aggregate_units = self._aggregate_units(vertically_aggregated, horizontal_aggregator)
+            if filter_content.get("display_units", True):
+                aggregate_report = {f"ver_hor_agg_{aggregate_units}": ver_hor_aggregated}
+            else:
+                aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
         return aggregate_report
 
     def _extract_and_check_aggregation_keys(self, filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
@@ -676,29 +823,26 @@ class ReportGenerator:
         str
             The expected units of aggregating the report data using the accompanying aggregator function.
         """
-        if len(report_data) >= 2:
-            first_key, second_key = list(report_data.keys())[:2]
-            first_key_units = self._extract_units(first_key)
-            second_key_units = self._extract_units(second_key)
+        if 0 >= len(report_data) > 2:
+            raise ValueError("No report data available.")
+        elif len(report_data) == 1:
+            var_units_match = re.search(r'\((.*?)\)', next(iter(report_data)))
+            if var_units_match:
+                return var_units_match.group(1)
+            else:
+                return ""
         else:
-            return self._extract_units(next(iter(report_data)))
+            first_key, second_key = list(report_data.keys())[:2]
+            first_key_numerator_units, first_key_denominator_units = self._extract_units(first_key)
+            second_key_numerator_units, second_key_denominator_units = self._extract_units(second_key)
+            combined_numerator, combined_denominator = self._combine_units(first_key_numerator_units,
+                                                                           first_key_denominator_units,
+                                                                           second_key_numerator_units,
+                                                                           second_key_denominator_units,
+                                                                           aggregator)
+            stringified_combined_units = self._units_to_string(combined_numerator, combined_denominator)
 
-        if aggregator == "division":
-            if not any("unitless" in s for s in [first_key_units, second_key_units]):
-                aggregate_units = f"({first_key_units} / {second_key_units})"
-                return aggregate_units
-            else:
-                return first_key_units if "unitless" in second_key_units else second_key_units
-        if aggregator == "product":
-            if not any("unitless" in s for s in [first_key_units, second_key_units]):
-                aggregate_units = f"({first_key_units} {second_key_units})"
-                return aggregate_units
-            else:
-                return first_key_units if "unitless" in second_key_units else second_key_units
-        if aggregator == "sum" or aggregator == "subtraction":
-            if first_key_units != second_key_units:
-                raise ValueError
-        return first_key_units
+        return stringified_combined_units
 
     def _apply_vertical_aggregation(
         self,
