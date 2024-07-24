@@ -556,7 +556,7 @@ def test_distribute_residue_nutrients(
         (116.0, -0.626, 1721.0, 10.0, 0.1782675),
         (116.0, -0.626, 1721.0, 150.0, 0.5537369),
         (116.0, -0.626, 1721.0, 2000.0, 1.0),
-    ]
+    ],
 )
 def test_calculate_root_mass_distribution(
     crop_manager: CropManagement, d_a: float, c: float, max_depth: float, depth: float, expected: float
