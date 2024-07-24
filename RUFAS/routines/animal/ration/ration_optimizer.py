@@ -848,7 +848,7 @@ class RationOptimizer:
         List
             List of each bound, divided by three and reported in triplicate for scipy.minimize function
         """
-        tribounds = []
+        bounds = []
         udr_tolerance = udrm.tolerance
         ration_key_list = sorted([int(key) for key in ration_percents.keys()])
         for key in ration_key_list:
@@ -865,10 +865,8 @@ class RationOptimizer:
                 * (DMIest * 1.1 + 0.0001)
             )
             targetbounds = (max(0.0, target_lower), target_upper)
-            tribounds.append(targetbounds)
-            tribounds.append(targetbounds)
-            tribounds.append(targetbounds)
-        return tribounds
+            bounds.append(targetbounds)
+        return bounds
 
     def optimize(
         self, animal_combination: AnimalCombination,
