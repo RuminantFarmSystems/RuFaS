@@ -401,7 +401,7 @@ class CropManagement:
         root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
         layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
         surface_layer.plant_residue += subsurface_residue * layer_fraction
-        surface_layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
+        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
         surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
         for layer in soil_data.soil_layers[1:]:
