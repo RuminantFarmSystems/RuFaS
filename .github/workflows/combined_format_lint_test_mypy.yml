@@ -97,6 +97,7 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+          ref: $${{ github.ref }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
