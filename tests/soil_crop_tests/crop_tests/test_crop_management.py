@@ -436,20 +436,18 @@ def test_record_yield(
 
 
 @pytest.mark.parametrize(
-    "root_biomass,residue,killed,expected_root_depth,expected_surface_residue,expected_root_residue",
+    "root_biomass,residue,killed,expected_surface_residue",
     [
-        (150, 150, True, 100, 0.0, 150.0),
-        (100, 150, True, 100, 50, 100.0),
-        (100, 150, False, 0, 150, 0),
+        (150, 150, True, 0.0),
+        (100, 150, True, 50),
+        (100, 150, False, 150),
     ],
 )
 def test_transfer_residue(
     root_biomass: float,
     residue: float,
     killed: bool,
-    expected_root_depth: float,
     expected_surface_residue: float,
-    expected_root_residue: float,
 ) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
     soil."""
@@ -465,10 +463,8 @@ def test_transfer_residue(
         crop_manage._transfer_residue(soil_data, killed)
         distribute_nutrients.assert_called_once() if killed else distribute_nutrients.assert_not_called()
 
-    assert soil_data.plant_surface_residue == expected_surface_residue
-    assert soil_data.plant_root_residue == expected_root_residue
-    assert soil_data.crop_root_depth == expected_root_depth
     if not killed:
+        assert soil_data.soil_layers[0].plant_residue == expected_surface_residue
         assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == 22
         assert soil_data.soil_layers[0].labile_inorganic_phosphorus_content == 23
     assert crop_data.yield_residue == 0.0
@@ -540,7 +536,7 @@ def test_distribute_residue_nutrients(
     soil_data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", [0.0] * 3)
 
-    crop_manager._distribute_residue_nutrients(soil_data, 50.0)
+    crop_manager._distribute_residue_nutrients(soil_data)
 
     assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
     assert (

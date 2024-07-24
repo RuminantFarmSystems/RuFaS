@@ -259,7 +259,6 @@ class SoilData:
     plant_residue_lignin_composition: float = 0.17
     plant_lignin_nitrogen_ratio: float = 0
     plant_residue_metabolic_fraction: float = 0
-    crop_root_depth: float = 0
     crop_yield_nitrogen: float = 0
 
     @property
