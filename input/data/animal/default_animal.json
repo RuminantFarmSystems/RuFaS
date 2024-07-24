@@ -149,7 +149,7 @@
 	"methane_model": "IPCC",
 	"ration": {
 		"phosphorus_requirement_buffer": 75,
-		"user_input": false,
+		"user_input": true,
 		"formulation_interval": 30
 	},
 	"pen_information": [
