@@ -1878,6 +1878,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
 
         """
+        distance_km = distance * GeneralConstants.M_TO_KM
         nutrient_standard = AnimalBase.config["nutrient_standard"]
         if nutrient_standard == "NRC":
             # Activity requirements
@@ -1890,14 +1891,15 @@ class AnimalRequirements:
                 net_energy_activity1 = 0.0
             # [A.Cow.A.6]-[A.Heifer.A.7]
             # Total net energy for activity requirement (Mcal)
-            net_energy_activity: float = distance * 0.00045 * body_weight + net_energy_activity1
+            net_energy_activity: float = distance_km * 0.00045 * body_weight + net_energy_activity1
             return net_energy_activity
         elif nutrient_standard == "NASEM":
             if housing == "Barn":
-                net_energy_activity = distance * 0.00035 * body_weight
+                net_energy_activity = distance_km * 0.00035 * body_weight
             elif housing == "Grazing":
                 nonpasturekgDMI: float = 1.0
-                net_energy_activity = distance * body_weight * 0.75 * (600 - 12 * nonpasturekgDMI) / 600
+                net_energy_activity = distance_km * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
+
             else:
                 net_energy_activity = 0.0
             return net_energy_activity
