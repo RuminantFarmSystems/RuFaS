@@ -76,7 +76,6 @@ class RationManager:
         previous_ration = None
         if hasattr(pen, "ration_per_animal"):
             previous_ration = pen.ration_per_animal
-
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
@@ -341,15 +340,14 @@ class RationManager:
         }
         ration_percents = UserDefinedRationManager.ration_to_use(pen.animal_combination)
         fixed_ration = False
-        num_attempts: int = 1
 
         previous_ration = None
         if hasattr(pen, "ration_per_animal"):
             previous_ration = pen.ration_per_animal
-
         solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
             req, available_feeds, pen.animal_combination, previous_ration
         )
+        num_attempts: int = 1
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
