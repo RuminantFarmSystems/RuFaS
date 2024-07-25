@@ -7,7 +7,6 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
@@ -459,17 +458,11 @@ def test_calculate_digester_methane_leakage(methane_vol: float, leakage_frac: fl
     assert actual == expected
 
 
-def test_methane_energy_content() -> None:
+@pytest.mark.parametrize("mass,expected", [(10.0, 550.0), (0.0, 0.0)])
+def test_methane_energy_content(mass: float, expected: float) -> None:
     """Tests calculate_methane_energy_content() in calculator.py."""
+    actual = GasEmissionsCalculator.calculate_methane_energy_content(mass)
 
-    # Arrange
-    CH4_volume = 10.0
-    expected = CH4_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
-
-    # Act
-    actual = GasEmissionsCalculator.calculate_methane_energy_content(CH4_volume)
-
-    # Assert
     assert actual == expected
 
 

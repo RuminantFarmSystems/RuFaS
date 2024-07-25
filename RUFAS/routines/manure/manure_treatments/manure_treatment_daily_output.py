@@ -161,8 +161,8 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     methane_generation_mass_unit: MeasurementUnits
         Unit for methane_generation_mass.
     methane_energy_content: float
-        Energy content of methane, MJ/m^3.
-    methane_energy_content_unit: MeasurementUnits
+        Energy content of methane, MJ.
+    methane_energy_content_unit: MeasurementUnits, default MeasurementUnits.MEGAJOULES
         Unit for methane_energy_content.
     methane_generation_volume: float
         Amount of methane generated, m^3.
@@ -305,7 +305,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     methane_generation_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS_PER_DAY
 
     methane_energy_content: float = 0.0
-    methane_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES_PER_CUBIC_METER
+    methane_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES
 
     methane_generation_volume: float = 0.0
     methane_generation_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS

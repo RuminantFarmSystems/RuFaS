@@ -818,13 +818,13 @@ class GasEmissionsCalculator:
         return generated_methane_volume * digester_methane_leakage_fraction
 
     @classmethod
-    def calculate_methane_energy_content(cls, methane_volume: float) -> float:
+    def calculate_methane_energy_content(cls, methane_mass: float) -> float:
         """Calculates energy content of methane generated in a digester.
 
         Parameters
         ----------
-        methane_volume : float
-            Methane generation volume, m^3.
+        methane_mass : float
+            Methane generation mass, kg.
 
         Returns
         -------
@@ -832,7 +832,7 @@ class GasEmissionsCalculator:
             Methane energy content, MJ.
 
         """
-        return methane_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        return methane_mass * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     @classmethod
     def methane_emission_from_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
