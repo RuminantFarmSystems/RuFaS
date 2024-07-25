@@ -174,12 +174,13 @@ class AnaerobicLagoon(BaseManureTreatment):
             0.0,
         )
         self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
-        new_accumulated_liquid_total_ammoniacal_nitrogen = max(
+
+        new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
             self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - daily_output.storage_ammonia,
             0.0,
         )
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
-            new_accumulated_liquid_total_ammoniacal_nitrogen
+            new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
 
         daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
@@ -391,7 +392,9 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         base_volume = self.lagoon_length * self.lagoon_width * self.lagoon_depth
-        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth**2)) * (self.lagoon_length + self.lagoon_width)
+        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth**2)) * (
+            self.lagoon_length + self.lagoon_width
+        )
         slope_correction_corners = 4 * self.lagoon_slope * (self.lagoon_depth**3) / 3
 
         return base_volume - slope_correction_sides + slope_correction_corners
