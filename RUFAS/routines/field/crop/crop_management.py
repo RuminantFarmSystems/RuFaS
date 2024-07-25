@@ -438,7 +438,7 @@ class CropManagement:
         will not contain any of the crop's root mass.
 
         """
-        if bottom_depth >= self.data.max_root_depth:
+        if bottom_depth >= self.data.root_depth:
             return 1.0
         if bottom_depth == 0.0:
             return 0.0
@@ -447,9 +447,9 @@ class CropManagement:
             1 + (bottom_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
         )
         second_term = 1 - 1 / (
-            1 + (self.data.max_root_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
+            1 + (self.data.root_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
         )
-        third_term = bottom_depth / self.data.max_root_depth
+        third_term = bottom_depth / self.data.root_depth
 
         return first_term + second_term * third_term
 
