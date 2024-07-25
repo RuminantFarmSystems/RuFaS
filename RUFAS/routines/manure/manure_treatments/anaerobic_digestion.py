@@ -116,10 +116,10 @@ class AnaerobicDigestion(BaseManureTreatment):
             total_methane_generation_volume, self.config.digester_methane_leakage_fraction
         )
         captured_methane_generation_volume = total_methane_generation_volume - methane_leakage
-        captured_methane_energy_content = GasEmissionsCalculator.calculate_methane_energy_content(
-            methane_volume=captured_methane_generation_volume
-        )
         captured_methane_generation_mass = captured_methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
+        captured_methane_energy_content = GasEmissionsCalculator.calculate_methane_energy_content(
+            methane_mass=captured_methane_generation_mass
+        )
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
         new_daily_output.methane_energy_content = captured_methane_energy_content

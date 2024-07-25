@@ -58,8 +58,8 @@ class GasEmissionConstants:
 
     METHANE_TO_METHANE_CARBON_DIOXIDE_RATIO: float = 9.25
     """
-    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar ratio of 1:3 
-    (methane : carbon dioxide).
+    The mass conversion factor from methane to methane and carbon dioxide emitted from stored manure, based on a molar
+    ratio of 1:3 (methane : carbon dioxide).
     """
 
     AD_METHANE_DENSITY: float = 0.629

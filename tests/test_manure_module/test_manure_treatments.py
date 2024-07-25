@@ -2324,7 +2324,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         manure_total_volatile_solids=mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids
     )
     patch_for_calc_methane_leakage.assert_called_once_with(methane_generation_volume, methane_leak_frac)
-    patch_for_calc_methane_energy_content.assert_called_once_with(methane_volume=expected_captured_methane_volume)
+    patch_for_calc_methane_energy_content.assert_called_once_with(methane_mass=expected_captured_methane_mass)
 
     assert actual_anaerobic_digestion_daily_output.methane_generation_mass == approx(expected_captured_methane_mass)
     assert actual_anaerobic_digestion_daily_output.heating_input_energy == approx(expected_heating_input_energy)

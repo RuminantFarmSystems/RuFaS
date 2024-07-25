@@ -74,5 +74,6 @@ class ManureConstants:
 
     AD_TAN_INCREASE_FACTOR = 1.60
     """
-    The factor by which manure total ammoniacal nitrogen content is increased by the anaerobic digestion process (unitless).
+    The factor by which manure total ammoniacal nitrogen content is increased by the anaerobic digestion process
+    (unitless).
     """
