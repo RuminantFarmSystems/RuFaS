@@ -117,7 +117,9 @@ class AnaerobicDigestion(BaseManureTreatment):
         methane_leakage = GasEmissionsCalculator.calculate_digester_methane_leakage(
             total_methane_generation_mass, self.config.digester_methane_leakage_fraction
         )
-        captured_methane_generation_volume = total_methane_generation_volume - (methane_leakage / GasEmissionConstants.AD_METHANE_DENSITY)
+        captured_methane_generation_volume = total_methane_generation_volume - (
+            methane_leakage / GasEmissionConstants.AD_METHANE_DENSITY
+        )
         captured_methane_generation_mass = total_methane_generation_mass - methane_leakage
         captured_methane_energy_content = GasEmissionsCalculator.calculate_methane_energy_content(
             methane_mass=captured_methane_generation_mass
