@@ -138,7 +138,7 @@
           "type": "number",
           "description": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off",
           "default": 218,
-          "minimum": 0
+          "minimum": 1
         },
         "heifer_repro_cull_time": {
           "type": "number",
@@ -214,7 +214,7 @@
             "type": "number",
             "description": "Wean Length (days) -- Length of the weaning process",
             "default": 7,
-            "minimum": 0
+            "minimum": 1
           },
           "milk_type": {
             "type": "string",
@@ -271,7 +271,7 @@
             "type": "number",
             "description": "Calving Interval (days) -- Current average calving interval, used for initial bodyweight adjustment and other calculations",
             "default": 400,
-            "minimum": 0
+            "minimum": 1
           },
           "heifers": {
             "type": "object",
@@ -375,7 +375,7 @@
             "type": "number",
             "description": "Average Holstein Birth Weight (kg/head)",
             "default": 42.9,
-            "minimum": 0
+            "minimum": 8
           },
           "birth_weight_std_ho": {
             "type": "number",
@@ -387,7 +387,7 @@
             "type": "number",
             "description": "Average Jersey Birth Weight (kg/head)",
             "default": 25.2,
-            "minimum": 0
+            "minimum": 8
           },
           "birth_weight_std_je": {
             "type": "number",
