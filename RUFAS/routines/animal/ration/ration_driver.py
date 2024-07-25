@@ -42,6 +42,7 @@ class RationManager:
         pen: Pen,
         available_feeds: AvailableFeedsTypedDict,
         animal_grouping_scenario: AnimalGroupingScenario,
+        sim_day: int,
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
@@ -57,6 +58,8 @@ class RationManager:
         animal_grouping_scenario : AnimalGroupingScenario enum
             A grouping scenario of animals used in the current simulation,
             specified in AnimalGroupingScenario enum and AnimalManager class.
+        sim_day: int
+            Current simulation day of the simulation.
 
         Returns
         -------
@@ -71,7 +74,9 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.is_udr:
-            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
+            ration, ration_vals = cls.get_user_defined_ration(
+                req, pen, available_feeds, animal_grouping_scenario, sim_day
+            )
             return ration, ration_vals
 
         if hasattr(pen, "ration_per_animal"):
@@ -259,6 +264,7 @@ class RationManager:
         pen,
         available_feeds: AvailableFeedsTypedDict,
         animal_grouping_scenario,
+        sim_day: int,
     ) -> tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
@@ -283,6 +289,8 @@ class RationManager:
 
         animal_grouping_scenario : AnimalCombination
             the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
+        sim_day: int
+            Current simulation day of the simulation.
 
         Returns
         -------
@@ -337,9 +345,8 @@ class RationManager:
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
-            animal_list = list(pen.animals_in_pen.values())
             fail_summary = {
-                "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
+                "simulation day": sim_day,
                 "reattempt number": num_reattempts,
                 "constraints_failed_dict": constraints_failed_list,
                 "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
@@ -393,7 +400,7 @@ class RationManager:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
                     fail_summary = {
-                        "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
+                        "simulation day": sim_day,
                         "reattempt number": num_reattempts,
                         "constraints_failed_dict": constraints_failed_list,
                         "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
