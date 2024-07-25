@@ -2282,7 +2282,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     patch_for_calc_methane_leakage = mocker.patch.object(
         GasEmissionsCalculator,
         "calculate_digester_methane_leakage",
-        wraps=GasEmissionsCalculator.calculate_digester_methane_leakage
+        wraps=GasEmissionsCalculator.calculate_digester_methane_leakage,
     )
 
     expected_methane_generation_mass = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY

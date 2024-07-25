@@ -310,8 +310,8 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     methane_generation_volume: float = 0.0
     methane_generation_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
 
-    methane_leakage_volume : float = 0.0
-    methane_leakage_volume_unit : MeasurementUnits = MeasurementUnits.CUBIC_METERS
+    methane_leakage_volume: float = 0.0
+    methane_leakage_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
 
     heating_input_energy: float = 0.0
     heating_input_energy_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES
