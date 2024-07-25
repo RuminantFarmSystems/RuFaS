@@ -631,8 +631,8 @@ class ReportGenerator:
 
             return combined_numerator, combined_denominator
 
-        if operation in ['product', 'division']:
-            if operation == 'product':
+        if operation in ["product", "division"]:
+            if operation == "product":
                 combined_numerator = add_units(numerator1, numerator2)
                 combined_denominator = add_units(denominator1, denominator2)
             elif operation == "division":
