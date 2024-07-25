@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Any, Callable, Collection
+from typing import Dict, List, Any, Callable, Collection, Tuple
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.util import Utility
 
@@ -274,10 +274,9 @@ class ReportGenerator:
             If the value of 'horizontal_first' in the report filter is not a boolean.
         """
 
-        if "horizontal_first" not in filter_content:
+        horizontal_first = filter_content.get("horizontal_first", False)
+        if not horizontal_first:
             return False
-
-        horizontal_first = filter_content["horizontal_first"]
 
         if not isinstance(horizontal_first, bool):
             raise ValueError(
@@ -371,7 +370,8 @@ class ReportGenerator:
         missing_references = []
 
         for ref in references:
-            if not any(re.fullmatch(ref, report_name) for report_name in self.reports):
+            escaped_ref = re.escape(ref)
+            if not any(re.fullmatch(escaped_ref, report_name) for report_name in self.reports):
                 missing_references.append(ref)
 
         if missing_references:
@@ -397,8 +397,9 @@ class ReportGenerator:
 
         matched_reports = {}
         for pattern in regex_patterns:
+            escaped_pattern = re.escape(pattern)
             for report_name in self.reports:
-                if re.fullmatch(pattern, report_name):
+                if re.fullmatch(escaped_pattern, report_name):
                     matched_reports[report_name] = self.reports[report_name]
         return matched_reports
 
@@ -440,7 +441,10 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data: Dict[str, List[Any]] = {key: filtered_pool[key]["values"] for key in filtered_pool.keys()}
+            report_data: Dict[str, List[Any]] = filtered_pool
+            if filter_content.get("display_units", True):
+                report_data = self._add_var_units(report_data)
+            report_data = {key: report_data[key]["values"] for key in report_data.keys()}
             if not all(report_data[key] for key in report_data.keys()):
                 raise ValueError
             self._add_constants_to_report_data(report_data, filter_content)
@@ -465,10 +469,13 @@ class ReportGenerator:
         elif horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
             loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
-            horizontally_aggregated = self._apply_horizontal_aggregation(
+            horizontally_aggregated, aggregated_units = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
-            aggregate_report = {"hor_agg": horizontally_aggregated}
+            if filter_content.get("display_units", True):
+                aggregate_report = {f"hor_agg_({aggregated_units})": horizontally_aggregated}
+            else:
+                aggregate_report = {"hor_agg": horizontally_aggregated}
 
         elif vertical_agg_key:
             vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
@@ -476,13 +483,221 @@ class ReportGenerator:
 
             has_dict_variables = filter_content.get("variables") is not None
             has_multiple_columns = len(vertically_aggregated) > 1
-
-            if has_dict_variables or has_multiple_columns:
-                aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
+            if filter_content.get("display_units", True):
+                if has_dict_variables or has_multiple_columns:
+                    aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
+                else:
+                    units = re.search(r"\(.*\)", next(iter(report_data)))
+                    aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
             else:
-                aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+                if has_dict_variables or has_multiple_columns:
+                    aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
+                else:
+                    aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
 
         return aggregate_report
+
+    @staticmethod
+    def _update_key(key: str) -> str:
+        """Updates dictionary keys to keep units at the end of the key.
+
+        Parameters
+        ----------
+        key : str
+            The key to be updated
+
+        Returns
+        -------
+        str
+            The updated key.
+        """
+        match = re.search(r"\(.*?\)", key)
+        if match:
+            units = match.group(0)
+            base_key = key[: match.start()].strip()
+            updated_key = f"{base_key}_ver_agg_{units}"
+        else:
+            updated_key = f"{key}_ver_agg"
+        return updated_key
+
+    @staticmethod
+    def _parse_unit(unit: str) -> dict:
+        """Parses a unit string to handle units with exponents.
+
+        Parameters
+        ----------
+        unit : str
+            A string representing measurement units.
+
+        Returns
+        -------
+        dict
+            A dictionary where the keys are unit names (str) and the values are their exponents (int).
+        """
+        unit_dict = {}
+        for part in unit.split("*"):
+            if "^" in part:
+                u, exp = part.split("^")
+                unit_dict[u.strip()] = int(exp)
+            else:
+                unit_dict[part.strip()] = 1
+        return unit_dict
+
+    @staticmethod
+    def _extract_units(key: str) -> tuple[dict, dict]:
+        """Extracts the units from a key.
+
+        Parameters
+        ----------
+        key : str
+            The key from which the units are extracted.
+
+        Returns
+        -------
+        tuple[dict, dict]
+            A tuple of the numerator and denominator units. If there is no denominator, the first element of tuple will
+            have the units and the second will be an empty string. If no units are found, it will return a tuple with
+            two empty strings.
+        """
+        match = re.search(r"\((.*?)\)", key)
+        if match:
+            units = match.group(1)
+            if "/" in units:
+                numerator, denominator = units.split("/")
+                numerator_units = ReportGenerator._parse_unit(numerator)
+                denominator_units = ReportGenerator._parse_unit(denominator)
+                return numerator_units, denominator_units
+            else:
+                numerator_units = ReportGenerator._parse_unit(units)
+                return numerator_units, {}
+        else:
+            return {}, {}
+
+    @staticmethod
+    def _combine_units(
+        numerator1: dict, denominator1: dict, numerator2: dict, denominator2: dict, operation: str
+    ) -> tuple[dict, dict]:
+        """
+        Combines two sets of units (numerator and denominator) based on the specified operation.
+
+        Parameters
+        ----------
+        numerator1 : dict
+            First set of numerator units, where keys are unit names (str) and values are exponents (int).
+        denominator1 : dict
+            First set of denominator units, where keys are unit names (str) and values are exponents (int).
+        numerator2 : dict
+            Second set of numerator units, where keys are unit names (str) and values are exponents (int).
+        denominator2 : dict
+            Second set of denominator units, where keys are unit names (str) and values are exponents (int).
+        operation : str
+            The operation to combine the units. Can be one of 'product', 'division', 'sum', 'subtraction',
+            'average', 'SD'.
+
+        Returns
+        -------
+        (dict, dict)
+            Two dictionaries representing the combined numerator and denominator units.
+
+        Raises
+        ------
+        ValueError
+            If the operation is addition or subtraction and the units are not the same.
+        """
+
+        def add_units(units1, units2, sign=1):
+            result_units = units1.copy()
+            for unit, exponent in units2.items():
+                if unit == "unitless" or unit == "1":
+                    continue
+                if unit in result_units:
+                    result_units[unit] += sign * exponent
+                else:
+                    result_units[unit] = sign * exponent
+            return {unit: exp for unit, exp in result_units.items() if exp != 0}
+
+        def simplify_units(numerator, denominator):
+            combined_numerator = numerator.copy()
+            combined_denominator = denominator.copy()
+
+            for unit in list(combined_numerator.keys()):
+                if unit in combined_denominator:
+                    if combined_numerator[unit] == combined_denominator[unit]:
+                        del combined_numerator[unit]
+                        del combined_denominator[unit]
+                    else:
+                        combined_numerator[unit] -= combined_denominator[unit]
+                        del combined_denominator[unit]
+
+            return combined_numerator, combined_denominator
+
+        if operation in ['product', 'division']:
+            if operation == 'product':
+                combined_numerator = add_units(numerator1, numerator2)
+                combined_denominator = add_units(denominator1, denominator2)
+            elif operation == "division":
+                combined_numerator = add_units(numerator1, denominator2)
+                combined_denominator = add_units(denominator1, numerator2, sign=-1)
+
+            combined_numerator, combined_denominator = simplify_units(combined_numerator, combined_denominator)
+
+        elif operation in ["sum", "subtraction", "average", "SD"]:
+            if numerator1 != numerator2 or denominator1 != denominator2:
+                # TODO add warning to OM
+                pass
+            combined_numerator = numerator1.copy()
+            combined_denominator = denominator1.copy()
+
+        return combined_numerator, combined_denominator
+
+    @staticmethod
+    def _units_to_string(numerator: dict, denominator: dict) -> str:
+        """
+        Converts two dictionaries of units (numerator and denominator) back to a single string format.
+
+        Parameters
+        ----------
+        numerator : dict
+            A dictionary where the keys are unit names (str) and the values are their exponents (int) for the numerator.
+        denominator : dict
+            A dictionary where the keys are unit names (str) and the values are their exponents (int) for the
+            denominator.
+
+        Returns
+        -------
+        str
+            A string representing the units.
+        """
+        numerator_units = []
+        denominator_units = []
+
+        for unit, exponent in numerator.items():
+            if unit == "unitless":
+                continue
+            if exponent == 1:
+                numerator_units.append(unit)
+            else:
+                numerator_units.append(f"{unit}^{exponent}")
+
+        for unit, exponent in denominator.items():
+            if unit == "unitless":
+                continue
+            if exponent == 1:
+                denominator_units.append(unit)
+            else:
+                denominator_units.append(f"{unit}^{exponent}")
+
+        numerator_str = "*".join(numerator_units)
+        denominator_str = "*".join(denominator_units)
+
+        if numerator_str and denominator_str:
+            return f"{numerator_str}/{denominator_str}"
+        elif numerator_str:
+            return numerator_str
+        elif denominator_str:
+            return f"1/{denominator_str}"
+        else:
+            return "unitless"
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
@@ -516,16 +731,23 @@ class ReportGenerator:
         vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
         if horizontal_first:
             loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
-            horizontally_aggregated = self._apply_horizontal_aggregation(
+            horizontally_aggregated, aggregate_units = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
-            aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
+            if filter_content.get("display_units", True):
+                aggregate_report = {f"hor_ver_agg_({aggregate_units})": [vertical_aggregator(horizontally_aggregated)]}
+            else:
+                aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
         else:
             vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
             ver_hor_aggregated = []
             for elements in zip(*vertically_aggregated.values()):
                 ver_hor_aggregated.append(horizontal_aggregator(list(elements)))
-            aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
+            aggregate_units = self._aggregate_units(vertically_aggregated, horizontal_aggregator)
+            if filter_content.get("display_units", True):
+                aggregate_report = {f"ver_hor_agg_({aggregate_units})": ver_hor_aggregated}
+            else:
+                aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
         return aggregate_report
 
     def _extract_and_check_aggregation_keys(self, filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
@@ -567,7 +789,7 @@ class ReportGenerator:
         report_data: Dict[str, List[float]],
         loop_list: List[str],
         aggregator: Callable[[List[float]], float],
-    ) -> List[float]:
+    ) -> Tuple[List[float], str]:
         """
         Performs horizontal aggregation on report data using a specified aggregator function.
 
@@ -591,16 +813,64 @@ class ReportGenerator:
             If the data to be aggregated has different lengths.
         """
 
-        lengths = [len(report_data[key]) for key in loop_list]
+        lengths = [len(report_data[key]) for key in report_data if any(loop_key in key for loop_key in loop_list)]
         if len(set(lengths)) != 1:
             raise ValueError("Can't aggregate data with different lengths")
         max_length = max(lengths)
         aggregated_data: List[float] = []
         for i in range(max_length):
-            temp_data = [report_data[key][i] for key in loop_list]
+            temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
-        return aggregated_data
+        aggregated_units = self._aggregate_units(report_data, aggregator)
+        return aggregated_data, aggregated_units
+
+    def _aggregate_units(
+        self,
+        report_data: Dict[str, List[float]],
+        aggregator: Callable[[List[float]], float],
+    ) -> str:
+        """Creates the appropriate units for the associated aggregator function used.
+
+        Parameters
+        ----------
+        report_data : Dict[str, List[float]]
+            The data pool to be aggregated, structured as a dictionary of lists.
+        aggregator : Callable[[List[float]], float]
+            The aggregation function to be used.
+
+        Returns
+        -------
+        str
+            The expected units of aggregating the report data using the accompanying aggregator function.
+        """
+        if 0 >= len(report_data) > 2:
+            raise ValueError("No report data available.")
+        elif len(report_data) == 1:
+            var_units_match = re.search(r"\((.*?)\)", next(iter(report_data)))
+            if var_units_match:
+                return var_units_match.group(1)
+            else:
+                return ""
+        else:
+            aggregator_key = None
+            for key, function in AGGREGATION_FUNCTIONS.items():
+                if function == aggregator:
+                    aggregator_key = key
+                    break
+            first_key, second_key = list(report_data.keys())[:2]
+            first_key_numerator_units, first_key_denominator_units = self._extract_units(first_key)
+            second_key_numerator_units, second_key_denominator_units = self._extract_units(second_key)
+            combined_numerator, combined_denominator = self._combine_units(
+                first_key_numerator_units,
+                first_key_denominator_units,
+                second_key_numerator_units,
+                second_key_denominator_units,
+                aggregator_key,
+            )
+            stringified_combined_units = self._units_to_string(combined_numerator, combined_denominator)
+
+        return stringified_combined_units
 
     def _apply_vertical_aggregation(
         self,
@@ -714,3 +984,31 @@ class ReportGenerator:
 
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
+
+    def _add_var_units(self, report_data: dict[str, List[Any]]) -> dict[str, List[Any]]:
+        """Adds variable units to variable name.
+
+        Parameters
+        ----------
+        filtered_pool : dict[str, List[Any]]
+            The data to be reported.
+
+        Returns
+        -------
+        dict[str, List[Any]]
+            The updated data with units added.
+        """
+        updated_data = {}
+        if not any("info_maps" in details for details in report_data.values()):
+            return report_data
+        for var_name, details in report_data.items():
+            unit_info = details["info_maps"][0]["units"]
+            if isinstance(unit_info, dict):
+                unit = unit_info.get(var_name, "not available")
+            else:
+                unit = unit_info
+
+            new_var_name = f"{var_name} ({unit})"
+            updated_data[new_var_name] = details
+
+        return updated_data
