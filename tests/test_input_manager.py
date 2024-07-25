@@ -11,6 +11,7 @@ from mock.mock import call
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
+from RUFAS.util import Utility
 
 
 @pytest.fixture
@@ -61,7 +62,6 @@ def input_manager_original_method_states(
         "get_data_keys_by_properties": mock_input_manager.get_data_keys_by_properties,
         "flush_pool": mock_input_manager.flush_pool,
         "_metadata_properties_exist": mock_input_manager._metadata_properties_exist,
-        "_set_nested_value": mock_input_manager._set_nested_value,
         "_add_variable_to_pool": mock_input_manager._add_variable_to_pool,
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
@@ -2733,30 +2733,6 @@ def test_log_missing_data_runtime_key_error(
     assert mock_add_warning.call_count == 0
 
 
-@pytest.mark.parametrize(
-    "nested_dict, element_hierarchy, value, expected_result",
-    [
-        ({}, ["a"], 1, {"a": 1}),
-        ({"a": 1}, ["a"], 2, {"a": 2}),
-        ({"a": {"b": 1}}, ["a", "c"], 2, {"a": {"b": 1, "c": 2}}),
-        ({"a": {"b": {"c": 1}}}, ["a", "b", "d"], 2, {"a": {"b": {"c": 1, "d": 2}}}),
-        ({"a": {"b": {"c": 1}}}, ["a", "b", "d", "e"], 2, {"a": {"b": {"c": 1, "d": {"e": 2}}}}),
-    ],
-)
-def test_set_nested_value(
-    nested_dict: Dict[str, Any],
-    element_hierarchy: List[str],
-    value: Any,
-    expected_result: Dict[str, Any],
-    mock_input_manager: InputManager,
-) -> None:
-    actual_result = mock_input_manager._set_nested_value(
-        nested_dict=nested_dict, element_hierarchy=element_hierarchy, value=value
-    )
-
-    assert actual_result == expected_result
-
-
 @pytest.fixture
 def mock_metadata_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any]]:
     return {
@@ -4814,7 +4790,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
 
 
 @pytest.mark.parametrize(
-    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties",
+    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties,is_nested",
     [
         (
             "example_property",
@@ -4825,6 +4801,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
                 "example_property": {"description": "An example property", "type": "string"},
                 "object_property": {"nested_property": {"description": "An example property", "type": "string"}},
             },
+            False,
         ),
         (
             "example_property.object_property.nested_property",
@@ -4832,6 +4809,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
             "example_blob_key",
             {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
             {"type": "string", "description": "An example property"},
+            True,
         ),
     ],
 )
@@ -4843,13 +4821,18 @@ def test_prepare_data(
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
     mocker: MockerFixture,
+    nested: bool,
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
+    mock_flat_to_nested = mocker.patch.object(
+        Utility, "flatten_keys_to_nested_structure", wraps=Utility.flatten_keys_to_nested_structure
+    )
 
     data, metadata_properties = input_manager._prepare_data(variable_name, input_data, properties_blob_key)
-
+    if nested:
+        mock_flat_to_nested.assert_called_once()
     assert data == expected_data
     assert metadata_properties == expected_metadata_properties
 
