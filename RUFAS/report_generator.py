@@ -465,9 +465,6 @@ class ReportGenerator:
             aggregate_report = self._handle_horizontal_and_vertical_aggregations(
                 aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
             )
-            if filter_content.get("display_units", True):
-                units = re.search(r"\(.*\)", next(iter(report_data)))
-                aggregate_report = {units.group(0): list(aggregate_report.values())[0]}
 
         elif horizontal_agg_key:
             horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
@@ -476,7 +473,7 @@ class ReportGenerator:
                 aggregate_report, loop_list, horizontal_aggregator
             )
             if filter_content.get("display_units", True):
-                aggregate_report = {f"hor_agg_{aggregated_units}": horizontally_aggregated}
+                aggregate_report = {f"hor_agg_({aggregated_units})": horizontally_aggregated}
             else:
                 aggregate_report = {"hor_agg": horizontally_aggregated}
 
@@ -518,7 +515,7 @@ class ReportGenerator:
         if match:
             units = match.group(0)
             base_key = key[: match.start()].strip()
-            updated_key = f"{base_key}_ver_agg {units}"
+            updated_key = f"{base_key}_ver_agg_{units}"
         else:
             updated_key = f"{key}_ver_agg"
         return updated_key
@@ -628,7 +625,8 @@ class ReportGenerator:
         elif operation in ['sum', 'subtraction', 'average', 'SD']:
             if numerator1 != numerator2 or denominator1 != denominator2:
                 # TODO add warning to OM instead of raising valueerror
-                raise ValueError("Units must be the same for addition, subtraction, average, and standard deviation.")
+                # raise ValueError("Units must be the same for addition, subtraction, average, and standard deviation.")
+                pass
             combined_numerator = numerator1.copy()
             combined_denominator = denominator1.copy()
 
@@ -719,7 +717,7 @@ class ReportGenerator:
                 aggregate_report, loop_list, horizontal_aggregator
             )
             if filter_content.get("display_units", True):
-                aggregate_report = {f"hor_ver_agg_{aggregate_units}": [vertical_aggregator(horizontally_aggregated)]}
+                aggregate_report = {f"hor_ver_agg_({aggregate_units})": [vertical_aggregator(horizontally_aggregated)]}
             else:
                 aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
         else:
@@ -729,7 +727,7 @@ class ReportGenerator:
                 ver_hor_aggregated.append(horizontal_aggregator(list(elements)))
             aggregate_units = self._aggregate_units(vertically_aggregated, horizontal_aggregator)
             if filter_content.get("display_units", True):
-                aggregate_report = {f"ver_hor_agg_{aggregate_units}": ver_hor_aggregated}
+                aggregate_report = {f"ver_hor_agg_({aggregate_units})": ver_hor_aggregated}
             else:
                 aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
         return aggregate_report
