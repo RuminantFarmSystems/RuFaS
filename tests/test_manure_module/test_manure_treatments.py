@@ -2302,7 +2302,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     )
     expected_evaporated_water = evaporation_fraction * daily_final_manure_volume
     expected_captured_methane_mass = expected_methane_generation_mass * (1 - methane_leak_frac)
-    expected_methane_leakage = methane_generation_volume * methane_leak_frac
+    expected_methane_leakage = expected_methane_generation_mass * methane_leak_frac
     expected_captured_methane_volume = methane_generation_volume * (1 - methane_leak_frac)
     expected_minimum_digester_volume = daily_final_manure_volume * hydraulic_retention_time
     expected_top_cover_volume = expected_minimum_digester_volume * top_cover_volume_fraction
@@ -2323,7 +2323,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     patch_for_CSTR_methane_volume.assert_called_once_with(
         manure_total_volatile_solids=mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids
     )
-    patch_for_calc_methane_leakage.assert_called_once_with(methane_generation_volume, methane_leak_frac)
+    patch_for_calc_methane_leakage.assert_called_once_with(expected_methane_generation_mass, methane_leak_frac)
     patch_for_calc_methane_energy_content.assert_called_once_with(methane_mass=expected_captured_methane_mass)
 
     assert actual_anaerobic_digestion_daily_output.methane_generation_mass == approx(expected_captured_methane_mass)
@@ -2333,7 +2333,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     assert actual_anaerobic_digestion_daily_output.minimum_digester_volume == approx(expected_minimum_digester_volume)
     assert actual_anaerobic_digestion_daily_output.top_cover_volume == approx(expected_top_cover_volume)
     assert actual_anaerobic_digestion_daily_output.methane_generation_volume == approx(expected_captured_methane_volume)
-    assert actual_anaerobic_digestion_daily_output.methane_leakage_volume == approx(expected_methane_leakage)
+    assert actual_anaerobic_digestion_daily_output.methane_leakage_mass == approx(expected_methane_leakage)
     assert actual_anaerobic_digestion_daily_output.liquid_manure_total_volatile_solids == approx(expected_total_VS)
     assert actual_anaerobic_digestion_daily_output.liquid_manure_total_degradable_volatile_solids == approx(
         expected_VSd

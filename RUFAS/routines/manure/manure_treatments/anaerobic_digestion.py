@@ -115,10 +115,10 @@ class AnaerobicDigestion(BaseManureTreatment):
             - (AD_VS_destruction / ManureConstants.SLURRY_MANURE_DENSITY)
         )
         methane_leakage = GasEmissionsCalculator.calculate_digester_methane_leakage(
-            total_methane_generation_volume, self.config.digester_methane_leakage_fraction
+            total_methane_generation_mass, self.config.digester_methane_leakage_fraction
         )
-        captured_methane_generation_volume = total_methane_generation_volume - methane_leakage
-        captured_methane_generation_mass = captured_methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
+        captured_methane_generation_volume = total_methane_generation_volume - (methane_leakage / GasEmissionConstants.AD_METHANE_DENSITY)
+        captured_methane_generation_mass = total_methane_generation_mass - methane_leakage
         captured_methane_energy_content = GasEmissionsCalculator.calculate_methane_energy_content(
             methane_mass=captured_methane_generation_mass
         )
@@ -127,7 +127,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         new_daily_output.methane_energy_content = captured_methane_energy_content
         new_daily_output.minimum_digester_volume = minimum_digester_volume
         new_daily_output.top_cover_volume = top_cover_volume
-        new_daily_output.methane_leakage_volume = methane_leakage
+        new_daily_output.methane_leakage_mass = methane_leakage
         new_daily_output.methane_generation_volume = captured_methane_generation_volume
         new_daily_output.methane_generation_mass = captured_methane_generation_mass
         return new_daily_output

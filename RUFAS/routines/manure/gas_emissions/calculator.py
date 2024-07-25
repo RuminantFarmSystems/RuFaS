@@ -797,25 +797,25 @@ class GasEmissionsCalculator:
 
     @classmethod
     def calculate_digester_methane_leakage(
-        cls, generated_methane_volume: float, digester_methane_leakage_fraction: float
+        cls, generated_methane_mass: float, digester_methane_leakage_fraction: float
     ) -> float:
         """
-        Calculates the volume of methane lost from a digester.
+        Calculates the mass of methane lost from a digester.
 
         Parameters
         ----------
-        generated_methane_volume : float
-            Amount of methane generated within the digester, m^3.
+        generated_methane_mass : float
+            Amount of methane generated within the digester, kg.
         digester_methane_leakage_fraction : float
             Fraction of generated methane that escapes as leakage.
 
         Returns
         -------
         float
-            Volume of methane lost as leakage, m^3.
+            Mass of methane lost as leakage, kg.
 
         """
-        return generated_methane_volume * digester_methane_leakage_fraction
+        return generated_methane_mass * digester_methane_leakage_fraction
 
     @classmethod
     def calculate_methane_energy_content(cls, methane_mass: float) -> float:
