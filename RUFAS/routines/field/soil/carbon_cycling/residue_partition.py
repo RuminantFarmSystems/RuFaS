@@ -196,43 +196,6 @@ class ResiduePartition:
         self.data.set_vectorized_layer_attribute("soil_structural_to_slow_or_active_rate", rates)
 
     @staticmethod
-    def _determine_soil_dry_matter_residue_amount(
-        root_depth: float,
-        plant_root_residue: float,
-        layer_bottom: float,
-        layer_top: float,
-        layer_thickness: float,
-    ) -> float:
-        """
-        Determine the amount of dry matter residue in each layer according to the portion of root in such layer.
-
-        Parameters
-        ----------
-        root_depth : float
-            Root depth of the crop harvested (mm).
-        plant_root_residue : float
-            Plant residue below the surface of the soil (kg/ha).
-        layer_bottom : float
-            Bottom depth of the layer (mm).
-        layer_top : float
-            Top depth of the layer (mm).
-        layer_thickness : float
-            Thickness of the soil layer (mm).
-
-        Returns
-        -------
-        float
-            The amount of dry matter residue in the layer.
-
-        """
-        if layer_top >= root_depth:
-            return 0
-        elif layer_bottom <= root_depth:
-            return plant_root_residue * layer_thickness / root_depth
-        else:
-            return plant_root_residue * (root_depth - layer_top) / root_depth
-
-    @staticmethod
     def _determine_plant_residue_lignin_composition(plant_residue_lignin_composition: float, rainfall: float) -> float:
         """
         This method calculates and updates the plant_residue_lignin_composition based on the amount of rainfall.

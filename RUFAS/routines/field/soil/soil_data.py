@@ -142,18 +142,12 @@ class SoilData:
         Amount of stable organic nitrogen removed from the soil surface by eroded sediment (kg / ha).
     eroded_active_organic_nitrogen : float, default 0.0
         Amount of active organic nitrogen removed from the soil surface by eroded sediment (kg / ha).
-    plant_surface_residue : float, default 0
-        Plant residue on the surface of the soil (kg/ha).
-    plant_root_residue : float, default 0
-        Plant residue below the surface of the soil (kg/ha).
     plant_residue_lignin_composition : float, default 0.17
         Lignin fraction of plant residue (unitless).
     plant_lignin_nitrogen_ratio : float, default 0
         Plant lignin to nitrogen ratio (unitless).
     plant_residue_metabolic_fraction : float, default 0
         Plant residue fraction that is metabolic (unitless).
-    crop_root_depth : float, default 0
-        Root depth of the crop harvested (mm).
     crop_yield_nitrogen : float, default 0
         Nitrogen contained in the harvested yield (kg/ha).
     machine_manure : ManurePool
@@ -263,7 +257,10 @@ class SoilData:
 
     @property
     def all_residue(self) -> float:
-        """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
+        """
+        Amount of total plant residue, above and below-ground, on the field which is to be transferred to litter pools
+        in the soil profile (kg/ha).
+        """
         return sum(self.get_vectorized_layer_attribute("plant_residue"))
 
     def __post_init__(self, field_size: float):

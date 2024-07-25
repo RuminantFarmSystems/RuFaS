@@ -1,6 +1,6 @@
 import pytest
 import math
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, patch
 from pytest_mock import MockerFixture
 from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.crop.crop_data import CropData
@@ -500,30 +500,6 @@ def test_determine_soil_structural_carbon_amount(
         soil_structural_to_slow_carbon_amount,
         root_biomass,
         soil_structural_carbon_amount,
-    )
-
-
-@pytest.mark.parametrize(
-    "root_depth, plant_root_residue, layer_bottom, layer_top, layer_thickness," "expected_dry_matter_residue_amount",
-    [
-        (100, 100, 50.5, 20.69, 40.3, 40.3),
-        (40, 100, 50.53, 20, 32, 50),
-        (20.32, 9.24, 60, 21, 39, 0),
-    ],
-)
-def test_determine_soil_dry_matter_residue_amount(
-    root_depth: float,
-    plant_root_residue: float,
-    layer_bottom: float,
-    layer_top: float,
-    layer_thickness: float,
-    expected_dry_matter_residue_amount: float,
-) -> None:
-    assert (
-        ResiduePartition._determine_soil_dry_matter_residue_amount(
-            root_depth, plant_root_residue, layer_bottom, layer_top, layer_thickness
-        )
-        == expected_dry_matter_residue_amount
     )
 
 
