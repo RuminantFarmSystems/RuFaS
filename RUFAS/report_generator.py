@@ -535,9 +535,9 @@ class ReportGenerator:
             A dictionary where the keys are unit names (str) and the values are their exponents (int).
         """
         unit_dict = {}
-        for part in unit.split('*'):
-            if '^' in part:
-                u, exp = part.split('^')
+        for part in unit.split("*"):
+            if "^" in part:
+                u, exp = part.split("^")
                 unit_dict[u.strip()] = int(exp)
             else:
                 unit_dict[part.strip()] = 1
@@ -559,11 +559,11 @@ class ReportGenerator:
             have the units and the second will be an empty string. If no units are found, it will return a tuple with
             two empty strings.
         """
-        match = re.search(r'\((.*?)\)', key)
+        match = re.search(r"\((.*?)\)", key)
         if match:
             units = match.group(1)
-            if '/' in units:
-                numerator, denominator = units.split('/')
+            if "/" in units:
+                numerator, denominator = units.split("/")
                 numerator_units = ReportGenerator._parse_unit(numerator)
                 denominator_units = ReportGenerator._parse_unit(denominator)
                 return numerator_units, denominator_units
@@ -574,8 +574,9 @@ class ReportGenerator:
             return {}, {}
 
     @staticmethod
-    def _combine_units(numerator1: dict, denominator1: dict, numerator2: dict, denominator2: dict, operation: str
-                       ) -> tuple[dict, dict]:
+    def _combine_units(
+        numerator1: dict, denominator1: dict, numerator2: dict, denominator2: dict, operation: str
+    ) -> tuple[dict, dict]:
         """
         Combines two sets of units (numerator and denominator) based on the specified operation.
 
@@ -614,15 +615,16 @@ class ReportGenerator:
                 else:
                     result_units[unit] = sign * exponent
             return {unit: exp for unit, exp in result_units.items() if exp != 0}
-        if operation in ['product', 'division']:
-            if operation == 'product':
+
+        if operation in ["product", "division"]:
+            if operation == "product":
                 combined_numerator = add_units(numerator1, numerator2)
                 combined_denominator = add_units(denominator1, denominator2)
-            elif operation == 'division':
+            elif operation == "division":
                 combined_numerator = add_units(numerator1, denominator2)
                 combined_denominator = add_units(denominator1, numerator2)
 
-        elif operation in ['sum', 'subtraction', 'average', 'SD']:
+        elif operation in ["sum", "subtraction", "average", "SD"]:
             if numerator1 != numerator2 or denominator1 != denominator2:
                 # TODO add warning to OM instead of raising valueerror
                 # raise ValueError("Units must be the same for addition, subtraction, average, and standard deviation.")
@@ -807,7 +809,11 @@ class ReportGenerator:
         aggregated_units = self._aggregate_units(report_data, aggregator)
         return aggregated_data, aggregated_units
 
-    def _aggregate_units(self, report_data: Dict[str, List[float]], aggregator: Callable[[List[float]], float],) -> str:
+    def _aggregate_units(
+        self,
+        report_data: Dict[str, List[float]],
+        aggregator: Callable[[List[float]], float],
+    ) -> str:
         """Creates the appropriate units for the associated aggregator function used.
 
         Parameters
@@ -825,7 +831,7 @@ class ReportGenerator:
         if 0 >= len(report_data) > 2:
             raise ValueError("No report data available.")
         elif len(report_data) == 1:
-            var_units_match = re.search(r'\((.*?)\)', next(iter(report_data)))
+            var_units_match = re.search(r"\((.*?)\)", next(iter(report_data)))
             if var_units_match:
                 return var_units_match.group(1)
             else:
@@ -839,11 +845,13 @@ class ReportGenerator:
             first_key, second_key = list(report_data.keys())[:2]
             first_key_numerator_units, first_key_denominator_units = self._extract_units(first_key)
             second_key_numerator_units, second_key_denominator_units = self._extract_units(second_key)
-            combined_numerator, combined_denominator = self._combine_units(first_key_numerator_units,
-                                                                           first_key_denominator_units,
-                                                                           second_key_numerator_units,
-                                                                           second_key_denominator_units,
-                                                                           aggregator_key)
+            combined_numerator, combined_denominator = self._combine_units(
+                first_key_numerator_units,
+                first_key_denominator_units,
+                second_key_numerator_units,
+                second_key_denominator_units,
+                aggregator_key,
+            )
             stringified_combined_units = self._units_to_string(combined_numerator, combined_denominator)
 
         return stringified_combined_units
