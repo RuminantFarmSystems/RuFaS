@@ -4821,7 +4821,7 @@ def test_prepare_data(
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
     mocker: MockerFixture,
-    nested: bool,
+    is_nested: bool,
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
@@ -4831,7 +4831,7 @@ def test_prepare_data(
     )
 
     data, metadata_properties = input_manager._prepare_data(variable_name, input_data, properties_blob_key)
-    if nested:
+    if is_nested:
         mock_flat_to_nested.assert_called_once()
     assert data == expected_data
     assert metadata_properties == expected_metadata_properties
