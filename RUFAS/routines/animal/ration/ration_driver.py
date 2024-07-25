@@ -1,6 +1,7 @@
 import collections
 from typing import Set, Dict, List, Tuple, Literal
 
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
@@ -62,6 +63,7 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.is_udr:
+            # print(list(pen.animals_in_pen.values())[0].body_weight_history)
             ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
             return ration, ration_vals
 
@@ -245,7 +247,7 @@ class RationManager:
     def get_user_defined_ration(  # noqa
         cls,
         req: animal_requirements.AnimalRequirements,
-        pen,
+        pen: Pen,
         available_feeds: AvailableFeedsTypedDict,
         animal_grouping_scenario,
     ) -> tuple[Dict[str, float], Dict[str, float]]:
@@ -327,18 +329,22 @@ class RationManager:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
             animal_list = list(pen.animals_in_pen.values())
-            fail_summary = {
-                "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
-                "reattempt number": num_reattempts,
-                "constraints_failed_dict": constraints_failed_list,
-                "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
-                "pen requirements": pen.avg_nutrient_rqmts,
-            }
-            om.add_variable(
-                f"failed_constraint_summary_for_pen_{pen.id}",
-                fail_summary,
-                dict(info_map, **{"units": fail_summary_units}),
-            )
+            print(str(animal_list[0]), str(animal_list[0].body_weight_history))
+            try:
+                fail_summary = {
+                    "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
+                    "reattempt number": num_reattempts,
+                    "constraints_failed_dict": constraints_failed_list,
+                    "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
+                    "pen requirements": pen.avg_nutrient_rqmts,
+                }
+                om.add_variable(
+                    f"failed_constraint_summary_for_pen_{pen.id}",
+                    fail_summary,
+                    dict(info_map, **{"units": fail_summary_units}),
+                )
+            except Exception:
+                pass
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
