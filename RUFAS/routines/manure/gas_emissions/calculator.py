@@ -779,46 +779,60 @@ class GasEmissionsCalculator:
         return temperature_celsius + 273.15
 
     @classmethod
-    def methane_volume_via_Chen_equation(
-        cls, manure_total_degradable_volatile_solids: float, hydraulic_retention_time: int
-    ) -> float:
-        """Calculates CH4 generation volume using the Chen-Hashimoto equation.
+    def calculate_CSTR_methane_volume(cls, manure_total_volatile_solids: float) -> float:
+        """Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor.
 
-        Args:
-            manure_total_degradable_volatile_solids: total volatile solids, kg.
-            hydraulic_retention_time: hydraulic retention time, days.
+        Parameters
+        ----------
+        manure_total_volatile_solids : float
+            Total volatile solids, kg.
 
-        Returns:
+        Returns
+        -------
+        float
             CH4 generation volume, m^3.
 
         """
-        return (
-            GasEmissionConstants.METHANE_POTENTIAL_Go
-            * (
-                1
-                - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                / (
-                    hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
-                    + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                    - 1
-                )
-            )
-            * manure_total_degradable_volatile_solids
-            * GeneralConstants.GRAMS_TO_KG
-        )
+        return GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * manure_total_volatile_solids
 
     @classmethod
-    def biogas_energy_content(cls, methane_volume: float) -> float:
-        """Calculates biogas energy content.
+    def calculate_digester_methane_leakage(
+        cls, generated_methane_volume: float, digester_methane_leakage_fraction: float
+    ) -> float:
+        """
+        Calculates the volume of methane lost from a digester.
 
-        Args:
-            methane_volume: Methane generation volume, m^3.
+        Parameters
+        ----------
+        generated_methane_volume : float
+            Amount of methane generated within the digester, m^3.
+        digester_methane_leakage_fraction : float
+            Fraction of generated methane that escapes as leakage.
 
-        Returns:
-            Biogas energy content, MJ.
+        Returns
+        -------
+        float
+            Volume of methane lost as leakage, m^3.
 
         """
-        return methane_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        return generated_methane_volume * digester_methane_leakage_fraction
+
+    @classmethod
+    def calculate_methane_energy_content(cls, methane_mass: float) -> float:
+        """Calculates energy content of methane generated in a digester.
+
+        Parameters
+        ----------
+        methane_mass : float
+            Methane generation mass, kg.
+
+        Returns
+        -------
+        float
+            Methane energy content, MJ.
+
+        """
+        return methane_mass * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     @classmethod
     def methane_emission_from_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
