@@ -392,9 +392,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         base_volume = self.lagoon_length * self.lagoon_width * self.lagoon_depth
-        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth**2)) * (
-            self.lagoon_length + self.lagoon_width
-        )
+        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth**2)) * (self.lagoon_length + self.lagoon_width)
         slope_correction_corners = 4 * self.lagoon_slope * (self.lagoon_depth**3) / 3
 
         return base_volume - slope_correction_sides + slope_correction_corners
