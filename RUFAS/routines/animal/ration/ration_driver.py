@@ -2,7 +2,6 @@ import collections
 from typing import Set, Dict, List, Tuple, Literal
 
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.ration import animal_requirements
@@ -50,6 +49,8 @@ class RationManager:
         animal_grouping_scenario : AnimalGroupingScenario enum
             A grouping scenario of animals used in the current simulation,
             specified in AnimalGroupingScenario enum and AnimalManager class.
+        sim_day: int
+            Current simulation day of the simulation.
 
         Returns
         -------
@@ -64,8 +65,8 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.is_udr:
-            # print(list(pen.animals_in_pen.values())[0].body_weight_history)
-            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario, sim_day)
+            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario,
+                                                              sim_day)
             return ration, ration_vals
 
         if hasattr(pen, "ration_per_animal"):
