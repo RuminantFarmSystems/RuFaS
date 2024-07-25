@@ -4790,7 +4790,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
 
 
 @pytest.mark.parametrize(
-    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties,nested",
+    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties,is_nested",
     [
         (
             "example_property",
