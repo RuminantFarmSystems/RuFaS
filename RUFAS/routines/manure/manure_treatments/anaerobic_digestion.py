@@ -61,6 +61,8 @@ class AnaerobicDigestion(BaseManureTreatment):
             The daily output from anaerobic digestion.
 
         """
+        assert self._current_manure_treatment_daily_input is not None
+
         daily_final_manure_volume = manure_treatment_daily_output.daily_final_manure_volume
         new_daily_output = manure_treatment_daily_output.clone()
 
