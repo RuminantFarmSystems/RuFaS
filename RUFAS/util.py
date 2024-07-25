@@ -53,6 +53,7 @@ class Utility:
         -------
         Dict[str, Union[Dict, list]]
             A nested structure of dictionaries and lists derived by interpreting the flat dictionary keys.
+
         """
         nested_structure: Dict[str, Any] = {}
         for flat_key, value in input_dict.items():
