@@ -42,7 +42,7 @@ class RationManager:
         pen: Pen,
         available_feeds: AvailableFeedsTypedDict,
         animal_grouping_scenario: AnimalGroupingScenario,
-        sim_day: int
+        sim_day: int,
     ) -> Tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
@@ -74,8 +74,9 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.is_udr:
-            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario,
-                                                              sim_day)
+            ration, ration_vals = cls.get_user_defined_ration(
+                req, pen, available_feeds, animal_grouping_scenario, sim_day
+            )
             return ration, ration_vals
 
         if hasattr(pen, "ration_per_animal"):
@@ -263,7 +264,7 @@ class RationManager:
         pen,
         available_feeds: AvailableFeedsTypedDict,
         animal_grouping_scenario,
-        sim_day: int
+        sim_day: int,
     ) -> tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
