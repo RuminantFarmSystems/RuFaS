@@ -344,7 +344,6 @@ class RationManager:
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
-            animal_list = list(pen.animals_in_pen.values())
             fail_summary = {
                 "simulation day": sim_day,
                 "reattempt number": num_reattempts,
