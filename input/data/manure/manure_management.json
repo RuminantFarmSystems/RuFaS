@@ -311,7 +311,7 @@
       "anaerobic_digestion_temperature_set_point": 37.5,
       "anaerobic_digestion_temperature_celsius": 37.5,
       "manure_cover": "N/A",
-      "digester_methane_leakage_fraction": 0.005
+      "digester_methane_leakage_fraction": 0.01
     },
     {
       "name": "compost bedded pack barn",
