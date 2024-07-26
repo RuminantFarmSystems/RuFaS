@@ -960,6 +960,11 @@ class LayerData:
             )
 
     @property
+    def water_filled_pore_space(self) -> float:
+        """Returns the fraction of pore space that is currently filled by water (unitless)."""
+        return self.water_content / self.saturation_content
+
+    @property
     def silt_clay_content(self):
         """
         Combined silt and clay fraction in the soil (unitless).
