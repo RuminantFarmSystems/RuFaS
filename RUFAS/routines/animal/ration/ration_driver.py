@@ -58,7 +58,7 @@ class RationManager:
         animal_grouping_scenario : AnimalGroupingScenario enum
             A grouping scenario of animals used in the current simulation,
             specified in AnimalGroupingScenario enum and AnimalManager class.
-        sim_day: int
+        sim_day : int
             Current simulation day of the simulation.
 
         Returns
