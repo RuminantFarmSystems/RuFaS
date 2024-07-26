@@ -6,6 +6,8 @@ from pathlib import Path
 import random
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
+from SALib.sample import sobol as sobol_sampler
+from SALib.sample import morris as morris_sampler
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
@@ -250,12 +252,26 @@ class TaskManager:
         data_types = [data_type_str_to_class_map[input_variable["data_type"]] for input_variable in SA_input_variables]
 
         if multi_run_args["sampler"] == "fractional_factorial":
-            sampled_values = fractional_factorial_sampler.sample(parsed_SA_input_variables)
-        elif multi_run_args["sampler"] == "saltelli_sobol":
+            sampled_values = fractional_factorial_sampler.sample(
+                parsed_SA_input_variables,
+                seed=multi_run_args["random_seed"]
+            )
+        elif multi_run_args["sampler"] == "saltelli":
             sampled_values = saltelli_sampler.sample(
                 parsed_SA_input_variables,
-                multi_run_args["saltelli_number"],
-                skip_values=multi_run_args["saltelli_skip"],
+                multi_run_args["N_sampler"],
+                skip_values=multi_run_args["skip_values"],
+            )
+        elif multi_run_args["sampler"] == "sobol":
+            sampled_values = sobol_sampler.sample(
+                parsed_SA_input_variables,
+                multi_run_args["N_sampler"],
+                skip_values=multi_run_args["skip_values"],
+                seed=multi_run_args["random_seed"]
+            )
+        elif multi_run_args["sampler"] == "morris":
+            sampled_values = morris_sampler.sample(
+                parsed_SA_input_variables, multi_run_args["N_sampler"], seed=multi_run_args["random_seed"]
             )
         else:
             self.output_manager.add_log(
