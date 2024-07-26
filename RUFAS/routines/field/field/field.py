@@ -22,7 +22,7 @@ from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.field.tillage_application import TillageApplication
-from typing import Optional, List, Dict, Tuple
+from typing import Optional, List, Dict, Tuple, Any
 from math import exp
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.field.manure_application import ManureApplication
@@ -1210,8 +1210,7 @@ class Field:
         for crop in self.crops:
             crop.data.field_proportion = field_coverage_fraction
 
-    @staticmethod
-    def _make_crop_from_config_dict(config: Dict) -> Crop:
+    def _make_crop_from_config_dict(self, config: Dict) -> Crop:
         """
         Initialize a new crop from a configuration dictionary.
 
@@ -1230,20 +1229,20 @@ class Field:
         -------
         Crop
             A Crop object initialized with the desired attribute values.
+
         """
         if "species" in config.keys():
             accepted_species = set(item.value for item in CropSpecies)
             species = config.pop("species")
 
             if species in accepted_species:
-                return Field._make_supported_crop(species=species, **config)
+                return self._make_supported_crop(species=species, **config)
             else:
                 config["species"] = "custom " + str(species)
 
         return Field._make_custom_crop(**config)
 
-    @staticmethod
-    def _make_supported_crop(species: str, **specs) -> Crop:
+    def _make_supported_crop(self, species: str, **specs: dict[str, Any]) -> Crop:
         """
         Create a crop instance with attributes determined by the species of the crop.
 
@@ -1264,10 +1263,20 @@ class Field:
         -------
         Crop
             A Crop object initialized with the desired attribute values.
-        """
 
+        """
         crop_species = CropSpecies(species)
         crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
+
+        bound_max_root_depth = crop_data.max_root_depth > self.soil.data.soil_layers[-1].bottom_depth
+        if bound_max_root_depth:
+            crop_data.max_root_depth = self.soil.data.soil_layers[-1].bottom_depth
+            om.add_warning(
+                "Max root depth of a crop is deeper that the bottom of the soil profile",
+                f"Setting the maximum root depth of {crop_data.name} to {crop_data.max_root_depth} mm.",
+                {"class": self.__class__.__name__, "function": self._make_supported_crop.__name__},
+            )
+
         return Crop(crop_data)
 
     @staticmethod
