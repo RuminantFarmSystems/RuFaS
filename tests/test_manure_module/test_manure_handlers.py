@@ -389,7 +389,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (
         approx(max(0.0, TAN - housing_ammonia_emission))
     )
-    assert manure_handler_daily_output.liquid_manure_nitrogen == approx(N)
+    assert manure_handler_daily_output.liquid_manure_nitrogen == N
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(TS)
     assert manure_handler_daily_output.liquid_manure_total_degradable_volatile_solids == approx(VSd)
     assert manure_handler_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(VSnd)

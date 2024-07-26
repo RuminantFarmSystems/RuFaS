@@ -7,7 +7,6 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
@@ -434,45 +433,36 @@ def test_convert_tempC_to_tempK() -> None:
     assert actual == expected
 
 
-def test_methane_volume_via_Chen_equation() -> None:
-    """Tests _methane_volume_via_Chen_equation() in calculator.py."""
+def test_CSTR_methane_volume() -> None:
+    """Tests calculate_CSTR_methane_volume() in calculator.py."""
 
     # Arrange
     VS_total = 10.0
-    hydraulic_retention_time = 20
-    expected = (
-        GasEmissionConstants.METHANE_POTENTIAL_Go
-        * (
-            1
-            - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-            / (
-                hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
-                + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                - 1
-            )
-        )
-        * VS_total
-        * GeneralConstants.GRAMS_TO_KG
-    )
+
+    expected = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * VS_total
 
     # Act
-    actual = GasEmissionsCalculator.methane_volume_via_Chen_equation(VS_total, hydraulic_retention_time)
+    actual = GasEmissionsCalculator.calculate_CSTR_methane_volume(VS_total)
 
     # Assert
     assert actual == expected
 
 
-def test_biogas_energy_content() -> None:
-    """Tests biogas_energy_content() in calculator.py."""
+@pytest.mark.parametrize(
+    "methane_vol,leakage_frac,expected", [(100.0, 0.01, 1.0), (200.0, 0.05, 10.0), (150.0, 0.13, 19.5)]
+)
+def test_calculate_digester_methane_leakage(methane_vol: float, leakage_frac: float, expected: float) -> None:
+    """Tests caculate_digester_methane_leakage() in calculator.py"""
+    actual = GasEmissionsCalculator.calculate_digester_methane_leakage(methane_vol, leakage_frac)
 
-    # Arrange
-    CH4_volume = 10.0
-    expected = CH4_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+    assert actual == expected
 
-    # Act
-    actual = GasEmissionsCalculator.biogas_energy_content(CH4_volume)
 
-    # Assert
+@pytest.mark.parametrize("mass,expected", [(10.0, 550.0), (0.0, 0.0)])
+def test_methane_energy_content(mass: float, expected: float) -> None:
+    """Tests calculate_methane_energy_content() in calculator.py."""
+    actual = GasEmissionsCalculator.calculate_methane_energy_content(mass)
+
     assert actual == expected
 
 
