@@ -183,6 +183,8 @@ class LayerData:
         Fraction of metabolic carbon incorporated into soil during tillage (unitless).
     structural_carbon_transfer_amount : float, default 0.0
         The amount of transfer of structural carbon during tillage (kg/ha).
+    plant_residue : float, default 0.0
+        Residue added to the soil which is to be transferred to the metabolic and structural litter pools (kg/ha).
     soil_dry_matter_residue_amount : float, default 0.0
         The amount of soil dry matter residue at harvest (kg/ha).
     plant_dry_matter_residue_amount : float, default 0.0
@@ -380,6 +382,7 @@ class LayerData:
     metabolic_litter_amount: float = 0.0
     tillage_fraction: float = 0.0
     structural_carbon_transfer_amount: float = 0.0
+    plant_residue: float = 0.0
     soil_dry_matter_residue_amount: float = 0.0
     plant_dry_matter_residue_amount: float = 0.0
     plant_residue_metabolic_fraction: float = 0.0

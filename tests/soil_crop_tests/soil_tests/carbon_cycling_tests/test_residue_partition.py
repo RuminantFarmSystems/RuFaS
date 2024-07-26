@@ -1,10 +1,20 @@
 import pytest
 import math
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, patch
+from pytest_mock import MockerFixture
 from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
+
+
+@pytest.fixture
+def soil_data(mocker: MockerFixture) -> SoilData:
+    mocker.patch.object(SoilData, "__init__", return_value=None)
+    mocker.patch.object(LayerData, "__init__", return_value=None)
+    soil_data = SoilData()
+    soil_data.soil_layers = [LayerData(), LayerData(), LayerData()]
+    return soil_data
 
 
 @pytest.mark.parametrize(
@@ -494,116 +504,35 @@ def test_determine_soil_structural_carbon_amount(
 
 
 @pytest.mark.parametrize(
-    "root_depth, plant_root_residue, layer_bottom, layer_top, layer_thickness," "expected_dry_matter_residue_amount",
+    "residues,metabolic_frac,expected_metabolic,expected_structural,decomp_rate_set",
     [
-        (100, 100, 50.5, 20.69, 40.3, 40.3),
-        (40, 100, 50.53, 20, 32, 50),
-        (20.32, 9.24, 60, 21, 39, 0),
+        ([10.0] * 3, 0.5, [5.0] * 3, [5.0] * 3, True),
+        ([10.0, 50.0, 30.0], 0.25, [2.5, 12.5, 7.5], [7.5, 37.5, 22.5], True),
+        ([0.0] * 3, 0.4, [0.0] * 3, [0.0] * 3, False),
     ],
-)
-def test_determine_soil_dry_matter_residue_amount(
-    root_depth: float,
-    plant_root_residue: float,
-    layer_bottom: float,
-    layer_top: float,
-    layer_thickness: float,
-    expected_dry_matter_residue_amount: float,
-) -> None:
-    assert (
-        ResiduePartition._determine_soil_dry_matter_residue_amount(
-            root_depth, plant_root_residue, layer_bottom, layer_top, layer_thickness
-        )
-        == expected_dry_matter_residue_amount
-    )
-
-
-@pytest.mark.parametrize(
-    "surface_residue,root_residue,root_depth,subsurface_residue_added,expected_surface_metabolic,"
-    "expected_surface_structural,",
-    [(100.0, 0.0, 0.0, False, 50.0, 50.0), (40.0, 100.0, 1500.0, True, 20.0, 20.0)],
 )
 def test_add_litter_to_pools(
-    surface_residue: float,
-    root_residue: float,
-    root_depth: float,
-    subsurface_residue_added: bool,
-    expected_surface_metabolic: float,
-    expected_surface_structural: float,
-) -> None:
-    """Tests that litter is partitioned correctly between metabolic and structural pools."""
-    data = MagicMock(SoilData)
-    data.soil_layers = [MagicMock(LayerData)]
-    data.soil_layers[0].metabolic_litter_amount = 15.0
-    data.soil_layers[0].structural_litter_amount = 10.0
-    data.plant_residue_metabolic_fraction = 0.5
-    data.plant_surface_residue = surface_residue
-    data.plant_root_residue = root_residue
-    data.crop_root_depth = root_depth
-    partitioner = ResiduePartition(data)
-
-    with patch.object(ResiduePartition, "_add_subsurface_residue", new_callable=MagicMock) as add_subsurface:
-        partitioner._add_litter_to_pools()
-
-    assert data.soil_layers[0].metabolic_litter_amount == 15.0 + expected_surface_metabolic
-    assert data.soil_layers[0].structural_litter_amount == 10.0 + expected_surface_structural
-    assert data.plant_surface_residue == 0.0
-    assert data.plant_root_residue == 0.0
-    assert data.crop_root_depth == 0.0
-    if subsurface_residue_added:
-        assert add_subsurface.call_count == 1
-    else:
-        assert add_subsurface.call_count == 0
-
-
-@pytest.mark.parametrize(
-    "residue,depth,expected_metabolic,expected_structural",
-    [
-        (100, 500, [2.5, 12.5, 10.0], [7.5, 37.5, 30.0]),
-        (100, 400, [3.125, 15.625, 6.25], [9.375, 46.875, 18.75]),
-    ],
-)
-def test_add_subsurface_residue(
-    residue: float,
-    depth: float,
+    mocker: MockerFixture,
+    soil_data: SoilData,
+    residues: list[float],
+    metabolic_frac: float,
     expected_metabolic: list[float],
     expected_structural: list[float],
+    decomp_rate_set: bool,
 ) -> None:
-    """Tests that residue is added to soil layers correctly."""
-    top_layer = LayerData(top_depth=0.0, bottom_depth=50, field_size=2.5)
-    second_layer = LayerData(top_depth=50.0, bottom_depth=300, field_size=2.5)
-    third_layer = LayerData(top_depth=300, bottom_depth=500, field_size=2.5)
-    data = MagicMock(SoilData)
-    data.soil_layers = [top_layer, second_layer, third_layer]
-    for layer in data.soil_layers:
-        layer.metabolic_litter_amount = 0.0
-        layer.structural_litter_amount = 0.0
-    data.plant_residue_metabolic_fraction = 0.25
-    partitioner = ResiduePartition(data)
-    expected_litter_amounts = [
-        metabolic + structural for metabolic, structural in zip(expected_metabolic, expected_structural)
-    ]
+    """Tests that litter is partitioned correctly between metabolic and structural pools."""
+    soil_data.set_vectorized_layer_attribute("plant_residue", residues)
+    soil_data.plant_residue_metabolic_fraction = metabolic_frac
+    partitioner = ResiduePartition(soil_data)
+    set_decomp_rate = mocker.patch.object(ResiduePartition, "_set_soil_structural_litter_decomposition_rate")
 
-    with (
-        patch.object(
-            ResiduePartition,
-            "_determine_soil_dry_matter_residue_amount",
-            new_callable=MagicMock,
-            side_effect=expected_litter_amounts,
-        ) as determine_dry_matter,
-        patch.object(
-            LayerData,
-            "layer_thickness",
-            new_callable=PropertyMock,
-            side_effect=[50, 250, 200],
-        ) as thickness,
-    ):
-        partitioner._add_subsurface_residue(residue, depth)
+    partitioner._add_litter_to_pools()
 
-    for index, expected in enumerate(list(zip(expected_metabolic, expected_structural))):
-        assert data.soil_layers[index].metabolic_litter_amount == expected[0]
-        assert data.soil_layers[index].structural_litter_amount == expected[1]
-    assert determine_dry_matter.call_count == 3
-    assert thickness.call_count == 3
+    actual_metabolic = soil_data.get_vectorized_layer_attribute("metabolic_litter_amount")
+    actual_structural = soil_data.get_vectorized_layer_attribute("structural_litter_amount")
+    assert actual_metabolic == expected_metabolic
+    assert actual_structural == expected_structural
+    set_decomp_rate.assert_called_once() if decomp_rate_set else set_decomp_rate.assert_not_called()
 
 
 @pytest.mark.parametrize("rainfall", [0.0, 1.0, 12.0])

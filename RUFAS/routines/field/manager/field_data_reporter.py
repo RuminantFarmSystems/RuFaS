@@ -26,11 +26,12 @@ class FieldDataReporter:
     def __init__(self, fields: List[Field]):
         self.fields = fields
 
-    def send_daily_variables(self) -> None:
+    def send_daily_variables(self, time) -> None:
         """sends daily variables to the output manager"""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_daily_variables.__name__,
+            "simulation_day": time.simulation_day,
         }
         for field in self.fields:
             info_map["suffix"] = "field='" + field.field_data.name + "'"
