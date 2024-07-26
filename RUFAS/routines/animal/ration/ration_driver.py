@@ -113,8 +113,6 @@ class RationManager:
                     "class": "RationManager",
                     "function": cls.formulate_ration.__name__,
                 }
-                animal_list = list(pen.animals_in_pen.values())
-                sim_day = animal_list[0].body_weight_history[-1].simulation_day
                 fail_summary = {
                     "simulation day": sim_day,
                     "reattempt number": num_reattempts,
