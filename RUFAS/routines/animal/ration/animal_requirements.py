@@ -1898,7 +1898,7 @@ class AnimalRequirements:
                 net_energy_activity = distance_km * 0.00035 * body_weight
             elif housing == "Grazing":
                 nonpasturekgDMI: float = 1.0
-                net_energy_activity = distance_km * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
+                net_energy_activity = distance_km * body_weight * 0.75 * (600 - 12 * nonpasturekgDMI) / 600
 
             else:
                 net_energy_activity = 0.0
