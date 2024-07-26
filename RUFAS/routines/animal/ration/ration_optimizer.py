@@ -623,12 +623,12 @@ class RationOptimizer:
         # [A.Cow.E.13]-[A.Cow.E.13]
         # Metabolizable bacterial protein production (g)
         ration_config.MPbact = float(0.64 * min(
-            1000 * 0.13 * ration_config.TDNact_diet,
-            1000 * 0.85 * ration_config.RDP_diet,
+            GeneralConstants.KG_TO_GRAMS * 0.13 * ration_config.TDNact_diet,
+            GeneralConstants.KG_TO_GRAMS * 0.85 * ration_config.RDP_diet,
         ))
         # [A.Cow.E.14]-[A.Heifer.E.14]
         # Dietary RUP (kg)
-        ration_config.RUP_diet = 1000 * sum(
+        ration_config.RUP_diet = GeneralConstants.KG_TO_GRAMS * sum(
             np.multiply(
                 decision_vector,
                 np.multiply(
