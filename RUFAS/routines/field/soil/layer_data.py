@@ -990,6 +990,17 @@ class LayerData:
         """
         return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
 
+    @property
+    def total_carbon_content(self) -> float:
+        """Returns the sum of the carbon pools in the layer."""
+        return (
+            self.metabolic_litter_amount
+            + self.structural_litter_amount
+            + self.active_carbon_amount
+            + self.slow_carbon_amount
+            + self.slow_carbon_amount
+        )
+
     def do_annual_reset(self) -> None:
         """
         Reset the pools
