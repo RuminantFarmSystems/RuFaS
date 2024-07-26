@@ -80,6 +80,16 @@ class RationManager:
             req, available_feeds, pen.animal_combination, previous_ration
         )
         num_attempts: int = 1
+        if solution and not solution.success:
+            cls.handle_failed_constraints(
+                num_attempts=num_attempts,
+                solution=solution,
+                ration_optimizer=ration_optimizer,
+                ration_config=ration_config,
+                pen=pen,
+                available_feeds=available_feeds,
+                info_map=info_map,
+            )
 
         if solution is None:
             # safeguard if scipy SLSQP bounds error still occurs after many iterations
@@ -88,15 +98,6 @@ class RationManager:
 
         if pen.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
-                cls.handle_failed_constraints(
-                    num_attempts=num_attempts,
-                    solution=solution,
-                    ration_optimizer=ration_optimizer,
-                    ration_config=ration_config,
-                    pen=pen,
-                    available_feeds=available_feeds,
-                    info_map=info_map,
-                )
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
                 req.set_requirements(pen, animal_grouping_scenario, recalc=True)
@@ -106,6 +107,16 @@ class RationManager:
                     ration_config,
                 ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 num_attempts += 1
+                if solution and not solution.success:
+                    cls.handle_failed_constraints(
+                    num_attempts=num_attempts,
+                    solution=solution,
+                    ration_optimizer=ration_optimizer,
+                    ration_config=ration_config,
+                    pen=pen,
+                    available_feeds=available_feeds,
+                    info_map=info_map,
+                )
 
         ration = cls.make_ration_from_solution(available_feeds, solution)
         return ration, ration_vals
@@ -348,6 +359,16 @@ class RationManager:
             req, available_feeds, pen.animal_combination, previous_ration
         )
         num_attempts: int = 1
+        if solution and not solution.success:
+            cls.handle_failed_constraints(
+                num_attempts=num_attempts,
+                solution=solution,
+                ration_optimizer=ration_optimizer,
+                ration_config=ration_config,
+                pen=pen,
+                available_feeds=available_feeds,
+                info_map=info_map,
+            )
 
         if udrm.milk_reduction_maximum == 0.0 and udrm.tolerance == 0.0 and not solution.success:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
@@ -360,15 +381,6 @@ class RationManager:
         if pen.animal_combination == AnimalCombination.LAC_COW and solution is not None:
             running_milk_reduction = 0.0
             while not solution.success:
-                cls.handle_failed_constraints(
-                    num_attempts=num_attempts,
-                    solution=solution,
-                    ration_optimizer=ration_optimizer,
-                    ration_config=ration_config,
-                    pen=pen,
-                    available_feeds=available_feeds,
-                    info_map=info_map,
-                )
                 running_average_milk = cls.calc_milk_average(pen)
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 if (
@@ -391,6 +403,16 @@ class RationManager:
                     ration_config,
                 ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
                 num_attempts += 1
+                if solution and not solution.success:
+                    cls.handle_failed_constraints(
+                        num_attempts=num_attempts,
+                        solution=solution,
+                        ration_optimizer=ration_optimizer,
+                        ration_config=ration_config,
+                        pen=pen,
+                        available_feeds=available_feeds,
+                        info_map=info_map,
+                    )
 
         if fixed_ration:
             ration = UserDefinedRationManager.make_ration_from_user_values(ration_percents, available_feeds, req)
