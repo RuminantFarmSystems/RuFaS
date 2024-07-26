@@ -253,8 +253,7 @@ class TaskManager:
 
         if multi_run_args["sampler"] == "fractional_factorial":
             sampled_values = fractional_factorial_sampler.sample(
-                parsed_SA_input_variables,
-                seed=multi_run_args["random_seed"]
+                parsed_SA_input_variables, seed=multi_run_args["random_seed"]
             )
         elif multi_run_args["sampler"] == "saltelli":
             sampled_values = saltelli_sampler.sample(
@@ -267,7 +266,7 @@ class TaskManager:
                 parsed_SA_input_variables,
                 multi_run_args["N_sampler"],
                 skip_values=multi_run_args["skip_values"],
-                seed=multi_run_args["random_seed"]
+                seed=multi_run_args["random_seed"],
             )
         elif multi_run_args["sampler"] == "morris":
             sampled_values = morris_sampler.sample(
