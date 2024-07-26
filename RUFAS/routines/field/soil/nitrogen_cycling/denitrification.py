@@ -1,5 +1,5 @@
 from typing import Optional
-from math import exp
+from math import exp, pi, atan
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -61,6 +61,10 @@ class Denitrification:
                 layer.nutrient_cycling_temp_factor,
                 layer.soil_overall_carbon_fraction,
             )
+
+            nitrate_effect = self._calculate_soil_nitrate_effect(layer.nitrate_content)
+            carbon_effect = self._calculate_soil_carbon_effect(layer.total_carbon_content)
+
             layer.nitrate_content -= denitrified_nitrates
             layer.nitrous_oxide_emissions = denitrified_nitrates
             layer.annual_nitrous_oxide_emissions_total += denitrified_nitrates
@@ -113,3 +117,43 @@ class Denitrification:
         denitrification_factor = 1 - exponential_term
         bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)
         return nitrate_content * bounded_denitrification_factor
+
+    def _calculate_soil_nitrate_effect(self, nitrate_content: float) -> float:
+        """
+        Calculates the effect that the soil nitrate level has on the ratio of nitrous oxide to dinitrogen in denitrified
+        nitrates.
+
+        Parameters
+        ----------
+        nitrate_content : float
+            Amount of nitrates (kg / ha).
+
+        Returns
+        -------
+        float
+            Effect of the soil nitrate level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        """
+        fractional_term = atan(pi * 0.01 * (nitrate_content - 190)) / pi
+
+        return 1 - (0.5 + fractional_term) * 25
+
+    def _calculate_soil_carbon_effect(self, carbon_content: float) -> float:
+        """
+        Calculates the effect that the soil carbon level has on the ratio of nitrous oxide to dinitrogen in denitrified
+        nitrates.
+
+        Parameters
+        ----------
+        carbon_content : float
+            Total carbon content of the soil layer (kg / ha).
+
+        Returns
+        -------
+        float
+            Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        """
+        numerator = 30.78 * atan(pi * 0.07 * (carbon_content - 13))
+
+        return 13 + numerator / pi
