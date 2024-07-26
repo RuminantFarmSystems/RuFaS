@@ -79,7 +79,7 @@ class CropManagement:
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
+        self._record_yield(field_name, field_size, time)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
     # ---- Sub Methods ----
@@ -284,7 +284,7 @@ class CropManagement:
         )
         feed_manager.receive_crop(harvested_crop, self.data.storage_type)
 
-    def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
+    def _record_yield(self, field_name: str, field_size: float, time: Time) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
 
@@ -307,6 +307,8 @@ class CropManagement:
             "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+            "yield_nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+            "yield_phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "harvest_index": MeasurementUnits.UNITLESS,
             "planting_year": MeasurementUnits.CALENDAR_YEAR,
             "planting_day": MeasurementUnits.ORDINAL_DAY,
@@ -324,6 +326,7 @@ class CropManagement:
             "function": self._record_yield.__name__,
             "suffix": f"field='{field_name}'",
             "units": units,
+            "simulation_day": time.simulation_day,
         }
         value = {
             "crop": self.data.species,
@@ -332,11 +335,13 @@ class CropManagement:
             "nitrogen": nitrogen_harvested,
             "phosphorus": phosphorus_harvested,
             "yield_residue": self.data.yield_residue,
+            "yield_nitrogen": self.data.yield_nitrogen,
+            "yield_phosphorus": self.data.yield_phosphorus,
             "harvest_index": self.data.harvest_index,
             "planting_year": self.data.planting_year,
             "planting_day": self.data.planting_day,
-            "harvest_year": year,
-            "harvest_day": day,
+            "harvest_year": time.current_calendar_year,
+            "harvest_day": time.current_julian_day,
             "field_size": field_size,
             "field_name": field_name,
         }
