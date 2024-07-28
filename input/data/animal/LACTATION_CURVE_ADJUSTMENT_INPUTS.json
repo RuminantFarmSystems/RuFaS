@@ -261,5 +261,10 @@
 		"parity2_MilkYield305_adjustment": 1632,
 		"parity3_MilkYield305_adjustment": 2196
 	}, 
+	"parameter_mean_values": {
+		"parameter_a_mean": 19.9, 
+		"parameter_b_mean": 0.247,
+		"parameter_c_mean": 0.003376
+	},
 	"assumed_milking_cow_percentage": 0.8356
 }

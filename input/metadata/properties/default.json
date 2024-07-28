@@ -1666,6 +1666,22 @@
         "description": "The P3 milk adjustment value for the 305 day milk yield"
       }
     },
+    "parameter_mean_values": {
+      "type": "object",
+      "description": "Mean values of parameters which serve as the defaults for all-lactation models",
+      "parameter_a_mean": {
+        "type": "number",
+        "description": "The mean value of parameter a"
+      },
+		  "parameter_b_mean": {
+        "type": "number",
+        "description": "The mean value of parameter b"
+      },
+      "parameter_c_mean": {
+        "type": "number",
+        "description": "The mean value of parameter c"
+      }
+    },
     "assumed_milking_cow_percentage": {
       "type": "number",
       "description": "the number of cows within the total herd assumed to be in milk at any one time (305/365 is the assumed ratio)"

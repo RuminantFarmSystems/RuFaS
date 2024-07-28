@@ -151,9 +151,12 @@ class LactationCurve:
             Tuple of floats containing estimates for Wood's parameters l, m, n,
             and 305-day milk yield of the lactation group.
         """
-        parameter_a = 19.9
-        parameter_b = 24.7 * 1e-2
-        parameter_c = 33.76 * 1e-4
+        parameter_a = im.get_data(
+            "lactation.parameter_mean_values.parameter_a_mean")
+        parameter_b = im.get_data(
+            "lactation.parameter_mean_values.parameter_b_mean")
+        parameter_c = im.get_data(
+            "lactation.parameter_mean_values.parameter_c_mean")
 
         # adjustment_dict = im.get_data("lactation.adjustment_dict")
 
