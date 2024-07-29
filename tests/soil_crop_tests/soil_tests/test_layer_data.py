@@ -3,7 +3,7 @@ from math import log, exp
 
 import pytest
 from pytest import approx
-
+from pytest_mock import MockerFixture
 from RUFAS.routines.field.crop_and_soil_constants import (
     CUBIC_MILLIMETERS_TO_CUBIC_METERS,
     HECTARES_TO_SQUARE_MILLIMETERS,
@@ -12,6 +12,12 @@ from RUFAS.routines.field.crop_and_soil_constants import (
     MEGAGRAMS_TO_KILOGRAMS,
 )
 from RUFAS.routines.field.soil.layer_data import LayerData
+
+
+@pytest.fixture
+def layer(mocker: MockerFixture) -> None:
+    mocker.patch.object(LayerData, "__init__", return_value=None)
+    return LayerData()
 
 
 @pytest.mark.parametrize(
@@ -47,6 +53,38 @@ def test_water_factor(
         layer.water_content = water_content
         actual = layer.water_factor
         assert expected == approx(actual)
+
+
+@pytest.mark.parametrize("water,saturation,expected", [(30.0, 60.0, 0.5), (0.0, 20.0, 0.0), (45.0, 45.0, 1.0)])
+def test_water_filled_pore_space(
+    layer: LayerData, mocker: MockerFixture, water: float, saturation: float, expected: float
+) -> None:
+    """Tests that the water-filled pore space is calculated correctly for a soil layer."""
+    layer.water_content = water
+    mocker.patch.object(LayerData, "saturation_content", new_callable=PropertyMock, return_value=saturation)
+
+    actual = layer.water_filled_pore_space
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "metabolic,structural,active,slow,passive,expected",
+    [(10.0, 20.0, 30.0, 100.0, 200.0, 360.0), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)]
+)
+def test_total_carbon_content(
+    layer: LayerData, metabolic: float, structural: float, active: float, slow: float, passive: float, expected: float
+) -> None:
+    """Tests that total carbon content in a single soil layer is calculated correctly."""
+    layer.metabolic_litter_amount = metabolic
+    layer.structural_litter_amount = structural
+    layer.active_carbon_amount = active
+    layer.slow_carbon_amount = slow
+    layer.passive_carbon_amount = passive
+
+    actual = layer.total_carbon_content
+
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
