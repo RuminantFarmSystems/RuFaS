@@ -351,8 +351,8 @@ class RationManager:
 
         available_feeds : an object of class AvailableFeeds
 
-        animal_grouping_scenario : AnimalCombination
-            the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
+        animal_grouping_scenario : AnimalGroupingScenario
+            Grouping scenario chosen for current simulation.
         sim_day: int
             Current simulation day of the simulation.
 
@@ -1032,12 +1032,7 @@ class RationReporter:
             Forage neutral detergent fiber content of feed item, g.
 
         """
-        forage_NDF_item = 0.0
-
-        if feed_item_info["feed_type"] == "Forage":
-            forage_NDF_item = feed_item_info["NDF"] * kg_fed
-
-        return forage_NDF_item
+        return feed_item_info["NDF"] * kg_fed if feed_item_info["feed_type"] == "Forage" else 0.0
 
     @staticmethod
     def get_metabolizable_protein(
