@@ -94,10 +94,12 @@ class RationManager:
                 }
                 num_reattempts += 1
                 if num_reattempts > 40:
-                    om.add_error("Ration formulation error.",
-                                 "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
-                                 + f" Check failed_constraint_summary_for_pen_{pen.id}",
-                                 info_map)
+                    om.add_error(
+                        "Ration formulation error.",
+                        "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
+                        + f" Check failed_constraint_summary_for_pen_{pen.id}",
+                        info_map,
+                    )
                     raise
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
@@ -156,10 +158,12 @@ class RationManager:
         elif pen.ration != {}:
             return pen.ration, ration_vals
         else:
-            om.add_error("Ration formulation error.",
-                         "Catastrophic ration formulation error: can't formulate, no previous ration available."
-                         + f" Check failed_constraint_summary_for_pen_{pen.id}",
-                         info_map)
+            om.add_error(
+                "Ration formulation error.",
+                "Catastrophic ration formulation error: can't formulate, no previous ration available."
+                + f" Check failed_constraint_summary_for_pen_{pen.id}",
+                info_map,
+            )
             raise
 
     @staticmethod
