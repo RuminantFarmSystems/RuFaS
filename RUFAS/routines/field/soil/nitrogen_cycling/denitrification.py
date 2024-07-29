@@ -66,7 +66,9 @@ class Denitrification:
             carbon_effect = self._calculate_carbon_effect(layer.total_carbon_content)
             moisture_effect = self._calculate_moisture_effect(layer.water_filled_pore_space)
             pH_effect = self._calculate_pH_effect(placeholder_value := 8.0)
-            partitioning_factor = self._calculate_partitioning_factor(nitrate_effect, carbon_effect, moisture_effect, pH_effect)
+            partitioning_factor = self._calculate_partitioning_factor(
+                nitrate_effect, carbon_effect, moisture_effect, pH_effect
+            )
             nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
 
             layer.nitrate_content -= denitrified_nitrates
@@ -178,10 +180,20 @@ class Denitrification:
         float
             Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
 
+        Notes
+        -----
+        The exponential term in this equation easily becomes too large for Python to handle. In this case the effect is
+        effectively zero.
+
         """
         fraction = 17 / (2.2 * water_filled_pore_space)
 
-        return 1.4 / 13 ** (13 ** fraction)
+        try:
+            effect = 1.4 / 13 ** (13**fraction)
+        except OverflowError:
+            effect = 0.0
+
+        return effect
 
     def _calculate_pH_effect(self, pH: float) -> float:
         """
@@ -242,6 +254,6 @@ class Denitrification:
         -------
         float
             Amount of nitrous oxide emissions (kg / ha).
-        
+
         """
         return denitrified_nitrates / (1 + partitioning_factor)
