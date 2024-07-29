@@ -83,24 +83,24 @@ class RationManager:
         )
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts: int = 0
+        info_map = {
+            "class": "RationManager",
+            "function": cls.formulate_ration.__name__,
+        }
 
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         # GitHub Issue #793
         if pen.animal_combination.name in ["LAC_COW"]:
             while not solution.success:
-                info_map = {
-                    "class": "RationManager",
-                    "function": cls.formulate_ration.__name__,
-                }
                 num_reattempts += 1
-                if pen.avg_milk < 20 or num_reattempts > 100:
+                if pen.avg_milk < 15:
                     om.add_error(
                         "Ration formulation error.",
                         "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
                         + f" Check failed_constraint_summary_for_pen_{pen.id}",
                         info_map,
                     )
-                    raise
+                    raise RuntimeError
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
                     solution.x, ration_optimizer.cow_constraints, ration_config
@@ -160,11 +160,11 @@ class RationManager:
         else:
             om.add_error(
                 "Ration formulation error.",
-                "Catastrophic ration formulation error: can't formulate, no previous ration available."
+                "Catastrophic ration formulation error: can't formulate; no previous ration available."
                 + f" Check failed_constraint_summary_for_pen_{pen.id}",
                 info_map,
             )
-            raise
+            raise RuntimeError
 
     @staticmethod
     def calc_milk_average(pen: Pen) -> float:
