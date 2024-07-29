@@ -1866,7 +1866,8 @@ class AnimalRequirements:
 
         Notes
         -----
-        Note that both NRC and NASEM calculations use distance walked in kilometers, hence the unit conversion in the code itself.
+        Note that both NRC and NASEM calculations use distance walked in kilometers,
+            hence the unit conversion in the code itself.
 
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
         Grazing system and hilly topography will cost additional energy.
