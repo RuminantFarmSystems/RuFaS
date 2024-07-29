@@ -224,6 +224,8 @@ class LayerData:
         Amount of nitrous oxide emitted from this soil layer on the current day (kg/ha).
     annual_nitrous_oxide_emissions_total : float, default 0.0
         Cumulative total amount of nitrates that have denitrified in a year (kg/ha).
+    dinitrogen_emissions : float, default 0.0
+        Amount of dinitrogen emitted from this soil layer on the current day (kg/ha).
     humus_mineralization_rate_factor : float, default 0.0003
         Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
         Reference: SWAT Input .BSN file, see "CMN" on page 101.
@@ -403,6 +405,8 @@ class LayerData:
 
     nitrous_oxide_emissions: float = 0.0
     annual_nitrous_oxide_emissions_total: float = 0.0
+
+    dinitrogen_emissions: float = 0.0
 
     humus_mineralization_rate_factor: float = 0.0003
     denitrification_rate_coefficient: float = 1.4

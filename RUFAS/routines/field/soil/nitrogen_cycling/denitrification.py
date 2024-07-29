@@ -71,6 +71,7 @@ class Denitrification:
 
             layer.nitrate_content -= denitrified_nitrates
             layer.nitrous_oxide_emissions = nitrous_oxide_emissions
+            layer.dinitrogen_emissions = denitrified_nitrates - nitrous_oxide_emissions
             layer.annual_nitrous_oxide_emissions_total += nitrous_oxide_emissions
 
     @staticmethod
