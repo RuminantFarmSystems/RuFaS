@@ -93,7 +93,7 @@ class RationManager:
                     "function": cls.formulate_ration.__name__,
                 }
                 num_reattempts += 1
-                if num_reattempts > 40:
+                if pen.avg_milk < 20 or num_reattempts > 100:
                     om.add_error(
                         "Ration formulation error.",
                         "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
