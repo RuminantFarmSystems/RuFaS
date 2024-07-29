@@ -88,7 +88,17 @@ class RationManager:
         # GitHub Issue #793
         if pen.animal_combination.name in ["LAC_COW"]:
             while not solution.success:
+                info_map = {
+                    "class": "RationManager",
+                    "function": cls.formulate_ration.__name__,
+                }
                 num_reattempts += 1
+                if num_reattempts > 40:
+                    om.add_error("Ration formulation error.",
+                                 "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
+                                 + f" Check failed_constraint_summary_for_pen_{pen.id}",
+                                 info_map)
+                    raise
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
                     solution.x, ration_optimizer.cow_constraints, ration_config
@@ -104,10 +114,6 @@ class RationManager:
                     ration_vals,
                     ration_config,
                 ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
-                info_map = {
-                    "class": "RationManager",
-                    "function": cls.formulate_ration.__name__,
-                }
                 animal_list = list(pen.animals_in_pen.values())
                 sim_day = animal_list[0].body_weight_history[-1].simulation_day
                 fail_summary = {
@@ -147,8 +153,14 @@ class RationManager:
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen
-        else:
+        elif pen.ration != {}:
             return pen.ration, ration_vals
+        else:
+            om.add_error("Ration formulation error.",
+                         "Catastrophic ration formulation error: can't formulate, no previous ration available."
+                         + f" Check failed_constraint_summary_for_pen_{pen.id}",
+                         info_map)
+            raise
 
     @staticmethod
     def calc_milk_average(pen: Pen) -> float:
