@@ -100,6 +100,7 @@ class RationManager:
                 ration_config=ration_config,
                 pen=pen,
                 available_feeds=available_feeds,
+                sim_day=sim_day,
                 info_map=info_map,
             )
 
@@ -127,6 +128,7 @@ class RationManager:
                     ration_config=ration_config,
                     pen=pen,
                     available_feeds=available_feeds,
+                    sim_day=sim_day,
                     info_map=info_map,
                 )
 
@@ -142,6 +144,7 @@ class RationManager:
         ration_config: RationConfig,
         pen,
         available_feeds: AvailableFeedsTypedDict,
+        sim_day: int,
         info_map: Dict[str, Any],
     ) -> None:
         """
@@ -167,6 +170,8 @@ class RationManager:
             The pen of animals for which the failed constraints are being handled.
         available_feeds : AvailableFeedsTypedDict
             A dictionary of available feeds for ration formulation.
+        sim_day : int
+            Day of simulation.
         info_map : Dict[str, Any]
             A dictionary containing additional information to be logged with the failed
             constraints summary.
@@ -189,7 +194,6 @@ class RationManager:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
         animal_list = list(pen.animals_in_pen.values())
-        sim_day = animal_list[0].body_weight_history[-1].simulation_day
         fail_summary = {
             "simulation day": sim_day,
             "reattempt number": num_attempts,
@@ -382,6 +386,7 @@ class RationManager:
                 ration_config=ration_config,
                 pen=pen,
                 available_feeds=available_feeds,
+                sim_day=sim_day,
                 info_map=info_map,
             )
 
@@ -426,6 +431,7 @@ class RationManager:
                         ration_config=ration_config,
                         pen=pen,
                         available_feeds=available_feeds,
+                        sim_day=sim_day,
                         info_map=info_map,
                     )
 
