@@ -2505,6 +2505,7 @@ def test_formulate_ration_is_udr_true(mocker: MockerFixture) -> None:
         pen=mocker.MagicMock(),
         available_feeds=mocker.MagicMock(),
         animal_grouping_scenario=mocker.MagicMock(),
+        sim_day=2,
     )
     # Assert
     assert actual == udrm_is_udr_expected
@@ -2539,9 +2540,7 @@ def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
     available_feeds = mocker.MagicMock()
     # Act
     actual = RationManager.formulate_ration(
-        pen=mock_pen,
-        available_feeds=available_feeds,
-        animal_grouping_scenario=mocker.MagicMock(),
+        pen=mock_pen, available_feeds=available_feeds, animal_grouping_scenario=mocker.MagicMock(), sim_day=2
     )
     # Assert
     assert actual == expected
@@ -2600,9 +2599,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     )
     # Act
     actual = RationManager.formulate_ration(
-        pen=mock_pen,
-        available_feeds=available_feeds,
-        animal_grouping_scenario=mocker.MagicMock(),
+        pen=mock_pen, available_feeds=available_feeds, animal_grouping_scenario=mocker.MagicMock(), sim_day=2
     )
     # Assert
     assert actual == expected
