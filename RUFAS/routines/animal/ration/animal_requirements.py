@@ -1857,8 +1857,7 @@ class AnimalRequirements:
         housing : str
             Housing type (Barn or Grazing)
         distance : float
-            NASEM: Estimated distance travels by the animal daily (km)
-            NRC: Daily walking distance (km)
+            Distance walked in meters.
 
         Returns
         -------
@@ -1867,6 +1866,8 @@ class AnimalRequirements:
 
         Notes
         -----
+        Note that both NRC and NASEM calculations use distance walked in kilometers, hence the unit conversion in the code itself.
+
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
         Grazing system and hilly topography will cost additional energy.
             Grazing is not implemented yet in the current version of code.
