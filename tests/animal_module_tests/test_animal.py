@@ -2570,6 +2570,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     mock_body_weight_history.simulation_day = 100
     mock_animal.body_weight_history = [mock_body_weight_history]
     mock_pen.animals_in_pen = {"a": mock_animal}
+    mock_pen.avg_milk = 42
     mock_solution = mocker.MagicMock()
     mock_solution.success = False
     mock_solution_exists = mocker.MagicMock()
