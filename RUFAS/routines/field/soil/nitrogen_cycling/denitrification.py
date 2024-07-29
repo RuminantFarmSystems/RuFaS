@@ -1,5 +1,6 @@
 from typing import Optional
 from math import exp, pi, atan, e
+import warnings
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -69,6 +70,9 @@ class Denitrification:
             partitioning_factor = self._calculate_partitioning_factor(
                 nitrate_effect, carbon_effect, moisture_effect, pH_effect
             )
+
+            print(f"{nitrate_effect} {carbon_effect} {moisture_effect} {pH_effect} {partitioning_factor} {layer.water_filled_pore_space}")
+
             nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
 
             layer.nitrate_content -= denitrified_nitrates
