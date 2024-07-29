@@ -648,8 +648,11 @@ class RationOptimizer:
     def protein_constraint_upper(decision_vector: np.ndarray,
                                  ration_config: RationConfig) -> float:
         """
-        Sets up the upper bound for the protein requirement constraint in the NLP. Uses MP_supply as calculated in
-        protein_constraint_lower.
+        Sets up the upper bound for the protein requirement constraint in the non-linear programming (NLP).
+        Uses MP_supply as calculated in protein_constraint_lower.
+
+        The selected limit of 2X the requirement is not based on NASEM or NRC literature, but a rough metric deemed
+            reasonable by SMEs on the team.
 
         Parameters
         ----------
@@ -1054,10 +1057,6 @@ class RationOptimizer:
             feed_limit_list = self.triple_values_in_list(available_feeds["lactating_cow_limit"])
             feed_minimum_list = self.triple_values_in_list(available_feeds["lactating_cow_minimum"])
             lactating = True
-        elif str(animal_combination) in ["AnimalCombination.DRY_COW"]:
-            feed_limit_list = self.triple_values_in_list(available_feeds["dry_cow_limit"])
-            feed_minimum_list = self.triple_values_in_list(available_feeds["dry_cow_minimum"])
-            lactating = False
         else:
             feed_limit_list = self.triple_values_in_list(available_feeds["dry_cow_limit"])
             feed_minimum_list = self.triple_values_in_list(available_feeds["dry_cow_minimum"])
