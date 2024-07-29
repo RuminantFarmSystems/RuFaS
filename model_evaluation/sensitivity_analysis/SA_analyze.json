@@ -1,7 +1,7 @@
 {
     "analyses": [
         {
-            "input_file": "input/data/tasks/sobol_animal_tasks.json",
+            "input_file": "input/data/tasks/sobol_animal_tasks_v2.json",
             "output_path": "output/",
             "report_name": "report_SA",
             "only_inputs": true,
