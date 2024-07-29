@@ -121,14 +121,14 @@ class RationManager:
                 num_attempts += 1
                 if solution and not solution.success:
                     cls.handle_failed_constraints(
-                    num_attempts=num_attempts,
-                    solution=solution,
-                    ration_optimizer=ration_optimizer,
-                    ration_config=ration_config,
-                    pen=pen,
-                    available_feeds=available_feeds,
-                    info_map=info_map,
-                )
+                        num_attempts=num_attempts,
+                        solution=solution,
+                        ration_optimizer=ration_optimizer,
+                        ration_config=ration_config,
+                        pen=pen,
+                        available_feeds=available_feeds,
+                        info_map=info_map,
+                    )
 
         ration = cls.make_ration_from_solution(available_feeds, solution)
         return ration, ration_vals
