@@ -636,6 +636,11 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
                 )
                 om.add_variable(
+                    "dinitrogen_emissions",
+                    layer.dinitrogen_emissions,
+                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+                )
+                om.add_variable(
                     "ammonia_emissions",
                     layer.ammonia_emissions,
                     dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
