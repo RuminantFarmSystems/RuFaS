@@ -237,7 +237,9 @@ class Denitrification:
             Factor used to partition nitrified nitrates into nitrous oxide and dinitrogen.
 
         """
-        return min(nitrate_effect, carbon_effect) * moisture_effect * pH_effect
+        partitioning_factor = min(nitrate_effect, carbon_effect) * moisture_effect * pH_effect
+
+        return max(partitioning_factor, 0.0)
 
     def _calculate_nitrous_oxide_emissions(self, denitrified_nitrates: float, partitioning_factor: float) -> float:
         """
