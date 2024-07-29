@@ -325,9 +325,9 @@ class RationManager:
     def get_user_defined_ration(  # noqa
         cls,
         req: animal_requirements.AnimalRequirements,
-        pen,
+        pen: Pen,
         available_feeds: AvailableFeedsTypedDict,
-        animal_grouping_scenario,
+        animal_grouping_scenario: AnimalGroupingScenario,
         sim_day: int,
     ) -> tuple[Dict[str, str | float], Dict[str, float]]:
         """
@@ -907,9 +907,7 @@ class RationReporter:
 
         """
         feed_to_dCa_map = {"Forage": 0.3, "Conc": 0.6, "Mineral": 0.95}
-
         dCa = feed_to_dCa_map.get(feed_item_info["feed_type"], 0.0)
-
         calcium_item = kg_fed * feed_item_info["calcium"] * 0.01 * dCa
 
         return calcium_item
@@ -942,9 +940,7 @@ class RationReporter:
 
         """
         feed_to_dP_map = {"Forage": 0.64, "Conc": 0.70, "Mineral": 0.80}
-
         dP = feed_to_dP_map.get(feed_item_info["feed_type"], 0.0)
-
         return dP * feed_item_info["phosphorus"] * 0.01 * kg_fed
 
     @staticmethod
