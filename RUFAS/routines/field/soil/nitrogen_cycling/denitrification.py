@@ -141,7 +141,8 @@ class Denitrification:
             Effect of the soil nitrate level on the ratio of nitrous oxide to dinitrogen (unitless).
 
         """
-        fractional_term = atan(pi * 0.01 * (nitrate_content - 190)) / pi
+        nitrate_content_grams = nitrate_content * GeneralConstants.KG_TO_GRAMS
+        fractional_term = atan(pi * 0.01 * (nitrate_content_grams - 190)) / pi
 
         return 1 - (0.5 + fractional_term) * 25
 
@@ -161,7 +162,8 @@ class Denitrification:
             Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
 
         """
-        numerator = 30.78 * atan(pi * 0.07 * (carbon_content - 13))
+        carbon_content_grams = carbon_content * GeneralConstants.KG_TO_GRAMS
+        numerator = 30.78 * atan(pi * 0.07 * (carbon_content_grams - 13))
 
         return 13 + numerator / pi
 
