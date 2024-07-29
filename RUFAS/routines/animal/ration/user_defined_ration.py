@@ -1,4 +1,6 @@
 from typing import Dict
+
+from RUFAS.enums import AnimalCombination
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
@@ -31,7 +33,7 @@ class UserDefinedRationManager(object):
             self.milk_reduction_maximum: float = 0.0
 
     @staticmethod
-    def ration_to_use(animal_combination) -> Dict[str, float]:
+    def ration_to_use(animal_combination: AnimalCombination) -> Dict[str, float]:
         """
         Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
 
@@ -60,7 +62,9 @@ class UserDefinedRationManager(object):
 
     @staticmethod
     def make_ration_from_user_values(
-        ration_percents: Dict[str, float], available_feeds: AvailableFeedsTypedDict, req: AnimalRequirements
+        ration_percents: Dict[str, float],
+        available_feeds: AvailableFeedsTypedDict,
+        req: AnimalRequirements,
     ) -> Dict[str, float | str]:
         """
         Generate ration dict from user ration percents input,
