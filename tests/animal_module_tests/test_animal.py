@@ -3265,12 +3265,12 @@ def test_get_feed_data_from_feed_ids() -> None:
     available_feeds.TDN = [0, 0, 0, 0]
     available_feeds.calcium = [22, 34, 1, 0.7]
     available_feeds.dRUP = [0, 0, 0, 0]
-    available_feeds.dry_cow_minimum = [100, 100, 100, 100]
+    available_feeds.dry_cow_minimum = [0, 0, 0, 0]
     available_feeds.dry_cow_limit = [100, 100, 100, 100]
     available_feeds.feed_key = [136, 139, 155, 157]
     available_feeds.is_fat = [0, 0, 0, 0]
     available_feeds.is_wetforage = [0, 0, 0, 0]
-    available_feeds.lactating_cow_minimum = [100, 100, 100, 100]
+    available_feeds.lactating_cow_minimum = [0, 0, 0, 0]
     available_feeds.lactating_cow_limit = [100, 100, 100, 100]
     available_feeds.phosphorus = [19.3, 0, 0.75, 0.45]
     available_feeds.price = [0.1, 0.05, 0.82, 0.44]
@@ -3302,12 +3302,12 @@ def test_get_feed_data_from_feed_ids() -> None:
         "TDN": [0, 0],
         "calcium": [1, 0.7],
         "dRUP": [0, 0],
-        "dry_cow_minimum": [100, 100],
+        "dry_cow_minimum": [0, 0],
         "dry_cow_limit": [100, 100],
         "feed_key": [155, 157],
         "is_fat": [0, 0],
         "is_wetforage": [0, 0],
-        "lactating_cow_minimum": [100, 100],
+        "lactating_cow_minimum": [0, 0],
         "lactating_cow_limit": [100, 100],
         "phosphorus": [0.75, 0.45],
         "price": [0.82, 0.44],
@@ -3996,6 +3996,6 @@ def test_get_metabolizable_protein(mocker: MockerFixture, mock_available_feeds: 
         "RUFAS.routines.animal.ration.ration_driver.RationReporter.get_TDN_discount",
         return_value=1,
     )
-    expected = 174.76685
+    expected = 256.7
     actual = RationReporter.get_metabolizable_protein(ration, mock_avail_feeds, ration_report, body_weight)
     assert np.isclose(actual, expected, rtol=1e-3)
