@@ -30,6 +30,8 @@ class LayerData:
         Top depth of the layer (mm).
     bottom_depth : float, optional
         Bottom depth of the layer (mm).
+    pH : float, default 7.0
+        pH of the soil layer.
     soil_water_concentration : float, optional, default 0.25
         Soil water concentration of the layer (mm water / mm soil).
     water_content : float, optional
@@ -268,6 +270,8 @@ class LayerData:
     residue: InitVar[float] = 0
     top_depth: Optional[float] = None
     bottom_depth: Optional[float] = None
+
+    pH: float = 7.0
 
     # --- Water
     soil_water_concentration: float = 0.25  # arbitrary
