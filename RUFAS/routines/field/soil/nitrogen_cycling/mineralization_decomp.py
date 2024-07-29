@@ -166,8 +166,9 @@ class MineralizationDecomposition:
         return exp(inner_term)
 
     @staticmethod
-    def _calculate_nutrient_cycling_residue_composition_factor(carbon_nitrogen_ratio: float,
-                                                               carbon_phosphorus_ratio: float) -> float:
+    def _calculate_nutrient_cycling_residue_composition_factor(
+        carbon_nitrogen_ratio: float, carbon_phosphorus_ratio: float
+    ) -> float:
         """
         Calculates the residue composition factor for use in computing the decay rate constant.
 
@@ -191,11 +192,15 @@ class MineralizationDecomposition:
         The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
 
         """
-        nitrogen_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
-            carbon_nitrogen_ratio, 25
+        nitrogen_term = (
+            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
+                carbon_nitrogen_ratio, 25
+            )
         )
-        phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
-            carbon_phosphorus_ratio, 200
+        phosphorus_term = (
+            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
+                carbon_phosphorus_ratio, 200
+            )
         )
         # temporary fix to replace the process based method for the effect of the soil C, N, and P on the decomposition
         # rate factor
