@@ -1,0 +1,51 @@
+{
+  "crop_schedules": [
+    {
+      "crop_species": "corn_grain",
+      "harvest_days": [
+        293,
+        293,
+        294,
+        293,
+        293,
+        293
+      ],
+      "harvest_years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "harvest_operations": [
+        "harvest_kill",
+        "harvest_kill",
+        "harvest_kill",
+        "harvest_kill",
+        "harvest_kill",
+        "harvest_kill"
+      ],
+      "harvest_type": "scheduled",
+      "planting_days": [
+        129,
+        129,
+        129,
+        129,
+        129,
+        129
+      ],
+      "planting_years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023
+      ],
+      "pattern_repeat": 0,
+      "planting_skip": 0,
+      "harvesting_skip": 0
+    }
+  ]
+}
