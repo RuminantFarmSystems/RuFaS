@@ -4729,6 +4729,13 @@
           "minimum": 0.01,
           "default": 9.5
         },
+        "pH": {
+          "type": "number",
+          "description": "pH of the soil layer.",
+          "default": 7.0,
+          "minimum": 0.0,
+          "maximum": 14.0
+        },
         "initial_temperature": {
           "type": "number",
           "description": "Temperature of the layer at the beginning of the simulation.\nUnits: degrees Celsius.",
