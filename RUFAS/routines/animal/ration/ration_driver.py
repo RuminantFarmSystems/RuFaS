@@ -122,15 +122,15 @@ class RationManager:
                 num_attempts += 1
                 if solution and not solution.success:
                     cls.handle_failed_constraints(
-                    num_attempts=num_attempts,
-                    solution=solution,
-                    ration_optimizer=ration_optimizer,
-                    ration_config=ration_config,
-                    pen=pen,
-                    available_feeds=available_feeds,
-                    sim_day=sim_day,
-                    info_map=info_map,
-                )
+                        num_attempts=num_attempts,
+                        solution=solution,
+                        ration_optimizer=ration_optimizer,
+                        ration_config=ration_config,
+                        pen=pen,
+                        available_feeds=available_feeds,
+                        sim_day=sim_day,
+                        info_map=info_map,
+                    )
 
         ration = cls.make_ration_from_solution(available_feeds, solution)
         return ration, ration_vals
@@ -142,7 +142,7 @@ class RationManager:
         solution: scipy.optimize.OptimizeResult,
         ration_optimizer: RationOptimizer,
         ration_config: RationConfig,
-        pen,
+        pen: Pen,
         available_feeds: AvailableFeedsTypedDict,
         sim_day: int,
         info_map: Dict[str, Any],
@@ -193,7 +193,6 @@ class RationManager:
         if failed_constraints:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
-        animal_list = list(pen.animals_in_pen.values())
         fail_summary = {
             "simulation day": sim_day,
             "reattempt number": num_attempts,
