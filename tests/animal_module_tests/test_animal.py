@@ -2521,11 +2521,7 @@ def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
     mock_pen.id = 0
 
     mock_cow1 = mocker.MagicMock()
-    mock_latest_history = mocker.MagicMock()
-    mock_latest_history.simulation_day = 44
-    mock_older_history = mocker.MagicMock()
-    mock_older_history.simulation_day = 43
-    mock_cow1.body_weight_history = [mock_older_history, mock_latest_history]
+    sim_day = 44
     mock_cow2 = mocker.MagicMock()
     mock_cow3 = mocker.MagicMock()
 
@@ -2563,6 +2559,7 @@ def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
         mock_ration_config,
         mock_pen,
         mock_available_feeds,
+        sim_day=sim_day,
         info_map=mock_info_map,
     )
 
@@ -2611,11 +2608,6 @@ def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
     mock_heifer_pen.id = 1
 
     mock_heifer1 = mocker.MagicMock()
-    mock_latest_history = mocker.MagicMock()
-    mock_latest_history.simulation_day = 22
-    mock_older_history = mocker.MagicMock()
-    mock_older_history.simulation_day = 21
-    mock_heifer1.body_weight_history = [mock_older_history, mock_latest_history]
     mock_heifer2 = mocker.MagicMock()
     mock_heifer3 = mocker.MagicMock()
 
@@ -2645,6 +2637,8 @@ def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
         return_value={"dummy_feed1": 38.6, "dummy_feed2": 40.7},
     )
 
+    sim_day = 22
+
     mock_heifer_info_map = {
         "class": "RationManager",
         "function": "handle_failed_constraints",
@@ -2657,6 +2651,7 @@ def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
         mock_heifer_ration_config,
         mock_heifer_pen,
         mock_heifer_available_feeds,
+        sim_day=sim_day,
         info_map=mock_heifer_info_map,
     )
 

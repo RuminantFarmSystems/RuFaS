@@ -16,7 +16,6 @@ from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
 
-
 om = OutputManager()
 udrm = UserDefinedRationManager()
 
@@ -92,7 +91,7 @@ class RationOptimizer:
         return tripled_list
 
     @staticmethod
-    def objective(decision_vector: npt.NDArray[np.float32], ration_config: RationConfig) -> float:
+    def objective(decision_vector: npt.NDArray[np.float64], ration_config: RationConfig) -> float:
         """
         Sets up the objective function in the optimize function for the non-linear
         program. Whenever the paramert x is used, it refers to the "decision vetor
@@ -119,7 +118,7 @@ class RationOptimizer:
     # fmt: off
     @staticmethod
     def total_energy(  # noqa
-        decision_vector: npt.NDArray[np.float32], ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
@@ -258,7 +257,7 @@ class RationOptimizer:
     # fmt: off
     @staticmethod
     def NEmact_constraint(  # noqa
-        decision_vector: npt.NDArray[np.float32], ration_config: RationConfig
+        decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
         """
