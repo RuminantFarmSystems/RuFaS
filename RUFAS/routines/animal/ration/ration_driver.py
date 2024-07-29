@@ -1171,21 +1171,21 @@ class AvailableFeeds:
         self.CP: List[float] = []
         # RUP degradability (% of RUP)
         self.dRUP: List[float] = []
-        # lactating cows feed limits
+        # lactating cows feed limits (kg)
         self.lactating_cow_limit: List[float] = []
-        # dry cow feed limits
+        # dry cow feed limits (kg)
         self.dry_cow_limit: List[float] = []
-        # lactating cows feed limits
+        # lactating cows feed limits (kg)
         self.lactating_cow_minimum: List[float] = []
-        # dry cow feed limits
+        # dry cow feed limits (kg)
         self.dry_cow_minimum: List[float] = []
-        # heiferIII limits
+        # heiferIII limits (kg)
         self.heiferIII_limit: List[float] = []
-        # heiferII limit
+        # heiferII limit (kg)
         self.heiferII_limit: List[float] = []
-        # heiferI limit
+        # heiferI limit (kg)
         self.heiferI_limit: List[float] = []
-        # calf limit
+        # calf limit (kg)
         self.calf_limit: List[float] = []
         # key = feed_id, val = index of that feed_id in self.feed_id list
         self._feed_id_to_list_idx_dict: Dict[int, int] = {}

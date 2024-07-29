@@ -177,6 +177,8 @@ class RationConfig:
             RUP degradability in each feed (% of RUP).
         limit__list : list, optional
             Limiting upper bounds for each feed (kg).
+        feed_minimum_list : list, optional
+            Limiting lower bounds for each feed (kg).
         lactating_ : bool, optional
             True if the cow is lactating, False otherwise.
         DMIest__requirement : float, optional
