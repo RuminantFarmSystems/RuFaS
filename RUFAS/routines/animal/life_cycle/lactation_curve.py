@@ -134,7 +134,7 @@ class LactationCurve:
         month: str = None,
         region: str = None,
         milking_frequency: str = None,
-        MY_305d: str = None,
+        MY_305d: str | None = None,
     ) -> tuple[float, float, float]:
         """
         Adjusts the default lactation curve parameters based on farm-specific attributes.
