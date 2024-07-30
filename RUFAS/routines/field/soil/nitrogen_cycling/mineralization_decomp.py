@@ -64,6 +64,10 @@ class MineralizationDecomposition:
                 self.data.soil_layers[layer_num].nutrient_cycling_temp_factor,
                 self.data.soil_layers[layer_num].nutrient_cycling_water_factor,
             )
+            if layer_num == 0:
+                print("Layer 0", decay_rate_constant)
+            elif layer_num == 1:
+                print("Layer 1", decay_rate_constant)
 
             fresh_organic_nitrogen_removed = decay_rate_constant * self.data.soil_layers[layer_num].fresh_organic_nitrogen_content
             fresh_organic_nitrogen_removed = min(
