@@ -851,7 +851,7 @@ class GasEmissionsCalculator:
 
             :math:`E_{CH_4}` is methane emissions from anaerobic lagoon (kg :math:`CH_4`-N/day),
 
-            :math:`Bo` is the achievable emission of methane during anaerobic digestion (kg :math:`CH_4`/kg VS),
+            :math:`Bo` is the achievable emission of methane during anaerobic digestion (:math:`m^3 CH_4`/kg VS),
 
             :math:`MCF` is the methane conversion factor (unitless),
 

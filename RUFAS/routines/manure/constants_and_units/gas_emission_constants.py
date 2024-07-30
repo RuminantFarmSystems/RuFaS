@@ -39,7 +39,7 @@ class GasEmissionConstants:
     """The ideal gas constant (J/mol :math:`\\cdot` K)."""
 
     ACHIEVABLE_METHANE_EMISSION: float = 0.24
-    """Achievable emission of methane (:math:`CH_4`) from dairy manure (kg :math:`CH_4`/kg VS)."""
+    """Achievable emission of methane (:math:`CH_4`) from dairy manure (:math:`m^3 CH_4`/kg VS)."""
 
     METHANE_CONVERSION_FACTOR: float = 0.79
     """Methane conversion factor (unitless)."""
