@@ -26,7 +26,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import (
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
-from RUFAS.routines.animal.life_cycle import LactationCurve
+from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 
 om = OutputManager()
 
