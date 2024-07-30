@@ -197,34 +197,39 @@ class MineralizationDecomposition:
         The values of the constant used to determine the nitrogen and phosphorus terms are 25 and 200, respectively.
 
         """
-        nitrogen_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa
-            carbon_nitrogen_ratio, 25
+        nitrogen_term = (
+            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
+                carbon_nitrogen_ratio, 25
+            )
         )
-        phosphorus_term = MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa
-            carbon_phosphorus_ratio, 200
+        phosphorus_term = (
+            MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor(  # noqa: F841, E501
+                carbon_phosphorus_ratio, 200
+            )
         )
-        # temporary value
+        # temporary fix to replace the process based method for the effect of the soil C, N, and P on the decomposition
+        # rate factor
         return 1
 
     @staticmethod
     def _calculate_decay_rate_constant(
-        fresh_organic_residue_decay_rate: float,
-        composition_factor: float,
+        fresh_organic_residue_mineralization_rate: float,
+        residue_composition_factor: float,
         temp_factor: float,
-        water_factor,
+        moisture_factor,
     ) -> float:
         """
         Calculates the decay rate constant for residue.
 
         Parameters
         ----------
-        fresh_organic_residue_decay_rate : float
+        fresh_organic_residue_mineralization_rate : float
             Rate coefficient for mineralization of fresh organic nutrients from residue (unitless).
-        composition_factor : float
+        residue_composition_factor : float
             Nutrient cycling residue composition factor for the current soil layer (unitless).
         temp_factor : float
             Nutrient cycling temperature factor for the current soil layer (unitless).
-        water_factor : float
+        moisture_factor : float
             Nutrient cycling water factor for the current soil layer (unitless).
 
         Returns
@@ -241,5 +246,5 @@ class MineralizationDecomposition:
         in the SWAT Input .BSN file (see "RSDCO" on page 101) and SWAT Input CROP.DAT file (see "RSDCO_PL" on page 205).
 
         """
-        factor_square_root_term = (temp_factor * water_factor) ** 0.5
-        return fresh_organic_residue_decay_rate * composition_factor * factor_square_root_term
+        square_root_factor = (temp_factor * moisture_factor) ** 0.5
+        return fresh_organic_residue_mineralization_rate * residue_composition_factor * square_root_factor
