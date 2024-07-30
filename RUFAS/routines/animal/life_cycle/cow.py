@@ -26,6 +26,7 @@ from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import (
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
+from RUFAS.routines.animal.life_cycle import LactationCurve
 
 om = OutputManager()
 
@@ -288,16 +289,18 @@ class Cow(HeiferIII):
             if parity_key < 0:
                 parity_key = 0
 
+            lactation_curve = LactationCurve()
+            lactation_parameters = lactation_curve.set_lactation_curve_parameters()
             self.wood_l = self.determine_param_value(
-                AnimalBase.lactation_parameters[parity_key + 1][0],
+                lactation_parameters[parity_key][0],
                 AnimalBase.config["wood_l_std"][self.breed_index][self.parity_index],
             )
             self.wood_m = self.determine_param_value(
-                AnimalBase.lactation_parameters[parity_key + 1][1],
+                lactation_parameters[parity_key][1],
                 AnimalBase.config["wood_m_std"][self.breed_index][self.parity_index],
             )
             self.wood_n = self.determine_param_value(
-                AnimalBase.lactation_parameters[parity_key + 1][2],
+                lactation_parameters[parity_key][2],
                 AnimalBase.config["wood_n_std"][self.breed_index][self.parity_index],
             )
 
