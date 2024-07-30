@@ -95,6 +95,11 @@ class LactationCurve:
         numpy.float64
             Milk yield at time t.
 
+        References
+        ----------
+        Li, M., et al. "Investigating the effect of temporal, geographic, and management factors on US Holstein
+        lactation curve parameters." Journal of Dairy Science 105.9 (2022): 7525-7538.
+
         """
         return parameter_a * np.power(t, parameter_b) * np.exp(-1 * parameter_c * t)
 
