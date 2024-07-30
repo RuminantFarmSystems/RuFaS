@@ -24,7 +24,7 @@
     "lactation": {
       "title": "Lactation curve adjustment values",
       "description": "Values for the adjustment of the three wood parameters based on farm specific data",
-      "path": "input/data/animal/LACTATION_CURVE_ADJUSTMENT_CONSTANTS.json",
+      "path": "input/data/animal/LACTATION_CURVE_ADJUSTMENT_INPUTS.json",
       "type": "json",
       "properties": "lactation_properties"
     },

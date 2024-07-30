@@ -89,10 +89,10 @@
       },
       "parity_percentages": {
         "type": "array",
-        "description": "Percentage of total herd represented by parity 1, 2, and 3+ (length 3)",
+        "description": "Percentage of the animal population in parity 1, 2, and 3 and beyond. The array length needs to be 3",
         "properties": {
           "type": "number",
-          "description": "Percentage of total herd made up by given parity group, either 1, 2, or 3+",
+          "description": "Percentage of the animal population in parity 1, 2, or 3 and beyond",
           "minimum": 0,
           "maximum": 1
         }
@@ -1646,11 +1646,11 @@
         "description": "the FIPS state code and its corresponding geographic region",
         "code": {
           "type": "number",
-          "decription": "The FIPS state code"
+          "description": "The FIPS state code"
         },
         "region": {
           "type": "string",
-          "decription": "One of the 13 possible geographic regions or 'None' if the location is not included in the dataset"
+          "description": "One of the 13 possible geographic regions or 'None' if the location is not included in the dataset"
         }
       }
     },
@@ -1659,11 +1659,11 @@
       "description": "Parity 2 and 3 milk yield adjustment assumptions for use in calculations",
       "parity2_MilkYield305_adjustment": {
         "type": "number",
-        "description": "The P2 milk adjustment value for the 305 day milk yield"
+        "description": "The parity 2 milk adjustment value for the 305 day milk yield"
       },
 		  "parity3_MilkYield305_adjustment": {
         "type": "number",
-        "description": "The P3 milk adjustment value for the 305 day milk yield"
+        "description": "The parity 3 milk adjustment value for the 305 day milk yield"
       }
     },
     "parameter_mean_values": {
