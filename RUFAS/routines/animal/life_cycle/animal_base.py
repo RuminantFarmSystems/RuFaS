@@ -2,6 +2,7 @@ from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
+from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.input_manager import InputManager
 from RUFAS.general_constants import GeneralConstants
 from typing import Tuple
@@ -9,6 +10,7 @@ from typing import Tuple
 
 class AnimalBase:
     config = {}
+    lactation_curve = None
     nutrients = None
 
     @staticmethod
@@ -22,6 +24,7 @@ class AnimalBase:
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
         AnimalBase.config["ration"] = im.get_data("animal.ration")
+        AnimalBase.lactation_curve = LactationCurve()
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
