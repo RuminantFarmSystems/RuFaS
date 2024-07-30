@@ -2468,24 +2468,24 @@ def test_calc_rqmts() -> None:
 
 def test_energy_activity_rqmts() -> None:
     """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
-    AnimalBase.config["nutrient_standard"] = "NASEM"
+    AnimalBase.config["nutrient_standard"] = "NRC"
     req = AnimalRequirements()
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
-    assert (result_energy_activity) == pytest.approx((294), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.48018), rel=1e-2)
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Not_Grazing", distance=1)
-    assert (result_energy_activity) == pytest.approx((0), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.00018), rel=1e-2)
 
-    AnimalBase.config["nutrient_standard"] = "NRC"
+    AnimalBase.config["nutrient_standard"] = "NASEM"
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Barn", distance=1)
-    assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.00014), rel=1e-2)
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
-    assert (result_energy_activity) == pytest.approx((0.66), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.294), rel=1e-2)
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="n e i t h e r", distance=1)
-    assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.0), rel=1e-2)
 
 
 def test_formulate_ration_is_udr_true(mocker: MockerFixture) -> None:
