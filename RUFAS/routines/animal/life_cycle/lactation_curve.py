@@ -68,6 +68,10 @@ class LactationCurve:
 
         self.adjustment_dict = im.get_data("lactation.adjustment_dict")
 
+        self.wood_parameter_l = im.get_data("lactation.parameter_mean_values.parameter_a_mean")
+        self.wood_parameter_m = im.get_data("lactation.parameter_mean_values.parameter_b_mean")
+        self.wood_parameter_n = im.get_data("lactation.parameter_mean_values.parameter_c_mean")
+
     def get_y_values_wood_curve(
         self, t: float, parameter_a: float, parameter_b: float, parameter_c: float
     ) -> np.float64:
@@ -150,12 +154,6 @@ class LactationCurve:
             Tuple of floats containing estimates for Wood's parameters l, m, n,
             and 305-day milk yield of the lactation group.
         """
-        parameter_a = InputManager.get_data(
-            "lactation.parameter_mean_values.parameter_a_mean")
-        parameter_b = InputManager.get_data(
-            "lactation.parameter_mean_values.parameter_b_mean")
-        parameter_c = InputManager.get_data(
-            "lactation.parameter_mean_values.parameter_c_mean")
 
         farm_specific = {}
         farm_specific["parity"] = lactation_group
@@ -166,7 +164,6 @@ class LactationCurve:
 
         for category in ["parity", "year", "month", "region", "milking_frequency"]:
             if farm_specific[category]:
-                print(category)
                 adjustment_applied = False
                 x = 0
                 while (
@@ -175,34 +172,31 @@ class LactationCurve:
                     and (farm_specific[category] is not None)
                 ):
                     if self.adjustment_dict[category][x][category] == farm_specific[category]:
-                        parameter_a += self.adjustment_dict[category][x]["adjustments"][0]
-                        parameter_b += self.adjustment_dict[category][x]["adjustments"][1] * 1e-2
-                        parameter_c += self.adjustment_dict[category][x]["adjustments"][2] * 1e-4
+                        l_param = self.wood_parameter_l + self.adjustment_dict[category][x]["adjustments"][0]
+                        m_param = self.wood_parameter_m + self.adjustment_dict[category][x]["adjustments"][1] * 1e-2
+                        n_param = self.wood_parameter_n + self.adjustment_dict[category][x]["adjustments"][2] * 1e-4
                         adjustment_applied = True
-
-                        print(self.adjustment_dict[category][x][category])
-                        print(farm_specific[category])
 
                     x = x + 1
 
         if MY_305d is None:
-            MY_305d = self.calc_integral_wood_curve(parameter_a, parameter_b, parameter_c)
-            return parameter_a, parameter_b, parameter_c, MY_305d
+            MY_305d = self.calc_integral_wood_curve(l_param, m_param, n_param)
+            return l_param, m_param, n_param, MY_305d
 
         else:
             min_diff = float("inf")
-            parameter_a_best_estimate = 0
+            l_param_best_estimate = 0
             MY_305d_best_estimate = 0
             MY_305d = float(MY_305d)
 
-            for parameter_a_error in np.arange(-10, 10, 0.01):
-                parameter_a_vary = parameter_a + parameter_a_error
-                MY_305d_vary = self.calc_integral_wood_curve(parameter_a_vary, parameter_b, parameter_c)
+            for l_param_error in np.arange(-10, 10, 0.01):
+                l_param_vary = l_param + l_param_error
+                MY_305d_vary = self.calc_integral_wood_curve(l_param_vary, m_param, n_param)
                 if abs(MY_305d_vary - MY_305d) < min_diff:
                     min_diff = abs(MY_305d_vary - MY_305d)
-                    parameter_a_best_estimate = parameter_a_vary
+                    l_param_best_estimate = l_param_vary
                     MY_305d_best_estimate = MY_305d_vary
-            return parameter_a_best_estimate, parameter_b, parameter_c, MY_305d_best_estimate
+            return l_param_best_estimate, m_param, n_param, MY_305d_best_estimate
 
     def calc_parities(self) -> tuple[float, float, float]:
         """
