@@ -3510,9 +3510,9 @@ def test_get_TDN_discount(ration_report: Dict[str, Dict[str, float]], body_weigh
 @pytest.mark.parametrize(
     "kg_fed,feed_item_info,ration_report,body_weight,expected",
     [
-        ("dummy_variable", {"DE": 2}, "dummy_variable", "dummy_variable", 1.0),
-        ("dummy_variable", {"DE": 1}, "dummy_variable", "dummy_variable", 0.5),
-        ("dummy_variable", {"DE": 0}, "dummy_variable", "dummy_variable", 0.0),
+        (1, {"DE": 2}, "dummy_variable", "dummy_variable", 1.0),
+        (1, {"DE": 1}, "dummy_variable", "dummy_variable", 0.5),
+        (1, {"DE": 0}, "dummy_variable", "dummy_variable", 0.0),
     ],
 )
 def test_get_DE(
