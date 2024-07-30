@@ -2,8 +2,6 @@ from RUFAS.input_manager import InputManager
 import numpy as np
 from scipy.integrate import quad
 
-im = InputManager()
-
 
 class LactationCurve:
     """
@@ -27,14 +25,15 @@ class LactationCurve:
     milking_freq: int
         The average or most common number of times cows are milked per day (1, 2, or 3 times daily)
     parity2_MilkYield305_adj: int
-        The P2 milk adjustment value for the 305 day milk yield
+        The parity 2 milk adjustment value for the 305 day milk yield
     parity3_MilkYield305_adj: int
-        The P3 milk adjustment value for the 305 day milk yield
+        The parity 3 adjustment value for the 305 day milk yield
     adjustment_dict: dict
 
     """
 
     def __init__(self):
+        im = InputManager()
 
         self.year = im.get_data("config.end_date")[:4]
         if int(self.year) > 2016:
@@ -151,14 +150,12 @@ class LactationCurve:
             Tuple of floats containing estimates for Wood's parameters l, m, n,
             and 305-day milk yield of the lactation group.
         """
-        parameter_a = im.get_data(
+        parameter_a = InputManager.get_data(
             "lactation.parameter_mean_values.parameter_a_mean")
-        parameter_b = im.get_data(
+        parameter_b = InputManager.get_data(
             "lactation.parameter_mean_values.parameter_b_mean")
-        parameter_c = im.get_data(
+        parameter_c = InputManager.get_data(
             "lactation.parameter_mean_values.parameter_c_mean")
-
-        # adjustment_dict = im.get_data("lactation.adjustment_dict")
 
         farm_specific = {}
         farm_specific["parity"] = lactation_group
