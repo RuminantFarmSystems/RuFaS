@@ -22,7 +22,7 @@ class LactationCurve:
         Percentages of total herd represented by parity 1, 2, and 3+.
     num_milking_cows: float
         Number of milking cows in the herd. Calculated using the number of cows and assumed milking cow percentage.
-    milking_freq: int
+    milking_freq : string
         The average or most common number of times cows are milked per day (1, 2, or 3 times daily)
     parity2_MilkYield305_adj: int
         The parity 2 milk adjustment value for the 305 day milk yield
@@ -32,14 +32,16 @@ class LactationCurve:
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         im = InputManager()
 
         self.year = im.get_data("config.end_date")[:4]
         if int(self.year) > 2016:
             self.year = "2016"
 
-        region_dict = im.get_data("lactation.fips_region")
+        lactation_inputs = im.get_data("lactation")
+
+        region_dict = lactation_inputs["fips_region"]
         FIPS_code = im.get_data("config.FIPS_county_code")
         FIPS_state_code = None
         if FIPS_code is not None:
@@ -52,25 +54,24 @@ class LactationCurve:
 
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
-        self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * im.get_data(
-            "lactation.assumed_milking_cow_percentage"
-        )
+        self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * lactation_inputs[
+            "assumed_milking_cow_percentage"
+        ]
 
-        self.milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
-        if self.milking_freq >= 2.5:
+        milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
+        if milking_freq >= 2.5:
             self.milking_freq = "3x/d"
         else:
             self.milking_freq = "2x/d"
 
-        # Assuming Y = 1632 and Z = 2196 based on the given assumptions
-        self.parity2_MilkYield305_adj = im.get_data("lactation.parity_milk_adjustments.parity2_MilkYield305_adjustment")
-        self.parity3_MilkYield305_adj = im.get_data("lactation.parity_milk_adjustments.parity3_MilkYield305_adjustment")
+        self.parity2_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity2_MilkYield305_adjustment"]
+        self.parity3_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity3_MilkYield305_adjustment"]
 
-        self.adjustment_dict = im.get_data("lactation.adjustment_dict")
+        self.adjustment_dict = lactation_inputs["adjustment_dict"]
 
-        self.wood_parameter_l = im.get_data("lactation.parameter_mean_values.parameter_a_mean")
-        self.wood_parameter_m = im.get_data("lactation.parameter_mean_values.parameter_b_mean")
-        self.wood_parameter_n = im.get_data("lactation.parameter_mean_values.parameter_c_mean")
+        self.wood_parameter_l = lactation_inputs["parameter_mean_values"]["parameter_a_mean"]
+        self.wood_parameter_m = lactation_inputs["parameter_mean_values"]["parameter_b_mean"]
+        self.wood_parameter_n = lactation_inputs["parameter_mean_values"]["parameter_c_mean"]
 
     def get_y_values_wood_curve(
         self, t: float, parameter_a: float, parameter_b: float, parameter_c: float
