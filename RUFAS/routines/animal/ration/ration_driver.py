@@ -713,7 +713,7 @@ class RationReporter:
         """
         DE_act = RationReporter.get_DE(
             kg_fed, feed_item_info, ration_report, body_weight
-        ) / kg_fed
+        ) / kg_fed if kg_fed > 0 else 0.0
 
         if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
@@ -763,7 +763,7 @@ class RationReporter:
         """
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        ) / kg_fed
+        ) / kg_fed if kg_fed > 0 else 0.0
         if feed_item_info["is_fat"] is True:
             NEm_item = 0.8 * ME_item
         else:
@@ -805,10 +805,10 @@ class RationReporter:
         """
         DE_act = RationReporter.get_DE(
             kg_fed, feed_item_info, ration_report, body_weight
-        ) / kg_fed
+        ) / kg_fed if kg_fed > 0 else 0.0
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        ) / kg_fed
+        ) / kg_fed if kg_fed > 0 else 0.0
         if feed_item_info["feed_type"] == "Mineral":
             NE_lactation_item = 0.0
         elif feed_item_info["is_fat"] is True:
@@ -857,7 +857,7 @@ class RationReporter:
         """
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        ) / kg_fed
+        ) / kg_fed if kg_fed > 0 else 0.0
         if feed_item_info["feed_type"] == "Mineral":
             NE_growth = 0.0
         elif feed_item_info["is_fat"] is True:

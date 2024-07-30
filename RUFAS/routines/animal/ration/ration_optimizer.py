@@ -968,8 +968,6 @@ class RationOptimizer:
             )
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
-            # bnds = []
-            # bnds = [(0, (lim / 3) + 0.0001) for lim in ration_config.feed_limit_list]
             bnds = list(zip(
                 [(lim / 3) for lim in ration_config.feed_minimum_list],
                 [(lim / 3) for lim in ration_config.feed_limit_list]))
