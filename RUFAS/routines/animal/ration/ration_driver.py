@@ -678,7 +678,7 @@ class RationReporter:
         DE_act = feed_item_info[de_key] * RationReporter.get_TDN_discount(
             ration_report, body_weight
         )
-        return DE_act
+        return DE_act * kg_fed
 
     @staticmethod
     def get_ME(
@@ -705,11 +705,15 @@ class RationReporter:
         -------
         float
             metabolizable energy of feed i, Mcal/kg.
+        Notes
+        -----
+        Division of DE_act by kg_fed is to get the DE for each item on a per kg basis,
+            as is used in the subsequent calculations.
 
         """
         DE_act = RationReporter.get_DE(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed
 
         if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
@@ -723,7 +727,7 @@ class RationReporter:
             ME_item = 1.01 * DE_act - 0.45 + 0.0046 * (feed_item_info["EE"] - 3)
         else:
             ME_item = 1.01 * DE_act - 0.45
-        return ME_item
+        return ME_item * kg_fed
 
     @staticmethod
     def get_NE_maintenance_and_activity(
@@ -751,10 +755,15 @@ class RationReporter:
         float
             Net energy of feed i, Mcal/kg.
 
+        Notes
+        -----
+        Division of ME_item by kg_fed is to get the ME for each item on a per kg basis,
+            as is used in the subsequent calculations.
+
         """
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed
         if feed_item_info["is_fat"] is True:
             NEm_item = 0.8 * ME_item
         else:
@@ -789,13 +798,17 @@ class RationReporter:
         float
             Net energy of feed i, Mcal/kg.
 
+        Notes
+        -----
+        Division of DE_act and ME_item by kg_fed is to get the DE and ME for each item on a per kg basis,
+            as is used in the subsequent calculations.
         """
         DE_act = RationReporter.get_DE(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed
         if feed_item_info["feed_type"] == "Mineral":
             NE_lactation_item = 0.0
         elif feed_item_info["is_fat"] is True:
@@ -836,10 +849,15 @@ class RationReporter:
         float
             Net energy of feed i, Mcal/kg.
 
+        Notes
+        -----
+        Division of ME_item by kg_fed is to get the ME for each item on a per kg basis,
+            as is used in the subsequent calculations.
+
         """
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed
         if feed_item_info["feed_type"] == "Mineral":
             NE_growth = 0.0
         elif feed_item_info["is_fat"] is True:
