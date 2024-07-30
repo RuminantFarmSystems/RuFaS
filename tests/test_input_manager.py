@@ -13,7 +13,6 @@ from RUFAS.elements import ElementState
 from RUFAS.elements import ElementsCounter
 from RUFAS.input_validator import InputValidator
 from RUFAS.modifiability import Modifiability
-from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
 from RUFAS.util import Utility
 
 
