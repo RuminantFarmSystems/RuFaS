@@ -3,8 +3,6 @@ from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.input_manager import InputManager
-
-im = InputManager()
 from RUFAS.general_constants import GeneralConstants
 from typing import Tuple
 
@@ -12,7 +10,6 @@ from typing import Tuple
 class AnimalBase:
     config = {}
     nutrients = None
-    lactation_parameters = {}
 
     @staticmethod
     def set_nutrient_list(nutrients):
