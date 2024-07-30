@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Callable, Tuple
+from typing import Any, Dict, List, Union, Callable, Sequence, Tuple
 
 import pandas as pd
 from deepdiff import DeepDiff
@@ -528,7 +528,6 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self.get_data.__name__,
         }
-
         element_hierarchy = data_address.split(".")
         try:
             data_value = InputValidator.extract_value_by_key_list(self.__pool, element_hierarchy)
@@ -569,7 +568,6 @@ class InputManager:
         >>> input_manager.check_property_exists_in_pool('animal.herd_information.nonexistent_property')
         False
         """
-
         variable_path = data_address.split(".")
         try:
             InputValidator.extract_value_by_key_list(self.__pool, variable_path)
@@ -782,65 +780,6 @@ class InputManager:
             )
         return True
 
-    def _set_nested_value(
-        self, nested_dict: Dict[str, Any], element_hierarchy: List[str], value: Any
-    ) -> Dict[str, Any]:
-        """
-        Sets a given value within a nested dictionary structure at a specified hierarchical level and returns the
-        updated dictionary.
-
-        Notes
-        -----
-        This function iteratively traverses through the levels of a nested dictionary, guided by a list of keys
-        (element_hierarchy). At each level, it checks for the existence of the key. If a key is missing, a new nested
-        dictionary is created at that key. The function sets the given value at the final key in the hierarchy.
-
-        While this function modifies the input dictionary in place, it also returns the modified dictionary for
-        convenience and chaining operations.
-
-        Be cautious of the in-place modification of the input dictionary, which may lead to unintended side effects.
-
-        In other words, this function operates through the side effect of altering the state of `nested_dict` outside
-        its local scope. This behavior of in-place modification of the input dictionary introduces potential unintended
-        changes.
-
-        Parameters
-        ----------
-        nested_dict : Dict[str, Any]
-            The nested dictionary to be updated. This should be the top-level dictionary if the hierarchy spans multiple
-            levels.
-        element_hierarchy : List[str]
-            A list of strings representing the keys that define the path through the nested dictionary to the location
-            where the value should be set. Each element in the list corresponds to one level in the nested structure.
-        value : Any
-            The value to be set at the specified location within the nested dictionary structure.
-
-        Returns
-        -------
-        Dict[str, Any]
-            The updated nested dictionary after setting the specified value.
-
-        Examples
-        --------
-        >>> nested_dictionary = {'a': {'b': {'c': 1}}}
-        >>> updated_dict = self._set_nested_value(nested_dictionary, ['a', 'b', 'd'], 2)
-        >>> print(updated_dict)
-        {'a': {'b': {'c': 1, 'd': 2}}}
-
-        >>> nested_dictionary = {'a': {'b': {'c': 1}}}
-        >>> updated_dict = self._set_nested_value(nested_dictionary, ['a', 'b', 'c'], 2)
-        >>> print(updated_dict)
-        {'a': {'b': {'c': 2}}}
-        """
-        current_dict_level = nested_dict
-        for key in element_hierarchy[:-1]:
-            if key not in current_dict_level.keys():
-                current_dict_level[key] = {}
-            current_dict_level = current_dict_level[key]
-
-        current_dict_level[element_hierarchy[-1]] = value
-        return nested_dict
-
     def _add_variable_to_pool(
         self,
         variable_name: str,
@@ -942,7 +881,8 @@ class InputManager:
         """
         element_hierarchy = variable_name.split(".")
         if len(element_hierarchy) > 1:
-            data = self._set_nested_value({}, element_hierarchy[1:], input_data)
+            flat_key_data = {variable_name.split(".", 1)[1]: input_data}
+            data = Utility.flatten_keys_to_nested_structure(flat_key_data)
             element_hierarchy = element_hierarchy if isinstance(input_data, Dict) else element_hierarchy[:-1]
             metadata_properties = reduce(
                 lambda d, k: d[k], element_hierarchy[1:], self.__metadata["properties"][properties_blob_key]
