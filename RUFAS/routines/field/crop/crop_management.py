@@ -1,5 +1,6 @@
 from math import exp
 from typing import Optional
+from ....general_constants import GeneralConstants
 from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
@@ -78,7 +79,7 @@ class CropManagement:
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
+        self._record_yield(field_name, field_size, time)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
     # ---- Sub Methods ----
@@ -283,7 +284,7 @@ class CropManagement:
         )
         feed_manager.receive_crop(harvested_crop, self.data.storage_type)
 
-    def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
+    def _record_yield(self, field_name: str, field_size: float, time: Time) -> None:
         """
         Records the mass and nutrients collected in an individual harvest and sends them to the OutputManager.
 
@@ -306,6 +307,8 @@ class CropManagement:
             "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+            "residue_nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+            "residue_phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
             "harvest_index": MeasurementUnits.UNITLESS,
             "planting_year": MeasurementUnits.CALENDAR_YEAR,
             "planting_day": MeasurementUnits.ORDINAL_DAY,
@@ -323,6 +326,7 @@ class CropManagement:
             "function": self._record_yield.__name__,
             "suffix": f"field='{field_name}'",
             "units": units,
+            "simulation_day": time.simulation_day,
         }
         value = {
             "crop": self.data.species,
@@ -331,11 +335,13 @@ class CropManagement:
             "nitrogen": nitrogen_harvested,
             "phosphorus": phosphorus_harvested,
             "yield_residue": self.data.yield_residue,
+            "residue_nitrogen": self.data.residue_nitrogen,
+            "residue_phosphorus": self.data.residue_phosphorus,
             "harvest_index": self.data.harvest_index,
             "planting_year": self.data.planting_year,
             "planting_day": self.data.planting_day,
-            "harvest_year": year,
-            "harvest_day": day,
+            "harvest_year": time.current_calendar_year,
+            "harvest_day": time.current_julian_day,
             "field_size": field_size,
             "field_name": field_name,
         }
@@ -361,27 +367,20 @@ class CropManagement:
 
         """
         soil_data.crop_yield_nitrogen = self.data.residue_nitrogen
-        soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
-        dry_matter_root_biomass = self.data.root_biomass
+        soil_data.plant_residue_lignin_composition = (
+            self.data.lignin_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
         if killed:
-            soil_data.plant_surface_residue = self.data.yield_residue - dry_matter_root_biomass
-            soil_data.plant_root_residue = dry_matter_root_biomass
-            soil_data.crop_root_depth = self.data.root_depth
-            self._distribute_residue_nutrients(
-                soil_data,
-                dry_matter_root_biomass,
-            )
+            self._distribute_residue_nutrients(soil_data)
         else:
-            soil_data.plant_surface_residue = self.data.yield_residue
-            soil_data.plant_root_residue = 0
-            soil_data.crop_root_depth = 0
+            soil_data.soil_layers[0].plant_residue = self.data.yield_residue
             soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen
             soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus
         self.data.yield_residue = 0.0
         self.data.residue_nitrogen = 0.0
         self.data.residue_phosphorus = 0.0
 
-    def _distribute_residue_nutrients(self, soil_data: SoilData, root_residue_mass: float) -> None:
+    def _distribute_residue_nutrients(self, soil_data: SoilData) -> None:
         """
         Distributes nutrients from plant residue into the soil profile.
 
@@ -392,39 +391,72 @@ class CropManagement:
         root_residue_mass : float
             Dry matter mass of residue that is roots (kg / ha).
 
-        Notes
-        -----
-        This method ensures that when nutrients are added to soil profile layers via root residue, they are distributed
-        proportionally between layers based on the depth the crop's roots reach.
-
         """
-        surface_fraction = (self.data.yield_residue - root_residue_mass) / self.data.yield_residue
-        soil_data.soil_layers[0].fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
-        soil_data.soil_layers[0].labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
+        surface_layer = soil_data.soil_layers[0]
+        surface_fraction = (self.data.yield_residue - self.data.root_biomass) / self.data.yield_residue
+        surface_layer.plant_residue = self.data.yield_residue * surface_fraction
+        surface_layer.fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
+        surface_layer.labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
 
+        subsurface_residue = self.data.yield_residue * (1 - surface_fraction)
         subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
-        surface_layer = soil_data.soil_layers[0]
-        surface_root_fraction = (
-            (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth
-            if surface_layer.bottom_depth <= self.data.root_depth
-            else max(
-                0.0,
-                (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth,
-            )
-        )
-        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
-        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
+        root_frac_to_top_depth = self._calculate_root_mass_distribution(surface_layer.top_depth)
+        root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
+        layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
+        surface_layer.plant_residue += subsurface_residue * layer_fraction
+        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
+        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
 
         for layer in soil_data.soil_layers[1:]:
-            layer_fraction = (
-                (layer.bottom_depth - layer.top_depth) / self.data.root_depth
-                if layer.bottom_depth <= self.data.root_depth
-                else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
-            )
+            root_frac_to_top_depth = self._calculate_root_mass_distribution(layer.top_depth)
+            root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
+            layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
+            layer.plant_residue = subsurface_residue * layer_fraction
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
+
+    def _calculate_root_mass_distribution(self, bottom_depth: float) -> float:
+        """
+        Calculates the fraction of total root biomass that is contained within each soil layer.
+
+        Parameters
+        ----------
+        bottom_depth : float
+            The bottom depth of the soil layer for which the root distribution is being calculated for (mm).
+
+        Returns
+        -------
+        float
+            Fraction of root biomass that is at or above the passed soil depth (unitless).
+
+        References
+        ----------
+        .. [1] Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops Research
+                189 (2016): 68-74, equation (2).
+
+        Notes
+        -----
+        If the bottom depth of a soil layer extends past the maximum depth of the roots, then that soil layer contains
+        all of the crop's root mass. If the bottom depth of the soil layer is 0 (i.e. it is the soil surface) then it
+        will not contain any of the crop's root mass.
+
+        """
+        if bottom_depth >= self.data.root_depth:
+            return 1.0
+        if bottom_depth == 0.0:
+            return 0.0
+
+        first_term = 1 / (
+            1 + (bottom_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
+        )
+        second_term = 1 - 1 / (
+            1 + (self.data.root_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
+        )
+        third_term = bottom_depth / self.data.root_depth
+
+        return first_term + second_term * third_term
 
     # ---- Helper Methods ----
     @staticmethod
