@@ -3353,6 +3353,14 @@
         "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter|No)$"
       }
     },
+    "Fd_Category": {
+      "type": "array",
+      "description": "Feed Category.",
+      "properties": {
+        "type": "string",
+        "pattern": "^(Animal Protein|By-Product/Other|Calf Liquid Feed|Energy Source|Fat Supplement|Fatty Acid Supplement|Grain Crop Forage|Grass/Legume Forage|Pasture|Plant Protein|Vitamin/Mineral)$"
+      }
+    },
     "DM": {
       "type": "array",
       "description": "Dry matter content of the feed (% DM).",
