@@ -112,9 +112,10 @@ class SimulationEngine:
         """Executes the daily simulation routines."""
 
         # TODO: remove this code after Animal and Feed Storage modules are connected - #1878
-        process_degradations_today = self.time.current_julian_day % 15 == 0
-        if self.is_end_to_end_test_run and process_degradations_today:
-            self.feed_manager.process_degradations(self.weather, self.time)
+        if self.is_end_to_end_test_run:
+            process_degradations_today = self.time.current_julian_day % 15 == 0
+            if process_degradations_today:
+                self.feed_manager.process_degradations(self.weather, self.time)
 
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
@@ -193,7 +194,6 @@ class SimulationEngine:
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
         is_end_to_end_test_run = self.im.get_data("end_to_end_testing_inputs")
-        if not is_end_to_end_test_run:
-            return
-        self.feed_manager.setup_stored_feeds(is_end_to_end_test_run, self.time)
-        self.is_end_to_end_test_run = True
+        if is_end_to_end_test_run:
+            self.feed_manager.setup_stored_feeds(is_end_to_end_test_run, self.time)
+            self.is_end_to_end_test_run = True
