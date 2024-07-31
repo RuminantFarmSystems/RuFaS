@@ -8,6 +8,7 @@ from mock import MagicMock
 from pytest_lazyfixture import lazy_fixture
 from pytest_mock import MockerFixture
 
+import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_typed_dicts import (
@@ -1807,7 +1808,7 @@ def test_attempt_optimization(
         DMIest__requirement=10.0,
     )
 
-    mock_optimize.assert_called_with(not_lac_cow_animal_combination, mock_RationConfig.return_value, None)
+    ration_optimizer.optimize.assert_called_with(not_lac_cow_animal_combination, mock_RationConfig.return_value, None)
 
     mock_get_ration_vals.assert_called_with(mock_optimize.return_value.x, mock_RationConfig.return_value)
 
@@ -2228,7 +2229,7 @@ def ration_optimizer(mock_cow_constraints: MagicMock, mock_heifer_constraints: M
 
 
 @pytest.mark.parametrize(
-    "is_udr, animal_combination, expected_x0, expected_bounds, expected_constraints",
+    "use_user_defined_ration, animal_combination, expected_x0, expected_bounds, expected_constraints",
     [
         (
             True,
@@ -2278,15 +2279,18 @@ def test_ration_optimizer_optimize(
     mocker: MockerFixture,
     mock_ration_config: MagicMock,
     ration_optimizer: RationOptimizer,
-    is_udr: bool,
-    animal_combination: str,
+    use_user_defined_ration: bool,
+    animal_combination: AnimalCombination,
     expected_x0: list[float],
     expected_bounds: list[float],
     expected_constraints: MagicMock,
 ) -> None:
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
 
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(is_udr=is_udr))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.udrm",
+        MagicMock(use_user_defined_ration=use_user_defined_ration),
+    )
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
     mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.make_user_bounds",
@@ -2302,7 +2306,7 @@ def test_ration_optimizer_optimize(
 
     ration_optimizer.set_constraints.assert_called_once_with(arguments=(mock_ration_config,))
 
-    if is_udr:
+    if use_user_defined_ration:
         mock_ration_to_use.assert_called_once_with(animal_combination)
 
         ration_optimizer.make_user_bounds.assert_called_once_with(
@@ -2326,8 +2330,8 @@ def test_ration_optimizer_optimize_with_prev_ration(
     mock_heifer_constraints: MagicMock,
 ) -> None:
     """Unit test for function optimize in file routines/animal/ration/ration_optimizer.py"""
-    is_udr = False
-    animal_combination = "AnimalCombination.GROWING"
+    use_user_defined_ration = False
+    animal_combination = AnimalCombination.GROWING
     expected_bounds = [
         (0, 1.0001),
         (0, 2.0001),
@@ -2336,9 +2340,13 @@ def test_ration_optimizer_optimize_with_prev_ration(
         (0, 5.0001),
         (0, 6.0001),
     ]
+    expected_constraints = mock_heifer_constraints
     prev_ration = {"a": 3.0, "b": 6.0}
     expected_x0 = [3.0, 6.0]
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(is_udr=is_udr))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.udrm",
+        MagicMock(use_user_defined_ration=use_user_defined_ration),
+    )
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
     mock_minimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.minimize")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.random.random", return_value=0.1)
@@ -2362,7 +2370,10 @@ def test_ration_optimizer_optimize_value_error(
     ration_optimizer: RationOptimizer,
 ) -> None:
     """Unit test for value error in function optimize in file routines/animal/ration/ration_optimizer.py"""
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(is_udr=False))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.udrm",
+        MagicMock(use_user_defined_ration=False),
+    )
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
 
     animal_combination = AnimalCombination.CALF
@@ -2437,46 +2448,232 @@ def test_calc_rqmts() -> None:
 
 def test_energy_activity_rqmts() -> None:
     """Unit test for function energy_activity_rqmts in file routines/animal/ration/animal_requirements.py"""
-    AnimalBase.config["nutrient_standard"] = "NASEM"
+    AnimalBase.config["nutrient_standard"] = "NRC"
     req = AnimalRequirements()
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
-    assert (result_energy_activity) == pytest.approx((294), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.48018), rel=1e-2)
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Not_Grazing", distance=1)
-    assert (result_energy_activity) == pytest.approx((0), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.00018), rel=1e-2)
 
-    AnimalBase.config["nutrient_standard"] = "NRC"
+    AnimalBase.config["nutrient_standard"] = "NASEM"
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Barn", distance=1)
-    assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.00014), rel=1e-2)
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="Grazing", distance=1)
-    assert (result_energy_activity) == pytest.approx((0.66), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.294), rel=1e-2)
 
     result_energy_activity = req.energy_activity_rqmts(body_weight=400, housing="n e i t h e r", distance=1)
-    assert (result_energy_activity) == pytest.approx((0.18), rel=1e-2)
+    assert (result_energy_activity) == pytest.approx((0.0), rel=1e-2)
 
 
-def test_formulate_ration_is_udr_true(mocker: MockerFixture) -> None:
+def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
+    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py,
+    using cow constraints"""
+    mock_ration_optimizer = mocker.MagicMock()
+    mock_cow_constraint1 = mocker.MagicMock()
+    mock_cow_constraint2 = mocker.MagicMock()
+    mock_ration_optimizer.cow_constraints = [mock_cow_constraint1, mock_cow_constraint2]
+
+    mock_ration_config = mocker.MagicMock()
+    mock_ration_config.price_list = [1, 1, 1]
+
+    mock_available_feeds = mocker.MagicMock()
+
+    # make a mocked solution object - the critical component being the x
+    mock_solution = mocker.MagicMock()
+    mock_solution.x = [1, 1, 1, 2, 2, 2, 3, 3, 3]
+
+    mock_pen = mocker.MagicMock()
+    mock_pen.animal_combination = AnimalCombination.LAC_COW
+    mock_pen.avg_nutrient_rqmts = {"avg_BW": 1}
+    mock_pen.id = 0
+
+    mock_cow1 = mocker.MagicMock()
+    sim_day = 44
+    mock_cow2 = mocker.MagicMock()
+    mock_cow3 = mocker.MagicMock()
+
+    mock_pen.animals_in_pen = {"id1": mock_cow1, "id2": mock_cow2, "id3": mock_cow3}
+
+    dummy_constr1 = mocker.MagicMock()
+    dummy_constr1.__name__ = "constr1"
+
+    dummy_constr2 = mocker.MagicMock()
+    dummy_constr2.__name__ = "constr2"
+
+    dummy_constr3 = mocker.MagicMock()
+    dummy_constr3.__name__ = "constr3"
+
+    mock_ration_optimizer.find_failed_constraints.return_value = [
+        {"fun": dummy_constr1},
+        {"fun": dummy_constr2},
+        {"fun": dummy_constr3},
+    ]
+
+    mock_make_ration_from_solution = mocker.patch(
+        "RUFAS.routines.animal.ration.ration_driver.RationManager.make_ration_from_solution",
+        return_value={"dummy_feed1": 77.2, "dummy_feed2": 81.4},
+    )
+
+    mock_info_map = {
+        "class": "RationManager",
+        "function": "handle_failed_constraints",
+    }
+
+    RationManager.handle_failed_constraints(
+        4,
+        mock_solution,
+        mock_ration_optimizer,
+        mock_ration_config,
+        mock_pen,
+        mock_available_feeds,
+        sim_day=sim_day,
+        info_map=mock_info_map,
+    )
+
+    mock_ration_optimizer.find_failed_constraints.assert_called_once_with(
+        mock_solution.x, mock_ration_optimizer.cow_constraints, mock_ration_config
+    )
+
+    mock_make_ration_from_solution.assert_called_once_with(mock_available_feeds, mock_solution)
+
+    assert om.variables_pool["RationManager.handle_failed_constraints.failed_constraint_summary_for_pen_0"][
+        "values"
+    ] == [
+        {
+            "simulation day": 44,
+            "attempt number": 4,
+            "constraints_failed_dict": ["constr1", "constr2", "constr3"],
+            "ration_attempted": {"dummy_feed1": 77.2, "dummy_feed2": 81.4},
+            "pen requirements": {"avg_BW": 1},
+        }
+    ]
+
+
+def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
+    """Unit test for function find_failed_constraints in file routines/animal/ration/ration_driver.py,
+    using heifer constraints"""
+    mock_heifer_ration_optimizer = mocker.MagicMock()
+    mock_heifer_constraint1 = mocker.MagicMock()
+    mock_heifer_constraint2 = mocker.MagicMock()
+    mock_heifer_ration_optimizer.heifer_constraints = [
+        mock_heifer_constraint1,
+        mock_heifer_constraint2,
+    ]
+
+    mock_heifer_ration_config = mocker.MagicMock()
+    mock_heifer_ration_config.price_list = [1, 1, 1]
+
+    mock_heifer_available_feeds = mocker.MagicMock()
+
+    # make a mocked solution object - the critical component being the x
+    mock_heifer_solution = mocker.MagicMock()
+    mock_heifer_solution.x = [3, 3, 3, 2, 2, 2, 1, 1, 1]
+
+    mock_heifer_pen = mocker.MagicMock()
+    mock_heifer_pen.animal_combination = AnimalCombination.CLOSE_UP
+    mock_heifer_pen.avg_nutrient_rqmts = {"avg_BW": 0.5}
+    mock_heifer_pen.id = 1
+
+    mock_heifer1 = mocker.MagicMock()
+    mock_heifer2 = mocker.MagicMock()
+    mock_heifer3 = mocker.MagicMock()
+
+    mock_heifer_pen.animals_in_pen = {
+        "heifer_id1": mock_heifer1,
+        "heifer_id2": mock_heifer2,
+        "heifer_id3": mock_heifer3,
+    }
+
+    heifer_dummy_constr1 = mocker.MagicMock()
+    heifer_dummy_constr1.__name__ = "heifer_constr1"
+
+    heifer_dummy_constr2 = mocker.MagicMock()
+    heifer_dummy_constr2.__name__ = "heifer_constr2"
+
+    heifer_dummy_constr3 = mocker.MagicMock()
+    heifer_dummy_constr3.__name__ = "heifer_constr3"
+
+    mock_heifer_ration_optimizer.find_failed_constraints.return_value = [
+        {"fun": heifer_dummy_constr1},
+        {"fun": heifer_dummy_constr2},
+        {"fun": heifer_dummy_constr3},
+    ]
+
+    mock_make_ration_from_solution = mocker.patch(
+        "RUFAS.routines.animal.ration.ration_driver.RationManager.make_ration_from_solution",
+        return_value={"dummy_feed1": 38.6, "dummy_feed2": 40.7},
+    )
+
+    sim_day = 22
+
+    mock_heifer_info_map = {
+        "class": "RationManager",
+        "function": "handle_failed_constraints",
+    }
+
+    RationManager.handle_failed_constraints(
+        2,
+        mock_heifer_solution,
+        mock_heifer_ration_optimizer,
+        mock_heifer_ration_config,
+        mock_heifer_pen,
+        mock_heifer_available_feeds,
+        sim_day=sim_day,
+        info_map=mock_heifer_info_map,
+    )
+
+    mock_heifer_ration_optimizer.find_failed_constraints.assert_called_once_with(
+        mock_heifer_solution.x,
+        mock_heifer_ration_optimizer.heifer_constraints,
+        mock_heifer_ration_config,
+    )
+
+    mock_make_ration_from_solution.assert_called_once_with(mock_heifer_available_feeds, mock_heifer_solution)
+
+    assert om.variables_pool["RationManager.handle_failed_constraints.failed_constraint_summary_for_pen_1"][
+        "values"
+    ] == [
+        {
+            "simulation day": 22,
+            "attempt number": 2,
+            "constraints_failed_dict": [
+                "heifer_constr1",
+                "heifer_constr2",
+                "heifer_constr3",
+            ],
+            "ration_attempted": {"dummy_feed1": 38.6, "dummy_feed2": 40.7},
+            "pen requirements": {"avg_BW": 0.5},
+        }
+    ]
+
+
+def test_formulate_ration_use_user_defined_ration_true(mocker: MockerFixture) -> None:
     """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
     mocker.patch(
         "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
         return_value=None,
     )
-    mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=True))
-    udrm_is_udr_expected = (1, 2)
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_driver.udrm",
+        MagicMock(use_user_defined_ration=True),
+    )
+    udrm_use_user_defined_ration_expected = (1, 2)
     mocker.patch(
         "RUFAS.routines.animal.ration.ration_driver.RationManager.get_user_defined_ration",
-        return_value=udrm_is_udr_expected,
+        return_value=udrm_use_user_defined_ration_expected,
     )
     # Act
     actual = RationManager.formulate_ration(
         pen=mocker.MagicMock(),
         available_feeds=mocker.MagicMock(),
         animal_grouping_scenario=mocker.MagicMock(),
+        sim_day=2,
     )
     # Assert
-    assert actual == udrm_is_udr_expected
+    assert actual == udrm_use_user_defined_ration_expected
 
 
 def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
@@ -2490,7 +2687,10 @@ def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
         "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
         return_value=None,
     )
-    mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=False))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_driver.udrm",
+        MagicMock(use_user_defined_ration=False),
+    )
     mock_pen = mocker.MagicMock()
     prev_ration = mocker.MagicMock()
     mock_pen.ration_per_animal = prev_ration
@@ -2508,9 +2708,7 @@ def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
     available_feeds = mocker.MagicMock()
     # Act
     actual = RationManager.formulate_ration(
-        pen=mock_pen,
-        available_feeds=available_feeds,
-        animal_grouping_scenario=mocker.MagicMock(),
+        pen=mock_pen, available_feeds=available_feeds, animal_grouping_scenario=mocker.MagicMock(), sim_day=2
     )
     # Assert
     assert actual == expected
@@ -2519,7 +2717,7 @@ def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
 
 def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     """Unit test for function formulate_ration in file routines/animal/ration/ration_driver.py"""
-    req = AnimalRequirements()
+    req = RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements()
     mocker.patch(
         "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.__new__",
         return_value=req,
@@ -2528,11 +2726,14 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
         "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
         return_value=None,
     )
-    mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=False))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_driver.udrm",
+        MagicMock(use_user_defined_ration=False),
+    )
     mock_pen = mocker.MagicMock()
     delattr(mock_pen, "ration_per_animal")
     mock_pen.animal_combination = mocker.MagicMock()
-    mock_pen.animal_combination.name = "LAC_COW"
+    mock_pen.animal_combination = AnimalCombination.LAC_COW
     mock_pen.ration = None
     mock_animal = mocker.MagicMock()
     mock_body_weight_history = mocker.MagicMock()
@@ -2554,7 +2755,6 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
         ],
     )
     available_feeds = mocker.MagicMock()
-
     mock_find_failed_constraints = mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.find_failed_constraints",
         return_value=mocker.MagicMock(),
@@ -2569,9 +2769,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     )
     # Act
     actual = RationManager.formulate_ration(
-        pen=mock_pen,
-        available_feeds=available_feeds,
-        animal_grouping_scenario=mocker.MagicMock(),
+        pen=mock_pen, available_feeds=available_feeds, animal_grouping_scenario=mocker.MagicMock(), sim_day=2
     )
     # Assert
     assert actual == expected
