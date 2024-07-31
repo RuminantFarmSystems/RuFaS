@@ -6,6 +6,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
+
 class Denitrification:
     """
     A class to handle the denitrification process of nitrogen in the nitrates pool, as outlined in SWAT section 3:1.4.
