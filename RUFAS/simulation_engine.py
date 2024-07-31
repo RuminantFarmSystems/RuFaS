@@ -41,7 +41,8 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
-    run_end_to_end_testing : bool
+    is_end_to_end_test_run : bool
+        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
         Indicates if a simulation is being run for end-to-end testing. Defaults to False, is set to True if end-to-end
         testing inputs are found in the Input Manager.
 
@@ -57,7 +58,10 @@ class SimulationEngine:
         """
         self.im = InputManager()
         self.time = Time()
-        self.run_end_to_end_testing = False
+
+        # TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        self.is_end_to_end_test_run = False
+
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -106,9 +110,12 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+
+        # TODO: remove this code after Animal and Feed Storage modules are connected - #1878
         process_degradations_today = self.time.current_julian_day % 15 == 0
-        if self.run_end_to_end_testing and process_degradations_today:
+        if self.is_end_to_end_test_run and process_degradations_today:
             self.feed_manager.process_degradations(self.weather, self.time)
+
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
@@ -184,8 +191,9 @@ class SimulationEngine:
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
 
-        run_end_to_end_testing = self.im.get_data("end_to_end_testing_inputs")
-        if not run_end_to_end_testing:
+        # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
+        is_end_to_end_test_run = self.im.get_data("end_to_end_testing_inputs")
+        if not is_end_to_end_test_run:
             return
-        self.feed_manager.setup_stored_feeds(run_end_to_end_testing, self.time)
-        self.run_end_to_end_testing = True
+        self.feed_manager.setup_stored_feeds(is_end_to_end_test_run, self.time)
+        self.is_end_to_end_test_run = True
