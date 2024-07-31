@@ -71,8 +71,6 @@ class Denitrification:
                 nitrate_effect, carbon_effect, moisture_effect, pH_effect
             )
 
-            print(f"{nitrate_effect=} {carbon_effect=} {moisture_effect=} {pH_effect=} {partitioning_factor=} {layer.water_filled_pore_space=}")
-
             nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
 
             layer.nitrate_content -= denitrified_nitrates
@@ -188,18 +186,15 @@ class Denitrification:
 
         Notes
         -----
-        The exponential term in this equation easily becomes too large for Python to handle. In this case the effect is
-        effectively zero.
+        If the water-filled pore space is 0, then the moisture effect is 0.0.
 
         """
-        fraction = 17 / (2.2 * water_filled_pore_space)
+        if water_filled_pore_space == 0.0:
+            return 0.0
 
-        try:
-            effect = 1.4 / 13 ** (13**fraction)
-        except OverflowError:
-            effect = 0.0
+        fraction = 17 / (13 ** (2.2 * water_filled_pore_space))
 
-        return effect
+        return 1.4 / (13 ** fraction)
 
     def _calculate_pH_effect(self, pH: float) -> float:
         """

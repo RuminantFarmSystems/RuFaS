@@ -60,6 +60,16 @@ def test_calculate_carbon_effect(denitrifier: Denitrification, carbon: float, ex
     assert pytest.approx(actual) == expected
 
 
+@pytest.mark.parametrize(
+    "moisture,expected", [(0.0, 0.0), (0.3, 0.000459068), (0.5, 0.1044713), (0.7, 0.6046569), (1.0, 1.1996133)]
+)
+def test_calculate_moisture_effect(denitrifier: Denitrification, moisture: float, expected: float) -> None:
+    """Tests that the moisture effect is correctly calculated."""
+    actual = denitrifier._calculate_moisture_effect(moisture)
+
+    assert pytest.approx(actual) == expected
+
+
 @pytest.mark.parametrize("pH,expected", [(5.0, 0.1664570), (6.5, 0.8667387), (7.5, 2.6038270), (10.0, 40.7307086)])
 def test_calculate_pH_effect(denitrifier: Denitrification, pH: float, expected: float) -> None:
     """Tests that the pH effect is correctly calculated."""
