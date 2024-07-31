@@ -707,7 +707,7 @@ class RationReporter:
         DE_act = feed_item_info[de_key] * RationReporter.get_TDN_discount(
             ration_report, body_weight
         )
-        return DE_act
+        return DE_act * kg_fed
 
     @staticmethod
     def get_ME(
@@ -734,11 +734,15 @@ class RationReporter:
         -------
         float
             metabolizable energy of feed i, Mcal/kg.
+        Notes
+        -----
+        Division of DE_act by kg_fed is to get the DE for each item on a per kg basis,
+            as is used in the subsequent calculations.
 
         """
         DE_act = RationReporter.get_DE(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed if kg_fed > 0 else 0.0
 
         if feed_item_info["feed_type"] == "Mineral":
             ME_item = 0.0
@@ -752,7 +756,7 @@ class RationReporter:
             ME_item = 1.01 * DE_act - 0.45 + 0.0046 * (feed_item_info["EE"] - 3)
         else:
             ME_item = 1.01 * DE_act - 0.45
-        return ME_item
+        return ME_item * kg_fed
 
     @staticmethod
     def get_NE_maintenance_and_activity(
@@ -780,10 +784,15 @@ class RationReporter:
         float
             Net energy of feed i, Mcal/kg.
 
+        Notes
+        -----
+        Division of ME_item by kg_fed is to get the ME for each item on a per kg basis,
+            as is used in the subsequent calculations.
+
         """
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed if kg_fed > 0 else 0.0
         if feed_item_info["is_fat"] is True:
             NEm_item = 0.8 * ME_item
         else:
@@ -818,13 +827,17 @@ class RationReporter:
         float
             Net energy of feed i, Mcal/kg.
 
+        Notes
+        -----
+        Division of DE_act and ME_item by kg_fed is to get the DE and ME for each item on a per kg basis,
+            as is used in the subsequent calculations.
         """
         DE_act = RationReporter.get_DE(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed if kg_fed > 0 else 0.0
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed if kg_fed > 0 else 0.0
         if feed_item_info["feed_type"] == "Mineral":
             NE_lactation_item = 0.0
         elif feed_item_info["is_fat"] is True:
@@ -865,10 +878,15 @@ class RationReporter:
         float
             Net energy of feed i, Mcal/kg.
 
+        Notes
+        -----
+        Division of ME_item by kg_fed is to get the ME for each item on a per kg basis,
+            as is used in the subsequent calculations.
+
         """
         ME_item = RationReporter.get_ME(
             kg_fed, feed_item_info, ration_report, body_weight
-        )
+        ) / kg_fed if kg_fed > 0 else 0.0
         if feed_item_info["feed_type"] == "Mineral":
             NE_growth = 0.0
         elif feed_item_info["is_fat"] is True:
@@ -1124,8 +1142,11 @@ class RationReporter:
         RDP_diet = []
         RUP_diet = []
         for i, kg_fed in enumerate(ration.values()):
-            RDP_diet.append(RDP_list[i] * kg_fed * 0.01)
-            RUP_diet.append(kg_fed * RUP_list[i] * dRUP_diet[i])
+            RDP_diet.append(GeneralConstants.KG_TO_GRAMS * RDP_list[i]
+                            * kg_fed * GeneralConstants.PERCENTAGE_TO_FRACTION)
+            RUP_diet.append(GeneralConstants.KG_TO_GRAMS * kg_fed
+                            * RUP_list[i] * GeneralConstants.PERCENTAGE_TO_FRACTION
+                            * dRUP_diet[i] * GeneralConstants.PERCENTAGE_TO_FRACTION)
 
         TDN_total_actual = TDNtotal * RationReporter.get_TDN_discount(
             ration_report, body_weight
@@ -1133,10 +1154,11 @@ class RationReporter:
 
         # MP bact calcs
         MP_bact = 0.64 * min(
-            1000 * 0.13 * TDN_total_actual, 1000 * 0.85 * sum(RDP_diet)
+            GeneralConstants.KG_TO_GRAMS * 0.13 * TDN_total_actual,
+            GeneralConstants.KG_TO_GRAMS * 0.85 * sum(RDP_diet)
         )
 
-        MP_supply = MP_bact + sum(RUP_diet) * 0.0001 + 0.4 * 11.8 * DMI_estimate
+        MP_supply = MP_bact + sum(RUP_diet) + 0.4 * 11.8 * DMI_estimate
         return float(MP_supply)
 
 
@@ -1182,17 +1204,21 @@ class AvailableFeeds:
         self.CP: List[float] = []
         # RUP degradability (% of RUP)
         self.dRUP: List[float] = []
-        # lactating cows feed limits
+        # lactating cows feed limits (kg)
         self.lactating_cow_limit: List[float] = []
-        # dry cow feed limits
+        # dry cow feed limits (kg)
         self.dry_cow_limit: List[float] = []
-        # heiferIII limits
+        # lactating cows feed limits (kg)
+        self.lactating_cow_minimum: List[float] = []
+        # dry cow feed limits (kg)
+        self.dry_cow_minimum: List[float] = []
+        # heiferIII limits (kg)
         self.heiferIII_limit: List[float] = []
-        # heiferII limit
+        # heiferII limit (kg)
         self.heiferII_limit: List[float] = []
-        # heiferI limit
+        # heiferI limit (kg)
         self.heiferI_limit: List[float] = []
-        # calf limit
+        # calf limit (kg)
         self.calf_limit: List[float] = []
         # key = feed_id, val = index of that feed_id in self.feed_id list
         self._feed_id_to_list_idx_dict: Dict[int, int] = {}
@@ -1235,10 +1261,15 @@ class AvailableFeeds:
             if isinstance(feed["limit"], dict):
                 self.lactating_cow_limit.append(feed["limit"]["lactating_cows"])
                 self.dry_cow_limit.append(feed["limit"]["dry_cows"])
-
             else:
                 self.lactating_cow_limit.append(feed["limit"])
                 self.dry_cow_limit.append(feed["limit"])
+            if isinstance(feed["lower_limit"], dict):
+                self.lactating_cow_limit.append(feed["lower_limit"]["lactating_cows"])
+                self.dry_cow_limit.append(feed["lower_limit"]["dry_cows"])
+            else:
+                self.lactating_cow_minimum.append(feed["lower_limit"])
+                self.dry_cow_minimum.append(feed["lower_limit"])
 
     def get_feed_data_from_feed_ids(self, feed_ids: Set[int]):
         """
