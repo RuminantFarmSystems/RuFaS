@@ -206,7 +206,7 @@ class Denitrification:
 
         fraction = 17 / (13 ** (2.2 * water_filled_pore_space))
 
-        return 1.4 / (13 ** fraction)
+        return 1.4 / (13**fraction)
 
     def _calculate_pH_effect(self, pH: float) -> float:
         """

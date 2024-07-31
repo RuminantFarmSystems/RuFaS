@@ -70,7 +70,7 @@ def test_water_filled_pore_space(
 
 @pytest.mark.parametrize(
     "metabolic,structural,active,slow,passive,expected",
-    [(10.0, 20.0, 30.0, 100.0, 200.0, 360.0), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)]
+    [(10.0, 20.0, 30.0, 100.0, 200.0, 360.0), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)],
 )
 def test_total_carbon_content(
     layer: LayerData, metabolic: float, structural: float, active: float, slow: float, passive: float, expected: float
