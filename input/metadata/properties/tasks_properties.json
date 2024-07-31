@@ -136,18 +136,18 @@
         "sampler": {
           "type": "string",
           "description": "The sampler for Sensitivity Analysis",
-          "pattern": "fractional_factorial|saltelli_sobol",
-          "default": "saltelli_sobol"
+          "pattern": "fractional_factorial|saltelli|sobol|morris",
+          "default": "fractional_factorial"
         },
-        "saltelli_skip": {
+        "skip_values": {
           "type": "number",
-          "description": "The saltelli skip value for Sensitivity Analysis",
+          "description": "The number of points in the sampling sequence to skip for Sensitivity Analysis",
           "minimum": 0,
           "default": 0
         },
-        "saltelli_number": {
+        "N_sampler": {
           "type": "number",
-          "description": "The saltelli sampling value for Sensitivity Analysis",
+          "description": "The number of samples to generate for Sensitivity Analysis. Ideally a power of 2 and <= 'skip_values'",
           "minimum": 2,
           "default": 2
         },
