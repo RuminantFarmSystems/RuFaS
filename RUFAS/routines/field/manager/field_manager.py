@@ -454,6 +454,7 @@ class FieldManager:
             "field_capacity_water_concentration",
             "saturation_point_water_concentration",
             "saturated_hydraulic_conductivity",
+            "pH",
             "bulk_density",
             "organic_carbon_fraction",
             "clay_fraction",
