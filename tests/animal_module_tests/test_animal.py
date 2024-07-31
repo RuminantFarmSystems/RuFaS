@@ -2340,7 +2340,6 @@ def test_ration_optimizer_optimize_with_prev_ration(
         (0, 5.0001),
         (0, 6.0001),
     ]
-    expected_constraints = mock_heifer_constraints
     prev_ration = {"a": 3.0, "b": 6.0}
     expected_x0 = [3.0, 6.0]
     mocker.patch(
