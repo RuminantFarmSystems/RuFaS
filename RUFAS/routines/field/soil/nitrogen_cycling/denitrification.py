@@ -71,7 +71,7 @@ class Denitrification:
                 nitrate_effect, carbon_effect, moisture_effect, pH_effect
             )
 
-            print(f"{nitrate_effect} {carbon_effect} {moisture_effect} {pH_effect} {partitioning_factor} {layer.water_filled_pore_space}")
+            print(f"{nitrate_effect=} {carbon_effect=} {moisture_effect=} {pH_effect=} {partitioning_factor=} {layer.water_filled_pore_space=}")
 
             nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
 
@@ -264,4 +264,6 @@ class Denitrification:
             Amount of nitrous oxide emissions (kg / ha).
 
         """
-        return denitrified_nitrates / (1 + partitioning_factor)
+        nitrates = denitrified_nitrates * GeneralConstants.KG_TO_GRAMS
+        n2o_grams = nitrates / (1 + partitioning_factor)
+        return n2o_grams * GeneralConstants.GRAMS_TO_KG
