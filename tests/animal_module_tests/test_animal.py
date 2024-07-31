@@ -2380,8 +2380,9 @@ def test_ration_optimizer_optimize_with_prev_ration(
     expected_constraints = mock_heifer_constraints
     prev_ration = {"a": 3, "b": 6}
     expected_x0 = [0.3333333333333333, 0.6666666666666666, 1.0, 1.3333333333333333, 1.6666666666666667, 2.0]
-    mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.udrm",
-                 MagicMock(use_user_defined_ration=use_user_defined_ration))
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(use_user_defined_ration=use_user_defined_ration)
+    )
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.set_constraints")
     mock_minimize = mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.minimize")
     mocker.patch("RUFAS.routines.animal.ration.ration_optimizer.random.random", return_value=0.1)
