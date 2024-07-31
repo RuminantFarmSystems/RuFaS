@@ -2574,7 +2574,7 @@ def test_handle_failed_constraints_cow(mocker: MockerFixture) -> None:
     ] == [
         {
             "simulation day": 44,
-            "reattempt number": 4,
+            "attempt number": 4,
             "constraints_failed_dict": ["constr1", "constr2", "constr3"],
             "ration_attempted": {"dummy_feed1": 77.2, "dummy_feed2": 81.4},
             "pen requirements": {"avg_BW": 1},
@@ -2668,7 +2668,7 @@ def test_handle_failed_constraints_heifer(mocker: MockerFixture) -> None:
     ] == [
         {
             "simulation day": 22,
-            "reattempt number": 2,
+            "attempt number": 2,
             "constraints_failed_dict": [
                 "heifer_constr1",
                 "heifer_constr2",

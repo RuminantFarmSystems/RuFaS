@@ -54,7 +54,7 @@ class RationManager:
         Parameters
         ----------
         pen : Pen
-            An object of class Pen.
+            The pen a ration is being formulated for.
         available_feeds : AvailableFeedsTypedDict
             An object of class AvailableFeeds.
         animal_grouping_scenario : AnimalGroupingScenario enum
@@ -152,7 +152,7 @@ class RationManager:
 
         This method identifies and logs the constraints that failed during the optimization
         process for a specific pen of animals. It gathers relevant information about the
-        failed attempt, including the simulation day, the number of reattempts, the failed
+        failed attempt, including the simulation day, the number of attempts, the failed
         constraints, the attempted ration, and the pen's nutrient requirements. This
         information is then added to the output manager via a variable.
 
@@ -166,7 +166,7 @@ class RationManager:
             A RationOptimizer object.
         ration_config : RationConfig
             A RationConfig object.
-        pen :
+        pen : Pen
             The pen of animals for which the failed constraints are being handled.
         available_feeds : AvailableFeedsTypedDict
             A dictionary of available feeds for ration formulation.
@@ -195,14 +195,14 @@ class RationManager:
                 constraints_failed_list.append(constr["fun"].__name__)
         fail_summary = {
             "simulation day": sim_day,
-            "reattempt number": num_attempts,
+            "attempt number": num_attempts,
             "constraints_failed_dict": constraints_failed_list,
             "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
             "pen requirements": pen.avg_nutrient_rqmts,
         }
         fail_summary_units = {
-            "simulation_day": MeasurementUnits.SIMULATION_DAY,
-            "reattempt number": MeasurementUnits.UNITLESS,
+            "simulation day": MeasurementUnits.SIMULATION_DAY,
+            "attempt number": MeasurementUnits.UNITLESS,
             "constraints_failed_dict": MeasurementUnits.UNITLESS,
             "ration_attempted": MeasurementUnits.UNITLESS,
             "pen requirements": {
@@ -340,17 +340,17 @@ class RationManager:
         2: Optimization is a success, and optimized solution (within the tolerance bounds) is used.
         3: Optimization fails
             3a: If lactation reduction is set to 0.0, no reattempt is made
-            3b: Optimization reattempted until lactation reduction threshold is reached.
+            3b: Optimization attempted until lactation reduction threshold is reached.
                 (e.g. milk_reduction_maximum)
 
         Parameters
         ----------
-        req : an object of class Requirements
-
-        pen : an object of class Pen
-
-        available_feeds : an object of class AvailableFeeds
-
+        req : Pen
+            Requirements for the given pen.
+        pen : Pen
+            The pen a ration is being formulated for.
+        available_feeds : AvailableFeeds
+            Available feeds object to get information from.
         animal_grouping_scenario : AnimalGroupingScenario
             Grouping scenario chosen for current simulation.
         sim_day: int
