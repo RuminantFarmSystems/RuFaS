@@ -899,7 +899,7 @@ class RationOptimizer:
         """
         arguments = (ration_config,)
         self.set_constraints(arguments=arguments)
-        if previous_ration and not udrm.is_udr:
+        if previous_ration and not udrm.use_user_defined_ration:
             x0 = []
             prev_ration = previous_ration.copy()
             for key, value in prev_ration.items():
@@ -909,7 +909,7 @@ class RationOptimizer:
             n = len(ration_config.price_list)
             x0 = [1] + [random.random() * 10 for _ in range(n - 1)]
         # Dividing limit by 3 for tri-decision variables for farm grown feeds
-        if udrm.is_udr:
+        if udrm.use_user_defined_ration:
             bnds = self.make_user_bounds(
                 UserDefinedRationManager.ration_to_use(animal_combination),
                 ration_config.DMIest_requirement,
@@ -919,7 +919,7 @@ class RationOptimizer:
             bnds = []
             bnds = [(0, lim + 0.0001) for lim in ration_config.feed_limit_list]
 
-        if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
+        if animal_combination is AnimalCombination.LAC_COW:
             return minimize(
                 self.objective,
                 x0,
@@ -928,10 +928,10 @@ class RationOptimizer:
                 constraints=self.cow_constraints,
                 args=arguments,
             )
-        elif str(animal_combination) in [
-            "AnimalCombination.GROWING",
-            "AnimalCombination.CLOSE_UP",
-            "AnimalCombination.GROWING_AND_CLOSE_UP",
+        elif animal_combination in [
+            AnimalCombination.GROWING,
+            AnimalCombination.CLOSE_UP,
+            AnimalCombination.GROWING_AND_CLOSE_UP,
         ]:
             return minimize(
                 self.objective,
@@ -992,9 +992,7 @@ class RationOptimizer:
         N_B_list = available_feeds["N_B"]
         CP_list = available_feeds["CP"]
         dRUP_list = available_feeds["dRUP"]
-        # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
-        # GitHub Issue # 793
-        if str(animal_combination) in ["AnimalCombination.LAC_COW"]:
+        if animal_combination is AnimalCombination.LAC_COW:
             feed_limit_list = available_feeds["lactating_cow_limit"]
             lactating = True
         else:
