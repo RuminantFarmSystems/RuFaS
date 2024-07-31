@@ -1,10 +1,10 @@
 from typing import Optional
 from math import exp, pi, atan, e
-import warnings
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
-
+from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 class Denitrification:
     """
@@ -32,6 +32,7 @@ class Denitrification:
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
+        self.om = OutputManager()
 
     def denitrify(self) -> None:
         """
@@ -70,6 +71,17 @@ class Denitrification:
             partitioning_factor = self._calculate_partitioning_factor(
                 nitrate_effect, carbon_effect, moisture_effect, pH_effect
             )
+
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.denitrify.__name__,
+                "units": MeasurementUnits.UNITLESS,
+            }
+            self.om.add_variable("nitrate_effect", nitrate_effect, info_map)
+            self.om.add_variable("carbon_effect", carbon_effect, info_map)
+            self.om.add_variable("moisture_effect", moisture_effect, info_map)
+            self.om.add_variable("pH_effect", pH_effect, info_map)
+            self.om.add_variable("partitioning_factor", partitioning_factor, info_map)
 
             nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
 
