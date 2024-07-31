@@ -433,18 +433,11 @@ def test_convert_tempC_to_tempK() -> None:
     assert actual == expected
 
 
-def test_CSTR_methane_volume() -> None:
+@pytest.mark.parametrize("volatile_solids,expected", [(0.0, 0.0), (10.0, 2.4), (1000.0, 240.0)])
+def test_CSTR_methane_volume(volatile_solids: float, expected: float) -> None:
     """Tests calculate_CSTR_methane_volume() in calculator.py."""
+    actual = GasEmissionsCalculator.calculate_CSTR_methane_volume(volatile_solids)
 
-    # Arrange
-    VS_total = 10.0
-
-    expected = GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * VS_total
-
-    # Act
-    actual = GasEmissionsCalculator.calculate_CSTR_methane_volume(VS_total)
-
-    # Assert
     assert actual == expected
 
 
