@@ -42,8 +42,7 @@ def test_calculate_denitrification_amount(
 
 
 @pytest.mark.parametrize(
-    "nitrates,expected",
-    [(0.0, -0.3209067), (3.0, -23.909860), (25.0, -23.989790), (150.0, -23.99830)]
+    "nitrates,expected", [(0.0, -0.3209067), (3.0, -23.909860), (25.0, -23.989790), (150.0, -23.99830)]
 )
 def test_calculate_nitrate_effect(denitrifier: Denitrification, nitrates: float, expected: float) -> None:
     """Tests that the nitrate effect is correctly calculated."""
