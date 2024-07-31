@@ -780,7 +780,8 @@ class GasEmissionsCalculator:
 
     @classmethod
     def calculate_CSTR_methane_volume(cls, manure_total_volatile_solids: float) -> float:
-        """Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor.
+        """
+        Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor.
 
         Parameters
         ----------
@@ -807,7 +808,7 @@ class GasEmissionsCalculator:
         generated_methane_mass : float
             Amount of methane generated within the digester, kg.
         digester_methane_leakage_fraction : float
-            Fraction of generated methane that escapes as leakage.
+            Fraction of generated methane that escapes as leakage (unitless).
 
         Returns
         -------
@@ -819,7 +820,8 @@ class GasEmissionsCalculator:
 
     @classmethod
     def calculate_methane_energy_content(cls, methane_mass: float) -> float:
-        """Calculates energy content of methane generated in a digester.
+        """
+        Calculates energy content of methane generated in a digester.
 
         Parameters
         ----------
