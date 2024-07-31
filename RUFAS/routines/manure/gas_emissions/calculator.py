@@ -787,11 +787,19 @@ class GasEmissionsCalculator:
         ----------
         manure_total_volatile_solids : float
             Total volatile solids, kg.
-This function originates from personal communications with subject matter experts Wei Liao (liaow@msu.edu) and April Leytem (april.leytem@usda.gov). The equation is a simplification of the IPCC Tier II estimate of CH4 emissions from anaerobic digesters, where CH4 generated in the digester is assumed to be equivalent to the amount of manure volatile solids loaded per day, multiplied by the generally-accepted methane potential value for dairy manure (240 L CH4 per kg of manure volatile solids). 
+
         Returns
         -------
         float
             CH4 generation volume, m^3.
+
+        Notes
+        -----
+        This function originates from personal communications with subject matter experts Wei Liao (liaow@msu.edu) and
+        April Leytem (april.leytem@usda.gov). The equation is a simplification of the IPCC Tier II estimate of CH4
+        emissions from anaerobic digesters, where CH4 generated in the digester is assumed to be equivalent to the
+        amount of manure volatile solids loaded per day, multiplied by the generally-accepted methane potential value
+        for dairy manure (240 L CH4 per kg of manure volatile solids).
 
         """
         return GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * manure_total_volatile_solids
