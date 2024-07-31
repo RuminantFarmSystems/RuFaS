@@ -1,5 +1,6 @@
 from typing import Optional
-from math import exp
+from math import exp, pi, atan, e
+import warnings
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -55,15 +56,27 @@ class Denitrification:
             if nutrient_is_below_threshold:
                 continue
 
-            nitrified_nitrates = self._calculate_denitrification_amount(
+            denitrified_nitrates = self._calculate_denitrification_amount(
                 layer.nitrate_content,
                 layer.denitrification_rate_coefficient,
                 layer.nutrient_cycling_temp_factor,
                 layer.soil_overall_carbon_fraction,
             )
-            layer.nitrate_content -= nitrified_nitrates
-            layer.nitrous_oxide_emissions = nitrified_nitrates
-            layer.annual_nitrous_oxide_emissions_total += nitrified_nitrates
+
+            nitrate_effect = self._calculate_nitrate_effect(layer.nitrate_content)
+            carbon_effect = self._calculate_carbon_effect(layer.total_carbon_content)
+            moisture_effect = self._calculate_moisture_effect(layer.water_filled_pore_space)
+            pH_effect = self._calculate_pH_effect(layer.pH)
+            partitioning_factor = self._calculate_partitioning_factor(
+                nitrate_effect, carbon_effect, moisture_effect, pH_effect
+            )
+
+            nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
+
+            layer.nitrate_content -= denitrified_nitrates
+            layer.nitrous_oxide_emissions = nitrous_oxide_emissions
+            layer.dinitrogen_emissions = denitrified_nitrates - nitrous_oxide_emissions
+            layer.annual_nitrous_oxide_emissions_total += nitrous_oxide_emissions
 
     @staticmethod
     def _calculate_denitrification_amount(
@@ -113,3 +126,139 @@ class Denitrification:
         denitrification_factor = 1 - exponential_term
         bounded_denitrification_factor = max(min(1.0, denitrification_factor), 0.0)
         return nitrate_content * bounded_denitrification_factor
+
+    def _calculate_nitrate_effect(self, nitrate_content: float) -> float:
+        """
+        Calculates the effect that the soil nitrate level has on the ratio of nitrous oxide to dinitrogen in denitrified
+        nitrates.
+
+        Parameters
+        ----------
+        nitrate_content : float
+            Amount of nitrates (kg / ha).
+
+        Returns
+        -------
+        float
+            Effect of the soil nitrate level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        """
+        nitrate_content_grams = nitrate_content * GeneralConstants.KG_TO_GRAMS
+        fractional_term = atan(pi * 0.01 * (nitrate_content_grams - 190)) / pi
+
+        return 1 - (0.5 + fractional_term) * 25
+
+    def _calculate_carbon_effect(self, carbon_content: float) -> float:
+        """
+        Calculates the effect that the soil carbon level has on the ratio of nitrous oxide to dinitrogen in denitrified
+        nitrates.
+
+        Parameters
+        ----------
+        carbon_content : float
+            Total carbon content of the soil layer (kg / ha).
+
+        Returns
+        -------
+        float
+            Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        """
+        carbon_content_grams = carbon_content * GeneralConstants.KG_TO_GRAMS
+        numerator = 30.78 * atan(pi * 0.07 * (carbon_content_grams - 13))
+
+        return 13 + numerator / pi
+
+    def _calculate_moisture_effect(self, water_filled_pore_space: float) -> float:
+        """
+        Calculates the effect that the moisture level has on the ratio of nitrous oxide to dinitrogen in denitrified
+        nitrates.
+
+        Parameters
+        ----------
+        water_filled_pore_space : float
+            Fraction of pore space that is occupied by water in the soil layer (unitless).
+
+        Returns
+        -------
+        float
+            Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        Notes
+        -----
+        If the water-filled pore space is 0, then the moisture effect is 0.0.
+
+        """
+        if water_filled_pore_space == 0.0:
+            return 0.0
+
+        fraction = 17 / (13 ** (2.2 * water_filled_pore_space))
+
+        return 1.4 / (13 ** fraction)
+
+    def _calculate_pH_effect(self, pH: float) -> float:
+        """
+        Calculates the effect that the soil pH has on the ratio of nitrous oxide to dinitrogen in denitrified nitrates.
+
+        Parameters
+        ----------
+        pH : float
+            pH of the soil layer.
+
+        Returns
+        -------
+        float
+            Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        """
+        denominator = 1470 * e ** (-1.1 * pH)
+
+        return 1 / denominator
+
+    def _calculate_partitioning_factor(
+        self, nitrate_effect: float, carbon_effect: float, moisture_effect: float, pH_effect: float
+    ) -> float:
+        """
+        Calculates the factor used to determine the ratio of nitrous oxide to dinitrogen.
+
+        Parameters
+        ----------
+        nitrate_effect : float
+            Effect of the nitrate level (unitless).
+        carbon_effect : float
+            Effect of the carbon level (unitless).
+        moisture_effect : float
+            Effect of the moisture level (unitless).
+        pH_effect : float
+            Effect of the pH (unitless).
+
+        Returns
+        -------
+        float
+            Factor used to partition nitrified nitrates into nitrous oxide and dinitrogen.
+
+        """
+        partitioning_factor = min(nitrate_effect, carbon_effect) * moisture_effect * pH_effect
+
+        return max(partitioning_factor, 0.0)
+
+    def _calculate_nitrous_oxide_emissions(self, denitrified_nitrates: float, partitioning_factor: float) -> float:
+        """
+        Calculates the quantity of denitrified nitrates that are nitrous oxide.
+
+        Parameters
+        ----------
+        denitrified_nitrates : float
+            Amount of nitrates that have been denitrified (kg / ha).
+        partitioning_factor : float
+            Factor used to determine how much of the denitrified nitrates are nitrous oxide (unitless).
+
+        Returns
+        -------
+        float
+            Amount of nitrous oxide emissions (kg / ha).
+
+        """
+        nitrates = denitrified_nitrates * GeneralConstants.KG_TO_GRAMS
+        n2o_grams = nitrates / (1 + partitioning_factor)
+        return n2o_grams * GeneralConstants.GRAMS_TO_KG
