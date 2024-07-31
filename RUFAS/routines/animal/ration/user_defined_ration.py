@@ -22,7 +22,7 @@ class UserDefinedRationManager(object):
         if UserDefinedRationManager.__instance is None:
             UserDefinedRationManager.__instance = self
 
-            self.is_udr = None
+            self.use_user_defined_ration = None
 
             self.calf_ration: Dict[str, float] = {}
             self.growing_ration: Dict[str, float] = {}
