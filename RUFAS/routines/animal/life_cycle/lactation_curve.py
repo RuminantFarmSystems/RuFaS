@@ -1,4 +1,5 @@
 from RUFAS.input_manager import InputManager
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 import numpy as np
@@ -99,14 +100,30 @@ class LactationCurve:
         self.m_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_m_std_dev"]
         self.n_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_n_std_dev"]
 
-        self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
-        self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
-        self.num_milking_cows = (
-            im.get_data("animal.herd_information.cow_num") * lactation_inputs["assumed_milking_cow_percentage"]
-        )
+        annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield_lbs"]
+        num_milking_cows = animal_inputs["herd_information"]["cow_num"] * lactation_inputs["milking_cow_percentage"]
+        parity_1_percentage = animal_inputs["herd_infomation"]["parity_percentages"][0]
+        parity_2_percentage = animal_inputs["herd_infomation"]["parity_percentages"][1]
+        parity_3_percentage = animal_inputs["herd_infomation"]["parity_percentages"][2]
+        parity_2_milk_yield_adjustment = lactation_inputs["parity_milk_yield_adjustments"][
+            "parity_2_305_day_milk_yield_adjustment"
+        ]
+        parity_3_milk_yield_adjustment = lactation_inputs["parity_milk_yield_adjustments"][
+            "parity_3_305_day_milk_yield_adjustment"
+        ]
 
         self.parity2_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity2_MilkYield305_adjustment"]
         self.parity3_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity3_MilkYield305_adjustment"]
+
+        milk_yield_305_day_by_parity = self._estimate_305_day_milk_yield_by_parity(
+            annual_milk_yield_lbs,
+            num_milking_cows,
+            parity_1_percentage,
+            parity_2_percentage,
+            parity_3_percentage,
+            parity_2_milk_yield_adjustment,
+            parity_3_milk_yield_adjustment,
+        )
 
     def _get_year_adjustments(
         self, year_adjustment_values: dict[str, dict[str, float]], time: Time
@@ -312,42 +329,66 @@ class LactationCurve:
                     MY_305d_best_estimate = MY_305d_vary
             return l_param_best_estimate, m_param, n_param, MY_305d_best_estimate
 
-    def calc_parities(self) -> tuple[float, float, float]:
+    def _estimate_305_day_milk_yield_by_parity(
+        self,
+        annual_milk_yield_lbs: float,
+        num_milking_cows: int,
+        parity_1_percentage: float,
+        parity_2_percentage: float,
+        parity_3_percentage: float,
+        parity_2_milk_yield_adjustment: float,
+        parity_3_milk_yield_adjustment: float,
+    ) -> dict[int, float]:
         """
-        Calculates milk yield for each lactation group.
+        Calculates the 305-day milk yield for each lactation group based on total farm milk production.
+
+        Parameters
+        ----------
+        annual_milk_yield_lbs : float
+            Annual milk yield of the farm (lbs).
+        num_milking_cows : int
+            Number of milking cows on the farm.
+        parity_1_percentage : float
+            Percentage of cows on the farm that have a parity of 1.
+        parity_2_percentage : float
+            Percentage of cows on the farm that have a parity of 2.
+        parity_3_percentage : float
+            Percentage of cows on the farm that have a parity of 3 or more.
 
         Returns
         -------
-        tuple
-            List of floats. Floats represents the 305-day milk yield for lactation
-            group/parity 1, lactation group/parity 2, and lactation group/parity 3, in that order.
+        dict[int, float]
+            Mapping of the parity (1, 2, 3+) to the estimated 305 day milk production of an individual cow of that
+            parity (kg).
+
         """
-        # calculate lactation group yield
+        annual_milk_yield_kg = annual_milk_yield_lbs * GeneralConstants.LBS_TO_KG
+        milk_yield_305_day_all_cows = annual_milk_yield_kg * (305 / GeneralConstants.YEAR_LENGTH)
+        milk_yield_305_day = milk_yield_305_day_all_cows / num_milking_cows
 
-        if self.annual_MY_lbs is not None:
-            total_avg_305 = self.annual_MY_lbs * 305 / (365 * self.num_milking_cows * 2.205)
+        parity_percentages_sum = parity_1_percentage + parity_2_percentage + parity_3_percentage
+        assert parity_percentages_sum == 100.0  # TODO: find better way to check this!
 
-            # Extracting percentage distribution for each lactation group
-            percent_parity2 = self.parity_percentages[1] * 100
-            percent_parity3 = self.parity_percentages[2] * 100
+        # TODO: I get a different equation when I solve for parity_1_305_day_milk_yield (see original equation in
+        # https://docs.google.com/document/d/1QE_XKmlwhTvKDKPPhUYvnIqjBA_ha9JcSUD_XOgCdJE/edit). More explicitly, I get
+        # parity_1_305_day_milk_yield = (
+        #     (milk_yield_305_day / parity_percentages_sum)
+        #     - (parity_2_percentage * parity_2_milk_yield_adjustment / parity_percentages_sum)
+        #     - (parity_3_percentage * parity_3_milk_yield_adjustment / parity_percentages_sum)
+        # )
+        parity_1_305_day_milk_yield = (
+            milk_yield_305_day
+            - (parity_2_percentage * parity_2_milk_yield_adjustment / parity_percentages_sum)
+            - (parity_3_percentage * parity_3_milk_yield_adjustment / parity_percentages_sum)
+        )
+        parity_2_305_day_milk_yield = parity_1_305_day_milk_yield + parity_2_milk_yield_adjustment
+        parity_3_305_day_milk_yield = parity_1_305_day_milk_yield + parity_3_milk_yield_adjustment
 
-            # Solving for parity1_305 using the provided equation
-            parity1_305 = (
-                total_avg_305
-                - percent_parity2 * self.parity2_MilkYield305_adj / 100
-                - percent_parity3 * self.parity3_MilkYield305_adj / 100
-            )
-
-            # Calculating 305-day milk yield for each lactation group
-            parity2_305 = parity1_305 + self.parity2_MilkYield305_adj
-            parity3_305 = parity1_305 + self.parity3_MilkYield305_adj
-
-        else:
-            parity1_305 = None
-            parity2_305 = None
-            parity3_305 = None
-
-        return parity1_305, parity2_305, parity3_305
+        return {
+            "parity_1": parity_1_305_day_milk_yield,
+            "parity_2": parity_2_305_day_milk_yield,
+            "parity_3": parity_3_305_day_milk_yield,
+        }
 
     def set_lactation_curve_parameters(self) -> tuple[tuple, tuple, tuple]:
         """
