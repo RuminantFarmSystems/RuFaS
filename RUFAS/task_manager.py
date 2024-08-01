@@ -432,11 +432,16 @@ class TaskManager:
         args: Dict[str, Any],
         input_manager: InputManager,
         output_manager: OutputManager,
-        task_id: Any,
+        task_id: str,
         produce_graphics: bool,
     ) -> None:
         """Runs end-to-end testing routine."""
-        info_map = {"class": TaskManager.__name__, "function": TaskManager._handle_end_to_end_testing.__name__}
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager._handle_end_to_end_testing.__name__,
+            "task_id": task_id,
+            "produce_graphics": produce_graphics,
+        }
 
         output_manager.add_log("Starting end-to-end testing simulation", "", info_map)
 
