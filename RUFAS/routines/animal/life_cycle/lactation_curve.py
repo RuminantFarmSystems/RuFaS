@@ -11,6 +11,13 @@ to adjust the lactation curve parameters.
 """
 MILKING_FREQUENCY_THRESHOLD = 2.5
 
+"""
+Constants used to scale the adjustments for Wood's m and n parameters, respectively, before using them to the adjust
+parameters.
+"""
+M_ADJUSTMENT_SCALING_FACTOR = 1e-2
+N_ADJUSTMENT_SCALING_FACTOR = 1e-4
+
 
 class LactationCurve:
     """
@@ -47,34 +54,55 @@ class LactationCurve:
 
         lactation_inputs = im.get_data("lactation")
         all_year_adjustments = lactation_inputs["adjustments"]["year"]
-        _year_adjustments = self._get_year_adjustments(all_year_adjustments, time)
+        year_adjustments = self._get_year_adjustments(all_year_adjustments, time)
 
         fips_code = im.get_data("config.FIPS_county_code")
         all_region_adjustments = lactation_inputs["adjustments"]["region"]
         region_mapping = lactation_inputs["state_to_region_mapping"]
-        _region_adjustments = self._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
+        region_adjustments = self._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
         animal_inputs = im.get_data("animal")
         animal_milking_frequency = animal_inputs["animal_config"]["management_decisions"]["cow_times_milked_per_day"]
         all_milking_frequency_adjustments = lactation_inputs["adjustments"]["milking_frequency"]
-        _milking_frequency_adjustments = self._get_milking_frequency_adjustments(
+        milking_frequency_adjustments = self._get_milking_frequency_adjustments(
             all_milking_frequency_adjustments, animal_milking_frequency
+        )
+
+        parity_adjustments = lactation_inputs["adjustments"]["parity"]
+
+        base_wood_parameter_l = lactation_inputs["parameter_mean_values"]["parameter_l_mean"]
+        base_wood_parameter_m = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
+        base_wood_parameter_n = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
+
+        self.parity_one_parameters = self._calculate_adjusted_wood_parameters(
+            base_wood_parameter_l,
+            base_wood_parameter_m,
+            base_wood_parameter_n,
+            [parity_adjustments["1"], year_adjustments, region_adjustments, milking_frequency_adjustments],
+        )
+
+        self.parity_two_parameters = self._calculate_adjusted_wood_parameters(
+            base_wood_parameter_l,
+            base_wood_parameter_m,
+            base_wood_parameter_n,
+            [parity_adjustments["2"], year_adjustments, region_adjustments, milking_frequency_adjustments],
+        )
+
+        self.parity_three_parameters = self._calculate_adjusted_wood_parameters(
+            base_wood_parameter_l,
+            base_wood_parameter_m,
+            base_wood_parameter_n,
+            [parity_adjustments["3"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
 
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
-        self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * lactation_inputs[
-            "assumed_milking_cow_percentage"
-        ]
+        self.num_milking_cows = (
+            im.get_data("animal.herd_information.cow_num") * lactation_inputs["assumed_milking_cow_percentage"]
+        )
 
         self.parity2_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity2_MilkYield305_adjustment"]
         self.parity3_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity3_MilkYield305_adjustment"]
-
-        self.adjustment_dict = lactation_inputs["adjustment_dict"]
-
-        self.wood_parameter_l = lactation_inputs["parameter_mean_values"]["parameter_a_mean"]
-        self.wood_parameter_m = lactation_inputs["parameter_mean_values"]["parameter_b_mean"]
-        self.wood_parameter_n = lactation_inputs["parameter_mean_values"]["parameter_c_mean"]
 
     def _get_year_adjustments(
         self, year_adjustment_values: dict[str, dict[str, float]], time: Time
@@ -88,7 +116,7 @@ class LactationCurve:
             self.om.add_log(
                 f"Lactation curve adjustments not available for simulation ending in {end_year}",
                 f"Using adjustments for {bounded_end_year}.",
-                info_map
+                info_map,
             )
             end_year = bounded_end_year
 
@@ -114,6 +142,40 @@ class LactationCurve:
             frequency = "thrice_daily"
 
         return milking_frequency_adjustments[frequency]
+
+    def _calculate_adjusted_wood_parameters(
+        self,
+        l_param: float,
+        m_param: float,
+        n_param: float,
+        adjustments: list[dict[str, float]],
+    ) -> dict[str, float]:
+        """
+        Computes the Wood's Lactation Curve parameters adjusted for different factors.
+
+        Parameters
+        ----------
+        l_param : float
+            Base value for Wood's l parameter (unitless).
+        m_param : float
+            Base value for Wood's m parameter (unitless).
+        n_param : float
+            Base value for Wood's n parameter (unitless).
+        adjustments : list[dict[str, float]]
+            List of adjustment sets, where each dictionary in the list represents the adjustments for a single factor
+            (region, parity, etc.) and contains the keys "l", "m", and "n".
+
+        Returns
+        -------
+        dict[str, float]
+            Dictionary containing the adjusted Wood l, m, and n parameters.
+
+        """
+        l_param += sum([adjustment["l"] for adjustment in adjustments])
+        m_param += sum([adjustment["m"] for adjustment in adjustments]) * M_ADJUSTMENT_SCALING_FACTOR
+        n_param += sum([adjustment["n"] for adjustment in adjustments]) * N_ADJUSTMENT_SCALING_FACTOR
+
+        return {"l": l_param, "m": m_param, "n": n_param}
 
     def get_y_values_wood_curve(
         self, t: float, parameter_a: float, parameter_b: float, parameter_c: float
