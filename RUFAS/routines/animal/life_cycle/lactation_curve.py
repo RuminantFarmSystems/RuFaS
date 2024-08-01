@@ -5,6 +5,13 @@ import numpy as np
 from scipy.integrate import quad
 
 
+"""
+Constant that is used to determine whether cows are considered to be milking twice or thrice daily when determining how
+to adjust the lactation curve parameters.
+"""
+MILKING_FREQUENCY_THRESHOLD = 2.5
+
+
 class LactationCurve:
     """
     Class that represents the lacatation curve of the simulated farm.
@@ -47,17 +54,18 @@ class LactationCurve:
         region_mapping = lactation_inputs["state_to_region_mapping"]
         _region_adjustments = self._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
+        animal_inputs = im.get_data("animal")
+        animal_milking_frequency = animal_inputs["animal_config"]["management_decisions"]["cow_times_milked_per_day"]
+        all_milking_frequency_adjustments = lactation_inputs["adjustments"]["milking_frequency"]
+        _milking_frequency_adjustments = self._get_milking_frequency_adjustments(
+            all_milking_frequency_adjustments, animal_milking_frequency
+        )
+
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
         self.num_milking_cows = im.get_data("animal.herd_information.cow_num") * lactation_inputs[
             "assumed_milking_cow_percentage"
         ]
-
-        milking_freq = im.get_data("animal.animal_config.management_decisions.cow_times_milked_per_day")
-        if milking_freq >= 2.5:
-            self.milking_freq = "3x/d"
-        else:
-            self.milking_freq = "2x/d"
 
         self.parity2_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity2_MilkYield305_adjustment"]
         self.parity3_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity3_MilkYield305_adjustment"]
@@ -95,6 +103,17 @@ class LactationCurve:
         region = region_mapping[str(state_fips_code)]
 
         return region_adjustment_values[region]
+
+    def _get_milking_frequency_adjustments(
+        self, milking_frequency_adjustments: dict[str, dict[str, float]], milking_frequency: float
+    ) -> dict[str, float]:
+        """Retrieves the lactation curve adjustment values for the milking frequency of cows in the simulation."""
+        if milking_frequency < MILKING_FREQUENCY_THRESHOLD:
+            frequency = "twice_daily"
+        else:
+            frequency = "thrice_daily"
+
+        return milking_frequency_adjustments[frequency]
 
     def get_y_values_wood_curve(
         self, t: float, parameter_a: float, parameter_b: float, parameter_c: float
