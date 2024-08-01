@@ -2615,6 +2615,17 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
 
 def test_formulate_ration_error(mocker: MockerFixture) -> None:
     om = OutputManager()
+
+    req = AnimalRequirements()
+    mocker.patch(
+        "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.__new__",
+        return_value=req,
+    )
+    mocker.patch(
+        "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
+        return_value=None,
+    )
+    mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=False))
     mock_pen = mocker.MagicMock()
     mock_pen.avg_milk = 1
     mock_pen.id = 42
