@@ -131,6 +131,7 @@ class AnimalManager:
 
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
+        AnimalBase.setup_lactation_curve_parameters(time)
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)

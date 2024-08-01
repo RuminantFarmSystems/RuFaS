@@ -5,6 +5,7 @@ from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.input_manager import InputManager
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
 from typing import Tuple
 
 
@@ -24,7 +25,11 @@ class AnimalBase:
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
         AnimalBase.config["ration"] = im.get_data("animal.ration")
-        AnimalBase.lactation_curve = LactationCurve()
+
+    @classmethod
+    def setup_lactation_curve_parameters(cls, time: Time) -> None:
+        """Initializes the LactationCurve class attribute."""
+        cls.lactation_curve = LactationCurve(time)
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """

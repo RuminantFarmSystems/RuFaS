@@ -1,4 +1,6 @@
 from RUFAS.input_manager import InputManager
+from RUFAS.time import Time
+from RUFAS.output_manager import OutputManager
 import numpy as np
 from scipy.integrate import quad
 
@@ -32,25 +34,18 @@ class LactationCurve:
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self, time: Time) -> None:
         im = InputManager()
-
-        self.year = im.get_data("config.end_date")[:4]
-        if int(self.year) > 2016:
-            self.year = "2016"
+        self.om = OutputManager()
 
         lactation_inputs = im.get_data("lactation")
+        all_year_adjustments = lactation_inputs["adjustments"]["year"]
+        _year_adjustments = self._get_year_adjustments(all_year_adjustments, time)
 
-        region_dict = lactation_inputs["fips_region"]
-        FIPS_code = im.get_data("config.FIPS_county_code")
-        FIPS_state_code = None
-        if FIPS_code is not None:
-            FIPS_state_code = int(FIPS_code / 1000)
-        self.region = None
-        if FIPS_state_code is not None:
-            for code_region in region_dict:
-                if code_region["code"] == FIPS_state_code:
-                    self.region = code_region["region"]
+        fips_code = im.get_data("config.FIPS_county_code")
+        all_region_adjustments = lactation_inputs["adjustments"]["region"]
+        region_mapping = lactation_inputs["state_to_region_mapping"]
+        _region_adjustments = self._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
@@ -72,6 +67,34 @@ class LactationCurve:
         self.wood_parameter_l = lactation_inputs["parameter_mean_values"]["parameter_a_mean"]
         self.wood_parameter_m = lactation_inputs["parameter_mean_values"]["parameter_b_mean"]
         self.wood_parameter_n = lactation_inputs["parameter_mean_values"]["parameter_c_mean"]
+
+    def _get_year_adjustments(
+        self, year_adjustment_values: dict[str, dict[str, float]], time: Time
+    ) -> dict[str, float]:
+        """Retrieves the appropriate adjustment values based on the end year of the simulation."""
+        end_year = time.end_year_int
+
+        info_map = {"class": self.__class__.__name__, "function": self._get_year_adjustments.__name__}
+        if not 2006 <= end_year <= 2016:
+            bounded_end_year = min(2016, max(2006, end_year))
+            self.om.add_log(
+                f"Lactation curve adjustments not available for simulation ending in {end_year}",
+                f"Using adjustments for {bounded_end_year}.",
+                info_map
+            )
+            end_year = bounded_end_year
+
+        return year_adjustment_values[str(end_year)]
+
+    def _get_region_adjustments(
+        self, region_adjustment_values: dict[str, dict[str, float]], region_mapping: dict[str, str], fips_code: int
+    ) -> dict[str, float]:
+        """Retrieves the appropriate adjustment values for the region being simulated."""
+        state_fips_code = int(fips_code / 1000)
+
+        region = region_mapping[str(state_fips_code)]
+
+        return region_adjustment_values[region]
 
     def get_y_values_wood_curve(
         self, t: float, parameter_a: float, parameter_b: float, parameter_c: float
