@@ -2613,6 +2613,37 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     mock_reduce_milk_production.assert_called_once()
 
 
+def test_formulate_ration_error(mocker: MockerFixture) -> None:
+    om = OutputManager()
+    mock_pen = mocker.MagicMock()
+    mock_pen.avg_milk = 1
+    mock_pen.id = 42
+    mock_pen.animal_combination.name = "LAC_COW"
+
+    mock_solution = mocker.MagicMock()
+    mock_solution.success = False
+    mock_ration_vals = mocker.MagicMock()
+    mock_ration_config = mocker.MagicMock()
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.attempt_optimization",
+        side_effect=[
+            (mock_solution, mock_ration_vals, mock_ration_config),
+        ],
+    )
+
+    with pytest.raises(RuntimeError) as e:
+        RationManager.formulate_ration(
+            pen=mock_pen,
+            available_feeds=mocker.MagicMock(),
+            animal_grouping_scenario=mocker.MagicMock())
+        assert "RuntimeError" in str(e.value)
+    actual = om.errors_pool["RationManager.formulate_ration.Ration formulation error."]
+    assert actual["values"].__contains__(
+        "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
+        " Check failed_constraint_summary_for_pen_42"
+    )
+
+
 def test_calc_milk_average() -> None:
     """Unit test for function calc_milk_average in file routines/animal/ration/ration_driver.py"""
     mockpen = MagicMock()
