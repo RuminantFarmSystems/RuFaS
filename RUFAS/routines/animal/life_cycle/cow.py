@@ -712,9 +712,13 @@ class Cow(HeiferIII):
                 if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
                     self.tissue_changed = 40 * self.days_in_milk / 70 * math.exp(1 - self.days_in_milk / 70)
         else:  # dry period
-            bodyweight_tissue = self.tissue_changed / (
-                self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
-            )
+            # TODO
+            try:
+                bodyweight_tissue = self.tissue_changed / (
+                    self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
+                )
+            except:
+                bodyweight_tissue = 0.0
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 

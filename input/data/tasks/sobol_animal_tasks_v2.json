@@ -3,7 +3,7 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "test-10-animal_S256",
+        "output_prefix": "test-12-animal_S256",
         "log_verbosity": "errors",
         "sampler": "fractional_factorial",
         "saltelli_number": 256,
@@ -20,8 +20,8 @@
           },
           {
             "variable_name": "animal.animal_config.management_decisions.days_in_preg_when_dry",
-            "lower_bound": 1,
-            "upper_bound": 300,
+            "lower_bound": 31,
+            "upper_bound": 282,
             "data_type":"int"
           },
           {
@@ -87,7 +87,7 @@
           {
             "variable_name": "animal.animal_config.farm_level.repro.voluntary_waiting_period",
             "lower_bound": 0,
-            "upper_bound": 120,
+            "upper_bound": 59,
             "data_type":"int"
           },
           {
@@ -116,43 +116,43 @@
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.calving_interval",
-            "lower_bound": 1,
+            "lower_bound": 300,
             "upper_bound": 800,
             "data_type":"int"
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.heifers.estrus_detection_rate",
-            "lower_bound": 0.0,
+            "lower_bound": 0.001,
             "upper_bound": 1,
             "data_type":"float"
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.heifers.estrus_conception_rate",
-            "lower_bound": 0.0,
+            "lower_bound": 0.001,
             "upper_bound": 1,
             "data_type":"float"
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.heifers.repro_sub_properties.conception_rate",
-            "lower_bound": 0.0,
+            "lower_bound": 0.001,
             "upper_bound": 1,
             "data_type":"float"
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.heifers.repro_sub_properties.estrus_detection_rate",
-            "lower_bound": 0.0,
+            "lower_bound": 0.001,
             "upper_bound": 1,
             "data_type":"float"
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.cows.estrus_detection_rate",
-            "lower_bound": 0.0,
+            "lower_bound": 0.001,
             "upper_bound": 1,
             "data_type":"float"
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.cows.ED_conception_rate",
-            "lower_bound": 0.0,
+            "lower_bound": 0.001,
             "upper_bound": 1,
             "data_type":"float"
           },
@@ -170,7 +170,7 @@
           },
           {
             "variable_name": "animal.animal_config.farm_level.repro.cows.ovsynch_program_conception_rate",
-            "lower_bound": 0.0,
+            "lower_bound": 0.001,
             "upper_bound": 1,
             "data_type":"int"
           },
@@ -317,7 +317,7 @@
           {
             "variable_name": "animal.animal_config.from_literature.life_cycle.still_birth_rate",
             "lower_bound": 0,
-            "upper_bound": 1,
+            "upper_bound": 0.9,
             "data_type":"float"
           },
   
