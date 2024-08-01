@@ -95,6 +95,10 @@ class LactationCurve:
             [parity_adjustments["3"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
 
+        self.l_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_l_std_dev"]
+        self.m_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_m_std_dev"]
+        self.n_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_n_std_dev"]
+
         self.annual_MY_lbs = im.get_data("animal.herd_information.annual_milk_yield_lbs")  # int or None
         self.parity_percentages = im.get_data("animal.herd_information.parity_percentages")  # list of 3 floats
         self.num_milking_cows = (
@@ -151,7 +155,7 @@ class LactationCurve:
         adjustments: list[dict[str, float]],
     ) -> dict[str, float]:
         """
-        Computes the Wood's Lactation Curve parameters adjusted for different factors.
+        Computes Wood's Lactation Curve parameters adjusted for different factors.
 
         Parameters
         ----------
