@@ -4,7 +4,7 @@ from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 import numpy as np
 from scipy.integrate import quad
-
+from typing import Any
 
 """
 Constant that is used to determine whether cows are considered to be milking twice or thrice daily when determining how
@@ -75,21 +75,21 @@ class LactationCurve:
         base_wood_parameter_m = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
         base_wood_parameter_n = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
 
-        self.parity_one_parameters = self._calculate_adjusted_wood_parameters(
+        self.parity_1_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["1"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
 
-        self.parity_two_parameters = self._calculate_adjusted_wood_parameters(
+        self.parity_2_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["2"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
 
-        self.parity_three_parameters = self._calculate_adjusted_wood_parameters(
+        self.parity_3_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
@@ -101,29 +101,8 @@ class LactationCurve:
         self.n_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_n_std_dev"]
 
         annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield_lbs"]
-        num_milking_cows = animal_inputs["herd_information"]["cow_num"] * lactation_inputs["milking_cow_percentage"]
-        parity_1_percentage = animal_inputs["herd_infomation"]["parity_percentages"][0]
-        parity_2_percentage = animal_inputs["herd_infomation"]["parity_percentages"][1]
-        parity_3_percentage = animal_inputs["herd_infomation"]["parity_percentages"][2]
-        parity_2_milk_yield_adjustment = lactation_inputs["parity_milk_yield_adjustments"][
-            "parity_2_305_day_milk_yield_adjustment"
-        ]
-        parity_3_milk_yield_adjustment = lactation_inputs["parity_milk_yield_adjustments"][
-            "parity_3_305_day_milk_yield_adjustment"
-        ]
-
-        self.parity2_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity2_MilkYield305_adjustment"]
-        self.parity3_MilkYield305_adj = lactation_inputs["parity_milk_adjustments"]["parity3_MilkYield305_adjustment"]
-
-        milk_yield_305_day_by_parity = self._estimate_305_day_milk_yield_by_parity(
-            annual_milk_yield_lbs,
-            num_milking_cows,
-            parity_1_percentage,
-            parity_2_percentage,
-            parity_3_percentage,
-            parity_2_milk_yield_adjustment,
-            parity_3_milk_yield_adjustment,
-        )
+        if annual_milk_yield_lbs is not None:
+            self._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
 
     def _get_year_adjustments(
         self, year_adjustment_values: dict[str, dict[str, float]], time: Time
@@ -329,6 +308,50 @@ class LactationCurve:
                     MY_305d_best_estimate = MY_305d_vary
             return l_param_best_estimate, m_param, n_param, MY_305d_best_estimate
 
+    def _adjust_lactation_curve_to_milk_yield(
+        self, animal_inputs: dict[str, Any], lactation_curve_inputs: dict[str, dict[str, Any]]
+    ) -> None:
+        """
+        Adjust the lactation parameters using predicted milk yields for the different parities of cows on the farm.
+        """
+        num_milking_cows = animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_percentage"]
+        annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield_lbs"]
+        parity_1_percentage = animal_inputs["herd_information"]["parity_percentages"][0]
+        parity_2_percentage = animal_inputs["herd_information"]["parity_percentages"][1]
+        parity_3_percentage = animal_inputs["herd_information"]["parity_percentages"][2]
+        parity_2_milk_yield_adjustment = lactation_curve_inputs["parity_milk_yield_adjustments"][
+            "parity_2_305_day_milk_yield_adjustment"
+        ]
+        parity_3_milk_yield_adjustment = lactation_curve_inputs["parity_milk_yield_adjustments"][
+            "parity_3_305_day_milk_yield_adjustment"
+        ]
+
+        self.parity2_MilkYield305_adj = lactation_curve_inputs["parity_milk_yield_adjustments"][
+            "parity_2_305_day_milk_yield_adjustment"
+        ]
+        self.parity3_MilkYield305_adj = lactation_curve_inputs["parity_milk_yield_adjustments"][
+            "parity_3_305_day_milk_yield_adjustment"
+        ]
+
+        milk_yield_305_day_by_parity = self._estimate_305_day_milk_yield_by_parity(
+            annual_milk_yield_lbs,
+            num_milking_cows,
+            parity_1_percentage,
+            parity_2_percentage,
+            parity_3_percentage,
+            parity_2_milk_yield_adjustment,
+            parity_3_milk_yield_adjustment,
+        )
+
+        param_milk_yield_paired_by_parity = [
+            (self.parity_1_parameters, milk_yield_305_day_by_parity["parity_1"]),
+            (self.parity_2_parameters, milk_yield_305_day_by_parity["parity_2"]),
+            (self.parity_3_parameters, milk_yield_305_day_by_parity["parity_3"]),
+        ]
+        for params, milk_yield in param_milk_yield_paired_by_parity:
+            fitted_l_param = self._fit_wood_l_param_to_milk_yield(params["l"], params["m"], params["n"], milk_yield)
+            params["l"] = fitted_l_param
+
     def _estimate_305_day_milk_yield_by_parity(
         self,
         annual_milk_yield_lbs: float,
@@ -389,6 +412,42 @@ class LactationCurve:
             "parity_2": parity_2_305_day_milk_yield,
             "parity_3": parity_3_305_day_milk_yield,
         }
+
+    def _fit_wood_l_param_to_milk_yield(
+        self, l_param: float, m_param: float, n_param: float, milk_yield: float
+    ) -> float:
+        """
+        Modifies Wood's l parameter to best fit a given 305 day milk yield.
+
+        Parameters
+        ----------
+        l_param : float
+            Wood's l lactation curve parameter.
+        m_param : float
+            Wood's m lactation curve parameter.
+        n_param : float
+            Wood's n lactation curve parameter.
+        milk_yield : float
+            305 day milk yield that Wood's l parameter will be fitted to (kg).
+
+        Returns
+        -------
+        float
+            Wood's l parameter adjusted to best fit the given milk yield.
+
+        """
+        smallest_diff = float('inf')
+        l_param_best_fit = l_param
+
+        for l_param_error in np.arange(-10, 10, 0.01):
+            l_param_varied = l_param + l_param_error
+            varied_305_day_milk_yield = self.calc_integral_wood_curve(l_param_varied, m_param, n_param)
+            milk_yield_difference = abs(varied_305_day_milk_yield - milk_yield)
+            if milk_yield_difference < smallest_diff:
+                smallest_diff = milk_yield_difference
+                l_param_best_fit = l_param_varied
+
+        return l_param_best_fit
 
     def set_lactation_curve_parameters(self) -> tuple[tuple, tuple, tuple]:
         """
