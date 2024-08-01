@@ -436,6 +436,8 @@ class TaskManager:
         produce_graphics: bool,
     ) -> None:
         """Runs end-to-end testing routine."""
+        # import remote_pdb
+        # remote_pdb.set_trace("localhost", 4444)
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager._handle_end_to_end_testing.__name__,
@@ -443,25 +445,25 @@ class TaskManager:
             "produce_graphics": produce_graphics,
         }
 
-        output_manager.add_log("Starting end-to-end testing simulation", "", info_map)
+        output_manager.add_log("End-to-end testing", "Starting end-to-end testing simulation.", info_map)
 
         TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
 
-        output_manager.add_log("Completed end-to-end testing simulation", "", info_map)
+        output_manager.add_log("End-to-end testing", "Completed end-to-end testing simulation", info_map)
 
         TaskManager._compare_simulation_outputs_to_expected_outputs(output_manager)
 
     @staticmethod
-    def _compare_simulation_outputs_to_expected_outputs(output_manager: OutputManager) -> None:
+    def _compare_simulation_outputs_to_expected_outputs(args: Dict[str, Any], output_manager: OutputManager) -> None:
         """Compares outputs from a simulation to the results expected for that simulation."""
         info_map = {
             "class": TaskManager.__class__.__name__,
             "function": TaskManager._compare_simulation_outputs_to_expected_outputs.__name__,
         }
         path_to_actual_results = None
-        for path in Path("output/JSONs/").iterdir():
+        for path in args["json_output_directory"].iterdir():
             matches = re.match(
-                "output/JSONs/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*", str(path)
+                f"{str(path)}/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*", str(path)
             )
             if matches:
                 path_to_actual_results = path
@@ -485,7 +487,7 @@ class TaskManager:
             if diff == {}:
                 results_file.write("End-to-end testing successful.\n")
                 results_file.write("No differences found between actual and expected outputs.\n")
-                output_manager.add_log("End-to-end testing successful", "", info_map)
+                output_manager.add_log("End-to-end testing", "End-to-end testing successful", info_map)
             else:
                 results_file.write("End-to-end testing unsuccessful.\n")
                 results_file.write("Differences found between actual and expected outputs.\n\n")
@@ -505,7 +507,7 @@ class TaskManager:
                         results_file.write(f"{item}: {value}\n")
                     results_file.write("\n")
 
-                output_manager.add_warning("End-to-end testing unsuccessful", "", info_map)
+                output_manager.add_error("End-to-end testing", "End-to-end testing unsuccessful", info_map)
 
         output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
 
