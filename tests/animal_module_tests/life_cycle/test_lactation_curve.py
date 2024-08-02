@@ -201,6 +201,21 @@ def test_estimate_305_day_milk_yield_by_parity() -> None:
     pass
 
 
-def test_fit_wood_l_param_to_milk_yield() -> None:
+@pytest.mark.parametrize(
+    "l_param,milk_yield,expected",
+    [
+        (19.2, 11331.4772561, 19.20),
+        (20.1, 11868.5420636, 20.11),
+        (16.4, 12393.8032489, 21.0),
+        (19.5, 10033.0788205, 17.0),
+        (23.0, 5901.8110709, 13.0),
+        (12.0, 14754.5276773, 21.99),
+    ]
+)
+def test_fit_wood_l_param_to_milk_yield(
+    lactation_curve: LactationCurve, l_param: float, milk_yield: float, expected: float
+) -> None:
     """Test that Wood's l parameter is correctly fitted to a 305 day milk yield."""
-    pass
+    actual = lactation_curve._fit_wood_l_param_to_milk_yield(l_param, 0.247, 0.003376, milk_yield)
+
+    assert pytest.approx(actual) == expected
