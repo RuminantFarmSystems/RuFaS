@@ -14,6 +14,7 @@ def lactation_curve(mocker: MockerFixture) -> LactationCurve:
 def animal_inputs() -> dict[str, Any]:
     return {
         "herd_information": {
+            "cow_num": 100,
             "parity_percentages": {"1": 38.6, "2": 28.1, "3": 33.3},
             "annual_milk_yield": 10_000_000,
         },
