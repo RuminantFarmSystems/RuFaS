@@ -188,9 +188,22 @@ def test_get_milking_frequency_adjustments() -> None:
     pass
 
 
-def test_calculate_adjusted_wood_parameters() -> None:
+@pytest.mark.parametrize(
+    "l_param,m_param,n_param,adjustments,expected",
+    [
+        (19.2, 0.247, 0.003376, [{"l": 1, "m": 1, "n": 1}],
+            {"l": 20.2, "m": 0.257, "n": 0.003476}),
+        (19.2, 0.247, 0.003376, [{"l": 1, "m": 1, "n": 1}, {"l": 1, "m": 1, "n": 1}],
+            {"l": 21.2, "m": 0.267, "n": 0.003576}),
+    ]
+)
+def test_calculate_adjusted_wood_parameters(
+    lactation_curve: LactationCurve, l_param: float, m_param: float,
+        n_param: float, adjustments: list[dict[str, float]], expected: dict[str, float]) -> None:
     """Test that the Wood's parameters are adjusted correctly."""
-    pass
+    actual = lactation_curve._calculate_adjusted_wood_parameters(
+        l_param, m_param, n_param, adjustments)
+    assert actual == expected
 
 
 def test_get_milk_yield_values_wood_curve() -> None:
