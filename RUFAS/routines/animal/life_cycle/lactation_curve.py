@@ -122,7 +122,7 @@ class LactationCurve:
         info_map = {"class": self.__class__.__name__, "function": self._get_year_adjustments.__name__}
         if not 2006 <= end_year <= 2016:
             bounded_end_year = min(2016, max(2006, end_year))
-            self.om.add_log(
+            self.om.add_warning(
                 f"Lactation curve adjustments not available for simulation ending in {end_year}",
                 f"Using adjustments for {bounded_end_year}.",
                 info_map,
@@ -272,7 +272,7 @@ class LactationCurve:
         num_milking_cows = (
             animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_percentage"]
         )
-        annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield"]
+        annual_milk_yield = animal_inputs["herd_information"]["annual_milk_yield"]
         parity_1_percentage = animal_inputs["herd_information"]["parity_percentages"]["1"]
         parity_2_percentage = animal_inputs["herd_information"]["parity_percentages"]["2"]
         parity_3_percentage = animal_inputs["herd_information"]["parity_percentages"]["3"]
@@ -284,7 +284,7 @@ class LactationCurve:
         ]
 
         milk_yield_305_day_by_parity = self._estimate_305_day_milk_yield_by_parity(
-            annual_milk_yield_lbs,
+            annual_milk_yield,
             num_milking_cows,
             parity_1_percentage,
             parity_2_percentage,
