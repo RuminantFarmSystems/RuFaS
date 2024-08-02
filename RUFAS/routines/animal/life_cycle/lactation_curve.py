@@ -2,6 +2,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.util import Utility
 import numpy as np
 from scipy.integrate import quad
 from typing import Any
@@ -81,24 +82,21 @@ class LactationCurve:
             base_wood_parameter_n,
             [parity_adjustments["1"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
-
         self.parity_2_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["2"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
-
         self.parity_3_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["3"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
+
         self.parity_to_parameter_mapping = {
-            1: self.parity_1_parameters,
-            2: self.parity_2_parameters,
-            3: self.parity_3_parameters,
+            1: self.parity_1_parameters, 2: self.parity_2_parameters, 3: self.parity_3_parameters
         }
 
         self.l_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_l_std_dev"]
@@ -107,6 +105,11 @@ class LactationCurve:
 
         annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield_lbs"]
         if annual_milk_yield_lbs is not None:
+            self.om.add_log(
+                "Projected annual milk yield provided to simulation",
+                "Using the annual milk yield input to fit lactation curve parameters.",
+                {"class": self.__class__.__name__, "function": "__init__"}
+            )
             self._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
 
     def _get_year_adjustments(
@@ -243,7 +246,7 @@ class LactationCurve:
         Parameters
         ----------
         parity : int
-            The number of calves the calling cow has had.
+            The number of calves that a cow has had.
 
         Returns
         -------
@@ -253,7 +256,12 @@ class LactationCurve:
         """
         parity = min(3, parity)
 
-        return self.parity_to_parameter_mapping[parity]
+        params = self.parity_to_parameter_mapping[parity]
+        return {
+            "l": Utility.generate_random_number(params["l"], self.l_param_std_dev),
+            "m": Utility.generate_random_number(params["m"], self.m_param_std_dev),
+            "n": Utility.generate_random_number(params["n"], self.n_param_std_dev)
+        }
 
     def _adjust_lactation_curve_to_milk_yield(
         self, animal_inputs: dict[str, Any], lactation_curve_inputs: dict[str, dict[str, Any]]

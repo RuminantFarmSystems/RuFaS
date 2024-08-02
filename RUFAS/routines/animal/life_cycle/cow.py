@@ -281,26 +281,10 @@ class Cow(HeiferIII):
         Currently only set up for wood model.
         """
         if self.lactation_curve == "wood":
-
-            parity_key = self.parity_index
-            # this is a temporary fix for the negative parity_index issue
-            # 'parity_key' should not be needed if self.parity_index is always an int between 0 and 2
-            if parity_key < 0:
-                parity_key = 0
-
             lactation_parameters = AnimalBase.lactation_curve.get_wood_parameters(self.calves)
-            self.wood_l = self.determine_param_value(
-                lactation_parameters["l"],
-                AnimalBase.config["wood_l_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_m = self.determine_param_value(
-                lactation_parameters["m"],
-                AnimalBase.config["wood_m_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_n = self.determine_param_value(
-                lactation_parameters["n"],
-                AnimalBase.config["wood_n_std"][self.breed_index][self.parity_index],
-            )
+            self.wood_l = lactation_parameters["l"]
+            self.wood_m = lactation_parameters["m"]
+            self.wood_n = lactation_parameters["n"]
 
     def calculate_daily_milk_produced(self) -> float:
         """Returns a float calculation of the milk produced based on a cow's lactation curve parameters"""
