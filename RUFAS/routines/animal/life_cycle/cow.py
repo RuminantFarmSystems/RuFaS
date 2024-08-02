@@ -288,7 +288,7 @@ class Cow(HeiferIII):
 
     def calculate_daily_milk_produced(self) -> float:
         """Returns a float calculation of the milk produced based on a cow's lactation curve parameters"""
-        if self.lactation_curve == "wood":
+        if self.lactation_curve == "wood":  # TODO: use lactation module here.
             return (
                 self.wood_l * math.pow(self.days_in_milk, self.wood_m) * math.exp((0 - self.wood_n) * self.days_in_milk)
             )
