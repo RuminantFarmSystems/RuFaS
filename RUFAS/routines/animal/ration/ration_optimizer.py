@@ -651,8 +651,8 @@ class RationOptimizer:
         Sets up the upper bound for the protein requirement constraint in the non-linear programming (NLP).
         Uses MP_supply as calculated in protein_constraint_lower.
 
-        The selected limit of 2X the requirement is not based on NASEM or NRC literature, but a rough metric deemed
-            reasonable by SMEs on the team.
+        This upper limit is calculated by multipling the  PROTEIN_UPPER_LIMIT_FACTOR in AnimalModuleConstants
+            by the protein requirement.
 
         Parameters
         ----------
@@ -664,7 +664,8 @@ class RationOptimizer:
         float
 
         """
-        return (ration_config.MP_requirement * 2) - ration_config.MP_supply
+        return (ration_config.MP_requirement * AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR)\
+            - ration_config.MP_supply
 
     @staticmethod
     def NDF_constraint_lower(
