@@ -8,9 +8,7 @@ from typing import Any, Dict, List, Callable, Tuple
 import pandas as pd
 from deepdiff import DeepDiff
 
-from RUFAS.elements import ElementsCounter
-from RUFAS.modifiability import Modifiability
-from RUFAS.input_validator import InputValidator
+from RUFAS.input_validator import InputValidator, ElementsCounter, Modifiability
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -88,7 +86,7 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        InputValidator.validate_metadata(self.__metadata)
+        InputValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
         self._load_properties()
         InputValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
         is_input_data_valid = self._populate_pool(eager_termination)
@@ -311,6 +309,7 @@ class InputManager:
                     properties_blob_key=properties_blob_key,
                     elements_counter=self.elements_counter,
                     called_during_initialization=True,
+                    fixable_data_types=FIXABLE_INPUT_DATA_TYPES
                 )
 
                 valid_data = valid_data and is_element_acceptable
@@ -981,6 +980,7 @@ class InputManager:
                 properties_blob_key=properties_blob_key,
                 elements_counter=elements_counter,
                 called_during_initialization=False,
+                fixable_data_types=FIXABLE_INPUT_DATA_TYPES
             )
 
             if is_element_acceptable:

@@ -1,23 +1,184 @@
 import os
 import re
+from enum import Enum
 from functools import reduce
 from typing import Dict, Any, Callable, List, Union, Sequence
 
-from RUFAS.elements import ElementState, ElementsCounter
-from RUFAS.modifiability import Modifiability
 from RUFAS.output_manager import OutputManager
 
-"""
-Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
-"""
-FIXABLE_INPUT_DATA_TYPES: set[str] = {"string", "number", "bool"}
 
-"""
-Set enumerating the input data formats the Input Manager can accept.
-"""
-VALID_INPUT_TYPES: set[str] = {"json", "csv"}
+#  These should be passed in via IM not here
+#  No wording of INPUT
+#  log error here, leave termination for IM
+#  Move elements counters...etc to here
 
-ADDRESS_TO_INPUTS = "files"
+class ElementState(Enum):
+    """
+    An enumeration of the states an input data element can be in during validation. An element cannot
+    be in more than one state at a time.
+
+    Attributes
+    ----------
+    VALID : int
+        The element is valid.
+    INVALID : int
+        The element is invalid and cannot be fixed.
+    FIXED : int
+        The element is invalid initially but has been fixed.
+    """
+
+    VALID = "valid"
+    INVALID = "invalid"
+    FIXED = "fixed"
+
+
+class ElementsCounter:
+    """
+    A class to keep track of the number of elements in each state during validation.
+
+    Attributes
+    ----------
+    valid_elements : int
+        The number of valid elements.
+    invalid_elements : int
+        The number of invalid elements.
+    fixed_elements : int
+        The number of fixed elements.
+    """
+
+    def __init__(self) -> None:
+        self.valid_elements = 0
+        self.invalid_elements = 0
+        self.fixed_elements = 0
+
+    def update(self, state: ElementState, value: int) -> None:
+        """
+        Updates the count of elements in a given state.
+
+        Parameters
+        ----------
+        state : ElementState
+            The state of the element.
+        value : int
+            The value by which the count should be updated.
+
+        Raises
+        ------
+        ValueError
+            If the state is not one of the valid states.
+        """
+        if state == ElementState.VALID:
+            self.valid_elements += value
+        elif state == ElementState.INVALID:
+            self.invalid_elements += value
+        elif state == ElementState.FIXED:
+            self.fixed_elements += value
+        else:
+            raise ValueError(f"Invalid state: {state}")
+
+    def increment(self, state: ElementState) -> None:
+        """
+        Increments the count of elements in a given state by one.
+
+        Parameters
+        ----------
+        state : ElementState
+            The state of the element.
+        """
+
+        self.update(state, 1)
+
+    def reset(self) -> None:
+        """
+        Resets the counts of all element states to zero.
+        """
+
+        self.valid_elements = 0
+        self.invalid_elements = 0
+        self.fixed_elements = 0
+
+    def total_elements(self) -> int:
+        """
+        Returns the total number of elements by adding the counts of valid, invalid, and fixed elements.
+        """
+        return self.valid_elements + self.invalid_elements + self.fixed_elements
+
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the ElementsCounter object.
+        """
+
+        return str(
+            {
+                "valid_elements": self.valid_elements,
+                "invalid_elements": self.invalid_elements,
+                "fixed_elements": self.fixed_elements,
+                "total_elements": self.total_elements(),
+            }
+        )
+
+    def __add__(self, other: "ElementsCounter") -> "ElementsCounter":
+        """
+        Adds the counts of two ElementsCounter objects together.
+
+        Parameters
+        ----------
+        other : ElementsCounter
+            The other ElementsCounter object to be added.
+
+        Returns
+        -------
+        ElementsCounter
+            A new ElementsCounter object with the counts of the two objects added together.
+        """
+
+        new_counter = ElementsCounter()
+        new_counter.valid_elements = self.valid_elements + other.valid_elements
+        new_counter.invalid_elements = self.invalid_elements + other.invalid_elements
+        new_counter.fixed_elements = self.fixed_elements + other.fixed_elements
+        return new_counter
+
+
+class Modifiability(Enum):
+    """
+    Enum class representing the modifiability status of a variable.
+
+    This Enum defines various levels of modifiability for a variable, indicating whether a variable is required at
+    initialization and if it can be modified during runtime.
+
+    Attributes
+    ----------
+    REQUIRED_LOCKED : str
+        Indicates the variable must be initialized with a value and cannot be modified thereafter.
+    REQUIRED_UNLOCKED : str
+        Indicates the variable must be initialized with a value but can be modified during runtime.
+    UNREQUIRED_UNLOCKED : str
+        Indicates the variable does not need to be initialized with a value and can be modified during runtime.
+    """
+
+    REQUIRED_LOCKED: str = "required locked"
+    REQUIRED_UNLOCKED: str = "required unlocked"
+    UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
+
+    @classmethod
+    def values(cls) -> List[str]:
+        """
+        Provides a list of the string values of the enum members.
+
+        Returns
+        -------
+        List[str]
+            A list containing the string values of the enum members.
+        """
+        return list(map(lambda c: c.value, cls))
+
+    @classmethod
+    def get_required_during_initialization(cls) -> List["Modifiability"]:
+        return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
+
+    @classmethod
+    def get_modifiable_at_runtime(cls) -> List["Modifiability"]:
+        return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
 class InputValidator:
@@ -363,14 +524,14 @@ class InputValidator:
         )
 
     @staticmethod
-    def validate_metadata(metadata: Dict[str, Any]) -> None:
+    def validate_metadata(metadata: Dict[str, Any], valid_data_types: set[str], address_to_data: str) -> None:
         """Checks that top-level metadata has valid and required keys and values."""
         om = OutputManager()
         info_map = {
             "class": InputValidator.__name__,
             "function": InputValidator.validate_metadata.__name__,
         }
-        metadata_files = metadata[ADDRESS_TO_INPUTS]
+        metadata_files = metadata[address_to_data]
         required_keys = {"path", "type", "properties"}
         optional_keys = {"title", "description"}
         valid_keys = required_keys | optional_keys
@@ -384,10 +545,10 @@ class InputValidator:
                 om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
                 raise ValueError
 
-            if data["type"] not in VALID_INPUT_TYPES:
+            if data["type"] not in valid_data_types:
                 om.add_error(
                     "Metadata Validation",
-                    f"Invalid type '{data['type']}' in '{key}'. Expected one option from {VALID_INPUT_TYPES}",
+                    f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}",
                     info_map,
                 )
                 raise ValueError
@@ -412,6 +573,7 @@ class InputValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
+        fixable_data_types: set[str]
     ) -> bool:
         """
         Validates the input data based on its specified type.
@@ -432,6 +594,8 @@ class InputValidator:
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization.
+        fixable_data_types: set[str]
+            Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
 
         Returns
         -------
@@ -479,7 +643,7 @@ class InputValidator:
             called_during_initialization,
         )
 
-        if data_type not in FIXABLE_INPUT_DATA_TYPES:
+        if data_type not in fixable_data_types:
             return is_valid
 
         if is_valid:
