@@ -283,13 +283,6 @@ class LactationCurve:
             "parity_3_305_day_milk_yield_adjustment"
         ]
 
-        self.parity2_MilkYield305_adj = lactation_curve_inputs["parity_milk_yield_adjustments"][
-            "parity_2_305_day_milk_yield_adjustment"
-        ]
-        self.parity3_MilkYield305_adj = lactation_curve_inputs["parity_milk_yield_adjustments"][
-            "parity_3_305_day_milk_yield_adjustment"
-        ]
-
         milk_yield_305_day_by_parity = self._estimate_305_day_milk_yield_by_parity(
             annual_milk_yield_lbs,
             num_milking_cows,
