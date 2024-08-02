@@ -161,8 +161,25 @@ def test_get_year_adjustments() -> None:
     pass
 
 
-def test_get_region_adjustments() -> None:
+@pytest.mark.parametrize(
+    "fips_code,expected",
+    [
+        (1000, {"l": -2.00, "m": 2.59, "n": 2.60}),
+        (42000, {"l": 1.15, "m": -0.96, "n": 0.06}),
+        (12000, {"l": -2.00, "m": 2.59, "n": 2.60}),
+        (52000, {"l": 0.0, "m": 0.0, "n": 0.0}),
+        (26000, {"l": 0.61, "m": -0.40, "n": -0.64}),
+        (35000, {"l": -0.96, "m": 3.13, "n": 1.50}),
+    ]
+)
+def test_get_region_adjustments(lactation_inputs, lactation_curve: LactationCurve, fips_code, expected) -> None:
     """Test that the region adjustments are retrieved appropriately."""
+    all_region_adjustments = lactation_inputs["adjustments"]["region"]
+    region_mapping = lactation_inputs["state_to_region_mapping"]
+    
+    actual = lactation_curve._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
+
+    assert actual == expected
     pass
 
 
