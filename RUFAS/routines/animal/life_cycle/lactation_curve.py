@@ -104,8 +104,8 @@ class LactationCurve:
         self.m_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_m_std_dev"]
         self.n_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_n_std_dev"]
 
-        annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield_lbs"]
-        if annual_milk_yield_lbs is not None:
+        annual_milk_yield = animal_inputs["herd_information"]["annual_milk_yield"]
+        if annual_milk_yield is not None:
             self.om.add_log(
                 "Projected annual milk yield provided to simulation",
                 "Using the annual milk yield input to fit lactation curve parameters.",
@@ -272,10 +272,10 @@ class LactationCurve:
         num_milking_cows = (
             animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_percentage"]
         )
-        annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield_lbs"]
-        parity_1_percentage = animal_inputs["herd_information"]["parity_percentages"][0]
-        parity_2_percentage = animal_inputs["herd_information"]["parity_percentages"][1]
-        parity_3_percentage = animal_inputs["herd_information"]["parity_percentages"][2]
+        annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield"]
+        parity_1_percentage = animal_inputs["herd_information"]["parity_percentages"]["1"]
+        parity_2_percentage = animal_inputs["herd_information"]["parity_percentages"]["2"]
+        parity_3_percentage = animal_inputs["herd_information"]["parity_percentages"]["3"]
         parity_2_milk_yield_adjustment = lactation_curve_inputs["parity_milk_yield_adjustments"][
             "parity_2_305_day_milk_yield_adjustment"
         ]
@@ -304,7 +304,7 @@ class LactationCurve:
 
     def _estimate_305_day_milk_yield_by_parity(
         self,
-        annual_milk_yield_lbs: float,
+        annual_milk_yield: float,
         num_milking_cows: int,
         parity_1_percentage: float,
         parity_2_percentage: float,
@@ -317,8 +317,8 @@ class LactationCurve:
 
         Parameters
         ----------
-        annual_milk_yield_lbs : float
-            Annual milk yield of the farm (lbs).
+        annual_milk_yield : float
+            Annual milk yield of the farm (kg).
         num_milking_cows : int
             Number of milking cows on the farm.
         parity_1_percentage : float
@@ -335,8 +335,7 @@ class LactationCurve:
             parity (kg).
 
         """
-        annual_milk_yield_kg = annual_milk_yield_lbs * GeneralConstants.LBS_TO_KG
-        milk_yield_305_day_all_cows = annual_milk_yield_kg * (305 / GeneralConstants.YEAR_LENGTH)
+        milk_yield_305_day_all_cows = annual_milk_yield * (305 / GeneralConstants.YEAR_LENGTH)
         milk_yield_305_day = milk_yield_305_day_all_cows / num_milking_cows
 
         parity_percentages_sum = parity_1_percentage + parity_2_percentage + parity_3_percentage
