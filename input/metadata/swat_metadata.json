@@ -45,14 +45,14 @@
     "purchased_feeds_emissions": {
       "title": "Emissions from purchased feeds",
       "description": "Purchased feeds emission values used in the EEE module.",
-      "path": "input/data/EEE/full_feeds_emissions_new.csv",
+      "path": "input/data/EEE/full_feeds_emissions_July202.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
     "purchased_feed_land_use_change_emissions": {
       "title": "Land Use Change emissions from purchased feeds",
       "description": "Purchased feeds land use change emission values used in the EEE module.",
-      "path": "input/data/EEE/full_feeds_land_use_change_emissions.csv",
+      "path": "input/data/EEE/full_feeds_land_use_change_emissions_July2024.csv",
       "type": "csv",
       "properties": "feed_emissions_properties"
     },
