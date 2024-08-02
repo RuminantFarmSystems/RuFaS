@@ -95,6 +95,11 @@ class LactationCurve:
             base_wood_parameter_n,
             [parity_adjustments["3"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
+        self.parity_to_parameter_mapping = {
+            1: self.parity_1_parameters,
+            2: self.parity_2_parameters,
+            3: self.parity_3_parameters,
+        }
 
         self.l_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_l_std_dev"]
         self.m_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_m_std_dev"]
@@ -231,82 +236,24 @@ class LactationCurve:
         result, _ = quad(self.get_y_values_wood_curve, 1, 305, args=(parameter_a, parameter_b, parameter_c))
         return result
 
-    def get_wood_parameters(
-        self,
-        lactation_group: str = None,
-        year: str = None,
-        month: str = None,
-        region: str = None,
-        milking_frequency: str = None,
-        MY_305d: str | None = None,
-    ) -> tuple[float, float, float]:
+    def get_wood_parameters(self, parity: int) -> dict[str, float]:
         """
         Adjusts the default lactation curve parameters based on farm-specific attributes.
 
         Parameters
         ----------
-        lacation_group : str, default=None
-            The lactation group or parity of the cows.
-        year : str, default=None
-            The simulation year. Minimum 2006, maximum 2016.
-        month : str, default=None
-            The simulation month.
-        region : str, default=None
-            The region of the simulated farm. One of 13 regions in United States as defined by Manfei's research.
-        milking_frequency : str, default=None
-            How often cows are milked per day. Can either be "2x/d" or "3x/d".
-        MY_305d : str, default=None
-            Annual 305-day milk yield in kilograms.
+        parity : int
+            The number of calves the calling cow has had.
 
         Returns
         -------
-        tuple
-            Tuple of floats containing estimates for Wood's parameters l, m, n,
-            and 305-day milk yield of the lactation group.
+        dict[str, float]
+            Wood's parameters l, m, and n for the specified parity.
+
         """
+        parity = min(3, parity)
 
-        farm_specific = {}
-        farm_specific["parity"] = lactation_group
-        farm_specific["year"] = year
-        farm_specific["month"] = month
-        farm_specific["region"] = region
-        farm_specific["milking_frequency"] = milking_frequency
-
-        for category in ["parity", "year", "month", "region", "milking_frequency"]:
-            if farm_specific[category]:
-                adjustment_applied = False
-                x = 0
-                while (
-                    x < len(self.adjustment_dict[category])
-                    and (not adjustment_applied)
-                    and (farm_specific[category] is not None)
-                ):
-                    if self.adjustment_dict[category][x][category] == farm_specific[category]:
-                        l_param = self.wood_parameter_l + self.adjustment_dict[category][x]["adjustments"][0]
-                        m_param = self.wood_parameter_m + self.adjustment_dict[category][x]["adjustments"][1] * 1e-2
-                        n_param = self.wood_parameter_n + self.adjustment_dict[category][x]["adjustments"][2] * 1e-4
-                        adjustment_applied = True
-
-                    x = x + 1
-
-        if MY_305d is None:
-            MY_305d = self.calc_integral_wood_curve(l_param, m_param, n_param)
-            return l_param, m_param, n_param, MY_305d
-
-        else:
-            min_diff = float("inf")
-            l_param_best_estimate = 0
-            MY_305d_best_estimate = 0
-            MY_305d = float(MY_305d)
-
-            for l_param_error in np.arange(-10, 10, 0.01):
-                l_param_vary = l_param + l_param_error
-                MY_305d_vary = self.calc_integral_wood_curve(l_param_vary, m_param, n_param)
-                if abs(MY_305d_vary - MY_305d) < min_diff:
-                    min_diff = abs(MY_305d_vary - MY_305d)
-                    l_param_best_estimate = l_param_vary
-                    MY_305d_best_estimate = MY_305d_vary
-            return l_param_best_estimate, m_param, n_param, MY_305d_best_estimate
+        return self.parity_to_parameter_mapping[parity]
 
     def _adjust_lactation_curve_to_milk_yield(
         self, animal_inputs: dict[str, Any], lactation_curve_inputs: dict[str, dict[str, Any]]
@@ -314,7 +261,9 @@ class LactationCurve:
         """
         Adjust the lactation parameters using predicted milk yields for the different parities of cows on the farm.
         """
-        num_milking_cows = animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_percentage"]
+        num_milking_cows = (
+            animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_percentage"]
+        )
         annual_milk_yield_lbs = animal_inputs["herd_information"]["annual_milk_yield_lbs"]
         parity_1_percentage = animal_inputs["herd_information"]["parity_percentages"][0]
         parity_2_percentage = animal_inputs["herd_information"]["parity_percentages"][1]
@@ -436,7 +385,7 @@ class LactationCurve:
             Wood's l parameter adjusted to best fit the given milk yield.
 
         """
-        smallest_diff = float('inf')
+        smallest_diff = float("inf")
         l_param_best_fit = l_param
 
         for l_param_error in np.arange(-10, 10, 0.01):
@@ -448,39 +397,3 @@ class LactationCurve:
                 l_param_best_fit = l_param_varied
 
         return l_param_best_fit
-
-    def set_lactation_curve_parameters(self) -> tuple[tuple, tuple, tuple]:
-        """
-        The wood lactation curve parameters for parities/lacation groups 1, 2, 3 of the herd.
-
-        Returns
-        -------
-        tuple
-            List of lists. Each list contains estimates for parameter l, m, n, and
-            305-day milk yield for the lactation group. The list is ordered by lactation group.
-        """
-        parity1_305, parity2_305, parity3_305 = self.calc_parities()
-
-        return (
-            self.get_wood_parameters(
-                lactation_group="1",
-                year=self.year,
-                region=self.region,
-                milking_frequency=self.milking_freq,
-                MY_305d=parity1_305,
-            ),
-            self.get_wood_parameters(
-                lactation_group="2",
-                year=self.year,
-                region=self.region,
-                milking_frequency=self.milking_freq,
-                MY_305d=parity2_305,
-            ),
-            self.get_wood_parameters(
-                lactation_group="3",
-                year=self.year,
-                region=self.region,
-                milking_frequency=self.milking_freq,
-                MY_305d=parity3_305,
-            ),
-        )

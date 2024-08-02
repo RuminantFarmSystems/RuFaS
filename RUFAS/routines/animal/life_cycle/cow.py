@@ -288,17 +288,17 @@ class Cow(HeiferIII):
             if parity_key < 0:
                 parity_key = 0
 
-            lactation_parameters = AnimalBase.lactation_curve.set_lactation_curve_parameters()
+            lactation_parameters = AnimalBase.lactation_curve.get_wood_parameters(self.calves)
             self.wood_l = self.determine_param_value(
-                lactation_parameters[parity_key][0],
+                lactation_parameters["l"],
                 AnimalBase.config["wood_l_std"][self.breed_index][self.parity_index],
             )
             self.wood_m = self.determine_param_value(
-                lactation_parameters[parity_key][1],
+                lactation_parameters["m"],
                 AnimalBase.config["wood_m_std"][self.breed_index][self.parity_index],
             )
             self.wood_n = self.determine_param_value(
-                lactation_parameters[parity_key][2],
+                lactation_parameters["n"],
                 AnimalBase.config["wood_n_std"][self.breed_index][self.parity_index],
             )
 
