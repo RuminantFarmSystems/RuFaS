@@ -87,23 +87,23 @@
         "pattern": "(HO|JE)",
         "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
       },
-      "parity_percentages": {
+      "parity_fractions": {
         "type": "object",
-        "description": "Percentages of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these percentages must be 100.0",
+        "description": "Fractions of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these fractions must be 1.0",
         "1": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 100.0
+          "maximum": 1.0
         },
         "2": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 100.0
+          "maximum": 1.0
         },
         "3": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 100.0
+          "maximum": 1.0
         }
       },
       "annual_milk_yield": {

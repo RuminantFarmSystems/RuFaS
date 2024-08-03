@@ -15,7 +15,7 @@ def animal_inputs() -> dict[str, Any]:
     return {
         "herd_information": {
             "cow_num": 100,
-            "parity_percentages": {"1": 38.6, "2": 28.1, "3": 33.3},
+            "parity_fractions": {"1": 38.6, "2": 28.1, "3": 33.3},
             "annual_milk_yield": 10_000_000,
         },
         "management_decisions": {"cow_times_milked_per_day": 2.7},
@@ -221,9 +221,29 @@ def test_get_wood_parameters() -> None:
     pass
 
 
-def test_adjust_lactation_curve_to_milk_yield() -> None:
+def test_adjust_lactation_curve_to_milk_yield(
+    mocker: MockerFixture, lactation_curve: LactationCurve, animal_inputs: dict[str, Any], lactation_inputs: dict[str, Any]
+) -> None:
     """Test that Wood's parameters are correctly adjusted based on a farm's total milk yield."""
-    pass
+    lactation_curve.parity_1_parameters = {"l": 17.0, "m": 0.247, "n": 0.003376}
+    lactation_curve.parity_2_parameters = {"l": 17.0, "m": 0.247, "n": 0.003376}
+    lactation_curve.parity_3_parameters = {"l": 17.0, "m": 0.247, "n": 0.003376}
+    estimate_305d_yield = mocker.patch.object(
+        lactation_curve,
+        "_estimate_305_day_milk_yield_by_parity",
+        return_value={
+            "parity_1": 10_000.0, "parity_2": 11_000.0, "parity_3": 10_500.0
+        }
+    )
+    fit_l_param = mocker.patch.object(lactation_curve, "_fit_wood_l_param_to_milk_yield", side_effect=[19.2, 20.0, 19.5])
+
+    lactation_curve._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
+
+    estimate_305d_yield.assert_called_once()
+    assert fit_l_param.call_count == 3
+    assert lactation_curve.parity_1_parameters["l"] == 19.2
+    assert lactation_curve.parity_2_parameters["l"] == 20.0
+    assert lactation_curve.parity_3_parameters["l"] == 19.5
 
 
 @pytest.mark.parametrize(

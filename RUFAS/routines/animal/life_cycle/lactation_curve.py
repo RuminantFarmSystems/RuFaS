@@ -275,9 +275,9 @@ class LactationCurve:
             animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_percentage"]
         )
         annual_milk_yield = animal_inputs["herd_information"]["annual_milk_yield"]
-        parity_1_percentage = animal_inputs["herd_information"]["parity_percentages"]["1"]
-        parity_2_percentage = animal_inputs["herd_information"]["parity_percentages"]["2"]
-        parity_3_percentage = animal_inputs["herd_information"]["parity_percentages"]["3"]
+        parity_1_percentage = animal_inputs["herd_information"]["parity_fractions"]["1"]
+        parity_2_percentage = animal_inputs["herd_information"]["parity_fractions"]["2"]
+        parity_3_percentage = animal_inputs["herd_information"]["parity_fractions"]["3"]
         parity_2_milk_yield_adjustment = lactation_curve_inputs["parity_milk_yield_adjustments"][
             "parity_2_305_day_milk_yield_adjustment"
         ]
