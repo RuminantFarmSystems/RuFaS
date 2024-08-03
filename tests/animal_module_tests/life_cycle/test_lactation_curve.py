@@ -196,9 +196,34 @@ def test_adjust_lactation_curve_to_milk_yield() -> None:
     pass
 
 
-def test_estimate_305_day_milk_yield_by_parity() -> None:
+@pytest.mark.parametrize(
+    "annual_yield,milking_cows,p1_frac,p2_frac,p3_frac,p2_adjust,p3_adjust,expected_p1,expected_p2,expected_p3",
+    [
+        (1_196_721.31, 100, 0.3, 0.4, 0.3, 1632, 2196, 8688.4, 10320.4, 10884.4),
+    ],
+)
+def test_estimate_305_day_milk_yield_by_parity(
+    lactation_curve: LactationCurve,
+    annual_yield: float,
+    milking_cows: float,
+    p1_frac: float,
+    p2_frac: float,
+    p3_frac: float,
+    p2_adjust: float,
+    p3_adjust: float,
+    expected_p1: float,
+    expected_p2: float,
+    expected_p3: float,
+) -> None:
     """Test that the 305 day milk yields are correctly predicted for each parity based on a farm's total milk yield."""
-    pass
+    actual = lactation_curve._estimate_305_day_milk_yield_by_parity(
+        annual_yield, milking_cows, p1_frac, p2_frac, p3_frac, p2_adjust, p3_adjust
+    )
+
+    assert actual.keys() == {"parity_1", "parity_2", "parity_3"}
+    assert pytest.approx(actual["parity_1"]) == expected_p1
+    assert pytest.approx(actual["parity_2"]) == expected_p2
+    assert pytest.approx(actual["parity_3"]) == expected_p3
 
 
 @pytest.mark.parametrize(
@@ -210,7 +235,7 @@ def test_estimate_305_day_milk_yield_by_parity() -> None:
         (19.5, 10033.0788205, 17.0),
         (23.0, 5901.8110709, 13.0),
         (12.0, 14754.5276773, 21.99),
-    ]
+    ],
 )
 def test_fit_wood_l_param_to_milk_yield(
     lactation_curve: LactationCurve, l_param: float, milk_yield: float, expected: float
