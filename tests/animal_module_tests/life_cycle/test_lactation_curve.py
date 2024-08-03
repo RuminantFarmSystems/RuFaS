@@ -229,7 +229,8 @@ def test_adjust_lactation_curve_to_milk_yield() -> None:
 @pytest.mark.parametrize(
     "annual_yield,milking_cows,p1_frac,p2_frac,p3_frac,p2_adjust,p3_adjust,expected_p1,expected_p2,expected_p3",
     [
-        (1_196_721.31, 100, 0.3, 0.4, 0.3, 1632, 2196, 8688.4, 10320.4, 10884.4),
+        (1_196_721.31, 100, 0.3, 0.4, 0.3, 1632.0, 2196.0, 8688.4, 10320.4, 10884.4),
+        (15_000_000.0, 1500, 0.28, 0.36, 0.36, 1632.0, 2196.0, 6978.084, 8610.084, 9174.084)
     ],
 )
 def test_estimate_305_day_milk_yield_by_parity(
