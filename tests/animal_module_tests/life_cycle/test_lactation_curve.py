@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
+from RUFAS.util import Utility
 from typing import Any
 
 
@@ -216,9 +217,39 @@ def test_calc_305_day_milk_yield() -> None:
     pass
 
 
-def test_get_wood_parameters() -> None:
+@pytest.mark.parametrize(
+    "parity,l_expect,m_expect,n_expect",
+    [
+        (1, 18.1, 0.228, 0.003321),
+        (2, 22.1, 0.247, 0.003376),
+        (3, 22.0, 0.231, 0.003351)
+    ] 
+)
+def test_get_wood_parameters(
+    mocker: MockerFixture, lactation_curve: LactationCurve, parity: int, l_expect: float, m_expect: float, n_expect: float,
+) -> None:
     """Test that Wood's parameters are retrieved correctly from LactationCurve."""
-    pass
+    gen_rand = mocker.patch.object(Utility, "generate_random_number", side_effect=[20.22, 0.311, 0.003122])
+    lactation_curve.parity_1_parameters = {"l": 18.1, "m": 0.228, "n": 0.003321}
+    lactation_curve.parity_2_parameters = {"l": 22.1, "m": 0.247, "n": 0.003376}
+    lactation_curve.parity_3_parameters = {"l": 22.0, "m": 0.231, "n": 0.003351}
+    lactation_curve.parity_to_parameter_mapping = {
+        1: lactation_curve.parity_1_parameters,
+        2: lactation_curve.parity_2_parameters,
+        3: lactation_curve.parity_3_parameters
+    }
+    lactation_curve.l_param_std_dev = 0.28
+    lactation_curve.m_param_std_dev = 0.0046
+    lactation_curve.n_param_std_dev = 3.77e-5
+
+    actual = lactation_curve.get_wood_parameters(parity)
+
+    assert actual["l"] == 20.22
+    assert actual["m"] == 0.311
+    assert actual["n"] == 0.003122
+    gen_rand.assert_has_calls(
+        [mocker.call(l_expect, 0.28), mocker.call(m_expect, 0.0046), mocker.call(n_expect, 3.77e-5)]
+    )
 
 
 def test_adjust_lactation_curve_to_milk_yield(
