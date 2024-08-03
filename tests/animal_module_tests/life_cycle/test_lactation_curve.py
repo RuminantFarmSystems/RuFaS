@@ -1,5 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.util import Utility
 from typing import Any
@@ -19,7 +21,7 @@ def animal_inputs() -> dict[str, Any]:
             "parity_fractions": {"1": 38.6, "2": 28.1, "3": 33.3},
             "annual_milk_yield": 10_000_000,
         },
-        "management_decisions": {"cow_times_milked_per_day": 2.7},
+        "animal_config": {"management_decisions": {"cow_times_milked_per_day": 2.7}}
     }
 
 
@@ -152,9 +154,43 @@ def lactation_inputs() -> dict[str, Any]:
     }
 
 
-def test_init() -> None:
+@pytest.mark.parametrize("annual_milk_yield,expect_fitting", [(10_000_000, True), (None, False)])
+def test_init(mocker: MockerFixture, animal_inputs: dict[str, Any], lactation_inputs: dict[str, Any], annual_milk_yield: float, expect_fitting: bool) -> None:
     """Test init routine of the LactationCurve module."""
-    pass
+    mock_time = mocker.MagicMock()
+    animal_inputs["herd_information"]["annual_milk_yield"] = annual_milk_yield
+    im = InputManager()
+    get_data = mocker.patch.object(im, "get_data", side_effect=[lactation_inputs, 55025, animal_inputs])
+    add_log = mocker.patch.object(OutputManager, "add_log")
+    year_adjustments = mocker.patch.object(LactationCurve, "_get_year_adjustments", return_value=[0.0, 0.0, 0.0])
+    region_adjustments = mocker.patch.object(LactationCurve, "_get_region_adjustments", return_value=[0.0, 0.0, 0.0])
+    milking_freq = mocker.patch.object(LactationCurve, "_get_milking_frequency_adjustments", return_value=[0.0, 0.0, 0.0])
+    adjust_wood_params = mocker.patch.object(LactationCurve, "_calculate_adjusted_wood_parameters", side_effect=[
+        {"l": 17.0, "m": 0.240, "n": 0.003376},
+        {"l": 21.0, "m": 0.247, "n": 0.003376},
+        {"l": 20.0, "m": 0.245, "n": 0.003376}
+    ])
+    adjust_lactation_curve = mocker.patch.object(LactationCurve, "_adjust_lactation_curve_to_milk_yield")
+
+    lactation_curve = LactationCurve(mock_time)
+
+    assert get_data.call_count == 3
+    year_adjustments.assert_called_once()
+    region_adjustments.assert_called_once()
+    milking_freq.assert_called_once()
+    assert adjust_wood_params.call_count == 3
+    assert lactation_curve.parity_to_parameter_mapping[1] == lactation_curve.parity_1_parameters
+    assert lactation_curve.parity_to_parameter_mapping[2] == lactation_curve.parity_2_parameters
+    assert lactation_curve.parity_to_parameter_mapping[3] == lactation_curve.parity_3_parameters
+    assert lactation_curve.l_param_std_dev == 0.28
+    assert lactation_curve.m_param_std_dev == 0.0046
+    assert lactation_curve.n_param_std_dev == 3.77e-5
+    if expect_fitting:
+        add_log.assert_called_once()
+        adjust_lactation_curve.assert_called_once()
+    else:
+        add_log.assert_not_called()
+        adjust_lactation_curve.assert_not_called()
 
 
 def test_get_year_adjustments() -> None:
