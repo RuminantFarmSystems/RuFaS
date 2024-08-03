@@ -97,7 +97,9 @@ class LactationCurve:
         )
 
         self.parity_to_parameter_mapping = {
-            1: self.parity_1_parameters, 2: self.parity_2_parameters, 3: self.parity_3_parameters
+            1: self.parity_1_parameters,
+            2: self.parity_2_parameters,
+            3: self.parity_3_parameters,
         }
 
         self.l_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_l_std_dev"]
@@ -109,7 +111,7 @@ class LactationCurve:
             self.om.add_log(
                 "Projected annual milk yield provided to simulation",
                 "Using the annual milk yield input to fit lactation curve parameters.",
-                {"class": self.__class__.__name__, "function": "__init__"}
+                {"class": self.__class__.__name__, "function": "__init__"},
             )
             self._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
 
@@ -260,7 +262,7 @@ class LactationCurve:
         return {
             "l": Utility.generate_random_number(params["l"], self.l_param_std_dev),
             "m": Utility.generate_random_number(params["m"], self.m_param_std_dev),
-            "n": Utility.generate_random_number(params["n"], self.n_param_std_dev)
+            "n": Utility.generate_random_number(params["n"], self.n_param_std_dev),
         }
 
     def _adjust_lactation_curve_to_milk_yield(
@@ -306,9 +308,9 @@ class LactationCurve:
         self,
         annual_milk_yield: float,
         num_milking_cows: int,
-        parity_1_percentage: float,
-        parity_2_percentage: float,
-        parity_3_percentage: float,
+        parity_1_frac: float,
+        parity_2_frac: float,
+        parity_3_frac: float,
         parity_2_milk_yield_adjustment: float,
         parity_3_milk_yield_adjustment: float,
     ) -> dict[int, float]:
@@ -321,12 +323,16 @@ class LactationCurve:
             Annual milk yield of the farm (kg).
         num_milking_cows : int
             Number of milking cows on the farm.
-        parity_1_percentage : float
-            Percentage of cows on the farm that have a parity of 1.
-        parity_2_percentage : float
-            Percentage of cows on the farm that have a parity of 2.
-        parity_3_percentage : float
-            Percentage of cows on the farm that have a parity of 3 or more.
+        parity_1_frac : float
+            Fraction of cows on the farm that have a parity of 1.
+        parity_2_frac : float
+            Fraction of cows on the farm that have a parity of 2.
+        parity_3_frac : float
+            Fraction of cows on the farm that have a parity of 3 or more.
+        parity_2_milk_yield_adjustment : float
+            Amount used to adjust for parity 2 cows (kg). TODO: double check these w/ Haowen
+        parity_3_milk_yield_adjustment : float
+            Amount used to adjust for parity 3 cows (kg). TODO: double check these w/ Haowen
 
         Returns
         -------
@@ -338,20 +344,12 @@ class LactationCurve:
         milk_yield_305_day_all_cows = annual_milk_yield * (305 / GeneralConstants.YEAR_LENGTH)
         milk_yield_305_day = milk_yield_305_day_all_cows / num_milking_cows
 
-        parity_percentages_sum = parity_1_percentage + parity_2_percentage + parity_3_percentage
-        assert parity_percentages_sum == 100.0  # TODO: find better way to check this!
+        assert sum([parity_1_frac, parity_2_frac, parity_3_frac]) == 1.0  # TODO: find better way to check this!
 
-        # TODO: I get a different equation when I solve for parity_1_305_day_milk_yield (see original equation in
-        # https://docs.google.com/document/d/1QE_XKmlwhTvKDKPPhUYvnIqjBA_ha9JcSUD_XOgCdJE/edit). More explicitly, I get
-        # parity_1_305_day_milk_yield = (
-        #     (milk_yield_305_day / parity_percentages_sum)
-        #     - (parity_2_percentage * parity_2_milk_yield_adjustment / parity_percentages_sum)
-        #     - (parity_3_percentage * parity_3_milk_yield_adjustment / parity_percentages_sum)
-        # )
         parity_1_305_day_milk_yield = (
             milk_yield_305_day
-            - (parity_2_percentage * parity_2_milk_yield_adjustment / parity_percentages_sum)
-            - (parity_3_percentage * parity_3_milk_yield_adjustment / parity_percentages_sum)
+            - parity_2_frac * parity_2_milk_yield_adjustment
+            - parity_3_frac * parity_3_milk_yield_adjustment
         )
         parity_2_305_day_milk_yield = parity_1_305_day_milk_yield + parity_2_milk_yield_adjustment
         parity_3_305_day_milk_yield = parity_1_305_day_milk_yield + parity_3_milk_yield_adjustment
