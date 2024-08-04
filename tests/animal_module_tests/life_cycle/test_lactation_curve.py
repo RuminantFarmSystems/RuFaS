@@ -22,7 +22,7 @@ def animal_inputs() -> dict[str, Any]:
             "parity_fractions": {"1": 38.6, "2": 28.1, "3": 33.3},
             "annual_milk_yield": 10_000_000,
         },
-        "animal_config": {"management_decisions": {"cow_times_milked_per_day": 2.7}}
+        "animal_config": {"management_decisions": {"cow_times_milked_per_day": 2.7}},
     }
 
 
@@ -156,7 +156,13 @@ def lactation_inputs() -> dict[str, Any]:
 
 
 @pytest.mark.parametrize("annual_milk_yield,expect_fitting", [(10_000_000, True), (None, False)])
-def test_init(mocker: MockerFixture, animal_inputs: dict[str, Any], lactation_inputs: dict[str, Any], annual_milk_yield: float, expect_fitting: bool) -> None:
+def test_init(
+    mocker: MockerFixture,
+    animal_inputs: dict[str, Any],
+    lactation_inputs: dict[str, Any],
+    annual_milk_yield: float,
+    expect_fitting: bool,
+) -> None:
     """Test init routine of the LactationCurve module."""
     mock_time = mocker.MagicMock()
     animal_inputs["herd_information"]["annual_milk_yield"] = annual_milk_yield
@@ -165,12 +171,18 @@ def test_init(mocker: MockerFixture, animal_inputs: dict[str, Any], lactation_in
     add_log = mocker.patch.object(OutputManager, "add_log")
     year_adjustments = mocker.patch.object(LactationCurve, "_get_year_adjustments", return_value=[0.0, 0.0, 0.0])
     region_adjustments = mocker.patch.object(LactationCurve, "_get_region_adjustments", return_value=[0.0, 0.0, 0.0])
-    milking_freq = mocker.patch.object(LactationCurve, "_get_milking_frequency_adjustments", return_value=[0.0, 0.0, 0.0])
-    adjust_wood_params = mocker.patch.object(LactationCurve, "_calculate_adjusted_wood_parameters", side_effect=[
-        {"l": 17.0, "m": 0.240, "n": 0.003376},
-        {"l": 21.0, "m": 0.247, "n": 0.003376},
-        {"l": 20.0, "m": 0.245, "n": 0.003376}
-    ])
+    milking_freq = mocker.patch.object(
+        LactationCurve, "_get_milking_frequency_adjustments", return_value=[0.0, 0.0, 0.0]
+    )
+    adjust_wood_params = mocker.patch.object(
+        LactationCurve,
+        "_calculate_adjusted_wood_parameters",
+        side_effect=[
+            {"l": 17.0, "m": 0.240, "n": 0.003376},
+            {"l": 21.0, "m": 0.247, "n": 0.003376},
+            {"l": 20.0, "m": 0.245, "n": 0.003376},
+        ],
+    )
     adjust_lactation_curve = mocker.patch.object(LactationCurve, "_adjust_lactation_curve_to_milk_yield")
 
     lactation_curve = LactationCurve(mock_time)
@@ -207,13 +219,15 @@ def test_get_year_adjustments() -> None:
         (52000, {"l": 0.0, "m": 0.0, "n": 0.0}),
         (26000, {"l": 0.61, "m": -0.40, "n": -0.64}),
         (35000, {"l": -0.96, "m": 3.13, "n": 1.50}),
-    ]
+    ],
 )
-def test_get_region_adjustments(lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, fips_code: int, expected: dict[str, float]) -> None:
+def test_get_region_adjustments(
+    lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, fips_code: int, expected: dict[str, float]
+) -> None:
     """Test that the region adjustments are retrieved appropriately."""
     all_region_adjustments = lactation_inputs["adjustments"]["region"]
     region_mapping = lactation_inputs["state_to_region_mapping"]
-    
+
     actual = lactation_curve._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
     assert actual == expected
@@ -226,13 +240,18 @@ def test_get_region_adjustments(lactation_inputs: dict[str, Any], lactation_curv
         (1.8, {"l": -0.74, "m": 0.090, "n": 0.15}),
         (3.6, {"l": 0.74, "m": -0.090, "n": -0.15}),
         (2.8, {"l": 0.74, "m": -0.090, "n": -0.15}),
-        (2.1, {"l": -0.74, "m": 0.090, "n": 0.15})
-    ]
+        (2.1, {"l": -0.74, "m": 0.090, "n": 0.15}),
+    ],
 )
-def test_get_milking_frequency_adjustments(lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, milking_frequency: float, expected: dict[str, float]) -> None:
+def test_get_milking_frequency_adjustments(
+    lactation_inputs: dict[str, Any],
+    lactation_curve: LactationCurve,
+    milking_frequency: float,
+    expected: dict[str, float],
+) -> None:
     """Test that the milking frequency adjustments are retrieved appropriately."""
     milking_frequency_adjustments = lactation_inputs["adjustments"]["milking_frequency"]
-    
+
     actual = lactation_curve._get_milking_frequency_adjustments(milking_frequency_adjustments, milking_frequency)
 
     assert actual == expected
@@ -241,35 +260,36 @@ def test_get_milking_frequency_adjustments(lactation_inputs: dict[str, Any], lac
 @pytest.mark.parametrize(
     "l_param,m_param,n_param,adjustments,expected",
     [
-        (19.2, 0.247, 0.003376,
-         [{"l": 0, "m": 0, "n": 0}],
-         {"l": 19.2, "m": 0.247, "n": 0.003376}),
-        (19.2, 0.247, 0.003376,
-         [{"l": 1, "m": 1, "n": 1}],
-         {"l": 20.2, "m": 0.257, "n": 0.003476}),
-        (19.2, 0.247, 0.003376,
-         [{"l": -1, "m": -1, "n": -1}],
-         {"l": 18.2, "m": 0.237, "n": 0.003276}),
-        (19.2, 0.247, 0.003376,
-         [{"l": 1, "m": 1, "n": 1}, {"l": 1, "m": 1, "n": 1}],
-         {"l": 21.2, "m": 0.267, "n": 0.003576}),
-        (19.2, 0.247, 0.003376,
-         [{"l": 1, "m": 1, "n": 1},
-          {"l": 1, "m": 1, "n": 1},
-          {"l": 1, "m": 1, "n": 1},
-          {"l": -1, "m": -1, "n": -1}],
-         {"l": 21.2, "m": 0.267, "n": 0.003576}),
-        (19.2, 24.7, 3.376,
-         [{"l": -19.2, "m": -2470, "n": -33760}],
-         {"l": 0.0, "m": 0.0, "n": 0.0})
-    ]
+        (19.2, 0.247, 0.003376, [{"l": 0, "m": 0, "n": 0}], {"l": 19.2, "m": 0.247, "n": 0.003376}),
+        (19.2, 0.247, 0.003376, [{"l": 1, "m": 1, "n": 1}], {"l": 20.2, "m": 0.257, "n": 0.003476}),
+        (19.2, 0.247, 0.003376, [{"l": -1, "m": -1, "n": -1}], {"l": 18.2, "m": 0.237, "n": 0.003276}),
+        (
+            19.2,
+            0.247,
+            0.003376,
+            [{"l": 1, "m": 1, "n": 1}, {"l": 1, "m": 1, "n": 1}],
+            {"l": 21.2, "m": 0.267, "n": 0.003576},
+        ),
+        (
+            19.2,
+            0.247,
+            0.003376,
+            [{"l": 1, "m": 1, "n": 1}, {"l": 1, "m": 1, "n": 1}, {"l": 1, "m": 1, "n": 1}, {"l": -1, "m": -1, "n": -1}],
+            {"l": 21.2, "m": 0.267, "n": 0.003576},
+        ),
+        (19.2, 24.7, 3.376, [{"l": -19.2, "m": -2470, "n": -33760}], {"l": 0.0, "m": 0.0, "n": 0.0}),
+    ],
 )
 def test_calculate_adjusted_wood_parameters(
-    lactation_curve: LactationCurve, l_param: float, m_param: float,
-        n_param: float, adjustments: list[dict[str, float]], expected: dict[str, float]) -> None:
+    lactation_curve: LactationCurve,
+    l_param: float,
+    m_param: float,
+    n_param: float,
+    adjustments: list[dict[str, float]],
+    expected: dict[str, float],
+) -> None:
     """Test that the Wood's parameters are adjusted correctly."""
-    actual = lactation_curve._calculate_adjusted_wood_parameters(
-        l_param, m_param, n_param, adjustments)
+    actual = lactation_curve._calculate_adjusted_wood_parameters(l_param, m_param, n_param, adjustments)
     assert pytest.approx(actual) == expected
 
 
@@ -280,9 +300,11 @@ def test_calculate_adjusted_wood_parameters(
         (40, 17.8, 0.229, 0.00331, 36.2903495),
         (200, 17.8, 0.229, 0.00331, 30.8924906),
         (305, 17.8, 0.229, 0.00331, 24.0371332),
-    ]
+    ],
 )
-def test_get_milk_yield_values_wood_curve(lactation_curve: LactationCurve, day: int, l_param: float, m_param: float, n_param: float, expected: float) -> None:
+def test_get_milk_yield_values_wood_curve(
+    lactation_curve: LactationCurve, day: int, l_param: float, m_param: float, n_param: float, expected: float
+) -> None:
     """Test that milk yield on a given day is estimated correctly."""
     actual = lactation_curve.get_milk_yield_values_wood_curve(day, l_param, m_param, n_param)
 
@@ -291,7 +313,7 @@ def test_get_milk_yield_values_wood_curve(lactation_curve: LactationCurve, day: 
 
 @pytest.mark.parametrize(
     "l_param,m_param,n_param,expected",
-    [(17.8, 0.229, 0.00331, 9745.195761), (19.9, 0.231, 0.00299, 11523.229036), (22.1, 0.334, 0.00400, 17955.511169)]
+    [(17.8, 0.229, 0.00331, 9745.195761), (19.9, 0.231, 0.00299, 11523.229036), (22.1, 0.334, 0.00400, 17955.511169)],
 )
 def test_calc_305_day_milk_yield(
     lactation_curve: LactationCurve, l_param: float, m_param: float, n_param: float, expected: float
@@ -304,14 +326,15 @@ def test_calc_305_day_milk_yield(
 
 @pytest.mark.parametrize(
     "parity,l_expect,m_expect,n_expect",
-    [
-        (1, 18.1, 0.228, 0.003321),
-        (2, 22.1, 0.247, 0.003376),
-        (3, 22.0, 0.231, 0.003351)
-    ] 
+    [(1, 18.1, 0.228, 0.003321), (2, 22.1, 0.247, 0.003376), (3, 22.0, 0.231, 0.003351)],
 )
 def test_get_wood_parameters(
-    mocker: MockerFixture, lactation_curve: LactationCurve, parity: int, l_expect: float, m_expect: float, n_expect: float,
+    mocker: MockerFixture,
+    lactation_curve: LactationCurve,
+    parity: int,
+    l_expect: float,
+    m_expect: float,
+    n_expect: float,
 ) -> None:
     """Test that Wood's parameters are retrieved correctly from LactationCurve."""
     gen_rand = mocker.patch.object(Utility, "generate_random_number", side_effect=[20.22, 0.311, 0.003122])
@@ -321,7 +344,7 @@ def test_get_wood_parameters(
     lactation_curve.parity_to_parameter_mapping = {
         1: lactation_curve.parity_1_parameters,
         2: lactation_curve.parity_2_parameters,
-        3: lactation_curve.parity_3_parameters
+        3: lactation_curve.parity_3_parameters,
     }
     lactation_curve.l_param_std_dev = 0.28
     lactation_curve.m_param_std_dev = 0.0046
@@ -338,7 +361,10 @@ def test_get_wood_parameters(
 
 
 def test_adjust_lactation_curve_to_milk_yield(
-    mocker: MockerFixture, lactation_curve: LactationCurve, animal_inputs: dict[str, Any], lactation_inputs: dict[str, Any]
+    mocker: MockerFixture,
+    lactation_curve: LactationCurve,
+    animal_inputs: dict[str, Any],
+    lactation_inputs: dict[str, Any],
 ) -> None:
     """Test that Wood's parameters are correctly adjusted based on a farm's total milk yield."""
     lactation_curve.parity_1_parameters = {"l": 17.0, "m": 0.247, "n": 0.003376}
@@ -347,11 +373,11 @@ def test_adjust_lactation_curve_to_milk_yield(
     estimate_305d_yield = mocker.patch.object(
         lactation_curve,
         "_estimate_305_day_milk_yield_by_parity",
-        return_value={
-            "parity_1": 10_000.0, "parity_2": 11_000.0, "parity_3": 10_500.0
-        }
+        return_value={"parity_1": 10_000.0, "parity_2": 11_000.0, "parity_3": 10_500.0},
     )
-    fit_l_param = mocker.patch.object(lactation_curve, "_fit_wood_l_param_to_milk_yield", side_effect=[19.2, 20.0, 19.5])
+    fit_l_param = mocker.patch.object(
+        lactation_curve, "_fit_wood_l_param_to_milk_yield", side_effect=[19.2, 20.0, 19.5]
+    )
 
     lactation_curve._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
 
@@ -366,7 +392,7 @@ def test_adjust_lactation_curve_to_milk_yield(
     "annual_yield,milking_cows,p1_frac,p2_frac,p3_frac,p2_adjust,p3_adjust,expected_p1,expected_p2,expected_p3",
     [
         (1_196_721.31, 100, 0.3, 0.4, 0.3, 1632.0, 2196.0, 8688.4, 10320.4, 10884.4),
-        (15_000_000.0, 1500, 0.28, 0.36, 0.36, 1632.0, 2196.0, 6978.084, 8610.084, 9174.084)
+        (15_000_000.0, 1500, 0.28, 0.36, 0.36, 1632.0, 2196.0, 6978.084, 8610.084, 9174.084),
     ],
 )
 def test_estimate_305_day_milk_yield_by_parity(

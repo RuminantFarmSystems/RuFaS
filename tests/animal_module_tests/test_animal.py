@@ -3176,7 +3176,9 @@ def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow
         (25.0, 0.24, 0.0035),
     ],
 )
-def test_set_lactation_curve_params(mocker: MockerFixture, wood_l: float, wood_m: float, wood_n: float, mock_cow_args: Dict[str, Any]) -> None:
+def test_set_lactation_curve_params(
+    mocker: MockerFixture, wood_l: float, wood_m: float, wood_n: float, mock_cow_args: Dict[str, Any]
+) -> None:
     """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
     mock_cow_args["breed"] = "HO"
     mock_cow = Cow(mock_cow_args)
