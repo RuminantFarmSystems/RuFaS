@@ -5,7 +5,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.util import Utility
 from typing import Any
-from RUFAS.time import Time
 
 
 @pytest.fixture

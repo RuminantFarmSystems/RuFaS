@@ -1,5 +1,4 @@
 from typing import Any, Callable, Dict, List, Tuple
-from unittest.mock import patch
 
 import numpy as np
 import numpy.typing as npt
