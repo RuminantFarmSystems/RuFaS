@@ -6,6 +6,7 @@ from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.util import Utility
 from typing import Any
 from RUFAS.time import Time
+from unittest.mock import PropertyMock
 
 
 @pytest.fixture
@@ -194,8 +195,31 @@ def test_init(mocker: MockerFixture, animal_inputs: dict[str, Any], lactation_in
         adjust_lactation_curve.assert_not_called()
 
 
-def test_get_year_adjustments() -> None:
+@pytest.fixture
+def time(mocker: MockerFixture) -> Time:
+    mocker.patch.object(Time, "__init__", return_value=None)
+    return Time()
+
+
+def test_get_year_adjustments(mocker: MockerFixture, lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, time: Time) -> None:
     """Test that year adjustments are retrieved appropriately."""
+    #mock_time = mocker.MagicMock()
+    #mock_time.end_year_int = 2017
+    with mocker.patch('RUFAS.time.Time.end_year_int', new_callable=PropertyMock) as mock_end_year:
+        mock_end_year.return_value = 2017
+        time2 = Time()
+    
+    #mocker.patch.object(time, "end_year_int", return_value=2017)
+
+    year_adjustments = lactation_inputs["adjustments"]["year"]
+    lactation_curve.om = mocker.MagicMock()
+    add_warning = mocker.patch.object(lactation_curve.om, "add_warning")
+
+    actual = lactation_curve._get_year_adjustments(year_adjustments, time2)
+    
+    add_warning.assert_called_once()
+    assert actual == {"l": 0.52, "m": -0.44, "n": -0.78}
+    #{"l": -0.37, "m": 0.72, "n": 0.83}
 
 
 @pytest.mark.parametrize(
