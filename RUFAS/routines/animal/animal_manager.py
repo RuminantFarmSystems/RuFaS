@@ -1126,7 +1126,7 @@ class AnimalManager:
                 ration_vals = {"ME_total": 0}
             else:
                 ration_per_animal, ration_vals = RationManager.formulate_ration(
-                    pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO
+                    pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO, self.simulation_day
                 )
 
         # recording ration nutrition information in pen

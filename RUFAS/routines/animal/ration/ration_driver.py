@@ -1,19 +1,25 @@
 import collections
-from typing import Set, Dict, List, Tuple, Literal
+from typing import Dict, List, Literal, Set, Tuple
 
-from RUFAS.units import MeasurementUnits
+import scipy
+
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_typed_dicts import (
+    AvailableFeedsTypedDict,
+    FeedInfoTypedDict,
+)
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import animal_requirements
+from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
-from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict, FeedInfoTypedDict
-from RUFAS.general_constants import GeneralConstants
-
-import scipy
+from RUFAS.routines.feed.feed import Feed
+from RUFAS.units import MeasurementUnits
 
 udrm = UserDefinedRationManager()
 ration_optimizer = RationOptimizer()
@@ -32,8 +38,12 @@ class RationManager:
 
     @classmethod
     def formulate_ration(
-        cls, pen, available_feeds: AvailableFeedsTypedDict, animal_grouping_scenario
-    ) -> Tuple[Dict[str, float | str], Dict[str, float]]:
+        cls,
+        pen: Pen,
+        available_feeds: AvailableFeedsTypedDict,
+        animal_grouping_scenario: AnimalGroupingScenario,
+        sim_day: int,
+    ) -> Tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
         animal_manager.py. Returns a dictionary of the rations by feed and status of the NLP
@@ -48,6 +58,8 @@ class RationManager:
         animal_grouping_scenario : AnimalGroupingScenario enum
             A grouping scenario of animals used in the current simulation,
             specified in AnimalGroupingScenario enum and AnimalManager class.
+        sim_day : int
+            Current simulation day of the simulation.
 
         Returns
         -------
@@ -62,7 +74,9 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.is_udr:
-            ration, ration_vals = cls.get_user_defined_ration(req, pen, available_feeds, animal_grouping_scenario)
+            ration, ration_vals = cls.get_user_defined_ration(
+                req, pen, available_feeds, animal_grouping_scenario, sim_day
+            )
             return ration, ration_vals
 
         if hasattr(pen, "ration_per_animal"):
@@ -99,8 +113,6 @@ class RationManager:
                     "class": "RationManager",
                     "function": cls.formulate_ration.__name__,
                 }
-                animal_list = list(pen.animals_in_pen.values())
-                sim_day = animal_list[0].body_weight_history[-1].simulation_day
                 fail_summary = {
                     "simulation day": sim_day,
                     "reattempt number": num_reattempts,
@@ -142,7 +154,7 @@ class RationManager:
             return pen.ration, ration_vals
 
     @staticmethod
-    def calc_milk_average(pen) -> float:
+    def calc_milk_average(pen: Pen) -> float:
         """
         Calculates average milk produced in a pen.
 
@@ -160,7 +172,7 @@ class RationManager:
         return starting_milk_average
 
     @classmethod
-    def reduce_milk_production(cls, pen, reduction: float) -> None:
+    def reduce_milk_production(cls, pen: Pen, reduction: float) -> None:
         """
         Reduces milk production for all animals in a pen.
         Only does so if post-reduction production would be above 1.0.
@@ -183,7 +195,9 @@ class RationManager:
 
     @classmethod
     def make_ration_from_solution(
-        cls, available_feeds: AvailableFeedsTypedDict, solution: scipy.optimize.OptimizeResult
+        cls,
+        available_feeds: AvailableFeedsTypedDict,
+        solution: scipy.optimize.OptimizeResult,
     ) -> Dict[str, float | str]:
         """
         Generates ration dictionary from scipy result
@@ -216,7 +230,7 @@ class RationManager:
         return ration
 
     @classmethod
-    def make_solution_from_fixed_ration(cls, ration: Dict[str, float]) -> List[float]:
+    def make_solution_from_fixed_ration(cls, ration: Dict[str, float | bool]) -> List[float]:
         """
         makes solution object from returned fixed ration for use in get_ration_vals function in ration_optimizer.py
         Simply puts the value in triplicate, and multiplies by the MEact defined in  ration_config
@@ -248,6 +262,7 @@ class RationManager:
         pen,
         available_feeds: AvailableFeedsTypedDict,
         animal_grouping_scenario,
+        sim_day: int,
     ) -> tuple[Dict[str, float], Dict[str, float]]:
         """
         Function that links the ration_driver file with the calc_ration function in
@@ -272,6 +287,8 @@ class RationManager:
 
         animal_grouping_scenario : AnimalCombination
             the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
+        sim_day: int
+            Current simulation day of the simulation.
 
         Returns
         -------
@@ -326,9 +343,8 @@ class RationManager:
         if failed_constraints is not None:
             for constr in failed_constraints:
                 constraints_failed_list.append(constr["fun"].__name__)
-            animal_list = list(pen.animals_in_pen.values())
             fail_summary = {
-                "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
+                "simulation day": sim_day,
                 "reattempt number": num_reattempts,
                 "constraints_failed_dict": constraints_failed_list,
                 "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
@@ -382,7 +398,7 @@ class RationManager:
                     for constr in failed_constraints:
                         constraints_failed_list.append(constr["fun"].__name__)
                     fail_summary = {
-                        "simulation day": animal_list[0].body_weight_history[-1].simulation_day,
+                        "simulation day": sim_day,
                         "reattempt number": num_reattempts,
                         "constraints_failed_dict": constraints_failed_list,
                         "ration_attempted": cls.make_ration_from_solution(available_feeds, solution),
@@ -1171,7 +1187,7 @@ class AvailableFeeds:
         # key = feed_id, val = index of that feed_id in self.feed_id list
         self._feed_id_to_list_idx_dict: Dict[int, int] = {}
 
-    def feed_nutrients(self, feed) -> None:
+    def feed_nutrients(self, feed: Feed) -> None:
         """
         Class function that manipulates the available feeds nutrient information
         into list (valid for input in the non-linear program) and populates the
