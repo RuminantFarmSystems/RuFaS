@@ -21,6 +21,22 @@ M_ADJUSTMENT_SCALING_FACTOR = 1e-2
 N_ADJUSTMENT_SCALING_FACTOR = 1e-4
 
 
+"""
+If user's input for parity 1, 2, and 3+ fractions of the milking herd are invalid (i.e. do not sum to 1), then the below
+defaults will be used. Note that these defaults are ONLY used to adjust the lactation curve parameters, they are not
+used at all to determine herd structure. These numbers are from Li et al, 2023.
+
+References
+----------
+.. [1] Li, M., K. F. Reed, and V. E. Cabrera. "A time series analysis of milk productivity in US dairy states." Journal
+of Dairy Science 106.9 (2023): 6232-6248.
+
+"""
+PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS = 0.386
+PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS = 0.281
+PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS = 0.333
+
+
 class LactationCurve:
     """
     Manages Wood's lactation curve parameters l, m, and n as they are used by the rest of the Animal module.
@@ -155,11 +171,7 @@ class LactationCurve:
         return milking_frequency_adjustments[frequency]
 
     def _calculate_adjusted_wood_parameters(
-        self,
-        l_param: float,
-        m_param: float,
-        n_param: float,
-        adjustments: list[dict[str, float]],
+        self, l_param: float, m_param: float, n_param: float, adjustments: list[dict[str, float]]
     ) -> dict[str, float]:
         """
         Computes Wood's Lactation Curve parameters adjusted for different factors.
@@ -344,7 +356,17 @@ class LactationCurve:
         milk_yield_305_day_all_cows = annual_milk_yield * (305 / GeneralConstants.YEAR_LENGTH)
         milk_yield_305_day = milk_yield_305_day_all_cows / num_milking_cows
 
-        assert sum([parity_1_frac, parity_2_frac, parity_3_frac]) == 1.0  # TODO: find better way to check this!
+        if not (parity_fractions_sum := sum([parity_1_frac, parity_2_frac, parity_3_frac])) == 1.0:
+            self.om.add_error(
+                f"Fractions of milking cows that are parity 1, 2 and 3+ sum to {parity_fractions_sum}, not 1.0",
+                f"Using {PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS}, {PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS} and "
+                f"{PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS} as the fractions of parity 1, 2 and 3+ cows in the "
+                "milking herd, respectively",
+                {"class": self.__class__.__name__, "function": self._estimate_305_day_milk_yield_by_parity.__name__},
+            )
+            parity_1_frac = PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS
+            parity_2_frac = PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS
+            parity_3_frac = PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS
 
         parity_1_305_day_milk_yield = (
             milk_yield_305_day
