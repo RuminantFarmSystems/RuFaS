@@ -1,7 +1,6 @@
 import pytest
 import numpy as np
 from typing import Any, Dict, List
-from unittest.mock import patch
 from mock import MagicMock
 from pytest_mock import MockerFixture
 
