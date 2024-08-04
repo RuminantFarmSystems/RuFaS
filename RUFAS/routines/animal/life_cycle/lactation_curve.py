@@ -359,10 +359,10 @@ class LactationCurve:
         if not (parity_fractions_sum := sum([parity_1_frac, parity_2_frac, parity_3_frac])) == 1.0:
             self.om.add_error(
                 f"Fractions of milking cows that are parity 1, 2 and 3+ sum to {parity_fractions_sum}, not 1.0",
-                f"Using {PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS}, {PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS} and " 
+                f"Using {PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS}, {PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS} and "
                 f"{PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS} as the fractions of parity 1, 2 and 3+ cows in the "
                 "milking herd, respectively",
-                {"class": self.__class__.__name__, "function": self._estimate_305_day_milk_yield_by_parity.__name__}
+                {"class": self.__class__.__name__, "function": self._estimate_305_day_milk_yield_by_parity.__name__},
             )
             parity_1_frac = PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS
             parity_2_frac = PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS
