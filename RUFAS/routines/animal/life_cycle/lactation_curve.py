@@ -155,11 +155,7 @@ class LactationCurve:
         return milking_frequency_adjustments[frequency]
 
     def _calculate_adjusted_wood_parameters(
-        self,
-        l_param: float,
-        m_param: float,
-        n_param: float,
-        adjustments: list[dict[str, float]],
+        self, l_param: float, m_param: float, n_param: float, adjustments: list[dict[str, float]]
     ) -> dict[str, float]:
         """
         Computes Wood's Lactation Curve parameters adjusted for different factors.
