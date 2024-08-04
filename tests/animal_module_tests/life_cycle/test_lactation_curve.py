@@ -389,13 +389,15 @@ def test_adjust_lactation_curve_to_milk_yield(
 
 
 @pytest.mark.parametrize(
-    "annual_yield,milking_cows,p1_frac,p2_frac,p3_frac,p2_adjust,p3_adjust,expected_p1,expected_p2,expected_p3",
+    "annual_yield,milking_cows,p1_frac,p2_frac,p3_frac,p2_adjust,p3_adjust,expected_p1,expected_p2,expected_p3,error",
     [
-        (1_196_721.31, 100, 0.3, 0.4, 0.3, 1632.0, 2196.0, 8688.4, 10320.4, 10884.4),
-        (15_000_000.0, 1500, 0.28, 0.36, 0.36, 1632.0, 2196.0, 6978.084, 8610.084, 9174.084),
+        (1_196_721.31, 100, 0.3, 0.4, 0.3, 1632.0, 2196.0, 8688.4, 10320.4, 10884.4, False),
+        (15_000_000.0, 1500, 0.28, 0.36, 0.36, 1632.0, 2196.0, 6978.084, 8610.084, 9174.084, False),
+        (15_000_000.0, 1500, 0.2, 0.3, 0.3, 1632.0, 2196.0, 7166.304, 8798.304, 9362.304, True),
     ],
 )
 def test_estimate_305_day_milk_yield_by_parity(
+    mocker: MockerFixture,
     lactation_curve: LactationCurve,
     annual_yield: float,
     milking_cows: float,
@@ -407,8 +409,13 @@ def test_estimate_305_day_milk_yield_by_parity(
     expected_p1: float,
     expected_p2: float,
     expected_p3: float,
+    error: float,
 ) -> None:
     """Test that the 305 day milk yields are correctly predicted for each parity based on a farm's total milk yield."""
+    om = OutputManager()
+    add_error = mocker.patch.object(om, "add_error")
+    lactation_curve.om = om
+
     actual = lactation_curve._estimate_305_day_milk_yield_by_parity(
         annual_yield, milking_cows, p1_frac, p2_frac, p3_frac, p2_adjust, p3_adjust
     )
@@ -417,6 +424,10 @@ def test_estimate_305_day_milk_yield_by_parity(
     assert pytest.approx(actual["parity_1"]) == expected_p1
     assert pytest.approx(actual["parity_2"]) == expected_p2
     assert pytest.approx(actual["parity_3"]) == expected_p3
+    if error:
+        add_error.assert_called_once()
+    else:
+        add_error.assert_not_called()
 
 
 @pytest.mark.parametrize(
