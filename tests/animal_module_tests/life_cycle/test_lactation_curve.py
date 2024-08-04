@@ -243,8 +243,16 @@ def test_get_milking_frequency_adjustments(lactation_inputs: dict[str, Any], lac
     [
         (19.2, 0.247, 0.003376, [{"l": 1, "m": 1, "n": 1}],
             {"l": 20.2, "m": 0.257, "n": 0.003476}),
+        (19.2, 0.247, 0.003376, [{"l": -1, "m": -1, "n": -1}],
+            {"l": 18.2, "m": 0.237, "n": 0.003276}),
         (19.2, 0.247, 0.003376, [{"l": 1, "m": 1, "n": 1}, {"l": 1, "m": 1, "n": 1}],
             {"l": 21.2, "m": 0.267, "n": 0.003576}),
+        (19.2, 0.247, 0.003376, [
+            {"l": 1, "m": 1, "n": 1},
+            {"l": 1, "m": 1, "n": 1},
+            {"l": 1, "m": 1, "n": 1},
+            {"l": -1, "m": -1, "n": -1}],
+            {"l": 21.2, "m": 0.267, "n": 0.003576})
     ]
 )
 def test_calculate_adjusted_wood_parameters(
@@ -253,7 +261,7 @@ def test_calculate_adjusted_wood_parameters(
     """Test that the Wood's parameters are adjusted correctly."""
     actual = lactation_curve._calculate_adjusted_wood_parameters(
         l_param, m_param, n_param, adjustments)
-    assert actual == expected
+    assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize(
