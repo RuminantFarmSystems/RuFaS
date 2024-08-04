@@ -5,6 +5,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.util import Utility
 from typing import Any
+from RUFAS.time import Time
 
 
 @pytest.fixture
@@ -195,7 +196,6 @@ def test_init(mocker: MockerFixture, animal_inputs: dict[str, Any], lactation_in
 
 def test_get_year_adjustments() -> None:
     """Test that year adjustments are retrieved appropriately."""
-    pass
 
 
 @pytest.mark.parametrize(
@@ -209,7 +209,7 @@ def test_get_year_adjustments() -> None:
         (35000, {"l": -0.96, "m": 3.13, "n": 1.50}),
     ]
 )
-def test_get_region_adjustments(lactation_inputs, lactation_curve: LactationCurve, fips_code, expected) -> None:
+def test_get_region_adjustments(lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, fips_code: int, expected: dict[str, float]) -> None:
     """Test that the region adjustments are retrieved appropriately."""
     all_region_adjustments = lactation_inputs["adjustments"]["region"]
     region_mapping = lactation_inputs["state_to_region_mapping"]
@@ -217,12 +217,25 @@ def test_get_region_adjustments(lactation_inputs, lactation_curve: LactationCurv
     actual = lactation_curve._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
     assert actual == expected
-    pass
 
 
-def test_get_milking_frequency_adjustments() -> None:
+@pytest.mark.parametrize(
+    "milking_frequency,expected",
+    [
+        (2.5, {"l": 0.74, "m": -0.090, "n": -0.15}),
+        (1.8, {"l": -0.74, "m": 0.090, "n": 0.15}),
+        (3.6, {"l": 0.74, "m": -0.090, "n": -0.15}),
+        (2.8, {"l": 0.74, "m": -0.090, "n": -0.15}),
+        (2.1, {"l": -0.74, "m": 0.090, "n": 0.15})
+    ]
+)
+def test_get_milking_frequency_adjustments(lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, milking_frequency: float, expected: dict[str, float]) -> None:
     """Test that the milking frequency adjustments are retrieved appropriately."""
-    pass
+    milking_frequency_adjustments = lactation_inputs["adjustments"]["milking_frequency"]
+    
+    actual = lactation_curve._get_milking_frequency_adjustments(milking_frequency_adjustments, milking_frequency)
+
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
