@@ -275,7 +275,9 @@ def mock_im_pool() -> Dict[str, Dict[str, Any]]:
 
 
 @pytest.fixture
-def animal_manager(input_manager: InputManager, mock_im_pool: Dict[str, Dict[str, Any]], mocker: MockerFixture) -> AnimalManager:
+def animal_manager(
+    input_manager: InputManager, mock_im_pool: Dict[str, Dict[str, Any]], mocker: MockerFixture
+) -> AnimalManager:
     mocker.patch.object(AnimalBase, "setup_lactation_curve_parameters")
     init_pens_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_pens")
     init_animals_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_animals")
