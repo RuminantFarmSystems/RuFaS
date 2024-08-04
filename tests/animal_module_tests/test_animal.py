@@ -3176,31 +3176,25 @@ def test_set_parity_index(mock_holstein: Cow, mock_jersey: Cow, mock_generic_cow
         (25.0, 0.24, 0.0035),
     ],
 )
-def test_set_lactation_curve_params(wood_l: float, wood_m: float, wood_n: float, mock_cow_args: Dict[str, Any]) -> None:
+def test_set_lactation_curve_params(
+    mocker: MockerFixture, wood_l: float, wood_m: float, wood_n: float, mock_cow_args: Dict[str, Any]
+) -> None:
     """Unit test for function set_lactation_curve_params in file routines/animal/life_cycle/cow.py"""
+    mock_cow_args["breed"] = "HO"
+    mock_cow = Cow(mock_cow_args)
+    mock_cow.calves = 3
+    mock_cow.lactation_curve = "wood"
+    AnimalBase.lactation_curve = mocker.MagicMock()
+    AnimalBase.lactation_curve.get_wood_parameters = mocker.MagicMock(
+        return_value={"l": wood_l, "m": wood_m, "n": wood_n}
+    )
 
-    with patch("numpy.random.normal") as mock_normal:
-        mock_normal.side_effect = [wood_l, wood_m, wood_n]
+    mock_cow.set_lactation_curve_params()
 
-        mock_cow_args["breed"] = "HO"
-        mock_cow = Cow(mock_cow_args)
-        mock_cow.calves = 3
-        mock_cow.lactation_curve = "wood"
-
-        AnimalBase.config = {
-            "wood_l": [[1, 2], [3, 4]],
-            "wood_l_std": [[0.1, 0.2], [0.3, 0.4]],
-            "wood_m": [[5, 6], [7, 8]],
-            "wood_m_std": [[0.5, 0.6], [0.7, 0.8]],
-            "wood_n": [[9, 10], [11, 12]],
-            "wood_n_std": [[0.9, 1.0], [1.1, 1.2]],
-        }
-
-        mock_cow.set_lactation_curve_params()
-
-        assert mock_cow.wood_l == wood_l
-        assert mock_cow.wood_m == wood_m
-        assert mock_cow.wood_n == wood_n
+    AnimalBase.lactation_curve.get_wood_parameters.assert_called_once_with(mock_cow.calves)
+    assert mock_cow.wood_l == wood_l
+    assert mock_cow.wood_m == wood_m
+    assert mock_cow.wood_n == wood_n
 
 
 @pytest.mark.parametrize(
