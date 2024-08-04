@@ -167,7 +167,8 @@ def test_init(
     animal_inputs["herd_information"]["annual_milk_yield"] = annual_milk_yield
     im = InputManager()
     get_data = mocker.patch.object(im, "get_data", side_effect=[lactation_inputs, 55025, animal_inputs])
-    add_log = mocker.patch.object(OutputManager, "add_log")
+    om = OutputManager()
+    add_log = mocker.patch.object(om, "add_log")
     year_adjustments = mocker.patch.object(LactationCurve, "_get_year_adjustments", return_value=[0.0, 0.0, 0.0])
     region_adjustments = mocker.patch.object(LactationCurve, "_get_region_adjustments", return_value=[0.0, 0.0, 0.0])
     milking_freq = mocker.patch.object(
