@@ -24,7 +24,7 @@ N_ADJUSTMENT_SCALING_FACTOR = 1e-4
 """
 If user's input for parity 1, 2, and 3+ fractions of the milking herd are invalid (i.e. do not sum to 1), then the below
 defaults will be used. Note that these defaults are ONLY used to adjust the lactation curve parameters, they are not
-used at all to determine herd structure. These numbers are from Li et al, 2022.
+used at all to determine herd structure. These numbers are from Li et al, 2023.
 
 References
 ----------
