@@ -83,7 +83,6 @@ class AnimalManager:
         config.update(data["farm_level"]["repro"])
         config.update(data["farm_level"]["bodyweight"])
         config.update(data["from_literature"]["repro"])
-        config.update(data["from_literature"]["milking"])
         config.update(data["from_literature"]["culling"])
         config.update(data["from_literature"]["life_cycle"])
         return config

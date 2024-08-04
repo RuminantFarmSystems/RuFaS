@@ -535,49 +535,6 @@
             "default": 2
           }
         },
-        "milking": {
-          "type": "object",
-          "description": "",
-          "wood_l_std": {
-            "type": "array",
-            "description": "Standard deviation of parameter l ",
-            "properties": {
-              "type": "array",
-              "description": "Standard deviation of parameter l ",
-              "properties": {
-                "type": "number",
-                "description": "Standard deviation of parameter l ",
-                "minimum": 0
-              }
-            }
-          },
-          "wood_m_std": {
-            "type": "array",
-            "description": "Standard deviation of parameter m",
-            "properties": {
-              "type": "array",
-              "description": "Standard deviation of parameter m",
-              "properties": {
-                "type": "number",
-                "description": "Standard deviation of parameter m",
-                "minimum": 0
-              }
-            }
-          },
-          "wood_n_std": {
-            "type": "array",
-            "description": "Standard deviation of parameter n",
-            "properties": {
-              "type": "array",
-              "description": "Standard deviation of parameter n",
-              "properties": {
-                "type": "number",
-                "description": "Standard deviation of parameter n",
-                "minimum": 0
-              }
-            }
-          }
-        },
         "culling": {
           "type": "object",
           "description": "Probabilities for removal from the herd for specific reason",
