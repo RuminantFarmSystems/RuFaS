@@ -1,6 +1,7 @@
 import datetime
 import re
 import shutil
+import numpy as np
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
 import numpy as np
@@ -574,3 +575,8 @@ class Utility:
         if not 1 <= day <= maximum_day:
             raise ValueError(f"Invalid day: {day} of year {year} must be between 1 and {maximum_day}.")
         return datetime.date(year, 1, 1) + datetime.timedelta(days=day - 1)
+
+    @staticmethod
+    def generate_random_number(mean: float, std_dev: float) -> float:
+        """Generates a normally distributed random number using the provided mean and standard deviation."""
+        return np.random.normal(mean, std_dev)
