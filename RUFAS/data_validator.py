@@ -280,8 +280,10 @@ class DataValidator:
                 f" keys are {sorted(required_properties_keys)}.",
                 info_map,
             )
-            error_message = (f"Missing required keys {sorted(missing_required_keys)} for {path}."
-                             f" Required keys are {sorted(required_properties_keys)}.")
+            error_message = (
+                f"Missing required keys {sorted(missing_required_keys)} for {path}."
+                f" Required keys are {sorted(required_properties_keys)}."
+            )
             return valid, error_message
 
         property_type = properties.get("type", "Unknown type")
@@ -574,9 +576,9 @@ class DataValidator:
         return True, ""
 
     @staticmethod
-    def validate_metadata(metadata: Dict[str, Any],
-                          valid_data_types: set[str],
-                          address_to_data: str) -> Tuple[bool, str]:
+    def validate_metadata(
+        metadata: Dict[str, Any], valid_data_types: set[str], address_to_data: str
+    ) -> Tuple[bool, str]:
         """Checks that top-level metadata has valid and required keys and values."""
         om = OutputManager()
         info_map = {
@@ -814,7 +816,7 @@ class DataValidator:
             True if the data element is valid or fixable, False otherwise.
         """
 
-        array_value = DataValidator. _extract_data_by_key_list(
+        array_value = DataValidator._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
 
