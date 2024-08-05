@@ -135,7 +135,7 @@ class LactationCurve:
         self, year_adjustment_values: dict[str, dict[str, float]], time: Time
     ) -> dict[str, float]:
         """Retrieves the appropriate adjustment values based on the end year of the simulation."""
-        end_year = time.end_year_int
+        end_year = int(time.end_date.strftime("%Y"))
 
         info_map = {"class": self.__class__.__name__, "function": self._get_year_adjustments.__name__}
         if not 2006 <= end_year <= 2016:

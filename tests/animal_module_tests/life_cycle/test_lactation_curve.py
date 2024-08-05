@@ -5,6 +5,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.util import Utility
 from typing import Any
+import datetime
 
 
 @pytest.fixture
@@ -206,21 +207,12 @@ def test_init(
         adjust_lactation_curve.assert_not_called()
 
 
-@pytest.fixture
-def time(mocker: MockerFixture) -> Time:
-    mocker.patch.object(Time, "__init__", return_value=None)
-    return Time()
-
-
 def test_get_year_adjustments(
-    mocker: MockerFixture, lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, time: Time
+    mocker: MockerFixture, lactation_inputs: dict[str, Any], lactation_curve: LactationCurve,
 ) -> None:
     """Test that year adjustments are retrieved appropriately."""
-    # mock_time = mocker.MagicMock()
-    # mock_time.end_year_int = 2017
-    with mocker.patch("RUFAS.time.Time.end_year_int", new_callable=PropertyMock) as mock_end_year:
-        mock_end_year.return_value = 2017
-        time2 = Time()
+    mock_time = mocker.MagicMock()
+    mock_time.end_date = datetime.datetime(2018, 6, 1)
 
     # mocker.patch.object(time, "end_year_int", return_value=2017)
 
@@ -228,7 +220,7 @@ def test_get_year_adjustments(
     lactation_curve.om = mocker.MagicMock()
     add_warning = mocker.patch.object(lactation_curve.om, "add_warning")
 
-    actual = lactation_curve._get_year_adjustments(year_adjustments, time2)
+    actual = lactation_curve._get_year_adjustments(year_adjustments, mock_time)
 
     add_warning.assert_called_once()
     assert actual == {"l": 0.52, "m": -0.44, "n": -0.78}
