@@ -41,6 +41,10 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
+    is_end_to_end_test_run : bool
+        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        Indicates if a simulation is being run for end-to-end testing. Defaults to False, is set to True if end-to-end
+        testing inputs are found in the Input Manager.
 
     Methods
     -------
@@ -54,6 +58,10 @@ class SimulationEngine:
         """
         self.im = InputManager()
         self.time = Time()
+
+        # TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        self.is_end_to_end_test_run = False
+
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -102,6 +110,13 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+
+        # TODO: remove this code after Animal and Feed Storage modules are connected - #1878
+        if self.is_end_to_end_test_run:
+            process_degradations_today = self.time.current_julian_day % 15 == 0
+            if process_degradations_today:
+                self.feed_manager.process_degradations(self.weather, self.time)
+
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
@@ -176,3 +191,10 @@ class SimulationEngine:
         self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
+
+        # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
+        is_end_to_end_test_run = self.im.get_data("end_to_end_testing_inputs")
+        if is_end_to_end_test_run:
+            self.feed_manager.setup_stored_feeds(is_end_to_end_test_run, self.time)
+            self.is_end_to_end_test_run = True
+            self.feed_manager.process_degradations(self.weather, self.time)
