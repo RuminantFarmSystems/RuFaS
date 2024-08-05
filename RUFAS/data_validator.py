@@ -187,17 +187,11 @@ class DataValidator:
         """Iteratively traverses the metadata properties to check the max depth and routes
         properties to be validated by type.
 
-        Raises
-        ------
-        ValueError
-            - If the depth of the metadata exceeds the metadata_depth_limit.
-            - If the properties' 'type' value is neither in the type_to_validator_map keys,
-            nor is None.
-
         return
         ------
-        bool
-            Indicates if properties were valid or not.
+        Tuple[bool, str]
+            boolean to indicate the validation status, error message in str if there's error that should be raised by
+            the caller.
         """
         om = OutputManager()
         info_map = {
@@ -221,14 +215,13 @@ class DataValidator:
             current_obj, depth, path = stack.pop()
 
             if depth > metadata_depth_limit:
-                valid = False
                 om.add_error(
                     "Max metadata depth exceeded.",
                     f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}",
                     info_map,
                 )
                 error_message = f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}"
-                return valid, error_message
+                return False, error_message
 
             if depth > current_max_depth:
                 current_max_depth = depth
@@ -245,14 +238,13 @@ class DataValidator:
                                 return valid, error_message
                         else:
                             if value_type is not None:
-                                valid = False
                                 om.add_error(
                                     "Properties value type error",
                                     f"'type' value not in {type_to_validator_map.keys()}",
                                     info_map,
                                 )
                                 error_message = f"Properties 'type' value not in {list(type_to_validator_map.keys())}"
-                                return valid, error_message
+                                return False, error_message
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
