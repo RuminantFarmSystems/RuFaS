@@ -208,7 +208,7 @@ class DataValidator:
         stack: list[tuple[dict[str, Any], int, list[str]]] = [(metadata["properties"], 0, [])]
         current_max_depth: int = 0
         deepest_path: list[str] = []
-        # fix
+
         type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], tuple[bool, str]]] = {
             "number": DataValidator._metadata_number_validator,
             "array": DataValidator._metadata_array_validator,

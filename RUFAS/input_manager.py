@@ -86,10 +86,12 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        DataValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+        valid, message = DataValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+        if not valid:
+            raise ValueError(message)
         self._load_properties()
-        validated, message = DataValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
-        if not validated:
+        valid, message = DataValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
+        if not valid:
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
