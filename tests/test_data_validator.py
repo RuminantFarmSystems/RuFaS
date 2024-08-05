@@ -57,7 +57,7 @@ def test_bool_type_validator(
     dummy_input_data = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
-    patch_extract = mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=input_data_value)
+    patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=input_data_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
@@ -112,7 +112,7 @@ def test_number_type_validator(
     dummy_properties_key = "dummy_variable_properties"
     unused_bool_input = False
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
-    patch_extract = mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
+    patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=dummy_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
@@ -167,7 +167,7 @@ def test_string_type_validator(
     dummy_input_data = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
-    patch_extract = mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
+    patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=dummy_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
@@ -846,8 +846,8 @@ def test_object_type_validator(
     """
 
     # Arrange
-    mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=patch_extract_return)
-    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=patch_validate_return)
+    mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_validate_return)
     mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
     mock_elements_counter = mocker.MagicMock()
 
@@ -878,14 +878,14 @@ def test_object_type_validator_key_removal(
     mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
 ) -> None:
     """Tests that extraneous keys are properly removed by the _object_type_validator in Input Manager."""
-    mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=data)
-    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=True)
+    mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=data)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
     mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy path")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
     mock_elements_counter = mocker.MagicMock()
     variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
     violation_msg = "Violates properties defined in metadata properties section 'properties blob'."
-    info_map = {"class": "InputValidator", "function": "_object_type_validator"}
+    info_map = {"class": "DataValidator", "function": "_object_type_validator"}
     expected_add_warning_calls = [
         mocker.call(
             "Validation: object contains extraneous data",
@@ -1103,9 +1103,9 @@ def test_array_type_validator(
     """
 
     # Arrange
-    mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(DataValidator, "_validate_array_container_properties", return_value=patch_container_valid)
-    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=patch_element_valid)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_element_valid)
     mock_elements_counter = mocker.MagicMock()
 
     # Act
