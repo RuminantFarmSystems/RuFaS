@@ -1,0 +1,1465 @@
+import os
+import re
+from enum import Enum
+from functools import reduce
+from typing import Dict, Any, Callable, List, Union, Sequence, Tuple
+
+from RUFAS.output_manager import OutputManager
+
+
+#  log error here, leave termination for IM
+#  Move elements counters...etc to here
+
+
+class ElementState(Enum):
+    """
+    An enumeration of the states a data element can be in during validation. An element cannot
+    be in more than one state at a time.
+
+    Attributes
+    ----------
+    VALID : int
+        The element is valid.
+    INVALID : int
+        The element is invalid and cannot be fixed.
+    FIXED : int
+        The element is invalid initially but has been fixed.
+    """
+
+    VALID = "valid"
+    INVALID = "invalid"
+    FIXED = "fixed"
+
+
+class ElementsCounter:
+    """
+    A class to keep track of the number of elements in each state during validation.
+
+    Attributes
+    ----------
+    valid_elements : int
+        The number of valid elements.
+    invalid_elements : int
+        The number of invalid elements.
+    fixed_elements : int
+        The number of fixed elements.
+    """
+
+    def __init__(self) -> None:
+        self.valid_elements = 0
+        self.invalid_elements = 0
+        self.fixed_elements = 0
+
+    def update(self, state: ElementState, value: int) -> None:
+        """
+        Updates the count of elements in a given state.
+
+        Parameters
+        ----------
+        state : ElementState
+            The state of the element.
+        value : int
+            The value by which the count should be updated.
+
+        Raises
+        ------
+        ValueError
+            If the state is not one of the valid states.
+        """
+        if state == ElementState.VALID:
+            self.valid_elements += value
+        elif state == ElementState.INVALID:
+            self.invalid_elements += value
+        elif state == ElementState.FIXED:
+            self.fixed_elements += value
+        else:
+            raise ValueError(f"Invalid state: {state}")
+
+    def increment(self, state: ElementState) -> None:
+        """
+        Increments the count of elements in a given state by one.
+
+        Parameters
+        ----------
+        state : ElementState
+            The state of the element.
+        """
+
+        self.update(state, 1)
+
+    def reset(self) -> None:
+        """
+        Resets the counts of all element states to zero.
+        """
+
+        self.valid_elements = 0
+        self.invalid_elements = 0
+        self.fixed_elements = 0
+
+    def total_elements(self) -> int:
+        """
+        Returns the total number of elements by adding the counts of valid, invalid, and fixed elements.
+        """
+        return self.valid_elements + self.invalid_elements + self.fixed_elements
+
+    def __str__(self) -> str:
+        """
+        Returns a string representation of the ElementsCounter object.
+        """
+
+        return str(
+            {
+                "valid_elements": self.valid_elements,
+                "invalid_elements": self.invalid_elements,
+                "fixed_elements": self.fixed_elements,
+                "total_elements": self.total_elements(),
+            }
+        )
+
+    def __add__(self, other: "ElementsCounter") -> "ElementsCounter":
+        """
+        Adds the counts of two ElementsCounter objects together.
+
+        Parameters
+        ----------
+        other : ElementsCounter
+            The other ElementsCounter object to be added.
+
+        Returns
+        -------
+        ElementsCounter
+            A new ElementsCounter object with the counts of the two objects added together.
+        """
+
+        new_counter = ElementsCounter()
+        new_counter.valid_elements = self.valid_elements + other.valid_elements
+        new_counter.invalid_elements = self.invalid_elements + other.invalid_elements
+        new_counter.fixed_elements = self.fixed_elements + other.fixed_elements
+        return new_counter
+
+
+class Modifiability(Enum):
+    """
+    Enum class representing the modifiability status of a variable.
+
+    This Enum defines various levels of modifiability for a variable, indicating whether a variable is required at
+    initialization and if it can be modified during runtime.
+
+    Attributes
+    ----------
+    REQUIRED_LOCKED : str
+        Indicates the variable must be initialized with a value and cannot be modified thereafter.
+    REQUIRED_UNLOCKED : str
+        Indicates the variable must be initialized with a value but can be modified during runtime.
+    UNREQUIRED_UNLOCKED : str
+        Indicates the variable does not need to be initialized with a value and can be modified during runtime.
+    """
+
+    REQUIRED_LOCKED: str = "required locked"
+    REQUIRED_UNLOCKED: str = "required unlocked"
+    UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
+
+    @classmethod
+    def values(cls) -> List[str]:
+        """
+        Provides a list of the string values of the enum members.
+
+        Returns
+        -------
+        List[str]
+            A list containing the string values of the enum members.
+        """
+        return list(map(lambda c: c.value, cls))
+
+    @classmethod
+    def get_required_during_initialization(cls) -> List["Modifiability"]:
+        return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
+
+    @classmethod
+    def get_modifiable_at_runtime(cls) -> List["Modifiability"]:
+        return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
+
+
+class DataValidator:
+
+    @staticmethod
+    def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
+        """Iteratively traverses the metadata properties to check the max depth and routes
+        properties to be validated by type.
+
+        Raises
+        ------
+        ValueError
+            - If the depth of the metadata exceeds the metadata_depth_limit.
+            - If the properties' 'type' value is neither in the type_to_validator_map keys,
+            nor is None.
+
+        return
+        ------
+        bool
+            Indicates if properties were valid or not.
+        """
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_properties.__name__,
+        }
+
+        stack: list[tuple[dict[str, Any], int, list[str]]] = [(metadata["properties"], 0, [])]
+        current_max_depth: int = 0
+        deepest_path: list[str] = []
+        # fix
+        type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], tuple[bool, str]]] = {
+            "number": DataValidator._metadata_number_validator,
+            "array": DataValidator._metadata_array_validator,
+            "bool": DataValidator._metadata_bool_validator,
+            "string": DataValidator._metadata_string_validator,
+            "object": DataValidator._metadata_object_validator,
+        }
+
+        while stack:
+            current_obj, depth, path = stack.pop()
+
+            if depth > metadata_depth_limit:
+                valid = False
+                om.add_error(
+                    "Max metadata depth exceeded.",
+                    f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}",
+                    info_map,
+                )
+                error_message = f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}"
+                return valid, error_message
+
+            if depth > current_max_depth:
+                current_max_depth = depth
+                deepest_path = path
+
+            if isinstance(current_obj, dict):
+                for key, value in current_obj.items():
+                    if isinstance(value, dict):
+                        stack.append((value, depth + 1, path + [key]))
+                        value_type = value.get("type")
+                        if value_type in type_to_validator_map:
+                            valid, error_message = type_to_validator_map[value_type](path + [key], value)
+                            if not valid:
+                                return valid, error_message
+                        else:
+                            if value_type is not None:
+                                valid = False
+                                om.add_error(
+                                    "Properties value type error",
+                                    f"'type' value not in {type_to_validator_map.keys()}",
+                                    info_map,
+                                )
+                                error_message = f"Properties 'type' value not in {list(type_to_validator_map.keys())}"
+                                return valid, error_message
+
+        om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
+        om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
+
+        return True, ""
+
+    @staticmethod
+    def _validate_metadata_properties_keys(
+        required_properties_keys: set[str],
+        optional_properties_keys: set[str],
+        properties: dict[str, Any],
+        path: list[str],
+    ) -> Tuple[bool, str]:
+        """Validates that keys in the metadata properties sections."""
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._validate_metadata_properties_keys.__name__,
+        }
+        if missing_required_keys := required_properties_keys - properties.keys():
+            valid = False
+            om.add_error(
+                "Metadata Validation",
+                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
+                f" keys are {sorted(required_properties_keys)}.",
+                info_map,
+            )
+            error_message = (f"Missing required keys {sorted(missing_required_keys)} for {path}."
+                             f" Required keys are {sorted(required_properties_keys)}.")
+            return valid, error_message
+
+        property_type = properties.get("type", "Unknown type")
+        valid_properties_keys = required_properties_keys.union(optional_properties_keys)
+        if property_type == "object":
+            if not (set(properties.keys()) - valid_properties_keys):
+                om.add_error(
+                    "Metadata Validation",
+                    f"No unique keys for {path}. At least one unique key is expected.",
+                    info_map,
+                )
+                error_message = f"No unique keys for {path}. At least one unique key is expected."
+                return False, error_message
+        if invalid_keys := set(properties.keys()) - valid_properties_keys:
+            om.add_error(
+                "Metadata Validation",
+                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                f" keys are {sorted(valid_properties_keys)}.",
+                info_map,
+            )
+            error_message = (
+                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
+                f" keys are {sorted(valid_properties_keys)}."
+            )
+            return False, error_message
+
+        return True, ""
+
+    @staticmethod
+    def _metadata_number_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+        """Validates number type properties in metadata."""
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_number_validator.__name__,
+        }
+        required_number_property_keys = {"type"}
+        optional_number_property_keys = {"description", "minimum", "maximum", "default", "nullable"}
+        valid, error_message = DataValidator._validate_metadata_properties_keys(
+            required_number_property_keys, optional_number_property_keys, value, key_path
+        )
+        if not valid:
+            return valid, error_message
+
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
+        nullable = value.get("nullable", False)
+        if default is None and not nullable:
+            om.add_error(
+                "Invalid metadata default number value.",
+                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.",
+                info_map,
+            )
+            error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'."
+            return False, error_message
+        if default is not None:
+            if not isinstance(default, (int, float)) and not has_no_default:
+                om.add_error(
+                    "Invalid metadata default number value.",
+                    f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
+                    info_map,
+                )
+                error_message = f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}."
+                return False, error_message
+        minimum = value.get("minimum")
+        maximum = value.get("maximum")
+        if minimum is not None and not isinstance(minimum, (int, float)):
+            om.add_error(
+                "Invalid metadata number properties minimum.",
+                f"Invalid 'minimum' for '{key_path}': Expected a number but got {type(minimum)}.",
+                info_map,
+            )
+            error_message = f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}."
+            return False, error_message
+        if maximum is not None and not isinstance(maximum, (int, float)):
+            om.add_error(
+                "Invalid metadata number properties maximum.",
+                f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.",
+                info_map,
+            )
+            error_message = f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}."
+            return False, error_message
+        if maximum is not None and minimum is not None and maximum < minimum:
+            om.add_error(
+                "Invalid range of acceptable numbers.",
+                f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
+                f"greater than 'maximum' value {maximum}",
+                info_map,
+            )
+            error_message = (
+                f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
+                f"greater than 'maximum' value {maximum}"
+            )
+            return False, error_message
+        if default is not None and not has_no_default:
+            if minimum is not None and default < minimum:
+                om.add_error(
+                    "Invalid metadata default.",
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is less than 'minimum' {minimum}",
+                    info_map,
+                )
+                error_message = (
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is " f"less than 'minimum' {minimum}"
+                )
+                return False, error_message
+            if maximum is not None and default > maximum:
+                om.add_error(
+                    "Invalid metadata default.",
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is greater than 'maximum' {maximum}",
+                    info_map,
+                )
+                error_message = (
+                    f"Invalid 'default' for '{key_path}': 'default' {default} is " f"greater than 'maximum' {maximum}"
+                )
+
+        return True, ""
+
+    @staticmethod
+    def _metadata_string_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+        """Validates string type properties in metadata."""
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_string_validator.__name__,
+        }
+        required_str_property_keys = {"type"}
+        optional_str_property_keys = {"description", "pattern", "default", "nullable"}
+        valid, message = DataValidator._validate_metadata_properties_keys(
+            required_str_property_keys, optional_str_property_keys, value, key_path
+        )
+        if not valid:
+            return valid, message
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
+        nullable = value.get("nullable", False)
+        if default is None and not nullable:
+            om.add_error(
+                "Invalid metadata default string value.",
+                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
+                info_map,
+            )
+            error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
+            return False, error_message
+        if default is not None and not has_no_default:
+            if not isinstance(default, str):
+                om.add_error(
+                    "Invalid metadata default string value.",
+                    f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
+                    info_map,
+                )
+                error_message = f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}"
+                return False, error_message
+        pattern = value.get("pattern")
+        if pattern is not None and not isinstance(pattern, str):
+            om.add_error(
+                "Invalid metadata string properties pattern.",
+                f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
+                info_map,
+            )
+            error_message = f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}"
+            return False, error_message
+        try:
+            if pattern is not None:
+                re.compile(pattern)
+        except re.error:
+            om.add_error(
+                "Invalid metadata string properties pattern.",
+                f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern.",
+                info_map,
+            )
+            error_message = (
+                f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern."
+            )
+            return False, error_message
+        if default != "" and default is not None and not has_no_default:
+            if pattern is not None and not re.match(pattern, default):
+                om.add_error(
+                    "Invalid metadata default string value.",
+                    f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
+                    f"match pattern {pattern}",
+                    info_map,
+                )
+                error_message = (
+                    f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
+                    f"match pattern {pattern}"
+                )
+                return False, error_message
+
+        return True, ""
+
+    @staticmethod
+    def _metadata_bool_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+        """Validates bool type properties in metadata."""
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_bool_validator.__name__,
+        }
+        required_bool_property_keys = {"type"}
+        optional_bool_property_keys = {"description", "default", "nullable"}
+        valid, message = DataValidator._validate_metadata_properties_keys(
+            required_bool_property_keys, optional_bool_property_keys, value, key_path
+        )
+        if not valid:
+            return valid, message
+        default = value.get("default", "No default")
+        has_no_default = default == "No default"
+        nullable = value.get("nullable", False)
+        if default is None and not nullable:
+            om.add_error(
+                "Invalid metadata default bool value.",
+                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
+                info_map,
+            )
+            error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
+            return False, error_message
+        if default is not None and not isinstance(default, bool) and not has_no_default:
+            om.add_error(
+                "Invalid metadata default bool value.",
+                f"Invalid 'default' for '{key_path}': Expected a bool but got {type(default)}",
+                info_map,
+            )
+            error_message = f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}"
+            return False, error_message
+
+        return True, ""
+
+    @staticmethod
+    def _metadata_array_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+        """Validates array type properties in metadata."""
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_array_validator.__name__,
+        }
+        required_array_property_keys = {"type", "properties"}
+        optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
+        valid, message = DataValidator._validate_metadata_properties_keys(
+            required_array_property_keys, optional_array_property_keys, value, key_path
+        )
+        if not valid:
+            return valid, message
+        minimum_length = value.get("minimum_length")
+        maximum_length = value.get("maximum_length")
+        if minimum_length is not None and not isinstance(minimum_length, (int, float)):
+            om.add_error(
+                "Invalid metadata default array minimum length.",
+                f"Invalid 'minimum_length' for '{key_path}': Expected a number but got {type(minimum_length)}",
+                info_map,
+            )
+            error_message = (
+                f"Invalid 'minimum_length' for '{key_path}': " f"Expected a number but got {type(minimum_length)}"
+            )
+            return False, error_message
+        if maximum_length is not None and not isinstance(maximum_length, (int, float)):
+            om.add_error(
+                "Invalid metadata default array maximum length.",
+                f"Invalid 'maximum_length' for '{key_path}': Expected a number but got {type(maximum_length)}",
+                info_map,
+            )
+            error_message = (
+                f"Invalid 'maximum_length' for '{key_path}': " f"Expected a number but got {type(maximum_length)}"
+            )
+            return False, error_message
+        if maximum_length is not None and minimum_length is not None and maximum_length < minimum_length:
+            om.add_error(
+                "Invalid metadata array length range.",
+                f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
+                f"greater than 'maximum_length' value {maximum_length}",
+                info_map,
+            )
+            error_message = (
+                f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
+                f"greater than 'maximum_length' value {maximum_length}"
+            )
+            return False, error_message
+
+        return True, ""
+
+    @staticmethod
+    def _metadata_object_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+        """Validates object type properties in metadata."""
+        required_object_property_keys = {"type"}
+        optional_object_property_keys = {"description"}
+        valid, message = DataValidator._validate_metadata_properties_keys(
+            required_object_property_keys, optional_object_property_keys, value, key_path
+        )
+        if not valid:
+            return valid, message
+        return True, ""
+
+    @staticmethod
+    def validate_metadata(metadata: Dict[str, Any],
+                          valid_data_types: set[str],
+                          address_to_data: str) -> Tuple[bool, str]:
+        """Checks that top-level metadata has valid and required keys and values."""
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_metadata.__name__,
+        }
+        metadata_files = metadata[address_to_data]
+        required_keys = {"path", "type", "properties"}
+        optional_keys = {"title", "description"}
+        valid_keys = required_keys | optional_keys
+        for key, data in metadata_files.items():
+            if missing_keys := (required_keys - data.keys()):
+                om.add_error(
+                    "Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'", info_map
+                )
+                return False, f"Missing required keys '{list(missing_keys)}' in '{key}'"
+            if invalid_keys := (data.keys() - valid_keys):
+                om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
+                return False, f"Invalid keys '{list(invalid_keys)}' in '{key}'"
+
+            if data["type"] not in valid_data_types:
+                om.add_error(
+                    "Metadata Validation",
+                    f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}",
+                    info_map,
+                )
+                return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
+
+            if not os.path.isfile(data["path"]):
+                om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
+                return False, f"Invalid path '{data['path']}' in '{key}'"
+
+            if data["properties"] is None or data["properties"] == "":
+                om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
+                return False, f"Properties section empty or None in '{key}'"
+
+        om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
+        return True, ""
+
+    # Validate input by type related
+    @staticmethod
+    def validate_data_by_type(
+        variable_properties: Dict[str, Any],
+        variable_path: List[str | int],
+        data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
+        fixable_data_types: set[str],
+    ) -> bool:
+        """
+        Validates the data based on its specified type.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            A dictionary containing properties relevant to the validation.
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        data : Dict[str, Any]
+            The data to be validated.
+        eager_termination : bool
+            If True, the process will be terminated as soon as finding invalid data and failing to fix it.
+        properties_blob_key : str
+            The metadata properties for the data file being checked.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+        fixable_data_types: set[str]
+            Set enumerating the data types that the caller will attempt to fix while validating data.
+
+        Returns
+        -------
+        bool
+            True if the data is valid, False otherwise.
+
+        Raises
+        ------
+        KeyError
+            If the variable's properties does not specify a "type".
+
+        Notes
+        -----
+        Fixing invalid data will only be attempted if the data is a "simple" type (i.e. a string, bool or number).
+
+        """
+
+        if "type" not in variable_properties:
+            raise KeyError(f"Missing 'type' key in {variable_properties}")
+        data_type = variable_properties["type"]
+
+        type_to_validator_map: Dict[
+            str, Callable[[List[int | str], Dict[str, Any], Dict[str, Any], bool, str, "ElementsCounter", bool], bool]
+        ] = {
+            "array": DataValidator._array_type_validator,
+            "object": DataValidator._object_type_validator,
+            "string": DataValidator._string_type_validator,
+            "number": DataValidator._number_type_validator,
+            "bool": DataValidator._bool_type_validator,
+        }
+
+        if data_type not in type_to_validator_map:
+            raise ValueError(
+                f"The metadata type of the element '{DataValidator.convert_variable_path_to_str(variable_path)}' "
+                f"is not valid. Supported types are: {type_to_validator_map.keys()}."
+            )
+
+        is_valid = type_to_validator_map[data_type](
+            variable_path,
+            variable_properties,
+            data,
+            eager_termination,
+            properties_blob_key,
+            elements_counter,
+            called_during_initialization,
+        )
+
+        if data_type not in fixable_data_types:
+            return is_valid
+
+        if is_valid:
+            elements_counter.increment(ElementState.VALID)
+            return True
+        is_fixed = DataValidator._fix_data(variable_properties, variable_path, data, properties_blob_key)
+        if is_fixed:
+            elements_counter.increment(ElementState.FIXED)
+            return True
+        elements_counter.increment(ElementState.INVALID)
+        return False
+
+    @staticmethod
+    def _validate_array_container_properties(
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        data: Any,
+        properties_blob_key: str,
+    ) -> bool:
+        """
+        Validates the container properties of an array data element.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        data : Any
+            The data to be validated.
+        properties_blob_key : str
+            The metadata properties for the data file being checked.
+
+        Returns
+        -------
+        bool
+            True if the array container properties are valid, False otherwise.
+        """
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._validate_array_container_properties.__name__,
+        }
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+        )
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        if not isinstance(data, list):
+            om.add_warning(
+                "Validation: array container is not a list",
+                f"Variable: '{variable_path_str}' is not an array but has type: {type(data)}. "
+                f"{properties_violation_message}",
+                info_map,
+            )
+            return False
+
+        maximum_length = variable_properties.get("maximum_length")
+        minimum_length = variable_properties.get("minimum_length")
+        if minimum_length is not None:
+            is_in_range = variable_properties["minimum_length"] <= len(data)
+            if not is_in_range:
+                om.add_warning(
+                    "Validation: array length less than minimum",
+                    f"Variable: '{variable_path_str}' has length: {len(data)}, less than minimum length: "
+                    f"{minimum_length}. {properties_violation_message}",
+                    info_map,
+                )
+                return False
+
+        if maximum_length is not None:
+            is_in_range = len(data) <= variable_properties["maximum_length"]
+            if not is_in_range:
+                om.add_warning(
+                    "Validation: array length greater than maximum",
+                    f"Variable: '{variable_path_str}' has length: {len(data)}, greater than maximum length: "
+                    f"{maximum_length}. {properties_violation_message}",
+                    info_map,
+                )
+                return False
+        return True
+
+    @staticmethod
+    def _array_type_validator(
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
+    ) -> bool:
+        """
+        Validates a data element of type array.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        data : Dict[str, Any]
+            The data to be validated.
+        eager_termination : bool
+            If True, the process will be terminated upon finding invalid data.
+        properties_blob_key : str
+            The metadata properties for the data file being checked.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        bool
+            True if the data element is valid or fixable, False otherwise.
+        """
+
+        array_value = DataValidator. _extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and array_value is None:
+            return True
+
+        if not DataValidator._validate_array_container_properties(
+            variable_path, variable_properties, array_value, properties_blob_key
+        ):
+            return False
+
+        is_whole_array_acceptable = True
+        for index, element in enumerate(array_value):
+            is_element_acceptable = DataValidator.validate_data_by_type(
+                variable_properties["properties"],
+                variable_path + [index],
+                data,
+                eager_termination,
+                properties_blob_key,
+                elements_counter,
+                called_during_initialization,
+            )
+            is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
+            if not is_element_acceptable and eager_termination:
+                return False
+        return is_whole_array_acceptable
+
+    @staticmethod
+    def _object_type_validator(
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: ElementsCounter,
+        called_during_initialization: bool,
+    ) -> bool:
+        """
+        Validates a data element of type object.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            The path to the variable being validated.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        data : Dict[str, Any]
+            The data to be validated.
+        eager_termination : bool
+            If True, the process will be terminated upon finding invalid data.
+        properties_blob_key : str
+            The metadata properties for the data file being checked.
+        elements_counter : ElementsCounter
+            A counter to keep track of the number of valid, invalid, and fixed elements.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        bool
+            True if the data element is valid or fixable, False otherwise.
+
+        Notes
+        -----
+        This method will look for and delete any keys in the data that do not have properties specified for them
+        in the metadata properties.
+
+        """
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._object_type_validator.__name__,
+        }
+
+        object_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
+        )
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+        )
+        if not isinstance(object_value, dict):
+            om.add_warning(
+                "Validation: object is not a dictionary",
+                f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
+                f"{properties_violation_message}",
+                info_map,
+            )
+            return False
+
+        is_whole_object_acceptable = True
+        for key in variable_properties.keys():
+            if key in ["type", "description", "default"]:
+                continue
+            is_element_acceptable = DataValidator.validate_data_by_type(
+                variable_properties[key],
+                variable_path + [key],
+                data,
+                eager_termination,
+                properties_blob_key,
+                elements_counter,
+                called_during_initialization,
+            )
+            is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
+            if not is_element_acceptable and eager_termination:
+                return False
+
+        extraneous_keys = [key for key in object_value.keys() if key not in variable_properties.keys()]
+        for key in extraneous_keys:
+            om.add_warning(
+                "Validation: object contains extraneous data",
+                f"Variable: '{variable_path_str}' contains data at key '{key}' that is not specified in the metadata "
+                f"properties. {properties_violation_message}",
+                info_map,
+            )
+            del object_value[key]
+
+        return is_whole_object_acceptable
+
+    @staticmethod
+    def _number_type_validator(
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
+    ) -> bool:
+        """Validates an data number element."""
+        om = OutputManager()
+        data_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and data_value is None:
+            return True
+
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._number_type_validator.__name__,
+        }
+        minimum_value = variable_properties.get("minimum")
+        maximum_value = variable_properties.get("maximum")
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+        )
+
+        if type(data_value) is not float and type(data_value) is not int:
+            warning_string = "Validation: value is not a number"
+            warning_message = (
+                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"{type(data_value)}. {properties_violation_message}"
+            )
+            om.add_warning(warning_string, warning_message, info_map)
+            return False
+        if minimum_value is not None:
+            is_in_range = minimum_value <= data_value
+            if not is_in_range:
+                warning_name = "Validation: value less than minimum"
+                warning_message = (
+                    f"Variable: '{variable_path_str}' has value: {data_value}, less than minimum value: "
+                    f"{minimum_value: .2f}. {properties_violation_message}"
+                )
+                om.add_warning(warning_name, warning_message, info_map)
+                return False
+        if maximum_value is not None:
+            is_in_range = data_value <= maximum_value
+            if not is_in_range:
+                warning_name = "Validation: value greater than maximum"
+                warning_string = (
+                    f"Variable: '{variable_path_str}' has value: {data_value}, greater than maximum value: "
+                    f"{maximum_value: .2f}. {properties_violation_message}"
+                )
+                om.add_warning(warning_name, warning_string, info_map)
+                return False
+
+        return True
+
+    @staticmethod
+    def _string_type_validator(
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
+    ) -> bool:
+        """Validates a data string element."""
+        om = OutputManager()
+        data_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and data_value is None:
+            return True
+
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._string_type_validator.__name__,
+        }
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+        )
+
+        if type(data_value) is not str:
+            warning_name = "Validation: string variable is not a string"
+            warning_message = (
+                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"{type(data_value)}. {properties_violation_message}"
+            )
+            om.add_warning(warning_name, warning_message, info_map)
+            return False
+
+        pattern_check = variable_properties.get("pattern")
+        if pattern_check is not None:
+            is_valid_string = bool(re.match(pattern_check, data_value))
+            if not is_valid_string:
+                warning_name = "Validation: string variable does not match pattern"
+                warning_message = (
+                    f"Variable: '{variable_path_str}' has value: '{data_value}', does not match pattern: "
+                    f"{pattern_check}. {properties_violation_message}"
+                )
+                om.add_warning(warning_name, warning_message, info_map)
+                return False
+
+        minimum_length = variable_properties.get("minimum_length")
+        maximum_length = variable_properties.get("maximum_length")
+        if minimum_length is not None:
+            is_valid_string = variable_properties["minimum_length"] <= len(data_value)
+            if not is_valid_string:
+                warning_name = "Validation: string length less than minimum"
+                warning_message = (
+                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is less than "
+                    f"minimum length: {minimum_length}. {properties_violation_message}"
+                )
+                om.add_warning(warning_name, warning_message, info_map)
+                return False
+        if maximum_length is not None:
+            is_valid_string = len(data_value) <= variable_properties["maximum_length"]
+            if not is_valid_string:
+                warning_name = "Validation: string length greater than maximum"
+                warning_message = (
+                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is greater than "
+                    f"maximum length: {maximum_length}. {properties_violation_message}"
+                )
+                om.add_warning(warning_name, warning_message, info_map)
+                return False
+
+        return True
+
+    @staticmethod
+    def _bool_type_validator(
+        variable_path: List[str | int],
+        variable_properties: Dict[str, Any],
+        data: Dict[str, Any],
+        eager_termination: bool,
+        properties_blob_key: str,
+        elements_counter: "ElementsCounter",
+        called_during_initialization: bool,
+    ) -> bool:
+        """Validates a data bool element."""
+        om = OutputManager()
+        data_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
+        )
+
+        if variable_properties.get("nullable", False) and data_value is None:
+            return True
+
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._bool_type_validator.__name__,
+        }
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
+        )
+
+        if type(data_value) is not bool:
+            warning_name = "Validation: bool variable is not a bool"
+            warning_message = (
+                f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
+                f"'{type(data_value)}'. {properties_violation_message}"
+            )
+            om.add_warning(warning_name, warning_message, info_map)
+            return False
+
+        return True
+
+    @staticmethod
+    def _fix_data(
+        variable_properties: Dict[str, Any],
+        element_hierarchy: List[Union[str, int]],
+        data: Dict[str, Any],
+        properties_blob_key: str,
+    ) -> bool:
+        """
+        Attempt to fix the invalid data.
+
+        Parameters
+        ----------
+        variable_properties : dict[str, Any]
+            The properties for the variable of interest.
+
+        element_hierarchy: list
+            A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
+
+        data: dict[str, Any]
+            A buffer dictionary that holds the data for validation and fixing.
+
+        properties_blob_key : str
+            The metadata properties section keyword for the data file being checked.
+
+        Returns
+        -------
+        bool
+            True if the data is fixed, False otherwise.
+        """
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._fix_data.__name__,
+        }
+
+        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1], data)
+
+        element_path = ".".join([str(element) for element in element_hierarchy])
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section '{properties_blob_key}'."
+        )
+        if "default" not in variable_properties.keys():
+            error_message = (
+                f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
+                f", and cannot be changed to a default value. {properties_violation_message}"
+            )
+            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
+            return False
+
+        if type(variable_parent) is list:
+            original_invalid_value = variable_parent[element_hierarchy[-1]]
+        else:
+            original_invalid_value = variable_parent.get(element_hierarchy[-1])
+
+        warning_message = (
+            f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
+        )
+        om.add_warning("Validation: invalid data found", warning_message, info_map)
+
+        variable_parent[element_hierarchy[-1]] = variable_properties["default"]
+
+        warning_message = (
+            f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to "
+            f"{variable_properties['default']}. Fix enabled by default value specified in "
+            f"'{properties_blob_key}'."
+        )
+        om.add_warning("Validation: data fixed", warning_message, info_map)
+        return True
+
+    @staticmethod
+    def _extract_data_by_key_list(
+        data: List[Any] | Dict[str, Any],
+        variable_path: Sequence[str | int],
+        variable_properties: Dict[str, Any],
+        called_during_initialization: bool,
+    ) -> Any:
+        """
+        Extracts a value from the data based on a specified path and handles missing data by calling
+        DataValidator._log_missing_data().
+
+        Parameters
+        ----------
+        data : List[Any] | Dict[str, Any]
+            The data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the data.
+        variable_properties : Dict[str, Any]
+            The metadata properties for the variable being validated.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization.
+
+        Returns
+        -------
+        Any
+            The value extracted from the data if found.
+            None if not found.
+
+        Notes
+        -----
+        This function navigates through the given data (which can be a list or a dictionary) following the path
+        specified in `variable_path`. If the path leads to a value, it is returned.
+        If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
+        the variable name by finding the last string element in the `variable_path` array and handles this missing data
+        by calling DataValidator._log_missing_data().
+        """
+        result = None
+        try:
+            result = DataValidator.extract_value_by_key_list(data, variable_path)
+        except KeyError:
+            var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
+            DataValidator._log_missing_data(
+                variable_properties=variable_properties,
+                var_name=var_name,
+                called_during_initialization=called_during_initialization,
+            )
+        return result
+
+    @staticmethod
+    def _log_missing_data(
+        variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+    ) -> None:
+        """
+        Handles logging for missing data for a variable, logging errors or warnings based on the context of
+        initialization or runtime updates.
+
+        Parameters
+        ----------
+        variable_properties : Dict[str, Any]
+            Properties of the variable, potentially including its modifiability status.
+        var_name : str
+            The name of the variable with missing data.
+        called_during_initialization: bool
+            Boolean variable indicating whether the function is being called during initialization
+
+        Raises
+        ------
+        KeyError
+            Raised if the missing data is deemed necessary, either during initialization or for a runtime update.
+
+        Notes
+        -----
+        This function determines if it's being called during the initialization phase and checks if the missing variable
+        data is required at this stage using '_is_data_required_upon_initialization'. If required, it logs an error and
+        raises a KeyError. If not, it logs a warning.
+        """
+        om = OutputManager()
+        info_map = {"class": DataValidator.__name__, "function": DataValidator._log_missing_data.__name__}
+        if not called_during_initialization:
+            error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
+            om.add_error("Missing required data", error_msg, info_map)
+            raise KeyError(error_msg)
+
+        if DataValidator._is_data_required_upon_initialization(
+            variable_name=var_name, variable_properties=variable_properties
+        ):
+            om.add_error(
+                "Missing required data",
+                f"Key {var_name} not found in data. Data value is required for this "
+                "variable upon program initialization.",
+                info_map,
+            )
+            raise KeyError(
+                f"Key {var_name} not found in data. Data value is required for this "
+                "variable upon program initialization."
+            )
+        om.add_warning(
+            "Validation: key not found in data -- data not required upon initialization",
+            f"Key {var_name} not found in data. Data value is not required for this "
+            "variable upon program initialization, setting the variable value to None.",
+            info_map,
+        )
+
+    @staticmethod
+    def _is_data_required_upon_initialization(variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+        """
+        Determines whether a variable requires a data value upon initialization based on its modifiability status.
+
+        This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
+        variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
+        modifiability status is either 'REQUIRED_AND_LOCKED' or 'REQUIRED_AND_UNLOCKED', indicating that the variable
+        must be initialized with a value.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable being evaluated for its initialization requirements.
+        variable_properties : Dict[str, Any]
+            A dictionary containing the properties of the variable, which should include its modifiability status among
+            others.
+
+        Returns
+        -------
+        bool
+            True if the variable's modifiability status necessitates a data value upon initialization,
+            False otherwise.
+        """
+        variable_modifiability = DataValidator._get_variable_modifiability(
+            variable_name=variable_name, variable_properties=variable_properties
+        )
+        return variable_modifiability in Modifiability.get_required_during_initialization()
+
+    @staticmethod
+    def _get_variable_modifiability(variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
+        """
+        Determines the modifiability status of a variable based on its properties and returns the corresponding enum
+        value.
+
+        Notes
+        -----
+        This function looks for a 'modifiability' key within `variable_properties`. If present and its value is not
+        empty, the function attempts to map this value to an enum member in Modifiability. If the value does not
+        correspond to any enum members, a KeyError is raised after logging the error. If 'modifiability' is absent or
+        its value is empty, the function defaults to Modifiability.NOT_REQUIRED_AND_UNLOCKED.
+
+        Parameters
+        ----------
+        variable_name : str
+            The name of the variable for which the modifiability status is being determined. Used for error logging.
+        variable_properties : Dict[str, Any]
+            A dictionary containing the properties of the variable, containing the desired 'modifiability' property.
+
+        Returns
+        -------
+        Modifiability
+            An enum member representing the variable's modifiability status.
+
+        Raises
+        ------
+        KeyError
+            If 'modifiability' in `variable_properties` does not match any enum member in Modifiability. The error
+            message includes the invalid modifiability value and suggests valid values.
+        """
+        om = OutputManager()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._get_variable_modifiability.__name__,
+        }
+
+        default = "UNREQUIRED UNLOCKED"
+        modifiability = variable_properties.get("modifiability", default)
+
+        try:
+            return Modifiability.__getitem__("_".join(modifiability.strip().upper().split()))
+        except KeyError:
+            om.add_warning(
+                "Unknown modifiability entry",
+                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability should be "
+                f"one of {Modifiability.values()}. Using the default value: {default}",
+                info_map,
+            )
+            return Modifiability.__getitem__("_".join(default.strip().upper().split()))
+
+    @staticmethod
+    def convert_variable_path_to_str(variable_path: List[str | int]) -> str:
+        """
+        Converts a list of keys (int or str) into a string representation of the path to a variable.
+
+        Parameters
+        ----------
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the data.
+
+        Returns
+        -------
+        str
+            A string representation of the path to a variable.
+
+        Examples
+        --------
+        >>> input_manager = InputManager()
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> DataValidator.convert_variable_path_to_str(var_path)
+        'animal.herd_information.calf_num'
+
+        >>> input_manager = InputManager()
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> DataValidator.convert_variable_path_to_str(var_path)
+        'manure_management_scenarios.[0].bedding_type'
+        """
+
+        formatted_path_elems = []
+        for raw_path_elem in variable_path:
+            if isinstance(raw_path_elem, int) or (isinstance(raw_path_elem, str) and raw_path_elem.isdigit()):
+                formatted_path_elems.append(f"[{raw_path_elem}]")
+            else:
+                formatted_path_elems.append(f"{raw_path_elem}")
+        return ".".join(formatted_path_elems)
+
+    @staticmethod
+    def extract_value_by_key_list(data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+        """
+        Extracts a value from a nested list or dictionary using a list of keys (int or str).
+
+        Parameters
+        ----------
+        data : List[Any] | Dict[str, Any]
+            The data containing the value to be extracted.
+        variable_path : List[str | int]
+            A list of keys to be used to extract the value from the data.
+
+        Returns
+        -------
+        Any
+            The value extracted from the data.
+
+        Raises
+        ------
+        KeyError
+            If the value cannot be extracted from the data using the provided variable path.
+
+        Examples
+        --------
+        >>> data_validator = DataValidator()
+        >>> example_data = {
+        ...     "animal": {
+        ...         "herd_information": {
+        ...             "calf_num": 8,
+        ...             "heiferI_num": 44,
+        ...             "heiferII_num": 38,
+        ...             "heiferIII_num_springers": 12
+        ...         }
+        ...     }
+        ... }
+        >>> var_path = ["animal", "herd_information", "calf_num"]
+        >>> DataValidator.extract_value_by_key_list(example_data, var_path)
+        8
+
+        >>> data_validator = DataValidator()
+        >>> example_data = {
+        ...     "manure_management_scenarios": [
+        ...         {
+        ...             "bedding_type": "straw",
+        ...             "manure_handler": "manual scraping"
+        ...         },
+        ...         {
+        ...             "bedding_type": "sawdust",
+        ...             "manure_handler": "flush system"
+        ...         }
+        ...     ]
+        ... }
+        >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
+        >>> DataValidator.extract_value_by_key_list(example_data, var_path)
+        'straw'
+        """
+
+        for key in variable_path:
+            if isinstance(data, list) and 0 <= int(key) < len(data):
+                data = data[int(key)]
+            elif isinstance(data, dict) and isinstance(key, str) and key in data:
+                data = data[key]
+            else:
+                raise KeyError(f"There is an error at key {key} in the path {variable_path}")
+        return data
