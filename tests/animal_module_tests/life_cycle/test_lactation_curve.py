@@ -208,7 +208,9 @@ def test_init(
 
 
 def test_get_year_adjustments(
-    mocker: MockerFixture, lactation_inputs: dict[str, Any], lactation_curve: LactationCurve,
+    mocker: MockerFixture,
+    lactation_inputs: dict[str, Any],
+    lactation_curve: LactationCurve,
 ) -> None:
     """Test that year adjustments are retrieved appropriately."""
     mock_time = mocker.MagicMock()
