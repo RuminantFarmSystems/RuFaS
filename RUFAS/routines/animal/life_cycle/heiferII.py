@@ -1449,6 +1449,14 @@ class HeiferII(HeiferI):
             AnimalBase.config[f"birth_weight_avg_{breed.lower()}"],
             AnimalBase.config[f"birth_weight_std_{breed.lower()}"],
         )
+        info_map = {"class": "HeiferII",
+                    "function": HeiferII._calculate_calf_birth_weight.__name__}
+        if birth_weight <= 0:
+            om.add_error(
+                "Calf birth weight error.",
+                "Calf birth weight less than or equal to 0. Standard deviation too high with respect to average birth weight.",
+                info_map
+            )
         return float(birth_weight)
 
     def _initialize_pregnancy_parameters(self) -> None:
