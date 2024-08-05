@@ -2,7 +2,7 @@ import os
 import re
 from enum import Enum
 from functools import reduce
-from typing import Dict, Any, Callable, List, Union, Sequence
+from typing import Dict, Any, Callable, List, Union, Sequence, Tuple
 
 from RUFAS.output_manager import OutputManager
 
@@ -182,7 +182,7 @@ class Modifiability(Enum):
 class DataValidator:
 
     @staticmethod
-    def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> None:
+    def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
         """Iteratively traverses the metadata properties to check the max depth and routes
         properties to be validated by type.
 
@@ -192,6 +192,11 @@ class DataValidator:
             - If the depth of the metadata exceeds the metadata_depth_limit.
             - If the properties' 'type' value is neither in the type_to_validator_map keys,
             nor is None.
+
+        return
+        ------
+        bool
+            Indicates if properties were valid or not.
         """
         om = OutputManager()
         info_map = {
@@ -202,26 +207,27 @@ class DataValidator:
         stack: list[tuple[dict[str, Any], int, list[str]]] = [(metadata["properties"], 0, [])]
         current_max_depth: int = 0
         deepest_path: list[str] = []
-
-        type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], None]] = {
+        # fix
+        type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], tuple[bool, str]]] = {
             "number": DataValidator._metadata_number_validator,
             "array": DataValidator._metadata_array_validator,
             "bool": DataValidator._metadata_bool_validator,
             "string": DataValidator._metadata_string_validator,
             "object": DataValidator._metadata_object_validator,
         }
+
         while stack:
             current_obj, depth, path = stack.pop()
 
             if depth > metadata_depth_limit:
+                valid = False
                 om.add_error(
                     "Max metadata depth exceeded.",
                     f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}",
                     info_map,
                 )
-                raise ValueError(
-                    f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}"
-                )
+                error_message = f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}"
+                return valid, error_message
 
             if depth > current_max_depth:
                 current_max_depth = depth
@@ -233,18 +239,24 @@ class DataValidator:
                         stack.append((value, depth + 1, path + [key]))
                         value_type = value.get("type")
                         if value_type in type_to_validator_map:
-                            type_to_validator_map[value_type](path + [key], value)
+                            valid, error_message = type_to_validator_map[value_type](path + [key], value)
+                            if not valid:
+                                return valid, error_message
                         else:
                             if value_type is not None:
+                                valid = False
                                 om.add_error(
                                     "Properties value type error",
                                     f"'type' value not in {type_to_validator_map.keys()}",
                                     info_map,
                                 )
-                                raise ValueError(f"Properties 'type' value not in {list(type_to_validator_map.keys())}")
+                                error_message = f"Properties 'type' value not in {list(type_to_validator_map.keys())}"
+                                return valid, error_message
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
+
+        return True, ""
 
     @staticmethod
     def _validate_metadata_properties_keys(
@@ -252,7 +264,7 @@ class DataValidator:
         optional_properties_keys: set[str],
         properties: dict[str, Any],
         path: list[str],
-    ) -> None:
+    ) -> Tuple[bool, str]:
         """Validates that keys in the metadata properties sections."""
         om = OutputManager()
         info_map = {
@@ -260,16 +272,17 @@ class DataValidator:
             "function": DataValidator._validate_metadata_properties_keys.__name__,
         }
         if missing_required_keys := required_properties_keys - properties.keys():
+            valid = False
             om.add_error(
                 "Metadata Validation",
                 f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
                 f" keys are {sorted(required_properties_keys)}.",
                 info_map,
             )
-            raise ValueError(
-                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
-                f" keys are {sorted(required_properties_keys)}."
-            )
+            error_message = (f"Missing required keys {sorted(missing_required_keys)} for {path}."
+                             f" Required keys are {sorted(required_properties_keys)}.")
+            return valid, error_message
+
         property_type = properties.get("type", "Unknown type")
         valid_properties_keys = required_properties_keys.union(optional_properties_keys)
         if property_type == "object":
@@ -279,8 +292,8 @@ class DataValidator:
                     f"No unique keys for {path}. At least one unique key is expected.",
                     info_map,
                 )
-                raise ValueError(f"No unique keys for {path}. At least one unique key is expected.")
-            return
+                error_message = f"No unique keys for {path}. At least one unique key is expected."
+                return False, error_message
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
                 "Metadata Validation",
@@ -288,13 +301,16 @@ class DataValidator:
                 f" keys are {sorted(valid_properties_keys)}.",
                 info_map,
             )
-            raise ValueError(
+            error_message = (
                 f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
                 f" keys are {sorted(valid_properties_keys)}."
             )
+            return False, error_message
+
+        return True, ""
 
     @staticmethod
-    def _metadata_number_validator(key_path: list[str], value: dict[str, Any]) -> None:
+    def _metadata_number_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates number type properties in metadata."""
         om = OutputManager()
         info_map = {
@@ -303,9 +319,12 @@ class DataValidator:
         }
         required_number_property_keys = {"type"}
         optional_number_property_keys = {"description", "minimum", "maximum", "default", "nullable"}
-        DataValidator._validate_metadata_properties_keys(
+        valid, error_message = DataValidator._validate_metadata_properties_keys(
             required_number_property_keys, optional_number_property_keys, value, key_path
         )
+        if not valid:
+            return valid, error_message
+
         default = value.get("default", "No default")
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
@@ -315,7 +334,8 @@ class DataValidator:
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.",
                 info_map,
             )
-            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.")
+            error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'."
+            return False, error_message
         if default is not None:
             if not isinstance(default, (int, float)) and not has_no_default:
                 om.add_error(
@@ -323,7 +343,8 @@ class DataValidator:
                     f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
                     info_map,
                 )
-                raise ValueError(f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.")
+                error_message = f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}."
+                return False, error_message
         minimum = value.get("minimum")
         maximum = value.get("maximum")
         if minimum is not None and not isinstance(minimum, (int, float)):
@@ -332,14 +353,16 @@ class DataValidator:
                 f"Invalid 'minimum' for '{key_path}': Expected a number but got {type(minimum)}.",
                 info_map,
             )
-            raise ValueError(f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}.")
+            error_message = f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}."
+            return False, error_message
         if maximum is not None and not isinstance(maximum, (int, float)):
             om.add_error(
                 "Invalid metadata number properties maximum.",
                 f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.",
                 info_map,
             )
-            raise ValueError(f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.")
+            error_message = f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}."
+            return False, error_message
         if maximum is not None and minimum is not None and maximum < minimum:
             om.add_error(
                 "Invalid range of acceptable numbers.",
@@ -347,10 +370,11 @@ class DataValidator:
                 f"greater than 'maximum' value {maximum}",
                 info_map,
             )
-            raise ValueError(
+            error_message = (
                 f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
                 f"greater than 'maximum' value {maximum}"
             )
+            return False, error_message
         if default is not None and not has_no_default:
             if minimum is not None and default < minimum:
                 om.add_error(
@@ -358,21 +382,24 @@ class DataValidator:
                     f"Invalid 'default' for '{key_path}': 'default' {default} is less than 'minimum' {minimum}",
                     info_map,
                 )
-                raise ValueError(
+                error_message = (
                     f"Invalid 'default' for '{key_path}': 'default' {default} is " f"less than 'minimum' {minimum}"
                 )
+                return False, error_message
             if maximum is not None and default > maximum:
                 om.add_error(
                     "Invalid metadata default.",
                     f"Invalid 'default' for '{key_path}': 'default' {default} is greater than 'maximum' {maximum}",
                     info_map,
                 )
-                raise ValueError(
+                error_message = (
                     f"Invalid 'default' for '{key_path}': 'default' {default} is " f"greater than 'maximum' {maximum}"
                 )
 
+        return True, ""
+
     @staticmethod
-    def _metadata_string_validator(key_path: list[str], value: dict[str, Any]) -> None:
+    def _metadata_string_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates string type properties in metadata."""
         om = OutputManager()
         info_map = {
@@ -381,9 +408,11 @@ class DataValidator:
         }
         required_str_property_keys = {"type"}
         optional_str_property_keys = {"description", "pattern", "default", "nullable"}
-        DataValidator._validate_metadata_properties_keys(
+        valid, message = DataValidator._validate_metadata_properties_keys(
             required_str_property_keys, optional_str_property_keys, value, key_path
         )
+        if not valid:
+            return valid, message
         default = value.get("default", "No default")
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
@@ -393,7 +422,8 @@ class DataValidator:
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                 info_map,
             )
-            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
+            error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
+            return False, error_message
         if default is not None and not has_no_default:
             if not isinstance(default, str):
                 om.add_error(
@@ -401,7 +431,8 @@ class DataValidator:
                     f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
                     info_map,
                 )
-                raise ValueError(f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}")
+                error_message = f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}"
+                return False, error_message
         pattern = value.get("pattern")
         if pattern is not None and not isinstance(pattern, str):
             om.add_error(
@@ -409,7 +440,8 @@ class DataValidator:
                 f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
                 info_map,
             )
-            raise ValueError(f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}")
+            error_message = f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}"
+            return False, error_message
         try:
             if pattern is not None:
                 re.compile(pattern)
@@ -419,9 +451,10 @@ class DataValidator:
                 f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern.",
                 info_map,
             )
-            raise ValueError(
+            error_message = (
                 f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern."
             )
+            return False, error_message
         if default != "" and default is not None and not has_no_default:
             if pattern is not None and not re.match(pattern, default):
                 om.add_error(
@@ -430,13 +463,16 @@ class DataValidator:
                     f"match pattern {pattern}",
                     info_map,
                 )
-                raise ValueError(
+                error_message = (
                     f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
                     f"match pattern {pattern}"
                 )
+                return False, error_message
+
+        return True, ""
 
     @staticmethod
-    def _metadata_bool_validator(key_path: list[str], value: dict[str, Any]) -> None:
+    def _metadata_bool_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates bool type properties in metadata."""
         om = OutputManager()
         info_map = {
@@ -445,10 +481,11 @@ class DataValidator:
         }
         required_bool_property_keys = {"type"}
         optional_bool_property_keys = {"description", "default", "nullable"}
-        DataValidator._validate_metadata_properties_keys(
+        valid, message = DataValidator._validate_metadata_properties_keys(
             required_bool_property_keys, optional_bool_property_keys, value, key_path
         )
-
+        if not valid:
+            return valid, message
         default = value.get("default", "No default")
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
@@ -458,17 +495,21 @@ class DataValidator:
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                 info_map,
             )
-            raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
+            error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
+            return False, error_message
         if default is not None and not isinstance(default, bool) and not has_no_default:
             om.add_error(
                 "Invalid metadata default bool value.",
                 f"Invalid 'default' for '{key_path}': Expected a bool but got {type(default)}",
                 info_map,
             )
-            raise ValueError(f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}")
+            error_message = f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}"
+            return False, error_message
+
+        return True, ""
 
     @staticmethod
-    def _metadata_array_validator(key_path: list[str], value: dict[str, Any]) -> None:
+    def _metadata_array_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates array type properties in metadata."""
         om = OutputManager()
         info_map = {
@@ -477,9 +518,11 @@ class DataValidator:
         }
         required_array_property_keys = {"type", "properties"}
         optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
-        DataValidator._validate_metadata_properties_keys(
+        valid, message = DataValidator._validate_metadata_properties_keys(
             required_array_property_keys, optional_array_property_keys, value, key_path
         )
+        if not valid:
+            return valid, message
         minimum_length = value.get("minimum_length")
         maximum_length = value.get("maximum_length")
         if minimum_length is not None and not isinstance(minimum_length, (int, float)):
@@ -488,18 +531,20 @@ class DataValidator:
                 f"Invalid 'minimum_length' for '{key_path}': Expected a number but got {type(minimum_length)}",
                 info_map,
             )
-            raise ValueError(
+            error_message = (
                 f"Invalid 'minimum_length' for '{key_path}': " f"Expected a number but got {type(minimum_length)}"
             )
+            return False, error_message
         if maximum_length is not None and not isinstance(maximum_length, (int, float)):
             om.add_error(
                 "Invalid metadata default array maximum length.",
                 f"Invalid 'maximum_length' for '{key_path}': Expected a number but got {type(maximum_length)}",
                 info_map,
             )
-            raise ValueError(
+            error_message = (
                 f"Invalid 'maximum_length' for '{key_path}': " f"Expected a number but got {type(maximum_length)}"
             )
+            return False, error_message
         if maximum_length is not None and minimum_length is not None and maximum_length < minimum_length:
             om.add_error(
                 "Invalid metadata array length range.",
@@ -507,22 +552,30 @@ class DataValidator:
                 f"greater than 'maximum_length' value {maximum_length}",
                 info_map,
             )
-            raise ValueError(
+            error_message = (
                 f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
                 f"greater than 'maximum_length' value {maximum_length}"
             )
+            return False, error_message
+
+        return True, ""
 
     @staticmethod
-    def _metadata_object_validator(key_path: list[str], value: dict[str, Any]) -> None:
+    def _metadata_object_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates object type properties in metadata."""
         required_object_property_keys = {"type"}
         optional_object_property_keys = {"description"}
-        DataValidator._validate_metadata_properties_keys(
+        valid, message = DataValidator._validate_metadata_properties_keys(
             required_object_property_keys, optional_object_property_keys, value, key_path
         )
+        if not valid:
+            return valid, message
+        return True, ""
 
     @staticmethod
-    def validate_metadata(metadata: Dict[str, Any], valid_data_types: set[str], address_to_data: str) -> None:
+    def validate_metadata(metadata: Dict[str, Any],
+                          valid_data_types: set[str],
+                          address_to_data: str) -> Tuple[bool, str]:
         """Checks that top-level metadata has valid and required keys and values."""
         om = OutputManager()
         info_map = {
@@ -538,10 +591,10 @@ class DataValidator:
                 om.add_error(
                     "Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'", info_map
                 )
-                raise ValueError
+                return False, f"Missing required keys '{list(missing_keys)}' in '{key}'"
             if invalid_keys := (data.keys() - valid_keys):
                 om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
-                raise ValueError
+                return False, f"Invalid keys '{list(invalid_keys)}' in '{key}'"
 
             if data["type"] not in valid_data_types:
                 om.add_error(
@@ -549,17 +602,18 @@ class DataValidator:
                     f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}",
                     info_map,
                 )
-                raise ValueError
+                return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
 
             if not os.path.isfile(data["path"]):
                 om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
-                raise ValueError
+                return False, f"Invalid path '{data['path']}' in '{key}'"
 
             if data["properties"] is None or data["properties"] == "":
                 om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
-                raise ValueError
+                return False, f"Properties section empty or None in '{key}'"
 
         om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
+        return True, ""
 
     # Validate input by type related
     @staticmethod
@@ -759,7 +813,7 @@ class DataValidator:
             True if the data element is valid or fixable, False otherwise.
         """
 
-        array_value = DataValidator._extract_data_by_key_list(
+        array_value = DataValidator. _extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
 
