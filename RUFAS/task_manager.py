@@ -480,36 +480,17 @@ class TaskManager:
 
         diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
-        results_dir = Path("output/end_to_end_testing_results")
-        results_dir.mkdir(parents=True, exist_ok=True)
-        results_path = Path(f"{results_dir}/end_to_end_test_results.txt")
-        with open(results_path, "w") as results_file:
-            if diff == {}:
-                results_file.write("End-to-end testing successful.\n")
-                results_file.write("No differences found between actual and expected outputs.\n")
-                output_manager.add_log("End-to-end testing", "End-to-end testing successful", info_map)
-            else:
-                results_file.write("End-to-end testing unsuccessful.\n")
-                results_file.write("Differences found between actual and expected outputs.\n\n")
-
-                sections = {
-                    "values_changed": "Differing results:\n",
-                    "dictionary_item_added": "Actual results contain unexpected items:\n",
-                    "dictionary_item_removed": "Actual results missing items:\n",
-                    "iterable_item_added": "Actual results contain unexpected items:\n",
-                    "iterable_item_removed": "Actual results missing items:\n",
-                }
-                for k, v in sections.items():
-                    if k not in diff:
-                        continue
-                    results_file.write(v)
-                    for item, value in diff[k].items():
-                        results_file.write(f"{item}: {value}\n")
-                    results_file.write("\n")
-
-                output_manager.add_error("End-to-end testing", "End-to-end testing unsuccessful", info_map)
-
-        output_manager.add_log("End-to-end testing completed", f"Results written to {results_path}.", info_map)
+        testing_results_file_name = output_manager.generate_file_name("end_to_end_testing_results", "json")
+        testing_results_path = json_output_path.joinpath(Path(testing_results_file_name))
+        no_diff = diff == {}
+        if no_diff:
+            passing = True
+            output_manager.add_log("End-to-end testing", "End-to-end testing successful", info_map)
+        else:
+            passing = False
+            output_manager.add_error("End-to-end testing", "End-to-end testing unsuccessful", info_map)
+        diff.update({"end_to_end_testing_passing": passing})
+        output_manager.dict_to_file_json(diff, testing_results_path, False)
 
     @staticmethod
     def handle_input_data_audit(
