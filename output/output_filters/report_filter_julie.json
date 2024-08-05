@@ -722,14 +722,14 @@
           "name": "adjusted whole herd enteric methane, kg",
           "cross_references": [
               "total herd enteric methane, kg_ver_hor_agg_(kg/day)",
-              "milk allocation factor_hor_agg_(kg^2/day)"
+              "milk allocation factor_hor_agg_(1/day)"
           ],
           "horizontal_aggregation": "product"
       },
       {
           "name": "adjusted herd enteric CH4 per FPCM, kg/kg",
           "cross_references": [
-              "adjusted whole herd enteric methane, kg_hor_agg_(kg^3/day^2)",
+              "adjusted whole herd enteric methane, kg_hor_agg_(kg/day^2)",
               "Herd FPCM, kg_hor_agg_(kg/day)"
           ],
           "horizontal_aggregation": "division"
@@ -822,14 +822,14 @@
           "name": "adjusted whole herd manure methane, kg",
           "cross_references": [
               "total herd manure methane, kg_ver_hor_agg_(kg)",
-              "milk allocation factor_hor_agg_(kg^2/day)"
+              "milk allocation factor_hor_agg_(1/day)"
           ],
           "horizontal_aggregation": "product"
       },
       {
           "name": "adjusted herd manure CH4 per FPCM, kg/kg",
           "cross_references": [
-              "adjusted whole herd manure methane, kg_hor_agg_(kg^3/day)",
+              "adjusted whole herd manure methane, kg_hor_agg_(kg/day)",
               "Herd FPCM, kg_hor_agg_(kg/day)"
           ],
           "horizontal_aggregation": "division"
@@ -916,14 +916,14 @@
           "name": "adjusted whole herd manure N2O, kg",
           "cross_references": [
               "total herd manure N2O, kg_ver_hor_agg_(kg)",
-              "milk allocation factor_hor_agg_(kg^2/day)"
+              "milk allocation factor_hor_agg_(1/day)"
           ],
           "horizontal_aggregation": "product"
       },
       {
           "name": "adjusted herd manure N2O per FPCM, kg/kg",
           "cross_references": [
-              "adjusted whole herd manure N2O, kg_hor_agg_(kg^3/day)",
+              "adjusted whole herd manure N2O, kg_hor_agg_(kg/day)",
               "Herd FPCM, kg_hor_agg_(kg/day)"
           ],
           "horizontal_aggregation": "division"
@@ -1016,14 +1016,14 @@
           "name": "adjusted whole herd manure nh3, kg",
           "cross_references": [
               "total herd manure nh3, kg_ver_hor_agg_(kg)",
-              "milk allocation factor_hor_agg_(kg^2/day)"
+              "milk allocation factor_hor_agg_(1/day)"
           ],
           "horizontal_aggregation": "product"
       },
       {
           "name": "adjusted herd manure nh3 per FPCM, kg/kg",
           "cross_references": [
-              "adjusted whole herd manure nh3, kg_hor_agg_(kg^3/day)",
+              "adjusted whole herd manure nh3, kg_hor_agg_(kg/day)",
               "Herd FPCM, kg_hor_agg_(kg/day)"
           ],
           "horizontal_aggregation": "division"
@@ -1111,14 +1111,14 @@
           "name": "adjusted whole herd feed CO2, kg",
           "cross_references": [
               "Total herd feed CO2, kg_feed_emissions_total_ver_agg_(kg CO2-eq)",
-              "milk allocation factor_hor_agg_(kg^2/day)"
+              "milk allocation factor_hor_agg_(1/day)"
           ],
           "horizontal_aggregation": "product"
       },
       {
           "name": "adjusted herd feed CO2 per FPCM, kg/kg",
           "cross_references": [
-              "adjusted whole herd feed CO2, kg_hor_agg_(kg CO2-eq*kg^2/day)",
+              "adjusted whole herd feed CO2, kg_hor_agg_(kg CO2-eq/day)",
               "Herd FPCM, kg_hor_agg_(kg/day)"
           ],
           "horizontal_aggregation": "division"

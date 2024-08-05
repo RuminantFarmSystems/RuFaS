@@ -618,7 +618,7 @@ class ReportGenerator:
                 combined_denominator = ReportGenerator.add_units(denominator1, denominator2)
             elif operation == "division":
                 combined_numerator = ReportGenerator.add_units(numerator1, denominator2)
-                combined_denominator = ReportGenerator.add_units(denominator1, numerator2, sign=-1)
+                combined_denominator = ReportGenerator.add_units(denominator1, numerator2, sign=1)
 
             combined_numerator, combined_denominator = ReportGenerator.simplify_units(combined_numerator,
                                                                                       combined_denominator)
@@ -649,11 +649,12 @@ class ReportGenerator:
 
         for unit in list(combined_numerator.keys()):
             if unit in combined_denominator:
-                if combined_numerator[unit] == combined_denominator[unit]:
+                new_exponent = combined_numerator[unit] - combined_denominator[unit]
+                if new_exponent == 0:
                     del combined_numerator[unit]
                     del combined_denominator[unit]
                 else:
-                    combined_numerator[unit] -= combined_denominator[unit]
+                    combined_numerator[unit] = new_exponent
                     del combined_denominator[unit]
 
         return combined_numerator, combined_denominator

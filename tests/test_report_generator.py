@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional, Type, Callable
+from typing import Dict, List, Any, Optional, Type
+from unittest.mock import patch
 
 import pytest
 from pytest_mock import MockerFixture
@@ -366,79 +367,58 @@ def test_perform_aggregations(filtered_pool: dict[dict[str, list[any]]], filter_
 
 
 @pytest.mark.parametrize(
-    "aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content, expected_result",
+    "aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content, mock_horizontal_agg,"
+    "mock_vertical_agg, expected_output",
     [
         (
-            {"var1": [1, 2, 3], "var2": [4, 5, 6]},
-            "sum",
-            "average",
-            {"horizontal_first": True, "horizontal_order": ["var1", "var2"]},
-            {"hor_ver_agg": [7.0]},
+            # Test case 1: Horizontal first with sum aggregations
+            {"col1": [1, 2, 3], "col2": [4, 5, 6]},
+            "sum", "sum",
+            {"horizontal_first": True, "display_units": False},
+            ([10], "units"),
+            21,
+            {"hor_ver_agg": [10]}
         ),
-        # (
-        #     {"var1": [1, 2, 3], "var2": [4, 5, 6]},
-        #     "average",
-        #     "sum",
-        #     {"horizontal_first": False},
-        #     {"ver_hor_agg": [10.5]},
-        # ),
-        # (
-        #     {"var1": [1, 2, 3], "var2": [4, 5, 6], "var3": [7, 8, 9]},
-        #     "product",
-        #     "subtraction",
-        #     {"horizontal_first": True},
-        #     {"hor_ver_agg": [-214]},
-        # ),
-        # (
-        #     {"var1": [1, 2, 3], "var2": [4, 5, 6], "var3": [7, 8, 9]},
-        #     "subtraction",
-        #     "product",
-        #     {"horizontal_first": False},
-        #     {"ver_hor_agg": [-618]},
-        # ),
-    ],
+        (
+            # Test case 2: Vertical first with sum aggregations
+            {"col1": [1, 2, 3], "col2": [4, 5, 6]},
+            "sum", "sum",
+            {"horizontal_first": False, "display_units": False},
+            None,
+            {"col1": [5], "col2": [7]},
+            {"ver_hor_agg": [12]}
+        ),
+    ]
 )
 def test_handle_horizontal_and_vertical_aggregations(
-    aggregate_report: Dict[str, List[Any]],
+    aggregate_report: dict[str, list[any]],
     horizontal_agg_key: str,
     vertical_agg_key: str,
-    filter_content: Dict[str, Any],
-    expected_result: Dict[str, List[Any]],
+    filter_content: dict[str, any],
+    mock_horizontal_agg: any,
+    mock_vertical_agg: any,
+    expected_output: dict[str, list[any]],
     mocker: MockerFixture,
-) -> None:
-    """
-    Unit test for _handle_horizontal_and_vertical_aggregations() method in report_generator.py file.
-    """
-
-    # Arrange
+):
     report_generator = ReportGenerator()
 
-    def mock_apply_horizontal_aggregation(
-        data: Dict[str, List[Any]], loop_list: List[str], aggregator: Callable[[List[Any]], Any]
-    ) -> List[Any]:
-        """Mock function for _apply_horizontal_aggregation() method in report_generator.py file."""
+    mocker.patch.object(report_generator, "_get_horizontal_first_value",
+                        return_value=filter_content["horizontal_first"])
 
-        return [aggregator([data[key][i] for key in loop_list]) for i in range(len(data[loop_list[0]]))]
+    if mock_horizontal_agg is not None:
+        mocker.patch.object(report_generator, "_apply_horizontal_aggregation", return_value=mock_horizontal_agg)
 
-    def mock_apply_vertical_aggregation(
-        data: Dict[str, List[Any]], aggregator: Callable[[List[Any]], Any]
-    ) -> Dict[str, List[Any]]:
-        """Mock function for _apply_vertical_aggregation() method in report_generator.py file."""
+    if mock_vertical_agg is not None:
+        mocker.patch.object(report_generator, "_apply_vertical_aggregation", return_value=mock_vertical_agg)
+        mocker.patch.object(report_generator, "_aggregate_units", return_value="units")
 
-        return {key: [aggregator(values)] for key, values in data.items()}
+    # Mock AGGREGATION_FUNCTIONS for sum
+    with patch.dict('RUFAS.report_generator.AGGREGATION_FUNCTIONS', {'sum': sum}):
+        result = report_generator._handle_horizontal_and_vertical_aggregations(
+            aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
+        )
 
-    mocker.patch.object(
-        report_generator, "_apply_horizontal_aggregation", side_effect=mock_apply_horizontal_aggregation
-    )
-    mocker.patch.object(report_generator, "_apply_vertical_aggregation", side_effect=mock_apply_vertical_aggregation)
-
-    # Act
-    result = report_generator._handle_horizontal_and_vertical_aggregations(
-        aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
-    )
-
-    # Assert
-    assert result == expected_result
+    assert result == expected_output
 
 
 @pytest.mark.parametrize(
