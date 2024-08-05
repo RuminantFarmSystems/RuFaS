@@ -463,7 +463,7 @@ class TaskManager:
         for path in json_output_path.iterdir():
             matches = re.match(
                 f"{str(json_output_path)}/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*",
-                str(path)
+                str(path),
             )
             if matches:
                 path_to_actual_results = path
