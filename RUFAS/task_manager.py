@@ -484,12 +484,10 @@ class TaskManager:
         testing_results_path = json_output_path.joinpath(Path(testing_results_file_name))
         no_diff = diff == {}
         if no_diff:
-            passing = True
             output_manager.add_log("End-to-end testing", "End-to-end testing successful", info_map)
         else:
-            passing = False
             output_manager.add_error("End-to-end testing", "End-to-end testing unsuccessful", info_map)
-        diff.update({"end_to_end_testing_passing": passing})
+        diff.update({"end_to_end_testing_passing": no_diff})
         output_manager.dict_to_file_json(diff, testing_results_path, False)
 
     @staticmethod
