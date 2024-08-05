@@ -305,6 +305,14 @@ class DataValidator:
         return True, ""
 
     @staticmethod
+    def check_error(valid: bool, message: str) -> Tuple[bool, str]:
+        """Helper method to reduce complexity"""
+        if not valid:
+            return valid, message
+        else:
+            pass
+
+    @staticmethod
     def _metadata_number_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates number type properties in metadata."""
         om = OutputManager()
@@ -323,6 +331,7 @@ class DataValidator:
         default = value.get("default", "No default")
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
+
         if default is None and not nullable:
             om.add_error(
                 "Invalid metadata default number value.",
@@ -331,17 +340,19 @@ class DataValidator:
             )
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'."
             return False, error_message
-        if default is not None:
-            if not isinstance(default, (int, float)) and not has_no_default:
-                om.add_error(
-                    "Invalid metadata default number value.",
-                    f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
-                    info_map,
-                )
-                error_message = f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}."
-                return False, error_message
+
+        if default is not None and not isinstance(default, (int, float)) and not has_no_default:
+            om.add_error(
+                "Invalid metadata default number value.",
+                f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
+                info_map,
+            )
+            error_message = f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}."
+            return False, error_message
+
         minimum = value.get("minimum")
         maximum = value.get("maximum")
+
         if minimum is not None and not isinstance(minimum, (int, float)):
             om.add_error(
                 "Invalid metadata number properties minimum.",
@@ -350,6 +361,7 @@ class DataValidator:
             )
             error_message = f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}."
             return False, error_message
+
         if maximum is not None and not isinstance(maximum, (int, float)):
             om.add_error(
                 "Invalid metadata number properties maximum.",
@@ -358,6 +370,7 @@ class DataValidator:
             )
             error_message = f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}."
             return False, error_message
+
         if maximum is not None and minimum is not None and maximum < minimum:
             om.add_error(
                 "Invalid range of acceptable numbers.",
@@ -390,6 +403,7 @@ class DataValidator:
                 error_message = (
                     f"Invalid 'default' for '{key_path}': 'default' {default} is " f"greater than 'maximum' {maximum}"
                 )
+                return False, error_message
 
         return True, ""
 
@@ -419,15 +433,16 @@ class DataValidator:
             )
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
             return False, error_message
-        if default is not None and not has_no_default:
-            if not isinstance(default, str):
-                om.add_error(
-                    "Invalid metadata default string value.",
-                    f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
-                    info_map,
-                )
-                error_message = f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}"
-                return False, error_message
+
+        if default is not None and not has_no_default and not isinstance(default, str):
+            om.add_error(
+                "Invalid metadata default string value.",
+                f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
+                info_map,
+            )
+            error_message = f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}"
+            return False, error_message
+
         pattern = value.get("pattern")
         if pattern is not None and not isinstance(pattern, str):
             om.add_error(
