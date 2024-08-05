@@ -103,5 +103,5 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             self._anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
         )
 
-anaerobic_lagoon_daily_output.biogas = self.anaerobic_digestion_daily_output.biogas
+        anaerobic_lagoon_daily_output.biogas = self.anaerobic_digestion_daily_output.biogas
         return anaerobic_lagoon_daily_output
