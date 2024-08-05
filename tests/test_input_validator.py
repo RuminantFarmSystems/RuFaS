@@ -5,8 +5,7 @@ import pytest
 from mock.mock import call
 from pytest_mock import MockerFixture
 
-from RUFAS.elements import ElementsCounter, ElementState
-from RUFAS.input_validator import InputValidator
+from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
 from RUFAS.output_manager import OutputManager
 
 
@@ -59,13 +58,13 @@ def test_bool_type_validator(
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
     patch_extract = mocker.patch.object(
-        InputValidator, "_extract_input_data_by_key_list", return_value=input_data_value
+        DataValidator, "_extract_input_data_by_key_list", return_value=input_data_value
     )
-    patch_path_to_str = mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
+    patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
-    result = InputValidator._bool_type_validator(
+    result = DataValidator._bool_type_validator(
         var_path,
         variable_properties,
         dummy_input_data,
@@ -115,11 +114,11 @@ def test_number_type_validator(
     dummy_properties_key = "dummy_variable_properties"
     unused_bool_input = False
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
-    patch_extract = mocker.patch.object(InputValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
-    patch_path_to_str = mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
+    patch_extract = mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = InputValidator._number_type_validator(
+    result = DataValidator._number_type_validator(
         dummy_var_path,
         dummy_variable_properties,
         dummy_input_data,
@@ -170,11 +169,11 @@ def test_string_type_validator(
     dummy_input_data = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
-    patch_extract = mocker.patch.object(InputValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
-    patch_path_to_str = mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="dummy_name")
+    patch_extract = mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=dummy_value)
+    patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
-    result = InputValidator._string_type_validator(
+    result = DataValidator._string_type_validator(
         var_path,
         dummy_variable_properties,
         dummy_input_data,
@@ -258,7 +257,7 @@ def test_fix_array_type_fixable_data(
     dummy_properties_key = "dummy_variable_properties"
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
-    result = InputValidator._fix_data(
+    result = DataValidator._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -330,7 +329,7 @@ def test_fix_array_type_critical_data(
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
 
-    result = InputValidator._fix_data(
+    result = DataValidator._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -428,7 +427,7 @@ def test_fix_string_type_fixable_data(
     dummy_properties_key = "dummy_variable_properties"
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = InputValidator._fix_data(
+    result = DataValidator._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -450,7 +449,7 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
     dummy_properties_key = "dummy_variable_properties"
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = InputValidator._fix_data(
+    result = DataValidator._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -526,7 +525,7 @@ def test_fix_string_type_critical_data(
     dummy_properties_key = "dummy_variable_properties"
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = InputValidator._fix_data(
+    result = DataValidator._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -621,7 +620,7 @@ def test_fix_number_type_fixable_data(
     dummy_properties_key = "dummy_variable_properties"
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = InputValidator._fix_data(
+    result = DataValidator._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -692,7 +691,7 @@ def test_fix_number_type_critical_data(
     dummy_properties_key = "dummy_variable_properties"
 
     add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = InputValidator._fix_data(
+    result = DataValidator._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -755,9 +754,9 @@ def test_extract_value_by_key_list(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            InputValidator.extract_value_by_key_list(input_data, variable_path)
+            DataValidator.extract_value_by_key_list(input_data, variable_path)
     else:
-        result = InputValidator.extract_value_by_key_list(input_data, variable_path)
+        result = DataValidator.extract_value_by_key_list(input_data, variable_path)
         assert result == expected
 
 
@@ -779,7 +778,7 @@ def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expe
     """
 
     # Act
-    result = InputValidator.convert_variable_path_to_str(variable_path)
+    result = DataValidator.convert_variable_path_to_str(variable_path)
 
     # Assert
     assert result == expected
@@ -849,13 +848,13 @@ def test_object_type_validator(
     """
 
     # Arrange
-    mocker.patch.object(InputValidator, "_extract_input_data_by_key_list", return_value=patch_extract_return)
-    mocker.patch.object(InputValidator, "validate_input_by_type", return_value=patch_validate_return)
+    mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=patch_validate_return)
     mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
     mock_elements_counter = mocker.MagicMock()
 
     # Act
-    result = InputValidator._object_type_validator(
+    result = DataValidator._object_type_validator(
         variable_path,
         variable_properties,
         input_data,
@@ -881,9 +880,9 @@ def test_object_type_validator_key_removal(
     mocker: MockerFixture, data: dict[str, Any], removed_keys: list[str]
 ) -> None:
     """Tests that extraneous keys are properly removed by the _object_type_validator in Input Manager."""
-    mocker.patch.object(InputValidator, "_extract_input_data_by_key_list", return_value=data)
-    mocker.patch.object(InputValidator, "validate_input_by_type", return_value=True)
-    mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="dummy path")
+    mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=data)
+    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=True)
+    mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy path")
     add_warning = mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
     mock_elements_counter = mocker.MagicMock()
     variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
@@ -899,7 +898,7 @@ def test_object_type_validator_key_removal(
         for key in removed_keys
     ]
 
-    result = InputValidator._object_type_validator(
+    result = DataValidator._object_type_validator(
         ["path", "to", "var"],
         variable_properties,
         {"dummy": "data"},
@@ -971,7 +970,7 @@ def test_validate_array_container_properties(
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 
     # Act
-    result = InputValidator._validate_array_container_properties(
+    result = DataValidator._validate_array_container_properties(
         variable_path, variable_properties, input_data, properties_blob_key
     )
 
@@ -1106,13 +1105,13 @@ def test_array_type_validator(
     """
 
     # Arrange
-    mocker.patch.object(InputValidator, "_extract_input_data_by_key_list", return_value=patch_extract_return)
-    mocker.patch.object(InputValidator, "_validate_array_container_properties", return_value=patch_container_valid)
-    mocker.patch.object(InputValidator, "validate_input_by_type", return_value=patch_element_valid)
+    mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=patch_extract_return)
+    mocker.patch.object(DataValidator, "_validate_array_container_properties", return_value=patch_container_valid)
+    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=patch_element_valid)
     mock_elements_counter = mocker.MagicMock()
 
     # Act
-    result = InputValidator._array_type_validator(
+    result = DataValidator._array_type_validator(
         variable_path,
         variable_properties,
         input_data,
@@ -1179,14 +1178,14 @@ def test_validate_input_by_type(
     properties_blob_key = "blobKey"
     elements_counter = mocker.MagicMock()
 
-    mocker.patch.object(InputValidator, "extract_value_by_key_list", return_value=input_value)
-    mocker.patch.object(InputValidator, "convert_variable_path_to_str", return_value="path.to.variable")
-    patch_for_fix_data = mocker.patch.object(InputValidator, "_fix_data", return_value=fixable)
+    mocker.patch.object(DataValidator, "extract_value_by_key_list", return_value=input_value)
+    mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="path.to.variable")
+    patch_for_fix_data = mocker.patch.object(DataValidator, "_fix_data", return_value=fixable)
 
-    validator_mock = mocker.patch.object(InputValidator, f"_{data_type}_type_validator", return_value=validator_return)
+    validator_mock = mocker.patch.object(DataValidator, f"_{data_type}_type_validator", return_value=validator_return)
 
     # Act
-    result = InputValidator.validate_input_by_type(
+    result = DataValidator.validate_data_by_type(
         variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter, True
     )
 
@@ -1219,7 +1218,7 @@ def test_validate_input_by_type_key_error() -> None:
 
     # Act and Assert
     with pytest.raises(KeyError):
-        InputValidator.validate_input_by_type(
+        DataValidator.validate_data_by_type(
             variable_properties,
             variable_path,
             input_data,
@@ -1298,11 +1297,11 @@ def test_validate_metadata(
 
     if expected_exception:
         with pytest.raises(ValueError):
-            InputValidator.validate_metadata(metadata)
+            DataValidator.validate_metadata(metadata)
         mock_add_log.assert_not_called()
         mock_add_error.assert_called()
     else:
-        InputValidator.validate_metadata(metadata)
+        DataValidator.validate_metadata(metadata)
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
 
@@ -1369,14 +1368,14 @@ def test_validate_properties(
 
     if should_raise:
         with pytest.raises(ValueError) as exc_info:
-            InputValidator.validate_properties(metadata, limit)
+            DataValidator.validate_properties(metadata, limit)
         assert str(exc_info.value) == expected_err_msg
         assert mock_add_error.call_count == len(expected_errors)
         for error_msg in expected_errors:
             mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
         mock_add_log.assert_not_called()
     else:
-        InputValidator.validate_properties(metadata, limit)
+        DataValidator.validate_properties(metadata, limit)
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
         assert mock_add_log.call_args_list == [
@@ -1464,12 +1463,12 @@ def test_metadata_number_validator(
     info_map = {"class": "InputValidator", "function": "_metadata_number_validator"}
     if should_raise:
         with pytest.raises(ValueError):
-            InputValidator._metadata_number_validator(key_path, value)
+            DataValidator._metadata_number_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
     else:
-        InputValidator._metadata_number_validator(key_path, value)
+        DataValidator._metadata_number_validator(key_path, value)
         mock_validate_properties_keys.assert_called_once()
 
 
@@ -1532,12 +1531,12 @@ def test_metadata_string_validator(
 
     if should_raise:
         with pytest.raises(ValueError):
-            InputValidator._metadata_string_validator(key_path, value)
+            DataValidator._metadata_string_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
     else:
-        InputValidator._metadata_string_validator(key_path, value)
+        DataValidator._metadata_string_validator(key_path, value)
         mock_add_error.assert_not_called()
         mock_validate_properties_keys.assert_called_once()
 
@@ -1586,12 +1585,12 @@ def test_metadata_bool_validator(
 
     if should_raise:
         with pytest.raises(ValueError):
-            InputValidator._metadata_bool_validator(key_path, value)
+            DataValidator._metadata_bool_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
     else:
-        InputValidator._metadata_bool_validator(key_path, value)
+        DataValidator._metadata_bool_validator(key_path, value)
         mock_add_error.assert_not_called()
         mock_validate_properties_keys.assert_called_once()
 
@@ -1641,12 +1640,12 @@ def test_metadata_array_validator(
 
     if should_raise:
         with pytest.raises(ValueError):
-            InputValidator._metadata_array_validator(key_path, value)
+            DataValidator._metadata_array_validator(key_path, value)
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
     else:
-        InputValidator._metadata_array_validator(key_path, value)
+        DataValidator._metadata_array_validator(key_path, value)
         mock_add_error.assert_not_called()
         mock_validate_properties_keys.assert_called_once()
 
@@ -1660,7 +1659,7 @@ def test_metadata_object_validator(
     )
     key_path = ["path", "cow"]
     value = {"type": "object", "description": "cow", "cow": {"data_about_cow": 17}}
-    InputValidator._metadata_object_validator(key_path, value)
+    DataValidator._metadata_object_validator(key_path, value)
     mock_validate_properties_keys.assert_called_once()
 
 
@@ -1724,7 +1723,7 @@ def test_validate_metadata_properties_keys(
 
     if should_raise:
         with pytest.raises(ValueError):
-            InputValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+            DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
         mock_add_error.assert_called_once_with(
             "Metadata Validation",
             expected_message,
@@ -1734,7 +1733,7 @@ def test_validate_metadata_properties_keys(
             },
         )
     else:
-        InputValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
         mock_add_error.assert_not_called()
 
 
@@ -1744,11 +1743,11 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     dummy_var_path: list[str | int] = ["dummy_var_path"]
     dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     dummy_value = 1
-    patch_extract = mocker.patch.object(InputValidator, "extract_value_by_key_list", return_value=dummy_value)
-    patch_log_missing_data = mocker.patch.object(InputValidator, "_log_missing_data")
+    patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", return_value=dummy_value)
+    patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
 
-    result = InputValidator._extract_input_data_by_key_list(
-        input_data=dummy_input_data,
+    result = DataValidator._extract_data_by_key_list(
+        data=dummy_input_data,
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=True,
@@ -1757,8 +1756,8 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     assert result == dummy_value
     patch_log_missing_data.assert_not_called()
 
-    result = InputValidator._extract_input_data_by_key_list(
-        input_data=dummy_input_data,
+    result = DataValidator._extract_data_by_key_list(
+        data=dummy_input_data,
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=False,
@@ -1790,11 +1789,11 @@ def test_extract_input_data_by_key_list_key_error(
     """Unit tests for making sure data were extracted when error occurs"""
     dummy_input_data: Dict[str, Any] = {"a": 1, "b": 2}
     dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
-    patch_extract = mocker.patch.object(InputValidator, "extract_value_by_key_list", side_effect=KeyError)
-    patch_log_missing_data = mocker.patch.object(InputValidator, "_log_missing_data")
+    patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", side_effect=KeyError)
+    patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
 
-    result = InputValidator._extract_input_data_by_key_list(
-        input_data=dummy_input_data,
+    result = DataValidator._extract_data_by_key_list(
+        data=dummy_input_data,
         variable_path=var_path,
         variable_properties=dummy_var_properties,
         called_during_initialization=called_during_initialization,

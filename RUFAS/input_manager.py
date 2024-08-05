@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Callable, Tuple
 import pandas as pd
 from deepdiff import DeepDiff
 
-from RUFAS.input_validator import InputValidator, ElementsCounter, Modifiability
+from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -86,9 +86,9 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        InputValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+        DataValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
         self._load_properties()
-        InputValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
+        DataValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -301,10 +301,10 @@ class InputManager:
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 variable_properties = metadata_properties[metadata_property]
-                is_element_acceptable = InputValidator.validate_input_by_type(
+                is_element_acceptable = DataValidator.validate_data_by_type(
                     variable_path=[metadata_property],
                     variable_properties=variable_properties,
-                    input_data=input_data,
+                    data=input_data,
                     eager_termination=eager_termination,
                     properties_blob_key=properties_blob_key,
                     elements_counter=self.elements_counter,
@@ -529,7 +529,7 @@ class InputManager:
         }
         element_hierarchy = data_address.split(".")
         try:
-            data_value = InputValidator.extract_value_by_key_list(self.__pool, element_hierarchy)
+            data_value = DataValidator.extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
@@ -569,7 +569,7 @@ class InputManager:
         """
         variable_path = data_address.split(".")
         try:
-            InputValidator.extract_value_by_key_list(self.__pool, variable_path)
+            DataValidator.extract_value_by_key_list(self.__pool, variable_path)
             return True
         except KeyError:
             return False
@@ -972,10 +972,10 @@ class InputManager:
             if metadata_property in variable_properties_to_ignore:
                 continue
             variable_properties = metadata_properties[metadata_property]
-            is_element_acceptable = InputValidator.validate_input_by_type(
+            is_element_acceptable = DataValidator.validate_data_by_type(
                 variable_path=[metadata_property],
                 variable_properties=variable_properties,
-                input_data=data,
+                data=data,
                 eager_termination=eager_termination,
                 properties_blob_key=properties_blob_key,
                 elements_counter=elements_counter,

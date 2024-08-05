@@ -7,14 +7,12 @@ from typing import Dict, Any, Callable, List, Union, Sequence
 from RUFAS.output_manager import OutputManager
 
 
-#  These should be passed in via IM not here
-#  No wording of INPUT
 #  log error here, leave termination for IM
 #  Move elements counters...etc to here
 
 class ElementState(Enum):
     """
-    An enumeration of the states an input data element can be in during validation. An element cannot
+    An enumeration of the states a data element can be in during validation. An element cannot
     be in more than one state at a time.
 
     Attributes
@@ -181,7 +179,7 @@ class Modifiability(Enum):
         return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
-class InputValidator:
+class DataValidator:
 
     @staticmethod
     def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> None:
@@ -197,8 +195,8 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator.validate_properties.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_properties.__name__,
         }
 
         stack: list[tuple[dict[str, Any], int, list[str]]] = [(metadata["properties"], 0, [])]
@@ -206,11 +204,11 @@ class InputValidator:
         deepest_path: list[str] = []
 
         type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], None]] = {
-            "number": InputValidator._metadata_number_validator,
-            "array": InputValidator._metadata_array_validator,
-            "bool": InputValidator._metadata_bool_validator,
-            "string": InputValidator._metadata_string_validator,
-            "object": InputValidator._metadata_object_validator,
+            "number": DataValidator._metadata_number_validator,
+            "array": DataValidator._metadata_array_validator,
+            "bool": DataValidator._metadata_bool_validator,
+            "string": DataValidator._metadata_string_validator,
+            "object": DataValidator._metadata_object_validator,
         }
         while stack:
             current_obj, depth, path = stack.pop()
@@ -258,8 +256,8 @@ class InputValidator:
         """Validates that keys in the metadata properties sections."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._validate_metadata_properties_keys.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._validate_metadata_properties_keys.__name__,
         }
         if missing_required_keys := required_properties_keys - properties.keys():
             om.add_error(
@@ -300,12 +298,12 @@ class InputValidator:
         """Validates number type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._metadata_number_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_number_validator.__name__,
         }
         required_number_property_keys = {"type"}
         optional_number_property_keys = {"description", "minimum", "maximum", "default", "nullable"}
-        InputValidator._validate_metadata_properties_keys(
+        DataValidator._validate_metadata_properties_keys(
             required_number_property_keys, optional_number_property_keys, value, key_path
         )
         default = value.get("default", "No default")
@@ -378,12 +376,12 @@ class InputValidator:
         """Validates string type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._metadata_string_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_string_validator.__name__,
         }
         required_str_property_keys = {"type"}
         optional_str_property_keys = {"description", "pattern", "default", "nullable"}
-        InputValidator._validate_metadata_properties_keys(
+        DataValidator._validate_metadata_properties_keys(
             required_str_property_keys, optional_str_property_keys, value, key_path
         )
         default = value.get("default", "No default")
@@ -442,12 +440,12 @@ class InputValidator:
         """Validates bool type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._metadata_bool_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_bool_validator.__name__,
         }
         required_bool_property_keys = {"type"}
         optional_bool_property_keys = {"description", "default", "nullable"}
-        InputValidator._validate_metadata_properties_keys(
+        DataValidator._validate_metadata_properties_keys(
             required_bool_property_keys, optional_bool_property_keys, value, key_path
         )
 
@@ -474,12 +472,12 @@ class InputValidator:
         """Validates array type properties in metadata."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._metadata_array_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._metadata_array_validator.__name__,
         }
         required_array_property_keys = {"type", "properties"}
         optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
-        InputValidator._validate_metadata_properties_keys(
+        DataValidator._validate_metadata_properties_keys(
             required_array_property_keys, optional_array_property_keys, value, key_path
         )
         minimum_length = value.get("minimum_length")
@@ -519,7 +517,7 @@ class InputValidator:
         """Validates object type properties in metadata."""
         required_object_property_keys = {"type"}
         optional_object_property_keys = {"description"}
-        InputValidator._validate_metadata_properties_keys(
+        DataValidator._validate_metadata_properties_keys(
             required_object_property_keys, optional_object_property_keys, value, key_path
         )
 
@@ -528,8 +526,8 @@ class InputValidator:
         """Checks that top-level metadata has valid and required keys and values."""
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator.validate_metadata.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator.validate_metadata.__name__,
         }
         metadata_files = metadata[address_to_data]
         required_keys = {"path", "type", "properties"}
@@ -565,10 +563,10 @@ class InputValidator:
 
     # Validate input by type related
     @staticmethod
-    def validate_input_by_type(
+    def validate_data_by_type(
         variable_properties: Dict[str, Any],
         variable_path: List[str | int],
-        input_data: Dict[str, Any],
+        data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -576,7 +574,7 @@ class InputValidator:
         fixable_data_types: set[str]
     ) -> bool:
         """
-        Validates the input data based on its specified type.
+        Validates the data based on its specified type.
 
         Parameters
         ----------
@@ -584,23 +582,23 @@ class InputValidator:
             A dictionary containing properties relevant to the validation.
         variable_path : List[str | int]
             The path to the variable being validated.
-        input_data : Dict[str, Any]
-            The input data to be validated.
+        data : Dict[str, Any]
+            The data to be validated.
         eager_termination : bool
             If True, the process will be terminated as soon as finding invalid data and failing to fix it.
         properties_blob_key : str
-            The metadata properties for the data input file being checked.
+            The metadata properties for the data file being checked.
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization.
         fixable_data_types: set[str]
-            Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
+            Set enumerating the data types that the caller will attempt to fix while validating data.
 
         Returns
         -------
         bool
-            True if the input data is valid, False otherwise.
+            True if the data is valid, False otherwise.
 
         Raises
         ------
@@ -620,23 +618,23 @@ class InputValidator:
         type_to_validator_map: Dict[
             str, Callable[[List[int | str], Dict[str, Any], Dict[str, Any], bool, str, "ElementsCounter", bool], bool]
         ] = {
-            "array": InputValidator._array_type_validator,
-            "object": InputValidator._object_type_validator,
-            "string": InputValidator._string_type_validator,
-            "number": InputValidator._number_type_validator,
-            "bool": InputValidator._bool_type_validator,
+            "array": DataValidator._array_type_validator,
+            "object": DataValidator._object_type_validator,
+            "string": DataValidator._string_type_validator,
+            "number": DataValidator._number_type_validator,
+            "bool": DataValidator._bool_type_validator,
         }
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{InputValidator.convert_variable_path_to_str(variable_path)}' "
+                f"The metadata type of the element '{DataValidator.convert_variable_path_to_str(variable_path)}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
         is_valid = type_to_validator_map[data_type](
             variable_path,
             variable_properties,
-            input_data,
+            data,
             eager_termination,
             properties_blob_key,
             elements_counter,
@@ -649,7 +647,7 @@ class InputValidator:
         if is_valid:
             elements_counter.increment(ElementState.VALID)
             return True
-        is_fixed = InputValidator._fix_data(variable_properties, variable_path, input_data, properties_blob_key)
+        is_fixed = DataValidator._fix_data(variable_properties, variable_path, data, properties_blob_key)
         if is_fixed:
             elements_counter.increment(ElementState.FIXED)
             return True
@@ -660,11 +658,11 @@ class InputValidator:
     def _validate_array_container_properties(
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        input_data: Any,
+        data: Any,
         properties_blob_key: str,
     ) -> bool:
         """
-        Validates the container properties of an array input data element.
+        Validates the container properties of an array data element.
 
         Parameters
         ----------
@@ -672,10 +670,10 @@ class InputValidator:
             The path to the variable being validated.
         variable_properties : Dict[str, Any]
             The metadata properties for the variable being validated.
-        input_data : Any
-            The input data to be validated.
+        data : Any
+            The data to be validated.
         properties_blob_key : str
-            The metadata properties for the data input file being checked.
+            The metadata properties for the data file being checked.
 
         Returns
         -------
@@ -684,17 +682,17 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._validate_array_container_properties.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._validate_array_container_properties.__name__,
         }
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
-        if not isinstance(input_data, list):
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        if not isinstance(data, list):
             om.add_warning(
                 "Validation: array container is not a list",
-                f"Variable: '{variable_path_str}' is not an array but has type: {type(input_data)}. "
+                f"Variable: '{variable_path_str}' is not an array but has type: {type(data)}. "
                 f"{properties_violation_message}",
                 info_map,
             )
@@ -703,22 +701,22 @@ class InputValidator:
         maximum_length = variable_properties.get("maximum_length")
         minimum_length = variable_properties.get("minimum_length")
         if minimum_length is not None:
-            is_in_range = variable_properties["minimum_length"] <= len(input_data)
+            is_in_range = variable_properties["minimum_length"] <= len(data)
             if not is_in_range:
                 om.add_warning(
                     "Validation: array length less than minimum",
-                    f"Variable: '{variable_path_str}' has length: {len(input_data)}, less than minimum length: "
+                    f"Variable: '{variable_path_str}' has length: {len(data)}, less than minimum length: "
                     f"{minimum_length}. {properties_violation_message}",
                     info_map,
                 )
                 return False
 
         if maximum_length is not None:
-            is_in_range = len(input_data) <= variable_properties["maximum_length"]
+            is_in_range = len(data) <= variable_properties["maximum_length"]
             if not is_in_range:
                 om.add_warning(
                     "Validation: array length greater than maximum",
-                    f"Variable: '{variable_path_str}' has length: {len(input_data)}, greater than maximum length: "
+                    f"Variable: '{variable_path_str}' has length: {len(data)}, greater than maximum length: "
                     f"{maximum_length}. {properties_violation_message}",
                     info_map,
                 )
@@ -729,14 +727,14 @@ class InputValidator:
     def _array_type_validator(
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
+        data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
     ) -> bool:
         """
-        Validates an input data element of type array.
+        Validates a data element of type array.
 
         Parameters
         ----------
@@ -744,12 +742,12 @@ class InputValidator:
             The path to the variable being validated.
         variable_properties : Dict[str, Any]
             The metadata properties for the variable being validated.
-        input_data : Dict[str, Any]
-            The input data to be validated.
+        data : Dict[str, Any]
+            The data to be validated.
         eager_termination : bool
             If True, the process will be terminated upon finding invalid data.
         properties_blob_key : str
-            The metadata properties for the data input file being checked.
+            The metadata properties for the data file being checked.
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
@@ -758,27 +756,27 @@ class InputValidator:
         Returns
         -------
         bool
-            True if the input data element is valid or fixable, False otherwise.
+            True if the data element is valid or fixable, False otherwise.
         """
 
-        array_value = InputValidator._extract_input_data_by_key_list(
-            input_data, variable_path, variable_properties, called_during_initialization
+        array_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
         )
 
         if variable_properties.get("nullable", False) and array_value is None:
             return True
 
-        if not InputValidator._validate_array_container_properties(
+        if not DataValidator._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
             return False
 
         is_whole_array_acceptable = True
         for index, element in enumerate(array_value):
-            is_element_acceptable = InputValidator.validate_input_by_type(
+            is_element_acceptable = DataValidator.validate_data_by_type(
                 variable_properties["properties"],
                 variable_path + [index],
-                input_data,
+                data,
                 eager_termination,
                 properties_blob_key,
                 elements_counter,
@@ -793,14 +791,14 @@ class InputValidator:
     def _object_type_validator(
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
+        data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: ElementsCounter,
         called_during_initialization: bool,
     ) -> bool:
         """
-        Validates an input data element of type object.
+        Validates a data element of type object.
 
         Parameters
         ----------
@@ -808,12 +806,12 @@ class InputValidator:
             The path to the variable being validated.
         variable_properties : Dict[str, Any]
             The metadata properties for the variable being validated.
-        input_data : Dict[str, Any]
-            The input data to be validated.
+        data : Dict[str, Any]
+            The data to be validated.
         eager_termination : bool
             If True, the process will be terminated upon finding invalid data.
         properties_blob_key : str
-            The metadata properties for the data input file being checked.
+            The metadata properties for the data file being checked.
         elements_counter : ElementsCounter
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
@@ -822,24 +820,24 @@ class InputValidator:
         Returns
         -------
         bool
-            True if the input data element is valid or fixable, False otherwise.
+            True if the data element is valid or fixable, False otherwise.
 
         Notes
         -----
-        This method will look for and delete any keys in the input data that do not have properties specified for them
+        This method will look for and delete any keys in the data that do not have properties specified for them
         in the metadata properties.
 
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._object_type_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._object_type_validator.__name__,
         }
 
-        object_value = InputValidator._extract_input_data_by_key_list(
-            input_data, variable_path, variable_properties, called_during_initialization
+        object_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
         )
-        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
@@ -856,10 +854,10 @@ class InputValidator:
         for key in variable_properties.keys():
             if key in ["type", "description", "default"]:
                 continue
-            is_element_acceptable = InputValidator.validate_input_by_type(
+            is_element_acceptable = DataValidator.validate_data_by_type(
                 variable_properties[key],
                 variable_path + [key],
-                input_data,
+                data,
                 eager_termination,
                 properties_blob_key,
                 elements_counter,
@@ -885,26 +883,26 @@ class InputValidator:
     def _number_type_validator(
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
+        data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
     ) -> bool:
-        """Validates an input data number element."""
+        """Validates an data number element."""
         om = OutputManager()
-        input_data_value = InputValidator._extract_input_data_by_key_list(
-            input_data, variable_path, variable_properties, called_during_initialization
+        data_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
         )
 
-        if variable_properties.get("nullable", False) and input_data_value is None:
+        if variable_properties.get("nullable", False) and data_value is None:
             return True
 
-        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
 
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._number_type_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._number_type_validator.__name__,
         }
         minimum_value = variable_properties.get("minimum")
         maximum_value = variable_properties.get("maximum")
@@ -912,30 +910,30 @@ class InputValidator:
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
 
-        if type(input_data_value) is not float and type(input_data_value) is not int:
+        if type(data_value) is not float and type(data_value) is not int:
             warning_string = "Validation: value is not a number"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: {input_data_value}, is type: "
-                f"{type(input_data_value)}. {properties_violation_message}"
+                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"{type(data_value)}. {properties_violation_message}"
             )
             om.add_warning(warning_string, warning_message, info_map)
             return False
         if minimum_value is not None:
-            is_in_range = minimum_value <= input_data_value
+            is_in_range = minimum_value <= data_value
             if not is_in_range:
                 warning_name = "Validation: value less than minimum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: {input_data_value}, less than minimum value: "
+                    f"Variable: '{variable_path_str}' has value: {data_value}, less than minimum value: "
                     f"{minimum_value: .2f}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_value is not None:
-            is_in_range = input_data_value <= maximum_value
+            is_in_range = data_value <= maximum_value
             if not is_in_range:
                 warning_name = "Validation: value greater than maximum"
                 warning_string = (
-                    f"Variable: '{variable_path_str}' has value: {input_data_value}, greater than maximum value: "
+                    f"Variable: '{variable_path_str}' has value: {data_value}, greater than maximum value: "
                     f"{maximum_value: .2f}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_string, info_map)
@@ -947,46 +945,46 @@ class InputValidator:
     def _string_type_validator(
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
+        data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
     ) -> bool:
-        """Validates an input data string element."""
+        """Validates a data string element."""
         om = OutputManager()
-        input_data_value = InputValidator._extract_input_data_by_key_list(
-            input_data, variable_path, variable_properties, called_during_initialization
+        data_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
         )
 
-        if variable_properties.get("nullable", False) and input_data_value is None:
+        if variable_properties.get("nullable", False) and data_value is None:
             return True
 
-        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._string_type_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._string_type_validator.__name__,
         }
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
 
-        if type(input_data_value) is not str:
+        if type(data_value) is not str:
             warning_name = "Validation: string variable is not a string"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: {input_data_value}, is type: "
-                f"{type(input_data_value)}. {properties_violation_message}"
+                f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
+                f"{type(data_value)}. {properties_violation_message}"
             )
             om.add_warning(warning_name, warning_message, info_map)
             return False
 
         pattern_check = variable_properties.get("pattern")
         if pattern_check is not None:
-            is_valid_string = bool(re.match(pattern_check, input_data_value))
+            is_valid_string = bool(re.match(pattern_check, data_value))
             if not is_valid_string:
                 warning_name = "Validation: string variable does not match pattern"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', does not match pattern: "
+                    f"Variable: '{variable_path_str}' has value: '{data_value}', does not match pattern: "
                     f"{pattern_check}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
@@ -995,21 +993,21 @@ class InputValidator:
         minimum_length = variable_properties.get("minimum_length")
         maximum_length = variable_properties.get("maximum_length")
         if minimum_length is not None:
-            is_valid_string = variable_properties["minimum_length"] <= len(input_data_value)
+            is_valid_string = variable_properties["minimum_length"] <= len(data_value)
             if not is_valid_string:
                 warning_name = "Validation: string length less than minimum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', length is less than "
+                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
-            is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
+            is_valid_string = len(data_value) <= variable_properties["maximum_length"]
             if not is_valid_string:
                 warning_name = "Validation: string length greater than maximum"
                 warning_message = (
-                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', length is greater than "
+                    f"Variable: '{variable_path_str}' has value: '{data_value}', length is greater than "
                     f"maximum length: {maximum_length}. {properties_violation_message}"
                 )
                 om.add_warning(warning_name, warning_message, info_map)
@@ -1021,36 +1019,36 @@ class InputValidator:
     def _bool_type_validator(
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
-        input_data: Dict[str, Any],
+        data: Dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
     ) -> bool:
-        """Validates an input data bool element."""
+        """Validates a data bool element."""
         om = OutputManager()
-        input_data_value = InputValidator._extract_input_data_by_key_list(
-            input_data, variable_path, variable_properties, called_during_initialization
+        data_value = DataValidator._extract_data_by_key_list(
+            data, variable_path, variable_properties, called_during_initialization
         )
 
-        if variable_properties.get("nullable", False) and input_data_value is None:
+        if variable_properties.get("nullable", False) and data_value is None:
             return True
 
-        variable_path_str = InputValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
 
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._bool_type_validator.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._bool_type_validator.__name__,
         }
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
 
-        if type(input_data_value) is not bool:
+        if type(data_value) is not bool:
             warning_name = "Validation: bool variable is not a bool"
             warning_message = (
-                f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
-                f"'{type(input_data_value)}'. {properties_violation_message}"
+                f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
+                f"'{type(data_value)}'. {properties_violation_message}"
             )
             om.add_warning(warning_name, warning_message, info_map)
             return False
@@ -1061,7 +1059,7 @@ class InputValidator:
     def _fix_data(
         variable_properties: Dict[str, Any],
         element_hierarchy: List[Union[str, int]],
-        input_data: Dict[str, Any],
+        data: Dict[str, Any],
         properties_blob_key: str,
     ) -> bool:
         """
@@ -1075,11 +1073,11 @@ class InputValidator:
         element_hierarchy: list
             A list indicating the path to reach the variable of interest in self.__metadata and self.__pool.
 
-        input_data: dict[str, Any]
-            A buffer dictionary that holds the input data for validation and fixing.
+        data: dict[str, Any]
+            A buffer dictionary that holds the data for validation and fixing.
 
         properties_blob_key : str
-            The metadata properties section keyword for the data input file being checked.
+            The metadata properties section keyword for the data file being checked.
 
         Returns
         -------
@@ -1088,11 +1086,11 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._fix_data.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._fix_data.__name__,
         }
 
-        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1], input_data)
+        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1], data)
 
         element_path = ".".join([str(element) for element in element_hierarchy])
         properties_violation_message = (
@@ -1127,22 +1125,22 @@ class InputValidator:
         return True
 
     @staticmethod
-    def _extract_input_data_by_key_list(
-        input_data: List[Any] | Dict[str, Any],
+    def _extract_data_by_key_list(
+        data: List[Any] | Dict[str, Any],
         variable_path: Sequence[str | int],
         variable_properties: Dict[str, Any],
         called_during_initialization: bool,
     ) -> Any:
         """
-        Extracts a value from the input data based on a specified path and handles missing data by calling
-        InputManager._log_missing_data().
+        Extracts a value from the data based on a specified path and handles missing data by calling
+        DataValidator._log_missing_data().
 
         Parameters
         ----------
-        input_data : List[Any] | Dict[str, Any]
-            The input data containing the value to be extracted.
+        data : List[Any] | Dict[str, Any]
+            The data containing the value to be extracted.
         variable_path : List[str | int]
-            A list of keys to be used to extract the value from the input data.
+            A list of keys to be used to extract the value from the data.
         variable_properties : Dict[str, Any]
             The metadata properties for the variable being validated.
         called_during_initialization: bool
@@ -1151,23 +1149,23 @@ class InputValidator:
         Returns
         -------
         Any
-            The value extracted from the input data if found.
+            The value extracted from the data if found.
             None if not found.
 
         Notes
         -----
-        This function navigates through the given input data (which can be a list or a dictionary) following the path
+        This function navigates through the given data (which can be a list or a dictionary) following the path
         specified in `variable_path`. If the path leads to a value, it is returned.
         If a KeyError occurs during this process (i.e., a key or index is missing in the path), the function extracts
         the variable name by finding the last string element in the `variable_path` array and handles this missing data
-        by calling InputManager._log_missing_data().
+        by calling DataValidator._log_missing_data().
         """
         result = None
         try:
-            result = InputValidator.extract_value_by_key_list(input_data, variable_path)
+            result = DataValidator.extract_value_by_key_list(data, variable_path)
         except KeyError:
             var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
-            InputValidator._log_missing_data(
+            DataValidator._log_missing_data(
                 variable_properties=variable_properties,
                 var_name=var_name,
                 called_during_initialization=called_during_initialization,
@@ -1199,40 +1197,40 @@ class InputValidator:
         Notes
         -----
         This function determines if it's being called during the initialization phase and checks if the missing variable
-        data is required at this stage using '_is_input_required_upon_initialization'. If required, it logs an error and
+        data is required at this stage using '_is_data_required_upon_initialization'. If required, it logs an error and
         raises a KeyError. If not, it logs a warning.
         """
         om = OutputManager()
-        info_map = {"class": InputValidator.__name__, "function": InputValidator._log_missing_data.__name__}
+        info_map = {"class": DataValidator.__name__, "function": DataValidator._log_missing_data.__name__}
         if not called_during_initialization:
             error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
             om.add_error("Missing required data", error_msg, info_map)
             raise KeyError(error_msg)
 
-        if InputValidator._is_input_required_upon_initialization(
+        if DataValidator._is_data_required_upon_initialization(
             variable_name=var_name, variable_properties=variable_properties
         ):
             om.add_error(
                 "Missing required data",
-                f"Key {var_name} not found in input data. Input value is required for this "
+                f"Key {var_name} not found in data. Data value is required for this "
                 "variable upon program initialization.",
                 info_map,
             )
             raise KeyError(
-                f"Key {var_name} not found in input data. Input value is required for this "
+                f"Key {var_name} not found in data. Data value is required for this "
                 "variable upon program initialization."
             )
         om.add_warning(
-            "Validation: key not found in input data -- input not required upon initialization",
-            f"Key {var_name} not found in input data. Input value is not required for this "
+            "Validation: key not found in data -- data not required upon initialization",
+            f"Key {var_name} not found in data. Data value is not required for this "
             "variable upon program initialization, setting the variable value to None.",
             info_map,
         )
 
     @staticmethod
-    def _is_input_required_upon_initialization(variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+    def _is_data_required_upon_initialization(variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
-        Determines whether a variable requires an input value upon initialization based on its modifiability status.
+        Determines whether a variable requires a data value upon initialization based on its modifiability status.
 
         This function utilizes the '_get_variable_modifiability' method to ascertain the modifiability status of the
         variable identified by 'variable_name' and described by 'variable_properties'. It then checks if the
@@ -1250,10 +1248,10 @@ class InputValidator:
         Returns
         -------
         bool
-            True if the variable's modifiability status necessitates an input value upon initialization,
+            True if the variable's modifiability status necessitates a data value upon initialization,
             False otherwise.
         """
-        variable_modifiability = InputValidator._get_variable_modifiability(
+        variable_modifiability = DataValidator._get_variable_modifiability(
             variable_name=variable_name, variable_properties=variable_properties
         )
         return variable_modifiability in Modifiability.get_required_during_initialization()
@@ -1291,8 +1289,8 @@ class InputValidator:
         """
         om = OutputManager()
         info_map = {
-            "class": InputValidator.__name__,
-            "function": InputValidator._get_variable_modifiability.__name__,
+            "class": DataValidator.__name__,
+            "function": DataValidator._get_variable_modifiability.__name__,
         }
 
         default = "UNREQUIRED UNLOCKED"
@@ -1317,7 +1315,7 @@ class InputValidator:
         Parameters
         ----------
         variable_path : List[str | int]
-            A list of keys to be used to extract the value from the input data.
+            A list of keys to be used to extract the value from the data.
 
         Returns
         -------
@@ -1328,12 +1326,12 @@ class InputValidator:
         --------
         >>> input_manager = InputManager()
         >>> var_path = ["animal", "herd_information", "calf_num"]
-        >>> InputValidator.convert_variable_path_to_str(var_path)
+        >>> DataValidator.convert_variable_path_to_str(var_path)
         'animal.herd_information.calf_num'
 
         >>> input_manager = InputManager()
         >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
-        >>> InputValidator.convert_variable_path_to_str(var_path)
+        >>> DataValidator.convert_variable_path_to_str(var_path)
         'manure_management_scenarios.[0].bedding_type'
         """
 
@@ -1346,30 +1344,30 @@ class InputValidator:
         return ".".join(formatted_path_elems)
 
     @staticmethod
-    def extract_value_by_key_list(input_data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+    def extract_value_by_key_list(data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
         Parameters
         ----------
-        input_data : List[Any] | Dict[str, Any]
-            The input data containing the value to be extracted.
+        data : List[Any] | Dict[str, Any]
+            The data containing the value to be extracted.
         variable_path : List[str | int]
-            A list of keys to be used to extract the value from the input data.
+            A list of keys to be used to extract the value from the data.
 
         Returns
         -------
         Any
-            The value extracted from the input data.
+            The value extracted from the data.
 
         Raises
         ------
         KeyError
-            If the value cannot be extracted from the input data using the provided variable path.
+            If the value cannot be extracted from the data using the provided variable path.
 
         Examples
         --------
-        >>> input_manager = InputValidator()
+        >>> data_validator = DataValidator()
         >>> example_data = {
         ...     "animal": {
         ...         "herd_information": {
@@ -1381,10 +1379,10 @@ class InputValidator:
         ...     }
         ... }
         >>> var_path = ["animal", "herd_information", "calf_num"]
-        >>> InputValidator.extract_value_by_key_list(example_data, var_path)
+        >>> DataValidator.extract_value_by_key_list(example_data, var_path)
         8
 
-        >>> input_manager = InputValidator()
+        >>> data_validator = DataValidator()
         >>> example_data = {
         ...     "manure_management_scenarios": [
         ...         {
@@ -1398,15 +1396,15 @@ class InputValidator:
         ...     ]
         ... }
         >>> var_path = ["manure_management_scenarios", 0, "bedding_type"]
-        >>> InputValidator.extract_value_by_key_list(example_data, var_path)
+        >>> DataValidator.extract_value_by_key_list(example_data, var_path)
         'straw'
         """
 
         for key in variable_path:
-            if isinstance(input_data, list) and 0 <= int(key) < len(input_data):
-                input_data = input_data[int(key)]
-            elif isinstance(input_data, dict) and isinstance(key, str) and key in input_data:
-                input_data = input_data[key]
+            if isinstance(data, list) and 0 <= int(key) < len(data):
+                data = data[int(key)]
+            elif isinstance(data, dict) and isinstance(key, str) and key in data:
+                data = data[key]
             else:
                 raise KeyError(f"There is an error at key {key} in the path {variable_path}")
-        return input_data
+        return data
