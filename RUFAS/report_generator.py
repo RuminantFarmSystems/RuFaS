@@ -312,6 +312,7 @@ class ReportGenerator:
             **filter_content["graph_details"],
             "title": filter_content["name"],
             "filters": filter_content["filters"],
+            "is_aggregated_report_data": True,
         }
         graphics_dir = graph_details.pop("graphics_dir", None)
         produce_graphics = graph_details.get("produce_graphics")
@@ -459,6 +460,13 @@ class ReportGenerator:
         if not horizontal_agg_key and not vertical_agg_key:
             return report_data
 
+        aggregate_report = self._route_aggregator_functions(report_data, filter_content, horizontal_agg_key,
+                                                            vertical_agg_key)
+
+        return aggregate_report
+
+    def _route_aggregator_functions(self, report_data, filter_content, horizontal_agg_key: str = None,
+                                    vertical_agg_key: str = None, ) -> Dict[str, List[float]]:
         aggregate_report = report_data
 
         if horizontal_agg_key and vertical_agg_key:
@@ -604,42 +612,16 @@ class ReportGenerator:
         ValueError
             If the operation is addition or subtraction and the units are not the same.
         """
-
-        def add_units(units1, units2, sign=1):
-            result_units = units1.copy()
-            for unit, exponent in units2.items():
-                if unit == "unitless" or unit == "1":
-                    continue
-                if unit in result_units:
-                    result_units[unit] += sign * exponent
-                else:
-                    result_units[unit] = sign * exponent
-            return {unit: exp for unit, exp in result_units.items() if exp != 0}
-
-        def simplify_units(numerator, denominator):
-            combined_numerator = numerator.copy()
-            combined_denominator = denominator.copy()
-
-            for unit in list(combined_numerator.keys()):
-                if unit in combined_denominator:
-                    if combined_numerator[unit] == combined_denominator[unit]:
-                        del combined_numerator[unit]
-                        del combined_denominator[unit]
-                    else:
-                        combined_numerator[unit] -= combined_denominator[unit]
-                        del combined_denominator[unit]
-
-            return combined_numerator, combined_denominator
-
         if operation in ["product", "division"]:
             if operation == "product":
-                combined_numerator = add_units(numerator1, numerator2)
-                combined_denominator = add_units(denominator1, denominator2)
+                combined_numerator = ReportGenerator.add_units(numerator1, numerator2)
+                combined_denominator = ReportGenerator.add_units(denominator1, denominator2)
             elif operation == "division":
-                combined_numerator = add_units(numerator1, denominator2)
-                combined_denominator = add_units(denominator1, numerator2, sign=-1)
+                combined_numerator = ReportGenerator.add_units(numerator1, denominator2)
+                combined_denominator = ReportGenerator.add_units(denominator1, numerator2, sign=-1)
 
-            combined_numerator, combined_denominator = simplify_units(combined_numerator, combined_denominator)
+            combined_numerator, combined_denominator = ReportGenerator.simplify_units(combined_numerator,
+                                                                                      combined_denominator)
 
         elif operation in ["sum", "subtraction", "average", "SD"]:
             if numerator1 != numerator2 or denominator1 != denominator2:
@@ -647,6 +629,32 @@ class ReportGenerator:
                 pass
             combined_numerator = numerator1.copy()
             combined_denominator = denominator1.copy()
+
+        return combined_numerator, combined_denominator
+
+    def add_units(units1, units2, sign=1):
+        result_units = units1.copy()
+        for unit, exponent in units2.items():
+            if unit == "unitless" or unit == "1":
+                continue
+            if unit in result_units:
+                result_units[unit] += sign * exponent
+            else:
+                result_units[unit] = sign * exponent
+        return {unit: exp for unit, exp in result_units.items() if exp != 0}
+
+    def simplify_units(numerator, denominator):
+        combined_numerator = numerator.copy()
+        combined_denominator = denominator.copy()
+
+        for unit in list(combined_numerator.keys()):
+            if unit in combined_denominator:
+                if combined_numerator[unit] == combined_denominator[unit]:
+                    del combined_numerator[unit]
+                    del combined_denominator[unit]
+                else:
+                    combined_numerator[unit] -= combined_denominator[unit]
+                    del combined_denominator[unit]
 
         return combined_numerator, combined_denominator
 
