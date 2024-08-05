@@ -209,7 +209,7 @@ def test_handle_end_to_end_testing(
     task_manager._handle_end_to_end_testing({}, mock_input_manager, mock_output_manager, "test_task", False)
 
     sim_engine_run_tasks.assert_called_once_with({}, mock_input_manager, mock_output_manager, "test_task", False)
-    compare_outputs.assert_called_once_with(mock_output_manager)
+    compare_outputs.assert_called_once_with({}, mock_output_manager)
     assert add_log.call_count == 2
 
 
@@ -222,35 +222,39 @@ def test_compare_simulation_outputs_to_expected_outputs(
     successful: bool,
 ) -> None:
     """Tests _compare_simulation_outputs_to_expected_outputs in TaskManager."""
+    args = {"json_output_directory": Path("json_dir")}
     mocker.patch(
         "pathlib.Path.iterdir",
         return_value=[
             Path("not/the/path"),
-            Path("output/JSONs/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.json"),
+            Path("json_dir/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.json"),
             Path("not/the/path/either"),
         ],
     )
     mocked_open = mocker.patch("builtins.open", mocker.mock_open(read_data="file contents"))
-    handle = mocked_open()
     mocked_load = mocker.patch("json.load", side_effect=[{"a": 1}, {"a": 1}])
     mocked_deepdiff = mocker.patch("RUFAS.task_manager.DeepDiff", return_value=diff)
-    mocked_mkdir = mocker.patch("pathlib.Path.mkdir")
     add_log = mocker.patch.object(mock_output_manager, "add_log")
-    add_warning = mocker.patch.object(mock_output_manager, "add_warning")
+    add_error = mocker.patch.object(mock_output_manager, "add_error")
+    generate_file_name = mocker.patch.object(mock_output_manager, "generate_file_name", return_value="file_name")
+    dict_to_json = mocker.patch.object(mock_output_manager, "dict_to_file_json")
+    expected_output = dict(diff, **{"end_to_end_testing_passing": successful})
+    expected_output_path = Path("json_dir/file_name")
 
-    task_manager._compare_simulation_outputs_to_expected_outputs(mock_output_manager)
+    task_manager._compare_simulation_outputs_to_expected_outputs(args, mock_output_manager)
 
+    assert mocked_open.call_count == 2
     assert mocked_load.call_count == 2
     mocked_deepdiff.assert_called_once()
-    mocked_mkdir.assert_called_once()
+    generate_file_name.assert_called_once_with("end_to_end_testing_results", "json")
     if successful:
-        handle.write.assert_any_call("End-to-end testing successful.\n")
-        assert add_log.call_count == 2
-        assert add_warning.call_count == 0
-    else:
-        handle.write.assert_any_call("End-to-end testing unsuccessful.\n")
         assert add_log.call_count == 1
-        assert add_warning.call_count == 1
+        assert add_error.call_count == 0
+    else:
+        assert add_log.call_count == 0
+        assert add_error.call_count == 1
+
+    dict_to_json.assert_called_once_with(expected_output, expected_output_path, False)
 
 
 @pytest.mark.parametrize("suppress_logs", [True, False])
