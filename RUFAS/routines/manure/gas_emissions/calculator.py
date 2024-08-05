@@ -779,46 +779,70 @@ class GasEmissionsCalculator:
         return temperature_celsius + 273.15
 
     @classmethod
-    def methane_volume_via_Chen_equation(
-        cls, manure_total_degradable_volatile_solids: float, hydraulic_retention_time: int
-    ) -> float:
-        """Calculates CH4 generation volume using the Chen-Hashimoto equation.
+    def calculate_CSTR_methane_volume(cls, manure_total_volatile_solids: float) -> float:
+        """
+        Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor.
 
-        Args:
-            manure_total_degradable_volatile_solids: total volatile solids, kg.
-            hydraulic_retention_time: hydraulic retention time, days.
+        Parameters
+        ----------
+        manure_total_volatile_solids : float
+            Total volatile solids, kg.
 
-        Returns:
+        Returns
+        -------
+        float
             CH4 generation volume, m^3.
 
+        Notes
+        -----
+        This function originates from personal communications with subject matter experts Wei Liao (liaow@msu.edu) and
+        April Leytem (april.leytem@usda.gov). The equation is a simplification of the IPCC Tier II estimate of CH4
+        emissions from anaerobic digesters, where CH4 generated in the digester is assumed to be equivalent to the
+        amount of manure volatile solids loaded per day, multiplied by the generally-accepted methane potential value
+        for dairy manure (240 L CH4 per kg of manure volatile solids).
+
         """
-        return (
-            GasEmissionConstants.METHANE_POTENTIAL_Go
-            * (
-                1
-                - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                / (
-                    hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
-                    + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                    - 1
-                )
-            )
-            * manure_total_degradable_volatile_solids
-            * GeneralConstants.GRAMS_TO_KG
-        )
+        return GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * manure_total_volatile_solids
 
     @classmethod
-    def biogas_energy_content(cls, methane_volume: float) -> float:
-        """Calculates biogas energy content.
+    def calculate_digester_methane_leakage(
+        cls, generated_methane_mass: float, digester_methane_leakage_fraction: float
+    ) -> float:
+        """
+        Calculates the mass of methane lost from a digester.
 
-        Args:
-            methane_volume: Methane generation volume, m^3.
+        Parameters
+        ----------
+        generated_methane_mass : float
+            Amount of methane generated within the digester, kg.
+        digester_methane_leakage_fraction : float
+            Fraction of generated methane that escapes as leakage (unitless).
 
-        Returns:
-            Biogas energy content, MJ.
+        Returns
+        -------
+        float
+            Mass of methane lost as leakage, kg.
 
         """
-        return methane_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        return generated_methane_mass * digester_methane_leakage_fraction
+
+    @classmethod
+    def calculate_methane_energy_content(cls, methane_mass: float) -> float:
+        """
+        Calculates energy content of methane generated in a digester.
+
+        Parameters
+        ----------
+        methane_mass : float
+            Methane generation mass, kg.
+
+        Returns
+        -------
+        float
+            Methane energy content, MJ.
+
+        """
+        return methane_mass * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     @classmethod
     def methane_emission_from_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
@@ -837,7 +861,7 @@ class GasEmissionsCalculator:
 
             :math:`E_{CH_4}` is methane emissions from anaerobic lagoon (kg :math:`CH_4`-N/day),
 
-            :math:`Bo` is the achievable emission of methane during anaerobic digestion (kg :math:`CH_4`/kg VS),
+            :math:`Bo` is the achievable emission of methane during anaerobic digestion (:math:`m^3 CH_4`/kg VS),
 
             :math:`MCF` is the methane conversion factor (unitless),
 
