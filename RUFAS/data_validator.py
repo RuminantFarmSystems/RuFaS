@@ -10,6 +10,7 @@ from RUFAS.output_manager import OutputManager
 #  log error here, leave termination for IM
 #  Move elements counters...etc to here
 
+
 class ElementState(Enum):
     """
     An enumeration of the states a data element can be in during validation. An element cannot
@@ -625,7 +626,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
-        fixable_data_types: set[str]
+        fixable_data_types: set[str],
     ) -> bool:
         """
         Validates the data based on its specified type.

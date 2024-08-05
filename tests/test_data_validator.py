@@ -57,9 +57,7 @@ def test_bool_type_validator(
     dummy_input_data = {"a": 1, "b": 2}
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     unused_bool_input = False
-    patch_extract = mocker.patch.object(
-        DataValidator, "_extract_input_data_by_key_list", return_value=input_data_value
-    )
+    patch_extract = mocker.patch.object(DataValidator, "_extract_input_data_by_key_list", return_value=input_data_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
 

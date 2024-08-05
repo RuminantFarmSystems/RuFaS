@@ -311,7 +311,7 @@ class InputManager:
                     properties_blob_key=properties_blob_key,
                     elements_counter=self.elements_counter,
                     called_during_initialization=True,
-                    fixable_data_types=FIXABLE_INPUT_DATA_TYPES
+                    fixable_data_types=FIXABLE_INPUT_DATA_TYPES,
                 )
 
                 valid_data = valid_data and is_element_acceptable
@@ -982,7 +982,7 @@ class InputManager:
                 properties_blob_key=properties_blob_key,
                 elements_counter=elements_counter,
                 called_during_initialization=False,
-                fixable_data_types=FIXABLE_INPUT_DATA_TYPES
+                fixable_data_types=FIXABLE_INPUT_DATA_TYPES,
             )
 
             if is_element_acceptable:
