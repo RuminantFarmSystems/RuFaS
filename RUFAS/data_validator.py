@@ -235,6 +235,7 @@ class DataValidator:
                         if value_type in type_to_validator_map:
                             valid, error_message = type_to_validator_map[value_type](path + [key], value)
                             if not valid:
+                                print("a")
                                 return valid, error_message
                         else:
                             if value_type is not None:

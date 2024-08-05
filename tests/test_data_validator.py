@@ -1184,7 +1184,8 @@ def test_validate_input_by_type(
 
     # Act
     result = DataValidator.validate_data_by_type(
-        variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter, True
+        variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter,
+        True, {"string", "number", "bool"}
     )
 
     # Assert
@@ -1224,6 +1225,7 @@ def test_validate_input_by_type_key_error() -> None:
             properties_blob_key,
             elements_counter,
             True,
+            {"string", "number", "bool"}
         )
 
 
@@ -1294,12 +1296,12 @@ def test_validate_metadata(
     mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 
     if expected_exception:
-        with pytest.raises(ValueError):
-            DataValidator.validate_metadata(metadata)
+        valid, message = DataValidator.validate_metadata(metadata, {"json", "csv"}, "files")
+        assert not valid
         mock_add_log.assert_not_called()
         mock_add_error.assert_called()
     else:
-        DataValidator.validate_metadata(metadata)
+        DataValidator.validate_metadata(metadata, {"json", "csv"}, "files")
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
 
@@ -1365,27 +1367,28 @@ def test_validate_properties(
     mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
 
     if should_raise:
-        with pytest.raises(ValueError) as exc_info:
-            DataValidator.validate_properties(metadata, limit)
-        assert str(exc_info.value) == expected_err_msg
+        valid, exc_info = DataValidator.validate_properties(metadata, limit)
+        assert exc_info == expected_err_msg
+        assert not valid
         assert mock_add_error.call_count == len(expected_errors)
         for error_msg in expected_errors:
             mock_add_error.assert_any_call(error_msg, mocker.ANY, mocker.ANY)
         mock_add_log.assert_not_called()
     else:
-        DataValidator.validate_properties(metadata, limit)
+        valid, exc_info = DataValidator.validate_properties(metadata, limit)
+        assert valid
         mock_add_log.assert_called()
         mock_add_error.assert_not_called()
         assert mock_add_log.call_args_list == [
             call(
                 "Metadata properties depth",
                 f"Max depth of metadata properties is {expected_depth}",
-                {"class": "InputValidator", "function": "validate_properties"},
+                {"class": "DataValidator", "function": "validate_properties"},
             ),
             call(
                 "Metadata properties path",
                 f"Deepest path of metadata properties is {expected_path}",
-                {"class": "InputValidator", "function": "validate_properties"},
+                {"class": "DataValidator", "function": "validate_properties"},
             ),
         ]
 
