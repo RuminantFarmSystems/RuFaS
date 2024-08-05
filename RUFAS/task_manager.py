@@ -436,8 +436,6 @@ class TaskManager:
         produce_graphics: bool,
     ) -> None:
         """Runs end-to-end testing routine."""
-        # import remote_pdb
-        # remote_pdb.set_trace("localhost", 4444)
         info_map = {
             "class": TaskManager.__name__,
             "function": TaskManager._handle_end_to_end_testing.__name__,
@@ -461,9 +459,11 @@ class TaskManager:
             "function": TaskManager._compare_simulation_outputs_to_expected_outputs.__name__,
         }
         path_to_actual_results = None
-        for path in args["json_output_directory"].iterdir():
+        json_output_path = args["json_output_directory"]
+        for path in json_output_path.iterdir():
             matches = re.match(
-                f"{str(path)}/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*", str(path)
+                f"{str(json_output_path)}/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*",
+                str(path)
             )
             if matches:
                 path_to_actual_results = path
