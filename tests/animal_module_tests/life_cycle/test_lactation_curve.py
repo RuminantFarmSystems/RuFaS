@@ -207,26 +207,32 @@ def test_init(
         adjust_lactation_curve.assert_not_called()
 
 
-def test_get_year_adjustments(
-    mocker: MockerFixture,
-    lactation_inputs: dict[str, Any],
-    lactation_curve: LactationCurve,
-) -> None:
+@pytest.mark.parametrize(
+    "year,bounded,expected",
+    [
+        (2004, False, {"l": -0.37, "m": 0.72, "n": 0.83}),
+        (2006, True, {"l": -0.37, "m": 0.72, "n": 0.83}),
+        (2008, True, {"l": -0.31, "m": 0.47, "n": 0.98}),
+        (2011, True, {"l": 0.10, "m": -0.58, "n": -0.56}),
+        (2016, True, {"l": 0.52, "m": -0.44, "n": -0.78}),
+        (2020, False, {"l": 0.52, "m": -0.44, "n": -0.78}),
+    ],
+)
+def test_get_year_adjustments(mocker: MockerFixture, lactation_inputs: dict[str, Any], 
+                              lactation_curve: LactationCurve, expected: dict[str, float], 
+                              year: int, bounded: bool) -> None:
     """Test that year adjustments are retrieved appropriately."""
     mock_time = mocker.MagicMock()
-    mock_time.end_date = datetime.datetime(2018, 6, 1)
-
-    # mocker.patch.object(time, "end_year_int", return_value=2017)
-
+    mock_time.end_date = datetime.datetime(year, 6, 1)
     year_adjustments = lactation_inputs["adjustments"]["year"]
     lactation_curve.om = mocker.MagicMock()
     add_warning = mocker.patch.object(lactation_curve.om, "add_warning")
 
     actual = lactation_curve._get_year_adjustments(year_adjustments, mock_time)
-
-    add_warning.assert_called_once()
-    assert actual == {"l": 0.52, "m": -0.44, "n": -0.78}
-    # {"l": -0.37, "m": 0.72, "n": 0.83}
+    
+    if not bounded:
+        add_warning.assert_called_once()
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
