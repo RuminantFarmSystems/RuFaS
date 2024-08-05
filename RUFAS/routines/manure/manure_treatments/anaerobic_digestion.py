@@ -126,12 +126,12 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         new_daily_output.heating_input_energy = heating_input_energy
         new_daily_output.evaporated_water = self.config.evaporation_fraction * daily_final_manure_volume
-        new_daily_output.methane_energy_content = captured_methane_energy_content
+        new_daily_output.biogas_energy_content = captured_methane_energy_content
         new_daily_output.minimum_digester_volume = minimum_digester_volume
         new_daily_output.top_cover_volume = top_cover_volume
         new_daily_output.methane_leakage_mass = methane_leakage
         new_daily_output.methane_generation_volume = captured_methane_generation_volume
-        new_daily_output.methane_generation_mass = captured_methane_generation_mass
+        new_daily_output.biogas = captured_methane_generation_mass
         return new_daily_output
 
     @classmethod
