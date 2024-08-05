@@ -1457,6 +1457,7 @@ class HeiferII(HeiferI):
                 "Calf birth weight less than or equal to 0. Standard deviation too high with respect to average birth weight.",
                 info_map
             )
+            raise RuntimeError
         return float(birth_weight)
 
     def _initialize_pregnancy_parameters(self) -> None:
