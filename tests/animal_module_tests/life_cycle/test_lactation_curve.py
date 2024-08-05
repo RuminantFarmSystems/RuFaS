@@ -218,9 +218,14 @@ def test_init(
         (2020, False, {"l": 0.52, "m": -0.44, "n": -0.78}),
     ],
 )
-def test_get_year_adjustments(mocker: MockerFixture, lactation_inputs: dict[str, Any], 
-                              lactation_curve: LactationCurve, expected: dict[str, float], 
-                              year: int, bounded: bool) -> None:
+def test_get_year_adjustments(
+    mocker: MockerFixture,
+    lactation_inputs: dict[str, Any],
+    lactation_curve: LactationCurve,
+    expected: dict[str, float],
+    year: int,
+    bounded: bool,
+) -> None:
     """Test that year adjustments are retrieved appropriately."""
     mock_time = mocker.MagicMock()
     mock_time.end_date = datetime.datetime(year, 6, 1)
@@ -229,7 +234,7 @@ def test_get_year_adjustments(mocker: MockerFixture, lactation_inputs: dict[str,
     add_warning = mocker.patch.object(lactation_curve.om, "add_warning")
 
     actual = lactation_curve._get_year_adjustments(year_adjustments, mock_time)
-    
+
     if not bounded:
         add_warning.assert_called_once()
     assert actual == expected
