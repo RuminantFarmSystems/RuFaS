@@ -197,3 +197,4 @@ class SimulationEngine:
         if is_end_to_end_test_run:
             self.feed_manager.setup_stored_feeds(is_end_to_end_test_run, self.time)
             self.is_end_to_end_test_run = True
+            self.feed_manager.process_degradations(self.weather, self.time)

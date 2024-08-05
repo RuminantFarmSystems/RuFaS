@@ -451,7 +451,7 @@ class TaskManager:
 
         output_manager.add_log("End-to-end testing", "Completed end-to-end testing simulation", info_map)
 
-        TaskManager._compare_simulation_outputs_to_expected_outputs(output_manager)
+        TaskManager._compare_simulation_outputs_to_expected_outputs(args, output_manager)
 
     @staticmethod
     def _compare_simulation_outputs_to_expected_outputs(args: Dict[str, Any], output_manager: OutputManager) -> None:
