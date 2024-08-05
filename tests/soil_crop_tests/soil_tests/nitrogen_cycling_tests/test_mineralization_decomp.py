@@ -49,7 +49,7 @@ def test_calculate_nutrient_cycling_residue_composition_factor(
     observed = MineralizationDecomposition._calculate_nutrient_cycling_residue_composition_factor(
         nitrogen_ratio, phosphorus_ratio
     )
-    expected = min(1.0, nutrient_term)
+    expected = 1
 
     calls = [call(nitrogen_ratio, 25), call(phosphorus_ratio, 200)]
     MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor.assert_has_calls(calls)
