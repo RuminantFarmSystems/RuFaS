@@ -6,11 +6,14 @@ from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
+from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
+from RUFAS.time import Time
 
 
 class AnimalBase:
     config: Dict[str, Any] = {}
     nutrients = None
+    lactation_curve = None
 
     @staticmethod
     def set_nutrient_list(nutrients):
@@ -23,6 +26,11 @@ class AnimalBase:
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
         AnimalBase.config["ration"] = im.get_data("animal.ration")
+
+    @classmethod
+    def setup_lactation_curve_parameters(cls, time: Time) -> None:
+        """Initializes the LactationCurve class attribute."""
+        cls.lactation_curve = LactationCurve(time)
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
