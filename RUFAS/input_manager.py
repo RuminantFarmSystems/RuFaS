@@ -88,7 +88,9 @@ class InputManager:
         self._load_metadata(metadata_path)
         DataValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
         self._load_properties()
-        DataValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
+        validated, message = DataValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
+        if not validated:
+            raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
         return is_input_data_valid
 
@@ -456,7 +458,7 @@ class InputManager:
         """
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
-            error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
+            error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
             om.add_error("Missing required data", error_msg, info_map)
             raise KeyError(error_msg)
 
