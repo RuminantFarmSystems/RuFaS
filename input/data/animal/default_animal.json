@@ -67,7 +67,7 @@
 			},
 			"bodyweight": {
 				"birth_weight_avg_ho": 43.9,
-				"birth_weight_std_ho": 100,
+				"birth_weight_std_ho": 1,
 				"birth_weight_avg_je": 27.2,
 				"birth_weight_std_je": 1,
 				"target_heifer_preg_day": 399,
