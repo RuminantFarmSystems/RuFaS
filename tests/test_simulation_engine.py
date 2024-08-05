@@ -85,8 +85,8 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     mock_estimate_emissions.assert_called_once()
 
 
-@pytest.mark.parametrize("run_end_to_end_testing", [True, False])
-def test_daily_simulation(mocker: MockerFixture, run_end_to_end_testing: bool) -> None:
+@pytest.mark.parametrize("is_end_to_end_test_run", [True, False])
+def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -> None:
     """
     Unit test for function _daily_simulation in file RUFAS/simulation_engine.py
     """
@@ -95,7 +95,7 @@ def test_daily_simulation(mocker: MockerFixture, run_end_to_end_testing: bool) -
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
     simulation_engine.day_counter = 100
-    simulation_engine.run_end_to_end_testing = run_end_to_end_testing
+    simulation_engine.is_end_to_end_test_run = is_end_to_end_test_run
     simulation_engine.feed = mocker.MagicMock()
     simulation_engine.animal_manager = mocker.MagicMock()
     simulation_engine.animal_manager.simulation_day = expected_animal_manager_sim_day = 10
@@ -116,7 +116,7 @@ def test_daily_simulation(mocker: MockerFixture, run_end_to_end_testing: bool) -
     simulation_engine._daily_simulation()
 
     # Assert
-    if run_end_to_end_testing:
+    if is_end_to_end_test_run:
         simulation_engine.feed_manager.process_degradations.assert_called_once_with(
             simulation_engine.weather, simulation_engine.time
         )
