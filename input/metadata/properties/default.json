@@ -1924,9 +1924,9 @@
         "description": "The standard deviation for of Wood's parameter n."
       }
     },
-    "milking_cow_percentage": {
+    "milking_cow_fraction": {
       "type": "number",
-      "description": "Number of cows within the total herd assumed to be in milk at any one time (305/365 is the default ratio).",
+      "description": "Fraction of cows assumed to be in milk at any given time (305/365 is the default).",
       "default": 0.8365,
       "minimum": 0.0,
       "maximum": 1.0

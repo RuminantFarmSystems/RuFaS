@@ -151,7 +151,7 @@ def lactation_inputs() -> dict[str, Any]:
             "parameter_m_std_dev": 0.0046,
             "parameter_n_std_dev": 3.77e-5,
         },
-        "milking_cow_percentage": 0.8356,
+        "milking_cow_fraction": 0.8356,
     }
 
 
