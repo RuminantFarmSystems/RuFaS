@@ -250,11 +250,9 @@ def test_start_data_processing(
     """Unit test for function start_data_processing in file input_manager.py"""
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
     patch_for_populate_pool = mocker.patch.object(InputManager, "_populate_pool", return_value=True)
-    patch_for_validate_metadata = mocker.patch.object(DataValidator, "validate_metadata",
-                                                      return_value=(True, ""))
+    patch_for_validate_metadata = mocker.patch.object(DataValidator, "validate_metadata", return_value=(True, ""))
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
-    patch_for_validate_properties = mocker.patch.object(DataValidator, "validate_properties",
-                                                        return_value=(True, ""))
+    patch_for_validate_properties = mocker.patch.object(DataValidator, "validate_properties", return_value=(True, ""))
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -3132,8 +3130,11 @@ def test_validate_data(
     )
 
     validated_data = input_manager._validate_data(
-        data=data, metadata_properties=metadata_properties, eager_termination=eager_termination,
-        properties_blob_key=properties_blob_key, elements_counter=elements_counter
+        data=data,
+        metadata_properties=metadata_properties,
+        eager_termination=eager_termination,
+        properties_blob_key=properties_blob_key,
+        elements_counter=elements_counter,
     )
 
     assert validated_data == expected_validated_data
