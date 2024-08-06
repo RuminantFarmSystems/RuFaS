@@ -70,7 +70,7 @@ def test_bool_type_validator(
         dummy_properties_key,
         dummy_counter,
         unused_bool_input,
-        {"string", "number", "bool"}
+        {"string", "number", "bool"},
     )
 
     # Assert
@@ -125,7 +125,7 @@ def test_number_type_validator(
         dummy_properties_key,
         dummy_counter,
         unused_bool_input,
-        {"string", "number", "bool"}
+        {"string", "number", "bool"},
     )
 
     patch_extract.assert_called_once_with(
@@ -181,7 +181,7 @@ def test_string_type_validator(
         dummy_properties_key,
         dummy_counter,
         unused_bool_input,
-        {"string", "number", "bool"}
+        {"string", "number", "bool"},
     )
 
     patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_properties, unused_bool_input)
@@ -863,7 +863,7 @@ def test_object_type_validator(
         properties_blob_key,
         mock_elements_counter,
         True,
-        {"string", "number", "bool"}
+        {"string", "number", "bool"},
     )
 
     # Assert
@@ -908,7 +908,7 @@ def test_object_type_validator_key_removal(
         "properties blob",
         mock_elements_counter,
         True,
-        {"string", "number", "bool"}
+        {"string", "number", "bool"},
     )
 
     assert result is True
@@ -1122,7 +1122,7 @@ def test_array_type_validator(
         properties_blob_key,
         mock_elements_counter,
         True,
-        {"string", "number", "bool"}
+        {"string", "number", "bool"},
     )
 
     # Assert
@@ -1190,8 +1190,14 @@ def test_validate_input_by_type(
 
     # Act
     result = DataValidator.validate_data_by_type(
-        variable_properties, variable_path, input_data, eager_termination, properties_blob_key, elements_counter,
-        True, {"string", "number", "bool"}
+        variable_properties,
+        variable_path,
+        input_data,
+        eager_termination,
+        properties_blob_key,
+        elements_counter,
+        True,
+        {"string", "number", "bool"},
     )
 
     # Assert
@@ -1231,7 +1237,7 @@ def test_validate_input_by_type_key_error() -> None:
             properties_blob_key,
             elements_counter,
             True,
-            {"string", "number", "bool"}
+            {"string", "number", "bool"},
         )
 
 
