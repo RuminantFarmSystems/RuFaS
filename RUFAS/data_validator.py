@@ -235,7 +235,6 @@ class DataValidator:
                         if value_type in type_to_validator_map:
                             valid, error_message = type_to_validator_map[value_type](path + [key], value)
                             if not valid:
-                                print("a")
                                 return valid, error_message
                         else:
                             if value_type is not None:
@@ -249,7 +248,6 @@ class DataValidator:
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
-        print("pass in DataValidator")
         return True, ""
 
     @staticmethod
@@ -266,7 +264,6 @@ class DataValidator:
             "function": DataValidator._validate_metadata_properties_keys.__name__,
         }
         if missing_required_keys := required_properties_keys - properties.keys():
-            valid = False
             om.add_error(
                 "Metadata Validation",
                 f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
@@ -277,7 +274,7 @@ class DataValidator:
                 f"Missing required keys {sorted(missing_required_keys)} for {path}."
                 f" Required keys are {sorted(required_properties_keys)}."
             )
-            return valid, error_message
+            return False, error_message
 
         property_type = properties.get("type", "Unknown type")
         valid_properties_keys = required_properties_keys.union(optional_properties_keys)
@@ -290,6 +287,7 @@ class DataValidator:
                 )
                 error_message = f"No unique keys for {path}. At least one unique key is expected."
                 return False, error_message
+            return True, ""
 
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
@@ -302,7 +300,6 @@ class DataValidator:
                 f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
                 f" keys are {sorted(valid_properties_keys)}."
             )
-            print(error_message)
             return False, error_message
 
         return True, ""
@@ -707,6 +704,7 @@ class DataValidator:
             properties_blob_key,
             elements_counter,
             called_during_initialization,
+            fixable_data_types
         )
 
         if data_type not in fixable_data_types:
@@ -800,6 +798,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
+        fixable_data_types: set[str]
     ) -> bool:
         """
         Validates a data element of type array.
@@ -820,6 +819,8 @@ class DataValidator:
             A counter to keep track of the number of valid, invalid, and fixed elements.
         called_during_initialization: bool
             Boolean variable indicating whether the function is being called during initialization.
+        fixable_data_types: set[str]
+            Set of data types that are fixable.
 
         Returns
         -------
@@ -849,6 +850,7 @@ class DataValidator:
                 properties_blob_key,
                 elements_counter,
                 called_during_initialization,
+                fixable_data_types
             )
             is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -864,6 +866,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: ElementsCounter,
         called_during_initialization: bool,
+        fixable_data_types: set[str]
     ) -> bool:
         """
         Validates a data element of type object.
@@ -930,6 +933,7 @@ class DataValidator:
                 properties_blob_key,
                 elements_counter,
                 called_during_initialization,
+                fixable_data_types
             )
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -956,6 +960,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
+        fixable_data_types: set[str]
     ) -> bool:
         """Validates an data number element."""
         om = OutputManager()
@@ -1018,6 +1023,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
+        fixable_data_types: set[str]
     ) -> bool:
         """Validates a data string element."""
         om = OutputManager()
@@ -1092,6 +1098,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
+        fixable_data_types: set[str]
     ) -> bool:
         """Validates a data bool element."""
         om = OutputManager()

@@ -70,6 +70,7 @@ def test_bool_type_validator(
         dummy_properties_key,
         dummy_counter,
         unused_bool_input,
+        {"string", "number", "bool"}
     )
 
     # Assert
@@ -124,6 +125,7 @@ def test_number_type_validator(
         dummy_properties_key,
         dummy_counter,
         unused_bool_input,
+        {"string", "number", "bool"}
     )
 
     patch_extract.assert_called_once_with(
@@ -179,6 +181,7 @@ def test_string_type_validator(
         dummy_properties_key,
         dummy_counter,
         unused_bool_input,
+        {"string", "number", "bool"}
     )
 
     patch_extract.assert_called_once_with(dummy_input_data, var_path, dummy_variable_properties, unused_bool_input)
@@ -860,6 +863,7 @@ def test_object_type_validator(
         properties_blob_key,
         mock_elements_counter,
         True,
+        {"string", "number", "bool"}
     )
 
     # Assert
@@ -904,6 +908,7 @@ def test_object_type_validator_key_removal(
         "properties blob",
         mock_elements_counter,
         True,
+        {"string", "number", "bool"}
     )
 
     assert result is True
@@ -1117,6 +1122,7 @@ def test_array_type_validator(
         properties_blob_key,
         mock_elements_counter,
         True,
+        {"string", "number", "bool"}
     )
 
     # Assert
@@ -1459,12 +1465,12 @@ def test_metadata_number_validator(
     """Tests metadata_number_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys", return_value=(True, "")
     )
-    info_map = {"class": "InputValidator", "function": "_metadata_number_validator"}
+    info_map = {"class": "DataValidator", "function": "_metadata_number_validator"}
     if should_raise:
-        with pytest.raises(ValueError):
-            DataValidator._metadata_number_validator(key_path, value)
+        valid, msg = DataValidator._metadata_number_validator(key_path, value)
+        assert not valid
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
@@ -1526,13 +1532,13 @@ def test_metadata_string_validator(
     """Tests _metadata_string_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys", return_value=(True, "")
     )
-    info_map = {"class": "InputValidator", "function": "_metadata_string_validator"}
+    info_map = {"class": "DataValidator", "function": "_metadata_string_validator"}
 
     if should_raise:
-        with pytest.raises(ValueError):
-            DataValidator._metadata_string_validator(key_path, value)
+        valid, msg = DataValidator._metadata_string_validator(key_path, value)
+        assert not valid
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
@@ -1580,13 +1586,13 @@ def test_metadata_bool_validator(
     """Tests _metadata_bool_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys", return_value=(True, "")
     )
-    info_map = {"class": "InputValidator", "function": "_metadata_bool_validator"}
+    info_map = {"class": "DataValidator", "function": "_metadata_bool_validator"}
 
     if should_raise:
-        with pytest.raises(ValueError):
-            DataValidator._metadata_bool_validator(key_path, value)
+        valid, msg = DataValidator._metadata_bool_validator(key_path, value)
+        assert not valid
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
@@ -1635,13 +1641,13 @@ def test_metadata_array_validator(
     """Tests _metadata_array_validator() method in InputManager"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys", return_value=(True, "")
     )
-    info_map = {"class": "InputValidator", "function": "_metadata_array_validator"}
+    info_map = {"class": "DataValidator", "function": "_metadata_array_validator"}
 
     if should_raise:
-        with pytest.raises(ValueError):
-            DataValidator._metadata_array_validator(key_path, value)
+        valid, msg = DataValidator._metadata_array_validator(key_path, value)
+        assert not valid
         assert mock_add_error.called
         assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
         mock_validate_properties_keys.assert_called_once()
@@ -1656,11 +1662,12 @@ def test_metadata_object_validator(
 ) -> None:
     """Tests _metadata_object_validator() method in InputManager"""
     mock_validate_properties_keys = mocker.patch(
-        "RUFAS.input_validator.InputValidator._validate_metadata_properties_keys"
+        "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys", return_value=(True, "")
     )
     key_path = ["path", "cow"]
     value = {"type": "object", "description": "cow", "cow": {"data_about_cow": 17}}
-    DataValidator._metadata_object_validator(key_path, value)
+    valid, msg = DataValidator._metadata_object_validator(key_path, value)
+    assert valid
     mock_validate_properties_keys.assert_called_once()
 
 
@@ -1723,18 +1730,19 @@ def test_validate_metadata_properties_keys(
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
     if should_raise:
-        with pytest.raises(ValueError):
-            DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        valid, msg = DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        assert not valid
         mock_add_error.assert_called_once_with(
             "Metadata Validation",
             expected_message,
             {
-                "class": "InputValidator",
+                "class": "DataValidator",
                 "function": "_validate_metadata_properties_keys",
             },
         )
     else:
-        DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        valid, msg = DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        assert valid
         mock_add_error.assert_not_called()
 
 
