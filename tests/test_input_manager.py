@@ -3126,7 +3126,7 @@ def test_validate_data(
         "validate_data_by_type",
         # fmt: off
         side_effect=lambda variable_path, variable_properties, data, eager_termination, properties_blob_key,
-                           elements_counter, called_during_initialization, fixable_data_types:
+        elements_counter, called_during_initialization, fixable_data_types:
         data.get(variable_path[0]) is not None,
         # fmt: on
     )
