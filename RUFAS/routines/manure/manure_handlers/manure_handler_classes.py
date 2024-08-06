@@ -160,6 +160,8 @@ class BaseManureHandler:
             total_bedding_mass = 0.0
             total_organic_bedding_mass_added = 0.0
 
+        non_degradable_volatile_solids = pen.manure.non_degradable_volatile_solids + total_organic_bedding_mass_added
+
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
             pen_id=pen.id,
@@ -173,9 +175,7 @@ class BaseManureHandler:
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
             liquid_manure_total_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
-            liquid_manure_total_non_degradable_volatile_solids=(
-                pen.manure.non_degradable_volatile_solids + total_organic_bedding_mass_added
-            ),
+            liquid_manure_total_non_degradable_volatile_solids=non_degradable_volatile_solids,
             liquid_manure_phosphorus=pen.manure.phosphorus,
             liquid_manure_potassium=pen.manure.potassium,
             housing_methane=housing_methane_emission,

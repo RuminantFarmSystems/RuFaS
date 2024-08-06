@@ -175,8 +175,7 @@ class BaseBedding(ABC):
     @abstractmethod
     def calc_organic_bedding_mass_added_to_manure(self, bedding_mass: float) -> float:
         """
-        Abstract method that calculates how much organic bedding material was added to the total mass of manure on a
-        single day.
+        Calculates how much organic bedding material was added to the total mass of manure on a single day.
 
         Parameters
         ----------
