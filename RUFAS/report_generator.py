@@ -460,13 +460,19 @@ class ReportGenerator:
         if not horizontal_agg_key and not vertical_agg_key:
             return report_data
 
-        aggregate_report = self._route_aggregator_functions(report_data, filter_content, horizontal_agg_key,
-                                                            vertical_agg_key)
+        aggregate_report = self._route_aggregator_functions(
+            report_data, filter_content, horizontal_agg_key, vertical_agg_key
+        )
 
         return aggregate_report
 
-    def _route_aggregator_functions(self, report_data, filter_content, horizontal_agg_key: str = None,
-                                    vertical_agg_key: str = None, ) -> Dict[str, List[float]]:
+    def _route_aggregator_functions(
+        self,
+        report_data,
+        filter_content,
+        horizontal_agg_key: str = None,
+        vertical_agg_key: str = None,
+    ) -> Dict[str, List[float]]:
         aggregate_report = report_data
 
         if horizontal_agg_key and vertical_agg_key:
@@ -620,8 +626,9 @@ class ReportGenerator:
                 combined_numerator = ReportGenerator.add_units(numerator1, denominator2)
                 combined_denominator = ReportGenerator.add_units(denominator1, numerator2, sign=1)
 
-            combined_numerator, combined_denominator = ReportGenerator.simplify_units(combined_numerator,
-                                                                                      combined_denominator)
+            combined_numerator, combined_denominator = ReportGenerator.simplify_units(
+                combined_numerator, combined_denominator
+            )
 
         elif operation in ["sum", "subtraction", "average", "SD"]:
             if numerator1 != numerator2 or denominator1 != denominator2:
