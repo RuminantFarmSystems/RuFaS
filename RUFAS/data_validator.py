@@ -305,14 +305,6 @@ class DataValidator:
         return True, ""
 
     @staticmethod
-    def check_error(valid: bool, message: str) -> Tuple[bool, str]:
-        """Helper method to reduce complexity"""
-        if not valid:
-            return valid, message
-        else:
-            pass
-
-    @staticmethod
     def _metadata_number_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates number type properties in metadata."""
         om = OutputManager()
