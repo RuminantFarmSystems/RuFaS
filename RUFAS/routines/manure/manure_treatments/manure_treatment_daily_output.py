@@ -157,9 +157,9 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     solid_manure_daily_mass_unit: MeasurementUnits
         Unit for solid_manure_daily_mass.
     biogas: float, default 0.0
-        Mass of methane produced from anaerobic digestion, kg.
+        Mass of biogas produced from anaerobic digestion, kg.
     biogas_unit: MeasurementUnits, default MeasurementUnits.KILOGRAMS_PER_DAY
-        Unit for methane_generation_mass.
+        Unit for biogas.
     biogas_energy_content : float, default 0.0
         Energy content of methane, MJ.
     biogas_energy_content_unit: MeasurementUnits, default MeasurementUnits.MEGAJOULES
