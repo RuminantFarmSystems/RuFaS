@@ -402,20 +402,19 @@ class CropManagement:
         subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
-        root_frac_to_top_depth = self._calculate_root_mass_distribution(surface_layer.top_depth)
         root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
-        layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
-        surface_layer.plant_residue += subsurface_residue * layer_fraction
-        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
-        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
+        surface_layer.plant_residue += subsurface_residue * root_frac_to_bottom_depth
+        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * root_frac_to_bottom_depth
+        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * root_frac_to_bottom_depth
 
+        root_frac_to_top_depth = root_frac_to_bottom_depth
         for layer in soil_data.soil_layers[1:]:
-            root_frac_to_top_depth = self._calculate_root_mass_distribution(layer.top_depth)
             root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
             layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
             layer.plant_residue = subsurface_residue * layer_fraction
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
+            root_frac_to_top_depth = root_frac_to_bottom_depth
 
     def _calculate_root_mass_distribution(self, bottom_depth: float) -> float:
         """
