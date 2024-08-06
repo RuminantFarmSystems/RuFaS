@@ -704,7 +704,7 @@ class DataValidator:
             properties_blob_key,
             elements_counter,
             called_during_initialization,
-            fixable_data_types
+            fixable_data_types,
         )
 
         if data_type not in fixable_data_types:
@@ -798,7 +798,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
-        fixable_data_types: set[str]
+        fixable_data_types: set[str],
     ) -> bool:
         """
         Validates a data element of type array.
@@ -850,7 +850,7 @@ class DataValidator:
                 properties_blob_key,
                 elements_counter,
                 called_during_initialization,
-                fixable_data_types
+                fixable_data_types,
             )
             is_whole_array_acceptable = is_whole_array_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -866,7 +866,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: ElementsCounter,
         called_during_initialization: bool,
-        fixable_data_types: set[str]
+        fixable_data_types: set[str],
     ) -> bool:
         """
         Validates a data element of type object.
@@ -933,7 +933,7 @@ class DataValidator:
                 properties_blob_key,
                 elements_counter,
                 called_during_initialization,
-                fixable_data_types
+                fixable_data_types,
             )
             is_whole_object_acceptable = is_whole_object_acceptable and is_element_acceptable
             if not is_element_acceptable and eager_termination:
@@ -960,7 +960,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
-        fixable_data_types: set[str]
+        fixable_data_types: set[str],
     ) -> bool:
         """Validates an data number element."""
         om = OutputManager()
@@ -1023,7 +1023,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
-        fixable_data_types: set[str]
+        fixable_data_types: set[str],
     ) -> bool:
         """Validates a data string element."""
         om = OutputManager()
@@ -1098,7 +1098,7 @@ class DataValidator:
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
         called_during_initialization: bool,
-        fixable_data_types: set[str]
+        fixable_data_types: set[str],
     ) -> bool:
         """Validates a data bool element."""
         om = OutputManager()
