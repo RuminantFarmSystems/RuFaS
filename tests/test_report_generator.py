@@ -312,7 +312,7 @@ def test_validate_constants(
             {"display_units": False, "filters": [], "name": "test1"},
             (None, None),
             None,
-            {"col1": [1, 2, 3], "col2": [4, 5, 6]}
+            {"col1": [1, 2, 3], "col2": [4, 5, 6]},
         ),
         (
             # Test case 2: Horizontal aggregation only
@@ -320,7 +320,7 @@ def test_validate_constants(
             {"display_units": False, "horizontal_agg": "sum", "filters": [], "name": "test2"},
             ("sum", None),
             {"hor_agg": [6, 15]},
-            {"hor_agg": [6, 15]}
+            {"hor_agg": [6, 15]},
         ),
         (
             # Test case 3: Vertical aggregation only
@@ -328,31 +328,48 @@ def test_validate_constants(
             {"display_units": False, "vertical_agg": "sum", "filters": [], "name": "test3"},
             (None, "sum"),
             {"ver_agg": [5, 7, 9]},
-            {"ver_agg": [5, 7, 9]}
+            {"ver_agg": [5, 7, 9]},
         ),
         (
             # Test case 4: Both horizontal and vertical aggregations, horizontal first
             {"col1": {"values": [1, 2, 3]}, "col2": {"values": [4, 5, 6]}},
-            {"display_units": False, "horizontal_agg": "sum", "vertical_agg": "sum", "horizontal_first": True,
-             "filters": [], "name": "test4"},
+            {
+                "display_units": False,
+                "horizontal_agg": "sum",
+                "vertical_agg": "sum",
+                "horizontal_first": True,
+                "filters": [],
+                "name": "test4",
+            },
             ("sum", "sum"),
             {"hor_ver_agg": [21]},
-            {"hor_ver_agg": [21]}
+            {"hor_ver_agg": [21]},
         ),
         (
             # Test case 5: Both horizontal and vertical aggregations, vertical first
             {"col1": {"values": [1, 2, 3]}, "col2": {"values": [4, 5, 6]}},
-            {"display_units": False, "horizontal_agg": "sum", "vertical_agg": "sum", "horizontal_first": False,
-             "filters": [], "name": "test5"},
+            {
+                "display_units": False,
+                "horizontal_agg": "sum",
+                "vertical_agg": "sum",
+                "horizontal_first": False,
+                "filters": [],
+                "name": "test5",
+            },
             ("sum", "sum"),
             {"ver_hor_agg": [21]},
-            {"ver_hor_agg": [21]}
+            {"ver_hor_agg": [21]},
         ),
-    ])
-def test_perform_aggregations(filtered_pool: dict[dict[str, list[any]]], filter_content: dict[str, any],
-                              mock_agg_keys: tuple[str | None, str | None],
-                              mock_aggregator_return_value: dict[str, list[any]],
-                              expected_output: dict[str, list[any]], mocker: MockerFixture):
+    ],
+)
+def test_perform_aggregations(
+    filtered_pool: dict[dict[str, list[any]]],
+    filter_content: dict[str, any],
+    mock_agg_keys: tuple[str | None, str | None],
+    mock_aggregator_return_value: dict[str, list[any]],
+    expected_output: dict[str, list[any]],
+    mocker: MockerFixture,
+):
     report_generator = ReportGenerator()
 
     mocker.patch.object(report_generator, "_extract_and_check_aggregation_keys", return_value=mock_agg_keys)
@@ -373,22 +390,24 @@ def test_perform_aggregations(filtered_pool: dict[dict[str, list[any]]], filter_
         (
             # Test case 1: Horizontal first with sum aggregations
             {"col1": [1, 2, 3], "col2": [4, 5, 6]},
-            "sum", "sum",
+            "sum",
+            "sum",
             {"horizontal_first": True, "display_units": False},
             ([10], "units"),
             21,
-            {"hor_ver_agg": [10]}
+            {"hor_ver_agg": [10]},
         ),
         (
             # Test case 2: Vertical first with sum aggregations
             {"col1": [1, 2, 3], "col2": [4, 5, 6]},
-            "sum", "sum",
+            "sum",
+            "sum",
             {"horizontal_first": False, "display_units": False},
             None,
             {"col1": [5], "col2": [7]},
-            {"ver_hor_agg": [12]}
+            {"ver_hor_agg": [12]},
         ),
-    ]
+    ],
 )
 def test_handle_horizontal_and_vertical_aggregations(
     aggregate_report: dict[str, list[any]],
@@ -402,8 +421,9 @@ def test_handle_horizontal_and_vertical_aggregations(
 ):
     report_generator = ReportGenerator()
 
-    mocker.patch.object(report_generator, "_get_horizontal_first_value",
-                        return_value=filter_content["horizontal_first"])
+    mocker.patch.object(
+        report_generator, "_get_horizontal_first_value", return_value=filter_content["horizontal_first"]
+    )
 
     if mock_horizontal_agg is not None:
         mocker.patch.object(report_generator, "_apply_horizontal_aggregation", return_value=mock_horizontal_agg)
@@ -413,7 +433,7 @@ def test_handle_horizontal_and_vertical_aggregations(
         mocker.patch.object(report_generator, "_aggregate_units", return_value="units")
 
     # Mock AGGREGATION_FUNCTIONS for sum
-    with patch.dict('RUFAS.report_generator.AGGREGATION_FUNCTIONS', {'sum': sum}):
+    with patch.dict("RUFAS.report_generator.AGGREGATION_FUNCTIONS", {"sum": sum}):
         result = report_generator._handle_horizontal_and_vertical_aggregations(
             aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
         )
