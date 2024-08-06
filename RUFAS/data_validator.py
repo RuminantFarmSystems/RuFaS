@@ -249,7 +249,7 @@ class DataValidator:
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
-
+        print("b")
         return True, ""
 
     @staticmethod
@@ -290,6 +290,7 @@ class DataValidator:
                 )
                 error_message = f"No unique keys for {path}. At least one unique key is expected."
                 return False, error_message
+
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
             om.add_error(
                 "Metadata Validation",
@@ -297,11 +298,11 @@ class DataValidator:
                 f" keys are {sorted(valid_properties_keys)}.",
                 info_map,
             )
-            error_message = (
+            print("kejd")
+            raise ValueError(
                 f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
                 f" keys are {sorted(valid_properties_keys)}."
             )
-            return False, error_message
 
         return True, ""
 
@@ -580,6 +581,7 @@ class DataValidator:
             required_object_property_keys, optional_object_property_keys, value, key_path
         )
         if not valid:
+            print(message)
             return valid, message
         return True, ""
 
