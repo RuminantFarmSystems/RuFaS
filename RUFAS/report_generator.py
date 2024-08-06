@@ -473,6 +473,7 @@ class ReportGenerator:
         horizontal_agg_key: str = None,
         vertical_agg_key: str = None,
     ) -> Dict[str, List[float]]:
+        """Routes report data to appropriate vertical and horizontal aggregator functions."""
         aggregate_report = report_data
 
         if horizontal_agg_key and vertical_agg_key:
