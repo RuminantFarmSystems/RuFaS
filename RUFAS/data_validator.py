@@ -249,7 +249,7 @@ class DataValidator:
 
         om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
         om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
-        print("b")
+        print("pass in DataValidator")
         return True, ""
 
     @staticmethod
@@ -298,11 +298,12 @@ class DataValidator:
                 f" keys are {sorted(valid_properties_keys)}.",
                 info_map,
             )
-            print("kejd")
-            raise ValueError(
+            error_message = (
                 f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
                 f" keys are {sorted(valid_properties_keys)}."
             )
+            print(error_message)
+            return False, error_message
 
         return True, ""
 
