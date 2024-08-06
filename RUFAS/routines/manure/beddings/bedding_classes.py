@@ -345,7 +345,7 @@ class SandBedding(BaseBedding):
         """
         bedding_mass = num_animals * self.bedding_mass_per_day
         return bedding_mass * (1 - self.sand_removal_efficiency)
-    
+
     def calc_organic_bedding_mass_added_to_manure(self, bedding_mass: float) -> float:
         """Sand bedding is not organic, so the organic mass added to manure is always 0."""
         return 0.0
