@@ -81,7 +81,7 @@ class FieldManager:
         current_conditions = weather.get_current_day_conditions(time)
         for field in self.fields:
             field.manage_field(time, current_conditions=current_conditions)
-        self.output_gatherer.send_daily_variables()
+        self.output_gatherer.send_daily_variables(time)
 
     def annual_update_routine(self) -> None:
         """

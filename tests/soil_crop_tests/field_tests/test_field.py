@@ -19,6 +19,7 @@ from RUFAS.routines.field.manager.events import (
 )
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -56,6 +57,21 @@ def mock_field_data() -> FieldData:
         name="test_field_data",
         field_size=1.5,
     )
+
+
+@pytest.fixture
+def field(mocker: MockerFixture) -> Field:
+    mocker.patch.object(Field, "__init__", return_value=None)
+    mocker.patch.object(Soil, "__init__", return_value=None)
+    mocker.patch.object(SoilData, "__init__", return_value=None)
+    mocker.patch.object(LayerData, "__init__", return_value=None)
+
+    field = Field()
+    field.soil = Soil()
+    field.soil.data = SoilData()
+    field.soil.data.soil_layers = [LayerData()]
+
+    return field
 
 
 @pytest.mark.parametrize(
@@ -955,19 +971,23 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "species,specs",
+    "species,specs,bottom_depth,bound_root_depth",
     [
-        ("corn_grain", {}),  # no additional arguments
-        (
-            "alfalfa_hay",
-            {"minimum_temperature": -2.1, "id": 123},
-        ),  # supported species, with alteration
+        ("corn_grain", {}, 100.0, True),
+        ("corn_grain", {}, 10_000.0, False),
+        ("alfalfa_hay", {"minimum_temperature": -2.1, "id": 123}, 3500.0, False),
+        ("alfalfa_hay", {"minimum_temperature": -2.1, "id": 123}, 350.0, True),
     ],
 )
-def test_make_supported_crop(species: str, specs: dict):
-    """ensure that supported crops are properly created."""
-    # check that attributes are correct
-    crop = Field._make_supported_crop(species, **specs)
+def test_make_supported_crop(
+    field: Field, mocker: MockerFixture, species: str, specs: dict, bottom_depth: float, bound_root_depth: bool
+) -> None:
+    """Ensure that supported crops are properly created."""
+    mock_add_warning = mocker.patch.object(om, "add_warning")
+    field.soil.data.soil_layers[-1].bottom_depth = bottom_depth
+
+    crop = field._make_supported_crop(species, **specs)
+
     assert crop.data.species == CropSpecies(species)
     for key, val in specs.items():
         assert getattr(crop.data, key) == val
@@ -976,6 +996,8 @@ def test_make_supported_crop(species: str, specs: dict):
         assert "altered" in crop.data.name
     else:
         assert "altered" not in crop.data.name
+
+    mock_add_warning.assert_called_once() if bound_root_depth else mock_add_warning.assert_not_called()
 
     # failing cases
     with pytest.raises(Exception):
@@ -1016,19 +1038,20 @@ def test_make_custom_crop(config: dict):
         {"minimum_temperature": -2.0},  # generic custom crop, with alterations
     ],
 )
-def test_make_crop_from_config_dict(config: dict):
+def test_make_crop_from_config_dict(field: Field, config: dict) -> None:
+    """Tests that custom crops are configured correctly."""
     supported_crops = set(item.value for item in CropSpecies)
     has_supported_species = "species" in config.keys() and str(config["species"]) in supported_crops
-    Field._make_supported_crop = MagicMock()
+    field._make_supported_crop = MagicMock()
     Field._make_custom_crop = MagicMock()
 
-    Field._make_crop_from_config_dict(config)
+    field._make_crop_from_config_dict(config)
 
     if has_supported_species:
-        Field._make_supported_crop.assert_called_once()
+        field._make_supported_crop.assert_called_once()
         Field._make_custom_crop.assert_not_called()
     else:
-        Field._make_supported_crop.assert_not_called()
+        field._make_supported_crop.assert_not_called()
         Field._make_custom_crop.assert_called_once()
 
 
@@ -2283,7 +2306,7 @@ def test_cycle_water(
             water_sublimated=1.0,
             snow_content=snow_content,
         )
-        soil_data.plant_surface_residue = surface_residue
+        soil_data.soil_layers[0].plant_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(
             field_proportion=crop_1_proportion,
