@@ -522,7 +522,7 @@ def test_distribute_residue_nutrients(
         root_depth=root_depth,
     )
     crop_manager = CropManagement(crop_data)
-    mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.0, 0.1, 0.1, 0.7, 0.7, 1.0])
+    mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 1.0])
     field_size = 1.0
     top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
     second_soil_layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size)
