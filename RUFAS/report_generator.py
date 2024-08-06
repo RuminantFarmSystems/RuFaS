@@ -1,6 +1,7 @@
 import re
 from typing import Dict, List, Any, Callable, Collection, Tuple
 from RUFAS.graph_generator import GraphGenerator
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
@@ -536,59 +537,6 @@ class ReportGenerator:
         return updated_key
 
     @staticmethod
-    def _parse_unit(unit: str) -> dict:
-        """Parses a unit string to handle units with exponents.
-
-        Parameters
-        ----------
-        unit : str
-            A string representing measurement units.
-
-        Returns
-        -------
-        dict
-            A dictionary where the keys are unit names (str) and the values are their exponents (int).
-        """
-        unit_dict = {}
-        for part in unit.split("*"):
-            if "^" in part:
-                u, exp = part.split("^")
-                unit_dict[u.strip()] = int(exp)
-            else:
-                unit_dict[part.strip()] = 1
-        return unit_dict
-
-    @staticmethod
-    def _extract_units(key: str) -> tuple[dict, dict]:
-        """Extracts the units from a key.
-
-        Parameters
-        ----------
-        key : str
-            The key from which the units are extracted.
-
-        Returns
-        -------
-        tuple[dict, dict]
-            A tuple of the numerator and denominator units. If there is no denominator, the first element of tuple will
-            have the units and the second will be an empty string. If no units are found, it will return a tuple with
-            two empty strings.
-        """
-        match = re.search(r"\((.*?)\)", key)
-        if match:
-            units = match.group(1)
-            if "/" in units:
-                numerator, denominator = units.split("/")
-                numerator_units = ReportGenerator._parse_unit(numerator)
-                denominator_units = ReportGenerator._parse_unit(denominator)
-                return numerator_units, denominator_units
-            else:
-                numerator_units = ReportGenerator._parse_unit(units)
-                return numerator_units, {}
-        else:
-            return {}, {}
-
-    @staticmethod
     def _combine_units(
         numerator1: dict, denominator1: dict, numerator2: dict, denominator2: dict, operation: str
     ) -> tuple[dict, dict]:
@@ -621,13 +569,13 @@ class ReportGenerator:
         """
         if operation in ["product", "division"]:
             if operation == "product":
-                combined_numerator = ReportGenerator.add_units(numerator1, numerator2)
-                combined_denominator = ReportGenerator.add_units(denominator1, denominator2)
+                combined_numerator = MeasurementUnits.adjust_unit_exponents(numerator1, numerator2)
+                combined_denominator = MeasurementUnits.adjust_unit_exponents(denominator1, denominator2)
             elif operation == "division":
-                combined_numerator = ReportGenerator.add_units(numerator1, denominator2)
-                combined_denominator = ReportGenerator.add_units(denominator1, numerator2, sign=1)
+                combined_numerator = MeasurementUnits.adjust_unit_exponents(numerator1, denominator2)
+                combined_denominator = MeasurementUnits.adjust_unit_exponents(denominator1, numerator2)
 
-            combined_numerator, combined_denominator = ReportGenerator.simplify_units(
+            combined_numerator, combined_denominator = MeasurementUnits.simplify_units(
                 combined_numerator, combined_denominator
             )
 
@@ -639,82 +587,6 @@ class ReportGenerator:
             combined_denominator = denominator1.copy()
 
         return combined_numerator, combined_denominator
-
-    def add_units(units1, units2, sign=1):
-        result_units = units1.copy()
-        for unit, exponent in units2.items():
-            if unit == "unitless" or unit == "1":
-                continue
-            if unit in result_units:
-                result_units[unit] += sign * exponent
-            else:
-                result_units[unit] = sign * exponent
-        return {unit: exp for unit, exp in result_units.items() if exp != 0}
-
-    def simplify_units(numerator, denominator):
-        combined_numerator = numerator.copy()
-        combined_denominator = denominator.copy()
-
-        for unit in list(combined_numerator.keys()):
-            if unit in combined_denominator:
-                new_exponent = combined_numerator[unit] - combined_denominator[unit]
-                if new_exponent == 0:
-                    del combined_numerator[unit]
-                    del combined_denominator[unit]
-                else:
-                    combined_numerator[unit] = new_exponent
-                    del combined_denominator[unit]
-
-        return combined_numerator, combined_denominator
-
-    @staticmethod
-    def _units_to_string(numerator: dict, denominator: dict) -> str:
-        """
-        Converts two dictionaries of units (numerator and denominator) back to a single string format.
-
-        Parameters
-        ----------
-        numerator : dict
-            A dictionary where the keys are unit names (str) and the values are their exponents (int) for the numerator.
-        denominator : dict
-            A dictionary where the keys are unit names (str) and the values are their exponents (int) for the
-            denominator.
-
-        Returns
-        -------
-        str
-            A string representing the units.
-        """
-        numerator_units = []
-        denominator_units = []
-
-        for unit, exponent in numerator.items():
-            if unit == "unitless":
-                continue
-            if exponent == 1:
-                numerator_units.append(unit)
-            else:
-                numerator_units.append(f"{unit}^{exponent}")
-
-        for unit, exponent in denominator.items():
-            if unit == "unitless":
-                continue
-            if exponent == 1:
-                denominator_units.append(unit)
-            else:
-                denominator_units.append(f"{unit}^{exponent}")
-
-        numerator_str = "*".join(numerator_units)
-        denominator_str = "*".join(denominator_units)
-
-        if numerator_str and denominator_str:
-            return f"{numerator_str}/{denominator_str}"
-        elif numerator_str:
-            return numerator_str
-        elif denominator_str:
-            return f"1/{denominator_str}"
-        else:
-            return "unitless"
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
@@ -876,8 +748,8 @@ class ReportGenerator:
                     aggregator_key = key
                     break
             first_key, second_key = list(report_data.keys())[:2]
-            first_key_numerator_units, first_key_denominator_units = self._extract_units(first_key)
-            second_key_numerator_units, second_key_denominator_units = self._extract_units(second_key)
+            first_key_numerator_units, first_key_denominator_units = MeasurementUnits.extract_units(first_key)
+            second_key_numerator_units, second_key_denominator_units = MeasurementUnits.extract_units(second_key)
             combined_numerator, combined_denominator = self._combine_units(
                 first_key_numerator_units,
                 first_key_denominator_units,
