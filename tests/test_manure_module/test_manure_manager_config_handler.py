@@ -351,6 +351,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             "evaporation_fraction": 0.02,
             "anaerobic_digestion_temperature_set_point": 37.5,
             "anaerobic_digestion_temperature": 37.5,
+            "digester_methane_leakage_fraction": 0.01,
         },
     ]
 
@@ -418,6 +419,7 @@ def test_process_manure_treatment_configs(mocker: MockerFixture) -> None:
             evaporation_fraction=0.02,
             anaerobic_digestion_temperature_set_point=37.5,
             anaerobic_digestion_temperature=37.5,
+            digester_methane_leakage_fraction=0.01,
         ),
     ]
     assert "slurry storage underfloor" in actual_manure_treatment_configs
