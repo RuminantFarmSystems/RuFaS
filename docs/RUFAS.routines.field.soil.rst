@@ -5,7 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
    RUFAS.routines.field.soil.carbon_cycling
    RUFAS.routines.field.soil.nitrogen_cycling
@@ -34,6 +34,14 @@ RUFAS.routines.field.soil.layer\_data module
 --------------------------------------------
 
 .. automodule:: RUFAS.routines.field.soil.layer_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.field.soil.manure\_pool module
+---------------------------------------------
+
+.. automodule:: RUFAS.routines.field.soil.manure_pool
    :members:
    :undoc-members:
    :show-inheritance:

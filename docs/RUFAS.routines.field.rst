@@ -5,7 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
    RUFAS.routines.field.crop
    RUFAS.routines.field.field
