@@ -305,7 +305,7 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     biogas_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS_PER_DAY
 
     biogas_energy_content: float = 0.0
-    biogas_energy_content_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS_PER_DAY
+    biogas_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES
 
     methane_generation_volume: float = 0.0
     methane_generation_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
