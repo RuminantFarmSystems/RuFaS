@@ -250,9 +250,11 @@ def test_start_data_processing(
     """Unit test for function start_data_processing in file input_manager.py"""
     patch_for_load_metadata = mocker.patch.object(mock_input_manager, "_load_metadata")
     patch_for_populate_pool = mocker.patch.object(InputManager, "_populate_pool", return_value=True)
-    patch_for_validate_metadata = mocker.patch.object(DataValidator, "validate_metadata")
+    patch_for_validate_metadata = mocker.patch.object(DataValidator, "validate_metadata",
+                                                      return_value=(True, ""))
     patch_for_load_properties = mocker.patch.object(mock_input_manager, "_load_properties")
-    patch_for_validate_properties = mocker.patch.object(DataValidator, "validate_properties")
+    patch_for_validate_properties = mocker.patch.object(DataValidator, "validate_properties",
+                                                        return_value=(True, ""))
 
     eager_termination = True
     mock_metadata_path = "mock/metadata/path"
@@ -303,7 +305,7 @@ def test_populate_pool_valid(
     mocker.patch.object(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
-    mocker.patch.object(DataValidator, "validate_input_by_type", side_effect=lambda *args, **kwargs: True)
+    mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: True)
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -333,7 +335,7 @@ def test_populate_pool_invalid(
     mocker.patch.object(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
-    mocker.patch.object(DataValidator, "validate_input_by_type", side_effect=lambda *args, **kwargs: False)
+    mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: False)
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
     elements_counter = ElementsCounter()
@@ -364,7 +366,7 @@ def test_populate_pool_partial_invalid(
     mocker.patch.object(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
-    mocker.patch.object(DataValidator, "validate_input_by_type", side_effect=[True, False, True, False])
+    mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=[True, False, True, False])
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -399,7 +401,7 @@ def test_populate_pool_eager_termination(
     mocker.patch.object(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
-    mocker.patch.object(DataValidator, "validate_input_by_type", side_effect=lambda *args, **kwargs: False)
+    mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: False)
     mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_log")
 
@@ -1273,7 +1275,7 @@ def test_add_variable_to_pool_valid(
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
-    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=True)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
 
     patch_add = mocker.patch("RUFAS.input_manager.InputManager._add_to_pool", wraps=input_manager._add_to_pool)
     input_manager._add_to_pool.__name__ = "_add_to_pool"
@@ -1414,7 +1416,7 @@ def test_add_variable_to_pool_invalid(
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
-    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=False)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=False)
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
     patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
     mock_elements_counter = mocker.MagicMock()
@@ -1547,7 +1549,7 @@ def test_add_variable_to_pool_eager_termination(
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
-    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=False)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=False)
     mock_elements_counter = mocker.MagicMock()
     mock_elements_counter.invalid_elements = 1
     mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
@@ -2413,7 +2415,7 @@ def test_add_variable_to_pool_nested(
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool_nested)
     mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_add_variable_to_pool_nested)
-    mocker.patch.object(DataValidator, "validate_input_by_type", return_value=True)
+    mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
     mocker.patch("RUFAS.input_manager.om.add_log")
     patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
     mocker.patch("RUFAS.input_manager.om.add_error")
@@ -3121,15 +3123,17 @@ def test_validate_data(
 
     mock_validate_input_by_type = mocker.patch.object(
         DataValidator,
-        "validate_input_by_type",
+        "validate_data_by_type",
         # fmt: off
-        side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
-        elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None,
+        side_effect=lambda variable_path, variable_properties, data, eager_termination, properties_blob_key,
+                           elements_counter, called_during_initialization, fixable_data_types:
+        data.get(variable_path[0]) is not None,
         # fmt: on
     )
 
     validated_data = input_manager._validate_data(
-        data, metadata_properties, eager_termination, properties_blob_key, elements_counter
+        data=data, metadata_properties=metadata_properties, eager_termination=eager_termination,
+        properties_blob_key=properties_blob_key, elements_counter=elements_counter
     )
 
     assert validated_data == expected_validated_data
