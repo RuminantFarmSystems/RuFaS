@@ -287,12 +287,11 @@ class RationManager:
         """
         ration: Dict[str, float | str] = {}
         for feed_id in range(len(available_feeds["feed_id"])):
-            i = feed_id * 3
-            num = solution.x[i] + solution.x[i + 1] + solution.x[i + 2]
-            ration[available_feeds["feed_key"][feed_id]] = round(num, 6)
+            kg_to_feed = solution.x[feed_id]
+            ration[available_feeds["feed_key"][feed_id]] = round(kg_to_feed, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
-        ration_config.price_list = RationOptimizer.triple_values_in_list(available_feeds["price"])
+        ration_config.price_list = available_feeds["price"]
         ration["objective"] = ration_optimizer.objective(solution.x, ration_config)
         return ration
 
@@ -316,9 +315,7 @@ class RationManager:
         stripped_ration = {k: ration[k] for k in ration if k not in ["status", "objective"]}
         solution_from_ration = []
         for key in stripped_ration:
-            solution_from_ration.append(stripped_ration[key] / 3)
-            solution_from_ration.append(stripped_ration[key] / 3)
-            solution_from_ration.append(stripped_ration[key] / 3)
+            solution_from_ration.append(stripped_ration[key])
         return solution_from_ration
 
     @classmethod
