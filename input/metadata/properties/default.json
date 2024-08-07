@@ -1881,14 +1881,14 @@
     },
     "parity_milk_yield_adjustments": {
       "type": "object",
-      "description": "Parity 2 and 3 milk yield adjustment assumptions for use in calculations",
+      "description": "Parity 2 and 3 milk yield adjustment factors used to estimate 305 day milk yields by parity.",
       "parity_2_305_day_milk_yield_adjustment": {
         "type": "number",
-        "description": "The parity 2 milk adjustment value for the 305 day milk yield"
+        "description": "The parity 2 milk adjustment factor for the 305 day milk yield."
       },
 		  "parity_3_305_day_milk_yield_adjustment": {
         "type": "number",
-        "description": "The parity 3 milk adjustment value for the 305 day milk yield"
+        "description": "The parity 3 milk adjustment factor for the 305 day milk yield."
       }
     },
     "parameter_mean_values": {
