@@ -22,6 +22,8 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output impor
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -37,7 +39,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initializes the outdoor slurry storage manure treatment.
 
         Args:
@@ -88,7 +90,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 0.0
 
     @property
-    def pit_depth(self):
+    def pit_depth(self) -> float:
         """Returns the depth of the pit.
 
         Returns:
@@ -98,7 +100,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 3.657
 
     @property
-    def pit_slope(self):
+    def pit_slope(self) -> float:
         """Returns the slope of the pit.
 
         Returns:
@@ -183,7 +185,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self._get_current_day_rainfall() * self.pit_surface_area
 
     @property
-    def freeboard_volume(self):
+    def freeboard_volume(self) -> float:
         """Calculates the additional pit volume needed for freeboard.
 
         Returns:
