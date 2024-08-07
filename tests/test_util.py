@@ -655,3 +655,14 @@ def test_make_serializable_recursive(
 
     # Assert
     assert result == expected_output
+
+
+@pytest.mark.parametrize("mean,std_dev", [(20.0, 1.0), (0.0, 0.0)])
+def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: float) -> float:
+    """Tests that random numbers are generated properly."""
+    random = mocker.patch("RUFAS.util.np.random.normal", return_value=10.0)
+
+    actual = Utility.generate_random_number(mean, std_dev)
+
+    assert actual == 10.0
+    random.assert_called_once_with(mean, std_dev)

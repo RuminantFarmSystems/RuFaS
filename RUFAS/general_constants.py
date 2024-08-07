@@ -7,6 +7,8 @@ class GeneralConstants:
         MM_TO_CM: The conversion factor from millimeters to centimeters.
 
         GRAMS_TO_KG: The conversion factor from grams to kilograms.
+        LBS_TO_KG: The conversion factor from pounds to kilograms.
+        KG_TO_LBS: The conversion factor from kilograms to pounds.
         LITERS_TO_CUBIC_METERS: The conversion factor from liters to cubic meters.
         KG_TO_CUBIC_METERS: The conversion factor from kilograms to cubic meters.
 
@@ -33,6 +35,8 @@ class GeneralConstants:
     # Mass-related
     GRAMS_TO_KG = 0.001
     KG_TO_GRAMS = 1000
+    LBS_TO_KG = 0.453592
+    KG_TO_LBS = 2.20462
 
     # Volume-related
     LITERS_TO_CUBIC_METERS = 0.001
