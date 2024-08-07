@@ -98,7 +98,7 @@ class RationManager:
         if pen.animal_combination.name in ["LAC_COW"]:
             while not solution.success:
                 num_reattempts += 1
-                if pen.avg_milk < 15:
+                if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     om.add_error(
                         "Ration formulation error.",
                         "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
