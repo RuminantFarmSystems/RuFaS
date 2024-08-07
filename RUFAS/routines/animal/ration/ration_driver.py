@@ -159,7 +159,7 @@ class RationManager:
                     dict(info_map, **{"units": fail_summary_units}),
                 )
 
-        if solution.success and solution is not None:
+        if solution is not None and solution.success:
             ration = cls.make_ration_from_solution(available_feeds, solution)
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
