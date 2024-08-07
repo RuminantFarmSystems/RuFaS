@@ -71,3 +71,8 @@ class ManureConstants:
     """
     The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
     """
+
+    METHANE_DESTRUCTION_EFFICIENCY = 81
+    """
+    The fraction of methane destruction efficiency rate.
+    """
