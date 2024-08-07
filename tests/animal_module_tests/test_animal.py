@@ -2640,7 +2640,8 @@ def test_formulate_ration_error(mocker: MockerFixture) -> None:
 
     with pytest.raises(RuntimeError) as e:
         RationManager.formulate_ration(
-            pen=mock_pen, available_feeds=mocker.MagicMock(), animal_grouping_scenario=mocker.MagicMock()
+            pen=mock_pen, available_feeds=mocker.MagicMock(), animal_grouping_scenario=mocker.MagicMock(),
+            sim_day=2
         )
         assert "RuntimeError" in str(e.value)
     actual = om.errors_pool["RationManager.formulate_ration.Ration formulation error."]
