@@ -133,7 +133,7 @@ class LactationCurve:
         self, year_adjustment_values: dict[str, dict[str, float]], time: Time
     ) -> dict[str, float]:
         """Retrieves the appropriate adjustment values based on the end year of the simulation."""
-        end_year = int(time.end_date.strftime("%Y"))
+        end_year = time.end_date.year
 
         info_map = {"class": self.__class__.__name__, "function": self._get_year_adjustments.__name__}
         if not 2006 <= end_year <= 2016:
@@ -200,7 +200,7 @@ class LactationCurve:
 
     def get_milk_yield_values_wood_curve(
         self, day_of_milk: int, l_param: float, m_param: float, n_param: float
-    ) -> np.float64:
+    ) -> float:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
@@ -226,7 +226,7 @@ class LactationCurve:
         lactation curve parameters." Journal of Dairy Science 105.9 (2022): 7525-7538.
 
         """
-        return l_param * np.power(day_of_milk, m_param) * np.exp(-1 * n_param * day_of_milk)
+        return float(l_param * np.power(day_of_milk, m_param) * np.exp(-1 * n_param * day_of_milk))
 
     def calc_305_day_milk_yield(self, l_param: float, m_param: float, n_param: float) -> float:
         """
@@ -249,7 +249,7 @@ class LactationCurve:
         """
 
         result, _ = quad(self.get_milk_yield_values_wood_curve, 1, 305, args=(l_param, m_param, n_param))
-        return result
+        return float(result)
 
     def get_wood_parameters(self, parity: int) -> dict[str, float]:
         """
@@ -322,7 +322,7 @@ class LactationCurve:
         parity_3_frac: float,
         parity_2_milk_yield_adjustment: float,
         parity_3_milk_yield_adjustment: float,
-    ) -> dict[int, float]:
+    ) -> dict[str, float]:
         """
         Calculates the 305-day milk yield for each lactation group based on total farm milk production.
 
@@ -345,7 +345,7 @@ class LactationCurve:
 
         Returns
         -------
-        dict[int, float]
+        dict[str, float]
             Mapping of the parity (1, 2, 3+) to the estimated 305 day milk production of an individual cow of that
             parity (kg).
 

@@ -3,6 +3,7 @@ from pytest_mock import MockerFixture
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
+from RUFAS.time import Time
 from RUFAS.util import Utility
 from typing import Any
 import datetime
@@ -11,7 +12,8 @@ import datetime
 @pytest.fixture
 def lactation_curve(mocker: MockerFixture) -> LactationCurve:
     mocker.patch.object(LactationCurve, "__init__", return_value=None)
-    return LactationCurve()
+    mock_time = mocker.MagicMock()
+    return LactationCurve(mock_time)
 
 
 @pytest.fixture
@@ -444,7 +446,7 @@ def test_estimate_305_day_milk_yield_by_parity(
     mocker: MockerFixture,
     lactation_curve: LactationCurve,
     annual_yield: float,
-    milking_cows: float,
+    milking_cows: int,
     p1_frac: float,
     p2_frac: float,
     p3_frac: float,
