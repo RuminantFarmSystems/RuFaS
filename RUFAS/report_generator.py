@@ -709,8 +709,9 @@ class ReportGenerator:
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
-        ordered_report_data = {key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key
-                               in key}
+        ordered_report_data = {
+            key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key in key
+        }
         aggregated_units = self._aggregate_units(ordered_report_data, aggregator)
         return aggregated_data, aggregated_units
 
