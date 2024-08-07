@@ -1909,19 +1909,57 @@
     },
     "parameter_standard_deviations": {
       "type": "object",
-      "description": "Standard deviations of Wood's Lactation Curve parameters which serve as the defaults for all-lactation models",
-      "parameter_l_std_dev": {
-        "type": "number",
-        "minimum": 0.0,
-        "description": "The standard deviation for Wood's parameter l."
+      "description": "Standard deviations of Wood's Lactation Curve parameters.",
+      "1": {
+        "type": "object",
+        "description": "Standard deviations of Wood's lactation Curve parameters for parity 1 cows.",
+        "parameter_l_std_dev": {
+          "type": "number",
+          "minimum": 0.0,
+          "description": "The standard deviation for Wood's parameter l."
+        },
+        "parameter_m_std_dev": {
+          "type": "number",
+          "description": "The standard deviation for of Wood's parameter m."
+        },
+        "parameter_n_std_dev": {
+          "type": "number",
+          "description": "The standard deviation for of Wood's parameter n."
+        }
       },
-		  "parameter_m_std_dev": {
-        "type": "number",
-        "description": "The standard deviation for of Wood's parameter m."
+      "2": {
+        "type": "object",
+        "description": "Standard deviations of Wood's lactation Curve parameters for parity 2 cows.",
+        "parameter_l_std_dev": {
+          "type": "number",
+          "minimum": 0.0,
+          "description": "The standard deviation for Wood's parameter l."
+        },
+        "parameter_m_std_dev": {
+          "type": "number",
+          "description": "The standard deviation for of Wood's parameter m."
+        },
+        "parameter_n_std_dev": {
+          "type": "number",
+          "description": "The standard deviation for of Wood's parameter n."
+        }
       },
-      "parameter_n_std_dev": {
-        "type": "number",
-        "description": "The standard deviation for of Wood's parameter n."
+      "3": {
+        "type": "object",
+        "description": "Standard deviations of Wood's lactation Curve parameters for parity 3+ cows.",
+        "parameter_l_std_dev": {
+          "type": "number",
+          "minimum": 0.0,
+          "description": "The standard deviation for Wood's parameter l."
+        },
+        "parameter_m_std_dev": {
+          "type": "number",
+          "description": "The standard deviation for of Wood's parameter m."
+        },
+        "parameter_n_std_dev": {
+          "type": "number",
+          "description": "The standard deviation for of Wood's parameter n."
+        }
       }
     },
     "milking_cow_fraction": {

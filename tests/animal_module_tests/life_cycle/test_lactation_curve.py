@@ -147,9 +147,9 @@ def lactation_inputs() -> dict[str, Any]:
         },
         "parameter_mean_values": {"parameter_l_mean": 19.9, "parameter_m_mean": 0.247, "parameter_n_mean": 0.003376},
         "parameter_standard_deviations": {
-            "parameter_l_std_dev": 0.28,
-            "parameter_m_std_dev": 0.0046,
-            "parameter_n_std_dev": 3.77e-5,
+            "1": {"parameter_l_std_dev": 0.28, "parameter_m_std_dev": 0.0046, "parameter_n_std_dev": 3.77e-5},
+            "2": {"parameter_l_std_dev": 0.54, "parameter_m_std_dev": 0.0064, "parameter_n_std_dev": 5.82e-5},
+            "3": {"parameter_l_std_dev": 0.51, "parameter_m_std_dev": 0.0060, "parameter_n_std_dev": 5.54e-5},
         },
         "milking_cow_fraction": 0.8356,
     }
@@ -196,9 +196,11 @@ def test_init(
     assert lactation_curve.parity_to_parameter_mapping[1] == lactation_curve.parity_1_parameters
     assert lactation_curve.parity_to_parameter_mapping[2] == lactation_curve.parity_2_parameters
     assert lactation_curve.parity_to_parameter_mapping[3] == lactation_curve.parity_3_parameters
-    assert lactation_curve.l_param_std_dev == 0.28
-    assert lactation_curve.m_param_std_dev == 0.0046
-    assert lactation_curve.n_param_std_dev == 3.77e-5
+    assert lactation_curve.parity_to_std_dev_mapping == {
+        1: {"parameter_l_std_dev": 0.28, "parameter_m_std_dev": 0.0046, "parameter_n_std_dev": 3.77e-5},
+        2: {"parameter_l_std_dev": 0.54, "parameter_m_std_dev": 0.0064, "parameter_n_std_dev": 5.82e-5},
+        3: {"parameter_l_std_dev": 0.51, "parameter_m_std_dev": 0.0060, "parameter_n_std_dev": 5.54e-5},
+    }
     if expect_fitting:
         add_log.assert_called_once()
         adjust_lactation_curve.assert_called_once()
@@ -355,8 +357,12 @@ def test_calc_305_day_milk_yield(
 
 
 @pytest.mark.parametrize(
-    "parity,l_expect,m_expect,n_expect",
-    [(1, 18.1, 0.228, 0.003321), (2, 22.1, 0.247, 0.003376), (3, 22.0, 0.231, 0.003351)],
+    "parity,l_expect,m_expect,n_expect,l_std_dev_expected,m_std_dev_expected,n_std_dev_expected",
+    [
+        (1, 18.1, 0.228, 0.003321, 0.28, 0.0046, 3.77e-5),
+        (2, 22.1, 0.247, 0.003376, 0.54, 0.0064, 5.82e-5),
+        (3, 22.0, 0.231, 0.003351, 0.51, 0.0060, 5.54e-5),
+    ],
 )
 def test_get_wood_parameters(
     mocker: MockerFixture,
@@ -365,6 +371,9 @@ def test_get_wood_parameters(
     l_expect: float,
     m_expect: float,
     n_expect: float,
+    l_std_dev_expected: float,
+    m_std_dev_expected: float,
+    n_std_dev_expected: float,
 ) -> None:
     """Test that Wood's parameters are retrieved correctly from LactationCurve."""
     gen_rand = mocker.patch.object(Utility, "generate_random_number", side_effect=[20.22, 0.311, 0.003122])
@@ -376,9 +385,10 @@ def test_get_wood_parameters(
         2: lactation_curve.parity_2_parameters,
         3: lactation_curve.parity_3_parameters,
     }
-    lactation_curve.l_param_std_dev = 0.28
-    lactation_curve.m_param_std_dev = 0.0046
-    lactation_curve.n_param_std_dev = 3.77e-5
+    parity_1_std_dev = {"parameter_l_std_dev": 0.28, "parameter_m_std_dev": 0.0046, "parameter_n_std_dev": 3.77e-5}
+    parity_2_std_dev = {"parameter_l_std_dev": 0.54, "parameter_m_std_dev": 0.0064, "parameter_n_std_dev": 5.82e-5}
+    parity_3_std_dev = {"parameter_l_std_dev": 0.51, "parameter_m_std_dev": 0.0060, "parameter_n_std_dev": 5.54e-5}
+    lactation_curve.parity_to_std_dev_mapping = {1: parity_1_std_dev, 2: parity_2_std_dev, 3: parity_3_std_dev}
 
     actual = lactation_curve.get_wood_parameters(parity)
 
@@ -386,7 +396,11 @@ def test_get_wood_parameters(
     assert actual["m"] == 0.311
     assert actual["n"] == 0.003122
     gen_rand.assert_has_calls(
-        [mocker.call(l_expect, 0.28), mocker.call(m_expect, 0.0046), mocker.call(n_expect, 3.77e-5)]
+        [
+            mocker.call(l_expect, l_std_dev_expected),
+            mocker.call(m_expect, m_std_dev_expected),
+            mocker.call(n_expect, n_std_dev_expected),
+        ]
     )
 
 
