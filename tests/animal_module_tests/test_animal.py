@@ -2569,6 +2569,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     mock_body_weight_history.simulation_day = 100
     mock_animal.body_weight_history = [mock_body_weight_history]
     mock_pen.animals_in_pen = {"a": mock_animal}
+    mock_pen.avg_milk = 42
     mock_solution = mocker.MagicMock()
     mock_solution.success = False
     mock_solution_exists = mocker.MagicMock()
@@ -2606,6 +2607,48 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     mock_make_ration_from_solution.assert_called_with(available_feeds, mock_solution_exists)
     mock_find_failed_constraints.assert_called_once()
     mock_reduce_milk_production.assert_called_once()
+
+
+def test_formulate_ration_error(mocker: MockerFixture) -> None:
+    om = OutputManager()
+
+    req = AnimalRequirements()
+    mocker.patch(
+        "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.__new__",
+        return_value=req,
+    )
+    mocker.patch(
+        "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
+        return_value=None,
+    )
+    mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=False))
+    mock_pen = mocker.MagicMock()
+    mock_pen.avg_milk = 1
+    mock_pen.id = 42
+    mock_pen.animal_combination.name = "LAC_COW"
+
+    mock_solution = mocker.MagicMock()
+    mock_solution.success = False
+    mock_ration_vals = mocker.MagicMock()
+    mock_ration_config = mocker.MagicMock()
+    mocker.patch(
+        "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.attempt_optimization",
+        side_effect=[
+            (mock_solution, mock_ration_vals, mock_ration_config),
+        ],
+    )
+
+    with pytest.raises(RuntimeError) as e:
+        RationManager.formulate_ration(
+            pen=mock_pen,
+            available_feeds=mocker.MagicMock(),
+            animal_grouping_scenario=mocker.MagicMock())
+        assert "RuntimeError" in str(e.value)
+    actual = om.errors_pool["RationManager.formulate_ration.Ration formulation error."]
+    assert actual["values"].__contains__(
+        "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
+        " Check failed_constraint_summary_for_pen_42"
+    )
 
 
 def test_calc_milk_average() -> None:
