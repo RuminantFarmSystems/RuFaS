@@ -3,7 +3,6 @@ from pytest_mock import MockerFixture
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
-from RUFAS.time import Time
 from RUFAS.util import Utility
 from typing import Any
 import datetime
