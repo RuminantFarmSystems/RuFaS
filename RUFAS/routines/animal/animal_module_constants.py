@@ -89,3 +89,6 @@ class AnimalModuleConstants:
 
     MINIMUM_HEIFER_DAILY_GROWTH_RATE: float = 0.5
     """Minimum daily growth for heifers, kg."""
+
+    MINIMUM_AVG_PEN_MILK: float = 15
+    """Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal"""
