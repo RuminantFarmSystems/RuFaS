@@ -88,12 +88,26 @@ class RationManager:
         )
         # Reduction of milk production estimate process to achieve feasible solution
         num_reattempts: int = 0
+        info_map = {
+            "class": "RationManager",
+            "function": cls.formulate_ration.__name__,
+        }
 
         # TODO: Put AnimalCombination enum in a separate file and use it here instead of hardcoding the names
         # GitHub Issue #793
         if pen.animal_combination.name in ["LAC_COW"]:
             while not solution.success:
                 num_reattempts += 1
+                if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                    om.add_error(
+                        "Ration formulation error",
+                        "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
+                        + f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail."
+                        + " Possible solution is to provide additional feed ingredients to"
+                        + f" {pen.animal_combination.name}.",
+                        info_map,
+                    )
+                    raise RuntimeError
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
                     solution.x, ration_optimizer.cow_constraints, ration_config
@@ -145,13 +159,22 @@ class RationManager:
                     dict(info_map, **{"units": fail_summary_units}),
                 )
 
-        if solution is not None:
+        if solution is not None and solution.success:
             ration = cls.make_ration_from_solution(available_feeds, solution)
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen
-        else:
+        elif pen.ration != {}:
             return pen.ration, ration_vals
+        else:
+            om.add_error(
+                "Ration formulation error",
+                "Catastrophic ration formulation error: can't formulate; no previous ration available."
+                + f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail."
+                + f" Possible solution is to provide additional feed ingredients to {pen.animal_combination.name}.",
+                info_map,
+            )
+            raise RuntimeError
 
     @staticmethod
     def calc_milk_average(pen: Pen) -> float:
