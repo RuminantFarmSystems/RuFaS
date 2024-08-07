@@ -2528,8 +2528,9 @@ def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
     mock_pen.ration_per_animal = prev_ration
     mock_pen.animal_combination = mocker.MagicMock()
     mock_pen.animal_combination.name = "mock_animal_combo_name"
-    mock_pen.ration = None
-    mock_solution = None
+    mock_pen.ration = prev_ration
+    mock_solution = mocker.MagicMock()
+    mock_solution.success = False
     mock_ration_vals = mocker.MagicMock()
     mock_ration_config = mocker.MagicMock()
     expected = (mock_pen.ration, mock_ration_vals)
@@ -2643,10 +2644,12 @@ def test_formulate_ration_error(mocker: MockerFixture) -> None:
             pen=mock_pen, available_feeds=mocker.MagicMock(), animal_grouping_scenario=mocker.MagicMock(), sim_day=2
         )
         assert "RuntimeError" in str(e.value)
-    actual = om.errors_pool["RationManager.formulate_ration.Ration formulation error."]
+    actual = om.errors_pool["RationManager.formulate_ration.Ration formulation error"]
     assert actual["values"].__contains__(
         "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
         " Check failed_constraint_summary_for_pen_42"
+        + " to see what caused formulation to fail."
+        + " Possible solution is to provide additional feed ingredients to LAC_COW."
     )
 
 
