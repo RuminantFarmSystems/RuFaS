@@ -372,8 +372,7 @@ class ReportGenerator:
         missing_references = []
 
         for ref in references:
-            escaped_ref = re.escape(ref)
-            if not any(re.fullmatch(escaped_ref, report_name) for report_name in self.reports):
+            if not any(re.fullmatch(ref, report_name) for report_name in self.reports):
                 missing_references.append(ref)
 
         if missing_references:
@@ -399,9 +398,8 @@ class ReportGenerator:
 
         matched_reports = {}
         for pattern in regex_patterns:
-            escaped_pattern = re.escape(pattern)
             for report_name in self.reports:
-                if re.fullmatch(escaped_pattern, report_name):
+                if re.fullmatch(pattern, report_name):
                     matched_reports[report_name] = self.reports[report_name]
         return matched_reports
 
@@ -711,7 +709,8 @@ class ReportGenerator:
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
-        ordered_report_data = {key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key in key}
+        ordered_report_data = {key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key
+                               in key}
         aggregated_units = self._aggregate_units(ordered_report_data, aggregator)
         return aggregated_data, aggregated_units
 
