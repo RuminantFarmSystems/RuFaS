@@ -55,15 +55,11 @@ class LactationCurve:
     parity_2_parameters : dict[str, float]
         Contains the adjusted l, m, and n parameters for parity 2 cows.
     parity_3_parameters : dict[str, float]
-        Contains the adjusted l, m, and n parameters for parity 3 cows.
+        Contains the adjusted l, m, and n parameters for parity 3+ cows.
     parity_to_parameter_mapping : dict[int, dict[str, float]]
-        Maps the parity (1, 2, and 3) to the associated sets of l, m and n parameters.
-    l_param_std_dev : float
-        The standard deviation for the l lactation parameter across all parity groups.
-    m_param_std_dev : float
-        The standard deviation for the m lactation parameter across all parity groups.
-    n_param_std_dev : float
-        The standard deviation for the n lactation parameter across all parity groups.
+        Maps the parity (1, 2, and 3+) to the associated sets of l, m and n parameters.
+    parity_to_std_dev_mapping : dict[int, dict[str, float]]
+        Maps parities (1, 2, and 3+) to the standard devations of Wood's l, m, and n parameters.
 
     """
 
@@ -118,9 +114,11 @@ class LactationCurve:
             3: self.parity_3_parameters,
         }
 
-        self.l_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_l_std_dev"]
-        self.m_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_m_std_dev"]
-        self.n_param_std_dev = lactation_inputs["parameter_standard_deviations"]["parameter_n_std_dev"]
+        self.parity_to_std_dev_mapping = {
+            1: lactation_inputs["parameter_standard_deviations"]["1"],
+            2: lactation_inputs["parameter_standard_deviations"]["2"],
+            3: lactation_inputs["parameter_standard_deviations"]["3"],
+        }
 
         annual_milk_yield = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
@@ -271,10 +269,11 @@ class LactationCurve:
         parity = min(3, parity)
 
         params = self.parity_to_parameter_mapping[parity]
+        std_deviations = self.parity_to_std_dev_mapping[parity]
         return {
-            "l": Utility.generate_random_number(params["l"], self.l_param_std_dev),
-            "m": Utility.generate_random_number(params["m"], self.m_param_std_dev),
-            "n": Utility.generate_random_number(params["n"], self.n_param_std_dev),
+            "l": Utility.generate_random_number(params["l"], std_deviations["parameter_l_std_dev"]),
+            "m": Utility.generate_random_number(params["m"], std_deviations["parameter_m_std_dev"]),
+            "n": Utility.generate_random_number(params["n"], std_deviations["parameter_n_std_dev"]),
         }
 
     def _adjust_lactation_curve_to_milk_yield(
