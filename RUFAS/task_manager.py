@@ -416,17 +416,20 @@ class TaskManager:
     @staticmethod
     def handle_single_simulation_run(args: Dict[str, Any], output_manager: OutputManager) -> None:
         """Conducts a single simulation run based on provided arguments."""
-        info_map = {
-            "class": TaskManager.__name__,
-            "function": TaskManager.handle_single_simulation_run.__name__,
-            "units": MeasurementUnits.UNITLESS,
-        }
-        TaskManager.handle_herd_initializaition(args, output_manager)
+        try:
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": TaskManager.handle_single_simulation_run.__name__,
+                "units": MeasurementUnits.UNITLESS,
+            }
+            TaskManager.handle_herd_initializaition(args, output_manager)
 
-        output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-        simulator = SimulationEngine()
-        simulator.simulate()
-        output_manager.add_log("Simulation completed", "Simulation completed", info_map)
+            output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
+            simulator = SimulationEngine()
+            simulator.simulate()
+            output_manager.add_log("Simulation completed", "Simulation completed", info_map)
+        except Exception:
+            pass
 
     @staticmethod
     def handle_input_data_audit(
@@ -485,35 +488,38 @@ class TaskManager:
             Whether to load data pool from file.
 
         """
-        info_map = {
-            "class": TaskManager.__name__,
-            "function": TaskManager.handle_post_processing.__name__,
-            "units": MeasurementUnits.UNITLESS,
-        }
-        output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
+        try:
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": TaskManager.handle_post_processing.__name__,
+                "units": MeasurementUnits.UNITLESS,
+            }
+            output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
-        if load_pool_from_file:
-            output_manager.flush_pools()
-            output_manager.load_variables_pool_from_file(args["output_pool_path"])
-            output_manager.set_metadata_prefix("reload")
+            if load_pool_from_file:
+                output_manager.flush_pools()
+                output_manager.load_variables_pool_from_file(args["output_pool_path"])
+                output_manager.set_metadata_prefix("reload")
 
-        output_manager.print_errors_warnings_logs_counts(task_id)
-        if save_results:
-            output_manager.save_results(
-                args["filters_directory"],
-                args["exclude_info_maps"],
-                produce_graphics,
-                args["report_directory"],
-                args["graphics_directory"],
-                args["csv_output_directory"],
-                args["json_output_directory"],
-            )
+            output_manager.print_errors_warnings_logs_counts(task_id)
+            if save_results:
+                output_manager.save_results(
+                    args["filters_directory"],
+                    args["exclude_info_maps"],
+                    produce_graphics,
+                    args["report_directory"],
+                    args["graphics_directory"],
+                    args["csv_output_directory"],
+                    args["json_output_directory"],
+                )
 
-        if not args["suppress_log_files"]:
-            input_manager.dump_get_data_logs(args["logs_directory"])
-            output_manager.dump_all_nondata_pools(
-                args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
-            )
+            if not args["suppress_log_files"]:
+                input_manager.dump_get_data_logs(args["logs_directory"])
+                output_manager.dump_all_nondata_pools(
+                    args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
+                )
+        except Exception:
+            pass
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
