@@ -22,6 +22,8 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output impor
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class SlurryStorageOutdoor(BaseManureTreatment):
@@ -37,7 +39,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
     """
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
         """Initializes the outdoor slurry storage manure treatment.
 
         Args:
@@ -88,7 +90,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 0.0
 
     @property
-    def pit_depth(self):
+    def pit_depth(self) -> float:
         """Returns the depth of the pit.
 
         Returns:
@@ -98,7 +100,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return 3.657
 
     @property
-    def pit_slope(self):
+    def pit_slope(self) -> float:
         """Returns the slope of the pit.
 
         Returns:
@@ -183,7 +185,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         return self._get_current_day_rainfall() * self.pit_surface_area
 
     @property
-    def freeboard_volume(self):
+    def freeboard_volume(self) -> float:
         """Calculates the additional pit volume needed for freeboard.
 
         Returns:
@@ -303,7 +305,6 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.set_daily_final_manure_volume(adjusted_daily_final_manure_volume)
 
         self._adjust_accumulated_output(daily_output)
-
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = self.calc_methane_emission(
             accumulated_liquid_manure_total_volatile_solids=(
@@ -313,6 +314,17 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                 self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
         )
+
+        daily_output.storage_methane = methane_loss
+
+        if self.config.manure_cover == "cover and flare":
+            daily_output.storage_methane_avoided = methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100
+            methane_loss = methane_loss * (1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100)
+            methane_emission_from_degradable_volatile_solids =\
+                methane_emission_from_degradable_volatile_solids * (
+                    1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100)
+            daily_output.storage_methane = methane_loss
+
         # fmt: on
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
@@ -326,7 +338,6 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             ),
         )
         daily_output.storage_ammonia = ammonia_loss
-        daily_output.storage_methane = methane_loss
 
         new_daily_output_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
         daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
