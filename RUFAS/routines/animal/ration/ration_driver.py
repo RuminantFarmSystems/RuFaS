@@ -287,9 +287,8 @@ class RationManager:
         """
         ration: Dict[str, float | str] = {}
         for feed_id in range(len(available_feeds["feed_id"])):
-            i = feed_id
-            num = solution.x[i]
-            ration[available_feeds["feed_key"][feed_id]] = round(num, 6)
+            kg_to_feed = solution.x[feed_id]
+            ration[available_feeds["feed_key"][feed_id]] = round(kg_to_feed, 6)
         ration["status"] = "Optimal"
         ration_config = RationConfig()
         ration_config.price_list = available_feeds["price"]
