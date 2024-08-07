@@ -2646,7 +2646,7 @@ def test_formulate_ration_error(mocker: MockerFixture) -> None:
         assert "RuntimeError" in str(e.value)
     actual = om.errors_pool["RationManager.formulate_ration.Ration formulation error"]
     assert actual["values"].__contains__(
-        "Catastrophic ration formulation error: milk production has dropped too low."
+        "Critical ration formulation error: milk production has dropped too low."
         " Check failed_constraint_summary_for_pen_42"
         + " to see what caused formulation to fail."
         + " Possible solution is to provide additional feed ingredients to LAC_COW."
