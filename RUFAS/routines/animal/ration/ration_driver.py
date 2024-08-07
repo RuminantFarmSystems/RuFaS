@@ -101,7 +101,7 @@ class RationManager:
                 if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     om.add_error(
                         "Ration formulation error",
-                        "Catastrophic ration formulation error: milk production has dropped too low."
+                        "Critical ration formulation error: milk production has dropped too low."
                         + f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail."
                         + " Possible solution is to provide additional feed ingredients to"
                         + f" {pen.animal_combination.name}.",
@@ -167,7 +167,7 @@ class RationManager:
         else:
             om.add_error(
                 "Ration formulation error",
-                "Catastrophic ration formulation error: can't formulate; no previous ration available."
+                "Critical ration formulation error: can't formulate; no previous ration available."
                 + f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail."
                 + f" Possible solution is to provide additional feed ingredients to {pen.animal_combination.name}.",
                 info_map,
