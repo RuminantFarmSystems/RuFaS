@@ -123,8 +123,6 @@ class RationManager:
                     ration_vals,
                     ration_config,
                 ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
-                animal_list = list(pen.animals_in_pen.values())
-                sim_day = animal_list[0].body_weight_history[-1].simulation_day
                 fail_summary = {
                     "simulation day": sim_day,
                     "reattempt number": num_reattempts,
