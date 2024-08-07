@@ -135,51 +135,51 @@ def test_apply_vertical_aggregation(
     "report_data, loop_list, aggregator_key, expected, expected_exception",
     [
         # Tests with sum aggregation
-        ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "sum", ([4, 6], "unitless"), None),
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], "sum", ([5, 7, 9], "unitless"), None),
+        ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "sum", ([4, 6], "unitless", []), None),
+        ({"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], "sum", ([5, 7, 9], "unitless", []), None),
         # Tests with subtraction aggregation
-        ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "subtraction", ([-2, -2], "unitless"), None),
+        ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "subtraction", ([-2, -2], "unitless", []), None),
         (
             {"a": [1, 2, 3], "b": [4, 5, 6]},
             ["a", "b"],
             "subtraction",
-            ([-3, -3, -3], "unitless"),
+            ([-3, -3, -3], "unitless", []),
             None,
         ),
         # Tests with product aggregation
-        ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "product", ([3, 8], "unitless"), None),
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], "product", ([4, 10, 18], "unitless"), None),
+        ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "product", ([3, 8], "unitless", []), None),
+        ({"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], "product", ([4, 10, 18], "unitless", []), None),
         # Tests with division aggregation
         (
             {"a": [1, 2], "b": [3, 4]},
             ["a", "b"],
             "division",
-            ([0.3333333333333333, 0.5], "unitless"),
+            ([0.3333333333333333, 0.5], "unitless", []),
             None,
         ),
         (
             {"a": [1, 2, 3], "b": [4, 5, 6]},
             ["a", "b"],
             "division",
-            ([0.25, 0.4, 0.5], "unitless"),
+            ([0.25, 0.4, 0.5], "unitless", []),
             None,
         ),
         # Tests with average aggregation
-        ({"a": [1, 3], "b": [2, 4]}, ["a", "b"], "average", ([1.5, 3.5], "unitless"), None),
+        ({"a": [1, 3], "b": [2, 4]}, ["a", "b"], "average", ([1.5, 3.5], "unitless", []), None),
         (
             {"a": [1, 2, 3], "b": [4, 5, 6]},
             ["a", "b"],
             "average",
-            ([2.5, 3.5, 4.5], "unitless"),
+            ([2.5, 3.5, 4.5], "unitless", []),
             None,
         ),
         # Tests with standard deviation aggregation
-        ({"a": [10, 10], "b": [20, 20]}, ["a", "b"], "SD", ([5.0, 5.0], "unitless"), None),
+        ({"a": [10, 10], "b": [20, 20]}, ["a", "b"], "SD", ([5.0, 5.0], "unitless", []), None),
         (
             {"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]},
             ["a", "b"],
             "SD",
-            ([3.5, 1.5, 0.5, 1.5], "unitless"),
+            ([3.5, 1.5, 0.5, 1.5], "unitless", []),
             None,
         ),
         # Tests with inconsistent lengths
@@ -191,7 +191,7 @@ def test_apply_horizontal_aggregation(
     loop_list: List[str],
     aggregator_key: str,
     expected: List[float],
-    expected_exception: Type[Exception],
+    expected_exception: Type[Exception] | None,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -312,23 +312,23 @@ def test_validate_constants(
             {"display_units": False, "filters": [], "name": "test1"},
             (None, None),
             None,
-            {"col1": [1, 2, 3], "col2": [4, 5, 6]},
+            ({"col1": [1, 2, 3], "col2": [4, 5, 6]}, []),
         ),
         (
             # Test case 2: Horizontal aggregation only
             {"col1": {"values": [1, 2, 3]}, "col2": {"values": [4, 5, 6]}},
             {"display_units": False, "horizontal_agg": "sum", "filters": [], "name": "test2"},
             ("sum", None),
-            {"hor_agg": [6, 15]},
-            {"hor_agg": [6, 15]},
+            ({"hor_agg": [6, 15]}, []),
+            ({"hor_agg": [6, 15]}, []),
         ),
         (
             # Test case 3: Vertical aggregation only
             {"col1": {"values": [1, 2, 3]}, "col2": {"values": [4, 5, 6]}},
             {"display_units": False, "vertical_agg": "sum", "filters": [], "name": "test3"},
             (None, "sum"),
-            {"ver_agg": [5, 7, 9]},
-            {"ver_agg": [5, 7, 9]},
+            ({"ver_agg": [5, 7, 9]}, []),
+            ({"ver_agg": [5, 7, 9]}, []),
         ),
         (
             # Test case 4: Both horizontal and vertical aggregations, horizontal first
@@ -342,8 +342,8 @@ def test_validate_constants(
                 "name": "test4",
             },
             ("sum", "sum"),
-            {"hor_ver_agg": [21]},
-            {"hor_ver_agg": [21]},
+            ({"hor_ver_agg": [21]}, []),
+            ({"hor_ver_agg": [21]}, []),
         ),
         (
             # Test case 5: Both horizontal and vertical aggregations, vertical first
@@ -357,8 +357,8 @@ def test_validate_constants(
                 "name": "test5",
             },
             ("sum", "sum"),
-            {"ver_hor_agg": [21]},
-            {"ver_hor_agg": [21]},
+            ({"ver_hor_agg": [21]}, []),
+            ({"ver_hor_agg": [21]}, []),
         ),
     ],
 )
@@ -395,7 +395,7 @@ def test_perform_aggregations(
             {"horizontal_first": True, "display_units": False},
             ([10], "units"),
             21,
-            {"hor_ver_agg": [10]},
+            ({"hor_ver_agg": [10]}, []),
         ),
         (
             # Test case 2: Vertical first with sum aggregations
@@ -405,7 +405,7 @@ def test_perform_aggregations(
             {"horizontal_first": False, "display_units": False},
             None,
             {"col1": [5], "col2": [7]},
-            {"ver_hor_agg": [12]},
+            ({"ver_hor_agg": [12]}, []),
         ),
     ],
 )
@@ -420,6 +420,7 @@ def test_handle_horizontal_and_vertical_aggregations(
     mocker: MockerFixture,
 ):
     report_generator = ReportGenerator()
+    aggregate_units_return = ("units", [])
 
     mocker.patch.object(
         report_generator, "_get_horizontal_first_value", return_value=filter_content["horizontal_first"]
@@ -430,7 +431,7 @@ def test_handle_horizontal_and_vertical_aggregations(
 
     if mock_vertical_agg is not None:
         mocker.patch.object(report_generator, "_apply_vertical_aggregation", return_value=mock_vertical_agg)
-        mocker.patch.object(report_generator, "_aggregate_units", return_value="units")
+        mocker.patch.object(report_generator, "_aggregate_units", return_value=aggregate_units_return)
 
     # Mock AGGREGATION_FUNCTIONS for sum
     with patch.dict("RUFAS.report_generator.AGGREGATION_FUNCTIONS", {"sum": sum}):
@@ -848,8 +849,11 @@ def test_generate_report(
         mocker.patch.object(
             report_generator,
             "_perform_aggregations",
-            return_value={fltr: filtered_pool[fltr] for fltr in filter_content["filters"]}
-            | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
+            return_value=(
+                {fltr: filtered_pool[fltr] for fltr in filter_content["filters"]}
+                | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
+                []
+            ),
         )
 
     get_reports_by_regex_spy = mocker.spy(report_generator, "_get_reports_by_regex")
