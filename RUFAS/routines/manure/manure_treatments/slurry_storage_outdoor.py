@@ -316,13 +316,12 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.storage_methane = methane_loss
 
         if self.config.manure_cover == "cover and flare":
-            daily_output.storage_methane_avoided = methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY/100
-            methane_loss = methane_loss * (1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY/100)
+            daily_output.storage_methane_avoided = methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100
+            methane_loss = methane_loss * (1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100)
             methane_emission_from_degradable_volatile_solids =\
                 methane_emission_from_degradable_volatile_solids * (
-                    1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY/100)
+                    1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100)
             daily_output.storage_methane = methane_loss
-
 
         # fmt: on
         methane_emission_from_non_degradable_volatile_solids = (
@@ -337,7 +336,6 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             ),
         )
         daily_output.storage_ammonia = ammonia_loss
-
 
         new_daily_output_liquid_manure_total_solids = max(daily_output.liquid_manure_total_solids - methane_loss, 0.0)
         daily_output.liquid_manure_total_solids = new_daily_output_liquid_manure_total_solids
