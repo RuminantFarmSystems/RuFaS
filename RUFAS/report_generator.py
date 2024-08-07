@@ -213,10 +213,7 @@ class ReportGenerator:
                 report_data, aggregation_logs = self._perform_aggregations(cross_reference_data, filter_content)
             else:
                 report_data, aggregation_logs = self._perform_aggregations(filtered_pool, filter_content)
-            if isinstance(aggregation_logs, list):
-                event_logs.extend(aggregation_logs)
-            else:
-                event_logs.append(aggregation_logs)
+            event_logs.extend(aggregation_logs)
             should_graph_report_data = filter_content.get("graph_details")
             enable_graph_and_report = filter_content.get("graph_and_report", False)
             for col, values in report_data.items():

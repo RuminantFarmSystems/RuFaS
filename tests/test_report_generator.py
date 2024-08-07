@@ -17,6 +17,7 @@ from RUFAS.report_generator import (
     ReportGenerator,
     AGGREGATION_FUNCTIONS,
 )
+from RUFAS.units import MeasurementUnits
 
 
 def test_average_aggregator() -> None:
@@ -360,6 +361,15 @@ def test_validate_constants(
             ({"ver_hor_agg": [21]}, []),
             ({"ver_hor_agg": [21]}, []),
         ),
+        (
+            # Test case 6: No aggregation specified
+            {"col1": {"values": [1, 2, 3], "info_maps": [{"units": "dummy_units"}]},
+             "col2": {"values": [4, 5, 6], "info_maps": [{"units": "dummy_units2"}]}},
+            {"display_units": True, "filters": [], "name": "test1"},
+            (None, None),
+            None,
+            ({"col1 (dummy_units)": [1, 2, 3], "col2 (dummy_units2)": [4, 5, 6]}, []),
+        ),
     ],
 )
 def test_perform_aggregations(
@@ -381,6 +391,78 @@ def test_perform_aggregations(
         result = report_generator._perform_aggregations(filtered_pool, filter_content)
 
     assert result == expected_output
+
+
+@pytest.mark.parametrize(
+    "report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report, expected_logs",
+    [
+        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", "sum", {'ver_hor_agg': [6]}, []),
+        ({"data_(km)": [1, 2, 3]}, {"display_units": True}, "sum", None, {"hor_agg_(km)": [1, 2, 3]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", None, {"hor_agg": [1, 2, 3]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": True}, None, None, {"data": [1, 2, 3]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": True, "variables": "data"}, None, "sum", {'data_ver_agg': [6]}, []),
+        ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum",
+         {'ver_agg_(kg)': [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False, "variables": "data"}, None, "sum", {'data_ver_agg': [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {'ver_agg': [6]}, []),
+    ]
+)
+def test_route_aggregator_functions(report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report,
+                                    expected_logs):
+    generator = ReportGenerator()
+    result_report, result_logs = generator._route_aggregator_functions(report_data, filter_content, horizontal_agg_key,
+                                                                       vertical_agg_key)
+    assert result_report == expected_report, f"Expected report {expected_report} but got {result_report}"
+    assert result_logs == expected_logs, f"Expected logs {expected_logs} but got {result_logs}"
+
+
+@pytest.mark.parametrize(
+    "key, expected",
+    [
+        ("temperature (C)", "temperature_ver_agg_(C)"),
+        ("pressure (Pa)", "pressure_ver_agg_(Pa)"),
+        ("velocity (m/s)", "velocity_ver_agg_(m/s)"),
+        ("volume (m^3)", "volume_ver_agg_(m^3)"),
+        ("density (kg/m^3)", "density_ver_agg_(kg/m^3)"),
+        ("energy", "energy_ver_agg"),
+        ("power (W)", "power_ver_agg_(W)"),
+        ("", "_ver_agg"),
+    ]
+)
+def test_update_key(key: str, expected: str) -> None:
+    generator = ReportGenerator()
+    result = generator._update_key(key)
+    assert result == expected, f"For key '{key}', expected '{expected}' but got '{result}'"
+
+
+@pytest.mark.parametrize(
+    "numerator1, denominator1, numerator2, denominator2, operation, expected_numerator, expected_denominator,"
+    "expected_logs",
+    [
+        ({"m": 1}, {"s": -1}, {"m": 1}, {"s": -1}, "product", {"m": 2}, {"s": -2}, []),
+        ({"m": 1}, {"s": -1}, {"s": -1}, {"m": 1}, "division", {"m": 2}, {"s": -2}, []),
+        ({"m": 1}, {"ks": -1}, {"m": 1}, {"s": -1}, "sum", {"m": 1}, {"ks": -1},
+         [{"warning": "Report Generator Units Warning", "message": "Report units do not match for operation sum.",
+           "info_map": {"class": "type", "function": "_combine_units"}}]),
+        ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "product", {"kg": 1}, {"s": -1}, []),
+        ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "division", {"m": 2}, {"s": -1, "kg": 1}, []),
+        ({"km": 1}, {"s": -1}, {"m": 1}, {"s": -1}, "subtraction", {"km": 1}, {"s": -1},
+         [{"warning": "Report Generator Units Warning",
+           "message": "Report units do not match for operation subtraction.",
+           "info_map": {"class": "type", "function": "_combine_units"}}]),
+    ]
+)
+def test_combine_units(numerator1, denominator1, numerator2, denominator2, operation, expected_numerator,
+                       expected_denominator, expected_logs):
+    generator = ReportGenerator()
+    result_numerator, result_denominator, result_logs = generator._combine_units(numerator1, denominator1, numerator2,
+                                                                                 denominator2, operation)
+    assert result_numerator == expected_numerator, f"For operation '{operation}',"
+    f" expected numerator {expected_numerator} but got {result_numerator}"
+    assert result_denominator == expected_denominator, f"For operation '{operation}', "
+    f"expected denominator {expected_denominator} but got {result_denominator}"
+    assert result_logs == expected_logs, f"For operation '{operation}', expected logs {expected_logs} "
+    f"but got {result_logs}"
 
 
 @pytest.mark.parametrize(
