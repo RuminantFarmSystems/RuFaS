@@ -100,7 +100,7 @@ class RationManager:
                 num_reattempts += 1
                 if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     om.add_error(
-                        "Ration formulation error.",
+                        "Ration formulation error",
                         "Catastrophic ration formulation error: can't formulate, too many formulation attempts."
                         + f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail."
                         + " Possible solution is to provide additional feed ingredients to"
@@ -157,7 +157,7 @@ class RationManager:
                     dict(info_map, **{"units": fail_summary_units}),
                 )
 
-        if solution is not None:
+        if solution.success and solution is not None:
             ration = cls.make_ration_from_solution(available_feeds, solution)
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
@@ -166,7 +166,7 @@ class RationManager:
             return pen.ration, ration_vals
         else:
             om.add_error(
-                "Ration formulation error.",
+                "Ration formulation error",
                 "Catastrophic ration formulation error: can't formulate; no previous ration available."
                 + f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail."
                 + f" Possible solution is to provide additional feed ingredients to {pen.animal_combination.name}.",
