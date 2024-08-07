@@ -711,7 +711,8 @@ class ReportGenerator:
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
-        aggregated_units = self._aggregate_units(report_data, aggregator)
+        ordered_report_data = {key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key in key}
+        aggregated_units = self._aggregate_units(ordered_report_data, aggregator)
         return aggregated_data, aggregated_units
 
     def _aggregate_units(
@@ -757,7 +758,7 @@ class ReportGenerator:
                 second_key_denominator_units,
                 aggregator_key,
             )
-            stringified_combined_units = self._units_to_string(combined_numerator, combined_denominator)
+            stringified_combined_units = MeasurementUnits.units_to_string(combined_numerator, combined_denominator)
 
         return stringified_combined_units
 
