@@ -885,6 +885,7 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
             "graphics_dir": "dir",
             "other_details": "details",
             "produce_graphics": True,
+            "is_aggregated_report_data": True,
         },
     }
     produce_graphics = True
@@ -904,6 +905,7 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
             "produce_graphics": True,
             "title": "example_report",
             "filters": ["filter1", "filter2"],
+            "is_aggregated_report_data": True,
         },
         individual_report_name,
         "dir",
@@ -958,7 +960,7 @@ def test_clear_reports(mocker: MockerFixture) -> None:
         ({"horizontal_first": "true"}, None, ValueError),
         ({"horizontal_first": "false"}, None, ValueError),
         ({"horizontal_first": 1}, None, ValueError),
-        ({"horizontal_first": None}, None, ValueError),
+        ({"horizontal_first": None}, False, None),
     ],
 )
 def test_get_horizontal_first_value(
