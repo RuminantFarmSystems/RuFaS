@@ -362,8 +362,10 @@ def test_validate_constants(
         ),
         (
             # Test case 6: No aggregation specified
-            {"col1": {"values": [1, 2, 3], "info_maps": [{"units": "dummy_units"}]},
-             "col2": {"values": [4, 5, 6], "info_maps": [{"units": "dummy_units2"}]}},
+            {
+                "col1": {"values": [1, 2, 3], "info_maps": [{"units": "dummy_units"}]},
+                "col2": {"values": [4, 5, 6], "info_maps": [{"units": "dummy_units2"}]},
+            },
             {"display_units": True, "filters": [], "name": "test1"},
             (None, None),
             None,
@@ -395,22 +397,23 @@ def test_perform_aggregations(
 @pytest.mark.parametrize(
     "report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report, expected_logs",
     [
-        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", "sum", {'ver_hor_agg': [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False}, "sum", "sum", {"ver_hor_agg": [6]}, []),
         ({"data_(km)": [1, 2, 3]}, {"display_units": True}, "sum", None, {"hor_agg_(km)": [1, 2, 3]}, []),
         ({"data": [1, 2, 3]}, {"display_units": False}, "sum", None, {"hor_agg": [1, 2, 3]}, []),
         ({"data": [1, 2, 3]}, {"display_units": True}, None, None, {"data": [1, 2, 3]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": True, "variables": "data"}, None, "sum", {'data_ver_agg': [6]}, []),
-        ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum",
-         {'ver_agg_(kg)': [6]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": False, "variables": "data"}, None, "sum", {'data_ver_agg': [6]}, []),
-        ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {'ver_agg': [6]}, []),
-    ]
+        ({"data": [1, 2, 3]}, {"display_units": True, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
+        ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg_(kg)": [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {"ver_agg": [6]}, []),
+    ],
 )
-def test_route_aggregator_functions(report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report,
-                                    expected_logs):
+def test_route_aggregator_functions(
+    report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report, expected_logs
+):
     generator = ReportGenerator()
-    result_report, result_logs = generator._route_aggregator_functions(report_data, filter_content, horizontal_agg_key,
-                                                                       vertical_agg_key)
+    result_report, result_logs = generator._route_aggregator_functions(
+        report_data, filter_content, horizontal_agg_key, vertical_agg_key
+    )
     assert result_report == expected_report, f"Expected report {expected_report} but got {result_report}"
     assert result_logs == expected_logs, f"Expected logs {expected_logs} but got {result_logs}"
 
@@ -426,7 +429,7 @@ def test_route_aggregator_functions(report_data, filter_content, horizontal_agg_
         ("energy", "energy_ver_agg"),
         ("power (W)", "power_ver_agg_(W)"),
         ("", "_ver_agg"),
-    ]
+    ],
 )
 def test_update_key(key: str, expected: str) -> None:
     generator = ReportGenerator()
@@ -440,22 +443,56 @@ def test_update_key(key: str, expected: str) -> None:
     [
         ({"m": 1}, {"s": -1}, {"m": 1}, {"s": -1}, "product", {"m": 2}, {"s": -2}, []),
         ({"m": 1}, {"s": -1}, {"s": -1}, {"m": 1}, "division", {"m": 2}, {"s": -2}, []),
-        ({"m": 1}, {"ks": -1}, {"m": 1}, {"s": -1}, "sum", {"m": 1}, {"ks": -1},
-         [{"warning": "Report Generator Units Warning", "message": "Report units do not match for operation sum.",
-           "info_map": {"class": "type", "function": "_combine_units"}}]),
+        (
+            {"m": 1},
+            {"ks": -1},
+            {"m": 1},
+            {"s": -1},
+            "sum",
+            {"m": 1},
+            {"ks": -1},
+            [
+                {
+                    "warning": "Report Generator Units Warning",
+                    "message": "Report units do not match for operation sum.",
+                    "info_map": {"class": "type", "function": "_combine_units"},
+                }
+            ],
+        ),
         ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "product", {"kg": 1}, {"s": -1}, []),
         ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "division", {"m": 2}, {"s": -1, "kg": 1}, []),
-        ({"km": 1}, {"s": -1}, {"m": 1}, {"s": -1}, "subtraction", {"km": 1}, {"s": -1},
-         [{"warning": "Report Generator Units Warning",
-           "message": "Report units do not match for operation subtraction.",
-           "info_map": {"class": "type", "function": "_combine_units"}}]),
-    ]
+        (
+            {"km": 1},
+            {"s": -1},
+            {"m": 1},
+            {"s": -1},
+            "subtraction",
+            {"km": 1},
+            {"s": -1},
+            [
+                {
+                    "warning": "Report Generator Units Warning",
+                    "message": "Report units do not match for operation subtraction.",
+                    "info_map": {"class": "type", "function": "_combine_units"},
+                }
+            ],
+        ),
+    ],
 )
-def test_combine_units(numerator1, denominator1, numerator2, denominator2, operation, expected_numerator,
-                       expected_denominator, expected_logs):
+def test_combine_units(
+    numerator1,
+    denominator1,
+    numerator2,
+    denominator2,
+    operation,
+    expected_numerator,
+    expected_denominator,
+    expected_logs,
+):
     generator = ReportGenerator()
-    result_numerator, result_denominator, result_logs = generator._combine_units(numerator1, denominator1, numerator2,
-                                                                                 denominator2, operation)
+    result_numerator, result_denominator, result_logs = generator._combine_units(
+        numerator1, denominator1, numerator2, denominator2, operation
+    )
     assert result_numerator == expected_numerator, f"For operation '{operation}',"
     f" expected numerator {expected_numerator} but got {result_numerator}"
     assert result_denominator == expected_denominator, f"For operation '{operation}', "
@@ -933,7 +970,7 @@ def test_generate_report(
             return_value=(
                 {fltr: filtered_pool[fltr] for fltr in filter_content["filters"]}
                 | {ref: reports[ref]["values"] for ref in filter_content.get("cross_references", [])},
-                []
+                [],
             ),
         )
 

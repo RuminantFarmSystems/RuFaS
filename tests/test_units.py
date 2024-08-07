@@ -105,7 +105,7 @@ def test_units_str_method() -> None:
         ("s^-1", {"s": -1}),
         ("m^1*s^-2", {"m": 1, "s": -2}),
         ("N*m", {"N": 1, "m": 1}),
-    ]
+    ],
 )
 def test_parse_unit(unit: str, expected: dict[str, int]) -> None:
     result = MeasurementUnits._parse_unit(unit)
@@ -123,7 +123,7 @@ def test_parse_unit(unit: str, expected: dict[str, int]) -> None:
         ("pressure (N/m^2)", ({"N": 1}, {"m": 2})),
         ("energy (J/kg*K)", ({"J": 1}, {"kg": 1, "K": 1})),
         ("no units here", ({}, {})),
-    ]
+    ],
 )
 def test_extract_units(key: str, expected: tuple[dict[str, int], dict[str, int]]) -> None:
     result = MeasurementUnits.extract_units(key)
@@ -144,7 +144,7 @@ def test_extract_units(key: str, expected: tuple[dict[str, int], dict[str, int]]
         ({"m": 1}, {}, {"m": 1}),
         ({"m": 1}, {"unitless": 1}, {"m": 1}),
         ({"m": 1}, {"1": 1}, {"m": 1}),
-    ]
+    ],
 )
 def test_adjust_unit_exponents(units1: dict[str, int], units2: dict[str, int], expected: dict[str, int]) -> None:
     result = MeasurementUnits.adjust_unit_exponents(units1, units2)
@@ -163,10 +163,14 @@ def test_adjust_unit_exponents(units1: dict[str, int], units2: dict[str, int], e
         ({}, {"m": 1}, {}, {"m": 1}),
         ({"m": 1}, {}, {"m": 1}, {}),
         ({"m": 1, "kg": 2}, {"kg": 2, "s": -1}, {"m": 1}, {"s": -1}),
-    ]
+    ],
 )
-def test_simplify_units(numerator: dict[str, int], denominator: dict[str, int], expected_numerator: dict[str, int],
-                        expected_denominator: dict[str, int]) -> None:
+def test_simplify_units(
+    numerator: dict[str, int],
+    denominator: dict[str, int],
+    expected_numerator: dict[str, int],
+    expected_denominator: dict[str, int],
+) -> None:
     result_numerator, result_denominator = MeasurementUnits.simplify_units(numerator, denominator)
     assert result_numerator == expected_numerator, f"For numerator '{numerator}' and denominator '{denominator}',"
     f" expected numerator {expected_numerator} but got {result_numerator}"
@@ -188,7 +192,7 @@ def test_simplify_units(numerator: dict[str, int], denominator: dict[str, int], 
         ({}, {}, "unitless"),
         ({"unitless": 1}, {}, "unitless"),
         ({}, {"unitless": 1}, "unitless"),
-    ]
+    ],
 )
 def test_units_to_string(numerator: dict[str, int], denominator: dict[str, int], expected: str) -> None:
     result = MeasurementUnits.units_to_string(numerator, denominator)
