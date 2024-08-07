@@ -129,4 +129,3 @@ def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected
         test = Schedule(name, [], [], skip, repeat)
         test._validate_pattern_parameters()
     assert str(e.value) == expected
-
