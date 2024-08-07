@@ -17,7 +17,6 @@ from RUFAS.report_generator import (
     ReportGenerator,
     AGGREGATION_FUNCTIONS,
 )
-from RUFAS.units import MeasurementUnits
 
 
 def test_average_aggregator() -> None:
