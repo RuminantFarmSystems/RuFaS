@@ -301,8 +301,12 @@ class TaskManager:
             self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
         )
         results = self.pool.imap(task_with_args, single_run_args)
+        failed = []
         for _ in results:
-            pass
+            failed.append(results)
+
+        if len(failed) > 0:
+            print(failed)
 
     @staticmethod
     def call_handler(
@@ -399,7 +403,7 @@ class TaskManager:
             output_manager.add_log(
                 "Early termination", "Unexpected early termination. Please see logs for details.", info_map
             )
-            return
+            return task_id
 
     @staticmethod
     def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
