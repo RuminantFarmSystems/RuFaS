@@ -874,7 +874,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             [
                 "Start generating individual report: error_report",
-                "Error generating the individual report (error_report) => KeyError: ",
+                "Error generating report (error_report) => KeyError: ",
             ],
             0,
         ),
@@ -888,7 +888,7 @@ def test_ensure_unique_report_name_with_timestamp(
             None,
             [
                 "Start generating individual report: error_report",
-                "Error generating the individual report (error_report) => ValueError: ",
+                "Error generating report (error_report) => ValueError: ",
             ],
             0,
         ),
