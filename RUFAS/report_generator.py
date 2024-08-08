@@ -244,12 +244,11 @@ class ReportGenerator:
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
-            event_logs.append(
-                {
-                    "error": "report_generation_error",
-                    "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
-                    "info_map": info_map,
-                }
+            event_logs.append({
+                "error": "report_generation_error",
+                "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
+                "info_map": info_map,
+            }
             )
 
         return event_logs
