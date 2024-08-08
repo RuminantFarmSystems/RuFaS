@@ -401,20 +401,17 @@ class TaskManager:
     @staticmethod
     def handle_single_simulation_run(args: Dict[str, Any], output_manager: OutputManager) -> None:
         """Conducts a single simulation run based on provided arguments."""
-        try:
-            info_map = {
-                "class": TaskManager.__name__,
-                "function": TaskManager.handle_single_simulation_run.__name__,
-                "units": MeasurementUnits.UNITLESS,
-            }
-            TaskManager.handle_herd_initializaition(args, output_manager)
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager.handle_single_simulation_run.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        TaskManager.handle_herd_initializaition(args, output_manager)
 
-            output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-            simulator = SimulationEngine()
-            simulator.simulate()
-            output_manager.add_log("Simulation completed", "Simulation completed", info_map)
-        except Exception:
-            pass
+        output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
+        simulator = SimulationEngine()
+        simulator.simulate()
+        output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
     def handle_input_data_audit(
