@@ -516,7 +516,7 @@ def test_combine_units(
             "sum",
             "sum",
             {"horizontal_first": True, "display_units": False},
-            ([10], "units"),
+            ([10], "units", []),  # Updated to include the event logs
             21,
             ({"hor_ver_agg": [10]}, []),
         ),
@@ -556,7 +556,6 @@ def test_handle_horizontal_and_vertical_aggregations(
         mocker.patch.object(report_generator, "_apply_vertical_aggregation", return_value=mock_vertical_agg)
         mocker.patch.object(report_generator, "_aggregate_units", return_value=aggregate_units_return)
 
-    # Mock AGGREGATION_FUNCTIONS for sum
     with patch.dict("RUFAS.report_generator.AGGREGATION_FUNCTIONS", {"sum": sum}):
         result = report_generator._handle_horizontal_and_vertical_aggregations(
             aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
