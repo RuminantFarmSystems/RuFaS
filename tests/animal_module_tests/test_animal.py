@@ -2639,11 +2639,11 @@ def test_formulate_ration_error(mocker: MockerFixture) -> None:
         ],
     )
 
-    with pytest.raises(RuntimeError) as e:
+    with pytest.raises(ValueError) as e:
         RationManager.formulate_ration(
             pen=mock_pen, available_feeds=mocker.MagicMock(), animal_grouping_scenario=mocker.MagicMock(), sim_day=2
         )
-        assert "RuntimeError" in str(e.value)
+        assert "ValueError" in str(e.value)
     actual = om.errors_pool["RationManager.formulate_ration.Milk production too low"]
     expected_error_message = (
         "Check failed_constraint_summary_for_pen_42"
