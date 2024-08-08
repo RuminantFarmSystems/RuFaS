@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Any, Optional, Type
+from typing import Callable, Dict, List, Any, Optional, Type
 from unittest.mock import patch
 
 import pytest
@@ -202,13 +202,14 @@ def test_apply_horizontal_aggregation(
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
     mock_time = mocker.MagicMock()
     report_generator = ReportGenerator(time=mock_time)
+    simplify_units = True
 
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
+            report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator, simplify_units)
     else:
-        result = report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator)
+        result = report_generator._apply_horizontal_aggregation(report_data, loop_list, aggregator, simplify_units)
         assert result == expected
 
 
@@ -405,6 +406,7 @@ def test_perform_aggregations(
         ({"data_(kg)": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg_(kg)": [6]}, []),
         ({"data": [1, 2, 3]}, {"display_units": False, "variables": "data"}, None, "sum", {"data_ver_agg": [6]}, []),
         ({"data": [1, 2, 3]}, {"display_units": False}, None, "sum", {"ver_agg": [6]}, []),
+        ({"data": [1, 2, 3]}, {"display_units": True}, None, "sum", {"ver_agg": [6]}, []),
     ],
 )
 def test_route_aggregator_functions(
@@ -482,6 +484,23 @@ def test_update_key(key: str, expected: str) -> None:
                 }
             ],
         ),
+        (
+            {"km": 1},
+            {"s": -1},
+            {"m": 1},
+            {"s": -1},
+            "bad_aggregator_function",
+            {"km": 1},
+            {"s": -1},
+            [
+                {
+                    "warning": "Report Generator Aggregator Operation Warning",
+                    "message": "Aggregator operation bad_aggregator_function does not match any current "
+                    "aggregator functions: ['average', 'division', 'product', 'SD', 'sum', 'subtraction'].",
+                    "info_map": {"class": "type", "function": "_combine_units"},
+                }
+            ],
+        ),
     ],
 )
 def test_combine_units(
@@ -495,8 +514,9 @@ def test_combine_units(
     expected_logs: list[Any],
 ) -> None:
     generator = ReportGenerator()
+    simplify_units = True
     result_numerator, result_denominator, result_logs = generator._combine_units(
-        numerator1, denominator1, numerator2, denominator2, operation
+        numerator1, denominator1, numerator2, denominator2, operation, simplify_units
     )
     assert result_numerator == expected_numerator, f"For operation '{operation}',"
     f" expected numerator {expected_numerator} but got {result_numerator}"
@@ -516,7 +536,7 @@ def test_combine_units(
             "sum",
             "sum",
             {"horizontal_first": True, "display_units": False},
-            ([10], "units", []),  # Updated to include the event logs
+            ([10], "units", []),
             21,
             ({"hor_ver_agg": [10]}, []),
         ),
@@ -529,6 +549,26 @@ def test_combine_units(
             None,
             {"col1": [5], "col2": [7]},
             ({"ver_hor_agg": [12]}, []),
+        ),
+        (
+            # Test case 3: horizontal first with sum aggregations, displays units
+            {"col1_(dummy_units)": [1, 2, 3], "col2_(dummy_units)": [4, 5, 6]},
+            "sum",
+            "sum",
+            {"horizontal_first": True, "display_units": True},
+            None,
+            {"col1_(kg)": [5], "col2_(Mj)": [7]},
+            ({"hor_ver_agg_(dummy_units)": [21]}, []),
+        ),
+        (
+            # Test case 2: Vertical first with sum aggregations
+            {"col1_(dummy_units)": [1, 2, 3], "col2_(dummy_units)": [4, 5, 6]},
+            "sum",
+            "sum",
+            {"horizontal_first": False, "display_units": True},
+            None,
+            {"col1": [5], "col2": [7]},
+            ({"ver_hor_agg_(dummy_units)": [12]}, []),
         ),
     ],
 )
@@ -543,7 +583,7 @@ def test_handle_horizontal_and_vertical_aggregations(
     mocker: MockerFixture,
 ) -> None:
     report_generator = ReportGenerator()
-    aggregate_units_return: tuple[str, list[Any]] = ("units", [])
+    aggregate_units_return: tuple[str, list[Any]] = ("dummy_units", [])
 
     mocker.patch.object(
         report_generator, "_get_horizontal_first_value", return_value=filter_content["horizontal_first"]
@@ -1113,3 +1153,120 @@ def test_get_horizontal_first_value(
     else:
         result = report_generator._get_horizontal_first_value(filter_content)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "input_data, expected_output",
+    [
+        (
+            {
+                "temperature": {
+                    "info_maps": [{"units": "Celsius"}],
+                    "values": [23, 24, 25]
+                }
+            },
+            {
+                "temperature (Celsius)": {
+                    "info_maps": [{"units": "Celsius"}],
+                    "values": [23, 24, 25]
+                }
+            }
+        ),
+        (
+            {
+                "pressure": {
+                    "info_maps": [{"units": {"pressure": "Pascal"}}],
+                    "values": [101325, 101300]
+                }
+            },
+            {
+                "pressure (Pascal)": {
+                    "info_maps": [{"units": {"pressure": "Pascal"}}],
+                    "values": [101325, 101300]
+                }
+            }
+        ),
+        (
+            {
+                "humidity": {
+                    "info_maps": [{"units": "percent"}],
+                    "values": [80, 75, 70]
+                }
+            },
+            {
+                "humidity (percent)": {
+                    "info_maps": [{"units": "percent"}],
+                    "values": [80, 75, 70]
+                }
+            }
+        ),
+        (
+            {
+                "humidity": {
+                    "values": [80, 75, 70]
+                }
+            },
+            {
+                "humidity": {
+                    "values": [80, 75, 70]
+                }
+            }
+        )
+    ]
+)
+def test_add_var_units(input_data: dict[str, dict[str, list[Any]]], expected_output: dict[str, dict[str, list[Any]]]
+                       ) -> None:
+    report_generator = ReportGenerator()
+    assert report_generator._add_var_units(input_data) == expected_output
+
+
+@pytest.mark.parametrize(
+    "report_data, aggregator, simplify_units, expected_output, raises_error",
+    [
+        (
+            {"temperature (Celsius)": [23.0, 24.0, 25.0]},
+            sum,
+            False,
+            ("Celsius", []),
+            False
+        ),
+        (
+            {"pressure (Pascal)": [101325.0, 101300.0]},
+            sum,
+            False,
+            ("Pascal", []),
+            False
+        ),
+        (
+            {"wind_speed (m/s)": [10.0, 12.0, 15.0]},
+            sum,
+            False,
+            ("m/s", []),
+            False
+        ),
+        (
+            {"a": [0, 1, 2], "b": [1, 2, 3], "c": [2, 3, 4]},
+            sum,
+            False,
+            ("", []),
+            True
+        ),
+        (
+            {},
+            sum,
+            False,
+            ("", []),
+            True
+        )
+    ]
+)
+def test_aggregate_units(report_data: dict[str, list[float]], aggregator: Callable[[List[float]], float] | str,
+                         simplify_units: bool, expected_output: tuple[str, list[dict[str, str | Dict[str, str]]]],
+                         raises_error: bool,
+                         ) -> None:
+    report_generator = ReportGenerator()
+    if raises_error:
+        with pytest.raises(ValueError):
+            report_generator._aggregate_units(report_data, aggregator, False)
+    else:
+        assert report_generator._aggregate_units(report_data, aggregator, simplify_units) == expected_output
