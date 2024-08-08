@@ -20,7 +20,7 @@ RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2 ** 32 - 1
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
 
 
 class TaskType(Enum):
@@ -307,14 +307,9 @@ class TaskManager:
                 failed.append(_)
 
         if len(failed) > 0:
-            info_map = {
-                "class": TaskManager.__name__,
-                "function": TaskManager._run_tasks.__name__
-            }
+            info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
             om = OutputManager()
-            om.add_log(
-                "Not all tasks are successful", f"There are tasks failed, the tasks are:{failed}", info_map
-            )
+            om.add_log("Not all tasks are successful", f"There are tasks failed, the tasks are:{failed}", info_map)
 
     @staticmethod
     def call_handler(
@@ -611,5 +606,4 @@ class TaskManager:
         produce_graphics: bool,
     ) -> None:
         """Handler for all methods related to postprocessing."""
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True,
-                                           True)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True, True)
