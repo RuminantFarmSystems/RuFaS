@@ -168,6 +168,7 @@ class TaskManager:
         Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]
             Parsed single run and multi-run task arguments.
         """
+        
         parsed_single_run_args: List[Dict[str, Any]] = []
         parsed_multi_run_args: List[Dict[str, Any]] = []
         tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
