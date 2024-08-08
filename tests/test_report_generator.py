@@ -190,7 +190,7 @@ def test_apply_horizontal_aggregation(
     report_data: Dict[str, List[float]],
     loop_list: List[str],
     aggregator_key: str,
-    expected: tuple[list[float], str],
+    expected: tuple[list[float], str, list[dict[str, str | dict[str, str]]]],
     expected_exception: Type[Exception] | None,
     mocker: MockerFixture,
 ) -> None:
@@ -1057,7 +1057,7 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
     produce_graphics = True
 
     mock_generate_graph = mocker.patch.object(
-        GraphGenerator, "generate_graph", return_value={"status": "success", "message": "Graph generated"}
+        GraphGenerator, "generate_graph", return_value=[{"status": "success", "message": "Graph generated"}]
     )
     graph_event_log = report_generator._prepare_report_data_to_be_graphed(
         graph_data, filter_content, individual_report_name
