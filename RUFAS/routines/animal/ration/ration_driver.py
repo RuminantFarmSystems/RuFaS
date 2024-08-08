@@ -108,7 +108,7 @@ class RationManager:
                         ),
                         info_map,
                     )
-                    raise RuntimeError
+                    raise ValueError
                 constraints_failed_list = []
                 failed_constraints = ration_optimizer.find_failed_constraints(
                     solution.x, ration_optimizer.cow_constraints, ration_config
@@ -170,7 +170,7 @@ class RationManager:
                 f"Possible solution is to provide additional feed ingredients to {pen.animal_combination.name}.",
                 info_map,
             )
-            raise RuntimeError
+            raise ValueError
 
     @staticmethod
     def calc_milk_average(pen: Pen) -> float:
