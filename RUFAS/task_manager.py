@@ -21,7 +21,7 @@ RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2 ** 32 - 1
 
 
 class TaskType(Enum):
@@ -134,7 +134,7 @@ class TaskManager:
         parsed_single_run_args, parsed_multi_run_args = self._parse_input_tasks()
         self.output_manager.add_log(
             "Task Manager parsed tasks",
-            f"Parsed {len(parsed_single_run_args)+len(parsed_multi_run_args)} tasks args.",
+            f"Parsed {len(parsed_single_run_args) + len(parsed_multi_run_args)} tasks args.",
             info_map,
         )
         expanded_args = self._expand_multi_runs_to_single_runs(parsed_multi_run_args)
@@ -145,7 +145,7 @@ class TaskManager:
             info_map,
         )
         for i in range(len(runnable_args)):
-            runnable_args[i]["task_id"] = f"{i+1}/{len(runnable_args)}"
+            runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
         self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
         TaskManager.handle_post_processing(
             args={
@@ -224,7 +224,7 @@ class TaskManager:
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
             new_args["random_seed"] = random.randint(NUMPY_RANDOM_SEED_LOWER_BOUND, NUMPY_RANDOM_SEED_UPPER_BOUND)
-            new_args["output_prefix"] = f"{new_args['output_prefix']} run {i+1}"
+            new_args["output_prefix"] = f"{new_args['output_prefix']} run {i + 1}"
             single_run_args.append(new_args)
 
         return single_run_args
@@ -286,7 +286,7 @@ class TaskManager:
         for sample_number in range(start_sample, stop_sample):
             new_args = multi_run_args.copy()
             new_args["task_type"] = TaskType.SIMULATION_SINGLE_RUN
-            run_number = f"{sample_number+1}".zfill(digits)
+            run_number = f"{sample_number + 1}".zfill(digits)
             new_args["output_prefix"] = f"{new_args['output_prefix']} run {run_number}"
             new_args["input_patch"] = {
                 names[variable_number]: data_types[variable_number](sampled_values[sample_number, variable_number])
@@ -305,12 +305,23 @@ class TaskManager:
         self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
     ) -> None:
         """Runs the tasks based on the provided arguments."""
+        om = OutputManager()
         task_with_args = partial(
             self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
         )
         results = self.pool.imap(task_with_args, single_run_args)
+        failed_tasks = []
         for _ in results:
-            pass
+            failed_tasks.append(_)
+        if len(failed_tasks) != 0:
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": self._run_tasks.__name__
+            }
+            list_string = ", ".join(map(str, failed_tasks))
+            om.add_log(
+                "Failed Tasks", f"Failed Tasks are:{list_string}", info_map
+            )
 
     @staticmethod
     def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> None:
@@ -384,6 +395,7 @@ class TaskManager:
             output_manager.add_log(
                 "Early termination", "Unexpected early termination. Please see logs for details.", info_map
             )
+            return task_id
 
     @staticmethod
     def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
@@ -401,20 +413,18 @@ class TaskManager:
     @staticmethod
     def handle_single_simulation_run(args: Dict[str, Any], output_manager: OutputManager) -> None:
         """Conducts a single simulation run based on provided arguments."""
-        try:
-            info_map = {
-                "class": TaskManager.__name__,
-                "function": TaskManager.handle_single_simulation_run.__name__,
-                "units": MeasurementUnits.UNITLESS,
-            }
-            TaskManager.handle_herd_initializaition(args, output_manager)
 
-            output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-            simulator = SimulationEngine()
-            simulator.simulate()
-            output_manager.add_log("Simulation completed", "Simulation completed", info_map)
-        except Exception:
-            pass
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager.handle_single_simulation_run.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        TaskManager.handle_herd_initializaition(args, output_manager)
+
+        output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
+        simulator = SimulationEngine()
+        simulator.simulate()
+        output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
     def handle_input_data_audit(
@@ -473,38 +483,36 @@ class TaskManager:
             Whether to load data pool from file.
 
         """
-        try:
-            info_map = {
-                "class": TaskManager.__name__,
-                "function": TaskManager.handle_post_processing.__name__,
-                "units": MeasurementUnits.UNITLESS,
-            }
-            output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
-            if load_pool_from_file:
-                output_manager.flush_pools()
-                output_manager.load_variables_pool_from_file(args["output_pool_path"])
-                output_manager.set_metadata_prefix("reload")
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager.handle_post_processing.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
-            output_manager.print_errors_warnings_logs_counts(task_id)
-            if save_results:
-                output_manager.save_results(
-                    args["filters_directory"],
-                    args["exclude_info_maps"],
-                    produce_graphics,
-                    args["report_directory"],
-                    args["graphics_directory"],
-                    args["csv_output_directory"],
-                    args["json_output_directory"],
-                )
+        if load_pool_from_file:
+            output_manager.flush_pools()
+            output_manager.load_variables_pool_from_file(args["output_pool_path"])
+            output_manager.set_metadata_prefix("reload")
 
-            if not args["suppress_log_files"]:
-                input_manager.dump_get_data_logs(args["logs_directory"])
-                output_manager.dump_all_nondata_pools(
-                    args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
-                )
-        except Exception:
-            pass
+        output_manager.print_errors_warnings_logs_counts(task_id)
+        if save_results:
+            output_manager.save_results(
+                args["filters_directory"],
+                args["exclude_info_maps"],
+                produce_graphics,
+                args["report_directory"],
+                args["graphics_directory"],
+                args["csv_output_directory"],
+                args["json_output_directory"],
+            )
+
+        if not args["suppress_log_files"]:
+            input_manager.dump_get_data_logs(args["logs_directory"])
+            output_manager.dump_all_nondata_pools(
+                args["logs_directory"], args["exclude_info_maps"], args["variable_name_style"]
+            )
 
     @staticmethod
     def set_random_seed(random_seed: int | None, output_manager: OutputManager) -> None:
