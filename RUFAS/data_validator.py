@@ -7,10 +7,6 @@ from typing import Dict, Any, Callable, List, Union, Sequence, Tuple
 from RUFAS.output_manager import OutputManager
 
 
-#  log error here, leave termination for IM
-#  Move elements counters...etc to here
-
-
 class ElementState(Enum):
     """
     An enumeration of the states a data element can be in during validation. An element cannot
