@@ -60,7 +60,7 @@ class MeasurementUnits(Enum):
         return self.value
 
     @staticmethod
-    def _parse_unit(unit: str) -> dict:
+    def _parse_unit(unit: str) -> dict[str, int]:
         """Parses a unit string to handle units with exponents.
 
         Parameters
@@ -83,7 +83,7 @@ class MeasurementUnits(Enum):
         return unit_dict
 
     @staticmethod
-    def extract_units(key: str) -> tuple[dict, dict]:
+    def extract_units(key: str) -> tuple[dict[str, int], dict[str, int]]:
         """Extracts the units from a key.
 
         Parameters
