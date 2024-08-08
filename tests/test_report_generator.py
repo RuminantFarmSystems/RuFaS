@@ -1078,6 +1078,11 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         produce_graphics,
     )
 
+    assert graph_event_log == [{
+        "status": "success",
+        "message": "Graph generated",
+    }], "Graph event log did not match expected output"
+
 
 def test_report_generator_init(mocker: MockerFixture) -> None:
     """
