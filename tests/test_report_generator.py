@@ -408,8 +408,12 @@ def test_perform_aggregations(
     ],
 )
 def test_route_aggregator_functions(
-    report_data: dict[str, list[Any]], filter_content: dict[str, Any], horizontal_agg_key: str, vertical_agg_key: str,
-    expected_report: dict[str, list[Any]], expected_logs: list[Any]
+    report_data: dict[str, list[Any]],
+    filter_content: dict[str, Any],
+    horizontal_agg_key: str,
+    vertical_agg_key: str,
+    expected_report: dict[str, list[Any]],
+    expected_logs: list[Any],
 ) -> None:
     generator = ReportGenerator()
     result_report, result_logs = generator._route_aggregator_functions(

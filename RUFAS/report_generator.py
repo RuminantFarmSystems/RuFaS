@@ -804,8 +804,9 @@ class ReportGenerator:
             aggregate_data_dict[key] = [aggregator(non_null_data_points)]
         return aggregate_data_dict
 
-    def _add_constants_to_report_data(self, report_data: dict[str, list[float]], filter_content: Dict[str, Any]
-                                      ) -> None:
+    def _add_constants_to_report_data(
+        self, report_data: dict[str, list[float]], filter_content: Dict[str, Any]
+    ) -> None:
         """
         Add constants to the report data.
 
