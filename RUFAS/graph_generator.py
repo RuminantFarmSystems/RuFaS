@@ -204,7 +204,7 @@ class GraphGenerator:
             graph_filter_validation_logs = self._validate_graph_filter(graph_details)
             var_units_logs: list[dict[str, str | dict[str, str]]] = []
             updated_pool = filtered_pool
-            if graph_details.get("display_units", True):
+            if graph_details.get("display_units", True) or graph_details.get("is_aggregated_report_data", False):
                 updated_pool, var_units_logs = self._add_var_units(
                     filtered_pool, graph_details.get("title", "Untitled graph")
                 )
@@ -435,6 +435,7 @@ class GraphGenerator:
                 "use_fill_value_in_gaps",
                 "use_fill_value_at_end",
                 "mask_values",
+                "is_aggregated_report_data",
             ]
         )
         graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
@@ -613,7 +614,7 @@ class GraphGenerator:
         graph_details: dict[str, str | list[str]],
         filter_file_name: str,
         graphics_dir: Path,
-    ) -> str:
+    ) -> Path:
         """
         Save the generated graph to a file.
 
