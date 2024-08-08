@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Any, Callable, Collection, Optional
+from typing import Dict, List, Any, Callable, Optional
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -170,7 +170,7 @@ class ReportGenerator:
         self,
         filter_content: Dict[str, Any],
         filtered_pool: dict[str, dict[str, list[Any]]],
-    ) -> List[Dict[str, str | Dict[str, str]]]:
+    ) -> list[dict[str, str | dict[str, str]]]:
         """
         Generates a report specified by the given filter content.
 
@@ -185,11 +185,11 @@ class ReportGenerator:
 
         Returns
         -------
-        List[Dict[str, str | Dict[str, str]]]
+        list[dict[str, str | dict[str, str]]]
             A list of log events.
         """
 
-        event_logs: List[Dict[str, str | Dict[str, str]]] = []
+        event_logs: list[dict[str, str | dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
             "function": self.generate_report.__name__,
@@ -197,7 +197,7 @@ class ReportGenerator:
 
         individual_report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
-        init_event_log: dict[str, str | dict[str, str]] = {
+        init_event_log= {
             "log": "start_generate_individual_report",
             "message": f"Start generating individual report: {individual_report_name}",
             "info_map": info_map,
@@ -291,7 +291,7 @@ class ReportGenerator:
 
     def _prepare_report_data_to_be_graphed(
         self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
-    ) -> List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]:
+    ) -> list[dict[str, str | dict[str, str]]]:
         """Prepare and send aggregated report data to Graph Generator to be graphed.
         Parameters
         ----------
@@ -305,7 +305,7 @@ class ReportGenerator:
 
         Returns
         -------
-        List[Dict[str, str | Dict[str, str]]] | List[Dict[str, Collection[str]]]
+        list[dict[str, str | dict[str, str]]]
             Returns the logs from GraphGenerator.generate_graph()
         """
 
@@ -408,7 +408,8 @@ class ReportGenerator:
         self,
         filtered_pool: dict[str, dict[str, list[Any]]],
         filter_content: Dict[str, Any],
-    ) -> tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
+               list[dict[str, str | dict[str, str]]]]:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
 
@@ -473,7 +474,8 @@ class ReportGenerator:
         filter_content: Dict[str, Any],
         horizontal_agg_key: Optional[str] = None,
         vertical_agg_key: Optional[str] = None,
-    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
+               list[dict[str, str | dict[str, str]]]]:
         """Routes report data to appropriate vertical and horizontal aggregator functions."""
         aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
@@ -564,7 +566,7 @@ class ReportGenerator:
 
         Returns
         -------
-        (dict, dict, list[dict[str, str | dict[str, str]]])
+        (dict, dict, list[dict[str, str | dict[str, str]]]])
             Two dictionaries representing the combined numerator and denominator units along with the event logs.
 
         Raises
@@ -626,7 +628,7 @@ class ReportGenerator:
 
         Returns
         -------
-        tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]]
+        tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]
             The aggregated report data and the event logs.
         """
 
@@ -749,7 +751,7 @@ class ReportGenerator:
 
         Returns
         -------
-        tuple[str, list[dict[str, str | dict[str, str]]]]
+        tuple[str, list[dict[str, str | dict[str, str]]]
             The expected units of aggregating the report data using the accompanying aggregator function and
             the event logs.
         """
@@ -903,7 +905,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        filtered_pool : dict[str, List[Any]]
+        report_data : dict[str, dict[str, list[Any]]]
             The data to be reported.
 
         Returns
@@ -911,7 +913,7 @@ class ReportGenerator:
         dict[str, List[Any]]
             The updated data with units added.
         """
-        updated_data = {}
+        updated_data: dict[str, dict[str, list[Any]]] = {}
         if not any("info_maps" in details for details in report_data.values()):
             return report_data
         for var_name, details in report_data.items():
