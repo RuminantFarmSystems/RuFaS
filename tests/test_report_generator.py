@@ -1078,10 +1078,12 @@ def test_prepare_report_data_to_be_graphed(mocker: MockerFixture) -> None:
         produce_graphics,
     )
 
-    assert graph_event_log == [{
-        "status": "success",
-        "message": "Graph generated",
-    }], "Graph event log did not match expected output"
+    assert graph_event_log == [
+        {
+            "status": "success",
+            "message": "Graph generated",
+        }
+    ], "Graph event log did not match expected output"
 
 
 def test_report_generator_init(mocker: MockerFixture) -> None:
@@ -1159,63 +1161,23 @@ def test_get_horizontal_first_value(
     "input_data, expected_output",
     [
         (
-            {
-                "temperature": {
-                    "info_maps": [{"units": "Celsius"}],
-                    "values": [23, 24, 25]
-                }
-            },
-            {
-                "temperature (Celsius)": {
-                    "info_maps": [{"units": "Celsius"}],
-                    "values": [23, 24, 25]
-                }
-            }
+            {"temperature": {"info_maps": [{"units": "Celsius"}], "values": [23, 24, 25]}},
+            {"temperature (Celsius)": {"info_maps": [{"units": "Celsius"}], "values": [23, 24, 25]}},
         ),
         (
-            {
-                "pressure": {
-                    "info_maps": [{"units": {"pressure": "Pascal"}}],
-                    "values": [101325, 101300]
-                }
-            },
-            {
-                "pressure (Pascal)": {
-                    "info_maps": [{"units": {"pressure": "Pascal"}}],
-                    "values": [101325, 101300]
-                }
-            }
+            {"pressure": {"info_maps": [{"units": {"pressure": "Pascal"}}], "values": [101325, 101300]}},
+            {"pressure (Pascal)": {"info_maps": [{"units": {"pressure": "Pascal"}}], "values": [101325, 101300]}},
         ),
         (
-            {
-                "humidity": {
-                    "info_maps": [{"units": "percent"}],
-                    "values": [80, 75, 70]
-                }
-            },
-            {
-                "humidity (percent)": {
-                    "info_maps": [{"units": "percent"}],
-                    "values": [80, 75, 70]
-                }
-            }
+            {"humidity": {"info_maps": [{"units": "percent"}], "values": [80, 75, 70]}},
+            {"humidity (percent)": {"info_maps": [{"units": "percent"}], "values": [80, 75, 70]}},
         ),
-        (
-            {
-                "humidity": {
-                    "values": [80, 75, 70]
-                }
-            },
-            {
-                "humidity": {
-                    "values": [80, 75, 70]
-                }
-            }
-        )
-    ]
+        ({"humidity": {"values": [80, 75, 70]}}, {"humidity": {"values": [80, 75, 70]}}),
+    ],
 )
-def test_add_var_units(input_data: dict[str, dict[str, list[Any]]], expected_output: dict[str, dict[str, list[Any]]]
-                       ) -> None:
+def test_add_var_units(
+    input_data: dict[str, dict[str, list[Any]]], expected_output: dict[str, dict[str, list[Any]]]
+) -> None:
     report_generator = ReportGenerator()
     assert report_generator._add_var_units(input_data) == expected_output
 
@@ -1223,47 +1185,20 @@ def test_add_var_units(input_data: dict[str, dict[str, list[Any]]], expected_out
 @pytest.mark.parametrize(
     "report_data, aggregator, simplify_units, expected_output, raises_error",
     [
-        (
-            {"temperature (Celsius)": [23.0, 24.0, 25.0]},
-            sum,
-            False,
-            ("Celsius", []),
-            False
-        ),
-        (
-            {"pressure (Pascal)": [101325.0, 101300.0]},
-            sum,
-            False,
-            ("Pascal", []),
-            False
-        ),
-        (
-            {"wind_speed (m/s)": [10.0, 12.0, 15.0]},
-            sum,
-            False,
-            ("m/s", []),
-            False
-        ),
-        (
-            {"a": [0, 1, 2], "b": [1, 2, 3], "c": [2, 3, 4]},
-            sum,
-            False,
-            ("", []),
-            True
-        ),
-        (
-            {},
-            sum,
-            False,
-            ("", []),
-            True
-        )
-    ]
+        ({"temperature (Celsius)": [23.0, 24.0, 25.0]}, sum, False, ("Celsius", []), False),
+        ({"pressure (Pascal)": [101325.0, 101300.0]}, sum, False, ("Pascal", []), False),
+        ({"wind_speed (m/s)": [10.0, 12.0, 15.0]}, sum, False, ("m/s", []), False),
+        ({"a": [0, 1, 2], "b": [1, 2, 3], "c": [2, 3, 4]}, sum, False, ("", []), True),
+        ({}, sum, False, ("", []), True),
+    ],
 )
-def test_aggregate_units(report_data: dict[str, list[float]], aggregator: Callable[[List[float]], float] | str,
-                         simplify_units: bool, expected_output: tuple[str, list[dict[str, str | Dict[str, str]]]],
-                         raises_error: bool,
-                         ) -> None:
+def test_aggregate_units(
+    report_data: dict[str, list[float]],
+    aggregator: Callable[[List[float]], float] | str,
+    simplify_units: bool,
+    expected_output: tuple[str, list[dict[str, str | Dict[str, str]]]],
+    raises_error: bool,
+) -> None:
     report_generator = ReportGenerator()
     if raises_error:
         with pytest.raises(ValueError):

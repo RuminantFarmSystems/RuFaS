@@ -244,11 +244,12 @@ class ReportGenerator:
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
-            event_logs.append({
-                "error": "report_generation_error",
-                "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
-                "info_map": info_map,
-            }
+            event_logs.append(
+                {
+                    "error": "report_generation_error",
+                    "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
+                    "info_map": info_map,
+                }
             )
 
         return event_logs
@@ -669,8 +670,9 @@ class ReportGenerator:
             ver_hor_aggregated = []
             for elements in zip(*vertically_aggregated.values()):
                 ver_hor_aggregated.append(horizontal_aggregator(list(elements)))
-            aggregate_units, event_logs = self._aggregate_units(vertically_aggregated, horizontal_aggregator,
-                                                                simplify_units)
+            aggregate_units, event_logs = self._aggregate_units(
+                vertically_aggregated, horizontal_aggregator, simplify_units
+            )
             if display_units:
                 aggregate_report = {f"ver_hor_agg_({aggregate_units})": ver_hor_aggregated}
             else:
@@ -760,7 +762,7 @@ class ReportGenerator:
         self,
         report_data: dict[str, list[float]],
         aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
-        simplify_units: bool
+        simplify_units: bool,
     ) -> tuple[str, list[dict[str, str | dict[str, str]]]]:
         """Creates the appropriate units for the associated aggregator function used.
 
@@ -802,7 +804,7 @@ class ReportGenerator:
                 second_key_numerator_units,
                 second_key_denominator_units,
                 aggregator_key,
-                simplify_units
+                simplify_units,
             )
             stringified_combined_units = MeasurementUnits.units_to_string(combined_numerator, combined_denominator)
 
