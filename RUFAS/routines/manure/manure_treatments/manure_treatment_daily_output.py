@@ -321,6 +321,9 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     solid_manure_carbon_decomposition: float = 0.0
     solid_manure_carbon_decomposition_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
 
+    storage_methane_avoided: float = 0.0
+    storage_methane_avoided_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+
     def __post_init__(self) -> None:
         """Ensures that the daily volume is set to the final manure volume."""
         self.liquid_manure_daily_volume = self.daily_final_manure_volume
