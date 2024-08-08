@@ -614,7 +614,7 @@ class GraphGenerator:
         graph_details: dict[str, str | list[str]],
         filter_file_name: str,
         graphics_dir: Path,
-    ) -> str:
+    ) -> Path:
         """
         Save the generated graph to a file.
 

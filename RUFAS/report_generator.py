@@ -125,7 +125,7 @@ def subtraction_aggregator(data: list[float]) -> float | None:
     return result
 
 
-AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
+AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float] | Callable[[list[float]], float | None]] = {
     "average": average_aggregator,
     "division": division_aggregator,
     "product": product_aggregator,
@@ -197,12 +197,11 @@ class ReportGenerator:
 
         individual_report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
-        init_event_log= {
+        event_logs.append({
             "log": "start_generate_individual_report",
             "message": f"Start generating individual report: {individual_report_name}",
             "info_map": info_map,
-        }
-        event_logs.append(init_event_log)
+        })
 
         try:
             report_filter_data = {}
@@ -232,22 +231,20 @@ class ReportGenerator:
                 self.reports.update(report_filter_data)
                 report_filter_data = {}
                 if enable_graph_and_report:
-                    warning_event_log = {
+                    event_logs.append({
                         "warning": "report_generation_warning",
                         "message": "Request to graph and report data not fulfilled "
                         "- no graph_details present in report filter file.",
                         "info_map": info_map,
-                    }
-                    event_logs.append(warning_event_log)
+                    })
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
-            error_event_log = {
+            event_logs.append({
                 "error": "report_generation_error",
                 "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
                 "info_map": info_map,
-            }
-            event_logs.append(error_event_log)
+            })
 
         return event_logs
 
@@ -317,7 +314,7 @@ class ReportGenerator:
             "is_aggregated_report_data": True,
         }
         graphics_dir = graph_details.pop("graphics_dir", None)
-        produce_graphics = graph_details.get("produce_graphics")
+        produce_graphics = graph_details.get("produce_graphics", True)
         graph_event_log = graph_generator.generate_graph(
             graph_data, graph_details, individual_report_name, graphics_dir, produce_graphics
         )
@@ -594,12 +591,11 @@ class ReportGenerator:
                     "class": ReportGenerator.__class__.__name__,
                     "function": ReportGenerator._combine_units.__name__,
                 }
-                warning_event_log = {
+                event_logs.append({
                     "warning": "Report Generator Units Warning",
                     "message": f"Report units do not match for operation {operation}.",
                     "info_map": info_map,
-                }
-                event_logs.append(warning_event_log)
+                })
             combined_numerator = numerator1.copy()
             combined_denominator = denominator1.copy()
 
@@ -695,7 +691,7 @@ class ReportGenerator:
         self,
         report_data: dict[str, list[float]],
         loop_list: List[str],
-        aggregator: Callable[[List[float]], float],
+        aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
     ) -> tuple[List[float], str, list[dict[str, str | dict[str, str]]]]:
         """
         Performs horizontal aggregation on report data using a specified aggregator function.
@@ -738,7 +734,7 @@ class ReportGenerator:
     def _aggregate_units(
         self,
         report_data: dict[str, list[float]],
-        aggregator: Callable[[List[float]], float],
+        aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
     ) -> tuple[str, list[dict[str, str | dict[str, str]]]]:
         """Creates the appropriate units for the associated aggregator function used.
 
@@ -788,8 +784,8 @@ class ReportGenerator:
     def _apply_vertical_aggregation(
         self,
         report_data: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
-        aggregator: Callable[[List[float]], float],
-    ) -> Dict[str, List[float]]:
+        aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
+    ) -> Dict[str, List[float | None]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -806,7 +802,7 @@ class ReportGenerator:
             The vertically aggregated data as a dictionary of lists.
         """
 
-        aggregate_data_dict: Dict[str, List[float]] = {}
+        aggregate_data_dict: Dict[str, List[float | None]] = {}
         for key, data in report_data.items():
             non_null_data_points = list(filter(lambda x: x is not None, data))
             aggregate_data_dict[key] = [aggregator(non_null_data_points)]
