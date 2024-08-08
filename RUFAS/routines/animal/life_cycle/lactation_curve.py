@@ -339,9 +339,9 @@ class LactationCurve:
         parity_3_frac : float
             Fraction of cows on the farm that have a parity of 3 or more.
         parity_2_milk_yield_adjustment : float
-            Amount used to adjust for parity 2 cows (kg). TODO: double check these w/ Haowen
+            Factor used to adjust for parity 2 cows (unitless).
         parity_3_milk_yield_adjustment : float
-            Amount used to adjust for parity 3 cows (kg). TODO: double check these w/ Haowen
+            Factor used to adjust for parity 3 cows (unitless).
 
         Returns
         -------
@@ -365,13 +365,13 @@ class LactationCurve:
             parity_2_frac = PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS
             parity_3_frac = PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS
 
-        parity_1_305_day_milk_yield = (
-            milk_yield_305_day
-            - parity_2_frac * parity_2_milk_yield_adjustment
-            - parity_3_frac * parity_3_milk_yield_adjustment
+        parity_1_305_day_milk_yield = milk_yield_305_day / (
+            parity_1_frac
+            + parity_2_frac * parity_2_milk_yield_adjustment
+            + parity_3_frac * parity_3_milk_yield_adjustment
         )
-        parity_2_305_day_milk_yield = parity_1_305_day_milk_yield + parity_2_milk_yield_adjustment
-        parity_3_305_day_milk_yield = parity_1_305_day_milk_yield + parity_3_milk_yield_adjustment
+        parity_2_305_day_milk_yield = parity_1_305_day_milk_yield * parity_2_milk_yield_adjustment
+        parity_3_305_day_milk_yield = parity_1_305_day_milk_yield * parity_3_milk_yield_adjustment
 
         return {
             "parity_1": parity_1_305_day_milk_yield,
