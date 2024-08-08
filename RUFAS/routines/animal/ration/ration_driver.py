@@ -100,11 +100,12 @@ class RationManager:
                 num_reattempts += 1
                 if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
                     om.add_error(
-                        "Ration formulation error",
-                        "Critical ration formulation error: milk production has dropped too low."
-                        + f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail."
-                        + " Possible solution is to provide additional feed ingredients to"
-                        + f" {pen.animal_combination.name}.",
+                        "Milk production too low",
+                        (
+                            f"Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
+                            f"Possible solution is to provide additional feed ingredients to "
+                            f"{pen.animal_combination.name}."
+                        ),
                         info_map,
                     )
                     raise RuntimeError

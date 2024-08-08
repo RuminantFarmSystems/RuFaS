@@ -2644,12 +2644,11 @@ def test_formulate_ration_error(mocker: MockerFixture) -> None:
             pen=mock_pen, available_feeds=mocker.MagicMock(), animal_grouping_scenario=mocker.MagicMock(), sim_day=2
         )
         assert "RuntimeError" in str(e.value)
-    actual = om.errors_pool["RationManager.formulate_ration.Ration formulation error"]
+    actual = om.errors_pool["RationManager.formulate_ration.Milk production too low"]
     assert actual["values"].__contains__(
-        "Critical ration formulation error: milk production has dropped too low."
         " Check failed_constraint_summary_for_pen_42"
-        + " to see what caused formulation to fail."
-        + " Possible solution is to provide additional feed ingredients to LAC_COW."
+        + " to see what caused formulation to fail. "
+        + "Possible solution is to provide additional feed ingredients to LAC_COW."
     )
 
 
