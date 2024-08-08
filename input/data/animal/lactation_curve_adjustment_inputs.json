@@ -111,7 +111,7 @@
 		"56": "Mountain"
 	},
 	"parity_milk_yield_adjustments": {
-		"parity_2_305_day_milk_yield_adjustment": 1632, "parity_3_305_day_milk_yield_adjustment": 2196
+		"parity_2_305_day_milk_yield_adjustment": 1.18, "parity_3_305_day_milk_yield_adjustment": 1.25
 	}, 
 	"parameter_mean_values": {
 		"parameter_l_mean": 19.9, "parameter_m_mean": 0.247, "parameter_n_mean": 0.003376
