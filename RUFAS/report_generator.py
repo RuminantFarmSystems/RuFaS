@@ -197,11 +197,13 @@ class ReportGenerator:
 
         individual_report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
-        event_logs.append({
-            "log": "start_generate_individual_report",
-            "message": f"Start generating individual report: {individual_report_name}",
-            "info_map": info_map,
-        })
+        event_logs.append(
+            {
+                "log": "start_generate_individual_report",
+                "message": f"Start generating individual report: {individual_report_name}",
+                "info_map": info_map,
+            }
+        )
 
         try:
             report_filter_data = {}
@@ -231,20 +233,24 @@ class ReportGenerator:
                 self.reports.update(report_filter_data)
                 report_filter_data = {}
                 if enable_graph_and_report:
-                    event_logs.append({
-                        "warning": "report_generation_warning",
-                        "message": "Request to graph and report data not fulfilled "
-                        "- no graph_details present in report filter file.",
-                        "info_map": info_map,
-                    })
+                    event_logs.append(
+                        {
+                            "warning": "report_generation_warning",
+                            "message": "Request to graph and report data not fulfilled "
+                            "- no graph_details present in report filter file.",
+                            "info_map": info_map,
+                        }
+                    )
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
-            event_logs.append({
-                "error": "report_generation_error",
-                "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
-                "info_map": info_map,
-            })
+            event_logs.append(
+                {
+                    "error": "report_generation_error",
+                    "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
+                    "info_map": info_map,
+                }
+            )
 
         return event_logs
 
@@ -405,8 +411,7 @@ class ReportGenerator:
         self,
         filtered_pool: dict[str, dict[str, list[Any]]],
         filter_content: Dict[str, Any],
-    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
-               list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
 
@@ -471,8 +476,7 @@ class ReportGenerator:
         filter_content: Dict[str, Any],
         horizontal_agg_key: Optional[str] = None,
         vertical_agg_key: Optional[str] = None,
-    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
-               list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """Routes report data to appropriate vertical and horizontal aggregator functions."""
         aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
@@ -541,8 +545,11 @@ class ReportGenerator:
 
     @staticmethod
     def _combine_units(
-        numerator1: dict[str, int], denominator1: dict[str, int], numerator2: dict[str, int],
-        denominator2: dict[str, int], operation: str
+        numerator1: dict[str, int],
+        denominator1: dict[str, int],
+        numerator2: dict[str, int],
+        denominator2: dict[str, int],
+        operation: str,
     ) -> tuple[dict[str, int], dict[str, int], list[dict[str, str | dict[str, str]]]]:
         """
         Combines two sets of units (numerator and denominator) based on the specified operation.
@@ -591,11 +598,13 @@ class ReportGenerator:
                     "class": ReportGenerator.__class__.__name__,
                     "function": ReportGenerator._combine_units.__name__,
                 }
-                event_logs.append({
-                    "warning": "Report Generator Units Warning",
-                    "message": f"Report units do not match for operation {operation}.",
-                    "info_map": info_map,
-                })
+                event_logs.append(
+                    {
+                        "warning": "Report Generator Units Warning",
+                        "message": f"Report units do not match for operation {operation}.",
+                        "info_map": info_map,
+                    }
+                )
             combined_numerator = numerator1.copy()
             combined_denominator = denominator1.copy()
 
