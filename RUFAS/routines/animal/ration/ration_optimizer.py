@@ -497,6 +497,9 @@ class RationOptimizer:
         pseudocode. Note the calculated phosphorus requirement 'P_requirement' is in grams and the formualted ration is
         reported in kg.
 
+        Uses both the requirement value calculated by NRC/NASEM and the one calculated in the phosphorus_rqmts methods
+        in each animal type class.
+
         Parameters
         ----------
         decision_vector : numpy.ndarray
