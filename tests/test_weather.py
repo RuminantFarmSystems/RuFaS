@@ -297,7 +297,7 @@ def test_get_current_day_conditions_error(
                     annual_mean_air_temperature=77,
                 ),
             ],
-        )
+        ),
     ],
 )
 def test_get_conditions_series(
