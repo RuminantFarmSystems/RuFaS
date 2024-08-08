@@ -90,12 +90,6 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     return mock_weather
 
 
-@pytest.fixture
-def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
-    """Fixture to store unmocked methods of Weather."""
-    return {"get_current_day_conditions": mock_weather.get_current_day_conditions}
-
-
 @pytest.mark.parametrize(
     "fields",
     [
@@ -119,7 +113,7 @@ def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]
 def test_daily_update_routine(
     fields: List[Field],
     mock_weather: Weather,
-    weather_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
@@ -130,7 +124,9 @@ def test_daily_update_routine(
 
     mocked_manure_manager = MagicMock(ManureManager)
     mocked_feed_manager = MagicMock(FeedManager)
-    mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
+    get_conditions = mocker.patch.object(
+        mock_weather, "get_current_day_conditions", return_value=MagicMock(CurrentDayConditions)
+    )
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
 
@@ -141,9 +137,8 @@ def test_daily_update_routine(
         fm.daily_update_routine(weather=mock_weather, time=mocked_time)
         for field in fields:
             assert field.manage_field.call_count == 1
-        assert mock_weather.get_current_day_conditions.call_count == 1
+        assert get_conditions.call_count == len(fields)
         assert fm.output_gatherer.send_daily_variables.call_count == 1
-    mock_weather.get_current_day_conditions = weather_original_method_states["get_current_day_conditions"]
 
 
 @pytest.mark.parametrize(
