@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Any, Callable, Collection, Tuple
+from typing import Dict, List, Any, Callable, Collection, Optional
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -443,7 +443,7 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data: dict[str, list[float]] = filtered_pool
+            report_data: dict[str, dict[str, list[Any]]] = filtered_pool
             if filter_content.get("display_units", True):
                 report_data = self._add_var_units(report_data)
             report_data = {key: report_data[key]["values"] for key in report_data.keys()}
@@ -469,13 +469,13 @@ class ReportGenerator:
 
     def _route_aggregator_functions(
         self,
-        report_data,
-        filter_content,
-        horizontal_agg_key: str = None,
-        vertical_agg_key: str = None,
-    ) -> tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]]:
+        report_data: dict[str, dict[str, list[Any]]],
+        filter_content: Dict[str, Any],
+        horizontal_agg_key: Optional[str] = None,
+        vertical_agg_key: Optional[str] = None,
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """Routes report data to appropriate vertical and horizontal aggregator functions."""
-        aggregate_report = report_data
+        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
 
         if horizontal_agg_key and vertical_agg_key:
@@ -505,7 +505,10 @@ class ReportGenerator:
                     aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
                 else:
                     units = re.search(r"\(.*\)", next(iter(report_data)))
-                    aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
+                    if units is not None:
+                        aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
+                    else:
+                        aggregate_report = {"ver_agg_unitless": list(vertically_aggregated.values())[0]}
             else:
                 if has_dict_variables or has_multiple_columns:
                     aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
@@ -539,8 +542,9 @@ class ReportGenerator:
 
     @staticmethod
     def _combine_units(
-        numerator1: dict, denominator1: dict, numerator2: dict, denominator2: dict, operation: str
-    ) -> tuple[dict, dict, list[dict[str, str | dict[str, str]]]]:
+        numerator1: dict[str, int], denominator1: dict[str, int], numerator2: dict[str, int],
+        denominator2: dict[str, int], operation: str
+    ) -> tuple[dict[str, int], dict[str, int], list[dict[str, str | dict[str, str]]]]:
         """
         Combines two sets of units (numerator and denominator) based on the specified operation.
 
@@ -605,7 +609,7 @@ class ReportGenerator:
         horizontal_agg_key: str,
         vertical_agg_key: str,
         filter_content: Dict[str, Any],
-    ) -> tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """
         Handles both horizontal and vertical aggregations on the report data.
 
@@ -632,7 +636,7 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         if horizontal_first:
             loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
-            horizontally_aggregated, aggregate_units = self._apply_horizontal_aggregation(
+            horizontally_aggregated, aggregate_units, event_logs = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
             if filter_content.get("display_units", True):
@@ -690,7 +694,7 @@ class ReportGenerator:
         report_data: dict[str, list[float]],
         loop_list: List[str],
         aggregator: Callable[[List[float]], float],
-    ) -> Tuple[List[float], str]:
+    ) -> tuple[List[float], str, list[dict[str, str | dict[str, str]]]]:
         """
         Performs horizontal aggregation on report data using a specified aggregator function.
 
@@ -763,6 +767,8 @@ class ReportGenerator:
                 if function == aggregator:
                     aggregator_key = key
                     break
+            if aggregator_key is None:
+                raise ValueError(f"Invalid Aggregator Key, must be in {list(AGGREGATION_FUNCTIONS.keys())}")
             first_key, second_key = list(report_data.keys())[:2]
             first_key_numerator_units, first_key_denominator_units = MeasurementUnits.extract_units(first_key)
             second_key_numerator_units, second_key_denominator_units = MeasurementUnits.extract_units(second_key)
@@ -779,7 +785,7 @@ class ReportGenerator:
 
     def _apply_vertical_aggregation(
         self,
-        report_data: dict[str, list[float]],
+        report_data: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
         aggregator: Callable[[List[float]], float],
     ) -> Dict[str, List[float]]:
         """
@@ -892,7 +898,7 @@ class ReportGenerator:
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
 
-    def _add_var_units(self, report_data: dict[str, List[Any]]) -> dict[str, List[Any]]:
+    def _add_var_units(self, report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
         """Adds variable units to variable name.
 
         Parameters
