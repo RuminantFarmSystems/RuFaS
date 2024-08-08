@@ -247,8 +247,7 @@ class ReportGenerator:
             event_logs.append(
                 {
                     "error": "report_generation_error",
-                    "message":
-                    f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
+                    "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
                     "info_map": info_map,
                 }
             )
