@@ -190,7 +190,7 @@ def test_apply_horizontal_aggregation(
     report_data: Dict[str, List[float]],
     loop_list: List[str],
     aggregator_key: str,
-    expected: List[float],
+    expected: tuple[list[float], str],
     expected_exception: Type[Exception] | None,
     mocker: MockerFixture,
 ) -> None:
@@ -374,13 +374,13 @@ def test_validate_constants(
     ],
 )
 def test_perform_aggregations(
-    filtered_pool: dict[dict[str, list[any]]],
-    filter_content: dict[str, any],
+    filtered_pool: dict[str, dict[str, list[Any]]],
+    filter_content: dict[str, Any],
     mock_agg_keys: tuple[str | None, str | None],
-    mock_aggregator_return_value: dict[str, list[any]],
-    expected_output: dict[str, list[any]],
+    mock_aggregator_return_value: dict[str, list[Any]],
+    expected_output: tuple[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]],
     mocker: MockerFixture,
-):
+) -> None:
     report_generator = ReportGenerator()
 
     mocker.patch.object(report_generator, "_extract_and_check_aggregation_keys", return_value=mock_agg_keys)
@@ -408,8 +408,9 @@ def test_perform_aggregations(
     ],
 )
 def test_route_aggregator_functions(
-    report_data, filter_content, horizontal_agg_key, vertical_agg_key, expected_report, expected_logs
-):
+    report_data: dict[str, list[Any]], filter_content: dict[str, Any], horizontal_agg_key: str, vertical_agg_key: str,
+    expected_report: dict[str, list[Any]], expected_logs: list[Any]
+) -> None:
     generator = ReportGenerator()
     result_report, result_logs = generator._route_aggregator_functions(
         report_data, filter_content, horizontal_agg_key, vertical_agg_key
@@ -480,15 +481,15 @@ def test_update_key(key: str, expected: str) -> None:
     ],
 )
 def test_combine_units(
-    numerator1,
-    denominator1,
-    numerator2,
-    denominator2,
-    operation,
-    expected_numerator,
-    expected_denominator,
-    expected_logs,
-):
+    numerator1: dict[str, int],
+    denominator1: dict[str, int],
+    numerator2: dict[str, int],
+    denominator2: dict[str, int],
+    operation: str,
+    expected_numerator: dict[str, int],
+    expected_denominator: dict[str, int],
+    expected_logs: list[Any],
+) -> None:
     generator = ReportGenerator()
     result_numerator, result_denominator, result_logs = generator._combine_units(
         numerator1, denominator1, numerator2, denominator2, operation
@@ -528,17 +529,17 @@ def test_combine_units(
     ],
 )
 def test_handle_horizontal_and_vertical_aggregations(
-    aggregate_report: dict[str, list[any]],
+    aggregate_report: dict[str, list[Any]],
     horizontal_agg_key: str,
     vertical_agg_key: str,
-    filter_content: dict[str, any],
-    mock_horizontal_agg: any,
-    mock_vertical_agg: any,
-    expected_output: dict[str, list[any]],
+    filter_content: dict[str, Any],
+    mock_horizontal_agg: Any,
+    mock_vertical_agg: Any,
+    expected_output: tuple[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]],
     mocker: MockerFixture,
-):
+) -> None:
     report_generator = ReportGenerator()
-    aggregate_units_return = ("units", [])
+    aggregate_units_return: tuple[str, list[Any]] = ("units", [])
 
     mocker.patch.object(
         report_generator, "_get_horizontal_first_value", return_value=filter_content["horizontal_first"]
@@ -926,7 +927,7 @@ def test_generate_report(
     reports: Dict[str, Dict[str, List[Any]]],
     reference_exception: Optional[Type[BaseException]],
     perform_aggregations_exception: Optional[Type[BaseException]],
-    expected_report_columns: Dict[str, List[Any]],
+    expected_report_columns: dict[str, dict[str, list[Any]]],
     expected_log_messages: List[str],
     expected_get_reports_by_regex_calls: int,
     mocker: MockerFixture,
