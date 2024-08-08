@@ -317,7 +317,7 @@ class TaskManager:
         handler(args, input_manager, output_manager, task_id, produce_graphics)
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> Any:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -399,6 +399,7 @@ class TaskManager:
             output_manager.add_log(
                 "Early termination", "Unexpected early termination. Please see logs for details.", info_map
             )
+            return
 
     @staticmethod
     def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
@@ -542,11 +543,8 @@ class TaskManager:
         produce_grahics: bool,
     ) -> None:
         """Handler for all methods related to metadata property comparison."""
-        try:
-            TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
-            TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
-        except Exception:
-            pass
+        TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
     @staticmethod
     def _handle_compare_metadata_properties_tasks(
@@ -589,11 +587,8 @@ class TaskManager:
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
-        try:
-            TaskManager.handle_single_simulation_run(args, output_manager)
-            TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
-        except Exception:
-            pass
+        TaskManager.handle_single_simulation_run(args, output_manager)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
 
     @staticmethod
     def _handle_postprocessing_tasks(
@@ -604,7 +599,5 @@ class TaskManager:
         produce_graphics: bool,
     ) -> None:
         """Handler for all methods related to postprocessing."""
-        try:
-            TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True, True)
-        except Exception:
-            pass
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True,
+                                           True)
