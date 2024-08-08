@@ -480,6 +480,7 @@ class ReportGenerator:
         """Routes report data to appropriate vertical and horizontal aggregator functions."""
         aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
+        display_units: bool = filter_content.get("display_units", True)
 
         if horizontal_agg_key and vertical_agg_key:
             aggregate_report, event_logs = self._handle_horizontal_and_vertical_aggregations(
@@ -492,7 +493,7 @@ class ReportGenerator:
             horizontally_aggregated, aggregated_units, event_logs = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
-            if filter_content.get("display_units", True):
+            if display_units:
                 aggregate_report = {f"hor_agg_({aggregated_units})": horizontally_aggregated}
             else:
                 aggregate_report = {"hor_agg": horizontally_aggregated}
@@ -503,7 +504,7 @@ class ReportGenerator:
 
             has_dict_variables = filter_content.get("variables") is not None
             has_multiple_columns = len(vertically_aggregated) > 1
-            if filter_content.get("display_units", True):
+            if display_units:
                 if has_dict_variables or has_multiple_columns:
                     aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
                 else:
@@ -579,6 +580,10 @@ class ReportGenerator:
             If the operation is addition or subtraction and the units are not the same.
         """
         event_logs: list[dict[str, str | dict[str, str]]] = []
+        info_map = {
+            "class": ReportGenerator.__class__.__name__,
+            "function": ReportGenerator._combine_units.__name__,
+        }
 
         if operation in ["product", "division"]:
             if operation == "product":
@@ -594,10 +599,6 @@ class ReportGenerator:
 
         elif operation in ["sum", "subtraction", "average", "SD"]:
             if numerator1 != numerator2 or denominator1 != denominator2:
-                info_map = {
-                    "class": ReportGenerator.__class__.__name__,
-                    "function": ReportGenerator._combine_units.__name__,
-                }
                 event_logs.append(
                     {
                         "warning": "Report Generator Units Warning",
@@ -605,6 +606,17 @@ class ReportGenerator:
                         "info_map": info_map,
                     }
                 )
+            combined_numerator = numerator1.copy()
+            combined_denominator = denominator1.copy()
+        else:
+            event_logs.append(
+                {
+                    "warning": "Report Generator Aggregator Operation Warning",
+                    "message": f"Aggregator operation {operation} does not match any of "
+                    f"{list(AGGREGATION_FUNCTIONS.keys())}.",
+                    "info_map": info_map,
+                }
+            )
             combined_numerator = numerator1.copy()
             combined_denominator = denominator1.copy()
 
@@ -641,12 +653,13 @@ class ReportGenerator:
         horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
         vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
         event_logs: list[dict[str, str | dict[str, str]]] = []
+        display_units = filter_content.get("display_units", True)
         if horizontal_first:
             loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
             horizontally_aggregated, aggregate_units, event_logs = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator
             )
-            if filter_content.get("display_units", True):
+            if display_units:
                 aggregate_report = {f"hor_ver_agg_({aggregate_units})": [vertical_aggregator(horizontally_aggregated)]}
             else:
                 aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
@@ -656,7 +669,7 @@ class ReportGenerator:
             for elements in zip(*vertically_aggregated.values()):
                 ver_hor_aggregated.append(horizontal_aggregator(list(elements)))
             aggregate_units, event_logs = self._aggregate_units(vertically_aggregated, horizontal_aggregator)
-            if filter_content.get("display_units", True):
+            if display_units:
                 aggregate_report = {f"ver_hor_agg_({aggregate_units})": ver_hor_aggregated}
             else:
                 aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
