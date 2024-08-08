@@ -498,7 +498,7 @@ class RationOptimizer:
         reported in kg.
 
         Uses both the requirement value calculated by NRC/NASEM and the one calculated in the phosphorus_rqmts methods
-        in each animal type class.
+        in each animal type class (uses suffix _process).
 
         Parameters
         ----------
