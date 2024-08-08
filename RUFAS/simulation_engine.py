@@ -18,7 +18,6 @@ from RUFAS.weather import Weather
 from .routines.EEE.EEE_manager import EEEManager
 
 om = OutputManager()
-im = InputManager()
 
 
 class SimulationEngine:
@@ -53,7 +52,7 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
-
+        self.im = InputManager()
         self.time = Time()
         self._initialize_simulation()
 
@@ -68,7 +67,9 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(self.animal_manager.life_cycle_manager, self.time.simulation_day)
+        AnimalModuleReporter.report_end_of_simulation(
+            self.animal_manager.life_cycle_manager, self.time, self.animal_manager.heiferIIs, self.animal_manager.cows
+        )
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
@@ -96,7 +97,7 @@ class SimulationEngine:
         """
         The main loop for simulation.
         """
-        while not self.time.end_simulation():
+        for simulation_year in range(self.time.simulation_length_years):
             self._annual_simulation()
 
     def _daily_simulation(self) -> None:
@@ -133,14 +134,13 @@ class SimulationEngine:
 
         self.annual_mass_balance(self.time)
         self.annual_reset()
-        self.time.advance()
 
     def _annual_simulation(self) -> None:
         """
         Executes the annual simulation routines.
         """
         self._run_pre_annual_routines()
-        while not self.time.end_year():
+        for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
             self._daily_simulation()
 
         self._run_post_annual_routines()
@@ -159,16 +159,16 @@ class SimulationEngine:
         Instantiates the simulation object by requesting data from the Input Manager.
         """
 
-        weather_data = im.get_data("weather")
+        weather_data = self.im.get_data("weather")
         om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
-        feed_class_config = im.get_data("feed")
+        feed_class_config = self.im.get_data("feed")
         self.feed = Feed(feed_class_config)
 
-        manure_class_config = im.get_data("manure_management")
-        animal_class_config = im.get_data("animal")
+        manure_class_config = self.im.get_data("manure_management")
+        animal_class_config = self.im.get_data("animal")
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)

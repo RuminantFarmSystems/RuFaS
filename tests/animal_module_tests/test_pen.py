@@ -835,3 +835,18 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen) -> None:
     actual = pen.get_manure_data()
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "pen_to_test, ration, expected",
+    [
+        (lazy_fixture("pen"), {}, False),
+        (lazy_fixture("pen"), {"something": 1, "something2": "value"}, False),
+        (lazy_fixture("pen_with_animals"), {}, True),
+        (lazy_fixture("pen_with_animals"), {"something": 1, "something2": "value"}, False),
+    ],
+)
+def test_needs_ration_formulation(pen_to_test: Pen, ration: Dict[str, float | str], expected: bool) -> None:
+    """Unit test for needs_ration_formulation property in file pen.py."""
+    pen_to_test.ration = ration
+    assert pen_to_test.needs_ration_formulation == expected

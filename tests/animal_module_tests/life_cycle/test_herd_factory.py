@@ -22,12 +22,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 
 @pytest.fixture
 def mock_herd_factory(mocker: MockerFixture) -> HerdFactory:
-    """Returns an uninitialized HerdFactory object"""
-
-    mocker.patch(
-        "RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory.__init__",
-        return_value=None,
-    )
+    """Returns an HerdFactory object"""
     return HerdFactory()
 
 

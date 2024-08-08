@@ -173,14 +173,14 @@ class ManureManager:
             )
             self.manure_separators_after_digestion[mm_pen.id] = separator_post_digester
 
-            custom_manure_treatment_config = self.manure_manager_config_handler.get_custom_manure_treatment_config(
+            manure_treatment_config = self.manure_manager_config_handler.get_manure_treatment_config(
                 mm_pen.manure_treatment
             )
             self.manure_treatments[mm_pen.id] = ManureTreatmentFactory.get_instance(
-                manure_treatment_type_name=mm_pen.manure_treatment,
+                configuration_name=mm_pen.manure_treatment,
                 weather=self.weather,
                 time=self.time,
-                custom_manure_treatment_config=custom_manure_treatment_config,
+                manure_treatment_config=manure_treatment_config,
             )
 
     def daily_update(self, pen_list: List[PenManureData], simulation_day: int) -> None:
@@ -586,12 +586,11 @@ class ManureManager:
             True if the manure treatment is a compound anaerobic manure treatment, False otherwise.
 
         """
-        manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_name)
-        compound_anaerobic_manure_treatment_types = [
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
-        ]
-        return manure_treatment_type in compound_anaerobic_manure_treatment_types
+        compound_anaerobic_manure_treatment_types = {
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value,
+        }
+        return manure_treatment_name in compound_anaerobic_manure_treatment_types
 
     def _handle_daily_update_for_compound_anaerobic_manure_treatment(
         self,

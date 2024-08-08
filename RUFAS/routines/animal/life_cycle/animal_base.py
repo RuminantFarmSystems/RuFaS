@@ -1,16 +1,15 @@
+from typing import Any, Dict, List, Set, Tuple
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
-from RUFAS.input_manager import InputManager
-from RUFAS.general_constants import GeneralConstants
-from typing import Tuple
-
-im = InputManager()
 
 
 class AnimalBase:
-    config = {}
+    config: Dict[str, Any] = {}
     nutrients = None
 
     @staticmethod
@@ -19,6 +18,7 @@ class AnimalBase:
 
     @staticmethod
     def set_config(config):
+        im = InputManager()
         AnimalBase.config = config
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
@@ -46,9 +46,9 @@ class AnimalBase:
         self.semen_used = self.config["semen_type"]
         self.culled = False
         self.do_not_breed = False
-        self.body_weight_history = []
+        self.body_weight_history: List[BodyWeightHistory] = []
         self.events = AnimalEvents()
-        self.pen_history = []
+        self.pen_history: List[PenHistory] = []
         self.daily_growth = 0.0
         self.nutrient_rqmts = {}
         self.set_default_nutrient_rqmts()
@@ -168,7 +168,7 @@ class AnimalBase:
         # (A.1G.C.1) from P tracking
         self.p_animal = 0.0072 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
-    def update_pen_history(self, curr_pen, curr_day, classes_in_pen):
+    def update_pen_history(self, curr_pen: int, curr_day: int, classes_in_pen: Set[str]) -> None:
         """
         Updates the animal's pen history by either appending to the existing
         history if the animal is in a different pen than it was the last time
@@ -187,7 +187,7 @@ class AnimalBase:
             self.pen_history[-1].end_date = curr_day
             self.pen_history[-1].classes_in_pen = list(classes_in_pen)
 
-    def update_body_weight_history(self, sim_day):
+    def update_body_weight_history(self, sim_day: int) -> None:
         """
         Updates the animal's body weight history by appending a
         BodyWeightHistory object to the list.

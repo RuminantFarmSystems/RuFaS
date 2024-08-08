@@ -1,6 +1,8 @@
 import pytest
+from mock.mock import call
 from pytest_mock import MockerFixture
 
+from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.animal_manager import AnimalManager
@@ -278,7 +280,8 @@ def test_report_ration_interval_data(animal_manager_fixture: AnimalManager, mock
         return_value="ration_supply_report",
     )
 
-    AnimalModuleReporter.report_ration_interval_data(animal_manager_fixture.all_pens, feed, 1)
+    for pen in animal_manager_fixture.all_pens:
+        AnimalModuleReporter.report_ration_interval_data(pen, feed, 1)
 
     for i in range(1, 2):
         assert om.variables_pool[
@@ -632,13 +635,30 @@ def test_report_daily_reports(mocker: MockerFixture) -> None:
 
 def test_report_end_of_simulation(mocker: MockerFixture) -> None:
     animal_manager = mocker.MagicMock()
+    animal_manager.heiferIIs = mocker.MagicMock()
+    animal_manager.cows = mocker.MagicMock()
+
+    time = mocker.MagicMock(auto_spec=Time)
+    time.simulation_day = mocker.MagicMock()
+
     patch_for_plan_animal_allocation = mocker.patch.object(
         AnimalModuleReporter, "report_sold_animal_information", return_value=""
     )
+    patch_for_record_animal_events = mocker.patch.object(AnimalModuleReporter, "_record_animal_events")
+    patch_for_record_heiferIIs_conception_rate = mocker.patch.object(
+        AnimalModuleReporter, "_record_heiferIIs_conception_rate"
+    )
+    patch_for_record_cows_conception_rate = mocker.patch.object(AnimalModuleReporter, "_record_cows_conception_rate")
 
     # act
-    AnimalModuleReporter.report_end_of_simulation(animal_manager, 100)
+    AnimalModuleReporter.report_end_of_simulation(animal_manager, time, animal_manager.heiferIIs, animal_manager.cows)
 
     # assert
     assert patch_for_plan_animal_allocation.call_count == 1
     patch_for_plan_animal_allocation.assert_called_once_with(animal_manager)
+    assert patch_for_record_animal_events.call_args_list == [
+        call(animal_manager.cows, time.simulation_day),
+        call(animal_manager.heiferIIs, time.simulation_day),
+    ]
+    patch_for_record_heiferIIs_conception_rate.assert_called_once()
+    patch_for_record_cows_conception_rate.assert_called_once()

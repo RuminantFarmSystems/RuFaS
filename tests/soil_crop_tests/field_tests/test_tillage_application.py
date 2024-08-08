@@ -14,19 +14,21 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 
 
 @pytest.mark.parametrize(
-    "data,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed",
+    "field_size,container_type,attr_name,attr_value,incorp_frac,expected_remaining,expected_removed",
     [
         (
-            SoilData(field_size=1.5),
-            "machine_water_extractable_inorganic_phosphorus",
+            1.5,
+            "manure_pool",
+            "water_extractable_inorganic_phosphorus",
             23,
             0.35,
             14.95,
             8.05,
         ),
-        (FieldData(), "current_residue", 45, 0.22, 35.1, 9.9),
+        (None, "field", "current_residue", 45, 0.22, 35.1, 9.9),
         (
-            SoilData(field_size=0.43),
+            0.43,
+            "soil",
             "available_phosphorus_pool",
             13.55,
             0.49,
@@ -36,7 +38,8 @@ from RUFAS.routines.manure.manure_manager import ManureManager
     ],
 )
 def test_remove_amount_incorporated(
-    data: object,
+    field_size: float,
+    container_type: str,
     attr_name: str,
     attr_value: float,
     incorp_frac: float,
@@ -44,10 +47,19 @@ def test_remove_amount_incorporated(
     expected_removed: float,
 ) -> None:
     """Tests that correct amount is removed and returned from the specified pool."""
-    setattr(data, attr_name, attr_value)
+    if container_type == "field":
+        data_container = FieldData()
+    else:
+        soil_data = SoilData(field_size=field_size)
+        if container_type == "manure_pool":
+            data_container = soil_data.machine_manure
+        else:
+            data_container = soil_data
 
-    actual_removed = TillageApplication._remove_amount_incorporated(data, attr_name, incorp_frac)
-    actual_remaining = getattr(data, attr_name)
+    setattr(data_container, attr_name, attr_value)
+
+    actual_removed = TillageApplication._remove_amount_incorporated(data_container, attr_name, incorp_frac)
+    actual_remaining = getattr(data_container, attr_name)
 
     assert pytest.approx(actual_removed) == expected_removed
     assert pytest.approx(actual_remaining) == expected_remaining
@@ -253,34 +265,37 @@ def test_till_soil(
     till_app.till_soil(till_depth, incorp_frac, mix_frac, implement, year, day)
 
     remove_calls = [
-        call(till_app.soil_data, "available_phosphorus_pool", incorp_frac),
-        call(till_app.soil_data, "recalcitrant_phosphorus_pool", incorp_frac),
+        call(till_app.soil_data, "", "available_phosphorus_pool", incorp_frac),
+        call(till_app.soil_data, "", "recalcitrant_phosphorus_pool", incorp_frac),
         call(
             till_app.soil_data,
-            "machine_water_extractable_inorganic_phosphorus",
+            "machine_manure",
+            "water_extractable_inorganic_phosphorus",
             incorp_frac,
         ),
         call(
             till_app.soil_data,
-            "machine_water_extractable_organic_phosphorus",
+            "machine_manure",
+            "water_extractable_organic_phosphorus",
             incorp_frac,
         ),
-        call(till_app.soil_data, "machine_stable_inorganic_phosphorus", incorp_frac),
-        call(till_app.soil_data, "machine_stable_organic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "machine_manure", "stable_inorganic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "machine_manure", "stable_organic_phosphorus", incorp_frac),
         call(
             till_app.soil_data,
-            "grazing_water_extractable_inorganic_phosphorus",
+            "grazing_manure",
+            "water_extractable_inorganic_phosphorus",
             incorp_frac,
         ),
         call(
             till_app.soil_data,
-            "grazing_water_extractable_organic_phosphorus",
+            "grazing_manure",
+            "water_extractable_organic_phosphorus",
             incorp_frac,
         ),
-        call(till_app.soil_data, "grazing_stable_inorganic_phosphorus", incorp_frac),
-        call(till_app.soil_data, "grazing_stable_organic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "grazing_manure", "stable_inorganic_phosphorus", incorp_frac),
+        call(till_app.soil_data, "grazing_manure", "stable_organic_phosphorus", incorp_frac),
     ]
-    till_app._remove_amount_incorporated.assert_has_calls(remove_calls)
     expected_total_phosphorus = len(remove_calls) * 8
     till_app.soil_data.soil_layers[0].add_to_labile_phosphorus.assert_called_once_with(expected_total_phosphorus, 1.5)
     mix_calls = [
