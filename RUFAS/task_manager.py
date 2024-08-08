@@ -20,7 +20,7 @@ RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2 ** 32 - 1
 
 
 class TaskType(Enum):
@@ -416,20 +416,17 @@ class TaskManager:
     @staticmethod
     def handle_single_simulation_run(args: Dict[str, Any], output_manager: OutputManager) -> None:
         """Conducts a single simulation run based on provided arguments."""
-        try:
-            info_map = {
-                "class": TaskManager.__name__,
-                "function": TaskManager.handle_single_simulation_run.__name__,
-                "units": MeasurementUnits.UNITLESS,
-            }
-            TaskManager.handle_herd_initializaition(args, output_manager)
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager.handle_single_simulation_run.__name__,
+            "units": MeasurementUnits.UNITLESS,
+        }
+        TaskManager.handle_herd_initializaition(args, output_manager)
 
-            output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-            simulator = SimulationEngine()
-            simulator.simulate()
-            output_manager.add_log("Simulation completed", "Simulation completed", info_map)
-        except Exception:
-            pass
+        output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
+        simulator = SimulationEngine()
+        simulator.simulate()
+        output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
     @staticmethod
     def handle_input_data_audit(
@@ -588,8 +585,12 @@ class TaskManager:
         """Handler for all methods related to simulation run."""
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
-        TaskManager.handle_single_simulation_run(args, output_manager)
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
+
+        try:
+            TaskManager.handle_single_simulation_run(args, output_manager)
+            TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
+        except Exception:
+            pass
 
     @staticmethod
     def _handle_postprocessing_tasks(
