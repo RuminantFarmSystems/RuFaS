@@ -303,10 +303,18 @@ class TaskManager:
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
         for _ in results:
-            failed.append(results)
+            if _ is not None:
+                failed.append(_)
 
         if len(failed) > 0:
-            print(failed)
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": TaskManager._run_tasks.__name__
+            }
+            om = OutputManager()
+            om.add_log(
+                "Not all tasks are successful", f"There are tasks failed, the tasks are:{failed}", info_map
+            )
 
     @staticmethod
     def call_handler(
@@ -351,7 +359,7 @@ class TaskManager:
                 RUFAS_VERSION,
                 task_id,
             )
-
+            # raise ValueError()
             input_manager = InputManager(metadata_depth_limit)
             task_type = args.get("task_type")
 
@@ -395,7 +403,7 @@ class TaskManager:
         except Exception as e:
             info_map.update(args)
             output_manager.add_error(
-                "Failed to finish the task",
+                "Failed to finish the task, continuing to the next task",
                 f"Failed to recover from error: {e}; traceback: {traceback.format_exc()}",
                 info_map,
             )
