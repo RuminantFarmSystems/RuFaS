@@ -22,7 +22,7 @@ def average_aggregator(data: List[float]) -> float:
     return sum(data) / len(data) if data else 0
 
 
-def division_aggregator(data: List[float]) -> float:
+def division_aggregator(data: List[float]) -> float | None:
     """
     Divides the first number in the list by each of the subsequent numbers.
 
@@ -102,7 +102,7 @@ def sum_aggregator(data: List[float]) -> float:
     return sum(data)
 
 
-def subtraction_aggregator(data: List[float]) -> float:
+def subtraction_aggregator(data: list[float]) -> float | None:
     """
     Subtracts each subsequent number in the list from the first number.
 
@@ -169,7 +169,7 @@ class ReportGenerator:
     def generate_report(
         self,
         filter_content: Dict[str, Any],
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        filtered_pool: dict[str, dict[str, list[Any]]],
     ) -> List[Dict[str, str | Dict[str, str]]]:
         """
         Generates a report specified by the given filter content.
@@ -180,7 +180,7 @@ class ReportGenerator:
             A dictionary containing the configuration for the report, including details
             such as 'name', 'filters', 'cross_references', and aggregation instructions.
 
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The data pool from which reports are generated.
 
         Returns
@@ -406,7 +406,7 @@ class ReportGenerator:
 
     def _perform_aggregations(
         self,
-        filtered_pool: Dict[str, Dict[str, List[Any]]],
+        filtered_pool: dict[str, dict[str, list[Any]]],
         filter_content: Dict[str, Any],
     ) -> tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]]:
         """
@@ -414,7 +414,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The data pool from which the report is to be generated, structured as a dictionary.
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
@@ -443,7 +443,7 @@ class ReportGenerator:
                 horizontal_agg_key,
                 vertical_agg_key,
             ) = self._extract_and_check_aggregation_keys(filter_content)
-            report_data: Dict[str, List[Any]] = filtered_pool
+            report_data: dict[str, list[float]] = filtered_pool
             if filter_content.get("display_units", True):
                 report_data = self._add_var_units(report_data)
             report_data = {key: report_data[key]["values"] for key in report_data.keys()}
@@ -687,7 +687,7 @@ class ReportGenerator:
 
     def _apply_horizontal_aggregation(
         self,
-        report_data: Dict[str, List[float]],
+        report_data: dict[str, list[float]],
         loop_list: List[str],
         aggregator: Callable[[List[float]], float],
     ) -> Tuple[List[float], str]:
@@ -731,7 +731,7 @@ class ReportGenerator:
 
     def _aggregate_units(
         self,
-        report_data: Dict[str, List[float]],
+        report_data: dict[str, list[float]],
         aggregator: Callable[[List[float]], float],
     ) -> tuple[str, list[dict[str, str | dict[str, str]]]]:
         """Creates the appropriate units for the associated aggregator function used.
@@ -779,7 +779,7 @@ class ReportGenerator:
 
     def _apply_vertical_aggregation(
         self,
-        report_data: Dict[str, List[float]],
+        report_data: dict[str, list[float]],
         aggregator: Callable[[List[float]], float],
     ) -> Dict[str, List[float]]:
         """
@@ -804,7 +804,7 @@ class ReportGenerator:
             aggregate_data_dict[key] = [aggregator(non_null_data_points)]
         return aggregate_data_dict
 
-    def _add_constants_to_report_data(self, report_data: Dict[str, List[Any]], filter_content: Dict[str, Any]) -> None:
+    def _add_constants_to_report_data(self, report_data: dict[str, list[float]], filter_content: Dict[str, Any]) -> None:
         """
         Add constants to the report data.
 
