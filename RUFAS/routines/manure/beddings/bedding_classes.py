@@ -172,6 +172,24 @@ class BaseBedding(ABC):
         """
         pass
 
+    @abstractmethod
+    def calc_organic_bedding_mass_added_to_manure(self, bedding_mass: float) -> float:
+        """
+        Calculates how much organic bedding material was added to the total mass of manure on a single day.
+
+        Parameters
+        ----------
+        bedding_mass : float
+            Mass of bedding used for the animals (kg).
+
+        Returns
+        -------
+        float
+            The mass of organic bedding material added to manure (kg).
+
+        """
+        pass
+
     def calc_total_bedding_volume(self, num_animals: int) -> float:
         """
         Calculate the total volume of bedding needed for all animals.
@@ -232,6 +250,10 @@ class BaseOrganicBedding(BaseBedding):
 
         """
         return num_animals * self.bedding_mass_per_day
+
+    def calc_organic_bedding_mass_added_to_manure(self, bedding_mass: float) -> float:
+        """Calculates the amount of organic bedding mass added to manure (kg)."""
+        return self.bedding_cleaned_fraction * bedding_mass
 
 
 class SawdustBedding(BaseOrganicBedding):
@@ -323,6 +345,10 @@ class SandBedding(BaseBedding):
         bedding_mass = num_animals * self.bedding_mass_per_day
         return bedding_mass * (1 - self.sand_removal_efficiency)
 
+    def calc_organic_bedding_mass_added_to_manure(self, bedding_mass: float) -> float:
+        """Sand bedding is not organic, so the organic mass added to manure is always 0."""
+        return 0.0
+
 
 class NoBedding(BaseBedding):
     """
@@ -339,6 +365,9 @@ class NoBedding(BaseBedding):
         return 0.0
 
     def calc_total_bedding_mass(self, num_animals: int) -> float:
+        return 0.0
+
+    def calc_organic_bedding_mass_added_to_manure(self, bedding_mass: float) -> float:
         return 0.0
 
     def calc_total_bedding_volume(self, num_animals: int) -> float:
