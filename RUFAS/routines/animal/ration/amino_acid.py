@@ -24,7 +24,7 @@ class EssentialAminoAcidRequirements:
         self.thryptophan: float = 0.0
         self.valine: float = 0.0
 
-    def __add__(self, other: 'EssentialAminoAcidRequirements') -> 'EssentialAminoAcidRequirements':
+    def __add__(self, other: "EssentialAminoAcidRequirements") -> "EssentialAminoAcidRequirements":
         for attribute_name, arg in self.__dict__.items():
             setattr(
                 self,
@@ -33,7 +33,7 @@ class EssentialAminoAcidRequirements:
             )
         return self
 
-    def __truediv__(self, other: int) -> 'EssentialAminoAcidRequirements':
+    def __truediv__(self, other: int) -> "EssentialAminoAcidRequirements":
         for attribute_name, arg in self.__dict__.items():
             setattr(
                 self,
@@ -229,23 +229,29 @@ class AminoAcidCalculator:
             if lactating:
                 net_AA_Milk: float = self._calculate_lactation(amino_acid, NPMilk)
 
-                setattr(total_amino_acid_requirements, amino_acid, float(
-                    (
+                setattr(
+                    total_amino_acid_requirements,
+                    amino_acid,
+                    float(
+                        (
                             (net_AA_scurf + net_AA_MFP + net_AA_Growth + net_AA_Milk)
                             / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
-                    )
-                    + (net_AA_Gest / target_efficiency_gest)
-                    + net_AA_End_Urine
-                )
                         )
+                        + (net_AA_Gest / target_efficiency_gest)
+                        + net_AA_End_Urine
+                    ),
+                )
             else:
-                setattr(total_amino_acid_requirements, amino_acid, float(
-                    ((net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid])
-                    + (net_AA_Growth / target_efficiency_growth)
-                    + (net_AA_Gest / target_efficiency_gest)
-                    + net_AA_End_Urine
+                setattr(
+                    total_amino_acid_requirements,
+                    amino_acid,
+                    float(
+                        ((net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid])
+                        + (net_AA_Growth / target_efficiency_growth)
+                        + (net_AA_Gest / target_efficiency_gest)
+                        + net_AA_End_Urine
+                    ),
                 )
-                        )
         return total_amino_acid_requirements
 
     def _calculate_scurf(self, amino_acid: str, NPscurf: float) -> float:

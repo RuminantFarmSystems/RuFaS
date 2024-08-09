@@ -155,7 +155,7 @@ class AnimalRequirements:
             "avg_milk": milk,
             "avg_CP_milk": CP_milk,
             "avg_milk_production_reduction": milk_production_reduction,
-            "essential_amino_acid_requirement": essential_amino_acid_requirement
+            "essential_amino_acid_requirement": essential_amino_acid_requirement,
         }
 
         calc_method_to_function_map = {
@@ -206,7 +206,7 @@ class AnimalRequirements:
             "milk": [0],
             "milk_production_reduction": [0],
             "CP_milk": [0],
-            "essential_amino_acid_requirement": []
+            "essential_amino_acid_requirement": [],
         }
         if recalc:
             requirements_lists = self.recalculate_requirements(pen, animal_grouping_scenario, requirements_lists)
@@ -679,7 +679,7 @@ class AnimalRequirements:
             "Ca_requirement": calcium_requirement,
             "P_requirement": phosphorus_requirement,
             "DMIest_requirement": dry_matter_intake_estimate,
-            "essential_amino_acid_requirement": essential_amino_acid_requirement
+            "essential_amino_acid_requirement": essential_amino_acid_requirement,
         }
 
     def calculate_NRC_energy_maintenance_requirements(
