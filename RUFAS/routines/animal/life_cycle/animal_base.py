@@ -6,6 +6,7 @@ from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
+from RUFAS.routines.animal.ration.amino_acid import EssentialAminoAcidRequirements
 
 
 class AnimalBase:
@@ -73,6 +74,7 @@ class AnimalBase:
         self.conceptus_weight = 0.0
         self.calf_birth_weight = 0.0
         self.tissue_changed = 0.0
+        self.essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements()
         self.sold_at_day: int | None = None
         if "body_weight_history" in args:
             self.body_weight_history = args["body_weight_history"]
