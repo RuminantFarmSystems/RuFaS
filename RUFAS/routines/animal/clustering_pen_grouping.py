@@ -1,33 +1,59 @@
-import pandas as pd
-import numpy as np
 import math
+from typing import List
+
+import numpy as np
+import numpy.typing as npt
+import pandas as pd
 from scipy.stats import percentileofscore
 
 
-def norm(x):
+def norm(x: List[int | float]) -> npt.NDArray[np.float64 | np.int64]:
     """
-    Helper function to normalize a list of values and return that normalized
-    list.
+    Normalizes a list of numerical values and returns the normalized list.
 
-    Args:
-        x: A list of values
+    This function takes a list of integers or floats, converts it to a NumPy array,
+    and normalizes the values to a range between 0 and 1.
+
+    Parameters
+    ----------
+    x : List[int | float]
+        A list of numerical values to be normalized.
+
+    Returns
+    -------
+    npt.NDArray[np.float64 | np.int64]
+        A NumPy array of normalized values if the input has varying values,
+        otherwise the original array.
     """
-    x = np.array(x)
-    if max(x) != min(x):
-        normalized = (x - min(x)) / (max(x) - min(x))
+
+    x_array = np.array(x)
+    if max(x_array) != min(x_array):
+        normalized = (x_array - min(x_array)) / (max(x_array) - min(x_array))
         return normalized
     else:
-        return x
+        return x_array
 
 
-def percentile_list(original_list):
+def percentile_list(original_list: List[int | float]) -> List[int | float]:
     """
-    Helper function that returns a list of percentiles corresponding
-    to its matching value in the original list.
+    Calculates a list of percentiles corresponding to the matching value in the original list.
 
-    Args:
-        l: a list of values
+    This function takes a list of integers or floats and calculates the percentile rank
+    of each element within the list. The percentile rank is then normalized by dividing
+    by 100, resulting in values between 0 and 1.
+
+    Parameters
+    ----------
+    original_list : List[int | float]
+        A list of numerical values for which the percentiles are to be calculated.
+
+    Returns
+    -------
+    List[int | float]
+        A list of normalized percentiles, each value representing the percentile
+        of the corresponding element in the original list, divided by 100.
     """
+
     perc_list = []
     for value in original_list:
         percentile = percentileofscore(original_list, value)

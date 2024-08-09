@@ -788,7 +788,12 @@ class AnimalModuleReporter:
     def report_daily_pen_total(cls, simulation_day: int, pen_list: List[Pen]) -> None:
         classname = AnimalModuleReporter.__name__
         funcname = AnimalModuleReporter.report_daily_pen_total.__name__
-        info_map = {"class": classname, "function": funcname, "units": MeasurementUnits.ANIMALS}
+        info_map = {
+            "class": classname,
+            "function": funcname,
+            "units": MeasurementUnits.ANIMALS,
+            "simulation_day": simulation_day,
+        }
         for pen in pen_list:
             variable_to_add = f"{classname}.{funcname}.number_of_animals_in_pen_{pen.id}_{pen.animal_combination.name}"
             reference_variable = f"{classname}.{funcname}.number_of_animals_in_pen_0_CALF"
