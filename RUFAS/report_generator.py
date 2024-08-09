@@ -779,14 +779,15 @@ class ReportGenerator:
             The expected units of aggregating the report data using the accompanying aggregator function and
             the event logs.
         """
-        if len(report_data) == 0 or len(report_data) > 2:
-            raise ValueError("No report data available.")
-        elif len(report_data) == 1:
+        event_logs: list[dict[str, str | dict[str, str]]] = []
+        if len(report_data) == 0:
+            raise ValueError("No report data available to aggregate units from.")
+        elif len(report_data) == 1 or len(report_data) > 2:
             var_units_match = re.search(r"\((.*?)\)", next(iter(report_data)))
             if var_units_match:
-                return var_units_match.group(1), []
+                return var_units_match.group(1), event_logs
             else:
-                return "", []
+                return "", event_logs
         else:
             aggregator_key = None
             for key, function in AGGREGATION_FUNCTIONS.items():
