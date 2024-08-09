@@ -37,6 +37,15 @@ PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS = 0.281
 PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS = 0.333
 
 
+"""
+These constants regulate the range and precision used to fit Wood's l lactation parameter to estimated 305 day milk
+yields.
+"""
+UPPER_BOUND = 20
+LOWER_BOUND = -20
+STEP_SIZE = 0.01
+
+
 class LactationCurve:
     """
     Manages Wood's lactation curve parameters l, m, and n as they are used by the rest of the Animal module.
@@ -405,8 +414,8 @@ class LactationCurve:
         smallest_diff = float("inf")
         l_param_best_fit = l_param
 
-        for l_param_error in np.arange(-10, 10, 0.01):
-            l_param_varied = l_param + l_param_error
+        for l_param_error in np.arange(LOWER_BOUND, UPPER_BOUND, STEP_SIZE):
+            l_param_varied = max(0.0, l_param + l_param_error)
             varied_305_day_milk_yield = self.calc_305_day_milk_yield(l_param_varied, m_param, n_param)
             milk_yield_difference = abs(varied_305_day_milk_yield - milk_yield)
             if milk_yield_difference < smallest_diff:
