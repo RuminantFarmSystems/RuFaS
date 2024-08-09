@@ -821,6 +821,7 @@ class Pen:
                 requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
             ) / animal.DMIest_requirement
             animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
+            animal.essential_amino_acid_requirement = requirements["essential_amino_acid_requirement"]
 
             animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 

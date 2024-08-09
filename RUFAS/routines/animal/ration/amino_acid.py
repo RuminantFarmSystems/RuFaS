@@ -12,6 +12,37 @@ class AminoAcidComposition(TypedDict):
     milk: float
 
 
+class EssentialAminoAcidRequirements:
+    def __init__(self):
+        self.histidine: float = 0.0
+        self.isoleucine: float = 0.0
+        self.leucine: float = 0.0
+        self.lysine: float = 0.0
+        self.methionine: float = 0.0
+        self.phenylalanine: float = 0.0
+        self.threonine: float = 0.0
+        self.thryptophan: float = 0.0
+        self.valine: float = 0.0
+
+    def __add__(self, other: 'EssentialAminoAcidRequirements') -> 'EssentialAminoAcidRequirements':
+        for attribute_name, arg in self.__dict__.items():
+            setattr(
+                self,
+                attribute_name,
+                self.__getattribute__(attribute_name) + other.__getattribute__(attribute_name),
+            )
+        return self
+
+    def __truediv__(self, other: int) -> 'EssentialAminoAcidRequirements':
+        for attribute_name, arg in self.__dict__.items():
+            setattr(
+                self,
+                attribute_name,
+                self.__getattribute__(attribute_name) / other,
+            )
+        return self
+
+
 AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
     "arginine": {
         "duodenal_endogenous": 4.61,
@@ -130,7 +161,7 @@ class AminoAcidCalculator:
         milk_true_protein: float,
         milk_production: float,
         NDF_conc: float,
-    ) -> Dict[str, float]:
+    ) -> EssentialAminoAcidRequirements:
         """
         This function calculates the total Essential Amino Acid for an animal according to equations on page 8 of the
         AA requirements design doc.
@@ -176,7 +207,7 @@ class AminoAcidCalculator:
         NPMilk: float
             Net protein in milk, or milk true protein yield, g
         """
-        total_amino_acid_requirements: Dict[str, float] = {}
+        total_amino_acid_requirements: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements()
 
         NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
         CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
@@ -198,22 +229,23 @@ class AminoAcidCalculator:
             if lactating:
                 net_AA_Milk: float = self._calculate_lactation(amino_acid, NPMilk)
 
-                total_amino_acid_requirements[amino_acid] = (
+                setattr(total_amino_acid_requirements, amino_acid, float(
                     (
-                        (net_AA_scurf + net_AA_MFP + net_AA_Growth + net_AA_Milk)
-                        / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
+                            (net_AA_scurf + net_AA_MFP + net_AA_Growth + net_AA_Milk)
+                            / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
                     )
                     + (net_AA_Gest / target_efficiency_gest)
                     + net_AA_End_Urine
                 )
+                        )
             else:
-                total_amino_acid_requirements[amino_acid] = (
+                setattr(total_amino_acid_requirements, amino_acid, float(
                     ((net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid])
                     + (net_AA_Growth / target_efficiency_growth)
                     + (net_AA_Gest / target_efficiency_gest)
                     + net_AA_End_Urine
                 )
-
+                        )
         return total_amino_acid_requirements
 
     def _calculate_scurf(self, amino_acid: str, NPscurf: float) -> float:
