@@ -8,6 +8,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 
 om = OutputManager()
 
@@ -79,6 +80,8 @@ class AnimalRequirements:
 
         self.avg_milk_production_reduction = None
 
+        self.essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements()
+
     def calc_pen_requirements(
         self,
         NEmaint_requirement_list: List[float],
@@ -95,6 +98,7 @@ class AnimalRequirements:
         milk: List[float],
         CP_milk: List[float],
         milk_production_reduction: List[float],
+        essential_amino_acid_requirement: List[EssentialAminoAcidRequirements],
         calc_method: str = "mean",
     ) -> None:
         """
@@ -151,6 +155,7 @@ class AnimalRequirements:
             "avg_milk": milk,
             "avg_CP_milk": CP_milk,
             "avg_milk_production_reduction": milk_production_reduction,
+            "essential_amino_acid_requirement": essential_amino_acid_requirement
         }
 
         calc_method_to_function_map = {
@@ -186,7 +191,7 @@ class AnimalRequirements:
         recalc : boolean
             True if requirements need to be recalculated since grouping
         """
-        requirements_lists = {
+        requirements_lists: dict[str, list[float | EssentialAminoAcidRequirements]] = {
             "NEmaint_requirement": [],
             "NEa_requirement": [],
             "NEg_requirement": [],
@@ -201,6 +206,7 @@ class AnimalRequirements:
             "milk": [0],
             "milk_production_reduction": [0],
             "CP_milk": [0],
+            "essential_amino_acid_requirement": []
         }
         if recalc:
             requirements_lists = self.recalculate_requirements(pen, animal_grouping_scenario, requirements_lists)
@@ -222,6 +228,7 @@ class AnimalRequirements:
             requirements_lists["milk"],
             requirements_lists["CP_milk"],
             requirements_lists["milk_production_reduction"],
+            requirements_lists["essential_amino_acid_requirement"],
             "mean",
         )
 
@@ -238,6 +245,7 @@ class AnimalRequirements:
             "DMIest_requirement": self.DMIest_requirement,
             "avg_BW": self.avg_BW,
             "avg_milk_production_reduction_pen": self.avg_milk_production_reduction,
+            "essential_amino_acid_requirement": self.essential_amino_acid_requirement,
         }
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
@@ -319,6 +327,7 @@ class AnimalRequirements:
             animal.Ca_requirement = req["Ca_requirement"]
             animal.P_requirement = req["P_requirement"]
             animal.DMIest_requirement = req["DMIest_requirement"]
+            animal.essential_amino_acid_requirement = req["essential_amino_acid_requirement"]
             # these animal class variables are only used for grouping purposes
             if animal_type in [AnimalType.LAC_COW]:
                 animal.DNED_requirement = (
@@ -350,6 +359,7 @@ class AnimalRequirements:
             requirements_lists["P_requirement_process"].append(animal.p_req)
             requirements_lists["DMIest_requirement"].append(req["DMIest_requirement"])
             requirements_lists["BW"].append(animal.body_weight)
+            requirements_lists["essential_amino_acid_requirement"].append(animal.essential_amino_acid_requirement)
         return requirements_lists
 
     def use_existing_requirements(
@@ -404,6 +414,7 @@ class AnimalRequirements:
             requirements_lists["P_requirement_process"].append(animal.p_req)
             requirements_lists["DMIest_requirement"].append(animal.DMIest_requirement)
             requirements_lists["BW"].append(animal.body_weight)
+            requirements_lists["essential_amino_acid_requirement"].append(animal.essential_amino_acid_requirement)
         return requirements_lists
 
     def calc_rqmts(
@@ -485,6 +496,7 @@ class AnimalRequirements:
         Dict[str, float]
             dictionary of requirement values, see individual functions for each key value pair
         """
+        essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements()
         if AnimalBase.config["nutrient_standard"] == "NRC":
             (
                 net_energy_maintenance,
@@ -610,6 +622,17 @@ class AnimalRequirements:
                 milk_production,
                 NDF_conc,
             )
+            AA_calculator = AminoAcidCalculator()
+            essential_amino_acid_requirement = AA_calculator.calculate_essential_amino_acid_requirements(
+                lactating,
+                body_weight,
+                frame_weight_gain,
+                gravid_uterine_weight_gain,
+                dry_matter_intake_estimate,
+                milk_true_protein,
+                milk_production,
+                NDF_conc,
+            )
             calcium_requirement = self.calculate_NASEM_calcium_requirements(
                 body_weight,
                 mature_body_weight,
@@ -656,6 +679,7 @@ class AnimalRequirements:
             "Ca_requirement": calcium_requirement,
             "P_requirement": phosphorus_requirement,
             "DMIest_requirement": dry_matter_intake_estimate,
+            "essential_amino_acid_requirement": essential_amino_acid_requirement
         }
 
     def calculate_NRC_energy_maintenance_requirements(

@@ -579,6 +579,7 @@ class Cow(HeiferIII):
             animal_requirements["NEmaint_requirement"] + animal_requirements["NEl_requirement"]
         ) / self.DMIest_requirement
         self.DMDP_requirement = (animal_requirements["MP_requirement"]) / self.DMIest_requirement
+        self.essential_amino_acid_requirement = animal_requirements["essential_amino_acid_requirement"]
 
     def phosphorus_rqmts(self, DMI: float) -> None:
         """
