@@ -12,7 +12,6 @@ import pandas as pd
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
-om = OutputManager()
 
 """
 Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
@@ -82,6 +81,7 @@ class InputManager:
         return cls.instance
 
     def __init__(self, metadata_depth_limit: int | None = None) -> None:
+        self.om = OutputManager()
         if InputManager.__instance is None:
             InputManager.__instance = self
             self.__metadata: Dict[str, Any] = {}
@@ -153,7 +153,7 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_metadata.__name__,
         }
-        om.add_log(
+        self.om.add_log(
             "load_metadata_attempt",
             f"Attempting to load metadata from {metadata_path}.",
             info_map,
@@ -161,7 +161,7 @@ class InputManager:
         try:
             with open(metadata_path) as metadata_file:
                 self.__metadata = json.load(metadata_file)
-                om.add_log(
+                self.om.add_log(
                     "load_metadata_success",
                     f"Successfully loaded metadata from {metadata_path}",
                     info_map,
@@ -192,7 +192,7 @@ class InputManager:
         }
         try:
             properties_path = Path(self.__metadata["files"]["properties"]["path"])
-            om.add_log(
+            self.om.add_log(
                 "load_properties_attempt",
                 f"Attempting to load properties from {properties_path}",
                 info_map,
@@ -203,20 +203,20 @@ class InputManager:
             del self.__metadata["files"]["properties"]
 
             self.__metadata["properties"] = self._load_data_from_json(properties_path)
-            om.add_log(
+            self.om.add_log(
                 "load_properties_success",
                 f"Successfully loaded properties from {properties_path}",
                 info_map,
             )
 
         except FileNotFoundError as fnfe:
-            om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+            self.om.add_error("load_properties_file_not_found", str(fnfe), info_map)
             raise
         except json.JSONDecodeError as jde:
-            om.add_error("load_properties_json_error", str(jde), info_map)
+            self.om.add_error("load_properties_json_error", str(jde), info_map)
             raise
         except Exception as e:
-            om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+            self.om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
             raise
 
     def _load_data_from_json(self, file_path: Path) -> Dict[str, Any]:
@@ -243,11 +243,11 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_data_from_json.__name__,
         }
-        om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
+        self.om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path) as json_file:
                 data: Dict[str, Any] = json.load(json_file)
-                om.add_log(
+                self.om.add_log(
                     "load_data_successful",
                     f"Successfully loaded data from {file_path}.",
                     info_map,
@@ -282,13 +282,13 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_data_from_csv.__name__,
         }
-        om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
+        self.om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path, "r", encoding="utf-8") as csv_file:
                 data_frame = pd.read_csv(csv_file)
                 data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
                 if not data_frame.empty:
-                    om.add_log(
+                    self.om.add_log(
                         "load_data_successful",
                         f"Successfully loaded data from {file_path}.",
                         info_map,
@@ -406,7 +406,7 @@ class InputManager:
         try:
             return Modifiability.__getitem__("_".join(modifiability.strip().upper().split()))
         except KeyError:
-            om.add_warning(
+            self.om.add_warning(
                 "Unknown modifiability entry",
                 f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability should be "
                 f"one of {Modifiability.values()}. Using the default value: {default}",
@@ -498,11 +498,11 @@ class InputManager:
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
             error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
-            om.add_error("Missing required data", error_msg, info_map)
+            self.om.add_error("Missing required data", error_msg, info_map)
             raise KeyError(error_msg)
 
         if self._is_input_required_upon_initialization(variable_name=var_name, variable_properties=variable_properties):
-            om.add_error(
+            self.om.add_error(
                 "Missing required data",
                 f"Key {var_name} not found in input data. Input value is required for this "
                 "variable upon program initialization.",
@@ -512,7 +512,7 @@ class InputManager:
                 f"Key {var_name} not found in input data. Input value is required for this "
                 "variable upon program initialization."
             )
-        om.add_warning(
+        self.om.add_warning(
             "Validation: key not found in input data -- input not required upon initialization",
             f"Key {var_name} not found in input data. Input value is not required for this "
             "variable upon program initialization, setting the variable value to None.",
@@ -644,7 +644,7 @@ class InputManager:
         )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         if not isinstance(input_data, list):
-            om.add_warning(
+            self.om.add_warning(
                 "Validation: array container is not a list",
                 f"Variable: '{variable_path_str}' is not an array but has type: {type(input_data)}. "
                 f"{properties_violation_message}",
@@ -657,7 +657,7 @@ class InputManager:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data)
             if not is_in_range:
-                om.add_warning(
+                self.om.add_warning(
                     "Validation: array length less than minimum",
                     f"Variable: '{variable_path_str}' has length: {len(input_data)}, less than minimum length: "
                     f"{minimum_length}. {properties_violation_message}",
@@ -668,7 +668,7 @@ class InputManager:
         if maximum_length is not None:
             is_in_range = len(input_data) <= variable_properties["maximum_length"]
             if not is_in_range:
-                om.add_warning(
+                self.om.add_warning(
                     "Validation: array length greater than maximum",
                     f"Variable: '{variable_path_str}' has length: {len(input_data)}, greater than maximum length: "
                     f"{maximum_length}. {properties_violation_message}",
@@ -792,7 +792,7 @@ class InputManager:
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
         if not isinstance(object_value, dict):
-            om.add_warning(
+            self.om.add_warning(
                 "Validation: object is not a dictionary",
                 f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
@@ -818,7 +818,7 @@ class InputManager:
 
         extraneous_keys = [key for key in object_value.keys() if key not in variable_properties.keys()]
         for key in extraneous_keys:
-            om.add_warning(
+            self.om.add_warning(
                 "Validation: object contains extraneous data",
                 f"Variable: '{variable_path_str}' contains data at key '{key}' that is not specified in the metadata "
                 f"properties. {properties_violation_message}",
