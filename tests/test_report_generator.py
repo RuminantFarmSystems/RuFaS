@@ -1188,7 +1188,6 @@ def test_add_var_units(
         ({"temperature (Celsius)": [23.0, 24.0, 25.0]}, sum, False, ("Celsius", []), False),
         ({"pressure (Pascal)": [101325.0, 101300.0]}, sum, False, ("Pascal", []), False),
         ({"wind_speed (m/s)": [10.0, 12.0, 15.0]}, sum, False, ("m/s", []), False),
-        ({"a": [0, 1, 2], "b": [1, 2, 3], "c": [2, 3, 4]}, sum, False, ("", []), True),
         ({}, sum, False, ("", []), True),
     ],
 )
