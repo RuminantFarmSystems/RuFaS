@@ -101,8 +101,8 @@ class Weather:
         time: Time
             Time object containing the current time of the simulation.
         latitude : float | None, default None
-            Latitude of the location which weather data is being collected for. If no latitude is provided, then the
-            daylength will not be provided in the returned CurrentDayConditions instance.
+            Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
+            then the daylength will not be provided in the returned CurrentDayConditions instance.
 
         Returns
         -------
@@ -147,8 +147,8 @@ class Weather:
         ending_offset : int
             Number of days before or after the given date to end the weather conditions series.
         latitude : float | None, default None
-            The latitude of the location that weather conditions are being collected for. If no latitude is provided,
-            then no daylengths will be included in weather conditions returned.
+            The latitude of the location that weather conditions are being collected for (degrees). If no latitude is
+            provided, then no daylengths will be included in weather conditions returned.
 
         Returns
         -------
