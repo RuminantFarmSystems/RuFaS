@@ -717,7 +717,8 @@ class Cow(HeiferIII):
                 bodyweight_tissue = self.tissue_changed / (
                     self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
                 )
-            except:
+            except Exception as e:
+                print(e)
                 bodyweight_tissue = 0.0
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue

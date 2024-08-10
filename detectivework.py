@@ -1,3 +1,4 @@
+# flake8: noqa
 #  type: ignore
 import os
 import json
