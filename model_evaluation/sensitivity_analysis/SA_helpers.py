@@ -1,4 +1,5 @@
 import os
+
 # import csv
 # import json
 import pandas as pd
@@ -20,6 +21,7 @@ from SALib.analyze import morris as morris_analyzer
 # from sklearn import datasets, linear_model
 # from sklearn.metrics import mean_squared_error, r2_score
 import statsmodels.api as sm
+
 # from scipy import stats
 
 
@@ -30,8 +32,8 @@ def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
     This will place the main effects and interaction effects into grouped columns in a single dataframe
     """
     intnames = analysis["interaction_names"]
-    intnames = [str(x).replace('(', "") for x in intnames]
-    intnames = [str(x).replace(')', "") for x in intnames]
+    intnames = [str(x).replace("(", "") for x in intnames]
+    intnames = [str(x).replace(")", "") for x in intnames]
     intnames = [str(x).replace(",", "*") for x in intnames]
     intnames = [str(x).replace(" ", "") for x in intnames]
     colnames = ["ME:" + x for x in analysis["names"]] + ["IE:" + str(x) for x in intnames]
@@ -84,10 +86,7 @@ def rewrite_morris_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List
         + ["mu_st_conf:" + str(x) for x in intnames]
     )
     rowvalues = (
-        list(analysis["mu"])
-        + list(analysis["mu_star"])
-        + list(analysis["sigma"])
-        + list(analysis["mu_st_conf"])
+        list(analysis["mu"]) + list(analysis["mu_star"]) + list(analysis["sigma"]) + list(analysis["mu_st_conf"])
     )
 
     analysis_out = [colnames, rowvalues]
@@ -102,9 +101,9 @@ def get_all_output_files(basedirectory: str, output_prefix: str, report_name: st
     ]
 
 
-def collate_outputs(basedirectory: str,
-                    all_report_filenames: List[str],
-                    total_num_files: int) -> Dict[str, List[float]]:
+def collate_outputs(
+    basedirectory: str, all_report_filenames: List[str], total_num_files: int
+) -> Dict[str, List[float]]:
     collected: Dict[str, List[float]] = {}
     digits = len(str(total_num_files))
 
@@ -133,18 +132,20 @@ def analyze_it(
 ) -> List[Any]:
     print_analysis = False
     if task_specified["sampler"] == "sobol":
-        analyzed = sobol_analyzer.analyze(parsed_SA_input_variables,
-                                          np.array(output_to_analyze),
-                                          print_to_console=print_analysis,
-                                          seed=task_specified["random_seed"]
-                                          )
+        analyzed = sobol_analyzer.analyze(
+            parsed_SA_input_variables,
+            np.array(output_to_analyze),
+            print_to_console=print_analysis,
+            seed=task_specified["random_seed"],
+        )
         analyzed_formatted = rewrite_sobol_analysis(analyzed, parsed_SA_input_variables)
     elif task_specified["sampler"] == "saltelli":
-        analyzed = sobol_analyzer.analyze(parsed_SA_input_variables,
-                                          np.array(output_to_analyze),
-                                          print_to_console=print_analysis,
-                                          seed=task_specified["random_seed"]
-                                          )
+        analyzed = sobol_analyzer.analyze(
+            parsed_SA_input_variables,
+            np.array(output_to_analyze),
+            print_to_console=print_analysis,
+            seed=task_specified["random_seed"],
+        )
         analyzed_formatted = rewrite_sobol_analysis(analyzed, parsed_SA_input_variables)
     elif task_specified["sampler"] == "morris":
         analyzed = morris_analyzer.analyze(
@@ -162,20 +163,19 @@ def analyze_it(
             output_to_analyze,
             second_order=True,
             seed=task_specified["random_seed"],
-            print_to_console=print_analysis
+            print_to_console=print_analysis,
         )
         analyzed_formatted = rewrite_ff_analysis(analyzed)
     return analyzed_formatted
 
 
-def get_sampled_values(task_to_analyze: Dict[str, Any],
-                       parsed_SA_input_variables: Dict[str, Any]) -> np.ndarray | Any:
+def get_sampled_values(task_to_analyze: Dict[str, Any], parsed_SA_input_variables: Dict[str, Any]) -> np.ndarray | Any:
     if task_to_analyze["sampler"] == "sobol":
         sampled_values = sobol_sampler.sample(
             parsed_SA_input_variables,
             task_to_analyze["saltelli_number"],
             skip_values=task_to_analyze["saltelli_skip"],
-            seed=task_to_analyze["random_seed"]
+            seed=task_to_analyze["random_seed"],
         )
     elif task_to_analyze["sampler"] == "saltelli_sobol":
         sampled_values = saltelli_sampler.sample(
@@ -223,16 +223,13 @@ def get_whole_output(
     for variable_name_for_analysis in list(collated_outputs.keys()):
         output_as_list = collated_outputs[variable_name_for_analysis]
         if len(output_as_list) == len(sampled_values):
-            out = analyze_it(task_to_analyze,
-                             parsed_SA_input_variables,
-                             sampled_values,
-                             output_as_list)
+            out = analyze_it(task_to_analyze, parsed_SA_input_variables, sampled_values, output_as_list)
             # outdf = pd.DataFrame(out)
             # prettier_variable_name = variable_name_for_analysis.replace("/", " per ")
             # prettier_variable_name = prettier_variable_name.replace(",", " ")
             # outdf.to_csv(path_or_buf=basedirectory + output_prefix + '_' + prettier_variable_name + '.csv')
             if not whole_output:
-                names_and_header = ['']
+                names_and_header = [""]
                 for name in out[0]:
                     names_and_header.append(name)
                 whole_output.append(names_and_header)
@@ -264,18 +261,17 @@ def get_new_whole_output(whole_output: List[Any]) -> List[Any]:
     return new_whole_output
 
 
-def plot_whole_new(output_path: str,
-                   output_prefix: str,
-                   ) -> None:
-    whole_new_output_report = pd.read_csv(
-        output_path + output_prefix + "_new whole analysis.csv",
-        index_col=0)
+def plot_whole_new(
+    output_path: str,
+    output_prefix: str,
+) -> None:
+    whole_new_output_report = pd.read_csv(output_path + output_prefix + "_new whole analysis.csv", index_col=0)
     # ,
     #     names=0, encoding='utf-8'
     # )
 
     df = pd.DataFrame(whole_new_output_report)
-    df_trimmed = df.select_dtypes(include=['float'])
+    df_trimmed = df.select_dtypes(include=["float"])
     # df_trimmed = df.drop(df.columns[99:], axis=1)
 
     plt.figure()
