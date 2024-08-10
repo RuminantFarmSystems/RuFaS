@@ -1,6 +1,6 @@
+import math
 from typing import Dict, List
 
-import math
 import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
@@ -67,6 +67,7 @@ class AnimalRequirements:
         self.Ca_requirement = 0
         # Phosphorus requirement (g)
         self.P_requirement = 0
+        self.P_requirement_process = 0
         # dry matter intake estimation (kg)
         self.DMIest_requirement = 0
         # average body weight in pen
@@ -88,6 +89,7 @@ class AnimalRequirements:
         MP_requirement_list: List[float],
         Ca_requirement_list: List[float],
         P_requirement_list: List[float],
+        P_requirement_process_list: List[float],
         DMIest_requirement_list: List[float],
         BW: List[float],
         milk: List[float],
@@ -116,7 +118,9 @@ class AnimalRequirements:
         Ca_requirement_list: List[float]
             List of Calcium requirement (g) for all animals in pen
         P_requirement_list: List[float]
-            List of Phosphorus requirement (g) for all animals in pen
+            List of Phosphorus requirement (g) for all animals in pen, as calculated using NASEM or NRC equations
+        P_requirement_process_list: List[float]
+            List of Phosphorus requirement (g) for all animals in pen, as calculated in phosphorus_rqmts
         DMIest_requirement_list: List[float]
             List of dry matter intake estimation (kg) for all animals in pen
         BW: List[float]
@@ -141,6 +145,7 @@ class AnimalRequirements:
             "MP_requirement": MP_requirement_list,
             "Ca_requirement": Ca_requirement_list,
             "P_requirement": P_requirement_list,
+            "P_requirement_process": P_requirement_process_list,
             "DMIest_requirement": DMIest_requirement_list,
             "avg_BW": BW,
             "avg_milk": milk,
@@ -158,9 +163,13 @@ class AnimalRequirements:
         stats_args = [default_percentile] if calc_method == "percentile" else []
 
         for attribute_name, arg in attr_names_to_args_map.items():
-            setattr(self, attribute_name, calc_method_to_function_map[calc_method](arg, *stats_args))
+            setattr(
+                self,
+                attribute_name,
+                calc_method_to_function_map[calc_method](arg, *stats_args),
+            )
 
-    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool):
+    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool) -> None:
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -186,6 +195,7 @@ class AnimalRequirements:
             "MP_requirement": [],
             "Ca_requirement": [],
             "P_requirement": [],
+            "P_requirement_process": [],
             "DMIest_requirement": [],
             "BW": [],
             "milk": [0],
@@ -206,6 +216,7 @@ class AnimalRequirements:
             requirements_lists["MP_requirement"],
             requirements_lists["Ca_requirement"],
             requirements_lists["P_requirement"],
+            requirements_lists["P_requirement_process"],
             requirements_lists["DMIest_requirement"],
             requirements_lists["BW"],
             requirements_lists["milk"],
@@ -223,6 +234,7 @@ class AnimalRequirements:
             "MP_requirement": self.MP_requirement,
             "Ca_requirement": self.Ca_requirement,
             "P_req": self.P_requirement,
+            "P_req_process": self.P_requirement_process,
             "DMIest_requirement": self.DMIest_requirement,
             "avg_BW": self.avg_BW,
             "avg_milk_production_reduction_pen": self.avg_milk_production_reduction,
@@ -232,7 +244,9 @@ class AnimalRequirements:
 
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
-    def recalculate_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def recalculate_requirements(
+        self, pen, animal_grouping_scenario, requirements_lists: Dict[str, List[float]]
+    ) -> Dict[str, List[float]]:
         """
         Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -245,12 +259,12 @@ class AnimalRequirements:
         animal_grouping_scenario : AnimalGroupingScenario
             the valid animal combinations inside the pen, an instance of the AnimalCombination Enum
 
-        requirements_lists : dict
+        requirements_lists : Dict[str, List[float]]
             Dictionary of requirements for each animal
 
         Returns
         -------
-        requirements_list : dict
+        requirements_list : Dict[str, List[float]]
             Dictionary of lists of animal requirements for all animals
 
         """
@@ -333,11 +347,14 @@ class AnimalRequirements:
             requirements_lists["MP_requirement"].append(req["MP_requirement"])
             requirements_lists["Ca_requirement"].append(req["Ca_requirement"])
             requirements_lists["P_requirement"].append(req["P_requirement"])
+            requirements_lists["P_requirement_process"].append(animal.p_req)
             requirements_lists["DMIest_requirement"].append(req["DMIest_requirement"])
             requirements_lists["BW"].append(animal.body_weight)
         return requirements_lists
 
-    def use_existing_requirements(self, pen, animal_grouping_scenario, requirements_lists: Dict):
+    def use_existing_requirements(
+        self, pen, animal_grouping_scenario, requirements_lists: Dict[str, List[float]]
+    ) -> Dict[str, List[float]]:
         """
         Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -351,12 +368,12 @@ class AnimalRequirements:
         animal_grouping_scenario : AnimalGroupingScenario
             the valid animal combinations inside the pen, an instance of the AnimalCombination Enum
 
-        requirements_lists : dict
+        requirements_lists : Dict[str, List[float]]
             Dictionary of requirements for each animal
 
         Returns
         -------
-        requirements_list : dict
+        requirements_list : Dict[str, List[float]]
             Dictionary of lists of animal requirements for all animals in pen
 
         """
@@ -384,6 +401,7 @@ class AnimalRequirements:
             requirements_lists["MP_requirement"].append(animal.MP_requirement)
             requirements_lists["Ca_requirement"].append(animal.Ca_requirement)
             requirements_lists["P_requirement"].append(animal.P_requirement)
+            requirements_lists["P_requirement_process"].append(animal.p_req)
             requirements_lists["DMIest_requirement"].append(animal.DMIest_requirement)
             requirements_lists["BW"].append(animal.body_weight)
         return requirements_lists
@@ -1843,8 +1861,7 @@ class AnimalRequirements:
         housing : str
             Housing type (Barn or Grazing)
         distance : float
-            NASEM: Estimated distance travels by the animal daily (km)
-            NRC: Daily walking distance (km)
+            Distance walked in meters.
 
         Returns
         -------
@@ -1853,6 +1870,9 @@ class AnimalRequirements:
 
         Notes
         -----
+        Note that both NRC and NASEM calculations use distance walked in kilometers,
+            hence the unit conversion in the code itself.
+
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
         Grazing system and hilly topography will cost additional energy.
             Grazing is not implemented yet in the current version of code.
@@ -1864,7 +1884,7 @@ class AnimalRequirements:
             National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
 
         """
-        distance_km = distance * 0.001
+        distance_km = distance * GeneralConstants.M_TO_KM
         nutrient_standard = AnimalBase.config["nutrient_standard"]
         if nutrient_standard == "NRC":
             # Activity requirements
@@ -1884,7 +1904,8 @@ class AnimalRequirements:
                 net_energy_activity = distance_km * 0.00035 * body_weight
             elif housing == "Grazing":
                 nonpasturekgDMI: float = 1.0
-                net_energy_activity = distance * body_weight * 0.75 * ((600 - 12 * nonpasturekgDMI)) / 600
+                net_energy_activity = distance_km * body_weight * 0.75 * (600 - 12 * nonpasturekgDMI) / 600
+
             else:
                 net_energy_activity = 0.0
             return net_energy_activity

@@ -9,9 +9,13 @@
 	  "herd_num": 1000,
 	  "breed": "HO"
 	},
-	"herd_initialization": {
-	  "initial_animal_num": 10000,
-	  "simulation_days": 5000
+	"housing": "barn",
+	"pasture_concentrate": 0,
+	"methane_model": "IPCC",
+	"ration": {
+		"phosphorus_requirement_buffer": 0,
+		"user_input": false,
+		"formulation_interval": 30
 	},
 	"animal_config": {
 	  "management_decisions": {

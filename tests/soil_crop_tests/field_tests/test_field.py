@@ -1680,18 +1680,35 @@ def test_execute_manure_application(
                     organic_nitrogen_fraction=pytest.approx(expected_total_organic_fraction),
                     water_extractable_inorganic_phosphorus_fraction=supplied_manure.inorganic_phosphorus_fraction,
                 )
-                field._record_manure_application.assert_called_once_with(
-                    dry_matter_mass=supplied_manure.dry_matter,
-                    dry_matter_fraction=supplied_manure.dry_matter_fraction,
-                    field_coverage=coverage,
-                    nitrogen=supplied_manure.nitrogen,
-                    phosphorus=supplied_manure.phosphorus,
-                    potassium=None,
-                    application_depth=depth,
-                    surface_remainder_fraction=remainder,
-                    year=year,
-                    day=day,
-                )
+                expected_record_manure_application_calls = [
+                    mocker.call(
+                        dry_matter_mass=supplied_manure.dry_matter,
+                        dry_matter_fraction=supplied_manure.dry_matter_fraction,
+                        field_coverage=coverage,
+                        nitrogen=supplied_manure.nitrogen,
+                        phosphorus=supplied_manure.phosphorus,
+                        potassium=None,
+                        application_depth=depth,
+                        surface_remainder_fraction=remainder,
+                        year=year,
+                        day=day,
+                        output_name="manure_application",
+                    ),
+                    mocker.call(
+                        dry_matter_mass=0.0,
+                        dry_matter_fraction=0.0,
+                        field_coverage=coverage,
+                        nitrogen=expected_request.nitrogen,
+                        phosphorus=expected_request.phosphorus,
+                        potassium=None,
+                        application_depth=depth,
+                        surface_remainder_fraction=remainder,
+                        year=year,
+                        day=day,
+                        output_name="manure_request",
+                    ),
+                ]
+                field._record_manure_application.assert_has_calls(expected_record_manure_application_calls)
 
             if fertilizer_applied and not supplement:
                 warn.assert_called_once()
@@ -1708,6 +1725,7 @@ def test_execute_manure_application(
                     "100_0_0",
                     expected_unmet_nitrogen,
                     expected_unmet_phosphorus,
+                    0,
                     depth,
                     remainder,
                     year,
@@ -1724,6 +1742,7 @@ def test_execute_manure_application(
                     "expected_optimal_mix",
                     expected_unmet_nitrogen,
                     expected_unmet_phosphorus,
+                    0,
                     depth,
                     remainder,
                     year,
@@ -1812,18 +1831,35 @@ def test_execute_manure_application_with_invalid_args(
             organic_nitrogen_fraction=expected_total_organic_fraction,
             water_extractable_inorganic_phosphorus_fraction=0.5,
         )
-        patched_recorder.assert_called_once_with(
-            dry_matter_mass=100.0,
-            dry_matter_fraction=0.66,
-            field_coverage=0.8,
-            nitrogen=50.0,
-            phosphorus=50.0,
-            potassium=None,
-            application_depth=expected_depth,
-            surface_remainder_fraction=expected_remainder,
-            year=2000,
-            day=133,
-        )
+        expected_record_manure_application_calls = [
+            mocker.call(
+                dry_matter_mass=100.0,
+                dry_matter_fraction=0.66,
+                field_coverage=0.8,
+                nitrogen=50.0,
+                output_name="manure_application",
+                phosphorus=50.0,
+                potassium=None,
+                application_depth=expected_depth,
+                surface_remainder_fraction=expected_remainder,
+                year=2000,
+                day=133,
+            ),
+            mocker.call(
+                dry_matter_mass=0.0,
+                dry_matter_fraction=0.0,
+                field_coverage=0.8,
+                nitrogen=50.0,
+                phosphorus=50.0,
+                potassium=None,
+                application_depth=expected_depth,
+                surface_remainder_fraction=expected_remainder,
+                year=2000,
+                day=133,
+                output_name="manure_request",
+            ),
+        ]
+        patched_recorder.assert_has_calls(expected_record_manure_application_calls)
         patched_optimizer.assert_not_called()
         patched_fertilizer_applicator.assert_not_called()
 
@@ -2003,16 +2039,17 @@ def test_record_manure_application(
         return_value=10.0,
     ) as clay:
         field._record_manure_application(
-            dry_mass,
-            dry_fraction,
-            coverage,
-            nitrogen,
-            phosphorus,
-            depth,
-            remainder,
-            year,
-            day,
-            potassium,
+            dry_matter_mass=dry_mass,
+            dry_matter_fraction=dry_fraction,
+            field_coverage=coverage,
+            nitrogen=nitrogen,
+            phosphorus=phosphorus,
+            application_depth=depth,
+            surface_remainder_fraction=remainder,
+            year=year,
+            day=day,
+            potassium=potassium,
+            output_name="manure_application",
         )
 
         clay.assert_called_once()
