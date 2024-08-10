@@ -1,9 +1,9 @@
 {
     "analyses": [
         {
-            "input_file": "input/data/tasks/sobol_animal_tasks_v2.json",
-            "output_path": "output/",
-            "report_name": "report_SA",
+            "input_file": "input/data/tasks/sobol_animal_tasks_v3.json",
+            "output_path": "output/reports/",
+            "report_name": "report_S30",
             "only_inputs": true,
             "plot_whole_new": false,
             "inputs_to_collate": [

@@ -1,15 +1,15 @@
 {
-    "parallel_workers": 4,
+    "parallel_workers": 5,
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "test-19-animal_S256",
+        "output_prefix": "animal_S064",
         "log_verbosity": "errors",
-        "sampler": "fractional_factorial",
-        "saltelli_number": 256,
+        "sampler": "sobol",
+        "saltelli_number": 64,
         "saltelli_skip": 2048,
         "SA_load_balancing_start": 0.0,
-        "SA_load_balancing_stop": 1,
+        "SA_load_balancing_stop": 1.0,
         "random_seed": 42,
         "SA_input_variables": [
           {

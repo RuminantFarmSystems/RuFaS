@@ -9,11 +9,11 @@ import time
 import gc
 
 logfilepath = "output/logs/"
-fileprefix = "test-10"
+fileprefix = "test-18"
 num_files = 96 + 32
 
 # read the CSV
-input_list = "output/test-10-animal_S256_inputs.csv"
+input_list = "output/test-18-animal_S256_inputs.csv"
 input_list_read = pd.read_csv(input_list)
 # add the index for each, 0-X is a columns for run
 df = pd.DataFrame(input_list_read)
@@ -238,43 +238,43 @@ num_subsets = len(subsets)
 #         else:
 #             all_combination_counts[combination] = count
 
-start = time.time()
-for subset_number in range(num_subsets):
-    if subset_number % 100000 == 0:
-        print(subset_number)
-    combination_count = combo_counting(subsets[subset_number], lists)
-    for combination, count in combination_count.items():
-        if combination in all_combination_counts:
-            all_combination_counts[combination] += count
-        else:
-            all_combination_counts[combination] = count
-stop = time.time()
-print(f'counted combinations in {(stop - start)/60} minutes.')
+# start = time.time()
+# for subset_number in range(num_subsets):
+#     if subset_number % 100000 == 0:
+#         print(subset_number)
+#     combination_count = combo_counting(subsets[subset_number], lists)
+#     for combination, count in combination_count.items():
+#         if combination in all_combination_counts:
+#             all_combination_counts[combination] += count
+#         else:
+#             all_combination_counts[combination] = count
+# stop = time.time()
+# print(f'counted combinations in {(stop - start)/60} minutes.')
 
 
-start = time.time()
-repeated = {}
-# Find and print repeated combinations
-repeated_combinations = {k: v for k, v in all_combination_counts.items() if v > 25}
-if repeated_combinations:
-    # print("Repeated combinations and their counts:")
-    for combination, count in repeated_combinations.items():
-        # print(f"{combination}: {count} times")
-        repeated[combination] = count
-else:
-    # print("No repeated combinations found.")
-    pass
-stop = time.time()
-print(f'counted repeats in {stop - start} seconds.')
+# start = time.time()
+# repeated = {}
+# # Find and print repeated combinations
+# repeated_combinations = {k: v for k, v in all_combination_counts.items() if v > 25}
+# if repeated_combinations:
+#     # print("Repeated combinations and their counts:")
+#     for combination, count in repeated_combinations.items():
+#         # print(f"{combination}: {count} times")
+#         repeated[combination] = count
+# else:
+#     # print("No repeated combinations found.")
+#     pass
+# stop = time.time()
+# print(f'counted repeats in {stop - start} seconds.')
 
-try:
-    with open('repeated.json', 'w', encoding='utf-8') as f:
-        json.dump(repeated, f, ensure_ascii=False, indent=4)
-except:
-    pass
+# try:
+#     with open('repeated.json', 'w', encoding='utf-8') as f:
+#         json.dump(repeated, f, ensure_ascii=False, indent=4)
+# except:
+#     pass
 
-dfrepeated = pd.DataFrame.from_dict(repeated, orient="index")
-dfrepeated.to_csv("repeated.csv")
+# dfrepeated = pd.DataFrame.from_dict(repeated, orient="index")
+# dfrepeated.to_csv("repeated.csv")
 
 # for each run in the CSV, get the log file, and then append relevant info
 # e.g. total runtime
