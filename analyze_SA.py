@@ -2,6 +2,7 @@
 import csv
 import json
 import pandas as pd
+
 # import numpy as np
 from typing import Dict, Any
 from model_evaluation.sensitivity_analysis import SA_helpers
@@ -11,7 +12,7 @@ config_json_filename = "model_evaluation/sensitivity_analysis/SA_analyze.json"
 with open(config_json_filename) as json_file:
     config_json = json.load(json_file)
 
-for analysis in config_json['analyses']: # noqa
+for analysis in config_json["analyses"]:  # noqa
     print(analysis)
     input_file = analysis["input_file"]
     output_path = analysis["output_path"]
@@ -27,13 +28,12 @@ for analysis in config_json['analyses']: # noqa
     with open(input_file) as json_file:
         input_config = json.load(json_file)
 
-    task_to_analyze: Dict[str, Any] = input_config['tasks'][0]
-    output_prefix = task_to_analyze['output_prefix']
+    task_to_analyze: Dict[str, Any] = input_config["tasks"][0]
+    output_prefix = task_to_analyze["output_prefix"]
     sampler = task_to_analyze["sampler"]
 
     parsed_SA_input_variables = SA_helpers.parse_input_variables(task_to_analyze)
-    sampled_values = SA_helpers.get_sampled_values(task_to_analyze,
-                                                   parsed_SA_input_variables)
+    sampled_values = SA_helpers.get_sampled_values(task_to_analyze, parsed_SA_input_variables)
     total_num_files = len(sampled_values)
     if only_inputs:
         print("true")
@@ -46,21 +46,16 @@ for analysis in config_json['analyses']: # noqa
         break
     print("didn't break")
     all_report_filenames = SA_helpers.get_all_output_files(
-        basedirectory=output_path,
-        output_prefix=output_prefix,
-        report_name=report_name
+        basedirectory=output_path, output_prefix=output_prefix, report_name=report_name
     )
 
     collated_outputs = SA_helpers.collate_outputs(
-        basedirectory=output_path,
-        all_report_filenames=all_report_filenames,
-        total_num_files=total_num_files
+        basedirectory=output_path, all_report_filenames=all_report_filenames, total_num_files=total_num_files
     )
 
-    whole_output = SA_helpers.get_whole_output(collated_outputs,
-                                               sampled_values,
-                                               task_to_analyze,
-                                               parsed_SA_input_variables)
+    whole_output = SA_helpers.get_whole_output(
+        collated_outputs, sampled_values, task_to_analyze, parsed_SA_input_variables
+    )
     with open(output_path + output_prefix + "_whole analysis.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(whole_output)
@@ -95,16 +90,16 @@ for analysis in config_json['analyses']: # noqa
             total_effect = IEsums + main_effects
             threethings = pd.concat([main_effects, IEsums, total_effect], axis=1)
             threethings.rename({0: "interaction_effects", 1: "total_effects"}, axis=1, inplace=True)
-        elif (sampler == "sobol" or sampler == "saltelli_sobol"):
+        elif sampler == "sobol" or sampler == "saltelli_sobol":
             # get the input column main effect: starts with S1:
             main_effects = new_whole_output_pd["S1:" + input]
             total_effect = new_whole_output_pd["ST:" + input]
             interaction_effects = total_effect - main_effects
             threethings = pd.concat([main_effects, interaction_effects, total_effect], axis=1)
-            threethings.rename({0: "interaction_effects",
-                               threethings.columns[-1]: "total_effects"},
-                               axis=1, inplace=True)
-        elif (sampler == "morris"):
+            threethings.rename(
+                {0: "interaction_effects", threethings.columns[-1]: "total_effects"}, axis=1, inplace=True
+            )
+        elif sampler == "morris":
             mu = new_whole_output_pd["mu:" + input]
             total_effects = new_whole_output_pd["mu_star:" + input]
             sigma = new_whole_output_pd["sigma:" + input]
@@ -138,12 +133,17 @@ for analysis in config_json['analyses']: # noqa
         newcols_pd = pd.DataFrame(newcols)
         newcols_pd.index = new_whole_output_pd.index
 
-        minmax = pd.DataFrame([(name['lower_bound'], name['upper_bound'])
-                               for name in task_to_analyze['SA_input_variables']
-                               if name['variable_name'] == input_reformatted2])
+        minmax = pd.DataFrame(
+            [
+                (name["lower_bound"], name["upper_bound"])
+                for name in task_to_analyze["SA_input_variables"]
+                if name["variable_name"] == input_reformatted2
+            ]
+        )
         output_pd = pd.concat([threethings, newcols_pd], axis=1)
-        output_pd.rename({output_pd.columns[0]: output_pd.columns[0] + str(minmax.iloc[0].values)},
-                         axis=1, inplace=True)
+        output_pd.rename(
+            {output_pd.columns[0]: output_pd.columns[0] + str(minmax.iloc[0].values)}, axis=1, inplace=True
+        )
         output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
         output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
         filenameout = output_path + output_prefix + "_inputs_META_" + input + "_summarytable.csv"
@@ -188,9 +188,8 @@ for analysis in config_json['analyses']: # noqa
         toteffs.rename({0: "total_effects"}, axis=1, inplace=True)
 
         # get ranges
-        variable_names = [name['variable_name'] for name in task_to_analyze['SA_input_variables']]
-        bounds = [(name['lower_bound'], name['upper_bound'])
-                  for name in task_to_analyze['SA_input_variables']]
+        variable_names = [name["variable_name"] for name in task_to_analyze["SA_input_variables"]]
+        bounds = [(name["lower_bound"], name["upper_bound"]) for name in task_to_analyze["SA_input_variables"]]
 
         output_temp = pd.concat([temp_output, inteffs, toteffs], axis=1)
 
@@ -198,8 +197,9 @@ for analysis in config_json['analyses']: # noqa
         bounds2 = []
         newcols = []
         for input_name in input_names:
-            input_reformatted = input_name.replace(" ", ".").replace("ME:", "").replace("S1:", "").replace("mu_star:",
-                                                                                                           "")
+            input_reformatted = (
+                input_name.replace(" ", ".").replace("ME:", "").replace("S1:", "").replace("mu_star:", "")
+            )
             if input_reformatted in variable_names:
                 idx = variable_names.index(input_reformatted)
                 bounds2.append(bounds[idx])
@@ -209,23 +209,23 @@ for analysis in config_json['analyses']: # noqa
             # get the list of outputs (Y)
             output_values = collated_outputs[output]
             slope, r2_value, p_value = SA_helpers.regression_stuff(
-                X=input_values, xname=input, Y=output_values, yname=output, plot_inputs=plot_inputs)
+                X=input_values, xname=input, Y=output_values, yname=output, plot_inputs=plot_inputs
+            )
             newcols.append([slope, r2_value, p_value])
         newcols_pd = pd.DataFrame(newcols)
         bounds2_pd = pd.DataFrame(bounds2)
         bounds2_pd.rename({0: "input_min", 1: "input_max"}, axis=1, inplace=True)
-        bounds2_pd.index = output_temp.index[0:len(bounds2)]  # TODO
+        bounds2_pd.index = output_temp.index[0 : len(bounds2)]  # TODO
         # the previous line might need to be reverted to remove the info in hard brackets
         newcols_pd.index = output_temp.index
         output_pd = pd.concat([bounds2_pd, output_temp, newcols_pd], axis=1)
         output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
         output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
-        output_reformatted = output.replace('/', ' per ')
+        output_reformatted = output.replace("/", " per ")
         filenameout = output_path + output_prefix + "_outputs_META_" + output_reformatted + "_summarytable.csv"
         output_pd.to_csv(filenameout)
 
     if plot_whole_new:
-        SA_helpers.plot_whole_new(output_path=output_path,
-                                  output_prefix=output_prefix)
+        SA_helpers.plot_whole_new(output_path=output_path, output_prefix=output_prefix)
 
-print('did all the stuff!')
+print("did all the stuff!")

@@ -263,7 +263,7 @@ class TaskManager:
                 parsed_SA_input_variables,
                 multi_run_args["saltelli_number"],
                 skip_values=multi_run_args["saltelli_skip"],
-                seed=multi_run_args["random_seed"]
+                seed=multi_run_args["random_seed"],
             )
         else:
             self.output_manager.add_log(

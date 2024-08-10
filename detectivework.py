@@ -22,7 +22,8 @@ num_rows = len(df.index)
 df.insert(0, "Simulation_number", list(range(1, num_rows + 1)), True)
 print(df)
 
-def load_json(json_filename: str) -> Any: # noqa
+
+def load_json(json_filename: str) -> Any:  # noqa
     with open(json_filename) as json_file:
         json_loaded = json.load(json_file)
     return json_loaded
@@ -31,8 +32,9 @@ def load_json(json_filename: str) -> Any: # noqa
 # Get the list of files
 logfiles = [filename for filename in os.listdir(logfilepath) if filename.startswith(fileprefix) and "logs" in filename]
 
-errorfiles = [filename for filename
-              in os.listdir(logfilepath) if filename.startswith(fileprefix) and "errors" in filename]
+errorfiles = [
+    filename for filename in os.listdir(logfilepath) if filename.startswith(fileprefix) and "errors" in filename
+]
 
 total_time_float_list: List[float | str] = []
 initornotlist: List[str | bool] = []
@@ -42,7 +44,7 @@ for row_num in range(num_rows):
     print(row_num)
     # INSIDE THE LOOP
     try:
-        logfilefound = [file for file in logfiles if 'run ' + f'{row_num + 1}'.zfill(digits) in file][-1]
+        logfilefound = [file for file in logfiles if "run " + f"{row_num + 1}".zfill(digits) in file][-1]
         logfile = load_json(logfilepath + logfilefound)
     except Exception as ex:
         print(ex)
@@ -53,13 +55,13 @@ for row_num in range(num_rows):
     # list(logfile.keys())
     try:
         total_time_string = logfile["SimulationEngine.simulate.total_simulation_time"]["values"][0]
-        total_time_float = float(total_time_string[total_time_string.rfind(":") + 1:])
+        total_time_float = float(total_time_string[total_time_string.rfind(":") + 1 :])
         total_time_float_list.append(total_time_float)
     except Exception as ex:
         print(ex)
         total_time_float_list.append(999999999999999999999999)
 
-    errorfilefound = [file for file in errorfiles if 'run ' + f'{row_num + 1}'.zfill(digits) in file][-1]
+    errorfilefound = [file for file in errorfiles if "run " + f"{row_num + 1}".zfill(digits) in file][-1]
     errorfile = load_json(logfilepath + errorfilefound)
     list(errorfile.keys())
     initornot = "TaskManager.task.Failed to finish the task" in list(errorfile.keys())
@@ -76,8 +78,8 @@ normal_simulations = df.loc[df["Simulation time"] <= 600]
 failed_simulations = df.loc[df["Failed simulation"] == True]
 passed_simulations = df.loc[df["Failed simulation"] == False]
 
-otherlist = ['Simulation_number', 'Simulation time', 'Failed simulation']
-input_variable_list = [colname for colname in list(df.columns) if 'dummy' not in colname and colname not in otherlist]
+otherlist = ["Simulation_number", "Simulation time", "Failed simulation"]
+input_variable_list = [colname for colname in list(df.columns) if "dummy" not in colname and colname not in otherlist]
 
 passfail_list = []
 timing_list = []
@@ -108,7 +110,7 @@ for input_variable in input_variable_list:
     if len(set(failed_inputs)) == 1:
         almost_uniquely_failed_list.append(failed_inputs[0])
     else:
-        almost_uniquely_failed_list.append('')
+        almost_uniquely_failed_list.append("")
     uniquely_failed = [input for input in failed_inputs if input not in passed_inputs]
     # print(uniquely_failed)
     uniquely_failed_list.append(uniquely_failed)
@@ -119,7 +121,7 @@ for input_variable in input_variable_list:
     if len(set(long_inputs)) == 1:
         almost_uniquely_long_list.append(long_inputs[0])
     else:
-        almost_uniquely_long_list.append('')
+        almost_uniquely_long_list.append("")
     long_mean = f'{float(f"{statistics.mean(long_inputs):.3g}"):g}'
     normal_mean = f'{float(f"{statistics.mean(normal_inputs):.3g}"):g}'
 
@@ -130,15 +132,19 @@ for input_variable in input_variable_list:
     uniquely_long = [input for input in long_inputs if input not in normal_inputs]
     uniquely_long_list.append(uniquely_long)
 
-meta = pd.DataFrame({"input_variable_list" : input_variable_list,
-                     "pass_mean_list": pass_mean_list,
-                     "fail_mean_list": fail_mean_list,
-                     "normal_mean_list": normal_mean_list,
-                     "long_mean_list": long_mean_list,
-                     "almost_uniquely_failed_list": almost_uniquely_failed_list,
-                     "almost_uniquely_long_list": almost_uniquely_long_list,
-                     "uniquely_failed_list": uniquely_failed_list,
-                     "uniquely_long_list": uniquely_long_list})
+meta = pd.DataFrame(
+    {
+        "input_variable_list": input_variable_list,
+        "pass_mean_list": pass_mean_list,
+        "fail_mean_list": fail_mean_list,
+        "normal_mean_list": normal_mean_list,
+        "long_mean_list": long_mean_list,
+        "almost_uniquely_failed_list": almost_uniquely_failed_list,
+        "almost_uniquely_long_list": almost_uniquely_long_list,
+        "uniquely_failed_list": uniquely_failed_list,
+        "uniquely_long_list": uniquely_long_list,
+    }
+)
 meta.to_csv(f"{fileprefix}_input_meta.csv")
 
 # Example lists
@@ -190,7 +196,7 @@ start = time.time()
 # Get all subsets of the lists
 subsets = all_subsets(lists)
 stop = time.time()
-print(f'time to get subsets is {stop - start} seconds')
+print(f"time to get subsets is {stop - start} seconds")
 
 
 def original_combo_counting(subsets, lists):
@@ -225,7 +231,7 @@ def combo_counting(subset, lists):
 # Dictionary to count all combinations
 all_combination_counts = {}
 
-print(f'Number of subsets = {len(subsets)}')
+print(f"Number of subsets = {len(subsets)}")
 print(subsets[100])
 num_subsets = len(subsets)
 
@@ -288,6 +294,6 @@ num_subsets = len(subsets)
 
 # THEN in the CSV file: for those with errors, and ALSO for those with long runtimes (over 10 minutes)
 # determine which parameters had in common?
-    # Which are the same among all
-    # Which are the same for those, and NOT for the rest
-    # Which are the
+# Which are the same among all
+# Which are the same for those, and NOT for the rest
+# Which are the
