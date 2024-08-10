@@ -553,7 +553,7 @@ class AnimalManager:
         if num_stalls < 0 or max_stocking_density < 0:
             raise ValueError("The number of stalls and maximum stocking density must be greater than or equal to 0.")
 
-        return int(num_stalls * max_stocking_density)
+        return max(int(num_stalls * max_stocking_density), 1)
 
     @classmethod
     def _calc_animal_space_shortage(cls, num_animals: int, pens: List[Pen]) -> int:
