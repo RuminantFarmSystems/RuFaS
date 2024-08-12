@@ -395,9 +395,10 @@ class TaskManager:
                 return
 
         except Exception as e:
+            output_prefix = args["output_prefix"]
             info_map.update(args)
             output_manager.add_error(
-                f"Failed to finish task: {task_id} with output prefix: {args["output_prefix"]}",
+                f"Failed to finish task: {task_id} with output prefix: {output_prefix}",
                 f"Failed to recover from error: {e}; traceback: {traceback.format_exc()}",
                 info_map,
             )
