@@ -24,38 +24,8 @@ class MachineManurePool(ManurePool):
 
         """
         decomposed_machine_manure_mass_change, decomposed_machine_manure_coverage_change = (
-            super()._determine_decomposed_surface_manure(temperature_factor))
+            super().determine_decomposed_surface_manure(temperature_factor))
         return {
             "decomposed_machine_manure_mass_change": decomposed_machine_manure_mass_change,
             "decomposed_machine_manure_coverage_change": decomposed_machine_manure_coverage_change
-        }
-
-    def determine_assimilated_machine_surface_manure(self,
-                                                     temperature_factor: float,
-                                                     field_size: float) -> Dict:
-        """
-        Determines how much machine manure is assimilated into the soil profile and how much the manure coverage is
-        reduced by on the current day.
-
-        Parameters
-        ----------
-        temperature_factor : float
-            The temperature factor on the current day (unitless).
-        field_size : float
-            The area of the field (ha).
-
-        Returns
-        -------
-        Dict (keys listed below)
-            assimilated_machine_manure: amount of machine-applied manure that is assimilated on a given day (kg).
-            machine_manure_coverage: amount of decrease in the fraction of field covered by machine-applied manure on a
-                given day (unitless).
-
-        """
-        assimilated_machine_manure, machine_manure_coverage = \
-            super()._determine_assimilated_surface_manure(temperature_factor, field_size)
-
-        return {
-            "assimilated_machine_manure": assimilated_machine_manure,
-            "machine_manure_coverage": machine_manure_coverage
         }

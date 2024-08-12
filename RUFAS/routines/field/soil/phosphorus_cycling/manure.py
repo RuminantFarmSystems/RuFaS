@@ -76,16 +76,15 @@ class Manure:
         temperature_factor = self._determine_temperature_factor(mean_air_temperature)
 
         if rainfall < 1 or rainfall > 4:
-            self._adjust_manure_moisture_factor(rainfall, temperature_factor)
+            self.data.grazing_manure.adjust_manure_moisture_factor(rainfall, temperature_factor)
+            self.data.machine_manure.adjust_manure_moisture_factor(rainfall, temperature_factor)
 
         # TODO
         # Calculate manure decomposition on soil surface
-        machine_decomposition_changes = self.data.machine_manure.determine_decomposed_surface_machine_manure(
-            temperature_factor)
-        decomposed_machine_mass = machine_decomposition_changes["decomposed_machine_manure_mass_change"]
-        decomposed_machine_coverage = machine_decomposition_changes["decomposed_machine_manure_coverage_change"]
-        decomposed_grazing_mass = decomposition_changes["decomposed_grazing_manure_mass_change"]
-        decomposed_grazing_coverage = decomposition_changes["decomposed_grazing_manure_coverage_change"]
+        decomposed_machine_mass, decomposed_machine_coverage = \
+            self.data.machine_manure.determine_decomposed_surface_manure(temperature_factor)
+        decomposed_grazing_mass, decomposed_grazing_coverage = \
+            self.data.grazing_manure.determine_decomposed_surface_manure(temperature_factor)
 
         # Calculate phosphorus mineralization between pools
         mineralized_machine_stable_organic = self._determine_mineralized_surface_phosphorus(
@@ -128,12 +127,10 @@ class Manure:
 
         # TODO
         # Calculate manure assimilation from soil surface into profile
-        assimilated_machine_manure_changes = self.data.machine_manure.determine_assimilated_machine_surface_manure(
-            temperature_factor, field_size)
-        assimilated_machine_mass = assimilated_machine_manure_changes["assimilated_machine_manure"]
-        assimilated_machine_coverage = assimilated_machine_manure_changes["machine_manure_coverage"]
-        assimilated_grazing_mass = assimilated_manure_changes["assimilated_grazing_manure"]
-        assimilated_grazing_coverage = assimilated_manure_changes["grazing_manure_coverage"]
+        assimilated_machine_mass, assimilated_machine_coverage = (
+            self.data.machine_manure.determine_assimilated_surface_manure(temperature_factor, field_size))
+        assimilated_grazing_mass, assimilated_grazing_coverage = (
+            self.data.grazing_manure.determine_assimilated_surface_manure(temperature_factor, field_size))
 
         # Calculate amounts of phosphorus assimilated into the soil
         if self.data.machine_manure.manure_dry_mass > 0:
@@ -374,6 +371,7 @@ class Manure:
         deeper.
 
         """
+        # kept
         self.data.soil_layers[0].add_to_labile_phosphorus(0.8 * infiltrated_phosphorus_amount, field_size)
         self.data.soil_layers[1].add_to_labile_phosphorus(0.2 * infiltrated_phosphorus_amount, field_size)
 
@@ -629,8 +627,8 @@ class Manure:
         runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
 
         phosphorus_lost_to_runoff_in_kg = (
-            runoff_dissolved_phosphorus_concentration * runoff_in_liters
-        ) * MILLIGRAMS_TO_KILOGRAMS
+                                              runoff_dissolved_phosphorus_concentration * runoff_in_liters
+                                          ) * MILLIGRAMS_TO_KILOGRAMS
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 
@@ -724,8 +722,8 @@ class Manure:
 
         """
         calculated_temperature_factor = (
-            (2 * (32**2) * (mean_air_temperature**2)) - (mean_air_temperature**4)
-        ) / (32**4)
+                                            (2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)
+                                        ) / (32 ** 4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -748,7 +746,7 @@ class Manure:
         SurPhos [1], pseudocode_soil [S.5.D.III.4]
 
         """
-        return 0.003 * (temperature_factor**0.5)
+        return 0.003 * (temperature_factor ** 0.5)
 
     @staticmethod
     def _determine_dry_manure_matter_assimilation(
@@ -784,7 +782,7 @@ class Manure:
         """
         if is_dung:
             exponential_term = exp(3.5 * sqrt(moisture_factor))
-            temperature_term = temperature_factor**0.1
+            temperature_term = temperature_factor ** 0.1
         else:
             exponential_term = exp(2.5 * moisture_factor)
             temperature_term = temperature_factor
