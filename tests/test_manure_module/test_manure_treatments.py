@@ -2333,7 +2333,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     assert actual_anaerobic_digestion_daily_output.minimum_digester_volume == approx(expected_minimum_digester_volume)
     assert actual_anaerobic_digestion_daily_output.top_cover_volume == approx(expected_top_cover_volume)
     assert actual_anaerobic_digestion_daily_output.methane_generation_volume == approx(expected_captured_methane_volume)
-    assert actual_anaerobic_digestion_daily_output.methane_leakage_mass == approx(expected_methane_leakage)
+    assert actual_anaerobic_digestion_daily_output.storage_methane == approx(expected_methane_leakage)
     assert actual_anaerobic_digestion_daily_output.liquid_manure_total_volatile_solids == approx(expected_total_VS)
     assert actual_anaerobic_digestion_daily_output.liquid_manure_total_degradable_volatile_solids == approx(
         expected_VSd
