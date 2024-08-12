@@ -20,7 +20,7 @@ RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2 ** 32 - 1
 
 
 class TaskType(Enum):
@@ -302,14 +302,19 @@ class TaskManager:
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
-        for _ in results:
-            if _ is not None:
-                failed.append(_)
+        for result in results:
+            if result is not None:
+                failed.append(result)
 
         if len(failed) > 0:
-            info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": TaskManager._run_tasks.__name__
+            }
             om = OutputManager()
-            om.add_log("Not all tasks are successful", f"There are tasks failed, the tasks are:{failed}", info_map)
+            om.add_error(
+                 "Task(s) failed", f"Failed tasks are: {failed}", info_map
+            )
 
     @staticmethod
     def call_handler(
@@ -398,7 +403,7 @@ class TaskManager:
         except Exception as e:
             info_map.update(args)
             output_manager.add_error(
-                "Failed to finish the task, continuing to the next task",
+                f"Failed to finish task: {task_id}",
                 f"Failed to recover from error: {e}; traceback: {traceback.format_exc()}",
                 info_map,
             )
@@ -575,12 +580,10 @@ class TaskManager:
         produce_grahics: bool,
     ) -> None:
         """Handler for all methods related to herd initialization."""
-        try:
-            args["init_herd"] = True
-            TaskManager.handle_herd_initializaition(args, output_manager)
-            TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
-        except Exception:
-            pass
+        args["init_herd"] = True
+        TaskManager.handle_herd_initializaition(args, output_manager)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+
 
     @staticmethod
     def _handle_simulation_engine_run_tasks(
