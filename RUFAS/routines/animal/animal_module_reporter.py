@@ -271,6 +271,7 @@ class AnimalModuleReporter:
                 "MP_requirement": MeasurementUnits.GRAMS,
                 "Ca_requirement": MeasurementUnits.GRAMS,
                 "P_req": MeasurementUnits.GRAMS,
+                "P_req_process": MeasurementUnits.GRAMS,
                 "DMIest_requirement": MeasurementUnits.KILOGRAMS,
                 "avg_BW": MeasurementUnits.KILOGRAMS,
                 "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
