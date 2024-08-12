@@ -1,6 +1,7 @@
 from typing import Any, Union, Dict
 from math import exp, sqrt
 
+from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.crop_and_soil_constants import (
     MILLIMETERS_TO_CENTIMETERS,
@@ -81,6 +82,81 @@ class ManurePool:
             and self.inorganic_phosphorus_runoff == other.inorganic_phosphorus_runoff
         )
 
+    def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
+        """
+        This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
+        that leached phosphorus is distributed, and updates the phosphorus pools based on those values.
+
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm).
+        runoff : float
+            The amount of runoff from rainfall on the current day (mm).
+        field_size : float
+            The size of the field (ha).
+
+        """
+        if self.manure_dry_mass > 0 and self.manure_field_coverage > 0:
+            machine_organic_results = Manure._determine_phosphorus_leached_from_surface(
+                rainfall,
+                runoff,
+                field_size,
+                self.manure_dry_mass,
+                self.manure_field_coverage,
+                self.water_extractable_organic_phosphorus,
+                True,
+            )
+            self.water_extractable_organic_phosphorus = machine_organic_results[
+                "new_phosphorus_pool_amount"
+            ]
+            self.organic_phosphorus_runoff = machine_organic_results["runoff_phosphorus"]
+            self.data.annual_runoff_machine_manure_organic_phosphorus += machine_organic_results["runoff_phosphorus"]
+            self._add_infiltrated_phosphorus_to_soil(machine_organic_results["infiltrated_phosphorus"], field_size)
+
+            machine_inorganic_results = self._determine_phosphorus_leached_from_surface(
+                rainfall,
+                runoff,
+                field_size,
+                self.data.machine_manure.manure_dry_mass,
+                self.data.machine_manure.manure_field_coverage,
+                self.data.machine_manure.water_extractable_inorganic_phosphorus,
+                False,
+            )
+            self.data.machine_manure.water_extractable_inorganic_phosphorus = machine_inorganic_results[
+                "new_phosphorus_pool_amount"
+            ]
+            self.data.machine_manure.inorganic_phosphorus_runoff = machine_inorganic_results["runoff_phosphorus"]
+            self.data.annual_runoff_machine_manure_inorganic_phosphorus += machine_inorganic_results[
+                "runoff_phosphorus"
+            ]
+            self._add_infiltrated_phosphorus_to_soil(machine_inorganic_results["infiltrated_phosphorus"], field_size)
+
+    def adjust_manure_moisture_factor(self, rainfall: float, temperature_factor: float) -> None:
+        """
+        Adjusts the moisture factor of manure on the soil surface based on the current day's precipitation level.
+
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm).
+        temperature_factor : float
+            The temperature factor on the current day (unitless).
+
+        """
+        if self.manure_dry_mass > 0 and self.manure_field_coverage > 0:
+            change_in_machine_manure_moisture = self._determine_moisture_change(
+                rainfall,
+                self.manure_moisture_factor,
+                self.manure_dry_mass,
+                self.manure_applied_mass,
+                temperature_factor,
+            )
+            self.manure_moisture_factor += change_in_machine_manure_moisture
+            self.manure_moisture_factor = min(
+                0.9, max(self.manure_moisture_factor, 0.0)
+            )
+
     def determine_decomposed_surface_manure(self, temperature_factor: float) -> tuple[float, float]:
         """
         This method calculates how much manure in both the machine and grazer-applied pools decompose on a given day,
@@ -119,9 +195,9 @@ class ManurePool:
 
         return decomposed_manure_mass_change, decomposed_manure_coverage_change
 
-    def _determine_assimilated_surface_manure(self,
-                                              temperature_factor: float,
-                                              field_size: float) -> tuple[float, float]:
+    def determine_assimilated_surface_manure(self,
+                                             temperature_factor: float,
+                                             field_size: float) -> tuple[float, float]:
         """
         Determines how much manure is assimilated into the soil profile and how much the manure coverage is reduced
         by on the current day.
