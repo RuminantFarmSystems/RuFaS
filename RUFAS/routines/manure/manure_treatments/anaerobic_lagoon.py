@@ -116,9 +116,13 @@ class AnaerobicLagoon(BaseManureTreatment):
             self._accumulated_output
         )
 
-        if self.config.manure_cover == "cover and flare":
-            daily_output.storage_methane_avoided = methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100
-            methane_loss = methane_loss * (1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100)
+        if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
+            daily_output.storage_methane_avoided = (
+                methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+            )
+            methane_loss = methane_loss * (
+                1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+            )
             daily_output.storage_methane = methane_loss
 
         methane_emission_from_non_degradable_volatile_solids = (
@@ -307,8 +311,8 @@ class AnaerobicLagoon(BaseManureTreatment):
         a = 3 * self.lagoon_depth
         if math.isclose(a, 0.0, abs_tol=1e-9):
             raise ValueError("Coefficient for the squared term (a) cannot be 0.")
-        b = -4 * self.lagoon_slope * self.lagoon_depth ** 2
-        c = 4 * (self.lagoon_slope ** 2) * (self.lagoon_depth ** 3) / 3 - self.volume_needed
+        b = -4 * self.lagoon_slope * self.lagoon_depth**2
+        c = 4 * (self.lagoon_slope**2) * (self.lagoon_depth**3) / 3 - self.volume_needed
         return a, b, c
 
     @property
@@ -331,13 +335,13 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         a, b, c = self._calc_lagoon_width_coefficients()
-        discriminant = b ** 2 - 4 * a * c
+        discriminant = b**2 - 4 * a * c
 
         if discriminant < 0:
             return 0.0
 
-        root1 = (-b + discriminant ** 0.5) / (2 * a)
-        root2 = (-b - discriminant ** 0.5) / (2 * a)
+        root1 = (-b + discriminant**0.5) / (2 * a)
+        root2 = (-b - discriminant**0.5) / (2 * a)
 
         if root1 < 0 and root2 < 0:
             return 0.0
@@ -397,9 +401,8 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         base_volume = self.lagoon_length * self.lagoon_width * self.lagoon_depth
-        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth ** 2)) * (
-            self.lagoon_length + self.lagoon_width)
-        slope_correction_corners = 4 * self.lagoon_slope * (self.lagoon_depth ** 3) / 3
+        slope_correction_sides = (self.lagoon_slope * (self.lagoon_depth**2)) * (self.lagoon_length + self.lagoon_width)
+        slope_correction_corners = 4 * self.lagoon_slope * (self.lagoon_depth**3) / 3
 
         return base_volume - slope_correction_sides + slope_correction_corners
 
