@@ -312,9 +312,7 @@ class TaskManager:
                 "function": TaskManager._run_tasks.__name__
             }
             om = OutputManager()
-            om.add_error(
-                 "Task(s) failed", f"Failed tasks are: {failed}", info_map
-            )
+            om.add_error("Task(s) failed", f"Failed tasks are: {failed}", info_map)
 
     @staticmethod
     def call_handler(
@@ -583,7 +581,6 @@ class TaskManager:
         args["init_herd"] = True
         TaskManager.handle_herd_initializaition(args, output_manager)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
-
 
     @staticmethod
     def _handle_simulation_engine_run_tasks(
