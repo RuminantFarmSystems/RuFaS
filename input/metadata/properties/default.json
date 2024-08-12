@@ -4590,7 +4590,7 @@
         "manure_cover": {
           "type": "string",
           "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|crust|no cover|N/A)",
+          "pattern": "(cover|crust|no cover|N/A|cover and flare)",
           "default": "no cover"
         },
         "hydraulic_retention_time": {
