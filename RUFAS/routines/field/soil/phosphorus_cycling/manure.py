@@ -78,10 +78,12 @@ class Manure:
         if rainfall < 1 or rainfall > 4:
             self._adjust_manure_moisture_factor(rainfall, temperature_factor)
 
+        # TODO
         # Calculate manure decomposition on soil surface
-        decomposition_changes = self._determine_decomposed_surface_manure(temperature_factor)
-        decomposed_machine_mass = decomposition_changes["decomposed_machine_manure_mass_change"]
-        decomposed_machine_coverage = decomposition_changes["decomposed_machine_manure_coverage_change"]
+        machine_decomposition_changes = self.data.machine_manure.determine_decomposed_surface_machine_manure(
+            temperature_factor)
+        decomposed_machine_mass = machine_decomposition_changes["decomposed_machine_manure_mass_change"]
+        decomposed_machine_coverage = machine_decomposition_changes["decomposed_machine_manure_coverage_change"]
         decomposed_grazing_mass = decomposition_changes["decomposed_grazing_manure_mass_change"]
         decomposed_grazing_coverage = decomposition_changes["decomposed_grazing_manure_coverage_change"]
 
@@ -124,10 +126,12 @@ class Manure:
             self.data.grazing_manure.manure_moisture_factor,
         )
 
+        # TODO
         # Calculate manure assimilation from soil surface into profile
-        assimilated_manure_changes = self._determine_assimilated_surface_manure(temperature_factor, field_size)
-        assimilated_machine_mass = assimilated_manure_changes["assimilated_machine_manure"]
-        assimilated_machine_coverage = assimilated_manure_changes["machine_manure_coverage"]
+        assimilated_machine_manure_changes = self.data.machine_manure.determine_assimilated_machine_surface_manure(
+            temperature_factor, field_size)
+        assimilated_machine_mass = assimilated_machine_manure_changes["assimilated_machine_manure"]
+        assimilated_machine_coverage = assimilated_machine_manure_changes["machine_manure_coverage"]
         assimilated_grazing_mass = assimilated_manure_changes["assimilated_grazing_manure"]
         assimilated_grazing_coverage = assimilated_manure_changes["grazing_manure_coverage"]
 
