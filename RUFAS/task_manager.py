@@ -20,7 +20,7 @@ RUFAS_VERSION = "0.8"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
-NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+NUMPY_RANDOM_SEED_UPPER_BOUND = 2 ** 32 - 1
 
 
 class TaskType(Enum):
@@ -301,8 +301,20 @@ class TaskManager:
             self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
         )
         results = self.pool.imap(task_with_args, single_run_args)
-        for _ in results:
-            pass
+        failed = []
+        for result in results:
+            if result is not None:
+                failed.append(result)
+
+        if len(failed) > 0:
+            info_map = {
+                "class": TaskManager.__name__,
+                "function": TaskManager._run_tasks.__name__
+            }
+            om = OutputManager()
+            om.add_error(
+                 "Task(s) failed", f"Failed tasks are: {failed}", info_map
+            )
 
     @staticmethod
     def call_handler(
@@ -317,7 +329,7 @@ class TaskManager:
         handler(args, input_manager, output_manager, task_id, produce_graphics)
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> None:
+    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> Any:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -347,7 +359,7 @@ class TaskManager:
                 RUFAS_VERSION,
                 task_id,
             )
-
+            # raise ValueError()
             input_manager = InputManager(metadata_depth_limit)
             task_type = args.get("task_type")
 
@@ -391,7 +403,7 @@ class TaskManager:
         except Exception as e:
             info_map.update(args)
             output_manager.add_error(
-                "Failed to finish the task",
+                f"Failed to finish task: {task_id}",
                 f"Failed to recover from error: {e}; traceback: {traceback.format_exc()}",
                 info_map,
             )
@@ -399,6 +411,7 @@ class TaskManager:
             output_manager.add_log(
                 "Early termination", "Unexpected early termination. Please see logs for details.", info_map
             )
+            return task_id
 
     @staticmethod
     def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
@@ -571,6 +584,7 @@ class TaskManager:
         TaskManager.handle_herd_initializaition(args, output_manager)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
 
+
     @staticmethod
     def _handle_simulation_engine_run_tasks(
         args: Dict[str, Any],
@@ -582,6 +596,7 @@ class TaskManager:
         """Handler for all methods related to simulation run."""
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
+
         TaskManager.handle_single_simulation_run(args, output_manager)
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
 
