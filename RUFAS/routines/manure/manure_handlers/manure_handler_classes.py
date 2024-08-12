@@ -153,6 +153,15 @@ class BaseManureHandler:
                 temp=self._get_current_day_average_temperature_in_celsius(),
             )
 
+        if bedding:
+            total_bedding_mass = bedding.calc_total_bedding_mass(pen.num_animals)
+            total_organic_bedding_mass_added = bedding.calc_organic_bedding_mass_added_to_manure(total_bedding_mass)
+        else:
+            total_bedding_mass = 0.0
+            total_organic_bedding_mass_added = 0.0
+
+        non_degradable_volatile_solids = pen.manure.non_degradable_volatile_solids + total_organic_bedding_mass_added
+
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
             pen_id=pen.id,
@@ -166,7 +175,7 @@ class BaseManureHandler:
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
             liquid_manure_total_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
-            liquid_manure_total_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
+            liquid_manure_total_non_degradable_volatile_solids=non_degradable_volatile_solids,
             liquid_manure_phosphorus=pen.manure.phosphorus,
             liquid_manure_potassium=pen.manure.potassium,
             housing_methane=housing_methane_emission,
@@ -175,7 +184,8 @@ class BaseManureHandler:
             manure_volume=pen.manure.manure_volume,
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals) if bedding is not None else 0.0,
-            total_bedding_mass=bedding.calc_total_bedding_mass(pen.num_animals) if bedding is not None else 0.0,
+            total_bedding_mass=total_bedding_mass,
+            organic_bedding_added_to_manure=total_organic_bedding_mass_added,
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)
             ),
