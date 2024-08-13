@@ -622,7 +622,7 @@ class RationOptimizer:
         ration_config.MP_supply = (
             ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
         )
-        return ration_config.MP_supply - (ration_config.MP_requirement / 1000)
+        return ration_config.MP_supply - (ration_config.MP_requirement)
 
     @staticmethod
     def NDF_constraint_lower(
@@ -924,6 +924,10 @@ class RationOptimizer:
         else:
             bnds = []
             bnds = [(0, lim + 0.0001) for lim in ration_config.feed_limit_list]
+
+        for i in range(0, len(x0)):
+            if x0[i] < bnds[i][0] or x0[i] > bnds[i][1]:
+                x0[i] = np.clip(x0[i], bnds[i][0], bnds[i][1])
 
         if animal_combination is AnimalCombination.LAC_COW:
             return minimize(
