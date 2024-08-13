@@ -871,12 +871,12 @@ class ReportGenerator:
             return
 
         try:
-            self._validate_constants(report_data, constants_config)
+            validated_constants_config = self._validate_constants(report_data, constants_config)
         except ValueError:
             raise
 
         max_length = max([len(lst) for lst in report_data.values()])
-        for name, value in constants_config.items():
+        for name, value in validated_constants_config.items():
             report_data[name] = [value] * max_length
 
     def _validate_constants(
@@ -908,6 +908,7 @@ class ReportGenerator:
             If a constant value is not a number.
         """
 
+        updated_constants_config: Dict[str, int | float] = {}
         for name, value in constants_config.items():
             if name in existing_reports:
                 raise ValueError(f"Constant name {name} already exists in report data.")
@@ -937,6 +938,9 @@ class ReportGenerator:
 
             unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_attribute, "")
             constant_with_units = f"{name}_({unit_for_constant})"
+            updated_constants_config[constant_with_units] = constants_config[name]
+
+        return updated_constants_config
 
     def _normalize_constant_name(self, name: str) -> str:
         """Normalize the constant name by converting to lowercase and removing underscores and spaces."""
