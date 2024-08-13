@@ -76,7 +76,7 @@ class LactationCurve:
         im = InputManager()
         self.om = OutputManager()
 
-        lactation_inputs: dict[str, any] = im.get_data("lactation")
+        lactation_inputs: dict[str, Any] = im.get_data("lactation")
         all_year_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["year"]
         year_adjustments = self._get_year_adjustments(all_year_adjustments, time)
 
@@ -86,7 +86,7 @@ class LactationCurve:
         region_adjustments = self._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
         animal_inputs: dict[str, Any] = im.get_data("animal")
-        animal_milking_frequency = animal_inputs["animal_config"]["management_decisions"]["cow_times_milked_per_day"]
+        animal_milking_frequency: float = animal_inputs["animal_config"]["management_decisions"]["cow_times_milked_per_day"]
         all_milking_frequency_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["milking_frequency"]
         milking_frequency_adjustments = self._get_milking_frequency_adjustments(
             all_milking_frequency_adjustments, animal_milking_frequency
@@ -123,7 +123,7 @@ class LactationCurve:
             3: self.parity_3_parameters,
         }
 
-        self.parity_to_std_dev_mapping: dict[int, float] = {
+        self.parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
             1: lactation_inputs["parameter_standard_deviations"]["1"],
             2: lactation_inputs["parameter_standard_deviations"]["2"],
             3: lactation_inputs["parameter_standard_deviations"]["3"],
@@ -291,7 +291,7 @@ class LactationCurve:
         """
         Adjust the lactation parameters using predicted milk yields for the different parities of cows on the farm.
         """
-        num_milking_cows: float = animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_fraction"]
+        num_milking_cows: int = animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_fraction"]
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         parity_1_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["1"]
         parity_2_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["2"]
