@@ -276,6 +276,26 @@ def test_task(
         mock_handler.assert_called_once()
 
 
+def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager) -> None:
+    """Tests that error were handled correctly"""
+    args = {
+        "task_type": "failure",
+        "log_verbosity": LogVerbosity.LOGS,
+        "exclude_info_maps": False,
+        "output_prefix": "test",
+        "logs_directory": Path("/fake/logs"),
+        "task_id": 1,
+        "random_seed": 924,
+        "suppress_log_files": True,
+        "metadata_file_path": Path("/fake/logs"),
+        "properties_file_path": Path("more/fake/paths"),
+        "produce_graphics": False,
+    }
+    produce_graphics = False
+    result = task_manager.task(args, produce_graphics, 10)
+    assert result == "test (1)"
+
+
 def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
     """Tests that all compare metadata properties tasks were handled"""
     args = {
