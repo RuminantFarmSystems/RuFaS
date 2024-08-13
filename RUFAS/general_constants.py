@@ -1,3 +1,6 @@
+from RUFAS.units import MeasurementUnits
+
+
 class GeneralConstants:
     """Contains general constants used in RuFaS.
 
@@ -53,6 +56,7 @@ class GeneralConstants:
     # Biochemistry-related
     PROTEIN_TO_NITROGEN = 0.16
     NITROGEN_TO_PROTEIN = 6.25
+    MILK_FAT_WEIGHT = 12.2
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
@@ -60,3 +64,34 @@ class GeneralConstants:
     # Fractions and Percentages
     PERCENTAGE_TO_FRACTION = 0.01
     FRACTION_TO_PERCENTAGE = 100.0
+
+    CONSTANTS_TO_UNITS = {
+        MM_TO_M: MeasurementUnits.METERS,
+        CM_TO_MM: MeasurementUnits.MILLIMETERS,
+        MM_TO_CM: MeasurementUnits.CENTIMETERS,
+        M_TO_KM: MeasurementUnits.KILOMETERS,
+        KM_TO_M: MeasurementUnits.METERS,
+
+        GRAMS_TO_KG: MeasurementUnits.KILOGRAMS,
+        KG_TO_GRAMS: MeasurementUnits.GRAMS,
+
+        LITERS_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
+        CUBIC_METERS_TO_LITERS: MeasurementUnits.LITERS,
+        KG_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
+
+        YEAR_LENGTH: MeasurementUnits.DAYS,
+        LEAP_YEAR_LENGTH: MeasurementUnits.DAYS,
+        SECONDS_PER_DAY: MeasurementUnits.SECONDS,
+
+        WATER_DENSITY_KG_PER_LITER: MeasurementUnits.KILOGRAMS,
+        WATER_DENSITY_KG_PER_M3: MeasurementUnits.CUBIC_METERS,
+
+        PROTEIN_TO_NITROGEN: MeasurementUnits.UNITLESS,
+        NITROGEN_TO_PROTEIN: MeasurementUnits.UNITLESS,
+        MILK_FAT_WEIGHT: MeasurementUnits.UNITLESS,
+
+        EARTH_ANGULAR_VELOCITY: MeasurementUnits.UNITLESS,
+
+        PERCENTAGE_TO_FRACTION: MeasurementUnits.UNITLESS,
+        FRACTION_TO_PERCENTAGE: MeasurementUnits.UNITLESS
+    }
