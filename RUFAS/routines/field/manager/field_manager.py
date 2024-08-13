@@ -11,14 +11,13 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.weather import Weather
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
-
-om = OutputManager()
 
 
 class FieldManager:
@@ -49,10 +48,11 @@ class FieldManager:
             "function": "__init__",
         }
         self.im = InputManager()
+        self.om = OutputManager()
         self.fields: List[Field] = []
         fields = self.im.get_data_keys_by_properties("field_properties")
         if not fields:
-            om.add_warning("No field input files.", "No fields will be simulated.", info_map)
+            self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         manure_supplier = self._get_manure_supplier(manure_manager)
 
@@ -78,8 +78,15 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
-        current_conditions = weather.get_current_day_conditions(time)
         for field in self.fields:
+            current_conditions = weather.get_current_day_conditions(time, field.field_data.absolute_latitude)
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.daily_update_routine.__name__,
+                "suffix": f"field='{field.field_data.name}'",
+                "units": MeasurementUnits.HOURS
+            }
+            self.om.add_variable("daylength", current_conditions.daylength, info_map)
             field.manage_field(time, current_conditions=current_conditions)
         self.output_gatherer.send_daily_variables()
 
@@ -110,7 +117,7 @@ class FieldManager:
         if animals_simulated:
             return manure_manager
 
-        om.add_log(
+        self.om.add_log(
             "Animals not being simulated",
             "Manure for field applications will be created by the FieldManureSupplier",
             info_map,
