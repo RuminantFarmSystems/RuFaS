@@ -871,8 +871,9 @@ class ReportGenerator:
             return
 
         try:
-            validated_constants_config = self._validate_constants(report_data, constants_config,
-                                                                  filter_content.get("display_units", False))
+            validated_constants_config = self._validate_constants(
+                report_data, constants_config, filter_content.get("display_units", False)
+            )
         except ValueError:
             raise
 
@@ -948,7 +949,7 @@ class ReportGenerator:
 
     def _normalize_constant_name(self, name: str) -> str:
         """Normalize the constant name by converting to lowercase and removing underscores and spaces."""
-        return re.sub(r'[\s_]', '', name).lower()
+        return re.sub(r"[\s_]", "", name).lower()
 
     @staticmethod
     def _add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
