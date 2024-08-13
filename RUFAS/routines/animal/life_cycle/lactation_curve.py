@@ -76,27 +76,27 @@ class LactationCurve:
         im = InputManager()
         self.om = OutputManager()
 
-        lactation_inputs = im.get_data("lactation")
-        all_year_adjustments = lactation_inputs["adjustments"]["year"]
+        lactation_inputs: dict[str, any] = im.get_data("lactation")
+        all_year_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["year"]
         year_adjustments = self._get_year_adjustments(all_year_adjustments, time)
 
-        fips_code = im.get_data("config.FIPS_county_code")
-        all_region_adjustments = lactation_inputs["adjustments"]["region"]
-        region_mapping = lactation_inputs["state_to_region_mapping"]
+        fips_code: int = im.get_data("config.FIPS_county_code")
+        all_region_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["region"]
+        region_mapping: dict[str, str] = lactation_inputs["state_to_region_mapping"]
         region_adjustments = self._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
-        animal_inputs = im.get_data("animal")
+        animal_inputs: dict[str, Any] = im.get_data("animal")
         animal_milking_frequency = animal_inputs["animal_config"]["management_decisions"]["cow_times_milked_per_day"]
-        all_milking_frequency_adjustments = lactation_inputs["adjustments"]["milking_frequency"]
+        all_milking_frequency_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["milking_frequency"]
         milking_frequency_adjustments = self._get_milking_frequency_adjustments(
             all_milking_frequency_adjustments, animal_milking_frequency
         )
 
-        parity_adjustments = lactation_inputs["adjustments"]["parity"]
+        parity_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["parity"]
 
-        base_wood_parameter_l = lactation_inputs["parameter_mean_values"]["parameter_l_mean"]
-        base_wood_parameter_m = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
-        base_wood_parameter_n = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
+        base_wood_parameter_l: float = lactation_inputs["parameter_mean_values"]["parameter_l_mean"]
+        base_wood_parameter_m: float = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
+        base_wood_parameter_n: float = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
 
         self.parity_1_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
@@ -123,13 +123,13 @@ class LactationCurve:
             3: self.parity_3_parameters,
         }
 
-        self.parity_to_std_dev_mapping = {
+        self.parity_to_std_dev_mapping: dict[int, float] = {
             1: lactation_inputs["parameter_standard_deviations"]["1"],
             2: lactation_inputs["parameter_standard_deviations"]["2"],
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        annual_milk_yield = animal_inputs["herd_information"]["annual_milk_yield"]
+        annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             self.om.add_log(
                 "Projected annual milk yield provided to simulation",
@@ -291,15 +291,15 @@ class LactationCurve:
         """
         Adjust the lactation parameters using predicted milk yields for the different parities of cows on the farm.
         """
-        num_milking_cows = animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_fraction"]
-        annual_milk_yield = animal_inputs["herd_information"]["annual_milk_yield"]
-        parity_1_percentage = animal_inputs["herd_information"]["parity_fractions"]["1"]
-        parity_2_percentage = animal_inputs["herd_information"]["parity_fractions"]["2"]
-        parity_3_percentage = animal_inputs["herd_information"]["parity_fractions"]["3"]
-        parity_2_milk_yield_adjustment = lactation_curve_inputs["parity_milk_yield_adjustments"][
+        num_milking_cows: float = animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_fraction"]
+        annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
+        parity_1_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["1"]
+        parity_2_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["2"]
+        parity_3_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["3"]
+        parity_2_milk_yield_adjustment: float = lactation_curve_inputs["parity_milk_yield_adjustments"][
             "parity_2_305_day_milk_yield_adjustment"
         ]
-        parity_3_milk_yield_adjustment = lactation_curve_inputs["parity_milk_yield_adjustments"][
+        parity_3_milk_yield_adjustment: float = lactation_curve_inputs["parity_milk_yield_adjustments"][
             "parity_3_305_day_milk_yield_adjustment"
         ]
 
