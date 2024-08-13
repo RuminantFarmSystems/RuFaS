@@ -1154,10 +1154,9 @@ class RationReporter:
         )
 
         # MP bact calcs
-        MP_bact = 0.64 * min(
-            GeneralConstants.KG_TO_GRAMS * 0.13 * TDN_total_actual,
-            GeneralConstants.KG_TO_GRAMS * 0.85 * sum(RDP_diet)
-        )
+        metabolizable_protein_TDN = GeneralConstants.KG_TO_GRAMS * 0.13 * TDN_total_actual
+        metabolizable_protein_RDP = GeneralConstants.KG_TO_GRAMS * 0.85 * sum(RDP_diet)
+        MP_bact = 0.64 * min(metabolizable_protein_TDN, metabolizable_protein_RDP)
 
         MP_supply = MP_bact + sum(RUP_diet) + 0.4 * 11.8 * DMI_estimate
         return float(MP_supply)
