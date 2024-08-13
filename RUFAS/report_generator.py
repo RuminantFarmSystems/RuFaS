@@ -871,7 +871,8 @@ class ReportGenerator:
             return
 
         try:
-            validated_constants_config = self._validate_constants(report_data, constants_config)
+            validated_constants_config = self._validate_constants(report_data, constants_config,
+                                                                  filter_content.get("display_units", False))
         except ValueError:
             raise
 
@@ -883,6 +884,7 @@ class ReportGenerator:
         self,
         existing_reports: Dict[str, List[Any]],
         constants_config: Dict[str, int | float],
+        display_units: bool,
     ) -> None:
         """
         Validates the names and values of the constants in the constants_config.
@@ -897,6 +899,8 @@ class ReportGenerator:
             The dictionary containing the names and values of the reports that have already been generated.
         constants_config : Dict[str, int | float]
             A dictionary containing the names and values of the constants to be added to the report data.
+        display_units : bool
+            Whether or not the report filter specifies to display units in the report header.
 
         Raises
         ------
@@ -928,17 +932,20 @@ class ReportGenerator:
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
 
-            normalized_prodived_name = self._normalize_constant_name(name)
-            matching_attribute = ""
-            for attribute in dir(GeneralConstants):
-                normalized_attribute_name = self._normalize_constant_name(attribute)
-                if normalized_attribute_name == normalized_prodived_name:
-                    matching_attribute = attribute
-                    break
+            if display_units:
+                normalized_prodived_name = self._normalize_constant_name(name)
+                matching_constant_value = None
+                for attribute in dir(GeneralConstants):
+                    normalized_attribute_name = self._normalize_constant_name(attribute)
+                    if normalized_attribute_name == normalized_prodived_name:
+                        matching_constant_value = getattr(GeneralConstants, attribute)
+                        break
 
-            unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_attribute, "")
-            constant_with_units = f"{name}_({unit_for_constant})"
-            updated_constants_config[constant_with_units] = constants_config[name]
+                unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant_value, "unit_not_found")
+                constant_with_units = f"{name}_({unit_for_constant})"
+                updated_constants_config[constant_with_units] = constants_config[name]
+            else:
+                updated_constants_config[name] = constants_config[name]
 
         return updated_constants_config
 

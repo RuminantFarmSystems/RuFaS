@@ -243,7 +243,7 @@ def test_add_constants_to_report_data(
     report_data: Dict[str, List[Any]],
     filter_content: Dict[str, Any],
     expected_report_data: Dict[str, List[Any]],
-    expected_exception: Type[Exception],
+    expected_exception: Type[Exception] | None,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -264,28 +264,29 @@ def test_add_constants_to_report_data(
 
 
 @pytest.mark.parametrize(
-    "report_data, constant_config, expected_exception",
+    "report_data, constant_config, expected_exception, display_units",
     [
         # Valid case with valid constants
-        ({}, {"Constant1": 10, "Constant2": 20.5}, None),
+        ({}, {"Constant1": 10, "Constant2": 20.5}, None, False),
         # Error case with repeated constant name
-        ({"Constant1": [5, 5, 5]}, {"Constant1": 10}, ValueError),
+        ({"Constant1": [5, 5, 5]}, {"Constant1": 10}, ValueError, False),
         # Error case with constant name None
-        ({}, {None: 10}, ValueError),
+        ({}, {None: 10}, ValueError, False),
         # Error case with constant value None
-        ({}, {"Constant1": None}, ValueError),
+        ({}, {"Constant1": None}, ValueError, False),
         # Error case with constant name not a string
-        ({}, {123: 10}, ValueError),
+        ({}, {123: 10}, ValueError, False),
         # Error case with constant value not a number
-        ({}, {"Constant1": "not_a_number"}, ValueError),
+        ({}, {"Constant1": "not_a_number"}, ValueError, False),
         # Error case with an empty constant name
-        ({}, {"": 10}, ValueError),
+        ({}, {"": 10}, ValueError, False),
     ],
 )
 def test_validate_constants(
     report_data: Dict[str, List[Any]],
     constant_config: Dict[str, Any],
-    expected_exception: Type[Exception],
+    expected_exception: Type[Exception] | None,
+    display_units: bool,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -299,9 +300,9 @@ def test_validate_constants(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._validate_constants(report_data, constant_config)
+            report_generator._validate_constants(report_data, constant_config, display_units)
     else:
-        report_generator._validate_constants(report_data, constant_config)
+        report_generator._validate_constants(report_data, constant_config, display_units)
 
 
 @pytest.mark.parametrize(
