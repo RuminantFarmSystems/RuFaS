@@ -406,7 +406,7 @@ class TaskManager:
             output_manager.add_log(
                 "Early termination", "Unexpected early termination. Please see logs for details.", info_map
             )
-            return f"Task: {task_id}, output prefix: {output_prefix}"
+            return f"{output_prefix} ({task_id})"
 
     @staticmethod
     def handle_herd_initializaition(args: Dict[str, Any], output_manager: OutputManager) -> None:
