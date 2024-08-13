@@ -86,7 +86,7 @@ class FieldManager:
                 "class": self.__class__.__name__,
                 "function": self.daily_update_routine.__name__,
                 "suffix": f"field='{field.field_data.name}'",
-                "units": MeasurementUnits.HOURS
+                "units": MeasurementUnits.HOURS,
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
             field.manage_field(time, current_conditions=current_conditions)
