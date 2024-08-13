@@ -248,7 +248,7 @@ def test_determine_mineralized_surface_phosphorus(
     phosphorus: float, rate: float, temp_factor: float, moisture_factor: float
 ) -> None:
     """Tests that the correct amount of mineralized phosphorus is calculated."""
-    observed = Manure._determine_mineralized_surface_phosphorus(phosphorus, rate, temp_factor, moisture_factor)
+    observed = Manure.determine_mineralized_surface_phosphorus(phosphorus, rate, temp_factor, moisture_factor)
     expected = min(phosphorus, max(0.0, phosphorus * rate * min(temp_factor, moisture_factor)))
     assert observed == expected
 
@@ -265,7 +265,7 @@ def test_determine_mineralized_surface_phosphorus(
 )
 def test_determine_assimilated_phosphorus_amount(ratio: float, phosphorus: float) -> None:
     """Tests that the correct amount of phosphorus assimilated into the soil is calculated."""
-    observed = Manure._determine_assimilated_phosphorus_amount(ratio, phosphorus)
+    observed = Manure.determine_assimilated_phosphorus_amount(ratio, phosphorus)
     expected = max(0.0, ratio * phosphorus)
     expected = min(phosphorus, expected)
     assert observed == expected
@@ -656,7 +656,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
             "decomposed_grazing_manure_coverage_change": 0.0,
         }
     )
-    incorp1._determine_mineralized_surface_phosphorus = MagicMock(return_value=0)
+    incorp1.determine_mineralized_surface_phosphorus = MagicMock(return_value=0)
     incorp1._determine_assimilated_surface_manure = MagicMock(
         return_value={
             "assimilated_machine_manure": 0,
@@ -665,7 +665,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
             "grazing_manure_coverage": 0.0,
         }
     )
-    incorp1._determine_assimilated_phosphorus_amount = MagicMock(return_value=0)
+    incorp1.determine_assimilated_phosphorus_amount = MagicMock(return_value=0)
     incorp1._add_infiltrated_phosphorus_to_soil = MagicMock()
 
     incorp1.daily_manure_update(rain, runoff, area, mean_temp)
@@ -680,9 +680,9 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     else:
         incorp1._adjust_manure_moisture_factor.assert_not_called()
     incorp1._determine_decomposed_surface_manure.assert_called_once_with(0.32)
-    assert incorp1._determine_mineralized_surface_phosphorus.call_count == 6
+    assert incorp1.determine_mineralized_surface_phosphorus.call_count == 6
     incorp1._determine_assimilated_surface_manure.assert_called_once_with(0.32, area)
-    assert incorp1._determine_assimilated_phosphorus_amount.call_count == 8
+    assert incorp1.determine_assimilated_phosphorus_amount.call_count == 8
     assert incorp1.data.machine_manure.manure_dry_mass == 0
     assert incorp1.data.machine_manure.manure_field_coverage == 0.0
     assert incorp1.data.machine_manure.stable_organic_phosphorus == 0
@@ -732,7 +732,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
             "decomposed_grazing_manure_coverage_change": 0.18,
         }
     )
-    incorp2._determine_mineralized_surface_phosphorus = MagicMock(return_value=3)
+    incorp2.determine_mineralized_surface_phosphorus = MagicMock(return_value=3)
     incorp2._determine_assimilated_surface_manure = MagicMock(
         return_value={
             "assimilated_machine_manure": 50,
@@ -741,7 +741,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
             "grazing_manure_coverage": 0.08,
         }
     )
-    incorp2._determine_assimilated_phosphorus_amount = MagicMock(return_value=2)
+    incorp2.determine_assimilated_phosphorus_amount = MagicMock(return_value=2)
     incorp2._add_infiltrated_phosphorus_to_soil = MagicMock()
 
     incorp2.daily_manure_update(rain, runoff, area, mean_temp)
@@ -756,9 +756,9 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     else:
         incorp2._adjust_manure_moisture_factor.assert_not_called()
     incorp2._determine_decomposed_surface_manure.assert_called_once_with(0.35)
-    assert incorp2._determine_mineralized_surface_phosphorus.call_count == 6
+    assert incorp2.determine_mineralized_surface_phosphorus.call_count == 6
     incorp2._determine_assimilated_surface_manure.assert_called_once_with(0.35, area)
-    assert incorp2._determine_assimilated_phosphorus_amount.call_count == 8
+    assert incorp2.determine_assimilated_phosphorus_amount.call_count == 8
     assert incorp2.data.machine_manure.manure_dry_mass == 150
     assert incorp2.data.machine_manure.manure_field_coverage == 0.54
     assert incorp2.data.machine_manure.stable_organic_phosphorus == 15
@@ -808,7 +808,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
             "decomposed_grazing_manure_coverage_change": 0.9,
         }
     )
-    incorp3._determine_mineralized_surface_phosphorus = MagicMock(return_value=2)
+    incorp3.determine_mineralized_surface_phosphorus = MagicMock(return_value=2)
     incorp3._determine_assimilated_surface_manure = MagicMock(
         return_value={
             "assimilated_machine_manure": 25,
@@ -817,7 +817,7 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
             "grazing_manure_coverage": 0.05,
         }
     )
-    incorp3._determine_assimilated_phosphorus_amount = MagicMock(return_value=3)
+    incorp3.determine_assimilated_phosphorus_amount = MagicMock(return_value=3)
     incorp3._add_infiltrated_phosphorus_to_soil = MagicMock()
 
     incorp3.daily_manure_update(rain, runoff, area, mean_temp)
@@ -832,9 +832,9 @@ def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp:
     else:
         incorp3._adjust_manure_moisture_factor.assert_not_called()
     incorp3._determine_decomposed_surface_manure.assert_called_once_with(0.37)
-    assert incorp3._determine_mineralized_surface_phosphorus.call_count == 6
+    assert incorp3.determine_mineralized_surface_phosphorus.call_count == 6
     incorp3._determine_assimilated_surface_manure.assert_called_once_with(0.37, area)
-    assert incorp3._determine_assimilated_phosphorus_amount.call_count == 8
+    assert incorp3.determine_assimilated_phosphorus_amount.call_count == 8
     assert incorp3.data.machine_manure.manure_dry_mass == 0
     assert incorp3.data.machine_manure.manure_field_coverage == 0.0
     assert incorp3.data.machine_manure.stable_organic_phosphorus == 0

@@ -88,53 +88,177 @@ class ManurePool:
             and self.annual_runoff_manure_inorganic_phosphorus == other.annual_runoff_manure_inorganic_phosphorus
         )
 
-    # def leach_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> tuple[float, float]:
-    #     """
-    #     This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
-    #     that leached phosphorus is distributed.
-    #
-    #     Parameters
-    #     ----------
-    #     rainfall : float
-    #         The amount of rainfall on the current day (mm).
-    #     runoff : float
-    #         The amount of runoff from rainfall on the current day (mm).
-    #     field_size : float
-    #         The size of the field (ha).
-    #
-    #     """
-    #     organic_results = Manure._determine_phosphorus_leached_from_surface(
-    #         rainfall,
-    #         runoff,
-    #         field_size,
-    #         self.manure_dry_mass,
-    #         self.manure_field_coverage,
-    #         self.water_extractable_organic_phosphorus,
-    #         True,
-    #     )
-    #     self.water_extractable_organic_phosphorus = organic_results[
-    #         "new_phosphorus_pool_amount"
-    #     ]
-    #     self.organic_phosphorus_runoff = organic_results["runoff_phosphorus"]
-    #     self.annual_runoff_manure_organic_phosphorus += organic_results["runoff_phosphorus"]
-    #
-    #     inorganic_results = Manure._determine_phosphorus_leached_from_surface(
-    #         rainfall,
-    #         runoff,
-    #         field_size,
-    #         self.manure_dry_mass,
-    #         self.manure_field_coverage,
-    #         self.water_extractable_inorganic_phosphorus,
-    #         False,
-    #     )
-    #     self.water_extractable_inorganic_phosphorus = inorganic_results[
-    #         "new_phosphorus_pool_amount"
-    #     ]
-    #     self.inorganic_phosphorus_runoff = inorganic_results["runoff_phosphorus"]
-    #     self.annual_runoff_manure_inorganic_phosphorus += inorganic_results[
-    #         "runoff_phosphorus"
-    #     ]
-    #     return organic_results["infiltrated_phosphorus"], inorganic_results["infiltrated_phosphorus"]
+    def daily_manure_update(
+        self,
+        rainfall: float,
+        field_size: float,
+        mean_air_temperature: float,
+    ) -> float:
+        """
+        This method conducts daily operations on manure including decomposition, assimilation and returns the total
+        assimilation.
+
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm).
+        field_size : float
+            The size of the field (ha).
+        mean_air_temperature : float
+            Mean air temperature on the current day (degrees C).
+
+        return
+        ------
+        float
+            The total amount of assimilated phosphorus (kg).
+        """
+        self.organic_phosphorus_runoff = 0.0
+        self.inorganic_phosphorus_runoff = 0.0
+        temperature_factor = self._determine_temperature_factor(mean_air_temperature)
+        if rainfall < 1 or rainfall > 4:
+            self.adjust_manure_moisture_factor(rainfall, temperature_factor)
+
+        # Calculate manure decomposition on soil surface
+        decomposed_mass, decomposed_coverage = \
+            self.determine_decomposed_surface_manure(temperature_factor)
+
+        # Calculate phosphorus mineralization between pools
+        mineralized_stable_organic = Manure.determine_mineralized_surface_phosphorus(
+            self.stable_organic_phosphorus,
+            0.01,
+            temperature_factor,
+            self.manure_moisture_factor,
+        )
+
+        mineralized_stable_inorganic = Manure.determine_mineralized_surface_phosphorus(
+            self.stable_inorganic_phosphorus,
+            0.0025,
+            temperature_factor,
+            self.manure_moisture_factor,
+        )
+
+        mineralized_water_extractable_organic = Manure.determine_mineralized_surface_phosphorus(
+            self.water_extractable_organic_phosphorus,
+            0.1,
+            temperature_factor,
+            self.manure_moisture_factor,
+        )
+
+        assimilated_mass, assimilated_coverage = self.determine_assimilated_surface_manure(temperature_factor,
+                                                                                           field_size)
+        if self.manure_dry_mass > 0:
+            assimilation_ratio = assimilated_mass / self.manure_dry_mass
+        else:
+            assimilation_ratio = 0
+
+        assimilated_stable_organic = Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+                                                                                    self.stable_organic_phosphorus)
+        assimilated_stable_inorganic = Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+                                                                                      self.stable_inorganic_phosphorus)
+        assimilated_water_extractable_organic = (
+            Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+                                                           self.water_extractable_organic_phosphorus))
+        assimilated_water_extractable_inorganic = (
+            Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+                                                           self.water_extractable_inorganic_phosphorus))
+
+        self.manure_dry_mass = max(
+            0.0,
+            self.manure_dry_mass - assimilated_mass - decomposed_mass
+        )
+
+        self.manure_field_coverage = max(
+            0.0,
+            self.manure_field_coverage - assimilated_coverage - decomposed_coverage,
+        )
+
+        self.stable_organic_phosphorus = max(
+            0.0,
+            self.stable_organic_phosphorus
+            - assimilated_stable_organic
+            - mineralized_stable_organic,
+        )
+
+        self.stable_inorganic_phosphorus = max(
+            0.0,
+            self.stable_inorganic_phosphorus
+            - assimilated_stable_inorganic
+            - mineralized_stable_inorganic,
+        )
+
+        self.water_extractable_organic_phosphorus = max(
+            0.0,
+            self.water_extractable_organic_phosphorus
+            - assimilated_water_extractable_organic
+            - mineralized_water_extractable_organic,
+        )
+
+        self.water_extractable_inorganic_phosphorus = max(
+            0.0,
+            self.water_extractable_inorganic_phosphorus
+            - assimilated_water_extractable_inorganic,
+        )
+
+        self.water_extractable_inorganic_phosphorus += (
+            mineralized_water_extractable_organic
+            + (0.75 * mineralized_stable_organic)
+            + mineralized_stable_inorganic
+        )
+
+        self.water_extractable_organic_phosphorus += 0.25 * mineralized_stable_organic
+
+        return (assimilated_stable_organic
+                + assimilated_stable_inorganic
+                + assimilated_water_extractable_organic
+                + assimilated_water_extractable_inorganic)
+
+    def leach_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> tuple[float, float]:
+        """
+        This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
+        that leached phosphorus is distributed.
+
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm).
+        runoff : float
+            The amount of runoff from rainfall on the current day (mm).
+        field_size : float
+            The size of the field (ha).
+
+        """
+        organic_results = self._determine_phosphorus_leached_from_surface(
+            rainfall,
+            runoff,
+            field_size,
+            self.manure_dry_mass,
+            self.manure_field_coverage,
+            self.water_extractable_organic_phosphorus,
+            True,
+        )
+        self.water_extractable_organic_phosphorus = organic_results[
+            "new_phosphorus_pool_amount"
+        ]
+        self.organic_phosphorus_runoff = organic_results["runoff_phosphorus"]
+        self.annual_runoff_manure_organic_phosphorus += organic_results["runoff_phosphorus"]
+
+        inorganic_results = self._determine_phosphorus_leached_from_surface(
+            rainfall,
+            runoff,
+            field_size,
+            self.manure_dry_mass,
+            self.manure_field_coverage,
+            self.water_extractable_inorganic_phosphorus,
+            False,
+        )
+        self.water_extractable_inorganic_phosphorus = inorganic_results[
+            "new_phosphorus_pool_amount"
+        ]
+        self.inorganic_phosphorus_runoff = inorganic_results["runoff_phosphorus"]
+        self.annual_runoff_manure_inorganic_phosphorus += inorganic_results[
+            "runoff_phosphorus"
+        ]
+        return organic_results["infiltrated_phosphorus"], inorganic_results["infiltrated_phosphorus"]
 
     def adjust_manure_moisture_factor(self, rainfall: float, temperature_factor: float) -> None:
         """
@@ -399,3 +523,94 @@ class ManurePool:
         dry_matter_in_grams = manure_dry_matter * KILOGRAMS_TO_GRAMS
         coverage_in_square_centimeters = manure_coverage * HECTARES_TO_SQUARE_CENTIMETERS
         return (rain_in_centimeters / dry_matter_in_grams) * coverage_in_square_centimeters
+
+    @staticmethod
+    def _determine_phosphorus_leached_from_surface(
+        rainfall: float,
+        runoff: float,
+        field_size: float,
+        manure_dry_mass: float,
+        field_coverage: float,
+        water_extractable_phosphorus: float,
+        is_organic: bool,
+    ) -> Dict[str, float]:
+        """
+        This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
+        between runoff and soil infiltration, and how much phosphorus remains in the given pool.
+
+        Parameters
+        ----------
+        rainfall : float
+            The amount of rainfall on the current day (mm).
+        runoff : float
+            The amount of runoff from rainfall on the current day (mm).
+        field_size : float
+            Area of the field (ha).
+        manure_dry_mass : float
+            Dry-weight equivalent of manure on the field (kg).
+        field_coverage : float
+            Percent of the field covered by manure, in range [0.0, 1.0] (unitless).
+        water_extractable_phosphorus : float
+            The mass of the water extractable phosphorus pool that is being leached from (kg).
+        is_organic : bool
+            Is the phosphorus being leached organic (True / False).
+
+        Returns
+        -------
+        Dict (keys listed below)
+            new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg).
+            infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg).
+            runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg).
+
+        Notes
+        -----
+        This method follows the steps outlined for how to calculate phosphorus lost from a field's surface as outlined
+        by the section with the header "Phosphorus Leaching from Manure by Rain" (page 8). Generally, the steps are
+            - Calculate the ratios of rainfall to manure mass and rainfall to runoff on the given day.
+            - Calculate the amounts of water extractable phosphorus lost by the surface manure pools on a given day.
+            - Calculate how much of the leached phosphorus runs off the field and how much infiltrates the soil based on
+                the ratios calculated above.
+            - Determine how much phosphorus is remains in the surface pool after leaching.
+            - Return all the above amounts of phosphorus (lost to runoff, infiltrated soil, still on field surface).
+
+        """
+        area_covered_by_manure = field_coverage * field_size
+        rain_manure_dry_matter_ratio = Manure._determine_rain_manure_dry_matter_ratio(
+            rainfall, manure_dry_mass, area_covered_by_manure
+        )
+
+        distribution_factor = Manure._determine_phosphorus_distribution_factor(rainfall, runoff)
+
+        if is_organic:
+            water_extractable_phosphorus_leached = Manure._determine_water_extractable_phosphorus_leached(
+                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True, True
+            )
+        else:
+            water_extractable_phosphorus_leached = Manure._determine_water_extractable_phosphorus_leached(
+                water_extractable_phosphorus, rain_manure_dry_matter_ratio, True, False
+            )
+
+        water_extractable_phosphorus_leached = min(water_extractable_phosphorus, water_extractable_phosphorus_leached)
+
+        runoff_dissolved_phosphorus_concentration = Manure._determine_water_extractable_phosphorus_runoff_concentration(
+            water_extractable_phosphorus_leached,
+            rainfall,
+            field_size,
+            distribution_factor,
+        )
+
+        runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
+
+        phosphorus_lost_to_runoff_in_kg = (
+                                              runoff_dissolved_phosphorus_concentration * runoff_in_liters
+                                          ) * MILLIGRAMS_TO_KILOGRAMS
+
+        infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
+
+        new_phosphorus_pool_amount = water_extractable_phosphorus - water_extractable_phosphorus_leached
+        return_dict = {
+            "new_phosphorus_pool_amount": new_phosphorus_pool_amount,
+            "infiltrated_phosphorus": infiltrated_phosphorus,
+            "runoff_phosphorus": phosphorus_lost_to_runoff_in_kg,
+        }
+        return return_dict
