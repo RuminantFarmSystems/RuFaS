@@ -12,35 +12,16 @@ class AminoAcidComposition(TypedDict):
     milk: float
 
 
-class EssentialAminoAcidRequirements:
-    def __init__(self):
-        self.histidine: float = 0.0
-        self.isoleucine: float = 0.0
-        self.leucine: float = 0.0
-        self.lysine: float = 0.0
-        self.methionine: float = 0.0
-        self.phenylalanine: float = 0.0
-        self.threonine: float = 0.0
-        self.thryptophan: float = 0.0
-        self.valine: float = 0.0
-
-    def __add__(self, other: "EssentialAminoAcidRequirements") -> "EssentialAminoAcidRequirements":
-        for attribute_name, arg in self.__dict__.items():
-            setattr(
-                self,
-                attribute_name,
-                self.__getattribute__(attribute_name) + other.__getattribute__(attribute_name),
-            )
-        return self
-
-    def __truediv__(self, other: int) -> "EssentialAminoAcidRequirements":
-        for attribute_name, arg in self.__dict__.items():
-            setattr(
-                self,
-                attribute_name,
-                self.__getattribute__(attribute_name) / other,
-            )
-        return self
+class EssentialAminoAcidRequirements(TypedDict):
+    histidine: float
+    isoleucine: float
+    leucine: float
+    lysine: float
+    methionine: float
+    phenylalanine: float
+    threonine: float
+    thryptophan: float
+    valine: float
 
 
 AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
@@ -171,44 +152,51 @@ class AminoAcidCalculator:
         lactating : bool
             If the animal is lactating.
         body_weight : float
-            Body weight (kilograms).
+            Body weight (kg).
         frame_weight_gain : float
-            Frame weight gain refers to the accretion of both fat and protein in carcass (grams per day).
+            Frame weight gain refers to the accretion of both fat and protein in carcass (g / day).
         gravid_uterine_weight_gain : float
             Daily energy Requirement associated to increased gain of reproductive tissues as pregnancy advances
-            (Mcal/d).
+            (Mcal / day).
         dry_matter_intake_estimate : float
-            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d).
+            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg / day).
         milk_true_protein : float
             True protein contents in milk (%).
         milk_production: float
-            Milk yield (kg/d).
+            Milk yield (kg / day).
         NDF_conc:
-            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration.
+            Concentration (percent value) of Neutral Detergent Fiber in previously fed ration (%).
 
         Returns
         -------
         total_amino_acid_requirements : Dict[str, float]
-            Total amino acid requirement for each of the essential amino acid (grams per day)
+            Total amino acid requirement for each of the essential amino acid (g / day)
 
         Notes
         -----
         NPscurf: float
-            Net protein requirement for scurf, g
+            Net protein requirement for scurf (g / day).
         NPEndUrin: float
-            Net protein requirement for endogenous urinary excretion, g
+            Net protein requirement for endogenous urinary excretion (g / day).
         CPMFP: float
-            Crude protein in metabolic fecal protein, g
+            Crude protein in metabolic fecal protein (g / day).
         NPMFP: float
-            Net protein requirement for metabolic fecal protein, g
+            Net protein requirement for metabolic fecal protein (g / day).
         NPGrowth: float
-            Net protein requirement for body frame weight gain, g
+            Net protein requirement for body frame weight gain (g / day).
         NPGest: float
-            Net protein requirement for pregnancy, g
+            Net protein requirement for pregnancy (g / day).
         NPMilk: float
-            Net protein in milk, or milk true protein yield, g
+            Net protein in milk, or milk true protein yield (g / day).
+
+        References
+        ----------
+        Equations on page 8 of the Amino Acid Requirements Design Doc.
         """
-        total_amino_acid_requirements: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements()
+        total_amino_acid_requirements: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
+            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
+            thryptophan=0.0, valine=0.0,
+        )
 
         NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
         CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
@@ -220,7 +208,7 @@ class AminoAcidCalculator:
         target_efficiency_gest: float = 0.33
         target_efficiency_growth: float = 0.40
 
-        for amino_acid in ESSENTIAL_AMINO_ACIDS:
+        for amino_acid in total_amino_acid_requirements.keys():
             net_AA_scurf: float = self._calculate_scurf(amino_acid, NPscurf)
             net_AA_End_Urine: float = self._calculate_endogenous_urinary_excretion(amino_acid, body_weight)
             net_AA_MFP: float = self._calculate_metabolic_fecal_protein(amino_acid, NPMFP)
@@ -229,136 +217,127 @@ class AminoAcidCalculator:
 
             if lactating:
                 net_AA_Milk: float = self._calculate_lactation(amino_acid, NPMilk)
-
-                setattr(
-                    total_amino_acid_requirements,
-                    amino_acid,
-                    float(
+                total_amino_acid_requirements[amino_acid] = float(
                         (
                             (net_AA_scurf + net_AA_MFP + net_AA_Growth + net_AA_Milk)
                             / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid]
                         )
                         + (net_AA_Gest / target_efficiency_gest)
                         + net_AA_End_Urine
-                    ),
-                )
+                    )
             else:
-                setattr(
-                    total_amino_acid_requirements,
-                    amino_acid,
-                    float(
+                total_amino_acid_requirements[amino_acid] = float(
                         ((net_AA_scurf + net_AA_MFP) / ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES[amino_acid])
                         + (net_AA_Growth / target_efficiency_growth)
                         + (net_AA_Gest / target_efficiency_gest)
                         + net_AA_End_Urine
-                    ),
-                )
+                    )
         return total_amino_acid_requirements
 
     def _calculate_scurf(self, amino_acid: str, NPscurf: float) -> float:
         """
-        Calculates the net demand for the specific amino acid in scurf excretion (g/d).
+        Calculates the net demand for the specific amino acid in scurf excretion.
 
         Parameters
         ----------
         amino_acid : str
             The type of amino acid to calculate.
         NPscurf: float
-            Net protein requirement for scurf, g
+            Net protein requirement for scurf (g / day).
 
         Returns
         -------
         float
-            The net demand for the specific amino acid in scurf excretion (grams per day).
+            The net demand for the specific amino acid in scurf excretion (g / day).
         """
         return NPscurf * AMINO_ACID_COMPOSITION[amino_acid]["scurf"] / 100
 
     def _calculate_endogenous_urinary_excretion(self, amino_acid: str, body_weight: float) -> float:
         """
-        Calculates the net demand for the specific amino acid for endogenous urinary excretion (g/d).
+        Calculates the net demand for the specific amino acid for endogenous urinary excretion.
 
         Parameters
         ----------
         amino_acid : str
             The type of amino acid to calculate.
         body_weight: float
-            Body weight, kg
+            Body weight (kg).
 
         Returns
         -------
         float
-            The net demand for the specific amino acid for endogenous urinary excretion (grams per day).
+            The net demand for the specific amino acid for endogenous urinary excretion (g / day).
         """
         return 0.010 * 6.25 * body_weight * AMINO_ACID_COMPOSITION[amino_acid]["whole_empty_body"] / 100
 
     def _calculate_metabolic_fecal_protein(self, amino_acid: str, NPMFP: float) -> float:
         """
-        Calculates the net demand for the specific amino acid for metabolic fecal protein (g/d).
+        Calculates the net demand for the specific amino acid for metabolic fecal protein.
 
         Parameters
         ----------
         amino_acid : str
             The type of amino acid to calculate.
         NPMFP: float
-            Net protein requirement for metabolic fecal protein, g
+            Net protein requirement for metabolic fecal protein (g).
 
         Returns
         -------
         float
-            The net demand for the specific amino acid for metabolic fecal protein (grams per day).
+            The net demand for the specific amino acid for metabolic fecal protein (g / day).
         """
         return NPMFP * AMINO_ACID_COMPOSITION[amino_acid]["metabolic_fecal"] / 100
 
     def _calculate_growth(self, amino_acid: str, NPGrowth: float) -> float:
         """
-        Calculates the net demand for the specific amino acid for body frame weight gain (g/d).
+        Calculates the net demand for the specific amino acid for body frame weight gain.
 
         Parameters
         ----------
         amino_acid : str
             The type of amino acid to calculate.
         NPGrowth: float
-            Net protein requirement for body frame weight gain, g
+            Net protein requirement for body frame weight gain (g).
 
         Returns
         -------
         float
-            The net demand for the specific amino acid for body frame weight gain (grams per day).
+            The net demand for the specific amino acid for body frame weight gain (g / day).
         """
         return NPGrowth * AMINO_ACID_COMPOSITION[amino_acid]["whole_empty_body"] / 100
 
     def _calculate_pregnancy(self, amino_acid: str, NPGest: float) -> float:
         """
-        Calculates the net amino acid composition of protein accretion associated with pregnancy (g/d).
+        Calculates the net amino acid composition of protein accretion associated with pregnancy.
 
         Parameters
         ----------
         amino_acid : str
             The type of amino acid to calculate.
         NPGest: float
-            Net protein requirement for pregnancy, g
+            Net protein requirement for pregnancy (g).
 
         Returns
         -------
         float
-            The net amino acid composition of protein accretion associated with pregnancy (grams per day).
+            The net amino acid composition of protein accretion associated with pregnancy (g / day).
         """
         return NPGest * AMINO_ACID_COMPOSITION[amino_acid]["whole_empty_body"] / 100
 
     def _calculate_lactation(self, amino_acid: str, NPMilk: float) -> float:
         """
-        Calculates the net amino acids yield in milk (g/d).
+        Calculates the net amino acids yield in milk.
 
         Parameters
         ----------
         amino_acid : str
             The type of amino acid to calculate.
         NPMilk: float
-            Net protein in milk, or milk true protein yield, g
+            Net protein in milk, or milk true protein yield (g).
 
         Returns
         -------
         float
-            The net amino acids yield in milk (grams per day).
+            The net amino acids yield in milk (g / day).
         """
         return NPMilk * AMINO_ACID_COMPOSITION[amino_acid]["milk"] / 100
