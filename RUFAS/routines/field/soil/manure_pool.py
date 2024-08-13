@@ -1,4 +1,4 @@
-from typing import Any, Union, Dict
+from typing import Any, Union, Dict, Tuple
 from math import exp, sqrt
 
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
@@ -54,6 +54,8 @@ class ManurePool:
         stable_organic_phosphorus: float = 0.0,
         organic_phosphorus_runoff: float = 0.0,
         inorganic_phosphorus_runoff: float = 0.0,
+        annual_runoff_manure_inorganic_phosphorus: float = 0.0,
+        annual_runoff_manure_organic_phosphorus: float = 0.0
     ) -> None:
         self.manure_dry_mass = manure_dry_mass
         self.manure_applied_mass = manure_applied_mass
@@ -65,6 +67,8 @@ class ManurePool:
         self.stable_organic_phosphorus = stable_organic_phosphorus
         self.organic_phosphorus_runoff = organic_phosphorus_runoff
         self.inorganic_phosphorus_runoff = inorganic_phosphorus_runoff
+        self.annual_runoff_manure_inorganic_phosphorus = annual_runoff_manure_inorganic_phosphorus
+        self.annual_runoff_manure_organic_phosphorus = annual_runoff_manure_organic_phosphorus
 
     def __eq__(self, other: Union["ManurePool", object]) -> Any:
         if not isinstance(other, ManurePool):
@@ -80,57 +84,57 @@ class ManurePool:
             and self.stable_organic_phosphorus == other.stable_organic_phosphorus
             and self.organic_phosphorus_runoff == other.organic_phosphorus_runoff
             and self.inorganic_phosphorus_runoff == other.inorganic_phosphorus_runoff
+            and self.annual_runoff_manure_organic_phosphorus == other.annual_runoff_manure_organic_phosphorus
+            and self.annual_runoff_manure_inorganic_phosphorus == other.annual_runoff_manure_inorganic_phosphorus
         )
 
-    def _leach_and_update_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> None:
-        """
-        This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
-        that leached phosphorus is distributed, and updates the phosphorus pools based on those values.
-
-        Parameters
-        ----------
-        rainfall : float
-            The amount of rainfall on the current day (mm).
-        runoff : float
-            The amount of runoff from rainfall on the current day (mm).
-        field_size : float
-            The size of the field (ha).
-
-        """
-        if self.manure_dry_mass > 0 and self.manure_field_coverage > 0:
-            machine_organic_results = Manure._determine_phosphorus_leached_from_surface(
-                rainfall,
-                runoff,
-                field_size,
-                self.manure_dry_mass,
-                self.manure_field_coverage,
-                self.water_extractable_organic_phosphorus,
-                True,
-            )
-            self.water_extractable_organic_phosphorus = machine_organic_results[
-                "new_phosphorus_pool_amount"
-            ]
-            self.organic_phosphorus_runoff = machine_organic_results["runoff_phosphorus"]
-            self.data.annual_runoff_machine_manure_organic_phosphorus += machine_organic_results["runoff_phosphorus"]
-            self._add_infiltrated_phosphorus_to_soil(machine_organic_results["infiltrated_phosphorus"], field_size)
-
-            machine_inorganic_results = self._determine_phosphorus_leached_from_surface(
-                rainfall,
-                runoff,
-                field_size,
-                self.data.machine_manure.manure_dry_mass,
-                self.data.machine_manure.manure_field_coverage,
-                self.data.machine_manure.water_extractable_inorganic_phosphorus,
-                False,
-            )
-            self.data.machine_manure.water_extractable_inorganic_phosphorus = machine_inorganic_results[
-                "new_phosphorus_pool_amount"
-            ]
-            self.data.machine_manure.inorganic_phosphorus_runoff = machine_inorganic_results["runoff_phosphorus"]
-            self.data.annual_runoff_machine_manure_inorganic_phosphorus += machine_inorganic_results[
-                "runoff_phosphorus"
-            ]
-            self._add_infiltrated_phosphorus_to_soil(machine_inorganic_results["infiltrated_phosphorus"], field_size)
+    # def leach_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> tuple[float, float]:
+    #     """
+    #     This method handles all calls to the methods that determine how much phosphorus is leached from manure, how
+    #     that leached phosphorus is distributed.
+    #
+    #     Parameters
+    #     ----------
+    #     rainfall : float
+    #         The amount of rainfall on the current day (mm).
+    #     runoff : float
+    #         The amount of runoff from rainfall on the current day (mm).
+    #     field_size : float
+    #         The size of the field (ha).
+    #
+    #     """
+    #     organic_results = Manure._determine_phosphorus_leached_from_surface(
+    #         rainfall,
+    #         runoff,
+    #         field_size,
+    #         self.manure_dry_mass,
+    #         self.manure_field_coverage,
+    #         self.water_extractable_organic_phosphorus,
+    #         True,
+    #     )
+    #     self.water_extractable_organic_phosphorus = organic_results[
+    #         "new_phosphorus_pool_amount"
+    #     ]
+    #     self.organic_phosphorus_runoff = organic_results["runoff_phosphorus"]
+    #     self.annual_runoff_manure_organic_phosphorus += organic_results["runoff_phosphorus"]
+    #
+    #     inorganic_results = Manure._determine_phosphorus_leached_from_surface(
+    #         rainfall,
+    #         runoff,
+    #         field_size,
+    #         self.manure_dry_mass,
+    #         self.manure_field_coverage,
+    #         self.water_extractable_inorganic_phosphorus,
+    #         False,
+    #     )
+    #     self.water_extractable_inorganic_phosphorus = inorganic_results[
+    #         "new_phosphorus_pool_amount"
+    #     ]
+    #     self.inorganic_phosphorus_runoff = inorganic_results["runoff_phosphorus"]
+    #     self.annual_runoff_manure_inorganic_phosphorus += inorganic_results[
+    #         "runoff_phosphorus"
+    #     ]
+    #     return organic_results["infiltrated_phosphorus"], inorganic_results["infiltrated_phosphorus"]
 
     def adjust_manure_moisture_factor(self, rainfall: float, temperature_factor: float) -> None:
         """

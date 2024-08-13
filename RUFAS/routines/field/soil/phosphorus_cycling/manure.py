@@ -295,7 +295,8 @@ class Manure:
                 "new_phosphorus_pool_amount"
             ]
             self.data.machine_manure.organic_phosphorus_runoff = machine_organic_results["runoff_phosphorus"]
-            self.data.annual_runoff_machine_manure_organic_phosphorus += machine_organic_results["runoff_phosphorus"]
+            self.data.machine_manure.annual_runoff_manure_organic_phosphorus += machine_organic_results[
+                "runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(machine_organic_results["infiltrated_phosphorus"], field_size)
 
             machine_inorganic_results = self._determine_phosphorus_leached_from_surface(
@@ -311,7 +312,7 @@ class Manure:
                 "new_phosphorus_pool_amount"
             ]
             self.data.machine_manure.inorganic_phosphorus_runoff = machine_inorganic_results["runoff_phosphorus"]
-            self.data.annual_runoff_machine_manure_inorganic_phosphorus += machine_inorganic_results[
+            self.data.machine_manure.annual_runoff_manure_inorganic_phosphorus += machine_inorganic_results[
                 "runoff_phosphorus"
             ]
             self._add_infiltrated_phosphorus_to_soil(machine_inorganic_results["infiltrated_phosphorus"], field_size)
@@ -330,7 +331,7 @@ class Manure:
                 "new_phosphorus_pool_amount"
             ]
             self.data.grazing_manure.organic_phosphorus_runoff = grazer_organic_results["runoff_phosphorus"]
-            self.data.annual_runoff_grazing_manure_organic_phosphorus += grazer_organic_results["runoff_phosphorus"]
+            self.data.grazing_manure.annual_runoff_manure_organic_phosphorus += grazer_organic_results["runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(grazer_organic_results["infiltrated_phosphorus"], field_size)
 
             grazer_inorganic_results = self._determine_phosphorus_leached_from_surface(
@@ -346,7 +347,7 @@ class Manure:
                 "new_phosphorus_pool_amount"
             ]
             self.data.grazing_manure.inorganic_phosphorus_runoff = grazer_inorganic_results["runoff_phosphorus"]
-            self.data.annual_runoff_grazing_manure_inorganic_phosphorus += grazer_inorganic_results["runoff_phosphorus"]
+            self.data.grazing_manure.annual_runoff_manure_inorganic_phosphorus += grazer_inorganic_results["runoff_phosphorus"]
             self._add_infiltrated_phosphorus_to_soil(grazer_inorganic_results["infiltrated_phosphorus"], field_size)
 
     def _add_infiltrated_phosphorus_to_soil(self, infiltrated_phosphorus_amount: float, field_size: float) -> None:

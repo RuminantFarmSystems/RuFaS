@@ -344,14 +344,14 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
     assert incorp.data.machine_manure.water_extractable_inorganic_phosphorus == 30
     assert incorp.data.machine_manure.organic_phosphorus_runoff == 20
     assert incorp.data.machine_manure.inorganic_phosphorus_runoff == 20
-    assert incorp.data.annual_runoff_machine_manure_organic_phosphorus == 20
-    assert incorp.data.annual_runoff_machine_manure_inorganic_phosphorus == 20
+    assert incorp.data.machine_manure.annual_runoff_manure_organic_phosphorus == 20
+    assert incorp.data.machine_manure.annual_runoff_manure_inorganic_phosphorus == 20
     assert incorp.data.grazing_manure.water_extractable_organic_phosphorus == 30
     assert incorp.data.grazing_manure.water_extractable_inorganic_phosphorus == 30
     assert incorp.data.grazing_manure.organic_phosphorus_runoff == 20
     assert incorp.data.grazing_manure.inorganic_phosphorus_runoff == 20
-    assert incorp.data.annual_runoff_grazing_manure_organic_phosphorus == 20
-    assert incorp.data.annual_runoff_grazing_manure_inorganic_phosphorus == 20
+    assert incorp.data.grazing_manure.annual_runoff_manure_organic_phosphorus == 20
+    assert incorp.data.grazing_manure.annual_runoff_manure_inorganic_phosphorus == 20
 
 
 @pytest.mark.parametrize(
