@@ -1,5 +1,6 @@
 import random
 from typing import Any, Callable, Dict, List, Tuple
+import warnings
 
 import numpy as np
 import numpy.typing as npt
@@ -992,29 +993,30 @@ class RationOptimizer:
                 x0[i] = np.clip(x0[i], bnds[i][0], bnds[i][1])
 
         if animal_combination is AnimalCombination.LAC_COW:
-            return minimize(
-                self.objective,
-                x0,
-                method="SLSQP",
-                bounds=bnds,
-                constraints=self.cow_constraints,
-                args=arguments,
-            )
-        elif animal_combination in [
-            AnimalCombination.GROWING,
-            AnimalCombination.CLOSE_UP,
-            AnimalCombination.GROWING_AND_CLOSE_UP,
-        ]:
-            return minimize(
-                self.objective,
-                x0,
-                method="SLSQP",
-                bounds=bnds,
-                constraints=self.heifer_constraints,
-                args=arguments,
-            )
+            constraints_to_use = self.cow_constraints
+        elif animal_combination in [AnimalCombination.GROWING,
+                                    AnimalCombination.CLOSE_UP,
+                                    AnimalCombination.GROWING_AND_CLOSE_UP,]:
+            constraints_to_use = self.heifer_constraints
         else:
             raise ValueError("Invalid animal combination: " + str(animal_combination))
+
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            result = minimize(
+                self.objective,
+                x0,
+                method="SLSQP",
+                bounds=bnds,
+                constraints=constraints_to_use,
+                args=arguments,
+            )
+            for warning in caught_warnings:
+                om.add_warning(
+                    f"Captured warning during optimization of type {warning.category.__name__}",
+                    f"{warning.message}. Warning generated in {warning.filename}",
+                    {"class": self.__class__.__name__, "function": self.optimize.__name__, "full_warning": warning}
+                )
+        return result
 
     def attempt_optimization(
         self,
