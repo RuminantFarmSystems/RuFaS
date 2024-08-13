@@ -923,21 +923,18 @@ class ReportGenerator:
             if value is None:
                 raise ValueError("Constant value cannot be None.")
 
-            if not isinstance(name, str):
-                raise ValueError(f"Constant name {name} must be a string.")
-
-            if len(name) == 0:
-                raise ValueError("Constant name cannot be empty.")
+            if not isinstance(name, str) or len(name) == 0:
+                raise ValueError(f"Constant name {name} must be a string and cannot be empty.")
 
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
 
             if display_units:
-                normalized_prodived_name = self._normalize_constant_name(name)
+                normalized_provided_name = self._normalize_constant_name(name)
                 matching_constant_value = None
                 for attribute in dir(GeneralConstants):
                     normalized_attribute_name = self._normalize_constant_name(attribute)
-                    if normalized_attribute_name == normalized_prodived_name:
+                    if normalized_attribute_name == normalized_provided_name:
                         matching_constant_value = getattr(GeneralConstants, attribute)
                         break
 
