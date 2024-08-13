@@ -278,8 +278,7 @@ def test_task(
 
 def test_task_failed(
     mock_output_manager: Generator[Any, Any, Any],
-    task_manager: TaskManager,
-    mocker: MockerFixture) -> None:
+    task_manager: TaskManager) -> None:
     """Tests that error were handled correctly"""
     args = {
         "task_type": "failure",
