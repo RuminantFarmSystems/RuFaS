@@ -683,7 +683,7 @@ class RationReporter:
         body_weight: float
     ) -> float:
         """
-        Returns actual digestible energy of feed item, Mcal/kg
+        Returns actual digestible energy of feed item, Mcal.
         Calculation is performed on a per feed item basis
 
         Parameters
@@ -700,7 +700,7 @@ class RationReporter:
         Returns
         -------
         float
-            actual digestible energy of feed item, Mcal/kg.
+            actual digestible energy of feed item, Mcal.
 
         """
         de_key: Literal["DE_Base", "DE"] = "DE_Base" if feed_item_info["DE"] == -1 else "DE"
@@ -733,7 +733,8 @@ class RationReporter:
         Returns
         -------
         float
-            metabolizable energy of feed i, Mcal/kg.
+            metabolizable energy of feed i, Mcal.
+
         Notes
         -----
         Division of DE_act by kg_fed is to get the DE for each item on a per kg basis,
@@ -782,7 +783,7 @@ class RationReporter:
         Returns
         -------
         float
-            Net energy of feed i, Mcal/kg.
+            Net energy of feed i, Mcal.
 
         Notes
         -----
@@ -825,7 +826,7 @@ class RationReporter:
         Returns
         -------
         float
-            Net energy of feed i, Mcal/kg.
+            Net energy of feed i, Mcal.
 
         Notes
         -----
@@ -876,11 +877,11 @@ class RationReporter:
         Returns
         -------
         float
-            Net energy of feed i, Mcal/kg.
+            Net energy of feed i, Mcal.
 
         Notes
         -----
-        Division of ME_item by kg_fed is to get the ME for each item on a per kg basis,
+        Division of ME_item by kg_fed is to get the metabolizable energy for each item on a per kg basis,
             as is used in the subsequent calculations.
 
         """
