@@ -129,6 +129,7 @@ def test_daily_update_routine(
     )
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
+        mock_add_var = mocker.patch.object(fm.om, "add_variable")
 
         fm.fields = fields
         for field in fields:
@@ -139,6 +140,7 @@ def test_daily_update_routine(
             assert field.manage_field.call_count == 1
         assert get_conditions.call_count == len(fields)
         assert fm.output_gatherer.send_daily_variables.call_count == 1
+        assert mock_add_var.call_count == len(fields)
 
 
 @pytest.mark.parametrize(
@@ -181,12 +183,13 @@ def test_annual_update_routine(fields: List[Field]):
 def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
     """Tests that the correct manure supplier is provided for setting up Fields."""
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
-    add_log = mocker.patch.object(om, "add_log")
     mocker.patch("RUFAS.routines.field.manager.field_manager.FieldManager.__init__", return_value=None)
 
     field_manager = FieldManager()
     field_manager.im = mocker.MagicMock()
     field_manager.im.get_data = mocker.MagicMock(return_value=animals)
+    field_manager.om = mocker.MagicMock()
+    add_log = mocker.patch.object(field_manager.om, "add_log")
 
     actual = field_manager._get_manure_supplier(mock_manure_manager)
 

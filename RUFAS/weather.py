@@ -193,7 +193,6 @@ class Weather:
         )
         om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
         om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
-        om.add_variable("daylength", current_weather.daylength, dict(info_map, **{"units": MeasurementUnits.HOURS}))
         om.add_variable(
             "maximum_temperature",
             current_weather.max_air_temperature,

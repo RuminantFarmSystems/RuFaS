@@ -335,7 +335,7 @@ def test_record_weather(
     ):
         mock_weather.record_weather(mock_time)
         assert mock_current_day_conditions.call_count == 1
-        assert add_var.call_count == 9
+        assert add_var.call_count == 8
 
 
 @pytest.mark.parametrize("weather_file", [{"year": [2023], "jday": [267, 268, 269, 270, 271]}])
