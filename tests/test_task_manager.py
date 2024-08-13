@@ -296,9 +296,6 @@ def test_task_failed(
     }
     produce_graphics = False
     result = task_manager.task(args, produce_graphics, 10)
-    mock_add_error = mocker.patch.object(mock_output_manager, "add_error", return_value=None)
-    mock_dump = mocker.patch.object(mock_output_manager, "dump_all_nondata_pools", return_value=None)
-    mock_add_log = mocker.patch.object(mock_output_manager, "add_log", return_value=None)
     assert result == "test (1)"
 
 
