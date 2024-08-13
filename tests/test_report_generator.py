@@ -281,8 +281,13 @@ def test_add_constants_to_report_data(
         # Error case with an empty constant name
         ({}, {"": 10}, ValueError, False, None),
         # Valid case with valid constants
-        ({}, {"Constant1": 10, "Constant2": 20.5}, None, True, {"Constant1_(unit_not_found)": 10,
-                                                                "Constant2_(unit_not_found)": 20.5}),
+        (
+            {},
+            {"Constant1": 10, "Constant2": 20.5},
+            None,
+            True,
+            {"Constant1_(unit_not_found)": 10, "Constant2_(unit_not_found)": 20.5},
+        ),
         ({}, {"PROTEIN_TO_NITROGEN": 10}, None, True, {"PROTEIN_TO_NITROGEN_(unitless)": 10}),
     ],
 )
