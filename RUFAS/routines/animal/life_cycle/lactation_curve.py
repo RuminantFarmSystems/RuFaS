@@ -87,7 +87,9 @@ class LactationCurve:
 
         animal_inputs: dict[str, Any] = im.get_data("animal")
         animal_milking_frequency = animal_inputs["animal_config"]["management_decisions"]["cow_times_milked_per_day"]
-        all_milking_frequency_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["milking_frequency"]
+        all_milking_frequency_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"][
+            "milking_frequency"
+        ]
         milking_frequency_adjustments = self._get_milking_frequency_adjustments(
             all_milking_frequency_adjustments, animal_milking_frequency
         )
@@ -291,7 +293,9 @@ class LactationCurve:
         """
         Adjust the lactation parameters using predicted milk yields for the different parities of cows on the farm.
         """
-        num_milking_cows: float = animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_fraction"]
+        num_milking_cows: float = (
+            animal_inputs["herd_information"]["cow_num"] * lactation_curve_inputs["milking_cow_fraction"]
+        )
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         parity_1_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["1"]
         parity_2_percentage: float = animal_inputs["herd_information"]["parity_fractions"]["2"]
