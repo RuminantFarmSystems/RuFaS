@@ -2,7 +2,8 @@ import pytest
 from pytest import approx
 
 from RUFAS.routines.animal.ration.amino_acid import (
-    AminoAcidCalculator, EssentialAminoAcidRequirements,
+    AminoAcidCalculator,
+    EssentialAminoAcidRequirements,
 )
 
 
@@ -131,33 +132,90 @@ def test_calculate_lactation(amino_acid: str, NPMilk: float, expected: float) ->
     "lactating, body_weight, frame_weight_gain, gravid_uterine_weight_gain, dry_matter_intake_estimate,"
     "milk_true_protein, milk_production, NDF_conc, expected",
     [
-        (True, 256.7, 100, 30.68, 50.79, 15, 8.8, 80,
-         EssentialAminoAcidRequirements(
-             histidine=444.75415905775316, isoleucine=607.8802372175029, leucine=1259.145226809208,
-             lysine=1169.9987839467644, methionine=350.6195244438681, phenylalanine=702.7935242069381,
-             threonine=754.7970603482727, thryptophan=164.91259507532814, valine=801.8208567273932,
-         )),
-        (True, 1256.7, 388.6, 48.1, 89.9, 66, 18.18, 98,
-         EssentialAminoAcidRequirements(
-             histidine=1101.86857774196, isoleucine=1845.3482152778374, leucine=3458.810162197632,
-             lysine=3092.1012637087865, methionine=971.62615877822, phenylalanine=2005.2365378218012,
-             threonine=1942.1550805517568, thryptophan=456.70449804253167, valine=2218.3784711619164,
-         )
-         ),
-        (False, 256.7, 100, 30.68, 50.79, 15, 8.8, 80,
-         EssentialAminoAcidRequirements(
-             histidine=393.6976737244198, isoleucine=493.3654940484889, leucine=1069.0814352338655,
-             lysine=1009.1291617245423, methionine=296.0838623205804, phenylalanine=587.421179206938,
-             threonine=659.9388078482726, thryptophan=139.71983867997932, valine=679.2993857814473,
-         )
-         ),
-        (False, 1256.7, 388.6, 48.1, 89.9, 66, 18.18, 98,
-         EssentialAminoAcidRequirements(
-             histidine=636.0191077366268, isoleucine=802.4263120554431, leucine=1726.529161286536,
-             lysine=1625.4751117532307, methionine=474.57840590411047, phenylalanine=954.6927251518009,
-             threonine=1077.659761336757, thryptophan=227.01112110881076, valine=1101.746089120024,
-         )
-         ),
+        (
+            True,
+            256.7,
+            100,
+            30.68,
+            50.79,
+            15,
+            8.8,
+            80,
+            EssentialAminoAcidRequirements(
+                histidine=444.75415905775316,
+                isoleucine=607.8802372175029,
+                leucine=1259.145226809208,
+                lysine=1169.9987839467644,
+                methionine=350.6195244438681,
+                phenylalanine=702.7935242069381,
+                threonine=754.7970603482727,
+                thryptophan=164.91259507532814,
+                valine=801.8208567273932,
+            ),
+        ),
+        (
+            True,
+            1256.7,
+            388.6,
+            48.1,
+            89.9,
+            66,
+            18.18,
+            98,
+            EssentialAminoAcidRequirements(
+                histidine=1101.86857774196,
+                isoleucine=1845.3482152778374,
+                leucine=3458.810162197632,
+                lysine=3092.1012637087865,
+                methionine=971.62615877822,
+                phenylalanine=2005.2365378218012,
+                threonine=1942.1550805517568,
+                thryptophan=456.70449804253167,
+                valine=2218.3784711619164,
+            ),
+        ),
+        (
+            False,
+            256.7,
+            100,
+            30.68,
+            50.79,
+            15,
+            8.8,
+            80,
+            EssentialAminoAcidRequirements(
+                histidine=393.6976737244198,
+                isoleucine=493.3654940484889,
+                leucine=1069.0814352338655,
+                lysine=1009.1291617245423,
+                methionine=296.0838623205804,
+                phenylalanine=587.421179206938,
+                threonine=659.9388078482726,
+                thryptophan=139.71983867997932,
+                valine=679.2993857814473,
+            ),
+        ),
+        (
+            False,
+            1256.7,
+            388.6,
+            48.1,
+            89.9,
+            66,
+            18.18,
+            98,
+            EssentialAminoAcidRequirements(
+                histidine=636.0191077366268,
+                isoleucine=802.4263120554431,
+                leucine=1726.529161286536,
+                lysine=1625.4751117532307,
+                methionine=474.57840590411047,
+                phenylalanine=954.6927251518009,
+                threonine=1077.659761336757,
+                thryptophan=227.01112110881076,
+                valine=1101.746089120024,
+            ),
+        ),
     ],
 )
 def test_calculate_lactation_integration(
