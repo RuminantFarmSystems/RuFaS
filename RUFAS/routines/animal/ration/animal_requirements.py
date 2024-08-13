@@ -81,8 +81,15 @@ class AnimalRequirements:
         self.avg_milk_production_reduction = None
 
         self.avg_essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
-            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
-            thryptophan=0.0, valine=0.0,
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
         )
 
     def calc_pen_requirements(
@@ -178,23 +185,32 @@ class AnimalRequirements:
                     attribute_name,
                     EssentialAminoAcidRequirements(
                         histidine=calc_method_to_function_map[calc_method](
-                            [eaa_req["histidine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["histidine"] for eaa_req in arg], *stats_args
+                        ),
                         isoleucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["isoleucine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["isoleucine"] for eaa_req in arg], *stats_args
+                        ),
                         leucine=calc_method_to_function_map[calc_method](
-                            [eaa_req["leucine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["leucine"] for eaa_req in arg], *stats_args
+                        ),
                         lysine=calc_method_to_function_map[calc_method](
-                            [eaa_req["lysine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["lysine"] for eaa_req in arg], *stats_args
+                        ),
                         methionine=calc_method_to_function_map[calc_method](
-                            [eaa_req["methionine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["methionine"] for eaa_req in arg], *stats_args
+                        ),
                         phenylalanine=calc_method_to_function_map[calc_method](
-                            [eaa_req["phenylalanine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["phenylalanine"] for eaa_req in arg], *stats_args
+                        ),
                         threonine=calc_method_to_function_map[calc_method](
-                            [eaa_req["threonine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["threonine"] for eaa_req in arg], *stats_args
+                        ),
                         thryptophan=calc_method_to_function_map[calc_method](
-                            [eaa_req["thryptophan"] for eaa_req in arg], *stats_args),
+                            [eaa_req["thryptophan"] for eaa_req in arg], *stats_args
+                        ),
                         valine=calc_method_to_function_map[calc_method](
-                            [eaa_req["valine"] for eaa_req in arg], *stats_args),
+                            [eaa_req["valine"] for eaa_req in arg], *stats_args
+                        ),
                     ),
                 )
 
@@ -528,8 +544,15 @@ class AnimalRequirements:
             dictionary of requirement values, see individual functions for each key value pair
         """
         essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
-            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
-            thryptophan=0.0, valine=0.0,
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
         )
         if AnimalBase.config["nutrient_standard"] == "NRC":
             (
