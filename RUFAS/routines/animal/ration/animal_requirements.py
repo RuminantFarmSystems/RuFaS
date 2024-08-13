@@ -80,7 +80,10 @@ class AnimalRequirements:
 
         self.avg_milk_production_reduction = None
 
-        self.essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements()
+        self.essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
+            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
+            thryptophan=0.0, valine=0.0,
+        )
 
     def calc_pen_requirements(
         self,
@@ -98,7 +101,7 @@ class AnimalRequirements:
         milk: List[float],
         CP_milk: List[float],
         milk_production_reduction: List[float],
-        essential_amino_acid_requirement: List[EssentialAminoAcidRequirements],
+        essential_amino_acid_requirement_list: List[EssentialAminoAcidRequirements],
         calc_method: str = "mean",
     ) -> None:
         """
@@ -137,7 +140,8 @@ class AnimalRequirements:
             list of milk_production_reduction values for all animals in the pen (kg)
         calc_method: str
             The summary statistic to be used (e.g. mean, median, etc)
-
+        essential_amino_acid_requirement_list: List[EssentialAminoAcidRequirements]
+            List of essential amino acid requirements (g).
         """
 
         attr_names_to_args_map = {
@@ -155,7 +159,7 @@ class AnimalRequirements:
             "avg_milk": milk,
             "avg_CP_milk": CP_milk,
             "avg_milk_production_reduction": milk_production_reduction,
-            "essential_amino_acid_requirement": essential_amino_acid_requirement,
+            "essential_amino_acid_requirement": essential_amino_acid_requirement_list,
         }
 
         calc_method_to_function_map = {
@@ -168,11 +172,38 @@ class AnimalRequirements:
         stats_args = [default_percentile] if calc_method == "percentile" else []
 
         for attribute_name, arg in attr_names_to_args_map.items():
-            setattr(
-                self,
-                attribute_name,
-                calc_method_to_function_map[calc_method](arg, *stats_args),
-            )
+            if attribute_name == "essential_amino_acid_requirement":
+                setattr(
+                    self,
+                    attribute_name,
+                    EssentialAminoAcidRequirements(
+                        histidine=calc_method_to_function_map[calc_method](
+                            [eaa_req["histidine"] for eaa_req in arg], *stats_args),
+                        isoleucine=calc_method_to_function_map[calc_method](
+                            [eaa_req["isoleucine"] for eaa_req in arg], *stats_args),
+                        leucine=calc_method_to_function_map[calc_method](
+                            [eaa_req["leucine"] for eaa_req in arg], *stats_args),
+                        lysine=calc_method_to_function_map[calc_method](
+                            [eaa_req["lysine"] for eaa_req in arg], *stats_args),
+                        methionine=calc_method_to_function_map[calc_method](
+                            [eaa_req["methionine"] for eaa_req in arg], *stats_args),
+                        phenylalanine=calc_method_to_function_map[calc_method](
+                            [eaa_req["phenylalanine"] for eaa_req in arg], *stats_args),
+                        threonine=calc_method_to_function_map[calc_method](
+                            [eaa_req["threonine"] for eaa_req in arg], *stats_args),
+                        thryptophan=calc_method_to_function_map[calc_method](
+                            [eaa_req["thryptophan"] for eaa_req in arg], *stats_args),
+                        valine=calc_method_to_function_map[calc_method](
+                            [eaa_req["valine"] for eaa_req in arg], *stats_args),
+                    ),
+                )
+
+            else:
+                setattr(
+                    self,
+                    attribute_name,
+                    calc_method_to_function_map[calc_method](arg, *stats_args),
+                )
 
     def set_requirements(self, pen, animal_grouping_scenario, recalc: bool) -> None:
         """
@@ -496,7 +527,10 @@ class AnimalRequirements:
         Dict[str, float]
             dictionary of requirement values, see individual functions for each key value pair
         """
-        essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements()
+        essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
+            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
+            thryptophan=0.0, valine=0.0,
+        )
         if AnimalBase.config["nutrient_standard"] == "NRC":
             (
                 net_energy_maintenance,
