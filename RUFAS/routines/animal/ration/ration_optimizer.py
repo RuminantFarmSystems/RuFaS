@@ -138,6 +138,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for total net energy.
 
         """
         dry_matter_intake = sum(decision_vector)
@@ -277,6 +278,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for maintenance
+             and activity.
 
         """
         # DMI calculated by the NLP
@@ -373,6 +376,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for pregnancy
+             and lactation.
 
         """
         # Actual net energy for lactation of feed i, Mcal/kg
@@ -420,6 +425,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for growth.
 
         """
         # Actual net energy for growth of feed i, Mcal/kg
@@ -553,6 +559,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the lower protein limit.
 
         """
         DMI = sum(decision_vector)
@@ -662,6 +669,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is below the upper protein limit.
 
         """
         return (ration_config.MP_requirement * AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR)\
@@ -686,6 +694,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that neutral detergent fiber content is greater than 25% of DMI.
+
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -716,6 +726,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that neutral detergent fiber content is less than 45% of DMI.
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -747,6 +758,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that NDF supply is greater than 15%.
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -791,6 +803,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than 7%.
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -806,7 +819,7 @@ class RationOptimizer:
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
-        greater than the DMI_est + 20% calculated in the requirements
+        greater than the DMI_est + DMI_CONSTRAINT_PERCENT calculated in the requirements
 
         Parameters
         ----------
@@ -818,6 +831,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the DMI minimum.
 
         """
         return float((sum(decision_vector)) - (
@@ -831,7 +845,7 @@ class RationOptimizer:
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
-        less than the DMI_est + 20% calculated in the requirements.
+        less than the DMI_est + DMI_CONSTRAINT_PERCENT calculated in the requirements.
 
         Parameters
         ----------
@@ -843,6 +857,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is less than the DMI maximum.
 
         """
         return float(-(sum(decision_vector)) + (
