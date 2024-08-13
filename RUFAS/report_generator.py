@@ -1,5 +1,6 @@
 import re
 from typing import Dict, List, Any, Callable, Optional
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -870,19 +871,22 @@ class ReportGenerator:
             return
 
         try:
-            self._validate_constants(report_data, constants_config)
+            validated_constants_config = self._validate_constants(
+                report_data, constants_config, filter_content.get("display_units", False)
+            )
         except ValueError:
             raise
 
         max_length = max([len(lst) for lst in report_data.values()])
-        for name, value in constants_config.items():
+        for name, value in validated_constants_config.items():
             report_data[name] = [value] * max_length
 
     def _validate_constants(
         self,
         existing_reports: Dict[str, List[Any]],
         constants_config: Dict[str, int | float],
-    ) -> None:
+        display_units: bool,
+    ) -> dict[str, int | float]:
         """
         Validates the names and values of the constants in the constants_config.
 
@@ -896,6 +900,8 @@ class ReportGenerator:
             The dictionary containing the names and values of the reports that have already been generated.
         constants_config : Dict[str, int | float]
             A dictionary containing the names and values of the constants to be added to the report data.
+        display_units : bool
+            Whether or not the report filter specifies to display units in the report header.
 
         Raises
         ------
@@ -907,6 +913,7 @@ class ReportGenerator:
             If a constant value is not a number.
         """
 
+        updated_constants_config: dict[str, int | float] = {}
         for name, value in constants_config.items():
             if name in existing_reports:
                 raise ValueError(f"Constant name {name} already exists in report data.")
@@ -917,14 +924,33 @@ class ReportGenerator:
             if value is None:
                 raise ValueError("Constant value cannot be None.")
 
-            if not isinstance(name, str):
-                raise ValueError(f"Constant name {name} must be a string.")
-
-            if len(name) == 0:
-                raise ValueError("Constant name cannot be empty.")
+            if not isinstance(name, str) or len(name) == 0:
+                raise ValueError(f"Constant name {name} must be a string and cannot be empty.")
 
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
+
+            if display_units:
+                normalized_provided_name = self._normalize_constant_name(name)
+                matching_constant_value = None
+                for attribute in dir(GeneralConstants):
+                    normalized_attribute_name = self._normalize_constant_name(attribute)
+                    if normalized_attribute_name == normalized_provided_name:
+                        matching_constant_value = getattr(GeneralConstants, attribute)
+                        break
+
+                unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant_value, "unit_not_found")
+                constant_with_units = f"{name}_({unit_for_constant})"
+                updated_constants_config[constant_with_units] = constants_config[name]
+            else:
+                updated_constants_config[name] = constants_config[name]
+
+        return updated_constants_config
+
+    @staticmethod
+    def _normalize_constant_name(name: str) -> str:
+        """Normalize the constant name by converting to lowercase and removing underscores and spaces."""
+        return re.sub(r"[\s_]", "", name).lower()
 
     @staticmethod
     def _add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
