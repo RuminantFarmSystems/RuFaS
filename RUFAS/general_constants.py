@@ -56,6 +56,7 @@ class GeneralConstants:
     # Biochemistry-related
     PROTEIN_TO_NITROGEN = 0.16
     NITROGEN_TO_PROTEIN = 6.25
+    MILK_FAT_WEIGHT = 12.2
 
     # Earth related data
     EARTH_ANGULAR_VELOCITY = 0.2618
@@ -85,11 +86,12 @@ class GeneralConstants:
         WATER_DENSITY_KG_PER_LITER: MeasurementUnits.KILOGRAMS,
         WATER_DENSITY_KG_PER_M3: MeasurementUnits.CUBIC_METERS,
 
-        PROTEIN_TO_NITROGEN: MeasurementUnits.FRACTION,
-        NITROGEN_TO_PROTEIN: MeasurementUnits.FRACTION,
+        PROTEIN_TO_NITROGEN: MeasurementUnits.UNITLESS,
+        NITROGEN_TO_PROTEIN: MeasurementUnits.UNITLESS,
+        MILK_FAT_WEIGHT: MeasurementUnits.UNITLESS,
 
         EARTH_ANGULAR_VELOCITY: MeasurementUnits.UNITLESS,
 
-        PERCENTAGE_TO_FRACTION: MeasurementUnits.FRACTION,
-        FRACTION_TO_PERCENTAGE: MeasurementUnits.PERCENT
+        PERCENTAGE_TO_FRACTION: MeasurementUnits.UNITLESS,
+        FRACTION_TO_PERCENTAGE: MeasurementUnits.UNITLESS
     }

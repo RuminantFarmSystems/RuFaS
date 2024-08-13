@@ -383,7 +383,6 @@ class AnimalModuleReporter:
                 info_map,
                 ration_total_units,
             )
-            ration_total["animals_in_pen"] = len(pen.animals_in_pen)
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_total,
