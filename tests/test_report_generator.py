@@ -1205,7 +1205,7 @@ def test_add_var_units(
 )
 def test_aggregate_units(
     report_data: dict[str, list[float]],
-    aggregator: Callable[[List[float]], float] | str,
+    aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
     simplify_units: bool,
     expected_output: tuple[str, list[dict[str, str | Dict[str, str]]]],
     raises_error: bool,
@@ -1216,3 +1216,22 @@ def test_aggregate_units(
             report_generator._aggregate_units(report_data, aggregator, False)
     else:
         assert report_generator._aggregate_units(report_data, aggregator, simplify_units) == expected_output
+
+
+@pytest.mark.parametrize("input_name, expected_output", [
+    ("CONSTANT_NAME", "constantname"),
+    ("  constant   name ", "constantname"),
+    ("ConstantName", "constantname"),
+    ("constant_name", "constantname"),
+    ("CONSTANT__NAME", "constantname"),
+    ("constant name", "constantname"),
+    ("CONSTANT NAME", "constantname"),
+    (" constant _ Name ", "constantname"),
+])
+def test_normalize_constant_name(input_name: str, expected_output: str):
+    """
+    Test the _normalize_constant_name method to ensure it normalizes the constant name
+    by converting it to lowercase and removing underscores and spaces.
+    """
+    report_generator = ReportGenerator()
+    assert report_generator._normalize_constant_name(input_name) == expected_output

@@ -886,7 +886,7 @@ class ReportGenerator:
         existing_reports: Dict[str, List[Any]],
         constants_config: Dict[str, int | float],
         display_units: bool,
-    ) -> None:
+    ) -> dict[str, int | float]:
         """
         Validates the names and values of the constants in the constants_config.
 
@@ -913,7 +913,7 @@ class ReportGenerator:
             If a constant value is not a number.
         """
 
-        updated_constants_config: Dict[str, int | float] = {}
+        updated_constants_config: dict[str, int | float] = {}
         for name, value in constants_config.items():
             if name in existing_reports:
                 raise ValueError(f"Constant name {name} already exists in report data.")
@@ -947,7 +947,8 @@ class ReportGenerator:
 
         return updated_constants_config
 
-    def _normalize_constant_name(self, name: str) -> str:
+    @staticmethod
+    def _normalize_constant_name(name: str) -> str:
         """Normalize the constant name by converting to lowercase and removing underscores and spaces."""
         return re.sub(r"[\s_]", "", name).lower()
 
