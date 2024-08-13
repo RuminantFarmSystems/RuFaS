@@ -5,6 +5,7 @@ from typing import List
 import pytest
 from pytest import approx
 
+from RUFAS.routines.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 
@@ -34,6 +35,10 @@ def test_default_initialization() -> None:
     assert animal_requirements.avg_milk == 0
     assert animal_requirements.avg_CP_milk == 0
     assert animal_requirements.avg_milk_production_reduction is None
+    assert animal_requirements.avg_essential_amino_acid_requirement == EssentialAminoAcidRequirements(
+            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
+            thryptophan=0.0, valine=0.0,
+        )
 
 
 @pytest.mark.parametrize(
@@ -55,9 +60,48 @@ def test_default_initialization() -> None:
                 [1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 7, 2003],
                 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 [1, 4, 4, 4, 4, 4, 4, 4],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
+                        thryptophan=1, valine=1,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                ]
             ],
             "mean",
-            [16.75, 46.75, 48.4, 60.625, 56.125, 52.8, 62.0, 51.5, 62.35, 62.35, 74.0, 157.0, 1.0, 3.625],
+            [16.75, 46.75, 48.4, 60.625, 56.125, 52.8, 62.0, 51.5, 62.35, 62.35, 74.0, 157.0, 1.0, 3.625,
+             EssentialAminoAcidRequirements(
+                 histidine=3.625, isoleucine=3.625, leucine=3.625, lysine=3.625, methionine=3.625, phenylalanine=3.625,
+                 threonine=3.625, thryptophan=3.625, valine=3.625,
+             ),
+             ],
         ),
         (
             [
@@ -75,9 +119,48 @@ def test_default_initialization() -> None:
                 [1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 7, 2003],
                 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 [1, 4, 4, 4, 4, 4, 4, 4],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
+                        thryptophan=1, valine=1,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                ]
             ],
             "median",
-            [15.5, 36.5, 51.5, 68.5, 53.0, 56.5, 68.0, 48.5, 72.5, 72.5, 74.0, 4.0, 1.0, 4.0],
+            [15.5, 36.5, 51.5, 68.5, 53.0, 56.5, 68.0, 48.5, 72.5, 72.5, 74.0, 4.0, 1.0, 4.0,
+             EssentialAminoAcidRequirements(
+                 histidine=4.0, isoleucine=4.0, leucine=4.0, lysine=4.0, methionine=4.0, phenylalanine=4.0,
+                 threonine=4.0, thryptophan=4.0, valine=4.0,
+             ),
+             ],
         ),
         (
             [
@@ -95,9 +178,48 @@ def test_default_initialization() -> None:
                 [1, 1, 1, 2, 2, 2, 4, 4, 4, 5, 5, 7, 2003],
                 [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 [1, 4, 4, 4, 4, 4, 4, 4],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
+                        thryptophan=1, valine=1,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=4, isoleucine=4, leucine=4, lysine=4, methionine=4, phenylalanine=4, threonine=4,
+                        thryptophan=4, valine=4,
+                    ),
+                ]
             ],
             "percentile",
-            [24.0, 91.3, 82.2, 84.7, 83.5, 75.0, 89.4, 83.0, 91.0, 91.0, 92.6, 6.6, 1.0, 4.0],
+            [24.0, 91.3, 82.2, 84.7, 83.5, 75.0, 89.4, 83.0, 91.0, 91.0, 92.6, 6.6, 1.0, 4.0,
+             EssentialAminoAcidRequirements(
+                 histidine=4.0, isoleucine=4.0, leucine=4.0, lysine=4.0, methionine=4.0, phenylalanine=4.0,
+                 threonine=4.0, thryptophan=4.0, valine=4.0,
+             ),
+             ],
         ),
         (
             [
@@ -115,9 +237,64 @@ def test_default_initialization() -> None:
                 [9, 12, 20, 23, 29, 34, 45, 45, 45, 49, 62, 63, 71, 76, 79, 83, 98],
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 19, 19, 19],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                ]
             ],
             "mean",
-            [69.846, 66.75, 47.214, 41.778, 59.0, 53.846, 50.769, 55.125, 58.125, 58.125, 54.333, 49.588, 1.0, 8.5],
+            [69.846, 66.75, 47.214, 41.778, 59.0, 53.846, 50.769, 55.125, 58.125, 58.125, 54.333, 49.588, 1.0, 8.5,
+             EssentialAminoAcidRequirements(
+                 histidine=8.5, isoleucine=8.5, leucine=8.5, lysine=8.5, methionine=8.5, phenylalanine=8.5,
+                 threonine=8.5, thryptophan=8.5, valine=8.5,
+             ),
+             ],
         ),
         (
             [
@@ -135,9 +312,64 @@ def test_default_initialization() -> None:
                 [9, 12, 20, 23, 29, 34, 45, 45, 45, 49, 62, 63, 71, 76, 79, 83, 98],
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 19, 19, 19],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                ]
             ],
             "median",
-            [73.0, 72.5, 49.5, 43.0, 74.0, 56.0, 47.0, 54.0, 64.5, 64.5, 52.0, 45.0, 1.0, 5.0],
+            [73.0, 72.5, 49.5, 43.0, 74.0, 56.0, 47.0, 54.0, 64.5, 64.5, 52.0, 45.0, 1.0, 5.0,
+             EssentialAminoAcidRequirements(
+                 histidine=5.0, isoleucine=5.0, leucine=5.0, lysine=5.0, methionine=5.0, phenylalanine=5.0,
+                 threonine=5.0, thryptophan=5.0, valine=5.0,
+             ),
+             ],
         ),
         (
             [
@@ -155,9 +387,64 @@ def test_default_initialization() -> None:
                 [9, 12, 20, 23, 29, 34, 45, 45, 45, 49, 62, 63, 71, 76, 79, 83, 98],
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 19, 19, 19],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=19, isoleucine=19, leucine=19, lysine=19, methionine=19, phenylalanine=19,
+                        threonine=19, thryptophan=19, valine=19,
+                    ),
+                ]
             ],
             "percentile",
-            [82.8, 81.9, 81.7, 84.2, 82.8, 74.6, 74.6, 88.5, 89.0, 89.0, 89.7, 80.6, 1.0, 19.0],
+            [82.8, 81.9, 81.7, 84.2, 82.8, 74.6, 74.6, 88.5, 89.0, 89.0, 89.7, 80.6, 1.0, 19.0,
+             EssentialAminoAcidRequirements(
+                 histidine=19.0, isoleucine=19.0, leucine=19.0, lysine=19.0, methionine=19.0, phenylalanine=19.0,
+                 threonine=19.0, thryptophan=19.0, valine=19.0,
+             ),
+             ],
         ),
         (
             [
@@ -175,9 +462,56 @@ def test_default_initialization() -> None:
                 [14, 53, 63, 62, 76, 56, 91, 34, 25, 57, 68, 59, 4, 77],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                ]
             ],
             "mean",
-            [45.0, 47.583, 60.0, 44.182, 63.0, 55.133, 37.692, 42.714, 56.6, 56.6, 44.294, 52.786, 5.5, 5.0],
+            [45.0, 47.583, 60.0, 44.182, 63.0, 55.133, 37.692, 42.714, 56.6, 56.6, 44.294, 52.786, 5.5, 5.0,
+             EssentialAminoAcidRequirements(
+                 histidine=5.0, isoleucine=5.0, leucine=5.0, lysine=5.0, methionine=5.0, phenylalanine=5.0,
+                 threonine=5.0, thryptophan=5.0, valine=5.0,
+             ),
+             ],
         ),
         (
             [
@@ -195,9 +529,56 @@ def test_default_initialization() -> None:
                 [14, 53, 63, 62, 76, 56, 91, 34, 25, 57, 68, 59, 4, 77],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                ]
             ],
             "median",
-            [47.5, 44.0, 69.0, 45.0, 59.0, 65.0, 30.0, 36.5, 57.0, 57.0, 42.0, 58.0, 5.5, 5.0],
+            [47.5, 44.0, 69.0, 45.0, 59.0, 65.0, 30.0, 36.5, 57.0, 57.0, 42.0, 58.0, 5.5, 5.0,
+             EssentialAminoAcidRequirements(
+                 histidine=5.0, isoleucine=5.0, leucine=5.0, lysine=5.0, methionine=5.0, phenylalanine=5.0,
+                 threonine=5.0, thryptophan=5.0, valine=5.0,
+             ),
+             ],
         ),
         (
             [
@@ -215,9 +596,56 @@ def test_default_initialization() -> None:
                 [14, 53, 63, 62, 76, 56, 91, 34, 25, 57, 68, 59, 4, 77],
                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+                [
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                    EssentialAminoAcidRequirements(
+                        histidine=5, isoleucine=5, leucine=5, lysine=5, methionine=5, phenylalanine=5, threonine=5,
+                        thryptophan=5, valine=5,
+                    ),
+                ]
             ],
             "percentile",
-            [73.2, 92.8, 92.4, 84.0, 95.6, 96.0, 68.4, 94.3, 75.4, 75.4, 88.6, 76.7, 9.1, 5.0],
+            [73.2, 92.8, 92.4, 84.0, 95.6, 96.0, 68.4, 94.3, 75.4, 75.4, 88.6, 76.7, 9.1, 5.0,
+             EssentialAminoAcidRequirements(
+                 histidine=5.0, isoleucine=5.0, leucine=5.0, lysine=5.0, methionine=5.0, phenylalanine=5.0,
+                 threonine=5.0, thryptophan=5.0, valine=5.0,
+             ),
+             ],
         ),
     ],
 )
@@ -248,6 +676,7 @@ def test_calc_pen_requirements(argument_lists: List[List[float]], stat_method: s
         "avg_milk",
         "avg_CP_milk",
         "avg_milk_production_reduction",
+        "avg_essential_amino_acid_requirement"
     ]
 
     for attr_name, statistic in zip(attr_list, expected):

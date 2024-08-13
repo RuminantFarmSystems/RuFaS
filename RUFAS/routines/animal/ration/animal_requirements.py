@@ -80,7 +80,7 @@ class AnimalRequirements:
 
         self.avg_milk_production_reduction = None
 
-        self.essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
+        self.avg_essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
             histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
             thryptophan=0.0, valine=0.0,
         )
@@ -159,7 +159,7 @@ class AnimalRequirements:
             "avg_milk": milk,
             "avg_CP_milk": CP_milk,
             "avg_milk_production_reduction": milk_production_reduction,
-            "essential_amino_acid_requirement": essential_amino_acid_requirement_list,
+            "avg_essential_amino_acid_requirement": essential_amino_acid_requirement_list,
         }
 
         calc_method_to_function_map = {
@@ -172,7 +172,7 @@ class AnimalRequirements:
         stats_args = [default_percentile] if calc_method == "percentile" else []
 
         for attribute_name, arg in attr_names_to_args_map.items():
-            if attribute_name == "essential_amino_acid_requirement":
+            if attribute_name == "avg_essential_amino_acid_requirement":
                 setattr(
                     self,
                     attribute_name,
@@ -276,7 +276,7 @@ class AnimalRequirements:
             "DMIest_requirement": self.DMIest_requirement,
             "avg_BW": self.avg_BW,
             "avg_milk_production_reduction_pen": self.avg_milk_production_reduction,
-            "essential_amino_acid_requirement": self.essential_amino_acid_requirement,
+            "avg_essential_amino_acid_requirement": self.avg_essential_amino_acid_requirement,
         }
 
         pen.set_avg_nutrient_rqmts(avg_nutrient_rqmts)
