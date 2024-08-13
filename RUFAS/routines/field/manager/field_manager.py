@@ -39,6 +39,8 @@ class FieldManager:
         A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
     output_gatherer : FieldDataReporter
         An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
+    om : OutputManager
+        Instance of the OutputManager.
 
     """
 
