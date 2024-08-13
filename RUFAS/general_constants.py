@@ -64,33 +64,32 @@ class GeneralConstants:
     PERCENTAGE_TO_FRACTION = 0.01
     FRACTION_TO_PERCENTAGE = 100.0
 
+    CONSTANTS_TO_UNITS = {
+        MM_TO_M: MeasurementUnits.METERS,
+        CM_TO_MM: MeasurementUnits.MILLIMETERS,
+        MM_TO_CM: MeasurementUnits.CENTIMETERS,
+        M_TO_KM: MeasurementUnits.KILOMETERS,
+        KM_TO_M: MeasurementUnits.METERS,
 
-CONSTANTS_TO_UNITS = {
-    GeneralConstants.MM_TO_M: MeasurementUnits.METERS,
-    GeneralConstants.CM_TO_MM: MeasurementUnits.MILLIMETERS,
-    GeneralConstants.MM_TO_CM: MeasurementUnits.CENTIMETERS,
-    GeneralConstants.M_TO_KM: MeasurementUnits.KILOMETERS,
-    GeneralConstants.KM_TO_M: MeasurementUnits.METERS,
+        GRAMS_TO_KG: MeasurementUnits.KILOGRAMS,
+        KG_TO_GRAMS: MeasurementUnits.GRAMS,
 
-    GeneralConstants.GRAMS_TO_KG: MeasurementUnits.KILOGRAMS,
-    GeneralConstants.KG_TO_GRAMS: MeasurementUnits.GRAMS,
+        LITERS_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
+        CUBIC_METERS_TO_LITERS: MeasurementUnits.LITERS,
+        KG_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
 
-    GeneralConstants.LITERS_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
-    GeneralConstants.CUBIC_METERS_TO_LITERS: MeasurementUnits.LITERS,
-    GeneralConstants.KG_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
+        YEAR_LENGTH: MeasurementUnits.DAYS,
+        LEAP_YEAR_LENGTH: MeasurementUnits.DAYS,
+        SECONDS_PER_DAY: MeasurementUnits.SECONDS,
 
-    GeneralConstants.YEAR_LENGTH: MeasurementUnits.DAYS,
-    GeneralConstants.LEAP_YEAR_LENGTH: MeasurementUnits.DAYS,
-    GeneralConstants.SECONDS_PER_DAY: MeasurementUnits.SECONDS,
+        WATER_DENSITY_KG_PER_LITER: MeasurementUnits.KILOGRAMS,
+        WATER_DENSITY_KG_PER_M3: MeasurementUnits.CUBIC_METERS,
 
-    GeneralConstants.WATER_DENSITY_KG_PER_LITER: MeasurementUnits.KILOGRAMS,
-    GeneralConstants.WATER_DENSITY_KG_PER_M3: MeasurementUnits.CUBIC_METERS,
+        PROTEIN_TO_NITROGEN: MeasurementUnits.FRACTION,
+        NITROGEN_TO_PROTEIN: MeasurementUnits.FRACTION,
 
-    GeneralConstants.PROTEIN_TO_NITROGEN: MeasurementUnits.FRACTION,
-    GeneralConstants.NITROGEN_TO_PROTEIN: MeasurementUnits.FRACTION,
+        EARTH_ANGULAR_VELOCITY: MeasurementUnits.UNITLESS,
 
-    GeneralConstants.EARTH_ANGULAR_VELOCITY: MeasurementUnits.UNITLESS,
-
-    GeneralConstants.PERCENTAGE_TO_FRACTION: MeasurementUnits.FRACTION,
-    GeneralConstants.FRACTION_TO_PERCENTAGE: MeasurementUnits.PERCENT
-}
+        PERCENTAGE_TO_FRACTION: MeasurementUnits.FRACTION,
+        FRACTION_TO_PERCENTAGE: MeasurementUnits.PERCENT
+    }
