@@ -1218,16 +1218,19 @@ def test_aggregate_units(
         assert report_generator._aggregate_units(report_data, aggregator, simplify_units) == expected_output
 
 
-@pytest.mark.parametrize("input_name, expected_output", [
-    ("CONSTANT_NAME", "constantname"),
-    ("  constant   name ", "constantname"),
-    ("ConstantName", "constantname"),
-    ("constant_name", "constantname"),
-    ("CONSTANT__NAME", "constantname"),
-    ("constant name", "constantname"),
-    ("CONSTANT NAME", "constantname"),
-    (" constant _ Name ", "constantname"),
-])
+@pytest.mark.parametrize(
+    "input_name, expected_output",
+    [
+        ("CONSTANT_NAME", "constantname"),
+        ("  constant   name ", "constantname"),
+        ("ConstantName", "constantname"),
+        ("constant_name", "constantname"),
+        ("CONSTANT__NAME", "constantname"),
+        ("constant name", "constantname"),
+        ("CONSTANT NAME", "constantname"),
+        (" constant _ Name ", "constantname"),
+    ],
+)
 def test_normalize_constant_name(input_name: str, expected_output: str):
     """
     Test the _normalize_constant_name method to ensure it normalizes the constant name
