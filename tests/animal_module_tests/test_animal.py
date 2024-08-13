@@ -342,7 +342,7 @@ def test_set_requirements(mocker: MockerFixture) -> None:
                     threonine=27.06357293105853,
                     thryptophan=5.442484275206361,
                     valine=26.100285251379756,
-                )
+                ),
             ],
         }
     )
@@ -381,8 +381,15 @@ def test_recalculate_requirements() -> None:
         animal_list[i].p_req = 1
         animal_list[i].DMIest_requirement = i
         animal_list[i].essential_amino_acid_requirement = EssentialAminoAcidRequirements(
-            histidine=i, isoleucine=i, leucine=i, lysine=i, methionine=i, phenylalanine=i, threonine=i,
-            thryptophan=i, valine=i,
+            histidine=i,
+            isoleucine=i,
+            leucine=i,
+            lysine=i,
+            methionine=i,
+            phenylalanine=i,
+            threonine=i,
+            thryptophan=i,
+            valine=i,
         )
         animal_list[i].body_weight = i
         animal_list[i].estimated_daily_milk_produced = i
@@ -416,7 +423,7 @@ def test_recalculate_requirements() -> None:
         "milk": [],
         "milk_production_reduction": [],
         "CP_milk": [],
-        "essential_amino_acid_requirement": []
+        "essential_amino_acid_requirement": [],
     }
     requirements_list_expected = {
         "NEmaint_requirement": [1, 1, 1, 1, 1],
@@ -435,26 +442,61 @@ def test_recalculate_requirements() -> None:
         "CP_milk": [4],
         "essential_amino_acid_requirement": [
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
             ),
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
             ),
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
             ),
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
             ),
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
-            )
-        ]
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
+            ),
+        ],
     }
 
     requirements_mock = AnimalRequirements()
@@ -471,9 +513,16 @@ def test_recalculate_requirements() -> None:
             "P_requirement": 1,
             "DMIest_requirement": 1,
             "essential_amino_acid_requirement": EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
-            )
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
+            ),
         }
     )
 
@@ -509,8 +558,15 @@ def test_use_existing_requirements() -> None:
         animal_list[i].milk_production_reduction = i
         animal_list[i].CP_milk = i
         animal_list[i].essential_amino_acid_requirement = EssentialAminoAcidRequirements(
-            histidine=i, isoleucine=i, leucine=i, lysine=i, methionine=i, phenylalanine=i, threonine=i,
-            thryptophan=i, valine=i,
+            histidine=i,
+            isoleucine=i,
+            leucine=i,
+            lysine=i,
+            methionine=i,
+            phenylalanine=i,
+            threonine=i,
+            thryptophan=i,
+            valine=i,
         )
         pen_mock.animals_in_list[i].calc_daily_walking_dist = MagicMock()
 
@@ -532,7 +588,7 @@ def test_use_existing_requirements() -> None:
         "milk": [],
         "milk_production_reduction": [],
         "CP_milk": [],
-        "essential_amino_acid_requirement": []
+        "essential_amino_acid_requirement": [],
     }
     requirements_list_expected = {
         "NEmaint_requirement": [0, 1],
@@ -551,14 +607,28 @@ def test_use_existing_requirements() -> None:
         "CP_milk": [1],
         "essential_amino_acid_requirement": [
             EssentialAminoAcidRequirements(
-                histidine=0, isoleucine=0, leucine=0, lysine=0, methionine=0, phenylalanine=0, threonine=0,
-                thryptophan=0, valine=0,
+                histidine=0,
+                isoleucine=0,
+                leucine=0,
+                lysine=0,
+                methionine=0,
+                phenylalanine=0,
+                threonine=0,
+                thryptophan=0,
+                valine=0,
             ),
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
             ),
-        ]
+        ],
     }
 
     requirements_mock = AnimalRequirements()
@@ -2515,9 +2585,16 @@ def test_calc_rqmts() -> None:
         "P_requirement": 1.35,
         "DMIest_requirement": 1,
         "essential_amino_acid_requirement": EssentialAminoAcidRequirements(
-            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
-            thryptophan=0.0, valine=0.0,
-        )
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
+        ),
     }
     assert actual == expected
     test_requirements.calculate_NRC_energy_maintenance_requirements.assert_called_once()
@@ -3232,16 +3309,37 @@ def test_calc_pen_requirements() -> None:
         [1, 2, 3],
         [
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
             ),
             EssentialAminoAcidRequirements(
-                histidine=2, isoleucine=2, leucine=2, lysine=2, methionine=2, phenylalanine=2, threonine=2,
-                thryptophan=2, valine=2,
+                histidine=2,
+                isoleucine=2,
+                leucine=2,
+                lysine=2,
+                methionine=2,
+                phenylalanine=2,
+                threonine=2,
+                thryptophan=2,
+                valine=2,
             ),
             EssentialAminoAcidRequirements(
-                histidine=3, isoleucine=3, leucine=3, lysine=3, methionine=3, phenylalanine=3, threonine=3,
-                thryptophan=3, valine=3,
+                histidine=3,
+                isoleucine=3,
+                leucine=3,
+                lysine=3,
+                methionine=3,
+                phenylalanine=3,
+                threonine=3,
+                thryptophan=3,
+                valine=3,
             ),
         ],
         "mean",
@@ -3260,13 +3358,20 @@ def test_calc_pen_requirements() -> None:
         "avg_milk",
         "avg_CP_milk",
         "avg_milk_production_reduction",
-        "avg_essential_amino_acid_requirement"
+        "avg_essential_amino_acid_requirement",
     ]
     for attribute in attributelist:
         if attribute == "avg_essential_amino_acid_requirement":
             assert getattr(req, attribute) == EssentialAminoAcidRequirements(
-                histidine=2, isoleucine=2, leucine=2, lysine=2, methionine=2, phenylalanine=2, threonine=2,
-                thryptophan=2, valine=2,
+                histidine=2,
+                isoleucine=2,
+                leucine=2,
+                lysine=2,
+                methionine=2,
+                phenylalanine=2,
+                threonine=2,
+                thryptophan=2,
+                valine=2,
             )
         else:
             assert getattr(req, attribute) == 2
@@ -3287,16 +3392,37 @@ def test_calc_pen_requirements() -> None:
         [1, 2, 3],
         [
             EssentialAminoAcidRequirements(
-                histidine=1, isoleucine=1, leucine=1, lysine=1, methionine=1, phenylalanine=1, threonine=1,
-                thryptophan=1, valine=1,
+                histidine=1,
+                isoleucine=1,
+                leucine=1,
+                lysine=1,
+                methionine=1,
+                phenylalanine=1,
+                threonine=1,
+                thryptophan=1,
+                valine=1,
             ),
             EssentialAminoAcidRequirements(
-                histidine=2, isoleucine=2, leucine=2, lysine=2, methionine=2, phenylalanine=2, threonine=2,
-                thryptophan=2, valine=2,
+                histidine=2,
+                isoleucine=2,
+                leucine=2,
+                lysine=2,
+                methionine=2,
+                phenylalanine=2,
+                threonine=2,
+                thryptophan=2,
+                valine=2,
             ),
             EssentialAminoAcidRequirements(
-                histidine=3, isoleucine=3, leucine=3, lysine=3, methionine=3, phenylalanine=3, threonine=3,
-                thryptophan=3, valine=3,
+                histidine=3,
+                isoleucine=3,
+                leucine=3,
+                lysine=3,
+                methionine=3,
+                phenylalanine=3,
+                threonine=3,
+                thryptophan=3,
+                valine=3,
             ),
         ],
         "percentile",
@@ -3304,8 +3430,15 @@ def test_calc_pen_requirements() -> None:
     for attribute in attributelist:
         if attribute == "avg_essential_amino_acid_requirement":
             assert getattr(req, attribute) == EssentialAminoAcidRequirements(
-                histidine=2.8, isoleucine=2.8, leucine=2.8, lysine=2.8, methionine=2.8, phenylalanine=2.8,
-                threonine=2.8, thryptophan=2.8, valine=2.8,
+                histidine=2.8,
+                isoleucine=2.8,
+                leucine=2.8,
+                lysine=2.8,
+                methionine=2.8,
+                phenylalanine=2.8,
+                threonine=2.8,
+                thryptophan=2.8,
+                valine=2.8,
             )
         else:
             assert getattr(req, attribute) == 2.8

@@ -75,8 +75,15 @@ class AnimalBase:
         self.calf_birth_weight = 0.0
         self.tissue_changed = 0.0
         self.essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
-            histidine=0.0, isoleucine=0.0, leucine=0.0, lysine=0.0, methionine=0.0, phenylalanine=0.0, threonine=0.0,
-            thryptophan=0.0, valine=0.0,
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
         )
         self.sold_at_day: int | None = None
         if "body_weight_history" in args:
