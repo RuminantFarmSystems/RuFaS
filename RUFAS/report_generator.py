@@ -1,5 +1,6 @@
 import re
 from typing import Dict, List, Any, Callable, Optional
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -925,6 +926,21 @@ class ReportGenerator:
 
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
+
+            normalized_prodived_name = self._normalize_constant_name(name)
+            matching_attribute = ""
+            for attribute in dir(GeneralConstants):
+                normalized_attribute_name = self._normalize_constant_name(attribute)
+                if normalized_attribute_name == normalized_prodived_name:
+                    matching_attribute = attribute
+                    break
+
+            unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_attribute, "")
+            constant_with_units = f"{name}_({unit_for_constant})"
+
+    def _normalize_constant_name(self, name: str) -> str:
+        """Normalize the constant name by converting to lowercase and removing underscores and spaces."""
+        return re.sub(r'[\s_]', '', name).lower()
 
     @staticmethod
     def _add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
