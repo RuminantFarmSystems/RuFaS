@@ -40,6 +40,9 @@ class ManureTreatmentConfig:
         Temperature set point for the anaerobic digestion.
     anaerobic_digestion_temperature_celsius:
         Temperature of the anaerobic digestion.
+    digester_methane_leakage_fraction : float, default 0.0
+        Fraction of methane generated in the digester that escapes to the atmosphere through unintended leakage and is
+        not collected by the gas capture system.
     storage_time_period:
         Time in days that manure is stored in the treatment system.
     freeboard_input:
@@ -72,6 +75,7 @@ class ManureTreatmentConfig:
     evaporation_fraction: float = 0.0
     anaerobic_digestion_temperature_set_point: float = 0.0
     anaerobic_digestion_temperature_celsius: float = 0.0
+    digester_methane_leakage_fraction: float = 0.0
 
     storage_time_period: int = 0
     freeboard_input: float = 0.0
