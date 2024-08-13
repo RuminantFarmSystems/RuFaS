@@ -216,10 +216,10 @@ def test_annual_reset() -> None:
     soil_data.annual_eroded_sediment_total = 3
     soil_data.annual_surface_runoff_total = 4
     soil_data.annual_runoff_fertilizer_phosphorus = 5
-    soil_data.annual_runoff_machine_manure_organic_phosphorus = 6
-    soil_data.annual_runoff_machine_manure_inorganic_phosphorus = 7
-    soil_data.annual_runoff_grazing_manure_organic_phosphorus = 8
-    soil_data.annual_runoff_grazing_manure_inorganic_phosphorus = 9
+    soil_data.machine_manure.annual_runoff_manure_organic_phosphorus = 6
+    soil_data.machine_manure.annual_runoff_manure_inorganic_phosphorus = 7
+    soil_data.grazing_manure.annual_runoff_manure_organic_phosphorus = 8
+    soil_data.grazing_manure.annual_runoff_manure_inorganic_phosphorus = 9
     soil_data.annual_soil_phosphorus_runoff = 10
     soil_data.annual_runoff_nitrates_total = 11
     soil_data.annual_runoff_ammonium_total = 12
@@ -241,10 +241,10 @@ def test_annual_reset() -> None:
         assert soil_data.annual_eroded_sediment_total == 0
         assert soil_data.annual_surface_runoff_total == 0
         assert soil_data.annual_runoff_fertilizer_phosphorus == 0
-        assert soil_data.annual_runoff_machine_manure_organic_phosphorus == 0
-        assert soil_data.annual_runoff_machine_manure_inorganic_phosphorus == 0
-        assert soil_data.annual_runoff_grazing_manure_organic_phosphorus == 0
-        assert soil_data.annual_runoff_grazing_manure_inorganic_phosphorus == 0
+        assert soil_data.machine_manure.annual_runoff_manure_organic_phosphorus == 0
+        assert soil_data.machine_manure.annual_runoff_manure_inorganic_phosphorus == 0
+        assert soil_data.grazing_manure.annual_runoff_manure_organic_phosphorus == 0
+        assert soil_data.grazing_manure.annual_runoff_manure_inorganic_phosphorus == 0
         assert soil_data.annual_soil_phosphorus_runoff == 0
         assert soil_data.annual_runoff_nitrates_total == 0
         assert soil_data.annual_runoff_ammonium_total == 0

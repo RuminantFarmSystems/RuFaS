@@ -4,6 +4,7 @@ from math import inf
 from copy import deepcopy
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.machine_manure_pool import MachineManurePool
 from RUFAS.routines.field.soil.manure_pool import ManurePool
 
 
@@ -184,10 +185,6 @@ class SoilData:
 
     # Track annual phosphorus activity
     annual_runoff_fertilizer_phosphorus: float = 0
-    annual_runoff_machine_manure_inorganic_phosphorus: float = 0
-    annual_runoff_machine_manure_organic_phosphorus: float = 0
-    annual_runoff_grazing_manure_inorganic_phosphorus: float = 0
-    annual_runoff_grazing_manure_organic_phosphorus: float = 0
     annual_soil_phosphorus_runoff: float = 0
 
     # Track annual nitrogen loss from field
@@ -245,7 +242,7 @@ class SoilData:
     rain_events_after_fertilizer_application: int = 0
 
     # ---- Manure pools (Phosphorus Cycling)
-    machine_manure: ManurePool = field(default_factory=ManurePool)
+    machine_manure: MachineManurePool = field(default_factory=ManurePool)
     grazing_manure: ManurePool = field(default_factory=ManurePool)
 
     soil_phosphorus_runoff: float = 0.0
@@ -411,11 +408,10 @@ class SoilData:
 
         # Reset phosphorus totals
         self.annual_runoff_fertilizer_phosphorus = 0
-        self.annual_runoff_machine_manure_organic_phosphorus = 0
-        self.annual_runoff_machine_manure_inorganic_phosphorus = 0
-        self.annual_runoff_grazing_manure_organic_phosphorus = 0
-        self.annual_runoff_grazing_manure_inorganic_phosphorus = 0
-
+        self.grazing_manure.annual_runoff_manure_inorganic_phosphorus = 0
+        self.grazing_manure.annual_runoff_manure_organic_phosphorus = 0
+        self.machine_manure.annual_runoff_manure_inorganic_phosphorus = 0
+        self.machine_manure.annual_runoff_manure_organic_phosphorus = 0
         self.annual_soil_phosphorus_runoff = 0
 
         self.annual_runoff_nitrates_total = 0
