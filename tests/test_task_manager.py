@@ -88,7 +88,7 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
 def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> None:
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(0, mock_output_manager)
-        mock_randint.assert_called_once_with(0, 2**32 - 1)
+        mock_randint.assert_called_once_with(0, 2 ** 32 - 1)
         mock_output_manager.add_log.assert_called_with(
             "Random seed used",
             "Seeded libaries with random_seed=4321",
@@ -103,7 +103,7 @@ def test_set_random_seed_with_parameters(
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(seed, mock_output_manager)
         if seed == 0:
-            mock_randint.assert_called_once_with(0, 2**32 - 1)
+            mock_randint.assert_called_once_with(0, 2 ** 32 - 1)
         mock_output_manager.add_log.assert_called_with(
             "Random seed used",
             f"Seeded libaries with random_seed={expected}",
@@ -274,6 +274,29 @@ def test_task(
         mock_handle_input_data_audit.assert_called_once()
         mock_set_random_seed.assert_called_once()
         mock_handler.assert_called_once()
+
+
+def test_task_failed(
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager
+) -> None:
+    """Tests that error were handled correctly"""
+    args = {
+        "task_type": "failure",
+        "log_verbosity": LogVerbosity.LOGS,
+        "exclude_info_maps": False,
+        "output_prefix": "test",
+        "logs_directory": Path("/fake/logs"),
+        "task_id": 1,
+        "random_seed": 924,
+        "suppress_log_files": True,
+        "metadata_file_path": Path("/fake/logs"),
+        "properties_file_path": Path("more/fake/paths"),
+        "produce_graphics": False,
+    }
+    produce_graphics = False
+    result = task_manager.task(args, produce_graphics, 10)
+    assert result == "test (1)"
 
 
 def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
