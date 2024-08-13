@@ -55,7 +55,7 @@ class ManurePool:
         organic_phosphorus_runoff: float = 0.0,
         inorganic_phosphorus_runoff: float = 0.0,
         annual_runoff_manure_inorganic_phosphorus: float = 0.0,
-        annual_runoff_manure_organic_phosphorus: float = 0.0
+        annual_runoff_manure_organic_phosphorus: float = 0.0,
     ) -> None:
         self.manure_dry_mass = manure_dry_mass
         self.manure_applied_mass = manure_applied_mass
@@ -119,8 +119,7 @@ class ManurePool:
             self.adjust_manure_moisture_factor(rainfall, temperature_factor)
 
         # Calculate manure decomposition on soil surface
-        decomposed_mass, decomposed_coverage = \
-            self.determine_decomposed_surface_manure(temperature_factor)
+        decomposed_mass, decomposed_coverage = self.determine_decomposed_surface_manure(temperature_factor)
 
         # Calculate phosphorus mineralization between pools
         mineralized_stable_organic = Manure.determine_mineralized_surface_phosphorus(
@@ -144,28 +143,28 @@ class ManurePool:
             self.manure_moisture_factor,
         )
 
-        assimilated_mass, assimilated_coverage = self.determine_assimilated_surface_manure(temperature_factor,
-                                                                                           field_size)
+        assimilated_mass, assimilated_coverage = self.determine_assimilated_surface_manure(
+            temperature_factor, field_size
+        )
         if self.manure_dry_mass > 0:
             assimilation_ratio = assimilated_mass / self.manure_dry_mass
         else:
             assimilation_ratio = 0
 
-        assimilated_stable_organic = Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                                                    self.stable_organic_phosphorus)
-        assimilated_stable_inorganic = Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                                                      self.stable_inorganic_phosphorus)
-        assimilated_water_extractable_organic = (
-            Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                           self.water_extractable_organic_phosphorus))
-        assimilated_water_extractable_inorganic = (
-            Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                           self.water_extractable_inorganic_phosphorus))
-
-        self.manure_dry_mass = max(
-            0.0,
-            self.manure_dry_mass - assimilated_mass - decomposed_mass
+        assimilated_stable_organic = Manure.determine_assimilated_phosphorus_amount(
+            assimilation_ratio, self.stable_organic_phosphorus
         )
+        assimilated_stable_inorganic = Manure.determine_assimilated_phosphorus_amount(
+            assimilation_ratio, self.stable_inorganic_phosphorus
+        )
+        assimilated_water_extractable_organic = Manure.determine_assimilated_phosphorus_amount(
+            assimilation_ratio, self.water_extractable_organic_phosphorus
+        )
+        assimilated_water_extractable_inorganic = Manure.determine_assimilated_phosphorus_amount(
+            assimilation_ratio, self.water_extractable_inorganic_phosphorus
+        )
+
+        self.manure_dry_mass = max(0.0, self.manure_dry_mass - assimilated_mass - decomposed_mass)
 
         self.manure_field_coverage = max(
             0.0,
@@ -174,16 +173,12 @@ class ManurePool:
 
         self.stable_organic_phosphorus = max(
             0.0,
-            self.stable_organic_phosphorus
-            - assimilated_stable_organic
-            - mineralized_stable_organic,
+            self.stable_organic_phosphorus - assimilated_stable_organic - mineralized_stable_organic,
         )
 
         self.stable_inorganic_phosphorus = max(
             0.0,
-            self.stable_inorganic_phosphorus
-            - assimilated_stable_inorganic
-            - mineralized_stable_inorganic,
+            self.stable_inorganic_phosphorus - assimilated_stable_inorganic - mineralized_stable_inorganic,
         )
 
         self.water_extractable_organic_phosphorus = max(
@@ -195,22 +190,21 @@ class ManurePool:
 
         self.water_extractable_inorganic_phosphorus = max(
             0.0,
-            self.water_extractable_inorganic_phosphorus
-            - assimilated_water_extractable_inorganic,
+            self.water_extractable_inorganic_phosphorus - assimilated_water_extractable_inorganic,
         )
 
         self.water_extractable_inorganic_phosphorus += (
-            mineralized_water_extractable_organic
-            + (0.75 * mineralized_stable_organic)
-            + mineralized_stable_inorganic
+            mineralized_water_extractable_organic + (0.75 * mineralized_stable_organic) + mineralized_stable_inorganic
         )
 
         self.water_extractable_organic_phosphorus += 0.25 * mineralized_stable_organic
 
-        return (assimilated_stable_organic
-                + assimilated_stable_inorganic
-                + assimilated_water_extractable_organic
-                + assimilated_water_extractable_inorganic)
+        return (
+            assimilated_stable_organic
+            + assimilated_stable_inorganic
+            + assimilated_water_extractable_organic
+            + assimilated_water_extractable_inorganic
+        )
 
     def leach_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> tuple[float, float]:
         """
@@ -236,9 +230,7 @@ class ManurePool:
             self.water_extractable_organic_phosphorus,
             True,
         )
-        self.water_extractable_organic_phosphorus = organic_results[
-            "new_phosphorus_pool_amount"
-        ]
+        self.water_extractable_organic_phosphorus = organic_results["new_phosphorus_pool_amount"]
         self.organic_phosphorus_runoff = organic_results["runoff_phosphorus"]
         self.annual_runoff_manure_organic_phosphorus += organic_results["runoff_phosphorus"]
 
@@ -251,13 +243,9 @@ class ManurePool:
             self.water_extractable_inorganic_phosphorus,
             False,
         )
-        self.water_extractable_inorganic_phosphorus = inorganic_results[
-            "new_phosphorus_pool_amount"
-        ]
+        self.water_extractable_inorganic_phosphorus = inorganic_results["new_phosphorus_pool_amount"]
         self.inorganic_phosphorus_runoff = inorganic_results["runoff_phosphorus"]
-        self.annual_runoff_manure_inorganic_phosphorus += inorganic_results[
-            "runoff_phosphorus"
-        ]
+        self.annual_runoff_manure_inorganic_phosphorus += inorganic_results["runoff_phosphorus"]
         return organic_results["infiltrated_phosphorus"], inorganic_results["infiltrated_phosphorus"]
 
     def adjust_manure_moisture_factor(self, rainfall: float, temperature_factor: float) -> None:
@@ -281,9 +269,7 @@ class ManurePool:
                 temperature_factor,
             )
             self.manure_moisture_factor += change_in_machine_manure_moisture
-            self.manure_moisture_factor = min(
-                0.9, max(self.manure_moisture_factor, 0.0)
-            )
+            self.manure_moisture_factor = min(0.9, max(self.manure_moisture_factor, 0.0))
 
     def determine_decomposed_surface_manure(self, temperature_factor: float) -> tuple[float, float]:
         """
@@ -316,16 +302,13 @@ class ManurePool:
                 self.manure_dry_mass,
             )
             decomposed_manure_coverage_change = min(
-                (decomposed_manure_mass_change / self.manure_dry_mass)
-                * self.manure_field_coverage,
+                (decomposed_manure_mass_change / self.manure_dry_mass) * self.manure_field_coverage,
                 self.manure_field_coverage,
             )
 
         return decomposed_manure_mass_change, decomposed_manure_coverage_change
 
-    def determine_assimilated_surface_manure(self,
-                                             temperature_factor: float,
-                                             field_size: float) -> tuple[float, float]:
+    def determine_assimilated_surface_manure(self, temperature_factor: float, field_size: float) -> tuple[float, float]:
         """
         Determines how much manure is assimilated into the soil profile and how much the manure coverage is reduced
         by on the current day.
@@ -350,17 +333,13 @@ class ManurePool:
             assimilated_manure = max(
                 0.0,
                 self._determine_dry_manure_matter_assimilation(
-                    self.manure_moisture_factor,
-                    temperature_factor,
-                    manure_cover_area,
-                    False
-                )
+                    self.manure_moisture_factor, temperature_factor, manure_cover_area, False
+                ),
             )
             assimilated_manure = min(self.manure_dry_mass, assimilated_manure)
             manure_coverage = max(
                 0.0,
-                (assimilated_manure / self.manure_dry_mass)
-                * self.manure_field_coverage,
+                (assimilated_manure / self.manure_dry_mass) * self.manure_field_coverage,
             )
             manure_coverage = min(manure_coverage, self.manure_field_coverage)
         return assimilated_manure, manure_coverage
@@ -386,8 +365,8 @@ class ManurePool:
 
         """
         calculated_temperature_factor = (
-                                            (2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)
-                                        ) / (32 ** 4)
+            (2 * (32**2) * (mean_air_temperature**2)) - (mean_air_temperature**4)
+        ) / (32**4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -410,7 +389,7 @@ class ManurePool:
         SurPhos [1], pseudocode_soil [S.5.D.III.4]
 
         """
-        return 0.003 * (temperature_factor ** 0.5)
+        return 0.003 * (temperature_factor**0.5)
 
     @staticmethod
     def _determine_dry_manure_matter_assimilation(
@@ -446,7 +425,7 @@ class ManurePool:
         """
         if is_dung:
             exponential_term = exp(3.5 * sqrt(moisture_factor))
-            temperature_term = temperature_factor ** 0.1
+            temperature_term = temperature_factor**0.1
         else:
             exponential_term = exp(2.5 * moisture_factor)
             temperature_term = temperature_factor
@@ -602,8 +581,8 @@ class ManurePool:
         runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
 
         phosphorus_lost_to_runoff_in_kg = (
-                                              runoff_dissolved_phosphorus_concentration * runoff_in_liters
-                                          ) * MILLIGRAMS_TO_KILOGRAMS
+            runoff_dissolved_phosphorus_concentration * runoff_in_liters
+        ) * MILLIGRAMS_TO_KILOGRAMS
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 

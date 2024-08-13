@@ -288,13 +288,15 @@ class Manure:
         """
         if self.data.machine_manure.manure_dry_mass > 0 and self.data.machine_manure.manure_field_coverage > 0:
             organic_phosphorus, inorganic_phosphorus = self.data.machine_manure.leach_phosphorus_pools(
-                rainfall, runoff, field_size)
+                rainfall, runoff, field_size
+            )
             self._add_infiltrated_phosphorus_to_soil(organic_phosphorus, field_size)
             self._add_infiltrated_phosphorus_to_soil(inorganic_phosphorus, field_size)
 
         if self.data.grazing_manure.manure_dry_mass > 0 and self.data.grazing_manure.manure_field_coverage > 0:
             organic_phosphorus, inorganic_phosphorus = self.data.grazing_manure.leach_phosphorus_pools(
-                rainfall, runoff, field_size)
+                rainfall, runoff, field_size
+            )
             self._add_infiltrated_phosphorus_to_soil(organic_phosphorus, field_size)
             self._add_infiltrated_phosphorus_to_soil(inorganic_phosphorus, field_size)
 
@@ -607,8 +609,8 @@ class Manure:
         runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
 
         phosphorus_lost_to_runoff_in_kg = (
-                                              runoff_dissolved_phosphorus_concentration * runoff_in_liters
-                                          ) * MILLIGRAMS_TO_KILOGRAMS
+            runoff_dissolved_phosphorus_concentration * runoff_in_liters
+        ) * MILLIGRAMS_TO_KILOGRAMS
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 
@@ -702,8 +704,8 @@ class Manure:
 
         """
         calculated_temperature_factor = (
-                                            (2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)
-                                        ) / (32 ** 4)
+            (2 * (32**2) * (mean_air_temperature**2)) - (mean_air_temperature**4)
+        ) / (32**4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -726,7 +728,7 @@ class Manure:
         SurPhos [1], pseudocode_soil [S.5.D.III.4]
 
         """
-        return 0.003 * (temperature_factor ** 0.5)
+        return 0.003 * (temperature_factor**0.5)
 
     @staticmethod
     def _determine_dry_manure_matter_assimilation(
@@ -762,7 +764,7 @@ class Manure:
         """
         if is_dung:
             exponential_term = exp(3.5 * sqrt(moisture_factor))
-            temperature_term = temperature_factor ** 0.1
+            temperature_term = temperature_factor**0.1
         else:
             exponential_term = exp(2.5 * moisture_factor)
             temperature_term = temperature_factor
