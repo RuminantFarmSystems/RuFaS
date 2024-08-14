@@ -148,15 +148,15 @@ class ManurePool:
             assimilation_ratio = 0
 
         assimilated_stable_organic = self.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                                                    self.stable_organic_phosphorus)
+                                                                                  self.stable_organic_phosphorus)
         assimilated_stable_inorganic = self.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                                                      self.stable_inorganic_phosphorus)
+                                                                                    self.stable_inorganic_phosphorus)
         assimilated_water_extractable_organic = (
             self.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                           self.water_extractable_organic_phosphorus))
+                                                         self.water_extractable_organic_phosphorus))
         assimilated_water_extractable_inorganic = (
             self.determine_assimilated_phosphorus_amount(assimilation_ratio,
-                                                           self.water_extractable_inorganic_phosphorus))
+                                                         self.water_extractable_inorganic_phosphorus))
 
         self.manure_dry_mass = max(
             0.0,
@@ -593,12 +593,13 @@ class ManurePool:
 
         water_extractable_phosphorus_leached = min(water_extractable_phosphorus, water_extractable_phosphorus_leached)
 
-        runoff_dissolved_phosphorus_concentration = ManurePool._determine_water_extractable_phosphorus_runoff_concentration(
-            water_extractable_phosphorus_leached,
-            rainfall,
-            field_size,
-            distribution_factor,
-        )
+        runoff_dissolved_phosphorus_concentration = \
+            ManurePool._determine_water_extractable_phosphorus_runoff_concentration(
+                water_extractable_phosphorus_leached,
+                rainfall,
+                field_size,
+                distribution_factor,
+            )
 
         runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
 
