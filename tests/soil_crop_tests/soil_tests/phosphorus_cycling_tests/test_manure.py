@@ -15,7 +15,6 @@ from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 # --- Helper method tests ---
 
 
-
 @pytest.mark.parametrize(
     "rain,temp_factor",
     [
