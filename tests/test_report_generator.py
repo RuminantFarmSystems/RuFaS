@@ -264,9 +264,9 @@ def test_add_constants_to_report_data(
     mock_time = mocker.MagicMock()
     report_generator = ReportGenerator(time=mock_time)
     display_units = filter_content.get("display_units", False)
-    mock_rg_add_units_to_constants = mocker.patch.object(report_generator, "_add_units_to_constants",
-                                                         return_value={"existing_data": 1,
-                                                                       "Constant1": 10})
+    mock_rg_add_units_to_constants = mocker.patch.object(
+        report_generator, "_add_units_to_constants", return_value={"existing_data": 1, "Constant1": 10}
+    )
 
     # Act and assert
     if expected_exception:
