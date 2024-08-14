@@ -1,13 +1,15 @@
 import math
-from typing import Dict, List
+from typing import Dict, List, Callable
 
 import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 
 om = OutputManager()
@@ -151,7 +153,7 @@ class AnimalRequirements:
             List of essential amino acid requirements (g).
         """
 
-        attr_names_to_args_map = {
+        attr_names_to_args_map: Dict[str, List[float | EssentialAminoAcidRequirements]] = {
             "NEmaint_requirement": NEmaint_requirement_list,
             "NEa_requirement": NEa_requirement_list,
             "NEg_requirement": NEg_requirement_list,
@@ -169,7 +171,7 @@ class AnimalRequirements:
             "avg_essential_amino_acid_requirement": essential_amino_acid_requirement_list,
         }
 
-        calc_method_to_function_map = {
+        calc_method_to_function_map: dict[str, Callable[..., float]] = {
             "mean": np.mean,
             "median": np.median,
             "percentile": np.percentile,
@@ -221,7 +223,7 @@ class AnimalRequirements:
                     calc_method_to_function_map[calc_method](arg, *stats_args),
                 )
 
-    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool) -> None:
+    def set_requirements(self, pen: Pen, animal_grouping_scenario: AnimalGroupingScenario, recalc: bool) -> None:
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -279,7 +281,7 @@ class AnimalRequirements:
             "mean",
         )
 
-        avg_nutrient_rqmts = {
+        avg_nutrient_rqmts: dict[str, float | EssentialAminoAcidRequirements] = {
             "NEmaint_requirement": self.NEmaint_requirement,
             "NEa_requirement": self.NEa_requirement,
             "NEg_requirement": self.NEg_requirement,
@@ -300,8 +302,9 @@ class AnimalRequirements:
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
     def recalculate_requirements(
-        self, pen, animal_grouping_scenario, requirements_lists: Dict[str, List[float]]
-    ) -> Dict[str, List[float]]:
+        self, pen: Pen, animal_grouping_scenario: AnimalGroupingScenario,
+            requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]]
+    ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
         """
         Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -410,8 +413,9 @@ class AnimalRequirements:
         return requirements_lists
 
     def use_existing_requirements(
-        self, pen, animal_grouping_scenario, requirements_lists: Dict[str, List[float]]
-    ) -> Dict[str, List[float]]:
+        self, pen: Pen, animal_grouping_scenario: AnimalGroupingScenario,
+            requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]]
+    ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
         """
         Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
          of requirements.
@@ -485,7 +489,7 @@ class AnimalRequirements:
         TDN_conc: float | None = 0.7,
         net_energy_diet_concentration: float | None = 1.0,
         days_born: float | None = None,
-    ) -> Dict[str, float]:
+    ) -> Dict[str, float | EssentialAminoAcidRequirements]:
         """
         Calculates the dietary requirements of a single animal.
 
