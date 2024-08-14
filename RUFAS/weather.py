@@ -85,6 +85,7 @@ class Weather:
             "class": self.__class__.__name__,
             "function": "__init__",
             "prefix": "Weather",
+            "simulation_day": time.simulation_day,
         }
         om.add_variable(
             "average_annual_temperature",
