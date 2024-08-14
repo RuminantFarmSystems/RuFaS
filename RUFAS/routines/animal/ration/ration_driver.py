@@ -111,6 +111,18 @@ class RationManager:
 
         if pen.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
+                if pen.avg_milk < 5:
+                    om.add_error(
+                        "Milk production too low",
+                        (
+                            f"Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
+                            f"Possible solution is to provide additional feed ingredients to "
+                            f"{pen.animal_combination.name}."
+                        ),
+                        info_map,
+                    )
+                    raise ValueError
+
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
                 req.set_requirements(pen, animal_grouping_scenario, recalc=True)
@@ -1121,8 +1133,11 @@ class RationReporter:
         RDP_diet = []
         RUP_diet = []
         for i, kg_fed in enumerate(ration.values()):
-            RDP_diet.append(GeneralConstants.KG_TO_GRAMS * RDP_list[i] * kg_fed * 0.01)
-            RUP_diet.append(GeneralConstants.KG_TO_GRAMS * kg_fed * RUP_list[i] * dRUP_diet[i])
+            RDP_diet.append(GeneralConstants.KG_TO_GRAMS * RDP_list[i] * kg_fed
+                            * GeneralConstants.PERCENTAGE_TO_FRACTION)
+            RUP_diet.append(GeneralConstants.KG_TO_GRAMS * kg_fed
+                            * RUP_list[i] * GeneralConstants.PERCENTAGE_TO_FRACTION
+                            * dRUP_diet[i] * GeneralConstants.PERCENTAGE_TO_FRACTION)
 
         TDN_total_actual = TDNtotal * RationReporter.get_TDN_discount(
             ration_report, body_weight
@@ -1130,7 +1145,8 @@ class RationReporter:
 
         # MP bact calcs
         MP_bact = 0.64 * min(
-            GeneralConstants.KG_TO_GRAMS * 0.13 * TDN_total_actual, 0.85 * sum(RDP_diet)
+            GeneralConstants.KG_TO_GRAMS * 0.13 * TDN_total_actual,
+            GeneralConstants.KG_TO_GRAMS * 0.85 * sum(RDP_diet)
         )
 
         MP_supply = MP_bact + sum(RUP_diet) + 0.4 * 11.8 * DMI_estimate
