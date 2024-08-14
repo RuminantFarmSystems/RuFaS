@@ -74,5 +74,5 @@ class ManureConstants:
 
     METHANE_DESTRUCTION_EFFICIENCY = 81
     """
-    The fraction of methane destruction efficiency rate.
+    The percentage of methane destroyed in systems using a cap and flare
     """
