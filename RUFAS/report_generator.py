@@ -871,9 +871,7 @@ class ReportGenerator:
             return
 
         try:
-            self._validate_constants(
-                report_data, constants_config
-            )
+            self._validate_constants(report_data, constants_config)
         except ValueError:
             raise
 
