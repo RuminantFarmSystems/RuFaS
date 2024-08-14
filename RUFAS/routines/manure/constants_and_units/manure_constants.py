@@ -76,3 +76,9 @@ class ManureConstants:
     """
     The percentage of methane destroyed in systems using a cap and flare
     """
+
+    AD_TAN_INCREASE_FACTOR = 1.60
+    """
+    The factor by which manure total ammoniacal nitrogen content is increased by the anaerobic digestion process
+    (unitless).
+    """
