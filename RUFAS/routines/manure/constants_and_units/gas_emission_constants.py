@@ -276,16 +276,19 @@ class GasEmissionConstants:
             ManureCoverEnum.COVER.value: 0.005,
             ManureCoverEnum.CRUST.value: 0.005,
             ManureCoverEnum.NO_COVER.value: 0.0,
+            ManureCoverEnum.COVER_AND_FLARE.value: 0.005
         },
         ManureTreatmentType.SLURRY_STORAGE_UNDERFLOOR: {
             ManureCoverEnum.COVER.value: 0.005,
             ManureCoverEnum.CRUST.value: 0.005,
             ManureCoverEnum.NO_COVER.value: 0.0,
+            ManureCoverEnum.COVER_AND_FLARE.value: 0.005
         },
         ManureTreatmentType.ANAEROBIC_LAGOON: {
             ManureCoverEnum.COVER.value: 0.005,
             ManureCoverEnum.CRUST.value: 0.005,
             ManureCoverEnum.NO_COVER.value: 0.0,
+            ManureCoverEnum.COVER_AND_FLARE.value: 0.005
         },
         ManureTreatmentType.ANAEROBIC_DIGESTION: {ManureCoverEnum.NOT_APPLICABLE.value: 0.0006},
     }
