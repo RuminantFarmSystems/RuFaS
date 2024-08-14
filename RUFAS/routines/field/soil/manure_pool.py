@@ -110,8 +110,6 @@ class ManurePool:
         float
             The total amount of assimilated phosphorus (kg).
         """
-        self.organic_phosphorus_runoff = 0.0
-        self.inorganic_phosphorus_runoff = 0.0
         temperature_factor = self._determine_temperature_factor(mean_air_temperature)
         if rainfall < 1 or rainfall > 4:
             self.adjust_manure_moisture_factor(rainfall, temperature_factor)
@@ -209,6 +207,11 @@ class ManurePool:
                 + assimilated_stable_inorganic
                 + assimilated_water_extractable_organic
                 + assimilated_water_extractable_inorganic)
+
+    def runoff_reset(self):
+        """Helper method to reset phosphorus runoff"""
+        self.organic_phosphorus_runoff = 0.0
+        self.inorganic_phosphorus_runoff = 0.0
 
     def leach_phosphorus_pools(self, rainfall: float, runoff: float, field_size: float) -> tuple[float, float]:
         """

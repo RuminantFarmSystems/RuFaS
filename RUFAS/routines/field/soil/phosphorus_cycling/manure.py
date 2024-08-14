@@ -56,6 +56,10 @@ class Manure:
         the moisture factors. Decomposition and assimilation occur simultaneously.
 
         """
+        self.data.machine_manure.runoff_reset()
+        self.data.grazing_manure.runoff_reset()
+        if rainfall > 0:
+            self._leach_and_update_phosphorus_pools(rainfall, runoff, field_size)
         machine_total = self.data.machine_manure.daily_manure_update(rainfall, field_size, mean_air_temperature)
         grazing_total = self.data.grazing_manure.daily_manure_update(rainfall, field_size, mean_air_temperature)
 
