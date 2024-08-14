@@ -4,8 +4,11 @@ from unittest.mock import MagicMock, call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, CUBIC_MILLIMETERS_TO_LITERS, \
-    MILLIGRAMS_TO_KILOGRAMS
+from RUFAS.routines.field.crop_and_soil_constants import (
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    CUBIC_MILLIMETERS_TO_LITERS,
+    MILLIGRAMS_TO_KILOGRAMS,
+)
 from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -24,7 +27,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 def test_determine_temperature_factor(avg_air_temp: float) -> None:
     """Tests that the temperature factor is correctly calculated and bounded."""
     observe = ManurePool._determine_temperature_factor(avg_air_temp)
-    expect = min(1, max(0, (2 * 32 ** 2 * avg_air_temp ** 2 - avg_air_temp ** 4) / 32 ** 4))
+    expect = min(1, max(0, (2 * 32**2 * avg_air_temp**2 - avg_air_temp**4) / 32**4))
     assert observe == expect
 
 
@@ -40,7 +43,7 @@ def test_determine_temperature_factor(avg_air_temp: float) -> None:
 def test_determine_dry_matter_decomposition_rate(temp_factor: float) -> None:
     """Tests that the dry matter decomposition rate is calculated correctly for a given day."""
     observe = ManurePool._determine_dry_matter_decomposition_rate(temp_factor)
-    expect = 0.003 * temp_factor ** 0.5
+    expect = 0.003 * temp_factor**0.5
     assert observe == expect
 
 
@@ -61,7 +64,7 @@ def test_determine_dry_manure_matter_assimilation(
     """
     observe = ManurePool._determine_dry_manure_matter_assimilation(moisture, temp_factor, area, is_dung)
     if is_dung:
-        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor ** 0.1) * area
+        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor**0.1) * area
     else:
         expect = (30 * exp(2.5 * moisture)) * temp_factor * area
     assert observe == expect
@@ -195,22 +198,20 @@ def test_determine_phosphorus_leached_from_surface(
     field_coverage: float,
     phosphorus_mass: float,
     organic: bool,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Test that subroutines are called correctly and that leached phosphorus amounts are calculated correctly."""
-    mock_rain_ratio = mocker.patch.object(ManurePool,
-                                          "_determine_rain_manure_dry_matter_ratio",
-                                          return_value=0.4)
-    mock_phosphorus_distribution_factor = mocker.patch.object(ManurePool,
-                                                              "_determine_phosphorus_distribution_factor",
-                                                              return_value=1.2)
-    mock_water_extractable_phosphorus_leached = mocker.patch.object(ManurePool,
-                                                                    "_determine_water_extractable_phosphorus_leached",
-                                                                    return_value=25.0)
+    mock_rain_ratio = mocker.patch.object(ManurePool, "_determine_rain_manure_dry_matter_ratio", return_value=0.4)
+    mock_phosphorus_distribution_factor = mocker.patch.object(
+        ManurePool, "_determine_phosphorus_distribution_factor", return_value=1.2
+    )
+    mock_water_extractable_phosphorus_leached = mocker.patch.object(
+        ManurePool, "_determine_water_extractable_phosphorus_leached", return_value=25.0
+    )
 
-    mock_runoff_concentration = mocker.patch.object(ManurePool,
-                                                    "_determine_water_extractable_phosphorus_runoff_concentration",
-                                                    return_value=5)
+    mock_runoff_concentration = mocker.patch.object(
+        ManurePool, "_determine_water_extractable_phosphorus_runoff_concentration", return_value=5
+    )
 
     observed = ManurePool._determine_phosphorus_leached_from_surface(
         rain, runoff, area, manure_mass, field_coverage, phosphorus_mass, organic
@@ -229,12 +230,8 @@ def test_determine_phosphorus_leached_from_surface(
     if organic:
         mock_water_extractable_phosphorus_leached.assert_called_once_with(phosphorus_mass, 0.4, True, True)
     else:
-        mock_water_extractable_phosphorus_leached.assert_called_once_with(
-            phosphorus_mass, 0.4, True, False
-        )
-    mock_runoff_concentration.assert_called_once_with(
-        expected_water_extractable_phosphorus_leached, rain, area, 1.2
-    )
+        mock_water_extractable_phosphorus_leached.assert_called_once_with(phosphorus_mass, 0.4, True, False)
+    mock_runoff_concentration.assert_called_once_with(expected_water_extractable_phosphorus_leached, rain, area, 1.2)
     assert observed["new_phosphorus_pool_amount"] == (phosphorus_mass - expected_water_extractable_phosphorus_leached)
     assert observed["infiltrated_phosphorus"] == expected_infiltrated_phosphorus
     assert observed["runoff_phosphorus"] == expected_runoff_phosphorus_in_kg
@@ -323,12 +320,15 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
     )
     incorp = Manure(data)
 
-    mock_leached_from_surface = mocker.patch.object(ManurePool, "_determine_phosphorus_leached_from_surface",
-                                                    return_value={
-                                                        "new_phosphorus_pool_amount": 30,
-                                                        "infiltrated_phosphorus": 25,
-                                                        "runoff_phosphorus": 20,
-                                                    })
+    mock_leached_from_surface = mocker.patch.object(
+        ManurePool,
+        "_determine_phosphorus_leached_from_surface",
+        return_value={
+            "new_phosphorus_pool_amount": 30,
+            "infiltrated_phosphorus": 25,
+            "runoff_phosphorus": 20,
+        },
+    )
     mock_add_pool = mocker.patch.object(incorp, "_add_infiltrated_phosphorus_to_soil")
 
     incorp._leach_and_update_phosphorus_pools(rain, runoff, area)
