@@ -302,8 +302,10 @@ class AnimalRequirements:
         pen.set_milk_avgs(self.avg_milk, self.avg_CP_milk, self.avg_milk_production_reduction)
 
     def recalculate_requirements(
-        self, pen: Pen, animal_grouping_scenario: AnimalGroupingScenario,
-            requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]]
+        self,
+        pen: Pen,
+        animal_grouping_scenario: AnimalGroupingScenario,
+        requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]],
     ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
         """
         Calculates requirements for every animal in a pen and appends each value to a list in a dictionary
@@ -413,8 +415,10 @@ class AnimalRequirements:
         return requirements_lists
 
     def use_existing_requirements(
-        self, pen: Pen, animal_grouping_scenario: AnimalGroupingScenario,
-            requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]]
+        self,
+        pen: Pen,
+        animal_grouping_scenario: AnimalGroupingScenario,
+        requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]],
     ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
         """
         Finds previous set of requirements for every animal in a pen and appends each value to a list in a dictionary
