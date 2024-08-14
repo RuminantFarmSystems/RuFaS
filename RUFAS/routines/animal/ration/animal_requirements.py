@@ -8,7 +8,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 
 om = OutputManager()
@@ -222,7 +221,7 @@ class AnimalRequirements:
                     calc_method_to_function_map[calc_method](arg, *stats_args),
                 )
 
-    def set_requirements(self, pen: Pen, animal_grouping_scenario, recalc: bool) -> None:
+    def set_requirements(self, pen, animal_grouping_scenario, recalc: bool) -> None:
         """
         Calculates the average requirements utilizing cow_requirements.py and an
         input pen to generate the average requirements across a pen. It then
@@ -302,7 +301,7 @@ class AnimalRequirements:
 
     def recalculate_requirements(
         self,
-        pen: Pen,
+        pen,
         animal_grouping_scenario,
         requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]],
     ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
@@ -415,7 +414,7 @@ class AnimalRequirements:
 
     def use_existing_requirements(
         self,
-        pen: Pen,
+        pen,
         animal_grouping_scenario,
         requirements_lists: Dict[str, List[float | EssentialAminoAcidRequirements]],
     ) -> Dict[str, List[float | EssentialAminoAcidRequirements]]:
