@@ -46,6 +46,10 @@ LOWER_BOUND = -20
 STEP_SIZE = 0.01
 
 
+"""Defines the accepted error tolerance when checking that fractions of parity 1, 2 and 3+ milking cows sum to 1.0."""
+ACCEPTABLE_PARITY_FRACTION_ERROR = 0.01
+
+
 class LactationCurve:
     """
     Manages Wood's lactation curve parameters l, m, and n as they are used by the rest of the Animal module.
@@ -368,7 +372,9 @@ class LactationCurve:
         milk_yield_305_day_all_cows = annual_milk_yield * (305 / GeneralConstants.YEAR_LENGTH)
         milk_yield_305_day = milk_yield_305_day_all_cows / num_milking_cows
 
-        if not (parity_fractions_sum := sum([parity_1_frac, parity_2_frac, parity_3_frac])) == 1.0:
+        parity_fractions_sum = sum([parity_1_frac, parity_2_frac, parity_3_frac])
+        parity_fractions_difference = abs(1.0 - parity_fractions_sum)
+        if parity_fractions_difference > ACCEPTABLE_PARITY_FRACTION_ERROR:
             self.om.add_error(
                 f"Fractions of milking cows that are parity 1, 2 and 3+ sum to {parity_fractions_sum}, not 1.0",
                 f"Using {PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS}, {PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS} and "
@@ -379,6 +385,14 @@ class LactationCurve:
             parity_1_frac = PARITY_1_DEFAULT_FRACTION_OF_MILKING_COWS
             parity_2_frac = PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS
             parity_3_frac = PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS
+        elif ACCEPTABLE_PARITY_FRACTION_ERROR >= parity_fractions_difference > 0.0:
+            self.om.add_warning(
+                f"Fractions of milking cows that are parity 1, 2 and 3+ sum to {parity_fractions_sum}, not 1.0, but the"
+                f" difference is within the accepted tolerance of {ACCEPTABLE_PARITY_FRACTION_ERROR}.",
+                f"Will use {parity_1_frac}, {parity_2_frac} and {parity_3_frac} as the fractions of parity 1, 2, and 3+"
+                " as the fractions of parity 1, 2, and 3+ cows in the milking herd, respectively.",
+                {"class": self.__class__.__name__, "function": self._estimate_305_day_milk_yield_by_parity.__name__},
+            )
 
         parity_1_305_day_milk_yield = milk_yield_305_day / (
             parity_1_frac
