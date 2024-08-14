@@ -1,6 +1,6 @@
 import re
 from typing import Dict, List, Any, Callable, Optional
-from RUFAS.general_constants import CONSTANTS_TO_UNITS, GeneralConstants
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
@@ -909,7 +909,7 @@ class ReportGenerator:
                 if normalized_attribute_name == normalized_provided_name:
                     matching_constant = str(attribute)
                     break
-            unit_for_constant = CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
+            unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
             constant_with_units = f"{name}_({unit_for_constant})"
             updated_constants_config[constant_with_units] = constants_config[name]
 

@@ -14,7 +14,7 @@ class MeasurementUnits(Enum):
     CALENDAR_YEAR = "calendar year"
     CENTIMETERS = "cm"
     CENTIMETERS_PER_MILLIMETER = "cm/mm"
-    CONCEPTIONS = "conceptions"
+    CONCEPTIONS = "conception"
     CONCEPTIONS_PER_SERVICE = "conceptions per service"
     COWS = "cows"
     CUBIC_METERS = "m^3"
@@ -39,6 +39,7 @@ class MeasurementUnits(Enum):
     KILOGRAMS = "kg"
     KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER = "kg CO2 / kg DM"
     KILOGRAMS_PER_ANIMAL = "kg/animal"
+    KILOGRAMS_CARBON_DIOXIDE_EQ = "kg CO2-eq"
     KILOGRAMS_PER_CUBIC_METER = "kg/m^3"
     KILOGRAMS_PER_DAY = "kg/day"
     KILOGRAMS_PER_GRAM = "kg/g"
@@ -70,7 +71,6 @@ class MeasurementUnits(Enum):
     SIMULATION_YEAR = "simulation year"
     UNITLESS = "unitless"
     WET_KILOGRAMS_PER_HECTARE = "wet kg/ha"
-    KILOGRAMS_CARBON_DIOXIDE_EQ = "kg CO2-eq"
 
     def __str__(self) -> str:
         """
