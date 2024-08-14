@@ -388,9 +388,9 @@ class LactationCurve:
         elif ACCEPTABLE_PARITY_FRACTION_ERROR >= parity_fractions_difference > 0.0:
             self.om.add_warning(
                 f"Fractions of milking cows that are parity 1, 2 and 3+ sum to {parity_fractions_sum}, not 1.0, but the"
-                f" difference is within the accepted tolerance of {ACCEPTABLE_PARITY_FRACTION_ERROR}.",
+                f" difference is within the accepted tolerance of {ACCEPTABLE_PARITY_FRACTION_ERROR}",
                 f"Will use {parity_1_frac}, {parity_2_frac} and {parity_3_frac} as the fractions of parity 1, 2, and 3+"
-                " as the fractions of parity 1, 2, and 3+ cows in the milking herd, respectively.",
+                " cows in the milking herd, respectively.",
                 {"class": self.__class__.__name__, "function": self._estimate_305_day_milk_yield_by_parity.__name__},
             )
 
