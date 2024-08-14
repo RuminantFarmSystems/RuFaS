@@ -226,6 +226,16 @@ def test_apply_horizontal_aggregation(
             },
             None,
         ),
+        # Valid case with a valid constant and display_units as True
+        (
+            {"existing_data": [1, 2, 3]},
+            {"constants": {"Constant1": 10}, "display_units": True},
+            {
+                "existing_data": [1, 1, 1],
+                "Constant1": [10, 10, 10],
+            },
+            None,
+        ),
         # Valid case with existing data of different lengths
         (
             {"col1": [1, 2, 3], "col2": [4, 5, 6, 7]},
@@ -253,6 +263,10 @@ def test_add_constants_to_report_data(
     # Arrange
     mock_time = mocker.MagicMock()
     report_generator = ReportGenerator(time=mock_time)
+    display_units = filter_content.get("display_units", False)
+    mock_rg_add_units_to_constants = mocker.patch.object(report_generator, "_add_units_to_constants",
+                                                         return_value={"existing_data": 1,
+                                                                       "Constant1": 10})
 
     # Act and assert
     if expected_exception:
@@ -262,41 +276,35 @@ def test_add_constants_to_report_data(
         report_generator._add_constants_to_report_data(report_data, filter_content)
         assert report_data == expected_report_data
 
+    if display_units:
+        mock_rg_add_units_to_constants.assert_called_once()
+    else:
+        mock_rg_add_units_to_constants.assert_not_called()
+
 
 @pytest.mark.parametrize(
-    "report_data, constant_config, expected_exception, display_units, expected",
+    "report_data, constant_config, expected_exception",
     [
         # Valid case with valid constants
-        ({}, {"Constant1": 10, "Constant2": 20.5}, None, False, {"Constant1": 10, "Constant2": 20.5}),
+        ({}, {"Constant1": 10, "Constant2": 20.5}, None),
         # Error case with repeated constant name
-        ({"Constant1": [5, 5, 5]}, {"Constant1": 10}, ValueError, False, None),
+        ({"Constant1": [5, 5, 5]}, {"Constant1": 10}, ValueError),
         # Error case with constant name None
-        ({}, {None: 10}, ValueError, False, None),
+        ({}, {None: 10}, ValueError),
         # Error case with constant value None
-        ({}, {"Constant1": None}, ValueError, False, None),
+        ({}, {"Constant1": None}, ValueError),
         # Error case with constant name not a string
-        ({}, {123: 10}, ValueError, False, None),
+        ({}, {123: 10}, ValueError),
         # Error case with constant value not a number
-        ({}, {"Constant1": "not_a_number"}, ValueError, False, None),
+        ({}, {"Constant1": "not_a_number"}, ValueError),
         # Error case with an empty constant name
-        ({}, {"": 10}, ValueError, False, None),
-        # Valid case with valid constants
-        (
-            {},
-            {"Constant1": 10, "Constant2": 20.5},
-            None,
-            True,
-            {"Constant1_(unit_not_found)": 10, "Constant2_(unit_not_found)": 20.5},
-        ),
-        ({}, {"PROTEIN_TO_NITROGEN": 10}, None, True, {"PROTEIN_TO_NITROGEN_(unitless)": 10}),
+        ({}, {"": 10}, ValueError),
     ],
 )
 def test_validate_constants(
     report_data: Dict[str, List[Any]],
     constant_config: Dict[str, Any],
     expected_exception: Type[Exception] | None,
-    display_units: bool,
-    expected: dict[str, int | float] | None,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -310,10 +318,42 @@ def test_validate_constants(
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            report_generator._validate_constants(report_data, constant_config, display_units)
+            report_generator._validate_constants(report_data, constant_config)
     else:
-        result = report_generator._validate_constants(report_data, constant_config, display_units)
-        assert result == expected
+        report_generator._validate_constants(report_data, constant_config)
+
+
+@pytest.mark.parametrize(
+    "constants_config, expected_result",
+    [
+        (
+            {"SomeConstant": 10, "AnotherConstant": 5.5},
+            {"SomeConstant_(unit_not_found)": 10, "AnotherConstant_(unit_not_found)": 5.5},
+        ),
+        (
+            {"LEAP_YEAR_LENGTH": 366, "FRACTION_TO_PERCENTAGE": 100.0},
+            {"LEAP_YEAR_LENGTH_(day/leap year)": 366, "FRACTION_TO_PERCENTAGE_(unitless)": 100.0},
+        ),
+        (
+            {"UnknownConstant": 100},
+            {"UnknownConstant_(unit_not_found)": 100},
+        ),
+        (
+            {},
+            {},
+        ),
+    ],
+)
+def test_add_units_to_constants(
+    constants_config: Dict[str, int | float],
+    expected_result: Dict[str, int | float],
+) -> None:
+    """
+    Test the _add_units_to_constants method to ensure that units are correctly appended to constants.
+    """
+    report_generator = ReportGenerator()
+    result = report_generator._add_units_to_constants(constants_config)
+    assert result == expected_result
 
 
 @pytest.mark.parametrize(
