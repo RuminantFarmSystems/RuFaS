@@ -13,6 +13,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from .animal_manager import AnimalManager
 from ...data_structures.animal_manure_excretions import AnimalManureExcretions
 from ...enums import AnimalCombination
 from RUFAS.routines.animal.pen import Pen
@@ -80,7 +81,7 @@ class AnimalModuleReporter:
                     )
 
     @classmethod
-    def report_daily_animal_population(cls, animal_manager) -> None:
+    def report_daily_animal_population(cls, animal_manager: AnimalManager) -> None:
         """
         Adds daily totals for animal types to output manager.
 
@@ -339,7 +340,7 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_daily_ration(cls, animal_manager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
+    def report_daily_ration(cls, animal_manager: AnimalManager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
         """
         Adds ration totals as fed to each pen to output manager.
 
@@ -396,7 +397,7 @@ class AnimalModuleReporter:
         ration_total: dict[str, float],
         pen_id: int,
         pen_animal_name: str,
-        animal_manager,
+        animal_manager: AnimalManager,
     ) -> None:
         """
         Adds emissions totals from purchased feeds on a pen / feed basis.
@@ -449,14 +450,14 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: dict[str, dict[str | AnimalManureExcretions]],
+        manure_excretions_output_data: dict[str, dict[str, str | AnimalManureExcretions]],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.
 
         Parameters
         ----------
-        manure_excretions_output_data : dict[str, dict[str | AnimalManureExcretions]]
+        manure_excretions_output_data : dict[str, dict[str, str | AnimalManureExcretions]]
             Dictionary mapping prefixes to animal manure data.
 
         """
@@ -917,7 +918,7 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_305d_milk(cls, animal_manager) -> None:
+    def report_305d_milk(cls, animal_manager: AnimalManager) -> None:
         """
         Adds herd mean of latest_milk_production_305days to output manager,
         though only for lactating cows with nonzero values.
@@ -945,7 +946,7 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_reports(cls, animal_manager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
+    def report_daily_reports(cls, animal_manager: AnimalManager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
         """
         Calls all reporter methods that should happen at the end of each day.
 
