@@ -892,8 +892,9 @@ class ReportGenerator:
 
         return event_logs
 
-    def _add_units_to_constants(self, constants_config: dict[str, int | float]
-                                ) -> tuple[dict[str, int | float], list[dict[str, str | dict[str, str]]]]:
+    def _add_units_to_constants(
+        self, constants_config: dict[str, int | float]
+    ) -> tuple[dict[str, int | float], list[dict[str, str | dict[str, str]]]]:
         """Checks constants provided in filter file against GeneralConstants and adds appropriate measurement units.
 
         Parameters
@@ -934,8 +935,10 @@ class ReportGenerator:
             constant_with_units = f"{name}_({unit_for_constant})"
             updated_constants_config[constant_with_units] = constants_config[name]
 
-        return (updated_constants_config if len(updated_constants_config) > 0 else constants_config,
-                event_logs if event_logs else [])
+        return (
+            updated_constants_config if len(updated_constants_config) > 0 else constants_config,
+            event_logs if event_logs else [],
+        )
 
     def _validate_constants(
         self,
