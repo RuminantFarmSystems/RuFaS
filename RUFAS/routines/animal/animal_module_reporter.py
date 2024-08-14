@@ -349,32 +349,34 @@ class AnimalModuleReporter:
         available_feeds : Dict[str, Dict[str, Any]]
             Available feeds dictionary from the Feed class object.
         """
+        classname = AnimalModuleReporter.__name__
+        funcname = AnimalModuleReporter.report_daily_ration.__name__
         info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_daily_ration.__name__,
-            "data_origin": [("AnimalModuleReporter", "report_daily_ration")],
+            "class": classname,
+            "function": funcname,
+            "data_origin": [(classname, funcname)],
         }
+        non_nemeric_keys = ["status", "objective"]
+        ration_across_pens = {"dry_matter_intake_total": 0, "byproducts_total": 0}
         for pen in animal_manager.all_pens:
-            ration_per_animal = pen.ration_per_animal.copy()
-            for non_numeric_key in ["status", "objective"]:
-                if non_numeric_key in ration_per_animal:
-                    del ration_per_animal[non_numeric_key]
-            ration_total = {}
-            ration_total["dry_matter_intake_total"] = 0.0
-            ration_total["byproducts_total"] = 0.0
-            for key in ration_per_animal.keys():
-                if key != "status" and key != "objective":
-                    ration_total[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
-                    ration_total["dry_matter_intake_total"] += ration_total[key]
-                    if available_feeds[key]["Fd_Category"] == "By-Product/Other":
-                        ration_total["byproducts_total"] += ration_total[key]
+            ration_per_pen = {"dry_matter_intake_total": 0, "byproducts_total": 0}
+            for key in pen.ration_per_animal.keys():
+                if key in non_nemeric_keys:
+                    continue
+                ration_per_pen[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
+                ration_per_pen["dry_matter_intake_total"] += ration_per_pen[key]
+                if available_feeds[key]["Fd_Category"] == "By-Product/Other":
+                    ration_per_pen["byproducts_total"] += ration_per_pen[key]
+
+                if key in ration_across_pens:
+                    ration_across_pens[key] += ration_per_pen[key]
+                else:
+                    ration_across_pens[key] = ration_per_pen[key]
 
             AnimalModuleReporter.report_daily_feed_emissions(
-                ration_total, pen.id, pen.animal_combination.name, animal_manager
+                ration_per_pen, pen.id, pen.animal_combination.name, animal_manager
             )
-            ration_total_units = {key: MeasurementUnits.KILOGRAMS for key in ration_total.keys()}
-            classname = AnimalModuleReporter.__name__
-            funcname = AnimalModuleReporter.report_daily_ration.__name__
+            ration_total_units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_pen.keys()}
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_0_CALF",
                 f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
@@ -385,9 +387,14 @@ class AnimalModuleReporter:
             )
             om.add_variable(
                 f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
-                ration_total,
+                ration_per_pen,
                 dict(info_map, **{"units": ration_total_units}),
             )
+        om.add_variable(
+            "ration_daily_feed_total_across_pens",
+            ration_across_pens,
+            dict(info_map, **{"units": ration_total_units}),
+        )
 
     @classmethod
     def report_daily_feed_emissions(
