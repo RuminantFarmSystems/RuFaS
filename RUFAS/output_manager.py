@@ -133,6 +133,10 @@ class OutputManager(object):
                 "json": "json_",
                 "report": "report_",
             }
+            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
+                "e2e_vars": "e2e_vars_",
+                "e2e_results": "e2e_results_",
+            }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
             self.add_log(
                 "init_log",
