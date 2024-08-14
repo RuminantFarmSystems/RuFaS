@@ -4,7 +4,6 @@ from math import inf
 from copy import deepcopy
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
-from RUFAS.routines.field.soil.machine_manure_pool import MachineManurePool
 from RUFAS.routines.field.soil.manure_pool import ManurePool
 
 
@@ -242,7 +241,7 @@ class SoilData:
     rain_events_after_fertilizer_application: int = 0
 
     # ---- Manure pools (Phosphorus Cycling)
-    machine_manure: MachineManurePool = field(default_factory=ManurePool)
+    machine_manure: ManurePool = field(default_factory=ManurePool)
     grazing_manure: ManurePool = field(default_factory=ManurePool)
 
     soil_phosphorus_runoff: float = 0.0

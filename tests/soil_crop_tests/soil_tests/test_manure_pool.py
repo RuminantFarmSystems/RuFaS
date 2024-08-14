@@ -1,5 +1,5 @@
 from math import exp, sqrt
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -7,6 +7,8 @@ from pytest_mock import MockerFixture
 from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, CUBIC_MILLIMETERS_TO_LITERS, \
     MILLIGRAMS_TO_KILOGRAMS
 from RUFAS.routines.field.soil.manure_pool import ManurePool
+from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
@@ -196,23 +198,16 @@ def test_determine_phosphorus_leached_from_surface(
     mocker: MockerFixture
 ) -> None:
     """Test that subroutines are called correctly and that leached phosphorus amounts are calculated correctly."""
-    #ManurePool._determine_rain_manure_dry_matter_ratio = MagicMock(return_value=0.4)
     mock_rain_ratio = mocker.patch.object(ManurePool,
                                           "_determine_rain_manure_dry_matter_ratio",
                                           return_value=0.4)
-    #ManurePool._determine_phosphorus_distribution_factor = MagicMock(return_value=1.2)
     mock_phosphorus_distribution_factor = mocker.patch.object(ManurePool,
                                                               "_determine_phosphorus_distribution_factor",
                                                               return_value=1.2)
-    #ManurePool._determine_water_extractable_phosphorus_leached = MagicMock(return_value=25.0)
     mock_water_extractable_phosphorus_leached = mocker.patch.object(ManurePool,
                                                                     "_determine_water_extractable_phosphorus_leached",
                                                                     return_value=25.0)
-    ManurePool._determine_water_extractable_inorganic_phosphorus_leached
-    ManurePool._determine_water_extractable_inorganic_phosphorus_leached = MagicMock(return_value=25.0)
-    mocker.patch.object(ManurePool, "_determine_water_extractable_inorganic_phosphorus_leached",
-                        return_value=25.0)
-    #ManurePool._determine_water_extractable_phosphorus_runoff_concentration = MagicMock(return_value=5)
+
     mock_runoff_concentration = mocker.patch.object(ManurePool,
                                                     "_determine_water_extractable_phosphorus_runoff_concentration",
                                                     return_value=5)
@@ -243,3 +238,230 @@ def test_determine_phosphorus_leached_from_surface(
     assert observed["new_phosphorus_pool_amount"] == (phosphorus_mass - expected_water_extractable_phosphorus_leached)
     assert observed["infiltrated_phosphorus"] == expected_infiltrated_phosphorus
     assert observed["runoff_phosphorus"] == expected_runoff_phosphorus_in_kg
+
+
+@pytest.mark.parametrize(
+    "phosphorus,rate,temp_factor,moisture_factor",
+    [
+        (25, 0.1, 0.33, 0.55),
+        (33, 0.01, 0.65, 0.78),
+        (21, 0.0025, 0.3423, 0.7768),
+        (0, 0.01, 0.012, 0.23),
+        (23, 0.0025, -0.13, 0.332),
+        (41, 0.1, -0.19, 0.0),
+    ],
+)
+def test_determine_mineralized_surface_phosphorus(
+    phosphorus: float, rate: float, temp_factor: float, moisture_factor: float
+) -> None:
+    """Tests that the correct amount of mineralized phosphorus is calculated."""
+    observed = ManurePool.determine_mineralized_surface_phosphorus(phosphorus, rate, temp_factor, moisture_factor)
+    expected = min(phosphorus, max(0.0, phosphorus * rate * min(temp_factor, moisture_factor)))
+    assert observed == expected
+
+
+@pytest.mark.parametrize(
+    "ratio,phosphorus",
+    [
+        (0.88, 26),
+        (0.212, 12.13),
+        (0.0, 30.21),
+        (0.441, 0.0),
+        (0.0, 0.0),
+    ],
+)
+def test_determine_assimilated_phosphorus_amount(ratio: float, phosphorus: float) -> None:
+    """Tests that the correct amount of phosphorus assimilated into the soil is calculated."""
+    observed = ManurePool.determine_assimilated_phosphorus_amount(ratio, phosphorus)
+    expected = max(0.0, ratio * phosphorus)
+    expected = min(phosphorus, expected)
+    assert observed == expected
+
+
+@pytest.mark.parametrize(
+    "amount_phosphorus,field_size",
+    [
+        (100, 3.1),
+        (25.6, 2),
+        (66.23, 1.88),
+    ],
+)
+def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size: float, mocker: MockerFixture) -> None:
+    """Test that methods are called correctly on correct layers of soil profile."""
+    data = SoilData(field_size=field_size)
+    incorp = Manure(data)
+    mock_add = mocker.patch("RUFAS.routines.field.soil.layer_data.LayerData.add_to_labile_phosphorus")
+    incorp._add_infiltrated_phosphorus_to_soil(amount_phosphorus, field_size)
+    assert mock_add.call_count == 2
+
+
+@pytest.mark.parametrize(
+    "rain,runoff,area",
+    [
+        (13, 4, 1.8),
+        (12, 1.8, 2.1),
+        (14, 12.2, 3.4),
+        (4.2, 0, 2.4),
+    ],
+)
+def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: float, mocker: MockerFixture) -> None:
+    """Tests that the update subroutine for phosphorus pools in Manure correctly calls methods and sets attributes."""
+    data = SoilData(
+        machine_manure=ManurePool(
+            manure_dry_mass=1000,
+            manure_field_coverage=0.86,
+            water_extractable_inorganic_phosphorus=200,
+            water_extractable_organic_phosphorus=90,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=800,
+            manure_field_coverage=0.78,
+            water_extractable_inorganic_phosphorus=125,
+            water_extractable_organic_phosphorus=70,
+        ),
+        field_size=area,
+    )
+    incorp = Manure(data)
+
+    mock_leached_from_surface = mocker.patch.object(ManurePool, "_determine_phosphorus_leached_from_surface",
+                                                    return_value={
+                                                        "new_phosphorus_pool_amount": 30,
+                                                        "infiltrated_phosphorus": 25,
+                                                        "runoff_phosphorus": 20,
+                                                    })
+    mock_add_pool = mocker.patch.object(incorp, "_add_infiltrated_phosphorus_to_soil")
+
+    incorp._leach_and_update_phosphorus_pools(rain, runoff, area)
+
+    leached_calls = [
+        call(rain, runoff, area, 1000, 0.86, 90, True),
+        call(rain, runoff, area, 1000, 0.86, 200, False),
+        call(rain, runoff, area, 800, 0.78, 70, True),
+        call(rain, runoff, area, 800, 0.78, 125, False),
+    ]
+
+    mock_leached_from_surface.assert_has_calls(leached_calls)
+    infiltrated_calls = [call(25, area), call(25, area), call(25, area), call(25, area)]
+    mock_add_pool.assert_has_calls(infiltrated_calls)
+    assert incorp.data.machine_manure.water_extractable_organic_phosphorus == 30
+    assert incorp.data.machine_manure.water_extractable_inorganic_phosphorus == 30
+    assert incorp.data.machine_manure.organic_phosphorus_runoff == 20
+    assert incorp.data.machine_manure.inorganic_phosphorus_runoff == 20
+    assert incorp.data.machine_manure.annual_runoff_manure_organic_phosphorus == 20
+    assert incorp.data.machine_manure.annual_runoff_manure_inorganic_phosphorus == 20
+    assert incorp.data.grazing_manure.water_extractable_organic_phosphorus == 30
+    assert incorp.data.grazing_manure.water_extractable_inorganic_phosphorus == 30
+    assert incorp.data.grazing_manure.organic_phosphorus_runoff == 20
+    assert incorp.data.grazing_manure.inorganic_phosphorus_runoff == 20
+    assert incorp.data.grazing_manure.annual_runoff_manure_organic_phosphorus == 20
+    assert incorp.data.grazing_manure.annual_runoff_manure_inorganic_phosphorus == 20
+
+
+@pytest.mark.parametrize(
+    "rain,temp_factor",
+    [
+        (10, 0.35),
+        (4, 0.4413),
+        (16, 0.121),
+    ],
+)
+def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
+    """Tests that the manure moisture factors of the different pools are correctly updated."""
+    # Case 1: calculated moisture factor is negative
+    with patch(
+        "RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+        new_callable=MagicMock,
+        return_value=-1.0,
+    ) as mocked_determine_moisture_change:
+        data1 = SoilData(
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
+            field_size=1.1,
+        )
+        incorp1 = Manure(data1)
+
+        incorp1._adjust_manure_moisture_factor(rain, temp_factor)
+
+        moisture_change_calls = [
+            call(rain, 0.5, 1000, 1100, temp_factor),
+            call(rain, 0.6, 800, 900, temp_factor),
+        ]
+        mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
+        assert incorp1.data.machine_manure.manure_moisture_factor == 0.0
+        assert incorp1.data.grazing_manure.manure_moisture_factor == 0.0
+
+    # Case 2: calculated moisture factor is greater than upper bound
+    with patch(
+        "RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+        new_callable=MagicMock,
+        return_value=1.0,
+    ) as mocked_determine_moisture_change:
+        data2 = SoilData(
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
+            field_size=1.1,
+        )
+        incorp2 = Manure(data2)
+
+        incorp2._adjust_manure_moisture_factor(rain, temp_factor)
+
+        moisture_change_calls = [
+            call(rain, 0.5, 1000, 1100, temp_factor),
+            call(rain, 0.6, 800, 900, temp_factor),
+        ]
+        mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
+        assert incorp2.data.machine_manure.manure_moisture_factor == 0.9
+        assert incorp2.data.grazing_manure.manure_moisture_factor == 0.9
+
+    # Case 3: calculated moisture factor is not reset due to being out of bounds
+    with patch(
+        "RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
+        new_callable=MagicMock,
+        return_value=0.1,
+    ) as mocked_determine_moisture_change:
+        data3 = SoilData(
+            machine_manure=ManurePool(
+                manure_dry_mass=1000,
+                manure_field_coverage=0.86,
+                manure_moisture_factor=0.5,
+                manure_applied_mass=1100,
+            ),
+            grazing_manure=ManurePool(
+                manure_dry_mass=800,
+                manure_field_coverage=0.76,
+                manure_moisture_factor=0.6,
+                manure_applied_mass=900,
+            ),
+            field_size=1.1,
+        )
+        incorp3 = Manure(data3)
+
+        incorp3._adjust_manure_moisture_factor(rain, temp_factor)
+
+        moisture_change_calls = [
+            call(rain, 0.5, 1000, 1100, temp_factor),
+            call(rain, 0.6, 800, 900, temp_factor),
+        ]
+        mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
+        assert incorp3.data.machine_manure.manure_moisture_factor == 0.6
+        assert incorp3.data.grazing_manure.manure_moisture_factor == 0.7

@@ -291,6 +291,7 @@ class Manure:
         if self.data.grazing_manure.manure_dry_mass > 0 and self.data.grazing_manure.manure_field_coverage > 0:
             organic_phosphorus, inorganic_phosphorus = self.data.grazing_manure.leach_phosphorus_pools(
                 rainfall, runoff, field_size)
+            print("a")
             self._add_infiltrated_phosphorus_to_soil(organic_phosphorus, field_size)
             self._add_infiltrated_phosphorus_to_soil(inorganic_phosphorus, field_size)
 
