@@ -368,8 +368,8 @@ def test_validate_constants(
     ],
 )
 def test_add_units_to_constants(
-    constants_config: Dict[str, int | float],
-    expected_result: Dict[str, int | float],
+    constants_config: dict[str, int | float],
+    expected_result: tuple[dict[str, int | float], list[dict[str, str | dict[str, str]]]],
 ) -> None:
     """
     Test the _add_units_to_constants method to ensure that units are correctly appended to constants.
@@ -1294,7 +1294,7 @@ def test_aggregate_units(
         (" constant _ Name ", "constantname"),
     ],
 )
-def test_normalize_constant_name(input_name: str, expected_output: str):
+def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
     """
     Test the _normalize_constant_name method to ensure it normalizes the constant name
     by converting it to lowercase and removing underscores and spaces.
