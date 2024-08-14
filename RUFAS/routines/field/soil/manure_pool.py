@@ -1,8 +1,6 @@
 from typing import Any, Union, Dict, Tuple
 from math import exp, sqrt
 
-from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.crop_and_soil_constants import (
     MILLIMETERS_TO_CENTIMETERS,
     KILOGRAMS_TO_GRAMS,
@@ -123,21 +121,21 @@ class ManurePool:
             self.determine_decomposed_surface_manure(temperature_factor)
 
         # Calculate phosphorus mineralization between pools
-        mineralized_stable_organic = Manure.determine_mineralized_surface_phosphorus(
+        mineralized_stable_organic = self.determine_mineralized_surface_phosphorus(
             self.stable_organic_phosphorus,
             0.01,
             temperature_factor,
             self.manure_moisture_factor,
         )
 
-        mineralized_stable_inorganic = Manure.determine_mineralized_surface_phosphorus(
+        mineralized_stable_inorganic = self.determine_mineralized_surface_phosphorus(
             self.stable_inorganic_phosphorus,
             0.0025,
             temperature_factor,
             self.manure_moisture_factor,
         )
 
-        mineralized_water_extractable_organic = Manure.determine_mineralized_surface_phosphorus(
+        mineralized_water_extractable_organic = self.determine_mineralized_surface_phosphorus(
             self.water_extractable_organic_phosphorus,
             0.1,
             temperature_factor,
@@ -151,15 +149,15 @@ class ManurePool:
         else:
             assimilation_ratio = 0
 
-        assimilated_stable_organic = Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+        assimilated_stable_organic = self.determine_assimilated_phosphorus_amount(assimilation_ratio,
                                                                                     self.stable_organic_phosphorus)
-        assimilated_stable_inorganic = Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+        assimilated_stable_inorganic = self.determine_assimilated_phosphorus_amount(assimilation_ratio,
                                                                                       self.stable_inorganic_phosphorus)
         assimilated_water_extractable_organic = (
-            Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+            self.determine_assimilated_phosphorus_amount(assimilation_ratio,
                                                            self.water_extractable_organic_phosphorus))
         assimilated_water_extractable_inorganic = (
-            Manure.determine_assimilated_phosphorus_amount(assimilation_ratio,
+            self.determine_assimilated_phosphorus_amount(assimilation_ratio,
                                                            self.water_extractable_inorganic_phosphorus))
 
         self.manure_dry_mass = max(
@@ -575,24 +573,24 @@ class ManurePool:
 
         """
         area_covered_by_manure = field_coverage * field_size
-        rain_manure_dry_matter_ratio = Manure._determine_rain_manure_dry_matter_ratio(
+        rain_manure_dry_matter_ratio = ManurePool._determine_rain_manure_dry_matter_ratio(
             rainfall, manure_dry_mass, area_covered_by_manure
         )
 
-        distribution_factor = Manure._determine_phosphorus_distribution_factor(rainfall, runoff)
+        distribution_factor = ManurePool._determine_phosphorus_distribution_factor(rainfall, runoff)
 
         if is_organic:
-            water_extractable_phosphorus_leached = Manure._determine_water_extractable_phosphorus_leached(
+            water_extractable_phosphorus_leached = ManurePool._determine_water_extractable_phosphorus_leached(
                 water_extractable_phosphorus, rain_manure_dry_matter_ratio, True, True
             )
         else:
-            water_extractable_phosphorus_leached = Manure._determine_water_extractable_phosphorus_leached(
+            water_extractable_phosphorus_leached = ManurePool._determine_water_extractable_phosphorus_leached(
                 water_extractable_phosphorus, rain_manure_dry_matter_ratio, True, False
             )
 
         water_extractable_phosphorus_leached = min(water_extractable_phosphorus, water_extractable_phosphorus_leached)
 
-        runoff_dissolved_phosphorus_concentration = Manure._determine_water_extractable_phosphorus_runoff_concentration(
+        runoff_dissolved_phosphorus_concentration = ManurePool._determine_water_extractable_phosphorus_runoff_concentration(
             water_extractable_phosphorus_leached,
             rainfall,
             field_size,
@@ -614,3 +612,171 @@ class ManurePool:
             "runoff_phosphorus": phosphorus_lost_to_runoff_in_kg,
         }
         return return_dict
+
+    @staticmethod
+    def determine_mineralized_surface_phosphorus(
+        phosphorus_amount: float,
+        rate: float,
+        temperature_factor: float,
+        moisture_factor: float,
+    ) -> float:
+        """
+        Calculates the amount of phosphorus that mineralizes into water-extractable inorganic phosphorus on the
+        current day from the given pool.
+
+        Parameters
+        ----------
+        phosphorus_amount : float
+            The amount of phosphorus in the pool that is being mineralized (kg).
+        rate : float
+            The rate factor for the type of phosphorus being mineralized (unitless).
+        temperature_factor : float
+            The temperature factor on the current day (unitless).
+        moisture_factor : float
+            The moisture factor of the given manure pool on the current day (unitless).
+
+        Returns
+        -------
+        float
+            The amount of phosphorus that is mineralized from that pool that is passed (kg).
+
+        References
+        ----------
+        SurPhos theoretical documentation eqn. [4]
+
+        Notes
+        -----
+        As defined in the paragraph on page 6 of the SurPhos theoretical documentation underneath eqn. [4], the rates
+        for stable organic Phosphorus, stable inorganic phosphorus, and water-extractable organic phosphorus are 0.01,
+        0.0025, and 0.1, respectively.
+
+        """
+        mineralization_rate = rate * min(temperature_factor, moisture_factor)
+        return min(phosphorus_amount, max(0.0, phosphorus_amount * mineralization_rate))
+
+    @staticmethod
+    def determine_assimilated_phosphorus_amount(assimilation_ratio: float, phosphorus_amount: float) -> float:
+        """
+        Calculates the amount of phosphorus that is removed through assimilation on a given day.
+
+        Parameters
+        ----------
+        assimilation_ratio : float
+            Ratio of manure mass assimilated to amount present before assimilation (unitless).
+        phosphorus_amount : float
+            The amount of phosphorus in the pool being removed from (kg).
+
+        Returns
+        -------
+        float
+            The amount of phosphorus removed from the pool (kg).
+
+        """
+        return min(phosphorus_amount, max(0.0, assimilation_ratio * phosphorus_amount))
+
+    @staticmethod
+    def _determine_phosphorus_distribution_factor(rainfall: float, runoff: float) -> float:
+        """
+        Calculates a factor used to determine the concentration of Phosphorus dissolved in runoff, based on the ratio
+        of rainfall to runoff.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rainfall on the current day (mm).
+        runoff : float
+            The amount of runoff from rainfall on the current day (mm).
+
+        Returns
+        -------
+        float
+            The ratio of rainfall to runoff adjusted for use in determining dissolved Phosphorus concentrations.
+
+        References
+        ----------
+        SurPhos [13], pseudocode_soil [S.5.D.II.2]
+
+        """
+        return (runoff / rainfall) ** 0.225
+
+    @staticmethod
+    def _determine_water_extractable_phosphorus_leached(
+        manure_water_extractable_phosphorus: float,
+        rainfall_to_dry_manure_ratio: float,
+        is_from_cow: bool,
+        organic_phosphorus: bool,
+    ) -> float:
+        """
+        Determines the amount of water extractable organic or inorganic phosphorus leached by rainfall.
+
+        Parameters
+        ----------
+        manure_water_extractable_phosphorus : float
+            The amount of water extractable phosphorus from manure on the field (kg).
+        rainfall_to_dry_manure_ratio : float
+            The ratio of rainfall to manure dry matter on soil surface (cubic centimeters per gram).
+        is_from_cow : float
+            Is the water extractable inorganic phosphorus from cow manure (true / false).
+        organic_phosphorus: bool
+            True for organic phosphorus calculation, False for inorganic phosphorus.
+
+        Returns
+        -------
+        float
+            The amount of water extractable phosphorus leached from manure on the soil surface by rain on the given
+            day (kg).
+
+        References
+        ----------
+        SurPhos [9, 10], pseudocode_soil [S.5.D.I.3, II.1]
+
+        Details
+        -------
+        Phosphorus leaching from cow manure is determined with a different set of constants than non-cow manure, which
+        is why the is_from_cow parameter is necessary.
+
+        """
+        if is_from_cow:
+            first_term = (1.2 * rainfall_to_dry_manure_ratio) / (rainfall_to_dry_manure_ratio + 73.1)
+        else:
+            first_term = (2.2 * rainfall_to_dry_manure_ratio) / (rainfall_to_dry_manure_ratio + 300.1)
+        first_term = min(1.0, first_term)
+        result = max(0.0, first_term * manure_water_extractable_phosphorus)
+        return result if not organic_phosphorus else result / 0.6
+
+    @staticmethod
+    def _determine_water_extractable_phosphorus_runoff_concentration(
+        manure_leached: float,
+        rainfall: float,
+        field_size: float,
+        distribution_factor: float,
+    ) -> float:
+        """
+        Calculates the concentration of water extractable phosphorus in runoff on the current day.
+
+        Parameters
+        ----------
+        manure_leached : float
+            Mass of water extractable phosphorus leached from surface manure by rain on the current day (kg).
+        rainfall : float
+            Amount of rainfall on the current day (mm).
+        field_size : float
+            Size of the field (ha).
+        distribution_factor : float
+            Factor accounting for runoff to rainfall ratio on the current day (unitless).
+
+        Returns
+        -------
+        float
+            The concentration of water extractable phosphorus in runoff on the current day (milligrams per liter).
+
+        """
+        manure_leached_in_mg = manure_leached * KILOGRAMS_TO_MILLIGRAMS
+        field_size_in_square_mm = field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        return (
+            manure_leached_in_mg
+            * (1 / rainfall)
+            * (1 / field_size_in_square_mm)
+            * (1 / CUBIC_MILLIMETERS_TO_LITERS)
+            * distribution_factor
+        )
