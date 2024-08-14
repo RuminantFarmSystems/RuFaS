@@ -318,7 +318,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         daily_output.storage_methane = methane_loss
 
         if self.config.manure_cover == "cover and flare":
-            daily_output.storage_methane_avoided = methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100
+            daily_output.storage_methane_burned = methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100
             methane_loss = methane_loss * (1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100)
             daily_output.storage_methane = methane_loss
 

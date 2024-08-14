@@ -118,7 +118,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         )
 
         if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
-            daily_output.storage_methane_avoided = (
+            daily_output.storage_methane_burned = (
                 methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
             )
             methane_loss = methane_loss * (
