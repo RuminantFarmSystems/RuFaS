@@ -1723,6 +1723,8 @@ def test_filter_variables_pool_complex(
     assert mock_output_manager.filter_variables_pool(filter_content) == expected_result
 
     # Restore original method
+    mock_output_manager.filter_variables_pool = output_manager_original_method_states["filter_variables_pool"]
+    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
     mock_output_manager.variables_pool = {}
 
 
