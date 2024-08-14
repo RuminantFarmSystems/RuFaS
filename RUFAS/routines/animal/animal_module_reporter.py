@@ -449,14 +449,14 @@ class AnimalModuleReporter:
     @classmethod
     def report_animal_module_manure(
         cls,
-        manure_excretions_output_data: dict[str, dict[str | AnimalManureExcretions]],
+        manure_excretions_output_data: dict[str, dict[str, str | AnimalManureExcretions]],
     ) -> None:
         """
         Generate detailed report of manure properties in the Animal Module.
 
         Parameters
         ----------
-        manure_excretions_output_data : dict[str, dict[str | AnimalManureExcretions]]
+        manure_excretions_output_data : dict[str, dict[str, str | AnimalManureExcretions]]
             Dictionary mapping prefixes to animal manure data.
 
         """
