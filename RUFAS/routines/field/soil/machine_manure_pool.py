@@ -24,8 +24,9 @@ class MachineManurePool(ManurePool):
 
         """
         decomposed_machine_manure_mass_change, decomposed_machine_manure_coverage_change = (
-            super().determine_decomposed_surface_manure(temperature_factor))
+            super().determine_decomposed_surface_manure(temperature_factor)
+        )
         return {
             "decomposed_machine_manure_mass_change": decomposed_machine_manure_mass_change,
-            "decomposed_machine_manure_coverage_change": decomposed_machine_manure_coverage_change
+            "decomposed_machine_manure_coverage_change": decomposed_machine_manure_coverage_change,
         }
