@@ -387,7 +387,7 @@ class Cow(HeiferIII):
         Journal of Dairy Science, Volume 105, Issue 9, 2022,
         Pages 7525-7538, ISSN 0022-0302.
         """
-        if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"]:
+        if self.days_in_preg >= AnimalBase.config["days_in_preg_when_dry"]:
             self.milking = False
             self.events.add_event(self.days_born, sim_day, const.DRY)
             self.days_in_milk = 0
@@ -399,6 +399,9 @@ class Cow(HeiferIII):
             self.lactose_milk = 0.0
             self.CP_milk = 0.0
             self.mPrt = 0.0
+        if self.days_in_preg > AnimalBase.config["days_in_preg_when_dry"] and self.milking:
+            dipwd = AnimalBase.config["days_in_preg_when_dry"]
+            print(f"days_in_preg {self.days_in_preg} > days_in_preg_when_dry {dipwd}")
 
         if self.milking:
             self.days_in_milk += 1
@@ -718,7 +721,6 @@ class Cow(HeiferIII):
                     self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
                 )
             except Exception as e:
-                print(e)
                 bodyweight_tissue = 0.0
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
@@ -749,7 +751,7 @@ class Cow(HeiferIII):
         new_born = False
         self.days_born += 1
 
-        if self.days_in_preg > 0 and self.days_in_preg == self.gestation_length:
+        if self.days_in_preg > 0 and self.days_in_preg >= self.gestation_length:
             self._repro_state_manager.reset()
             self.calves += 1
             self.milking = True
