@@ -105,6 +105,7 @@ class TaskManager:
             "Task Manager",
             RUFAS_VERSION,
             "TASK MANAGER",
+            False
         )
         info_map = {
             "class": TaskManager.__name__,
@@ -336,6 +337,8 @@ class TaskManager:
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
         }
         try:
+            task_type = args.get("task_type")
+            is_end_to_end_test = True if task_type is TaskType.END_TO_END_TESTING else False
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
@@ -345,10 +348,10 @@ class TaskManager:
                 args["output_prefix"],
                 RUFAS_VERSION,
                 task_id,
+                is_end_to_end_test
             )
 
             input_manager = InputManager(metadata_depth_limit)
-            task_type = args.get("task_type")
 
             handler = validation_and_comparison_handlers.get(task_type)
             if handler:

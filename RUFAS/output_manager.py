@@ -106,6 +106,9 @@ class OutputManager(object):
         Set to True to exclude info_maps when adding variables to the variables_pool
     _variables_usage_counter : Counter[str]
         A Counter object used to keep track of the number of times a variables in the variables_pool is used.
+    is_end_to_end_testing_run : bool
+        Indicates if  end-to-end testing is being run.
+
     """
 
     __instance = None
@@ -133,10 +136,6 @@ class OutputManager(object):
                 "json": "json_",
                 "report": "report_",
             }
-            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
-                "e2e_vars": "e2e_vars_",
-                "e2e_results": "e2e_results_",
-            }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
             self.add_log(
                 "init_log",
@@ -148,6 +147,11 @@ class OutputManager(object):
             )
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
+            self.is_end_to_end_testing_run: bool = False
+            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
+                "e2e_vars": "e2e_vars_",
+                "e2e_results": "e2e_results_",
+            }
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -1655,6 +1659,7 @@ class OutputManager(object):
         output_prefix: str,
         version_number: str,
         task_id: str,
+        is_end_to_end_testing_run: bool,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
@@ -1665,3 +1670,4 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+        self.is_end_to_end_testing_run = is_end_to_end_testing_run
