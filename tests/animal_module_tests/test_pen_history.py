@@ -19,10 +19,13 @@ def test_pen_history_initialization(start_date: int, end_date: int, pen, classes
     start date, end date, specific pen object, and the classes of animals that have been in the pen.
     """
     # Act
-    pen_history = PenHistory(start_date, end_date, pen, classes_in_pen)
+    pen_history = PenHistory(start_date=start_date,
+                             end_date=end_date,
+                             pen=pen,
+                             classes_in_pen=classes_in_pen)
 
     # Assert
-    assert pen_history.start_date == start_date, "start_date not initialized correctly"
-    assert pen_history.end_date == end_date, "end_date not initialized correctly"
-    assert pen_history.pen == pen, "pen not initialized correctly"
-    assert pen_history.classes_in_pen == classes_in_pen, "classes_in_pen not initialized correctly"
+    assert pen_history["start_date"] == start_date, "start_date not initialized correctly"
+    assert pen_history["end_date"] == end_date, "end_date not initialized correctly"
+    assert pen_history["pen"] == pen, "pen not initialized correctly"
+    assert pen_history["classes_in_pen"] == classes_in_pen, "classes_in_pen not initialized correctly"

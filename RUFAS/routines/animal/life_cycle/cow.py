@@ -3,7 +3,7 @@ from __future__ import annotations
 import collections
 import math
 from random import random
-from typing import Dict, Any
+from typing import Dict, Any, TypedDict
 
 import numpy as np
 
@@ -30,12 +30,11 @@ from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 om = OutputManager()
 
 
-class MilkProductionHistory:
-    def __init__(self, sim_day: int, days_in_milk: int, milk_prod: float, days_born: int) -> None:
-        self.simulation_day: int = sim_day
-        self.days_in_milk: int = days_in_milk
-        self.milk_production: float = milk_prod
-        self.days_born: int = days_born
+class MilkProductionHistory(TypedDict):
+    simulation_day: int
+    days_in_milk: int
+    milk_production: float
+    days_born: int
 
 
 class Cow(HeiferIII):
@@ -323,20 +322,20 @@ class Cow(HeiferIII):
             Day of simulation.
 
         """
-        if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
+        if len(self.milk_production_history) > 0 and self.milk_production_history[-1]["simulation_day"] == sim_day:
             del self.milk_production_history[-1]
 
         self.milk_production_history.append(
             MilkProductionHistory(
-                sim_day,
-                self.days_in_milk,
-                self.estimated_daily_milk_produced,
-                self.days_born,
+                simulation_day=sim_day,
+                days_in_milk=self.days_in_milk,
+                milk_production=self.estimated_daily_milk_produced,
+                days_born=self.days_born,
             )
         )
 
         if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
-            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            milk_history = [day["milk_production"] for day in self.milk_production_history[-305:]]
             self.latest_milk_production_305days = np.sum(milk_history)
 
     @staticmethod
