@@ -1,0 +1,25 @@
+{
+    "multiple": [
+        {
+            "name": " ",
+            "filters": [
+                "TaskManager.set_random_seed.random_seed",        
+                "Weather.*",
+                "Time.*",
+                "ProtectedIndoors.*",
+                "ProtectedWrapped.*",
+                "ProtectedTarped.*",
+                "Unprotected.*",
+                "Baleage.*",
+                "Dry.*",
+                "HighMoisture.*",
+                "Bunker.*",
+                "Pile.*",
+                "Bag.*"
+            ],
+            "expand_data": true,
+            "use_fill_value_in_gaps": false,
+            "use_fill_value_at_end": false
+        }
+    ]
+}
