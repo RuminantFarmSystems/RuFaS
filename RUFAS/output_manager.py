@@ -107,7 +107,7 @@ class OutputManager(object):
     _variables_usage_counter : Counter[str]
         A Counter object used to keep track of the number of times a variables in the variables_pool is used.
     is_end_to_end_testing_run : bool
-        Indicates if  end-to-end testing is being run.
+        Indicates if end-to-end testing is being run.
 
     """
 
@@ -149,8 +149,8 @@ class OutputManager(object):
             self._variables_usage_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
             self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
-                "e2e_vars": "e2e_vars_",
-                "e2e_results": "e2e_results_",
+                "e2e_json": "e2e_json_",
+                "e2e_comparison": "e2e_comparison_",
             }
 
     def _pool_element_factory(self) -> pool_element_type:
