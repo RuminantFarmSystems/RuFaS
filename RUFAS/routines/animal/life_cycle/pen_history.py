@@ -19,6 +19,7 @@ class PenHistory(TypedDict):
     classes_in_pen : list[str]
         The classes of animals that have been in the pen.
     """
+
     start_date: int
     end_date: int
     # TODO: Annotate pen later when circular dependency is resolved - may be solved by GitHub Issue # 793

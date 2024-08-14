@@ -17,6 +17,7 @@ class BodyWeightHistory(TypedDict):
     body_weight : float
         The body weight of the animal on the simulation day.
     """
+
     simulation_day: int
     days_born: int
     body_weight: float
