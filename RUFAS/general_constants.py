@@ -20,6 +20,7 @@ class GeneralConstants:
         WATER_DENSITY_KG_PER_M3: The density of water in kilograms per cubic meter.
 
         PROTEIN_TO_NITROGEN: The nitrogen content of proteins is assumed to be 16%.
+        MILK_FAT_WEIGHT: The weight of milk fat.
 
         EARTH_ANGULAR_VELOCITY: Earth's angular velocity.
 
@@ -65,26 +66,27 @@ class GeneralConstants:
     PERCENTAGE_TO_FRACTION = 0.01
     FRACTION_TO_PERCENTAGE = 100.0
 
-    CONSTANTS_TO_UNITS = {
-        MM_TO_M: MeasurementUnits.METERS,
-        CM_TO_MM: MeasurementUnits.MILLIMETERS,
-        MM_TO_CM: MeasurementUnits.CENTIMETERS,
-        M_TO_KM: MeasurementUnits.KILOMETERS,
-        KM_TO_M: MeasurementUnits.METERS,
-        GRAMS_TO_KG: MeasurementUnits.KILOGRAMS,
-        KG_TO_GRAMS: MeasurementUnits.GRAMS,
-        LITERS_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
-        CUBIC_METERS_TO_LITERS: MeasurementUnits.LITERS,
-        KG_TO_CUBIC_METERS: MeasurementUnits.CUBIC_METERS,
-        YEAR_LENGTH: MeasurementUnits.DAYS,
-        LEAP_YEAR_LENGTH: MeasurementUnits.DAYS,
-        SECONDS_PER_DAY: MeasurementUnits.SECONDS,
-        WATER_DENSITY_KG_PER_LITER: MeasurementUnits.KILOGRAMS,
-        WATER_DENSITY_KG_PER_M3: MeasurementUnits.CUBIC_METERS,
-        PROTEIN_TO_NITROGEN: MeasurementUnits.UNITLESS,
-        NITROGEN_TO_PROTEIN: MeasurementUnits.UNITLESS,
-        MILK_FAT_WEIGHT: MeasurementUnits.UNITLESS,
-        EARTH_ANGULAR_VELOCITY: MeasurementUnits.UNITLESS,
-        PERCENTAGE_TO_FRACTION: MeasurementUnits.UNITLESS,
-        FRACTION_TO_PERCENTAGE: MeasurementUnits.UNITLESS,
-    }
+
+CONSTANTS_TO_UNITS = {
+    "MM_TO_M": MeasurementUnits.METERS_PER_MILLIMETER,
+    "CM_TO_MM": MeasurementUnits.CENTIMETERS_PER_MILLIMETER,
+    "MM_TO_CM": MeasurementUnits.MILLIMETERS_PER_CENTIMETER,
+    "M_TO_KM": MeasurementUnits.KILOMETERS_PER_METER,
+    "KM_TO_M": MeasurementUnits.METERS_PER_KILOMETER,
+    "GRAMS_TO_KG": MeasurementUnits.KILOGRAMS_PER_GRAM,
+    "KG_TO_GRAMS": MeasurementUnits.GRAMS_PER_KILOGRAM,
+    "LITERS_TO_CUBIC_METERS": MeasurementUnits.CUBIC_METERS_PER_LITER,
+    "CUBIC_METERS_TO_LITERS": MeasurementUnits.LITERS_PER_CUBIC_METER,
+    "KG_TO_CUBIC_METERS": MeasurementUnits.CUBIC_METERS_PER_KILOGRAM,
+    "YEAR_LENGTH": MeasurementUnits.DAYS_PER_YEAR,
+    "LEAP_YEAR_LENGTH": MeasurementUnits.DAYS_PER_LEAP_YEAR,
+    "SECONDS_PER_DAY": MeasurementUnits.SECONDS_PER_DAY,
+    "WATER_DENSITY_KG_PER_LITER": MeasurementUnits.KILOGRAMS_PER_LITER,
+    "WATER_DENSITY_KG_PER_M3": MeasurementUnits.KILOGRAMS_PER_CUBIC_METER,
+    "PROTEIN_TO_NITROGEN": MeasurementUnits.UNITLESS,
+    "NITROGEN_TO_PROTEIN": MeasurementUnits.UNITLESS,
+    "MILK_FAT_WEIGHT": MeasurementUnits.UNITLESS,
+    "EARTH_ANGULAR_VELOCITY": MeasurementUnits.RADIANS_PER_HOUR,
+    "PERCENTAGE_TO_FRACTION": MeasurementUnits.UNITLESS,
+    "FRACTION_TO_PERCENTAGE": MeasurementUnits.UNITLESS,
+}
