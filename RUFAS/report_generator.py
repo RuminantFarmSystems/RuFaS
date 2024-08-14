@@ -453,7 +453,7 @@ class ReportGenerator:
             report_data = {key: report_data[key]["values"] for key in report_data.keys()}
             if not all(report_data[key] for key in report_data.keys()):
                 raise ValueError
-            self._add_constants_to_report_data(report_data, filter_content)
+            constants_event_logs = self._add_constants_to_report_data(report_data, filter_content)
         except ValueError:
             raise
 
@@ -463,11 +463,13 @@ class ReportGenerator:
             )
 
         if not horizontal_agg_key and not vertical_agg_key:
-            return report_data, []
+            return report_data, [] if not constants_event_logs else constants_event_logs
 
         aggregate_report, event_logs = self._route_aggregator_functions(
             report_data, filter_content, horizontal_agg_key, vertical_agg_key
         )
+
+        event_logs = event_logs + constants_event_logs
 
         return aggregate_report, event_logs
 
@@ -841,7 +843,7 @@ class ReportGenerator:
 
     def _add_constants_to_report_data(
         self, report_data: dict[str, list[float]], filter_content: Dict[str, Any]
-    ) -> None:
+    ) -> list[dict[str, str | dict[str, str]]]:
         """
         Add constants to the report data.
 
@@ -860,15 +862,20 @@ class ReportGenerator:
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
 
+        Returns
+        -------
+        list[dict[str, str | dict[str, str]]]
+            A list of warnings, logs, and errors to be returned to Output Manager for logging.
+
         Raises
         ------
         ValueError
             If the name or value of any constant is not valid.
         """
-
+        event_logs: list[dict[str, str | dict[str, str]]] = []
         constants_config = filter_content.get("constants")
         if not constants_config:
-            return
+            return []
 
         try:
             self._validate_constants(report_data, constants_config)
@@ -876,13 +883,17 @@ class ReportGenerator:
             raise
 
         if filter_content.get("display_units", False):
-            constants_config = self._add_units_to_constants(constants_config)
+            constants_config, event_logs = self._add_units_to_constants(constants_config)
 
         max_length = max([len(lst) for lst in report_data.values()])
+        print(constants_config)
         for name, value in constants_config.items():
             report_data[name] = [value] * max_length
 
-    def _add_units_to_constants(self, constants_config: dict[str, int | float]) -> dict[str, int | float]:
+        return event_logs
+
+    def _add_units_to_constants(self, constants_config: dict[str, int | float]
+                                ) -> tuple[dict[str, int | float], list[dict[str, str | dict[str, str]]]]:
         """Checks constants provided in filter file against GeneralConstants and adds appropriate measurement units.
 
         Parameters
@@ -897,6 +908,7 @@ class ReportGenerator:
             of the constants will have units appended at the end.
         """
         updated_constants_config: dict[str, int | float] = {}
+        event_logs: list[dict[str, str | dict[str, str]]] = []
         for name in constants_config.keys():
             normalized_provided_name = self._normalize_constant_name(name)
             matching_constant = None
@@ -907,11 +919,23 @@ class ReportGenerator:
                 if normalized_attribute_name == normalized_provided_name:
                     matching_constant = str(attribute)
                     break
+            else:
+                info_map = {
+                    "class": self.__class__.__name__,
+                    "function": self.generate_report.__name__,
+                }
+                constant_units_warning = {
+                    "warning": "report_generation_warning",
+                    "message": f"No matching GeneralConstant found for filter constant {name}.",
+                    "info_map": info_map,
+                }
+                event_logs.append(constant_units_warning)
             unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
             constant_with_units = f"{name}_({unit_for_constant})"
             updated_constants_config[constant_with_units] = constants_config[name]
 
-        return updated_constants_config if len(updated_constants_config) > 0 else constants_config
+        return (updated_constants_config if len(updated_constants_config) > 0 else constants_config,
+                event_logs if event_logs else [])
 
     def _validate_constants(
         self,

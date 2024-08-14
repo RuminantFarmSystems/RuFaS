@@ -264,9 +264,9 @@ def test_add_constants_to_report_data(
     mock_time = mocker.MagicMock()
     report_generator = ReportGenerator(time=mock_time)
     display_units = filter_content.get("display_units", False)
-    mock_rg_add_units_to_constants = mocker.patch.object(
-        report_generator, "_add_units_to_constants", return_value={"existing_data": 1, "Constant1": 10}
-    )
+    mock_rg_add_units_to_constants = mocker.patch.object(report_generator, "_add_units_to_constants",
+                                                         return_value=[{"existing_data": 1,
+                                                                       "Constant1": 10}, []])
 
     # Act and assert
     if expected_exception:
@@ -328,19 +328,31 @@ def test_validate_constants(
     [
         (
             {"SomeConstant": 10, "AnotherConstant": 5.5},
-            {"SomeConstant_(unit_not_found)": 10, "AnotherConstant_(unit_not_found)": 5.5},
+            ({"SomeConstant_(unit_not_found)": 10, "AnotherConstant_(unit_not_found)": 5.5},
+             [{'warning': 'report_generation_warning',
+               'message': 'No matching GeneralConstant found for filter constant SomeConstant.',
+               'info_map': {'class': 'ReportGenerator', 'function': 'generate_report'}},
+              {'warning': 'report_generation_warning',
+               'message': 'No matching GeneralConstant found for filter constant AnotherConstant.',
+               'info_map': {'class': 'ReportGenerator', 'function': 'generate_report'}}]
+             )
         ),
         (
             {"LEAP_YEAR_LENGTH": 366, "FRACTION_TO_PERCENTAGE": 100.0},
-            {"LEAP_YEAR_LENGTH_(day/leap year)": 366, "FRACTION_TO_PERCENTAGE_(unitless)": 100.0},
+            ({"LEAP_YEAR_LENGTH_(day/leap year)": 366, "FRACTION_TO_PERCENTAGE_(unitless)": 100.0}, []),
         ),
         (
             {"UnknownConstant": 100},
-            {"UnknownConstant_(unit_not_found)": 100},
+            ({"UnknownConstant_(unit_not_found)": 100},
+             [{'info_map': {'class': 'ReportGenerator',
+               'function': 'generate_report'},
+               'message': 'No matching GeneralConstant found for filter constant '
+               'UnknownConstant.',
+               'warning': 'report_generation_warning'}])
         ),
         (
             {},
-            {},
+            ({}, []),
         ),
     ],
 )
