@@ -176,7 +176,7 @@ class AnimalModuleReporter:
             milk_data_update["lactating"] = animal.milking
             milk_data_update["parity"] = animal.calves
             milk_data_update["cow_id"] = animal.id
-            milk_data_update["pen_id"] = animal.pen_history[-1].pen
+            milk_data_update["pen_id"] = animal.pen_history[-1]["pen"]
             milk_data_update["simulation_day"] = simulation_day
 
             om.add_variable("milk_data_at_milk_update", milk_data_update, info_map)
