@@ -19,11 +19,7 @@ def test_body_weight_history_initialization(sim_day: int, days_born: int, body_w
     simulation day, days born, and body weight values.
     """
     # Act
-    bw_history = BodyWeightHistory(
-        simulation_day=sim_day,
-        days_born=days_born,
-        body_weight=body_weight
-    )
+    bw_history = BodyWeightHistory(simulation_day=sim_day, days_born=days_born, body_weight=body_weight)
 
     # Assert
     assert bw_history["simulation_day"] == sim_day, "simulation_day not initialized correctly"
