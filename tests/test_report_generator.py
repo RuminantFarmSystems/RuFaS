@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Callable, Dict, List, Any, Optional, Type
 from unittest.mock import patch
 
+import numpy as np
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.graph_generator import GraphGenerator
@@ -23,6 +24,7 @@ def test_average_aggregator() -> None:
     assert average_aggregator([1, 2, 3, 4, 5]) == 3
     assert average_aggregator([-1, -2, -3, -4, -5]) == -3
     assert average_aggregator([]) == 0
+    assert average_aggregator([1, 2, np.nan, 4, 5]) == 3
 
 
 def test_division_aggregator() -> None:
@@ -31,24 +33,28 @@ def test_division_aggregator() -> None:
     assert division_aggregator([]) is None
     assert division_aggregator([10]) is None
     assert division_aggregator([10, 0]) is None
+    assert division_aggregator([100, np.nan, 5]) == 20
 
 
 def test_product_aggregator() -> None:
     assert product_aggregator([1, 2, 3, 4, 5]) == 120
     assert product_aggregator([-1, 2, -3, 4, -5]) == -120
     assert product_aggregator([]) == 1
+    assert product_aggregator([1, 2, np.nan, 4, 5]) == 40
 
 
 def test_sd_aggregator() -> None:
     assert sd_aggregator([2, 4, 4, 4, 5, 5, 7, 9]) == pytest.approx(2)
     assert sd_aggregator([-2, -4, -4, -4, -5, -5, -7, -9]) == pytest.approx(2)
     assert sd_aggregator([]) == 0
+    assert sd_aggregator([2, 4, np.nan, 4, 5, 5, 7, 9]) == pytest.approx(2.099562636671296, rel=1e-3)
 
 
 def test_sum_aggregator() -> None:
     assert sum_aggregator([1, 2, 3, 4, 5]) == 15
     assert sum_aggregator([-1, -2, -3, -4, -5]) == -15
     assert sum_aggregator([]) == 0
+    assert sum_aggregator([1, 2, np.nan, 4, 5]) == 12
 
 
 def test_subtraction_aggregator() -> None:
@@ -56,6 +62,7 @@ def test_subtraction_aggregator() -> None:
     assert subtraction_aggregator([10, -2, -3]) == 15
     assert subtraction_aggregator([]) is None
     assert subtraction_aggregator([10]) is None
+    assert subtraction_aggregator([10, np.nan, 3]) == 7
 
 
 class MockUtility:

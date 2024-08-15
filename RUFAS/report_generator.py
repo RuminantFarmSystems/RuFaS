@@ -803,8 +803,6 @@ class ReportGenerator:
                 if function == aggregator:
                     aggregator_key = key
                     break
-            if aggregator_key is None:
-                raise ValueError(f"Invalid Aggregator Key, must be in {list(AGGREGATION_FUNCTIONS.keys())}")
             first_key, second_key = list(report_data.keys())[:2]
             first_key_numerator_units, first_key_denominator_units = MeasurementUnits.extract_units(first_key)
             second_key_numerator_units, second_key_denominator_units = MeasurementUnits.extract_units(second_key)
