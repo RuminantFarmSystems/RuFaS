@@ -45,6 +45,7 @@ class MilkProductionHistory(TypedDict):
     days_born : int
         The age of the animal in days.
     """
+
     simulation_day: int
     days_in_milk: int
     milk_production: float
