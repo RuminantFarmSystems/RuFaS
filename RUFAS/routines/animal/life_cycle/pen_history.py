@@ -14,8 +14,8 @@ class PenHistory(TypedDict):
         The start date of the pen's usage.
     end_date : int
         The end date of the pen's usage.
-    pen : object
-        The specific pen object
+    pen : int
+        The id of the pen that the animal is in.
     classes_in_pen : list[str]
         The classes of animals that have been in the pen.
     """
@@ -23,5 +23,5 @@ class PenHistory(TypedDict):
     start_date: int
     end_date: int
     # TODO: Annotate pen later when circular dependency is resolved - may be solved by GitHub Issue # 793
-    pen: object
+    pen: int
     classes_in_pen: list[str]
