@@ -1,3 +1,4 @@
+import numpy as np
 import re
 from typing import Dict, List, Any, Callable, Optional
 from RUFAS.general_constants import GeneralConstants
@@ -8,7 +9,7 @@ from RUFAS.util import Utility
 
 def average_aggregator(data: List[float]) -> float:
     """
-    Calculates the average of a list of numbers.
+    Calculates the average of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -18,14 +19,15 @@ def average_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The average of the input numbers.
+        The average of the input numbers, ignoring NaN values.
     """
-    return sum(data) / len(data) if data else 0
+    return np.nanmean(data) if data else 0
 
 
 def division_aggregator(data: List[float]) -> float | None:
     """
-    Divides the first number in the list by each of the subsequent numbers.
+    Divides the first number in the list by each of the subsequent numbers,
+    ignoring NaN values in the subsequent numbers.
 
     Parameters
     ----------
@@ -35,13 +37,16 @@ def division_aggregator(data: List[float]) -> float | None:
     Returns
     -------
     float
-        The result of dividing the first number by each subsequent number.
-        Returns None if the list is empty or has only one element.
+        The result of dividing the first number by each subsequent number,
+        ignoring NaN values. Returns None if the list is empty or has only one
+        valid element (non-NaN).
     """
-    if len(data) < 2:
+    if len(data) < 2 or np.isnan(data[0]):
         return None
     result = data[0]
     for num in data[1:]:
+        if np.isnan(num):
+            continue
         if num == 0:  # Avoid division by zero
             return None
         result /= num
@@ -50,7 +55,7 @@ def division_aggregator(data: List[float]) -> float | None:
 
 def product_aggregator(data: List[float]) -> float:
     """
-    Returns the product of a list of numbers.
+    Returns the product of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -60,17 +65,15 @@ def product_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The product of the input numbers. Returns 1 for an empty list.
+        The product of the input numbers, ignoring NaN values. Returns 1 for an
+        empty list.
     """
-    product = 1
-    for num in data:
-        product *= num
-    return product
+    return np.nanprod(data) if data else 1
 
 
 def sd_aggregator(data: List[float]) -> float:
     """
-    Calculates the standard deviation of a list of numbers.
+    Calculates the standard deviation of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -80,15 +83,14 @@ def sd_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The standard deviation of the input numbers.
+        The standard deviation of the input numbers, ignoring NaN values.
     """
-    mean = average_aggregator(data)
-    return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0
+    return np.nanstd(data) if data else 0
 
 
 def sum_aggregator(data: List[float]) -> float:
     """
-    Returns the sum of a list of numbers.
+    Returns the sum of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -98,14 +100,15 @@ def sum_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The sum of the input numbers.
+        The sum of the input numbers, ignoring NaN values.
     """
-    return sum(data)
+    return np.nansum(data)
 
 
-def subtraction_aggregator(data: list[float]) -> float | None:
+def subtraction_aggregator(data: List[float]) -> float | None:
     """
-    Subtracts each subsequent number in the list from the first number.
+    Subtracts each subsequent number in the list from the first number,
+    ignoring NaN values in the subsequent numbers.
 
     Parameters
     ----------
@@ -115,13 +118,16 @@ def subtraction_aggregator(data: list[float]) -> float | None:
     Returns
     -------
     float
-        The result of subtracting each subsequent number from the first number.
-        Returns None if the list is empty or has only one element.
+        The result of subtracting each subsequent number from the first number,
+        ignoring NaN values. Returns None if the list is empty or has only one
+        valid element (non-NaN).
     """
-    if len(data) < 2:
+    if len(data) < 2 or np.isnan(data[0]):
         return None
     result = data[0]
     for num in data[1:]:
+        if np.isnan(num):
+            continue
         result -= num
     return result
 
