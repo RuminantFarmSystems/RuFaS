@@ -1352,30 +1352,30 @@ def test_update_pen_history(cow_fixture: AnimalBase) -> None:
     # Case 1
     # update hist with designated vals, using the time and the obj itself
     cow_fixture.update_pen_history(3, 2, set(["Cow"]))
-    assert cow_fixture.pen_history[0].pen == 3
-    assert cow_fixture.pen_history[-1].pen == 3
-    assert cow_fixture.pen_history[-1].classes_in_pen == ["Cow"]
-    assert cow_fixture.pen_history[-1].start_date == 2
-    assert cow_fixture.pen_history[-1].end_date == 2
+    assert cow_fixture.pen_history[0]["pen"] == 3
+    assert cow_fixture.pen_history[-1]["pen"] == 3
+    assert cow_fixture.pen_history[-1]["classes_in_pen"] == ["Cow"]
+    assert cow_fixture.pen_history[-1]["start_date"] == 2
+    assert cow_fixture.pen_history[-1]["end_date"] == 2
 
     # Case 2
     # check that it changes pens to 4
     cow_fixture.update_pen_history(4, 3, set(["Cow"]))
     # check previous history remains the same, then check newest
-    assert cow_fixture.pen_history[0].pen == 3
-    assert cow_fixture.pen_history[-1].pen == 4
-    assert cow_fixture.pen_history[-1].classes_in_pen == ["Cow"]
-    assert cow_fixture.pen_history[-1].start_date == 3
-    assert cow_fixture.pen_history[-1].end_date == 3
+    assert cow_fixture.pen_history[0]["pen"] == 3
+    assert cow_fixture.pen_history[-1]["pen"] == 4
+    assert cow_fixture.pen_history[-1]["classes_in_pen"] == ["Cow"]
+    assert cow_fixture.pen_history[-1]["start_date"] == 3
+    assert cow_fixture.pen_history[-1]["end_date"] == 3
 
     # Case 3
     # check that the start date remains the date of the change
     cow_fixture.update_pen_history(4, 4, set(["Cow"]))
-    assert cow_fixture.pen_history[0].pen == 3
-    assert cow_fixture.pen_history[-1].pen == 4
-    assert cow_fixture.pen_history[-1].classes_in_pen == ["Cow"]
-    assert cow_fixture.pen_history[-1].start_date == 3
-    assert cow_fixture.pen_history[-1].end_date == 4
+    assert cow_fixture.pen_history[0]["pen"] == 3
+    assert cow_fixture.pen_history[-1]["pen"] == 4
+    assert cow_fixture.pen_history[-1]["classes_in_pen"] == ["Cow"]
+    assert cow_fixture.pen_history[-1]["start_date"] == 3
+    assert cow_fixture.pen_history[-1]["end_date"] == 4
 
 
 def test_update_body_weight_history(cow_fixture: AnimalBase) -> None:
@@ -1389,9 +1389,9 @@ def test_update_body_weight_history(cow_fixture: AnimalBase) -> None:
         cow_fixture.update_body_weight_history(sim_day)
     # asserts for each update
     for idx, history in enumerate(histories):
-        assert cow_fixture.body_weight_history[idx].simulation_day == history[0]
-        assert cow_fixture.body_weight_history[idx].days_born == history[1]
-        assert cow_fixture.body_weight_history[idx].body_weight == history[2]
+        assert cow_fixture.body_weight_history[idx]["simulation_day"] == history[0]
+        assert cow_fixture.body_weight_history[idx]["days_born"] == history[1]
+        assert cow_fixture.body_weight_history[idx]["body_weight"] == history[2]
 
 
 def test_init_from_string() -> None:
