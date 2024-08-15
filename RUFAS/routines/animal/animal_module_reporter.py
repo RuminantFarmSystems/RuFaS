@@ -414,7 +414,7 @@ class AnimalModuleReporter:
         ration_total : dict[str, float]
            Total amounts of dry matter per feed type fed to the pen.
         pen_id : int | str
-            The unique number identifying a pen.
+            The unique number identifying a pen. Use `ALL` when the given ration is the sum of mulitple pens' rations.
         pen_animal_name : str
             The name of the animal combination in a pen.
         animal_manager : AnimalManager
