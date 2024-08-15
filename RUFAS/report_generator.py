@@ -1,3 +1,4 @@
+import numpy as np
 import re
 from typing import Dict, List, Any, Callable, Optional
 from RUFAS.general_constants import GeneralConstants
@@ -8,7 +9,7 @@ from RUFAS.util import Utility
 
 def average_aggregator(data: List[float]) -> float:
     """
-    Calculates the average of a list of numbers.
+    Calculates the average of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -18,14 +19,15 @@ def average_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The average of the input numbers.
+        The average of the input numbers, ignoring NaN values.
     """
-    return sum(data) / len(data) if data else 0
+    return float(np.nanmean(data)) if data else 0
 
 
 def division_aggregator(data: List[float]) -> float | None:
     """
-    Divides the first number in the list by each of the subsequent numbers.
+    Divides the first number in the list by each of the subsequent numbers,
+    ignoring NaN values in the subsequent numbers.
 
     Parameters
     ----------
@@ -35,22 +37,25 @@ def division_aggregator(data: List[float]) -> float | None:
     Returns
     -------
     float
-        The result of dividing the first number by each subsequent number.
-        Returns None if the list is empty or has only one element.
+        The result of dividing the first number by each subsequent number,
+        ignoring NaN values. Returns None if the list is empty or has only one
+        valid element (non-NaN).
     """
-    if len(data) < 2:
+    if len(data) < 2 or np.isnan(data[0]):
         return None
     result = data[0]
     for num in data[1:]:
+        if np.isnan(num):
+            continue
         if num == 0:  # Avoid division by zero
             return None
         result /= num
-    return result
+    return float(result) if result else None
 
 
 def product_aggregator(data: List[float]) -> float:
     """
-    Returns the product of a list of numbers.
+    Returns the product of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -60,17 +65,15 @@ def product_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The product of the input numbers. Returns 1 for an empty list.
+        The product of the input numbers, ignoring NaN values. Returns 1 for an
+        empty list.
     """
-    product = 1
-    for num in data:
-        product *= num
-    return product
+    return float(np.nanprod(data)) if data else 1
 
 
 def sd_aggregator(data: List[float]) -> float:
     """
-    Calculates the standard deviation of a list of numbers.
+    Calculates the standard deviation of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -80,15 +83,14 @@ def sd_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The standard deviation of the input numbers.
+        The standard deviation of the input numbers, ignoring NaN values.
     """
-    mean = average_aggregator(data)
-    return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0
+    return float(np.nanstd(data)) if data else 0
 
 
 def sum_aggregator(data: List[float]) -> float:
     """
-    Returns the sum of a list of numbers.
+    Returns the sum of a list of numbers, ignoring NaN values.
 
     Parameters
     ----------
@@ -98,14 +100,15 @@ def sum_aggregator(data: List[float]) -> float:
     Returns
     -------
     float
-        The sum of the input numbers.
+        The sum of the input numbers, ignoring NaN values.
     """
-    return sum(data)
+    return float(np.nansum(data))
 
 
-def subtraction_aggregator(data: list[float]) -> float | None:
+def subtraction_aggregator(data: List[float]) -> float | None:
     """
-    Subtracts each subsequent number in the list from the first number.
+    Subtracts each subsequent number in the list from the first number,
+    ignoring NaN values in the subsequent numbers.
 
     Parameters
     ----------
@@ -115,15 +118,18 @@ def subtraction_aggregator(data: list[float]) -> float | None:
     Returns
     -------
     float
-        The result of subtracting each subsequent number from the first number.
-        Returns None if the list is empty or has only one element.
+        The result of subtracting each subsequent number from the first number,
+        ignoring NaN values. Returns None if the list is empty or has only one
+        valid element (non-NaN).
     """
-    if len(data) < 2:
+    if len(data) < 2 or np.isnan(data[0]):
         return None
     result = data[0]
     for num in data[1:]:
+        if np.isnan(num):
+            continue
         result -= num
-    return result
+    return float(result) if result else None
 
 
 AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float] | Callable[[list[float]], float | None]] = {
@@ -481,7 +487,8 @@ class ReportGenerator:
         vertical_agg_key: Optional[str] = None,
     ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """Routes report data to appropriate vertical and horizontal aggregator functions."""
-        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
+        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] | dict[str, float | None] = \
+            report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
         display_units: bool = filter_content.get("display_units", False)
 
@@ -753,8 +760,11 @@ class ReportGenerator:
         aggregated_data: List[float] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
-            non_null_data_points = list(filter(lambda x: x is not None, temp_data))
-            aggregated_data.append(aggregator(non_null_data_points))
+            non_null_data_points = list(filter(lambda x: x is not None and not np.isnan(x), temp_data))
+            if not non_null_data_points:
+                aggregated_data.append(None)
+            else:
+                aggregated_data.append(aggregator(non_null_data_points))
         ordered_report_data = {
             key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key in key
         }
@@ -797,8 +807,6 @@ class ReportGenerator:
                 if function == aggregator:
                     aggregator_key = key
                     break
-            if aggregator_key is None:
-                raise ValueError(f"Invalid Aggregator Key, must be in {list(AGGREGATION_FUNCTIONS.keys())}")
             first_key, second_key = list(report_data.keys())[:2]
             first_key_numerator_units, first_key_denominator_units = MeasurementUnits.extract_units(first_key)
             second_key_numerator_units, second_key_denominator_units = MeasurementUnits.extract_units(second_key)
@@ -818,7 +826,7 @@ class ReportGenerator:
         self,
         report_data: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
         aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
-    ) -> Dict[str, List[float | None]]:
+    ) -> Dict[str, float | None]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -837,8 +845,11 @@ class ReportGenerator:
 
         aggregate_data_dict: Dict[str, List[float | None]] = {}
         for key, data in report_data.items():
-            non_null_data_points = list(filter(lambda x: x is not None, data))
-            aggregate_data_dict[key] = [aggregator(non_null_data_points)]
+            non_null_data_points = list(filter(lambda x: x is not None and not np.isnan(x), data))
+            if not non_null_data_points:
+                aggregate_data_dict[key] = [0]
+            else:
+                aggregate_data_dict[key] = [aggregator(non_null_data_points)]
         return aggregate_data_dict
 
     def _add_constants_to_report_data(
@@ -911,7 +922,7 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for name in constants_config.keys():
             normalized_provided_name = self._normalize_constant_name(name)
-            matching_constant = None
+            matching_constant = ""
             for attribute in dir(GeneralConstants):
                 if attribute.startswith("__"):
                     continue
