@@ -400,6 +400,10 @@ class BaseManureTreatment(ABC):
             The amount of storage methane burned and the adjusted methane loss (kg).
 
         """
-        storage_methane_burned = methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100
-        adjusted_methane_loss = methane_loss * (1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY / 100)
+        storage_methane_burned = (
+            methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        adjusted_methane_loss = methane_loss * (
+            1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
         return storage_methane_burned, adjusted_methane_loss
