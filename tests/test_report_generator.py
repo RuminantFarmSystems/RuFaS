@@ -116,7 +116,7 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
         # Test with empty data
         ({"a": [], "b": []}, "sum", {"a": [0], "b": [0]}),
         # Test with None values in data
-        ({"a": [1, None], "b": [None, 4]}, "sum", {"a": [1], "b": [4]}),
+        ({"a": [1, None, np.nan], "b": [None, 4, np.nan]}, "sum", {"a": [1], "b": [4]}),
     ],
 )
 def test_apply_vertical_aggregation(
@@ -141,22 +141,24 @@ def test_apply_vertical_aggregation(
 @pytest.mark.parametrize(
     "report_data, loop_list, aggregator_key, expected, expected_exception",
     [
-        # Tests with sum aggregation
-        ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "sum", ([4, 6], "unitless", []), None),
+        # Tests with sum aggregation including None and NaN values
+        ({"a": [1, 2, None], "b": [3, 4, np.nan]}, ["a", "b"], "sum", ([4, 6, None], "unitless", []), None),
         ({"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], "sum", ([5, 7, 9], "unitless", []), None),
-        # Tests with subtraction aggregation
+        # Tests with subtraction aggregation including None and NaN values
+        ({"a": [1, None], "b": [3, np.nan]}, ["a", "b"], "subtraction", ([-2, None], "unitless", []), None),
         ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "subtraction", ([-2, -2], "unitless", []), None),
         (
-            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"a": [1, 2, None], "b": [4, 5, np.nan]},
             ["a", "b"],
             "subtraction",
-            ([-3, -3, -3], "unitless", []),
+            ([-3, -3, None], "unitless", []),
             None,
         ),
-        # Tests with product aggregation
+        # Tests with product aggregation including None and NaN values
         ({"a": [1, 2], "b": [3, 4]}, ["a", "b"], "product", ([3, 8], "unitless", []), None),
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, ["a", "b"], "product", ([4, 10, 18], "unitless", []), None),
-        # Tests with division aggregation
+        ({"a": [1, None], "b": [3, np.nan]}, ["a", "b"], "product", ([3, None], "unitless", []), None),
+        ({"a": [None, 2, 3], "b": [np.nan, 5, 6]}, ["a", "b"], "product", ([None, 10, 18], "unitless", []), None),
+        # Tests with division aggregation including None and NaN values
         (
             {"a": [1, 2], "b": [3, 4]},
             ["a", "b"],
@@ -165,31 +167,40 @@ def test_apply_vertical_aggregation(
             None,
         ),
         (
-            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"a": [1, None], "b": [3, np.nan]},
             ["a", "b"],
             "division",
-            ([0.25, 0.4, 0.5], "unitless", []),
+            ([0.3333333333333333, None], "unitless", []),
             None,
         ),
-        # Tests with average aggregation
-        ({"a": [1, 3], "b": [2, 4]}, ["a", "b"], "average", ([1.5, 3.5], "unitless", []), None),
         (
-            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            {"a": [None, 2, 3], "b": [np.nan, 5, 6]},
+            ["a", "b"],
+            "division",
+            ([None, 0.4, 0.5], "unitless", []),
+            None,
+        ),
+        # Tests with average aggregation including None and NaN values
+        ({"a": [1, 3], "b": [2, 4]}, ["a", "b"], "average", ([1.5, 3.5], "unitless", []), None),
+        ({"a": [1, None], "b": [2, np.nan]}, ["a", "b"], "average", ([1.5, None], "unitless", []), None),
+        (
+            {"a": [None, 2, 3], "b": [np.nan, 5, 6]},
             ["a", "b"],
             "average",
-            ([2.5, 3.5, 4.5], "unitless", []),
+            ([None, 3.5, 4.5], "unitless", []),
             None,
         ),
-        # Tests with standard deviation aggregation
+        # Tests with standard deviation aggregation including None and NaN values
         ({"a": [10, 10], "b": [20, 20]}, ["a", "b"], "SD", ([5.0, 5.0], "unitless", []), None),
+        ({"a": [10, None], "b": [20, np.nan]}, ["a", "b"], "SD", ([5.0, None], "unitless", []), None),
         (
-            {"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]},
+            {"a": [None, 12, 23], "b": [np.nan, 15, 22]},
             ["a", "b"],
             "SD",
-            ([3.5, 1.5, 0.5, 1.5], "unitless", []),
+            ([None, 1.5, 0.5], "unitless", []),
             None,
         ),
-        # Tests with inconsistent lengths
+        # Test with inconsistent lengths
         ({"a": [1, 2, 3], "b": [3, 4]}, ["a", "b"], "sum", None, ValueError),
     ],
 )

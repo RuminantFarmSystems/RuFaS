@@ -759,8 +759,11 @@ class ReportGenerator:
         aggregated_data: List[float] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
-            non_null_data_points = list(filter(lambda x: x is not None, temp_data))
-            aggregated_data.append(aggregator(non_null_data_points))
+            non_null_data_points = list(filter(lambda x: x is not None and not np.isnan(x), temp_data))
+            if not non_null_data_points:
+                aggregated_data.append(None)
+            else:
+                aggregated_data.append(aggregator(non_null_data_points))
         ordered_report_data = {
             key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key in key
         }
@@ -822,7 +825,7 @@ class ReportGenerator:
         self,
         report_data: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
         aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
-    ) -> Dict[str, List[float | None]]:
+    ) -> Dict[str, float | None]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -841,8 +844,11 @@ class ReportGenerator:
 
         aggregate_data_dict: Dict[str, List[float | None]] = {}
         for key, data in report_data.items():
-            non_null_data_points = list(filter(lambda x: x is not None, data))
-            aggregate_data_dict[key] = [aggregator(non_null_data_points)]
+            non_null_data_points = list(filter(lambda x: x is not None and not np.isnan(x), data))
+            if not non_null_data_points:
+                aggregate_data_dict[key] = [0]
+            else:
+                aggregate_data_dict[key] = [aggregator(non_null_data_points)]
         return aggregate_data_dict
 
     def _add_constants_to_report_data(
