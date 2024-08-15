@@ -10,7 +10,7 @@
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/default_animal.json",
+      "path": "input/data/animal/cover_and_flare_default_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -80,7 +80,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
-      "path": "input/data/manure/manure_management.json",
+      "path": "input/data/manure/cover_and_flare_manure_management.json",
       "type": "json",
       "properties": "manure_management_properties"
     },

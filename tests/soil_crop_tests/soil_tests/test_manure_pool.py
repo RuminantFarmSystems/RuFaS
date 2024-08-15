@@ -365,9 +365,10 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
         (16, 0.121),
     ],
 )
-def test_adjust_manure_moisture_factor(rain: float, temp_factor: float) -> None:
+def test_adjust_manure_moisture_factor(rain: float, temp_factor: float, mocker: MockerFixture) -> None:
     """Tests that the manure moisture factors of the different pools are correctly updated."""
     # Case 1: calculated moisture factor is negative
+    mocked_determine_moisture_change = mocker.patch("RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change")
     with patch(
         "RUFAS.routines.field.soil.phosphorus_cycling.manure.Manure._determine_moisture_change",
         new_callable=MagicMock,
