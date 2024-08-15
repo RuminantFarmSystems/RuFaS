@@ -886,7 +886,6 @@ class ReportGenerator:
             constants_config, event_logs = self._add_units_to_constants(constants_config)
 
         max_length = max([len(lst) for lst in report_data.values()])
-        print(constants_config)
         for name, value in constants_config.items():
             report_data[name] = [value] * max_length
 
