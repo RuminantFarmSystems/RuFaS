@@ -487,8 +487,7 @@ class ReportGenerator:
         vertical_agg_key: Optional[str] = None,
     ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """Routes report data to appropriate vertical and horizontal aggregator functions."""
-        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] | dict[str, float | None] = \
-            report_data
+        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] | dict[str, float | None] = report_data
         event_logs: list[dict[str, str | dict[str, str]]] = []
         display_units: bool = filter_content.get("display_units", False)
 
