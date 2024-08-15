@@ -21,7 +21,7 @@
           {
             "variable_name": "animal.animal_config.management_decisions.days_in_preg_when_dry",
             "lower_bound": 31,
-            "upper_bound": 282,
+            "upper_bound": 280,
             "data_type":"int"
           },
           {
