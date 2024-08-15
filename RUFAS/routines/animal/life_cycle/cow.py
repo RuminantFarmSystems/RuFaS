@@ -31,6 +31,20 @@ om = OutputManager()
 
 
 class MilkProductionHistory(TypedDict):
+    """
+    A class to represent the milk production history entry of an animal.
+
+    Attributes
+    ----------
+    simulation_day : int
+        The simulate day that the milk production history entry is recorded.
+    days_in_milk : int
+        The number of days of the animal into milking.
+    milk_production : float
+        The amount of milk produced by the animal (kg).
+    days_born : int
+        The age of the animal in days.
+    """
     simulation_day: int
     days_in_milk: int
     milk_production: float
