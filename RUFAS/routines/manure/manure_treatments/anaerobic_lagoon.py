@@ -118,7 +118,8 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
             daily_output.storage_methane_burned, daily_output.storage_methane = self.calculate_cover_and_flare_methane(
-                methane_loss)
+                methane_loss
+            )
 
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
