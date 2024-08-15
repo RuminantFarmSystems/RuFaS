@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Tuple
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
@@ -115,6 +116,16 @@ class AnaerobicLagoon(BaseManureTreatment):
         methane_loss, methane_emission_from_degradable_volatile_solids = self._update_methane_emission(
             self._accumulated_output
         )
+
+        if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
+            daily_output.storage_methane_burned = (
+                methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+            )
+            methane_loss = methane_loss * (
+                1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+            )
+            daily_output.storage_methane = methane_loss
+
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
         )
