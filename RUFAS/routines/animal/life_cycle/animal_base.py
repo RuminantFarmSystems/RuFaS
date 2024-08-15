@@ -180,12 +180,14 @@ class AnimalBase:
             curr_day: the current simulation day
             classes_in_pen: the classes in the animal's current pen
         """
-        last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
+        last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
-            self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen, list(classes_in_pen)))
+            self.pen_history.append(
+                PenHistory(start_date=curr_day, end_date=curr_day, pen=curr_pen, classes_in_pen=list(classes_in_pen))
+            )
         else:  # last_pen == curr_pen
-            self.pen_history[-1].end_date = curr_day
-            self.pen_history[-1].classes_in_pen = list(classes_in_pen)
+            self.pen_history[-1]["end_date"] = curr_day
+            self.pen_history[-1]["classes_in_pen"] = list(classes_in_pen)
 
     def update_body_weight_history(self, sim_day: int) -> None:
         """
@@ -195,4 +197,6 @@ class AnimalBase:
         Args:
             sim_day: simulation day
         """
-        self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))
+        self.body_weight_history.append(
+            BodyWeightHistory(simulation_day=sim_day, days_born=self.days_born, body_weight=self.body_weight)
+        )
