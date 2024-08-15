@@ -21,7 +21,7 @@ def average_aggregator(data: List[float]) -> float:
     float
         The average of the input numbers, ignoring NaN values.
     """
-    return np.nanmean(data) if data else 0
+    return float(np.nanmean(data)) if data else 0
 
 
 def division_aggregator(data: List[float]) -> float | None:
@@ -50,7 +50,7 @@ def division_aggregator(data: List[float]) -> float | None:
         if num == 0:  # Avoid division by zero
             return None
         result /= num
-    return result
+    return float(result) if result else None
 
 
 def product_aggregator(data: List[float]) -> float:
@@ -68,7 +68,7 @@ def product_aggregator(data: List[float]) -> float:
         The product of the input numbers, ignoring NaN values. Returns 1 for an
         empty list.
     """
-    return np.nanprod(data) if data else 1
+    return float(np.nanprod(data)) if data else 1
 
 
 def sd_aggregator(data: List[float]) -> float:
@@ -85,7 +85,7 @@ def sd_aggregator(data: List[float]) -> float:
     float
         The standard deviation of the input numbers, ignoring NaN values.
     """
-    return np.nanstd(data) if data else 0
+    return float(np.nanstd(data)) if data else 0
 
 
 def sum_aggregator(data: List[float]) -> float:
@@ -102,7 +102,7 @@ def sum_aggregator(data: List[float]) -> float:
     float
         The sum of the input numbers, ignoring NaN values.
     """
-    return np.nansum(data)
+    return float(np.nansum(data))
 
 
 def subtraction_aggregator(data: List[float]) -> float | None:
@@ -129,7 +129,7 @@ def subtraction_aggregator(data: List[float]) -> float | None:
         if np.isnan(num):
             continue
         result -= num
-    return result
+    return float(result) if result else None
 
 
 AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float] | Callable[[list[float]], float | None]] = {
@@ -921,7 +921,7 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for name in constants_config.keys():
             normalized_provided_name = self._normalize_constant_name(name)
-            matching_constant = None
+            matching_constant = ""
             for attribute in dir(GeneralConstants):
                 if attribute.startswith("__"):
                     continue

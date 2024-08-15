@@ -120,7 +120,7 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
     ],
 )
 def test_apply_vertical_aggregation(
-    report_data: Dict[str, List[float]], aggregator_key: str, expected: Dict[str, List[float]], mocker: MockerFixture
+    report_data: Dict[str, List[float]], aggregator_key: str, expected: Dict[str, float | None], mocker: MockerFixture
 ) -> None:
     """
     Unit test for _apply_vertical_aggregation() static method in report_generator.py file.
@@ -503,7 +503,7 @@ def test_perform_aggregations(
     ],
 )
 def test_route_aggregator_functions(
-    report_data: dict[str, list[Any]],
+    report_data: dict[str, dict[str, list[Any]]],
     filter_content: dict[str, Any],
     horizontal_agg_key: str,
     vertical_agg_key: str,
