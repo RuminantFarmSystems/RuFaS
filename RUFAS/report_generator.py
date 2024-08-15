@@ -756,7 +756,7 @@ class ReportGenerator:
         if len(set(lengths)) != 1:
             raise ValueError("Can't aggregate data with different lengths")
         max_length = max(lengths)
-        aggregated_data: List[float] = []
+        aggregated_data: List[float | None] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None and not np.isnan(x), temp_data))
@@ -852,7 +852,7 @@ class ReportGenerator:
         return aggregate_data_dict
 
     def _add_constants_to_report_data(
-        self, report_data: dict[str, list[float]], filter_content: Dict[str, Any]
+        self, report_data: dict[str, list[float]] | dict[str, dict[str, list[Any]]], filter_content: Dict[str, Any]
     ) -> list[dict[str, str | dict[str, str]]]:
         """
         Add constants to the report data.
@@ -867,7 +867,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        report_data : Dict[str, List[Any]]
+        report_data : dict[str, list[float]] | dict[str, dict[str, list[Any]]]
             The data to which constants need to be added.
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
@@ -951,7 +951,7 @@ class ReportGenerator:
 
     def _validate_constants(
         self,
-        existing_reports: Dict[str, List[Any]],
+        existing_reports: dict[str, list[float]] | dict[str, dict[str, list[Any]]],
         constants_config: Dict[str, int | float],
     ) -> None:
         """
@@ -963,7 +963,7 @@ class ReportGenerator:
 
         Parameters
         ----------
-        existing_reports : Dict[str, List[Any]]
+        existing_reports : dict[str, list[float]] | dict[str, dict[str, list[Any]]]
             The dictionary containing the names and values of the reports that have already been generated.
         constants_config : Dict[str, int | float]
             A dictionary containing the names and values of the constants to be added to the report data.
