@@ -153,6 +153,14 @@ class OutputManager(object):
                 "e2e_comparison": "e2e_comparison_",
             }
 
+    @property
+    def _filter_prefixes(self) -> dict[str, str]:
+        """Returns the appropriate set of acceptable filter prefixes."""
+        if not self.is_end_to_end_testing_run:
+            return self.__supported_filter_types_prefixes
+        else:
+            return self.__end_to_end_testing_filter_prefixes
+
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
         info_maps: List[Dict[str, Any]] = []
@@ -844,16 +852,13 @@ class OutputManager(object):
             all_files = os.listdir(dir_path)
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
-                    for (
-                        _,
-                        supported_prefix,
-                    ) in self.__supported_filter_types_prefixes.items():
+                    for supported_prefix in self._filter_prefixes.values():
                         if filename.startswith(supported_prefix):
                             break
                     else:
                         self.add_warning(
                             "invalid filter file prefix",
-                            f"{filename} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                            f"{filename} prefix is not in {list(self._filter_prefixes.values())}",
                             info_map,
                         )
                         continue
@@ -1207,7 +1212,8 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._route_save_functions.__name__,
         }
-        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+
+        if filter_file.startswith(self._filter_prefixes["json"]):
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
@@ -1216,11 +1222,11 @@ class OutputManager(object):
                 filter_content,
             )
 
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
+        elif filter_file.startswith(self._filter_prefixes["csv"]):
             self.create_directory(csv_dir)
             variable_csv_file_path = csv_dir / self.generate_file_name(f"saved_variables_{filter_file}", "csv")
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+        elif filter_file.startswith(self._filter_prefixes["graph"]):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
