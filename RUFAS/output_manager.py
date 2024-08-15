@@ -149,8 +149,9 @@ class OutputManager(object):
             self._variables_usage_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
             self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
-                "e2e_json": "e2e_json_",
-                "e2e_comparison": "e2e_comparison_",
+                "json": "e2e_json_",
+                "csv": "e2e_csv_",
+                "comparison": "e2e_comparison_",
             }
 
     @property

@@ -473,7 +473,7 @@ class TaskManager:
         json_output_path = args["json_output_directory"]
         for path in json_output_path.iterdir():
             matches = re.match(
-                f"{str(json_output_path)}/end-to-end-testing_saved_variables_json_end_to_end_testing_filter.txt.*",
+                f"{str(json_output_path)}/end-to-end-testing_saved_variables_e2e_vars_.*",
                 str(path),
             )
             if matches:
@@ -486,8 +486,9 @@ class TaskManager:
             return
         with open(path_to_actual_results, "r") as results:
             actual_results = json.load(results)
-        with open("input/data/end_to_end_testing/end_to_end_results.json", "r") as e_to_e_results:
-            expected_results = json.load(e_to_e_results)
+        with open("input/data/end_to_end_testing/e2e_json_filter.json", "r") as e_to_e_results:
+            filter_and_results = json.load(e_to_e_results)
+            expected_results = filter_and_results["expected_results"]
 
         diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
