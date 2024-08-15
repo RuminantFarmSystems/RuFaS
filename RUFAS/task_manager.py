@@ -105,7 +105,7 @@ class TaskManager:
             "Task Manager",
             RUFAS_VERSION,
             "TASK MANAGER",
-            False
+            False,
         )
         info_map = {
             "class": TaskManager.__name__,
@@ -355,7 +355,7 @@ class TaskManager:
                 args["output_prefix"],
                 RUFAS_VERSION,
                 task_id,
-                is_end_to_end_test
+                is_end_to_end_test,
             )
             input_manager = InputManager(metadata_depth_limit)
 
