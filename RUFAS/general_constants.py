@@ -68,8 +68,8 @@ class GeneralConstants:
 
     CONSTANTS_TO_UNITS = {
         "MM_TO_M": MeasurementUnits.METERS_PER_MILLIMETER,
-        "CM_TO_MM": MeasurementUnits.CENTIMETERS_PER_MILLIMETER,
-        "MM_TO_CM": MeasurementUnits.MILLIMETERS_PER_CENTIMETER,
+        "CM_TO_MM": MeasurementUnits.MILLIMETERS_PER_CENTIMETER,
+        "MM_TO_CM": MeasurementUnits.CENTIMETERS_PER_MILLIMETER,
         "M_TO_KM": MeasurementUnits.KILOMETERS_PER_METER,
         "KM_TO_M": MeasurementUnits.METERS_PER_KILOMETER,
         "GRAMS_TO_KG": MeasurementUnits.KILOGRAMS_PER_GRAM,
