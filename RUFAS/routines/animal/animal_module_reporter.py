@@ -356,12 +356,12 @@ class AnimalModuleReporter:
             "function": funcname,
             "data_origin": [(classname, funcname)],
         }
-        non_nemeric_keys = ["status", "objective"]
+        non_numeric_keys = ["status", "objective"]
         ration_across_pens = {"dry_matter_intake_total": 0, "byproducts_total": 0}
         for pen in animal_manager.all_pens:
             ration_per_pen = {"dry_matter_intake_total": 0, "byproducts_total": 0}
             for key in pen.ration_per_animal.keys():
-                if key in non_nemeric_keys:
+                if key in non_numeric_keys:
                     continue
                 ration_per_pen[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
                 ration_per_pen["dry_matter_intake_total"] += ration_per_pen[key]
