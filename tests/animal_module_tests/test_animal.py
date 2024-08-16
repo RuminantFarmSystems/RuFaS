@@ -2355,15 +2355,15 @@ def test_ration_optimizer_optimize_with_prev_ration(
     use_user_defined_ration = False
     animal_combination = AnimalCombination.GROWING
     expected_bounds = [
-        (0, 1.0001),
-        (0, 2.0001),
-        (0, 3.0001),
-        (0, 4.0001),
-        (0, 5.0001),
-        (0, 6.0001),
+        (0, 1),
+        (0, 2),
+        (0, 3),
+        (0, 4),
+        (0, 5),
+        (0, 6),
     ]
     prev_ration = {"a": 3.0, "b": 6.0}
-    expected_x0 = [3.0, 6.0]
+    expected_x0 = [1.0, 2.0]
     mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.udrm", MagicMock(use_user_defined_ration=use_user_defined_ration)
     )
