@@ -152,7 +152,7 @@ class OutputManager(object):
                 "json": "e2e_json_",
                 "csv": "e2e_csv_",
                 "comparison": "e2e_comparison_",
-                "graph": "e2e_graph_"
+                "graph": "e2e_graph_",
             }
 
     @property
@@ -1281,7 +1281,8 @@ class OutputManager(object):
         else:
             base_name = f"saved_variables_{filter_file}"
 
-        file_name = self.generate_file_name(base_name, "json", include_millis=True)
+        use_millis = True if self.is_end_to_end_testing_run else False
+        file_name = self.generate_file_name(base_name, "json", include_millis=use_millis)
         file_path = save_path / file_name
         self.dict_to_file_json(filtered_pool, file_path)
 
