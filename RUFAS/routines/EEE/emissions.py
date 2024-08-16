@@ -73,9 +73,7 @@ class EmissionsEstimator:
             actual_purchased_feed_emissions,
             actual_land_use_change_emissions,
         ) = self._calculate_actual_purchased_feed_emissions(actual_purchased_feed_totals)
-        emissions_info_map = dict(
-            info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQUIVALENT}
-        )
+        emissions_info_map = dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQUIVALENT})
         om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
         om.add_variable("actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map)
 
