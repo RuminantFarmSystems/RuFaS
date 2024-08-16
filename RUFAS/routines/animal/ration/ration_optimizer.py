@@ -1,5 +1,6 @@
 import random
 from typing import Any, Callable, Dict, List, Tuple
+import warnings
 
 import numpy as np
 import numpy.typing as npt
@@ -50,7 +51,8 @@ class RationOptimizer:
             self.NEgact_constraint,
             self.calcium_constraint,
             self.phosphorus_constraint,
-            self.protein_constraint,
+            self.protein_constraint_lower,
+            self.protein_constraint_upper,
             self.NDF_constraint_lower,
             self.NDF_constraint_upper,
             self.forage_NDF_constraint,
@@ -112,6 +114,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for total net energy.
 
         """
         dry_matter_intake = sum(decision_vector)
@@ -251,6 +254,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for maintenance
+             and activity.
 
         """
         # DMI calculated by the NLP
@@ -347,6 +352,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for pregnancy
+             and lactation.
 
         """
         # Actual net energy for lactation of feed i, Mcal/kg
@@ -394,6 +401,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the requirement for net energy for growth.
 
         """
         # Actual net energy for growth of feed i, Mcal/kg
@@ -513,7 +521,7 @@ class RationOptimizer:
 
     # fmt: off
     @staticmethod
-    def protein_constraint(  # noqa
+    def protein_constraint_lower(  # noqa
         decision_vector: npt.NDArray[np.float64], ration_config: RationConfig
     ) -> float:
         # fmt: on
@@ -533,6 +541,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the lower protein limit.
 
         """
         DMI = sum(decision_vector)
@@ -602,13 +611,12 @@ class RationOptimizer:
         )
         # [A.Cow.E.13]-[A.Cow.E.13]
         # Metabolizable bacterial protein production (g)
-        ration_config.MPbact = float(0.64 * min(
-            1000 * 0.13 * ration_config.TDNact_diet,
-            1000 * 0.85 * ration_config.RDP_diet,
-        ))
+        metabolizable_protein_TDN = GeneralConstants.KG_TO_GRAMS * 0.13 * ration_config.TDNact_diet
+        metabolizable_protein_RDP = GeneralConstants.KG_TO_GRAMS * 0.85 * ration_config.RDP_diet
+        ration_config.MPbact = float(0.64 * min(metabolizable_protein_TDN, metabolizable_protein_RDP))
         # [A.Cow.E.14]-[A.Heifer.E.14]
         # Dietary RUP (kg)
-        ration_config.RUP_diet = sum(
+        ration_config.RUP_diet = GeneralConstants.KG_TO_GRAMS * sum(
             np.multiply(
                 decision_vector,
                 np.multiply(
@@ -622,7 +630,31 @@ class RationOptimizer:
         ration_config.MP_supply = (
             ration_config.MPbact + ration_config.RUP_diet + 0.4 * 11.8 * DMI
         )
-        return ration_config.MP_supply - (ration_config.MP_requirement / 1000)
+        return ration_config.MP_supply - (ration_config.MP_requirement)
+
+    @staticmethod
+    def protein_constraint_upper(decision_vector: np.ndarray,
+                                 ration_config: RationConfig) -> float:
+        """
+        Sets up the upper bound for the protein requirement constraint in the non-linear programming (NLP).
+        Uses MP_supply as calculated in protein_constraint_lower.
+
+        This upper limit is calculated by multipling the  PROTEIN_UPPER_LIMIT_FACTOR in AnimalModuleConstants
+            by the protein requirement.
+
+        Parameters
+        ----------
+        ration_config: RationConfig object
+            Attributes are animal requirement and feed supply information required for optimization
+
+        Returns
+        -------
+        float
+            Non-negative value indicates that supply is below the upper protein limit.
+
+        """
+        return (ration_config.MP_requirement * AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR)\
+            - ration_config.MP_supply
 
     @staticmethod
     def NDF_constraint_lower(
@@ -643,6 +675,8 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that neutral detergent fiber content is greater than 25% of DMI.
+
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -673,6 +707,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that neutral detergent fiber content is less than 45% of DMI.
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -704,6 +739,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that NDF supply is greater than 15%.
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -748,6 +784,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than 7%.
 
         """
         # From E/D: OTHER REQUIREMENTS
@@ -763,7 +800,7 @@ class RationOptimizer:
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
-        greater than the DMI_est + 20% calculated in the requirements
+        greater than the DMI_est + DMI_CONSTRAINT_PERCENT calculated in the requirements
 
         Parameters
         ----------
@@ -775,6 +812,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is greater than the DMI minimum.
 
         """
         return float((sum(decision_vector)) - (
@@ -788,7 +826,7 @@ class RationOptimizer:
     ) -> float:
         """
         Constraint in place to make sure the sum of all the feeds in the ration is
-        less than the DMI_est + 20% calculated in the requirements.
+        less than the DMI_est + DMI_CONSTRAINT_PERCENT calculated in the requirements.
 
         Parameters
         ----------
@@ -800,6 +838,7 @@ class RationOptimizer:
         Returns
         -------
         float
+            Non-negative value indicates that supply is less than the DMI maximum.
 
         """
         return float(-(sum(decision_vector)) + (
@@ -922,33 +961,39 @@ class RationOptimizer:
             )
             x0 = [np.mean(bnd) for bnd in bnds]
         else:
-            bnds = []
-            bnds = [(0, lim + 0.0001) for lim in ration_config.feed_limit_list]
+            bnds = list(zip(
+                [(lim) for lim in ration_config.feed_minimum_list],
+                [(lim) for lim in ration_config.feed_limit_list]))
+
+        for i in range(0, len(x0)):
+            if x0[i] < bnds[i][0] or x0[i] > bnds[i][1]:
+                x0[i] = np.clip(x0[i], bnds[i][0], bnds[i][1])
 
         if animal_combination is AnimalCombination.LAC_COW:
-            return minimize(
-                self.objective,
-                x0,
-                method="SLSQP",
-                bounds=bnds,
-                constraints=self.cow_constraints,
-                args=arguments,
-            )
-        elif animal_combination in [
-            AnimalCombination.GROWING,
-            AnimalCombination.CLOSE_UP,
-            AnimalCombination.GROWING_AND_CLOSE_UP,
-        ]:
-            return minimize(
-                self.objective,
-                x0,
-                method="SLSQP",
-                bounds=bnds,
-                constraints=self.heifer_constraints,
-                args=arguments,
-            )
+            constraints_to_use = self.cow_constraints
+        elif animal_combination in [AnimalCombination.GROWING,
+                                    AnimalCombination.CLOSE_UP,
+                                    AnimalCombination.GROWING_AND_CLOSE_UP,]:
+            constraints_to_use = self.heifer_constraints
         else:
             raise ValueError("Invalid animal combination: " + str(animal_combination))
+
+        with warnings.catch_warnings(record=True) as caught_warnings:
+            result = minimize(
+                self.objective,
+                x0,
+                method="SLSQP",
+                bounds=bnds,
+                constraints=constraints_to_use,
+                args=arguments,
+            )
+            for warning in caught_warnings:
+                om.add_warning(
+                    f"Captured warning during optimization of type {warning.category.__name__}",
+                    f"{warning.message}. Warning generated in {warning.filename}",
+                    {"class": self.__class__.__name__, "function": self.optimize.__name__, "full_warning": warning}
+                )
+        return result
 
     def attempt_optimization(
         self,
@@ -1000,9 +1045,11 @@ class RationOptimizer:
         dRUP_list = available_feeds["dRUP"]
         if animal_combination is AnimalCombination.LAC_COW:
             feed_limit_list = available_feeds["lactating_cow_limit"]
+            feed_minimum_list = available_feeds["lactating_cow_minimum"]
             lactating = True
         else:
             feed_limit_list = available_feeds["dry_cow_limit"]
+            feed_minimum_list = available_feeds["dry_cow_minimum"]
             lactating = False
         ration_config = RationConfig(
             price_list,
@@ -1030,6 +1077,7 @@ class RationOptimizer:
             N_B_list,
             CP_list,
             dRUP_list,
+            feed_minimum_list,
             feed_limit_list,
             lactating,
             DMIest__requirement=requirements.DMIest_requirement,
