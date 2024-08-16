@@ -1,5 +1,6 @@
 from ..field.crop.crop_enum import CropSpecies
 from ...input_manager import InputManager
+from ...time import Time
 from ...units import MeasurementUnits
 from ...output_manager import OutputManager
 from typing import Any
@@ -52,9 +53,12 @@ class EmissionsEstimator:
         self.im = InputManager()
 
     def estimate_emissions(self) -> None:
-        (homegrown_feeds, fertilizer_applications, manure_applications, manure_requests) = (
-            self._gather_homegrown_feeds_and_fertilizer_apps()
-        )
+        (
+            homegrown_feeds,
+            fertilizer_applications,
+            manure_applications,
+            manure_requests,
+        ) = self._gather_homegrown_feeds_and_fertilizer_apps()
         self._calculate_purchased_feed_emissions(homegrown_feeds)
         self._calculate_homegrown_feed_emissions(
             homegrown_feeds, fertilizer_applications, manure_applications, manure_requests
@@ -128,13 +132,15 @@ class EmissionsEstimator:
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
         }
-        date_cutoff = om.filter_variables_pool(time_filter)
-        day_cutoff = date_cutoff["Time.day"]["values"][0]
-        year_cutoff = date_cutoff["Time.calendar_year"]["values"][0]
+        date_variables = om.filter_variables_pool(time_filter)
+        day_cutoff = date_variables["Time.day"]["values"][0]
+        year_cutoff = date_variables["Time.calendar_year"]["values"][0]
+        date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff)
 
         filtered_yields = list(
             filter(
-                lambda crop: crop["harvest_day"] >= day_cutoff and crop["harvest_year"] >= year_cutoff, processed_yields
+                lambda crop: Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]) >= date_cutoff,
+                processed_yields,
             )
         )
 
@@ -142,15 +148,23 @@ class EmissionsEstimator:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
         filtered_fert_apps = list(
-            filter(lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_fert_apps)
+            filter(
+                lambda app: Time.convert_year_jday_to_date(app["year"], app["day"]) >= date_cutoff, processed_fert_apps
+            )
         )
 
         filtered_manure_apps = list(
-            filter(lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_manure_apps)
+            filter(
+                lambda app: Time.convert_year_jday_to_date(app["year"], app["day"]) >= date_cutoff,
+                processed_manure_apps,
+            )
         )
 
         filtered_manure_requests = list(
-            filter(lambda app: app["day"] >= day_cutoff and app["year"] >= year_cutoff, processed_manure_requests)
+            filter(
+                lambda app: Time.convert_year_jday_to_date(app["year"], app["day"]) >= date_cutoff,
+                processed_manure_requests,
+            )
         )
         return filtered_yields, filtered_fert_apps, filtered_manure_apps, filtered_manure_requests
 
