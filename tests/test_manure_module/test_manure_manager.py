@@ -12,9 +12,11 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.output_manager import OutputManager
 
 
-def test_manure_manager_init(mocker: MockFixture) -> None:
+@pytest.mark.parametrize("simulate_animals,log_added", [(True, False), (False, True)])
+def test_manure_manager_init(mocker: MockFixture, simulate_animals: bool, log_added: bool) -> None:
     """Unit test for __init__() of ManureManager in manure_manager.py"""
     # Arrange
     mock_animal_manager = mocker.MagicMock()
@@ -37,6 +39,7 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
         "RUFAS.routines.manure.manure_manager.ManureManager." "configure_manure_manager_components",
         return_value=None,
     )
+    patch_add_log = mocker.patch.object(OutputManager(), "add_log")
 
     # Act
     manure_manager = ManureManager(
@@ -44,7 +47,7 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
-        animals_are_simulated=True,
+        animals_are_simulated=simulate_animals,
     )
 
     # Assert
@@ -55,13 +58,17 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
     assert manure_manager.manure_treatments == {}
     assert manure_manager.weather == mock_weather
     assert manure_manager.time == mock_time
-    assert manure_manager.are_animals_simulated
+    assert manure_manager.are_animals_simulated == simulate_animals
 
     patch_for_manure_manager_config_handler.assert_called_once_with(mock_manure_manager_config)
     assert manure_manager.manure_manager_config_handler == mock_manure_manager_config_handler
     patch_for_manure_nutrient_manager.assert_called_once()
     patch_field_manure_supplier.assert_called_once()
     patch_forconfigure_manure_manager_components.assert_called_once_with(mock_animal_manager.all_pens)
+    if log_added:
+        patch_add_log.assert_called_once()
+    else:
+        patch_add_log.assert_not_called()
 
 
 @pytest.mark.parametrize(

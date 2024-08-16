@@ -9,6 +9,7 @@ from RUFAS.weather import Weather
 from RUFAS.time import Time
 
 from ...data_structures.pen_manure_data import PenManureData
+from ...output_manager import OutputManager
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
 )
@@ -129,6 +130,13 @@ class ManureManager:
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
         self.are_animals_simulated = animals_are_simulated
+        if not self.are_animals_simulated:
+            info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__}
+            OutputManager().add_log(
+                "Animals not being simulated",
+                "Manure for field applications will be created by the FieldManureSupplier",
+                info_map,
+            )
         self._field_manure_supplier = FieldManureSupplier()
         self.configure_manure_manager_components(pen_list)
 
