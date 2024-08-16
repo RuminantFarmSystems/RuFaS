@@ -152,6 +152,7 @@ class OutputManager(object):
                 "json": "e2e_json_",
                 "csv": "e2e_csv_",
                 "comparison": "e2e_comparison_",
+                "graph": "e2e_graph_"
             }
 
     @property
@@ -1244,6 +1245,14 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+        elif filter_file.startswith(self._filter_prefixes["comparison"]):
+            self.create_directory(json_dir)
+            self._save_to_json(
+                filter_file,
+                json_dir,
+                filtered_pool,
+                filter_content,
+            )
 
     def _save_to_json(
         self,
@@ -1272,7 +1281,7 @@ class OutputManager(object):
         else:
             base_name = f"saved_variables_{filter_file}"
 
-        file_name = self.generate_file_name(base_name, "json")
+        file_name = self.generate_file_name(base_name, "json", include_millis=True)
         file_path = save_path / file_name
         self.dict_to_file_json(filtered_pool, file_path)
 

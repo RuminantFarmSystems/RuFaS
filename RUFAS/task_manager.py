@@ -460,7 +460,13 @@ class TaskManager:
 
         output_manager.add_log("End-to-end testing", "Completed end-to-end testing simulation", info_map)
 
+        output_manager.flush_pools()
+
         TaskManager._compare_simulation_outputs_to_expected_outputs(args, output_manager)
+
+        TaskManager.handle_post_processing(
+            args, input_manager, output_manager, task_id, produce_graphics, save_results=True
+        )
 
     @staticmethod
     def _compare_simulation_outputs_to_expected_outputs(args: Dict[str, Any], output_manager: OutputManager) -> None:
@@ -492,15 +498,18 @@ class TaskManager:
 
         diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
-        testing_results_file_name = output_manager.generate_file_name("end_to_end_testing_results", "json")
-        testing_results_path = json_output_path.joinpath(Path(testing_results_file_name))
+        # testing_results_file_name = output_manager.generate_file_name("end_to_end_testing_results", "json")
+        # testing_results_path = json_output_path.joinpath(Path(testing_results_file_name))
         no_diff = diff == {}
         if no_diff:
             output_manager.add_log("End-to-end testing", "End-to-end testing successful", info_map)
         else:
             output_manager.add_error("End-to-end testing", "End-to-end testing unsuccessful", info_map)
         diff.update({"end_to_end_testing_passing": no_diff})
-        output_manager.dict_to_file_json(diff, testing_results_path, False)
+        # output_manager.dict_to_file_json(diff, testing_results_path, False)
+        info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": "FeedStorageResults"})
+        for comparison_type, difference in diff.items():
+            output_manager.add_variable(comparison_type, difference, info_map)
 
     @staticmethod
     def handle_input_data_audit(
