@@ -85,6 +85,16 @@ jobs:
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
+      
+      - name: Capture and save the latest commit SHA after Black formatting
+        id: capture_commit_sha
+        run: echo "LATEST_COMMIT_SHA=$(git rev-parse HEAD)" > commit_sha.txt
+
+      - name: Upload commit SHA
+        uses: actions/upload-artifact@v3
+        with:
+          name: commit-sha
+          path: commit_sha.txt
   
 
   lint_test_type_check:
@@ -98,19 +108,19 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Fetch latest commit SHA
-        id: fetch-latest-sha
-        run: |
-          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          echo "Branch name: $BRANCH_NAME"
-          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
-          echo "Latest SHA: $LATEST_SHA"
-          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
+      - name: Download commit SHA artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: commit-sha
+
+      - name: Read commit SHA
+        id: read_commit_sha
+        run: echo "LATEST_COMMIT_SHA=$(cat commit_sha.txt)" >> $GITHUB_ENV
 
       - name: Checkout the latest commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.fetch-latest-sha.outputs.sha }}
+          ref: ${{ env.LATEST_COMMIT_SHA }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
