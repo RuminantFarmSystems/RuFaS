@@ -3,11 +3,12 @@
 [![Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 [![Mypy](https://img.shields.io/badge/Mypy-3310%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 
+
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-the-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
 
 # Mission
-To build an integrated, whole-farm model that simulates milk, meat, and crop production, greenhouse gas emissions, water quality impacts, soil health, and other sustainability outcomes of ruminant farms. We strive to achieve the highest standards for prediction accuracy, code structure and clarity, documentation, and accessibility. Through continuous learning and improvement of our methods and algorithms, we are creating an open and inclusive platform for scientific collaboration. 
+To build an integrated, whole-farm model that simulates milk, meat, and crop production, greenhouse gas emissions, water quality impacts, soil health, and other sustainability outcomes of ruminant farms. We strive to achieve the highest standards for prediction accuracy, code structure and clarity, documentation, and accessibility. Through continuous learning and improvement of our methods and algorithms, we are creating an open and inclusive platform for scientific collaboration.
 
 # Priorities
 When decision-making is difficult and doubtful, we use these as our North Star to navigate the uncertain and unknown world.
@@ -51,18 +52,18 @@ Remember, flexibility and creativity are your allies in the grand adventure of p
 ### SWE Goals
 * Finish Feed Storage Module (P1)
   - Fix the issues in the Feed library _Issues_ [1245](https://github.com/RuminantFarmSystems/MASM/issues/1245)
-  - Feed Degradation _Issues_ [1375](https://github.com/RuminantFarmSystems/MASM/issues/1375) [1376](https://github.com/RuminantFarmSystems/MASM/issues/1376) [1377](https://github.com/RuminantFarmSystems/MASM/issues/1377) [1378](https://github.com/RuminantFarmSystems/MASM/issues/1378) 
+  - Feed Degradation _Issues_ [1375](https://github.com/RuminantFarmSystems/MASM/issues/1375) [1376](https://github.com/RuminantFarmSystems/MASM/issues/1376) [1377](https://github.com/RuminantFarmSystems/MASM/issues/1377) [1378](https://github.com/RuminantFarmSystems/MASM/issues/1378)
   - Purchase Feed logic
 * Finish Energy and Emission from EEE Module for FARM ES (Purchased feed emissions and field management fuel) (P0)
 * Implement Scenario Manager (P0)
 * Implement end to end testing (P1)
-* Analyze Animal Module and Plan on action items (P0) _Issues_ [1229](https://github.com/RuminantFarmSystems/MASM/issues/1229) [1232](https://github.com/RuminantFarmSystems/MASM/issues/1232) [1235](https://github.com/RuminantFarmSystems/MASM/issues/1235) 
+* Analyze Animal Module and Plan on action items (P0) _Issues_ [1229](https://github.com/RuminantFarmSystems/MASM/issues/1229) [1232](https://github.com/RuminantFarmSystems/MASM/issues/1232) [1235](https://github.com/RuminantFarmSystems/MASM/issues/1235)
 * Analyze S&C Module and Plan action items (P0) _Issues_ [1230](https://github.com/RuminantFarmSystems/MASM/issues/1230) [1233](https://github.com/RuminantFarmSystems/MASM/issues/1233) [1236](https://github.com/RuminantFarmSystems/MASM/issues/1236)
 * Analyze Manure Module and Plan action items (P0) _Issues_ [1231](https://github.com/RuminantFarmSystems/MASM/issues/1231) [1234](https://github.com/RuminantFarmSystems/MASM/issues/1234) [1237](https://github.com/RuminantFarmSystems/MASM/issues/1237)
 * Un-entangle bio physical modules [document here](https://docs.google.com/document/d/17BVgTnsqwVEZbdNoztIfBQILYJ94inlyXgwCvq9iQQw/edit?usp=sharing)  _Issues_ [1411](https://github.com/RuminantFarmSystems/MASM/issues/1411)
 * Implement IM cross validation (P1)
 * Draft Developer’s Rights and Responsibilities (P2)
-* Fix units across the codebase (P1) _Issues_ [1253](https://github.com/RuminantFarmSystems/MASM/issues/1253) [1254](https://github.com/RuminantFarmSystems/MASM/issues/1254) 
+* Fix units across the codebase (P1) _Issues_ [1253](https://github.com/RuminantFarmSystems/MASM/issues/1253) [1254](https://github.com/RuminantFarmSystems/MASM/issues/1254)
 * Revisit website backend (P2)
 ### SME Goals
 * Pilot testing reports (P0)
@@ -77,7 +78,7 @@ Remember, flexibility and creativity are your allies in the grand adventure of p
 * Complete feed module documentation (P1)
 * Develop design doc for automated lactation curve parameter selection implementation in RuFaS (P2)
 * Refine use of equipment (P2)
-  
+
 ## Q2 Goals
 ### SWE Goals
 * Finish Economics from EEE Module

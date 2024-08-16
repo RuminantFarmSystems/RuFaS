@@ -226,6 +226,16 @@ def test_apply_horizontal_aggregation(
             },
             None,
         ),
+        # Valid case with a valid constant and display_units as True
+        (
+            {"existing_data": [1, 2, 3]},
+            {"constants": {"Constant1": 10}, "display_units": True},
+            {
+                "existing_data": [1, 1, 1],
+                "Constant1": [10, 10, 10],
+            },
+            None,
+        ),
         # Valid case with existing data of different lengths
         (
             {"col1": [1, 2, 3], "col2": [4, 5, 6, 7]},
@@ -243,7 +253,7 @@ def test_add_constants_to_report_data(
     report_data: Dict[str, List[Any]],
     filter_content: Dict[str, Any],
     expected_report_data: Dict[str, List[Any]],
-    expected_exception: Type[Exception],
+    expected_exception: Type[Exception] | None,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -253,6 +263,10 @@ def test_add_constants_to_report_data(
     # Arrange
     mock_time = mocker.MagicMock()
     report_generator = ReportGenerator(time=mock_time)
+    display_units = filter_content.get("display_units", False)
+    mock_rg_add_units_to_constants = mocker.patch.object(
+        report_generator, "_add_units_to_constants", return_value=[{"existing_data": 1, "Constant1": 10}, []]
+    )
 
     # Act and assert
     if expected_exception:
@@ -261,6 +275,11 @@ def test_add_constants_to_report_data(
     else:
         report_generator._add_constants_to_report_data(report_data, filter_content)
         assert report_data == expected_report_data
+
+    if display_units:
+        mock_rg_add_units_to_constants.assert_called_once()
+    else:
+        mock_rg_add_units_to_constants.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -285,7 +304,7 @@ def test_add_constants_to_report_data(
 def test_validate_constants(
     report_data: Dict[str, List[Any]],
     constant_config: Dict[str, Any],
-    expected_exception: Type[Exception],
+    expected_exception: Type[Exception] | None,
     mocker: MockerFixture,
 ) -> None:
     """
@@ -302,6 +321,62 @@ def test_validate_constants(
             report_generator._validate_constants(report_data, constant_config)
     else:
         report_generator._validate_constants(report_data, constant_config)
+
+
+@pytest.mark.parametrize(
+    "constants_config, expected_result",
+    [
+        (
+            {"SomeConstant": 10, "AnotherConstant": 5.5},
+            (
+                {"SomeConstant_(unit_not_found)": 10, "AnotherConstant_(unit_not_found)": 5.5},
+                [
+                    {
+                        "warning": "report_generation_warning",
+                        "message": "No matching GeneralConstant found for filter constant SomeConstant.",
+                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                    },
+                    {
+                        "warning": "report_generation_warning",
+                        "message": "No matching GeneralConstant found for filter constant AnotherConstant.",
+                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                    },
+                ],
+            ),
+        ),
+        (
+            {"LEAP_YEAR_LENGTH": 366, "FRACTION_TO_PERCENTAGE": 100.0},
+            ({"LEAP_YEAR_LENGTH_(day/leap year)": 366, "FRACTION_TO_PERCENTAGE_(unitless)": 100.0}, []),
+        ),
+        (
+            {"UnknownConstant": 100},
+            (
+                {"UnknownConstant_(unit_not_found)": 100},
+                [
+                    {
+                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                        "message": "No matching GeneralConstant found for filter constant " "UnknownConstant.",
+                        "warning": "report_generation_warning",
+                    }
+                ],
+            ),
+        ),
+        (
+            {},
+            ({}, []),
+        ),
+    ],
+)
+def test_add_units_to_constants(
+    constants_config: dict[str, int | float],
+    expected_result: tuple[dict[str, int | float], list[dict[str, str | dict[str, str]]]],
+) -> None:
+    """
+    Test the _add_units_to_constants method to ensure that units are correctly appended to constants.
+    """
+    report_generator = ReportGenerator()
+    result = report_generator._add_units_to_constants(constants_config)
+    assert result == expected_result
 
 
 @pytest.mark.parametrize(
@@ -1193,7 +1268,7 @@ def test_add_var_units(
 )
 def test_aggregate_units(
     report_data: dict[str, list[float]],
-    aggregator: Callable[[List[float]], float] | str,
+    aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
     simplify_units: bool,
     expected_output: tuple[str, list[dict[str, str | Dict[str, str]]]],
     raises_error: bool,
@@ -1204,3 +1279,25 @@ def test_aggregate_units(
             report_generator._aggregate_units(report_data, aggregator, False)
     else:
         assert report_generator._aggregate_units(report_data, aggregator, simplify_units) == expected_output
+
+
+@pytest.mark.parametrize(
+    "input_name, expected_output",
+    [
+        ("CONSTANT_NAME", "constantname"),
+        ("  constant   name ", "constantname"),
+        ("ConstantName", "constantname"),
+        ("constant_name", "constantname"),
+        ("CONSTANT__NAME", "constantname"),
+        ("constant name", "constantname"),
+        ("CONSTANT NAME", "constantname"),
+        (" constant _ Name ", "constantname"),
+    ],
+)
+def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
+    """
+    Test the _normalize_constant_name method to ensure it normalizes the constant name
+    by converting it to lowercase and removing underscores and spaces.
+    """
+    report_generator = ReportGenerator()
+    assert report_generator._normalize_constant_name(input_name) == expected_output
