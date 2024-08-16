@@ -2811,11 +2811,11 @@ def test_formulate_ration_error(mocker: MockerFixture) -> None:
         "RUFAS.routines.animal.ration.animal_requirements.AnimalRequirements.set_requirements",
         return_value=None,
     )
-    mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(is_udr=False))
+    mocker.patch("RUFAS.routines.animal.ration.ration_driver.udrm", MagicMock(use_user_defined_ration=False))
     mock_pen = mocker.MagicMock()
     mock_pen.avg_milk = 1
     mock_pen.id = 42
-    mock_pen.animal_combination.name = "LAC_COW"
+    mock_pen.animal_combination = AnimalCombination.LAC_COW
 
     mock_solution = mocker.MagicMock()
     mock_solution.success = False

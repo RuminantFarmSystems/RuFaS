@@ -106,6 +106,17 @@ class RationManager:
 
         if pen.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
+                if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                    om.add_error(
+                        "Milk production too low",
+                        (
+                            f"Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
+                            f"Possible solution is to provide additional feed ingredients to "
+                            f"{pen.animal_combination.name}."
+                        ),
+                        info_map,
+                    )
+                    raise ValueError
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
                 req.set_requirements(pen, animal_grouping_scenario, recalc=True)
