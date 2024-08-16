@@ -6,6 +6,7 @@ from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import
     ManureModuleOutputManagerHelper,
 )
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
@@ -31,6 +32,7 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
         "RUFAS.routines.manure.manure_manager.ManureNutrientManager",
         return_value=mock_manure_nutrient_manager,
     )
+    patch_field_manure_supplier = mocker.patch.object(FieldManureSupplier, "__init__", return_value=None)
     patch_forconfigure_manure_manager_components = mocker.patch(
         "RUFAS.routines.manure.manure_manager.ManureManager." "configure_manure_manager_components",
         return_value=None,
@@ -42,6 +44,7 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
+        animals_are_simulated=True,
     )
 
     # Assert
@@ -52,10 +55,12 @@ def test_manure_manager_init(mocker: MockFixture) -> None:
     assert manure_manager.manure_treatments == {}
     assert manure_manager.weather == mock_weather
     assert manure_manager.time == mock_time
+    assert manure_manager.are_animals_simulated
 
     patch_for_manure_manager_config_handler.assert_called_once_with(mock_manure_manager_config)
     assert manure_manager.manure_manager_config_handler == mock_manure_manager_config_handler
     patch_for_manure_nutrient_manager.assert_called_once()
+    patch_field_manure_supplier.assert_called_once()
     patch_forconfigure_manure_manager_components.assert_called_once_with(mock_animal_manager.all_pens)
 
 
