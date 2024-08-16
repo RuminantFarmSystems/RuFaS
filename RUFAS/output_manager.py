@@ -106,6 +106,9 @@ class OutputManager(object):
         Set to True to exclude info_maps when adding variables to the variables_pool
     _variables_usage_counter : Counter[str]
         A Counter object used to keep track of the number of times a variables in the variables_pool is used.
+    is_end_to_end_testing_run : bool
+        Indicates if end-to-end testing is being run.
+
     """
 
     __instance = None
@@ -144,6 +147,21 @@ class OutputManager(object):
             )
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
+            self.is_end_to_end_testing_run: bool = False
+            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
+                "json": "e2e_json_",
+                "csv": "e2e_csv_",
+                "comparison": "e2e_comparison_",
+                "graph": "e2e_graph_",
+            }
+
+    @property
+    def _filter_prefixes(self) -> dict[str, str]:
+        """Returns the appropriate set of acceptable filter prefixes."""
+        if not self.is_end_to_end_testing_run:
+            return self.__supported_filter_types_prefixes
+        else:
+            return self.__end_to_end_testing_filter_prefixes
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -836,16 +854,13 @@ class OutputManager(object):
             all_files = os.listdir(dir_path)
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
-                    for (
-                        _,
-                        supported_prefix,
-                    ) in self.__supported_filter_types_prefixes.items():
+                    for supported_prefix in self._filter_prefixes.values():
                         if filename.startswith(supported_prefix):
                             break
                     else:
                         self.add_warning(
                             "invalid filter file prefix",
-                            f"{filename} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                            f"{filename} prefix is not in {list(self._filter_prefixes.values())}",
                             info_map,
                         )
                         continue
@@ -1199,7 +1214,8 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._route_save_functions.__name__,
         }
-        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+
+        if filter_file.startswith(self._filter_prefixes["json"]):
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
@@ -1208,11 +1224,11 @@ class OutputManager(object):
                 filter_content,
             )
 
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
+        elif filter_file.startswith(self._filter_prefixes["csv"]):
             self.create_directory(csv_dir)
             variable_csv_file_path = csv_dir / self.generate_file_name(f"saved_variables_{filter_file}", "csv")
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+        elif filter_file.startswith(self._filter_prefixes["graph"]):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
@@ -1229,6 +1245,14 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+        elif filter_file.startswith(self._filter_prefixes["comparison"]):
+            self.create_directory(json_dir)
+            self._save_to_json(
+                filter_file,
+                json_dir,
+                filtered_pool,
+                filter_content,
+            )
 
     def _save_to_json(
         self,
@@ -1257,7 +1281,8 @@ class OutputManager(object):
         else:
             base_name = f"saved_variables_{filter_file}"
 
-        file_name = self.generate_file_name(base_name, "json")
+        use_millis = True if self.is_end_to_end_testing_run else False
+        file_name = self.generate_file_name(base_name, "json", include_millis=use_millis)
         file_path = save_path / file_name
         self.dict_to_file_json(filtered_pool, file_path)
 
@@ -1651,6 +1676,7 @@ class OutputManager(object):
         output_prefix: str,
         version_number: str,
         task_id: str,
+        is_end_to_end_testing_run: bool,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
@@ -1661,3 +1687,4 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+        self.is_end_to_end_testing_run = is_end_to_end_testing_run
