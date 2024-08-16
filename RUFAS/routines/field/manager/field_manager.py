@@ -1,4 +1,4 @@
-from .field_manure_supplier import FieldManureSupplier
+from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
