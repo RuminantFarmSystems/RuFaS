@@ -23,7 +23,7 @@ class PurchasedFeedEmissionsEstimator:
         om.add_variable(
             "purchased_feed_emissions",
             self.purchased_feed_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQUIVALENT}),
         )
 
         self.purchased_feed_land_use_change_emissions = self._setup_feed_emissions(
@@ -32,7 +32,7 @@ class PurchasedFeedEmissionsEstimator:
         om.add_variable(
             "purchased_feed_land_use_change_emissions",
             self.purchased_feed_land_use_change_emissions,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}),
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQUIVALENT}),
         )
 
         self.missing_purchased_feed_ids: list[str] = []
