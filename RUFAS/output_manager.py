@@ -152,7 +152,7 @@ class OutputManager(object):
                 "json": "e2e_json_",
                 "csv": "e2e_csv_",
                 "comparison": "e2e_comparison_",
-                "graph": "e2e_graph_"
+                "graph": "e2e_graph_",
             }
 
     @property
