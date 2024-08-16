@@ -1044,8 +1044,8 @@ class RationOptimizer:
         CP_list = available_feeds["CP"]
         dRUP_list = available_feeds["dRUP"]
         if animal_combination is AnimalCombination.LAC_COW:
-            feed_limit_list = self.triple_values_in_list(available_feeds["lactating_cow_limit"])
-            feed_minimum_list = self.triple_values_in_list(available_feeds["lactating_cow_minimum"])
+            feed_limit_list = available_feeds["lactating_cow_limit"]
+            feed_minimum_list = available_feeds["lactating_cow_minimum"]
             lactating = True
         else:
             feed_limit_list = available_feeds["dry_cow_limit"]
