@@ -498,15 +498,18 @@ class TaskManager:
 
         diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
-        # testing_results_file_name = output_manager.generate_file_name("end_to_end_testing_results", "json")
-        # testing_results_path = json_output_path.joinpath(Path(testing_results_file_name))
-        no_diff = diff == {}
-        if no_diff:
-            output_manager.add_log("End-to-end testing", "End-to-end testing successful", info_map)
+        is_difference_in_results = diff == {}
+        if is_difference_in_results:
+            output_manager.add_log(
+                "End-to-end testing succeeded",
+                "No differences found between actual and expected end-to-end testing results.",
+                info_map,
+            )
         else:
-            output_manager.add_error("End-to-end testing", "End-to-end testing unsuccessful", info_map)
-        diff.update({"end_to_end_testing_passing": no_diff})
-        # output_manager.dict_to_file_json(diff, testing_results_path, False)
+            output_manager.add_error(
+                "Failed end-to-end testing", "Identified differences between actual and expected results.", info_map
+            )
+        diff.update({"end_to_end_testing_passing": is_difference_in_results})
         info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": "FeedStorageResults"})
         for comparison_type, difference in diff.items():
             output_manager.add_variable(comparison_type, difference, info_map)
