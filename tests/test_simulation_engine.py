@@ -179,7 +179,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
             mocker.call("feed"),
             mocker.call("manure_management"),
             mocker.call("animal"),
-            mocker.call("config.simulate_animals")
+            mocker.call("config.simulate_animals"),
         ]
     )
 
