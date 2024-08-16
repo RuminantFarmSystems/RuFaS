@@ -115,11 +115,17 @@ class AnaerobicLagoon(BaseManureTreatment):
         methane_loss, methane_emission_from_degradable_volatile_solids = self._update_methane_emission(
             self._accumulated_output
         )
+
+        daily_output.storage_methane = methane_loss
+
+        if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
+            daily_output.storage_methane_burned, daily_output.storage_methane = self.calculate_cover_and_flare_methane(
+                methane_loss
+            )
+
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
         )
-
-        daily_output.storage_methane = methane_loss
 
         new_daily_output_liquid_manure_nitrogen = max(
             daily_output.liquid_manure_nitrogen - daily_output.storage_ammonia, 0.0
@@ -174,12 +180,13 @@ class AnaerobicLagoon(BaseManureTreatment):
             0.0,
         )
         self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
-        new_accumulated_liquid_total_ammoniacal_nitrogen = max(
+
+        new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
             self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - daily_output.storage_ammonia,
             0.0,
         )
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
-            new_accumulated_liquid_total_ammoniacal_nitrogen
+            new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
 
         daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(

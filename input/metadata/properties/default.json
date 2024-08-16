@@ -4589,8 +4589,8 @@
         },
         "manure_cover": {
           "type": "string",
-          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|crust|no cover|N/A)",
+          "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
+          "pattern": "(cover|crust|no cover|cover and flare|N/A)",
           "default": "no cover"
         },
         "hydraulic_retention_time": {
@@ -4637,6 +4637,13 @@
           "description": "Anaerobic Digestion Temperature Celsius -- The temperature of the anaerobic digestion treatment system (degrees Celsius).",
           "default": 0,
           "minimum": 0
+        },
+        "digester_methane_leakage_fraction": {
+          "type": "number",
+          "description": "The fraction of methane generated in the digester that escapes to the atmosphere through unintended leakage and is not collected by the gas capture system.",
+          "default": 0.01,
+          "minimum": 0.0,
+          "maximum": 1.0
         }
       }
     }

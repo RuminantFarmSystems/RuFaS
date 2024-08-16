@@ -28,6 +28,8 @@ class RationConfig:
         Calcium requirement (g).
     P_requirement : float
         Phosphorus requirement (g).
+    P_requirement_process : float
+        Phosphorus requirement (g).
     TDN_list : list
         Total digestible nutrient in each feed (% of DM).
     DE_list : list
@@ -100,6 +102,7 @@ class RationConfig:
         MP__requirement: float = 0,
         C__requirement: float = 0,
         P__requirement: float = 0,
+        P__process__requirement: float = 0,
         TDN__list: list[float] = [],
         DE__list: list[float] = [],
         EE__list: list[float] = [],
@@ -143,7 +146,9 @@ class RationConfig:
         C__requirement : float, default 0
             Calcium requirement (g).
         P__requirement : float, default 0
-            Phosphorus requirement (g).
+            Phosphorus requirement (g) as calculated by NRC or NASEM.
+        P__process__requirement : float, default 0
+            Phosphorus requirement (g) as calculated by process-based P methods.
         TDN__list : list, default []
             Total digestible nutrient in each feed (% of DM).
         DE__list : list, default []
@@ -198,6 +203,7 @@ class RationConfig:
         self.MP_requirement = MP__requirement
         self.C_requirement = C__requirement
         self.P_requirement = P__requirement
+        self.P_requirement_process = P__process__requirement
         self.TDN_list = TDN__list
         self.DE_list = DE__list
         self.EE_list = EE__list

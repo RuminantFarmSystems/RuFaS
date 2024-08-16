@@ -148,7 +148,7 @@
 	"pasture_concentrate": 0,
 	"methane_model": "IPCC",
 	"ration": {
-		"phosphorus_requirement_buffer": 75,
+		"phosphorus_requirement_buffer": 0,
 		"user_input": false,
 		"formulation_interval": 30
 	},
