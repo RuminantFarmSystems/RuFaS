@@ -82,6 +82,15 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         Total amount of bedding needed for all the animals in pen, m^3.
     total_bedding_volume_unit: MeasurementUnits
         Unit for total_bedding_volume
+    total_bedding_mass : float, default 0.0
+        Total amount of bedding needed for all the animals in pen, kg.
+    total_bedding_mass_unit : MeasurementUnits, default MeasurementUnits.KILOGRAMS
+        Unit for total_bedding_mass.
+    organic_bedding_added_to_manure : float, default 0.0
+        Amount of organic bedding material removed from the pen and added to the non-degradable volatile solids pool in
+        the manure, kg.
+    organic_bedding_added_to_manure_unit : MeasurementUnits, default MeasurementUnits.KILOGRAMS
+        Unit for organic_bedding_added_to_manure.
     total_water_volume_in_milking_parlor: float
         Total volume of water used for lactating cows in the milking center, m^3.
     total_water_volume_in_milking_parlor_unit: MeasurementUnits
@@ -157,6 +166,9 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
 
     total_bedding_mass: float = 0.0
     total_bedding_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+
+    organic_bedding_added_to_manure: float = 0.0
+    organic_bedding_added_to_manure_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
 
     total_water_volume_in_milking_parlor: float = 0.0
     total_water_volume_in_milking_parlor_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS

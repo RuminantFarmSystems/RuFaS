@@ -10,6 +10,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
@@ -382,3 +383,27 @@ class BaseManureTreatment(ABC):
             self._accumulated_output = manure_treatment_daily_output.clone()
         else:
             self._accumulated_output += manure_treatment_daily_output
+
+    @staticmethod
+    def calculate_cover_and_flare_methane(methane_loss: float) -> tuple[float, float]:
+        """
+        Adjust the methane burned and lost when using cover and flare cover type.
+
+        Parameters
+        ----------
+        methane_loss: float
+            The amount of methane lost (kg).
+
+        Returns
+        -------
+        tuple[float, float]
+            The amount of storage methane burned and the adjusted methane loss (kg).
+
+        """
+        storage_methane_burned = (
+            methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        adjusted_methane_loss = methane_loss * (
+            1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        return storage_methane_burned, adjusted_methane_loss
