@@ -1152,6 +1152,7 @@ class OutputManager(object):
                     filtered_pool[key]["values"].extend(value["values"])
                 else:
                     filtered_pool[key] = value
+            self.variables_pool = {}
 
         return filtered_pool
 
