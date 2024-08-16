@@ -18,6 +18,7 @@ from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     BaseManureHandler,
 )
@@ -85,10 +86,18 @@ class ManureManager:
         A dictionary that maps an animal pen's id to a ManureSeparator object.
     manure_treatments : Dict
         A dictionary that maps an animal pen's id to a Treatment object.
+    animals_are_simulated : bool
+        Records whether animals are being simulated.
+
     """
 
     def __init__(
-        self, pen_list: List[PenManureData], weather: Weather, time: Time, manure_manager_config: dict[str, Any]
+        self,
+        pen_list: List[PenManureData],
+        weather: Weather,
+        time: Time,
+        manure_manager_config: dict[str, Any],
+        animals_are_simulated: bool,
     ) -> None:
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
@@ -104,6 +113,8 @@ class ManureManager:
         manure_manager_config : dict[str, Any]
             A dictionary that contains the configuration data for
             different manure management scenarios.
+        animals_are_simulated : bool
+            Indicates whether animals are being simulated.
 
         """
         self.beddings: Dict[int, BaseBedding] = {}
@@ -117,6 +128,8 @@ class ManureManager:
         self.manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config)
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
+        self.are_animals_simulated = animals_are_simulated
+        self._field_manure_supplier = FieldManureSupplier()
         self.configure_manure_manager_components(pen_list)
 
     def configure_manure_manager_components(self, pen_list: List[PenManureData]) -> None:
@@ -364,7 +377,10 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
-        return self._manure_nutrient_manager.request_nutrients(request)
+        if self.are_animals_simulated:
+            return self._manure_nutrient_manager.request_nutrients(request)
+        else:
+            return self._field_manure_supplier.request_nutrients(request)
 
     def _pen_daily_update(self, simulation_day: int, pen: PenManureData) -> None:
         """
@@ -669,11 +685,7 @@ class ManureManager:
         pen: ManureManagerPen,
         manure_handler_daily_output: ManureHandlerDailyOutput,
         reception_pit_daily_output: ReceptionPitDailyOutput,
-    ) -> Tuple[
-        Optional[ManureSeparatorDailyOutput],
-        ManureTreatmentDailyOutput,
-        ManureTreatmentDailyOutput,
-    ]:
+    ) -> Tuple[Optional[ManureSeparatorDailyOutput], ManureTreatmentDailyOutput, ManureTreatmentDailyOutput,]:
         """Handles the daily update for a manure treatment that is not a compound anaerobic manure treatment.
 
         If the given pen does not use a manure separator, the manure separator daily output will be None.
