@@ -820,13 +820,10 @@ def test_add_manure_nutrients(mocker: MockFixture) -> None:
     patch_manure_nutrients_init.assert_has_calls(expected_calls)
 
 
-def test_request_nutrients(mocker: MockFixture) -> None:
+@pytest.mark.parametrize("animals_simulated", [True, False])
+def test_request_nutrients(mocker: MockFixture, animals_simulated: bool) -> None:
     """
     Unit test for the request_nutrients method of the ManureManager class in manure_manager.py.
-
-    This test checks whether the request_nutrients method forwards the nutrient request to the
-    ManureNutrientManager instance correctly.
-
     """
     # Arrange
     mocker.patch("RUFAS.routines.manure.manure_manager.ManureManager.__init__", return_value=None)
@@ -835,16 +832,28 @@ def test_request_nutrients(mocker: MockFixture) -> None:
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
         manure_manager_config=mocker.MagicMock(),
+        animals_are_simulated=animals_simulated,
     )
+    manure_manager.are_animals_simulated = animals_simulated
     mock_manure_nutrient_manager = mocker.MagicMock()
+    mock_field_manure_supplier = mocker.MagicMock()
     manure_manager._manure_nutrient_manager = mock_manure_nutrient_manager
+    manure_manager._field_manure_supplier = mock_field_manure_supplier
     mock_nutrient_request = mocker.MagicMock()
     mock_nutrient_request_results = mocker.MagicMock()
-    mock_manure_nutrient_manager.request_nutrients.return_value = mock_nutrient_request_results
+    mock_nutrient_manager_request_nutrients = mocker.patch.object(
+        mock_manure_nutrient_manager, "request_nutrients", return_value=mock_nutrient_request_results
+    )
+    mock_field_manure_supplier_request_nutrients = mocker.patch.object(
+        mock_field_manure_supplier, "request_nutrients", return_value=mock_nutrient_request_results
+    )
 
     # Act
     actual_results = manure_manager.request_nutrients(mock_nutrient_request)
 
     # Assert
-    mock_manure_nutrient_manager.request_nutrients.assert_called_once_with(mock_nutrient_request)
+    if animals_simulated:
+        mock_nutrient_manager_request_nutrients.assert_called_once_with(mock_nutrient_request)
+    else:
+        mock_field_manure_supplier_request_nutrients.assert_called_once_with(mock_nutrient_request)
     assert actual_results == mock_nutrient_request_results
