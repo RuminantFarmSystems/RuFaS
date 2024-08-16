@@ -83,7 +83,6 @@ class AnimalManager:
         config.update(data["farm_level"]["repro"])
         config.update(data["farm_level"]["bodyweight"])
         config.update(data["from_literature"]["repro"])
-        config.update(data["from_literature"]["milking"])
         config.update(data["from_literature"]["culling"])
         config.update(data["from_literature"]["life_cycle"])
         return config
@@ -131,6 +130,7 @@ class AnimalManager:
 
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
+        AnimalBase.setup_lactation_curve_parameters(time)
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)
