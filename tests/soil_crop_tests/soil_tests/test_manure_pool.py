@@ -1,5 +1,5 @@
 from math import exp, sqrt
-from unittest.mock import MagicMock, call
+from unittest.mock import call
 
 import pytest
 from pytest_mock import MockerFixture
