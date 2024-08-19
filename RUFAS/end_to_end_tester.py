@@ -1,6 +1,7 @@
 from collections import namedtuple
 from deepdiff import DeepDiff
 from pathlib import Path
+from typing import Any
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
@@ -34,7 +35,7 @@ class EndToEndTester:
 
         """
         om = OutputManager()
-        info_map = {
+        info_map: dict[str, Any] = {
             "class": EndToEndTester.__class__.__name__,
             "function": EndToEndTester.compare_actual_and_expected_test_results.__name__,
         }
