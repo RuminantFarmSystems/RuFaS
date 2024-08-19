@@ -104,13 +104,19 @@ class RationManager:
                 info_map=info_map,
             )
 
-        if solution is None:
-            # safeguard if scipy SLSQP bounds error still occurs after many iterations
-            # using previous cycles ration for this pen
-            return pen.ration, ration_vals
-
         if pen.animal_combination == AnimalCombination.LAC_COW:
             while not solution.success:
+                if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                    om.add_error(
+                        "Milk production too low",
+                        (
+                            f"Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
+                            f"Possible solution is to provide additional feed ingredients to "
+                            f"{pen.animal_combination.name}."
+                        ),
+                        info_map,
+                    )
+                    raise ValueError
                 reduction = AnimalModuleConstants.MILK_REDUCTION_KG
                 cls.reduce_milk_production(pen, reduction)
                 req.set_requirements(pen, animal_grouping_scenario, recalc=True)
@@ -132,8 +138,21 @@ class RationManager:
                         info_map=info_map,
                     )
 
-        ration = cls.make_ration_from_solution(available_feeds, solution)
-        return ration, ration_vals
+        if solution is not None and solution.success:
+            ration = cls.make_ration_from_solution(available_feeds, solution)
+            return ration, ration_vals
+        # safeguard if scipy SLSQP bounds error still occurs after many iterations
+        # using previous cycles ration for this pen
+        elif pen.ration != {}:
+            return pen.ration, ration_vals
+        else:
+            om.add_error(
+                "No previous ration available",
+                f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
+                f"Possible solution is to provide additional feed ingredients to {pen.animal_combination.name}.",
+                info_map,
+            )
+            raise ValueError
 
     @classmethod
     def handle_failed_constraints(
@@ -342,7 +361,7 @@ class RationManager:
 
         Parameters
         ----------
-        req : Pen
+        req : Requirements
             Requirements for the given pen.
         pen : Pen
             The pen a ration is being formulated for.

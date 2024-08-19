@@ -295,18 +295,10 @@ class Cow(HeiferIII):
         Currently only set up for wood model.
         """
         if self.lactation_curve == "wood":
-            self.wood_l = self.determine_param_value(
-                AnimalBase.config["wood_l"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_l_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_m = self.determine_param_value(
-                AnimalBase.config["wood_m"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_m_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_n = self.determine_param_value(
-                AnimalBase.config["wood_n"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_n_std"][self.breed_index][self.parity_index],
-            )
+            lactation_parameters = AnimalBase.lactation_curve.get_wood_parameters(self.calves)
+            self.wood_l = lactation_parameters["l"]
+            self.wood_m = lactation_parameters["m"]
+            self.wood_n = lactation_parameters["n"]
 
     def calculate_daily_milk_produced(self) -> float:
         """Returns a float calculation of the milk produced based on a cow's lactation curve parameters"""
