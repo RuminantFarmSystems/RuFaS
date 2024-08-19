@@ -12,6 +12,7 @@ from SALib.sample import saltelli as saltelli_sampler
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
+from RUFAS.end_to_end_tester import EndToEndTester
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -462,57 +463,11 @@ class TaskManager:
 
         output_manager.flush_pools()
 
-        TaskManager._compare_simulation_outputs_to_expected_outputs(args, output_manager)
+        EndToEndTester.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
             args, input_manager, output_manager, task_id, produce_graphics, save_results=True
         )
-
-    @staticmethod
-    def _compare_simulation_outputs_to_expected_outputs(args: Dict[str, Any], output_manager: OutputManager) -> None:
-        """Compares outputs from a simulation to the results expected for that simulation."""
-        info_map = {
-            "class": TaskManager.__class__.__name__,
-            "function": TaskManager._compare_simulation_outputs_to_expected_outputs.__name__,
-        }
-        path_to_actual_results = None
-        json_output_path = args["json_output_directory"]
-        for path in json_output_path.iterdir():
-            is_a_match = re.match(
-                f"{str(json_output_path)}/end-to-end-testing_saved_variables_e2e_vars_.*",
-                str(path),
-            )
-            if is_a_match:
-                path_to_actual_results = path
-                break
-        else:
-            output_manager.add_error(
-                "Could not find actual end-to-end testing results.", "End-to-end testing failed.", info_map
-            )
-            return
-        with open(path_to_actual_results, "r") as results:
-            actual_results = json.load(results)
-        with open("input/data/end_to_end_testing/e2e_json_filter.json", "r") as e_to_e_results:
-            filter_and_results = json.load(e_to_e_results)
-            expected_results = filter_and_results["expected_results"]
-
-        diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
-
-        is_difference_in_results = diff == {}
-        if is_difference_in_results:
-            output_manager.add_log(
-                "End-to-end testing succeeded",
-                "No differences found between actual and expected end-to-end testing results.",
-                info_map,
-            )
-        else:
-            output_manager.add_error(
-                "Failed end-to-end testing", "Identified differences between actual and expected results.", info_map
-            )
-        diff.update({"end_to_end_testing_passing": is_difference_in_results})
-        info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": "FeedStorageResults"})
-        for comparison_type, difference in diff.items():
-            output_manager.add_variable(comparison_type, difference, info_map)
 
     @staticmethod
     def handle_input_data_audit(
