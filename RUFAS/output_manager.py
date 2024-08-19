@@ -152,6 +152,7 @@ class OutputManager(object):
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
+            self.is_first_end_to_end_filtering: bool = True
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:
@@ -1213,7 +1214,8 @@ class OutputManager(object):
             "function": self._route_save_functions.__name__,
         }
 
-        if filter_file.startswith(self._filter_prefixes.get("json", "Better than a key error.")):
+        is_json = filter_file.startswith(self._filter_prefixes.get("json", "Better than a key error."))
+        if is_json and self.is_first_end_to_end_filtering:
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
@@ -1221,12 +1223,13 @@ class OutputManager(object):
                 filtered_pool,
                 filter_content,
             )
-
-        elif filter_file.startswith(self._filter_prefixes.get("csv", "Better than a key error.")):
+            return
+        if filter_file.startswith(self._filter_prefixes.get("csv", "Better than a key error.")):
             self.create_directory(csv_dir)
             variable_csv_file_path = csv_dir / self.generate_file_name(f"saved_variables_{filter_file}", "csv")
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
-        elif filter_file.startswith(self._filter_prefixes.get("graph", "Better than a key error.")):
+            return
+        if filter_file.startswith(self._filter_prefixes.get("graph", "Better than a key error.")):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
@@ -1243,7 +1246,9 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
-        elif filter_file.startswith(self._filter_prefixes.get("comparison", "Better than a key error.")):
+            return
+        is_comparison = filter_file.startswith(self._filter_prefixes.get("comparison", "Better than a key error."))
+        if is_comparison and not self.is_first_end_to_end_filtering:
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
@@ -1279,8 +1284,7 @@ class OutputManager(object):
         else:
             base_name = f"saved_variables_{filter_file}"
 
-        use_millis = True if self.is_end_to_end_testing_run else False
-        file_name = self.generate_file_name(base_name, "json", include_millis=use_millis)
+        file_name = self.generate_file_name(base_name, "json", include_millis=False)
         file_path = save_path / file_name
         self.dict_to_file_json(filtered_pool, file_path)
 
