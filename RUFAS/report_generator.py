@@ -750,7 +750,7 @@ class ReportGenerator:
         if len(set(lengths)) != 1:
             raise ValueError("Can't aggregate data with different lengths")
         max_length = max(lengths)
-        aggregated_data: List[float] =  []
+        aggregated_data: List[float] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
