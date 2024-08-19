@@ -724,7 +724,6 @@ class Cow(HeiferIII):
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
-
     def update(self, sim_day: int, calving_interval: int | float) -> bool:  # noqa
         """Update cow status from the moment of calving, parity+1,
         milking start, pregnancy stop, and estrus restart.
