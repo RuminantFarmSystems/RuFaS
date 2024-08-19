@@ -1,5 +1,5 @@
 {
-    "name": "e2e_vars",
+    "name": "e2e_feed_storage",
     "filters": [
         "TaskManager.set_random_seed.random_seed",
         "Weather.*",

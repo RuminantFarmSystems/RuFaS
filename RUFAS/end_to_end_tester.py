@@ -12,7 +12,9 @@ import re
 ResultsCollection = namedtuple("ResultsCollection", ["output_prefix", "expected_results_path", "actual_results_path"])
 
 
-RESULTS_TO_COMPARE = [ResultsCollection("FeedStorageResults", "e2e_json_feed_storage_filter", "e2e_vars")]
+RESULTS_TO_COMPARE = {
+    "Feed Storage": ResultsCollection("FeedStorageResults", "e2e_json_feed_storage_filter", "e2e_feed_storage")
+}
 
 
 class EndToEndTester:
@@ -36,7 +38,10 @@ class EndToEndTester:
             "class": EndToEndTester.__class__.__name__,
             "function": EndToEndTester.compare_actual_and_expected_test_results.__name__,
         }
-        for result_set in RESULTS_TO_COMPARE:
+        for domain, result_set in RESULTS_TO_COMPARE.items():
+            om.add_log(
+                f"End-to-end testing for {domain}", "Collecting and comparing actual and expected results", info_map
+            )
             path_to_actual_results = None
             for path in json_output_path.iterdir():
                 is_a_match = re.match(
@@ -48,7 +53,9 @@ class EndToEndTester:
                     break
             else:
                 om.add_error(
-                    "Could not find actual end-to-end testing results.", "End-to-end testing failed.", info_map
+                    f"Could not find actual end-to-end testing results for {domain}.",
+                    "End-to-end testing failed.",
+                    info_map
                 )
                 return
             with open(path_to_actual_results, "r") as results:
@@ -62,13 +69,15 @@ class EndToEndTester:
             is_difference_in_results = diff == {}
             if is_difference_in_results:
                 om.add_log(
-                    "End-to-end testing succeeded",
+                    f"End-to-end testing succeeded for {domain}",
                     "No differences found between actual and expected end-to-end testing results.",
                     info_map,
                 )
             else:
                 om.add_error(
-                    "Failed end-to-end testing", "Identified differences between actual and expected results.", info_map
+                    f"Failed end-to-end testing for {domain}",
+                    "Identified differences between actual and expected results.",
+                    info_map
                 )
             diff.update({"end_to_end_testing_passing": is_difference_in_results})
             info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": result_set.output_prefix})
