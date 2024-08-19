@@ -113,7 +113,7 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
-        animals_are_simulated=True
+        animals_are_simulated=True,
     )
 
     mock_manure_manager_config_handler = mocker.MagicMock()
