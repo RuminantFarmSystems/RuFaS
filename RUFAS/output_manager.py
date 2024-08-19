@@ -136,6 +136,10 @@ class OutputManager(object):
                 "json": "json_",
                 "report": "report_",
             }
+            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
+                "json": "e2e_json_",
+                "comparison": "e2e_comparison_",
+            }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
             self.add_log(
                 "init_log",
@@ -148,12 +152,6 @@ class OutputManager(object):
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
-            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
-                "json": "e2e_json_",
-                "csv": "e2e_csv_",
-                "comparison": "e2e_comparison_",
-                "graph": "e2e_graph_",
-            }
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:
@@ -1215,7 +1213,7 @@ class OutputManager(object):
             "function": self._route_save_functions.__name__,
         }
 
-        if filter_file.startswith(self._filter_prefixes["json"]):
+        if filter_file.startswith(self._filter_prefixes.get("json", "Better than a key error.")):
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
@@ -1224,11 +1222,11 @@ class OutputManager(object):
                 filter_content,
             )
 
-        elif filter_file.startswith(self._filter_prefixes["csv"]):
+        elif filter_file.startswith(self._filter_prefixes.get("csv", "Better than a key error.")):
             self.create_directory(csv_dir)
             variable_csv_file_path = csv_dir / self.generate_file_name(f"saved_variables_{filter_file}", "csv")
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
-        elif filter_file.startswith(self._filter_prefixes["graph"]):
+        elif filter_file.startswith(self._filter_prefixes.get("graph", "Better than a key error.")):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
@@ -1245,7 +1243,7 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
-        elif filter_file.startswith(self._filter_prefixes["comparison"]):
+        elif filter_file.startswith(self._filter_prefixes.get("comparison", "Better than a key error.")):
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
