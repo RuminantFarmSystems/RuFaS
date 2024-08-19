@@ -89,7 +89,7 @@ jobs:
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
-          echo "Commit Hash: $COMMIT_HASH" >> $GITHUB_ENV
+          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
         
       - name: Capture the commit hash
         id: capture_commit_sha
