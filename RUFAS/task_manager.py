@@ -478,11 +478,11 @@ class TaskManager:
         path_to_actual_results = None
         json_output_path = args["json_output_directory"]
         for path in json_output_path.iterdir():
-            matches = re.match(
+            is_a_match = re.match(
                 f"{str(json_output_path)}/end-to-end-testing_saved_variables_e2e_vars_.*",
                 str(path),
             )
-            if matches:
+            if is_a_match:
                 path_to_actual_results = path
                 break
         else:
