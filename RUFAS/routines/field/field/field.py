@@ -16,7 +16,7 @@ from RUFAS.routines.field.manager.events import (
     FertilizerEvent,
     ManureEvent,
 )
-from ..manager.field_manure_supplier import FieldManureSupplier
+from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
