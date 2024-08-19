@@ -131,7 +131,7 @@ class ManureManager:
         self._manure_nutrient_manager = ManureNutrientManager()
         self.are_animals_simulated = animals_are_simulated
         if not self.are_animals_simulated:
-            info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__}
+            info_map = {"class": self.__class__.__name__, "function": "__init__"}
             OutputManager().add_log(
                 "Animals not being simulated",
                 "Manure for field applications will be created by the FieldManureSupplier",
