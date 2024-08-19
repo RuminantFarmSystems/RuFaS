@@ -655,7 +655,7 @@ class Cow(HeiferIII):
 
     def get_bw_change(self, CI: int | float) -> float:  # noqa
         """
-        Calculates the body weight change for a cow.
+        Calculates the body weight change for a cow.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
         Parameters
         ----------
