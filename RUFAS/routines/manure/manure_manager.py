@@ -8,8 +8,8 @@ from typing import Tuple
 from RUFAS.weather import Weather
 from RUFAS.time import Time
 
-from ...data_structures.pen_manure_data import PenManureData
-from ...output_manager import OutputManager
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
 )
