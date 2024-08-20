@@ -7,8 +7,6 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 
-om = OutputManager()
-
 
 class Weather:
     """
@@ -46,6 +44,7 @@ class Weather:
         time starts at 1).
 
         """
+        self.om = OutputManager()
         self.weather_data = {}
 
         self.check_adequate_weather_data(weather_file, time)
@@ -74,7 +73,7 @@ class Weather:
                         "function": "__init__",
                         "prefix": "Weather",
                     }
-                    om.add_warning(
+                    self.om.add_warning(
                         "Duplicate weather", f"duplicate weather data found for the date {date_key}", info_map
                     )
                 self.weather_data[date_key] = conditions
@@ -86,7 +85,7 @@ class Weather:
             "function": "__init__",
             "prefix": "Weather",
         }
-        om.add_variable(
+        self.om.add_variable(
             "average_annual_temperature",
             self.mean_annual_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
@@ -186,34 +185,34 @@ class Weather:
             "prefix": "Weather",
         }
         current_weather = self.get_current_day_conditions(time)
-        om.add_variable(
+        self.om.add_variable(
             "precipitation",
             current_weather.precipitation,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
-        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
-        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
-        om.add_variable(
+        self.om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        self.om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        self.om.add_variable(
             "maximum_temperature",
             current_weather.max_air_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "minimum_temperature",
             current_weather.min_air_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "average_temperature",
             current_weather.mean_air_temperature,
             dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "radiation",
             current_weather.incoming_light,
             dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
         )
-        om.add_variable(
+        self.om.add_variable(
             "irrigation", current_weather.irrigation, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
         )
 
@@ -266,6 +265,7 @@ class Weather:
         None
 
         """
+        om = OutputManager()
         years_list = weather_file["year"]
         days_list = weather_file["jday"]
         date_range = (time.end_date - time.start_date).days + 1
