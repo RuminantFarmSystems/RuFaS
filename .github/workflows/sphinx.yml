@@ -35,4 +35,4 @@ jobs:
       with:
         message: Update Sphinx Documentation
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.head_ref }}
+        branch: ${{ github.ref_name }}
