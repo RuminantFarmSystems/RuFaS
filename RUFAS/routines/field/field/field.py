@@ -1206,7 +1206,7 @@ class Field:
         if number_of_crops_in_field == 0:
             return
 
-        field_coverage_fraction = 1 / number_of_crops_in_field
+        field_coverage_fraction = 1 / number_of_crops_in_field 
         for crop in self.crops:
             crop.data.field_proportion = field_coverage_fraction
 
