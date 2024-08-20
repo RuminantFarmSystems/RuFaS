@@ -106,8 +106,11 @@ class OutputManager(object):
         Set to True to exclude info_maps when adding variables to the variables_pool
     _variables_usage_counter : Counter[str]
         A Counter object used to keep track of the number of times a variables in the variables_pool is used.
-    is_end_to_end_testing_run : bool
+    is_end_to_end_testing_run : bool, default False
         Indicates if end-to-end testing is being run.
+    is_first_post_processing : bool, default True
+        True if post-processing (i.e. filtering and saving variables) has not occurred yet. This variable is used during
+        end-to-end testing to manage which filters are used during different post-processing runs.
 
     """
 
@@ -152,7 +155,7 @@ class OutputManager(object):
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
             self.is_end_to_end_testing_run: bool = False
-            self.is_first_end_to_end_filtering: bool = True
+            self.is_first_post_processing: bool = True
 
     @property
     def _filter_prefixes(self) -> dict[str, str]:
@@ -1215,7 +1218,7 @@ class OutputManager(object):
         }
 
         is_json = filter_file.startswith(self._filter_prefixes.get("json", "Better than a key error."))
-        if is_json and self.is_first_end_to_end_filtering:
+        if is_json and self.is_first_post_processing:
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
@@ -1248,7 +1251,7 @@ class OutputManager(object):
                 )
             return
         is_comparison = filter_file.startswith(self._filter_prefixes.get("comparison", "Better than a key error."))
-        if is_comparison and not self.is_first_end_to_end_filtering:
+        if is_comparison and not self.is_first_post_processing:
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,

@@ -459,7 +459,7 @@ class TaskManager:
         output_manager.add_log("End-to-end testing", "Completed end-to-end testing simulation", info_map)
 
         output_manager.flush_pools()
-        output_manager.is_first_end_to_end_filtering = False
+        output_manager.is_first_post_processing = False
 
         EndToEndTester.compare_actual_and_expected_test_results(args["json_output_directory"])
 
