@@ -1066,7 +1066,7 @@ def test_fix_string_type_fixable_data(
     dummy_input_data = mock_input_string_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
 
-    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning, ):
+    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
             dummy_element_hierarchy,
@@ -1714,16 +1714,14 @@ def test_get_metadata_raises_exception(
         error_message = key_error.value.__str__().strip("'")
         assert (
             error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
-                             f'"{expected_error_parent_address}" does not have attribute '
-                             f'"{expected_error_invalid_key}".'
+            f'"{expected_error_parent_address}" does not have attribute '
+            f'"{expected_error_invalid_key}".'
         )
         assert add_error.call_count == expected_warning_call_count
 
 
 def test_get_data_by_properties_no_data(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
-    mocker: MockerFixture
+    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable], mocker: MockerFixture
 ) -> None:
     """Tests that error is handled properly when get_metadata() raises KeyError."""
     mock_input_manager.get_metadata = MagicMock(side_effect=KeyError)
@@ -3166,10 +3164,9 @@ def test_dump_get_data_logs(
     }
     mock_dir_path = Path("dummy_path")
     mock_generated_file_name = "dummy_file_name.json"
-    patch_for_generate_file_name = mocker.patch.object(mock_input_manager.om,
-                                                       "generate_file_name",
-                                                       return_value=mock_generated_file_name
-                                                       )
+    patch_for_generate_file_name = mocker.patch.object(
+        mock_input_manager.om, "generate_file_name", return_value=mock_generated_file_name
+    )
     patch_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
 
     mock_dict_to_file_json = mocker.patch.object(mock_input_manager.om, "dict_to_file_json")
