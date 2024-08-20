@@ -34,11 +34,13 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     """
 
     # Arrange
-    patch_for_output_manager = mocker.patch("RUFAS.simulation_engine.om")
-    patch_for_output_manager.get_error_and_warning_counts.return_value = (1, 2)
+    # patch_for_output_manager = mocker.patch("RUFAS.simulation_engine.om")
+    # patch_for_output_manager.get_error_and_warning_counts.return_value = (1, 2)
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
+    patch_for_output_manager = mocker.patch.object(simulation_engine, "get_error_and_warning_counts",
+                                                   return_value = (1, 2))
     simulation_engine.time = mocker.MagicMock()
     simulation_engine.time.simulation_day = 100
     simulation_engine.feed = mocker.MagicMock()
