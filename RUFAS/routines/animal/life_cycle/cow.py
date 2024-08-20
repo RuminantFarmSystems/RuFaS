@@ -114,6 +114,9 @@ class Cow(HeiferIII):
 
         """
         super().__init__(args)
+        if self.id == 168:
+            import remote_pdb
+            remote_pdb.set_trace("localhost", 4444)
 
         # current hard-coded values necessary for nutrient requirement
         # calculations
@@ -718,9 +721,14 @@ class Cow(HeiferIII):
                 if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
                     self.tissue_changed = 40 * self.days_in_milk / 70 * math.exp(1 - self.days_in_milk / 70)
         else:  # dry period
-            bodyweight_tissue = self.tissue_changed / (
-                self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
-            )
+            if self.gestation_length <= AnimalBase.config["days_in_preg_when_dry"]:
+                print(f"\n{self.days_born=} {self.id=} {self.events.events}")
+            try:
+                bodyweight_tissue = self.tissue_changed / (
+                    self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
+                )
+            except ZeroDivisionError:
+                bodyweight_tissue = 0.0
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 

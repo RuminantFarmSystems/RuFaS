@@ -25,7 +25,7 @@
       "heifer_repro_method": "ED",
       "cow_repro_method": "ED-TAI",
       "semen_type": "conventional",
-      "days_in_preg_when_dry": 218,
+      "days_in_preg_when_dry": 280,
       "heifer_repro_cull_time": 500,
       "do_not_breed_time": 185,
       "cull_milk_production": 30,
