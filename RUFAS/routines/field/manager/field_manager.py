@@ -90,7 +90,7 @@ class FieldManager:
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
             field.manage_field(time, current_conditions=current_conditions)
-        self.output_gatherer.send_daily_variables(time)
+        self.output_gatherer.send_daily_variables()
 
     def annual_update_routine(self) -> None:
         """

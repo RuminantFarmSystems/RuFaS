@@ -386,6 +386,8 @@ def test_record_yield(
     crop_manager.data.dry_matter_yield_collected = dry_mass
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
+    crop_manager.data.residue_nitrogen = 333.3
+    crop_manager.data.residue_phosphorus = 33.3
 
     expected_units = {
         "crop": MeasurementUnits.UNITLESS,
@@ -394,6 +396,8 @@ def test_record_yield(
         "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "residue_nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "residue_phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "harvest_index": MeasurementUnits.UNITLESS,
         "planting_year": MeasurementUnits.CALENDAR_YEAR,
         "planting_day": MeasurementUnits.ORDINAL_DAY,
@@ -418,6 +422,8 @@ def test_record_yield(
         "planting_year": 1995,
         "planting_day": 100,
         "yield_residue": crop_manager.data.yield_residue,
+        "residue_nitrogen": 333.3,
+        "residue_phosphorus": 33.3,
         "harvest_index": crop_manager.data.harvest_index,
         "harvest_year": year,
         "harvest_day": day,
