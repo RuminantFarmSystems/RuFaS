@@ -1443,7 +1443,7 @@ class InputManager:
         except KeyError:
             error_name = "Cannot find data"
             error_message = "Could not find input metadata."
-            om.add_error(error_name, error_message, info_map)
+            self.om.add_error(error_name, error_message, info_map)
             return data_keys
 
         data_keys = [key for key, data in input_data.items() if data.get("properties") == target_properties]
