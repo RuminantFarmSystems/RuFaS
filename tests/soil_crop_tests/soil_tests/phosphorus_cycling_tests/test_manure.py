@@ -1,6 +1,9 @@
+from unittest.mock import call
+
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 
@@ -41,3 +44,48 @@ def test_daily_manure_update(rain: float,
     mock_add.assert_called_once_with(304, area)
 
 
+@pytest.mark.parametrize(
+    "rain,runoff,area",
+    [
+        (13, 4, 1.8),
+        (12, 1.8, 2.1),
+        (14, 12.2, 3.4),
+        (4.2, 0, 2.4),
+    ],
+)
+def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: float, mocker: MockerFixture) -> None:
+    """Tests that the update subroutine for phosphorus pools in Manure correctly calls methods and sets attributes."""
+    data = SoilData(
+        machine_manure=ManurePool(
+            manure_dry_mass=1000,
+            manure_field_coverage=0.86,
+            water_extractable_inorganic_phosphorus=200,
+            water_extractable_organic_phosphorus=90,
+        ),
+        grazing_manure=ManurePool(
+            manure_dry_mass=800,
+            manure_field_coverage=0.78,
+            water_extractable_inorganic_phosphorus=125,
+            water_extractable_organic_phosphorus=70,
+        ),
+        field_size=area,
+    )
+    incorp = Manure(data)
+    mock_grazing_leach_phosphorus_pools = mocker.patch.object(data.grazing_manure, "leach_phosphorus_pools",
+                                                              return_value=(9, 24))
+    mock_machine_leach_phosphorus_pools = mocker.patch.object(data.machine_manure, "leach_phosphorus_pools",
+                                                              return_value=(9, 24))
+    mock_add = mocker.patch.object(incorp, "_add_infiltrated_phosphorus_to_soil")
+
+    incorp._leach_and_update_phosphorus_pools(rain, runoff, area)
+
+    mock_grazing_leach_phosphorus_pools.assert_called_once_with(rain, runoff, area)
+    mock_machine_leach_phosphorus_pools.assert_called_once_with(rain, runoff, area)
+    assert mock_add.call_count == 4
+    add_calls = [
+        call(9, area),
+        call(24, area),
+        call(9, area),
+        call(24, area),
+    ]
+    mock_add.assert_has_calls(add_calls)
