@@ -41,4 +41,3 @@ def test_daily_manure_update(rain: float,
     mock_add.assert_called_once_with(304, area)
 
 
-
