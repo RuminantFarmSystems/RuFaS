@@ -10,11 +10,19 @@ import json
 import re
 
 
-ResultsCollection = namedtuple("ResultsCollection", ["output_prefix", "expected_results_path", "actual_results_path"])
+TestResultPaths = namedtuple("TestResultPaths", ["domain_prefix", "expected_results_path", "actual_results_path"])
 
 
-RESULTS_TO_COMPARE = {
-    "Feed Storage": ResultsCollection("FeedStorageResults", "e2e_json_feed_storage_filter", "e2e_feed_storage")
+"""
+Maps a RuFaS domain that is supported for end-to-end testing to information needed to collect actual and expected
+results for testing that domain, and the prefix used when saving the test results to the Output Manager.
+"""
+DOMAINS = {
+    "Feed Storage": TestResultPaths(
+        "FeedStorageResults",
+        "end-to-end-testing_saved_variables_e2e_json_feed_storage_filter",
+        "input/data/end_to_end_testing/e2e_feed_storage.json",
+    )
 }
 
 
@@ -39,29 +47,26 @@ class EndToEndTester:
             "class": EndToEndTester.__class__.__name__,
             "function": EndToEndTester.compare_actual_and_expected_test_results.__name__,
         }
-        for domain, result_set in RESULTS_TO_COMPARE.items():
+        for domain, info in DOMAINS.items():
             om.add_log(
                 f"End-to-end testing for {domain}", "Collecting and comparing actual and expected results", info_map
             )
             path_to_actual_results = None
             for path in json_output_path.iterdir():
-                is_a_match = re.match(
-                    f"{str(json_output_path)}/end-to-end-testing_saved_variables_{result_set.actual_results_path}_.*",
-                    str(path),
-                )
+                is_a_match = re.match(f"{str(json_output_path)}/{info.actual_results_path}.*", str(path))
                 if is_a_match:
                     path_to_actual_results = path
                     break
             else:
                 om.add_error(
-                    f"Could not find actual end-to-end testing results for {domain}.",
+                    f"Could not find actual end-to-end testing results for {domain}",
                     "End-to-end testing failed.",
                     info_map
                 )
                 return
             with open(path_to_actual_results, "r") as results:
                 actual_results = json.load(results)
-            with open(f"input/data/end_to_end_testing/{result_set.expected_results_path}.json", "r") as e_to_e_results:
+            with open(f"{info.expected_results_path}", "r") as e_to_e_results:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
 
@@ -81,6 +86,6 @@ class EndToEndTester:
                     info_map
                 )
             diff.update({"end_to_end_testing_passing": is_difference_in_results})
-            info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": result_set.output_prefix})
+            info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": info.domain_prefix})
             for comparison_type, difference in diff.items():
                 om.add_variable(comparison_type, difference, info_map)
