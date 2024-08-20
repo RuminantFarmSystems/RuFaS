@@ -369,52 +369,6 @@ def test_adjust_manure_moisture_factor(
     rain: float, temp_factor: float, manure_dry_mass: float, no_calc: bool, mocker: MockerFixture
 ) -> None:
     """Tests that the manure moisture factors of the different pools are correctly updated."""
-    # Case 1: calculated moisture factor is negative
-    mocked_determine_moisture_change = mocker.patch.object(ManurePool, "_determine_moisture_change", return_value=0.1)
-
-    data1 = SoilData(
-        machine_manure=ManurePool(
-            manure_dry_mass=1000,
-            manure_field_coverage=0.86,
-            manure_moisture_factor=0.5,
-            manure_applied_mass=1100,
-        ),
-        grazing_manure=ManurePool(
-            manure_dry_mass=800,
-            manure_field_coverage=0.76,
-            manure_moisture_factor=0.6,
-            manure_applied_mass=900,
-        ),
-        field_size=1.1,
-    )
-    incorp1 = ManurePool(
-        manure_moisture_factor=0.5, manure_dry_mass=manure_dry_mass, manure_applied_mass=2.2, manure_field_coverage=69
-    )
-
-    incorp1.adjust_manure_moisture_factor(rain, temp_factor)
-
-    moisture_change_calls = [call(rain, 0.5, 500, 2.2, temp_factor)]
-    if no_calc:
-        mocked_determine_moisture_change.assert_not_called()
-        assert incorp1.manure_moisture_factor == 0.5
-    else:
-        mocked_determine_moisture_change.assert_has_calls(moisture_change_calls)
-        assert incorp1.manure_moisture_factor == 0.6
-
-
-@pytest.mark.parametrize(
-    "rain,temp_factor,manure_dry_mass,no_calc",
-    [
-        (10, 0.35, 0, True),
-        (4, 0.4413, 500, False),
-        (16, 0.121, -20, True),
-    ],
-)
-def test_adjust_manure_moisture_factor(
-    rain: float, temp_factor: float, manure_dry_mass: float, no_calc: bool, mocker: MockerFixture
-) -> None:
-    """Tests that the manure moisture factors of the different pools are correctly updated."""
-    # Case 1: calculated moisture factor is negative
     mocked_determine_moisture_change = mocker.patch.object(ManurePool, "_determine_moisture_change", return_value=0.1)
     incorp1 = ManurePool(
         manure_moisture_factor=0.5, manure_dry_mass=manure_dry_mass, manure_applied_mass=2.2, manure_field_coverage=69
