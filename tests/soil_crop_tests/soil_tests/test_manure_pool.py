@@ -27,7 +27,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 def test_determine_temperature_factor(avg_air_temp: float) -> None:
     """Tests that the temperature factor is correctly calculated and bounded."""
     observe = ManurePool._determine_temperature_factor(avg_air_temp)
-    expect = min(1, max(0, (2 * 32 ** 2 * avg_air_temp ** 2 - avg_air_temp ** 4) / 32 ** 4))
+    expect = min(1, max(0, (2 * 32**2 * avg_air_temp**2 - avg_air_temp**4) / 32**4))
     assert observe == expect
 
 
@@ -43,7 +43,7 @@ def test_determine_temperature_factor(avg_air_temp: float) -> None:
 def test_determine_dry_matter_decomposition_rate(temp_factor: float) -> None:
     """Tests that the dry matter decomposition rate is calculated correctly for a given day."""
     observe = ManurePool._determine_dry_matter_decomposition_rate(temp_factor)
-    expect = 0.003 * temp_factor ** 0.5
+    expect = 0.003 * temp_factor**0.5
     assert observe == expect
 
 
@@ -64,7 +64,7 @@ def test_determine_dry_manure_matter_assimilation(
     """
     observe = ManurePool._determine_dry_manure_matter_assimilation(moisture, temp_factor, area, is_dung)
     if is_dung:
-        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor ** 0.1) * area
+        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor**0.1) * area
     else:
         expect = (30 * exp(2.5 * moisture)) * temp_factor * area
     assert observe == expect
@@ -365,8 +365,9 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
         (16, 0.121, -20, True),
     ],
 )
-def test_adjust_manure_moisture_factor(rain: float, temp_factor: float, manure_dry_mass: float, no_calc: bool,
-                                       mocker: MockerFixture) -> None:
+def test_adjust_manure_moisture_factor(
+    rain: float, temp_factor: float, manure_dry_mass: float, no_calc: bool, mocker: MockerFixture
+) -> None:
     """Tests that the manure moisture factors of the different pools are correctly updated."""
     # Case 1: calculated moisture factor is negative
     mocked_determine_moisture_change = mocker.patch.object(ManurePool, "_determine_moisture_change", return_value=0.1)
@@ -386,14 +387,13 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float, manure_d
         ),
         field_size=1.1,
     )
-    incorp1 = ManurePool(manure_moisture_factor=0.5, manure_dry_mass=manure_dry_mass, manure_applied_mass=2.2,
-                         manure_field_coverage=69)
+    incorp1 = ManurePool(
+        manure_moisture_factor=0.5, manure_dry_mass=manure_dry_mass, manure_applied_mass=2.2, manure_field_coverage=69
+    )
 
     incorp1.adjust_manure_moisture_factor(rain, temp_factor)
 
-    moisture_change_calls = [
-        call(rain, 0.5, 500, 2.2, temp_factor)
-    ]
+    moisture_change_calls = [call(rain, 0.5, 500, 2.2, temp_factor)]
     if no_calc:
         mocked_determine_moisture_change.assert_not_called()
         assert incorp1.manure_moisture_factor == 0.5
@@ -410,19 +410,19 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float, manure_d
         (16, 0.121, -20, True),
     ],
 )
-def test_adjust_manure_moisture_factor(rain: float, temp_factor: float, manure_dry_mass: float, no_calc: bool,
-                                       mocker: MockerFixture) -> None:
+def test_adjust_manure_moisture_factor(
+    rain: float, temp_factor: float, manure_dry_mass: float, no_calc: bool, mocker: MockerFixture
+) -> None:
     """Tests that the manure moisture factors of the different pools are correctly updated."""
     # Case 1: calculated moisture factor is negative
     mocked_determine_moisture_change = mocker.patch.object(ManurePool, "_determine_moisture_change", return_value=0.1)
-    incorp1 = ManurePool(manure_moisture_factor=0.5, manure_dry_mass=manure_dry_mass, manure_applied_mass=2.2,
-                         manure_field_coverage=69)
+    incorp1 = ManurePool(
+        manure_moisture_factor=0.5, manure_dry_mass=manure_dry_mass, manure_applied_mass=2.2, manure_field_coverage=69
+    )
 
     incorp1.adjust_manure_moisture_factor(rain, temp_factor)
 
-    moisture_change_calls = [
-        call(rain, 0.5, 500, 2.2, temp_factor)
-    ]
+    moisture_change_calls = [call(rain, 0.5, 500, 2.2, temp_factor)]
     if no_calc:
         mocked_determine_moisture_change.assert_not_called()
         assert incorp1.manure_moisture_factor == 0.5
@@ -437,7 +437,7 @@ def test_adjust_manure_moisture_factor(rain: float, temp_factor: float, manure_d
         (0.45, 800, 0.85, (400.0, 0.425)),
         (0.66, 900, 0.92, (450.0, 0.46)),
         (0.12, 43, 0.07, (21.5, 0.035)),
-        (0.33, 3, 0.02, (1.5, 0.01))
+        (0.33, 3, 0.02, (1.5, 0.01)),
     ],
 )
 def test_determine_decomposed_surface_manure(
@@ -445,7 +445,7 @@ def test_determine_decomposed_surface_manure(
     manure_dry_mass: float,
     manure_field_coverage: float,
     expected: tuple[float, float],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the correct changes in mass and field coverage of machine and grazer applied manure are calculated."""
     incorp = ManurePool(manure_dry_mass=manure_dry_mass, manure_field_coverage=manure_field_coverage)
@@ -459,28 +459,25 @@ def test_determine_decomposed_surface_manure(
 
 @pytest.mark.parametrize(
     "temp_factor,area,manure_dry_mass,no_calc,expected",
-    [
-        (0.44, 1.89, 0, True, (0, 0)),
-        (0.3223, 2.45, 500, False, (20, 0.02)),
-        (0.661, 1.23, 500, False, (20, 0.02))
-    ],
+    [(0.44, 1.89, 0, True, (0, 0)), (0.3223, 2.45, 500, False, (20, 0.02)), (0.661, 1.23, 500, False, (20, 0.02))],
 )
-def test_determine_assimilated_surface_manure(temp_factor: float,
-                                              area: float,
-                                              manure_dry_mass: float,
-                                              no_calc: bool,
-                                              expected: tuple[float, float],
-                                              mocker: MockerFixture) -> None:
+def test_determine_assimilated_surface_manure(
+    temp_factor: float,
+    area: float,
+    manure_dry_mass: float,
+    no_calc: bool,
+    expected: tuple[float, float],
+    mocker: MockerFixture,
+) -> None:
     """Tests that correct decrease in manure and field coverage due to assimilation are calculated."""
     pool = ManurePool(manure_dry_mass=manure_dry_mass, manure_field_coverage=0.5, manure_moisture_factor=0.4)
     if no_calc:
         observed = pool.determine_assimilated_surface_manure(temp_factor, area)
         assert observed == (0, 0)
     else:
-        mocked_determine_dry_manure_matter_assimilation = (
-            mocker.patch.object(pool,
-                                "_determine_dry_manure_matter_assimilation",
-                                return_value=20))
+        mocked_determine_dry_manure_matter_assimilation = mocker.patch.object(
+            pool, "_determine_dry_manure_matter_assimilation", return_value=20
+        )
         observed = pool.determine_assimilated_surface_manure(temp_factor, area)
 
         mocked_determine_dry_manure_matter_assimilation.assert_called_once_with(0.4, temp_factor, 0.5 * area, False)
@@ -496,36 +493,32 @@ def test_determine_assimilated_surface_manure(temp_factor: float,
         (3, 2.4, 28),
     ],
 )
-def test_daily_manure_update(rain: float,
-                             area: float,
-                             mean_temp: float,
-                             mocker: MockerFixture) -> None:
+def test_daily_manure_update(rain: float, area: float, mean_temp: float, mocker: MockerFixture) -> None:
     """Tests that the main manure update method correctly calls all subroutines."""
     pool = ManurePool()
 
-    mock_determine_temperature_factor = mocker.patch.object(pool, "_determine_temperature_factor",
-                                                            return_value=0.1)
-    mock_determine_decomposed_surface_manure = mocker.patch.object(pool,
-                                                                   "determine_decomposed_surface_manure",
-                                                                   return_value=(0, 0))
-    mock_determine_mineralized_surface_phosphorus = mocker.patch.object(pool,
-                                                                        "determine_mineralized_surface_phosphorus",
-                                                                        return_value=4)
-    mock_adjust_manure_moisture_factor = mocker.patch.object(pool, "adjust_manure_moisture_factor",
-                                                             return_value=0.2)
-    mock_determine_assimilated_surface_manure = mocker.patch.object(pool, "determine_assimilated_surface_manure",
-                                                                    return_value=(0, 0))
-    mock_determine_assimilated_phosphorus_amount = mocker.patch.object(pool, "determine_assimilated_phosphorus_amount",
-                                                                       return_value=4)
+    mock_determine_temperature_factor = mocker.patch.object(pool, "_determine_temperature_factor", return_value=0.1)
+    mock_determine_decomposed_surface_manure = mocker.patch.object(
+        pool, "determine_decomposed_surface_manure", return_value=(0, 0)
+    )
+    mock_determine_mineralized_surface_phosphorus = mocker.patch.object(
+        pool, "determine_mineralized_surface_phosphorus", return_value=4
+    )
+    mock_adjust_manure_moisture_factor = mocker.patch.object(pool, "adjust_manure_moisture_factor", return_value=0.2)
+    mock_determine_assimilated_surface_manure = mocker.patch.object(
+        pool, "determine_assimilated_surface_manure", return_value=(0, 0)
+    )
+    mock_determine_assimilated_phosphorus_amount = mocker.patch.object(
+        pool, "determine_assimilated_phosphorus_amount", return_value=4
+    )
 
-    mineralized_surface_phosphorus_calls = [call(0, 0.01, 0.1, 0),
-                                            call(0, 0.0025, 0.1, 0),
-                                            call(0, 0.1, 0.1, 0), ]
+    mineralized_surface_phosphorus_calls = [
+        call(0, 0.01, 0.1, 0),
+        call(0, 0.0025, 0.1, 0),
+        call(0, 0.1, 0.1, 0),
+    ]
 
-    assimilated_phosphorus_amount_calls = [call(0, 0),
-                                           call(0, 0),
-                                           call(0, 0)
-                                           ]
+    assimilated_phosphorus_amount_calls = [call(0, 0), call(0, 0), call(0, 0)]
 
     observed = pool.daily_manure_update(rain, area, mean_temp)
     if rain < 1 or rain > 4:
