@@ -28,14 +28,6 @@ RUFAS.routines.field.manager.fertilizer\_schedule module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.manager.field\_data\_reporter module
----------------------------------------------------------
-
-.. automodule:: RUFAS.routines.field.manager.field_data_reporter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 RUFAS.routines.field.manager.field\_manager module
 --------------------------------------------------
 
@@ -44,18 +36,18 @@ RUFAS.routines.field.manager.field\_manager module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.field.manager.field\_manure\_supplier module
------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.field.manager.field_manure_supplier
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 RUFAS.routines.field.manager.manure\_schedule module
 ----------------------------------------------------
 
 .. automodule:: RUFAS.routines.field.manager.manure_schedule
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.routines.field.manager.output\_gatherer module
+----------------------------------------------------
+
+.. automodule:: RUFAS.routines.field.manager.output_gatherer
    :members:
    :undoc-members:
    :show-inheritance:

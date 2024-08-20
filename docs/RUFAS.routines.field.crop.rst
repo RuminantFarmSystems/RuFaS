@@ -5,7 +5,7 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    RUFAS.routines.field.crop.crop_configurations
 
@@ -32,14 +32,6 @@ RUFAS.routines.field.crop.crop\_data module
 -------------------------------------------
 
 .. automodule:: RUFAS.routines.field.crop.crop_data
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.field.crop.crop\_enum module
--------------------------------------------
-
-.. automodule:: RUFAS.routines.field.crop.crop_enum
    :members:
    :undoc-members:
    :show-inheritance:

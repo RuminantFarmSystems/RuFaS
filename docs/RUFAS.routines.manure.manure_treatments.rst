@@ -44,22 +44,6 @@ RUFAS.routines.manure.manure\_treatments.compost\_bedded\_pack\_barn module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.manure.manure\_treatments.composting module
-----------------------------------------------------------
-
-.. automodule:: RUFAS.routines.manure.manure_treatments.composting
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.manure.manure\_treatments.composting\_types module
------------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.manure.manure_treatments.composting_types
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 RUFAS.routines.manure.manure\_treatments.manure\_treatment\_configs module
 --------------------------------------------------------------------------
 
