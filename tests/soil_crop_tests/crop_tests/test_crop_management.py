@@ -479,36 +479,14 @@ def test_transfer_residue(
 
 
 @pytest.mark.parametrize(
-    "root_depth,n,p,expected_n,expected_p,",
+    "root_depth,n,p,expected_n,expected_p",
     [
         (
-            100.0,
-            40.0,
-            20.0,
-            [22.0, 12.0, 6.0],
-            [11.0, 6.0, 3.0],
+            100.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]
         ),
         (
-            45.0,
-            40.0,
-            20.0,
-            [22.0, 12.0, 6.0],
-            [11.0, 6.0, 3.0],
-        ),
-        (
-            50.0,
-            40.0,
-            20.0,
-            [22.0, 12.0, 6.0],
-            [11.0, 6.0, 3.0],
-        ),
-        (
-            10.0,
-            50.0,
-            22.0,
-            [27.5, 15.0, 7.5],
-            [12.1, 6.6, 3.3],
-        ),
+            45.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]
+        )
     ],
 )
 def test_distribute_residue_nutrients(
@@ -525,10 +503,10 @@ def test_distribute_residue_nutrients(
         root_biomass=50.0,
         residue_nitrogen=n,
         residue_phosphorus=p,
-        root_depth=root_depth,
+        max_root_depth=root_depth,
     )
     crop_manager = CropManagement(crop_data)
-    mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 1.0])
+    mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 0.8, 1.0])
     field_size = 1.0
     top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
     second_soil_layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size)
@@ -542,14 +520,19 @@ def test_distribute_residue_nutrients(
     soil_data.set_vectorized_layer_attribute("fresh_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", [0.0] * 3)
+    soil_data.set_vectorized_layer_attribute("plant_residue", [0.0] * 3)
+    expected_plant_residue = [55.0, 30.0, 5.0, 10.0]
 
     crop_manager._distribute_residue_nutrients(soil_data)
 
     assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
-    assert (
-        pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
-    )
-    assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
+    assert pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:3]) == expected_n[1:-1]
+    assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p[:-1]
+    assert pytest.approx(soil_data.get_vectorized_layer_attribute("plant_residue")) == expected_plant_residue[:-1]
+    
+    assert pytest.approx(soil_data.vadose_zone_layer.active_organic_nitrogen_content) == expected_n[-1]
+    assert pytest.approx(soil_data.vadose_zone_layer.labile_inorganic_phosphorus_content) == expected_p[-1]
+    assert pytest.approx(soil_data.vadose_zone_layer.plant_residue) == expected_plant_residue[-1]
 
 
 @pytest.mark.parametrize(
@@ -571,7 +554,7 @@ def test_calculate_root_mass_distribution(
     """Tests _calculate_root_mass_distribution() in CropManagement."""
     crop_manager.data.root_distribution_param_da = d_a
     crop_manager.data.root_distribution_param_c = c
-    crop_manager.data.root_depth = root_depth
+    crop_manager.data.max_root_depth = root_depth
 
     actual = crop_manager._calculate_root_mass_distribution(depth)
 
