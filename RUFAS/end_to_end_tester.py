@@ -61,7 +61,7 @@ class EndToEndTester:
                 om.add_error(
                     f"Could not find actual end-to-end testing results for {domain}",
                     "End-to-end testing failed.",
-                    info_map
+                    info_map,
                 )
                 return
             with open(path_to_actual_results, "r") as results:
@@ -83,7 +83,7 @@ class EndToEndTester:
                 om.add_error(
                     f"Failed end-to-end testing for {domain}",
                     "Identified differences between actual and expected results.",
-                    info_map
+                    info_map,
                 )
             diff.update({"end_to_end_testing_passing": is_difference_in_results})
             info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": info.domain_prefix})
