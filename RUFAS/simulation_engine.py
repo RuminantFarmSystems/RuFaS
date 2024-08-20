@@ -52,6 +52,7 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
+        self.om = OutputManager()
         self.im = InputManager()
         self.time = Time()
         self._initialize_simulation()
@@ -80,7 +81,7 @@ class SimulationEngine:
             "amount": MeasurementUnits.KILOGRAMS,
         }
         for available_feed in available_feeds_on_final_day:
-            om.add_variable(
+            self.om.add_variable(
                 "available_feeds_on_final_day",
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
@@ -88,10 +89,10 @@ class SimulationEngine:
         EEEManager.estimate_all()
         t_end_sim = timer.time()
 
-        om.add_log("Simulation complete", "Simulation Completed.", info_map)
+        self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
-        om.add_log("total_simulation_time", total_simulation_time_log, info_map)
+        self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -160,7 +161,7 @@ class SimulationEngine:
         """
 
         weather_data = self.im.get_data("weather")
-        om.time = self.time
+        self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
