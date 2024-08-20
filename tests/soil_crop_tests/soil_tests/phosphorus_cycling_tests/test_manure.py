@@ -17,21 +17,15 @@ from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
         (0, 0, 2.4, 28),
     ],
 )
-def test_daily_manure_update(rain: float,
-                             runoff: float,
-                             area: float,
-                             mean_temp: float,
-                             mocker: MockerFixture) -> None:
+def test_daily_manure_update(rain: float, runoff: float, area: float, mean_temp: float, mocker: MockerFixture) -> None:
     """Tests that the main manure update method correctly calls all subroutines."""
     data1 = SoilData(field_size=area)
     incorp = Manure(data1)
     mock_machine_reset = mocker.patch.object(data1.machine_manure, "runoff_reset")
     mock_graze_reset = mocker.patch.object(data1.grazing_manure, "runoff_reset")
     mock_leach = mocker.patch.object(incorp, "_leach_and_update_phosphorus_pools")
-    mock_machine_update = mocker.patch.object(data1.machine_manure, "daily_manure_update",
-                                              return_value=152)
-    mock_grazing_update = mocker.patch.object(data1.grazing_manure, "daily_manure_update",
-                                              return_value=152)
+    mock_machine_update = mocker.patch.object(data1.machine_manure, "daily_manure_update", return_value=152)
+    mock_grazing_update = mocker.patch.object(data1.grazing_manure, "daily_manure_update", return_value=152)
     mock_add = mocker.patch.object(incorp, "_add_infiltrated_phosphorus_to_soil")
     incorp.daily_manure_update(rain, runoff, area, mean_temp)
     mock_machine_reset.assert_called_once()
@@ -72,10 +66,12 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
         field_size=area,
     )
     incorp = Manure(data)
-    mock_grazing_leach_phosphorus_pools = mocker.patch.object(data.grazing_manure, "leach_phosphorus_pools",
-                                                              return_value=(9, 24))
-    mock_machine_leach_phosphorus_pools = mocker.patch.object(data.machine_manure, "leach_phosphorus_pools",
-                                                              return_value=(9, 24))
+    mock_grazing_leach_phosphorus_pools = mocker.patch.object(
+        data.grazing_manure, "leach_phosphorus_pools", return_value=(9, 24)
+    )
+    mock_machine_leach_phosphorus_pools = mocker.patch.object(
+        data.machine_manure, "leach_phosphorus_pools", return_value=(9, 24)
+    )
     mock_add = mocker.patch.object(incorp, "_add_infiltrated_phosphorus_to_soil")
 
     incorp._leach_and_update_phosphorus_pools(rain, runoff, area)
@@ -105,8 +101,5 @@ def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size
     incorp = Manure(data)
     mock_add = mocker.patch.object(LayerData, "add_to_labile_phosphorus")
     incorp._add_infiltrated_phosphorus_to_soil(amount_phosphorus, field_size)
-    add_calls = [
-        call(0.8 * amount_phosphorus, field_size),
-        call(0.2 * amount_phosphorus, field_size)
-    ]
+    add_calls = [call(0.8 * amount_phosphorus, field_size), call(0.2 * amount_phosphorus, field_size)]
     mock_add.assert_has_calls(add_calls)
