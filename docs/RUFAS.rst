@@ -5,25 +5,25 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
    RUFAS.routines
 
 Submodules
 ----------
 
-RUFAS.config module
--------------------
-
-.. automodule:: RUFAS.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 RUFAS.current\_day\_conditions module
 -------------------------------------
 
 .. automodule:: RUFAS.current_day_conditions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.enums module
+------------------
+
+.. automodule:: RUFAS.enums
    :members:
    :undoc-members:
    :show-inheritance:
@@ -76,14 +76,6 @@ RUFAS.report\_generator module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.scenario\_manager module
-------------------------------
-
-.. automodule:: RUFAS.scenario_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 RUFAS.simulation\_engine module
 -------------------------------
 
@@ -92,10 +84,10 @@ RUFAS.simulation\_engine module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.state module
-------------------
+RUFAS.task\_manager module
+--------------------------
 
-.. automodule:: RUFAS.state
+.. automodule:: RUFAS.task_manager
    :members:
    :undoc-members:
    :show-inheritance:
@@ -104,6 +96,14 @@ RUFAS.time module
 -----------------
 
 .. automodule:: RUFAS.time
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+RUFAS.units module
+------------------
+
+.. automodule:: RUFAS.units
    :members:
    :undoc-members:
    :show-inheritance:
