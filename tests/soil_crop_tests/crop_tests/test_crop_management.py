@@ -481,12 +481,8 @@ def test_transfer_residue(
 @pytest.mark.parametrize(
     "root_depth,n,p,expected_n,expected_p",
     [
-        (
-            100.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]
-        ),
-        (
-            45.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]
-        )
+        (100.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]),
+        (45.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]),
     ],
 )
 def test_distribute_residue_nutrients(
@@ -526,10 +522,16 @@ def test_distribute_residue_nutrients(
     crop_manager._distribute_residue_nutrients(soil_data)
 
     assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
-    assert pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:3]) == expected_n[1:-1]
-    assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p[:-1]
+    assert (
+        pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:3])
+        == expected_n[1:-1]
+    )
+    assert (
+        pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content"))
+        == expected_p[:-1]
+    )
     assert pytest.approx(soil_data.get_vectorized_layer_attribute("plant_residue")) == expected_plant_residue[:-1]
-    
+
     assert pytest.approx(soil_data.vadose_zone_layer.active_organic_nitrogen_content) == expected_n[-1]
     assert pytest.approx(soil_data.vadose_zone_layer.labile_inorganic_phosphorus_content) == expected_p[-1]
     assert pytest.approx(soil_data.vadose_zone_layer.plant_residue) == expected_plant_residue[-1]
