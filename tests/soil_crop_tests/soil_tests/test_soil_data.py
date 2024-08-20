@@ -1,6 +1,7 @@
 import pytest
 from typing import List
 from math import inf
+from pytest_mock import MockerFixture
 from unittest.mock import patch, PropertyMock
 
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -418,23 +419,18 @@ def test_profile_nitrates_total(layers: List[LayerData]) -> None:
 
 
 @pytest.mark.parametrize(
-    "plant_surface_residue,plant_root_residue,expected",
-    [(16, 4, 20), (16.5, 4.5, 21), (0, 0, 0)],
+    "residues,expected",
+    [([0.5, 12.0, 15.0, 0.0], 27.5), ([0.0, 0.0, 0.0], 0.0), ([10.0, 10.0, 10.0], 30.0)],
 )
-def test_all_residue(plant_surface_residue: float, plant_root_residue: float, expected: float) -> None:
+def test_all_residue(mocker: MockerFixture, residues: list[float], expected: float) -> None:
     """Tests the property method all_residue sums up the residues correctly"""
-    with (
-        patch(
-            "RUFAS.routines.field.soil.soil_data.SoilData.plant_surface_residue",
-            plant_surface_residue,
-        ),
-        patch(
-            "RUFAS.routines.field.soil.soil_data.SoilData.plant_root_residue",
-            plant_root_residue,
-        ),
-    ):
-        soil_data = SoilData(field_size=0.98)
-        assert soil_data.all_residue == expected
+    soil_data = SoilData(field_size=0.98)
+    get_vec_attr = mocker.patch.object(soil_data, "get_vectorized_layer_attribute", return_value=residues)
+
+    actual = soil_data.all_residue
+
+    assert actual == expected
+    get_vec_attr.assert_called_once_with("plant_residue")
 
 
 def test_soil_data_post_init_error() -> None:
