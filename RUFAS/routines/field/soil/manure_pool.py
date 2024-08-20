@@ -1,4 +1,4 @@
-from typing import Any, Union, Dict, Tuple
+from typing import Any, Union, Dict
 from math import exp, sqrt
 
 from RUFAS.routines.field.crop_and_soil_constants import (
