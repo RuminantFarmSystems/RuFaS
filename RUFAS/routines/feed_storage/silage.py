@@ -40,6 +40,7 @@ class Silage(Storage):
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+        self.om = OutputManager()
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
@@ -87,8 +88,8 @@ class Silage(Storage):
 
             self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
 
-        om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
-        om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
+        self.om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
+        self.om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
 
         super().process_degradations(weather, time)
 
