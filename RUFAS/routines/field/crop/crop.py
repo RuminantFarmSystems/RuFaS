@@ -1,8 +1,11 @@
 from __future__ import annotations
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
+from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
 from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
 from RUFAS.routines.field.crop.heat_units import HeatUnits
@@ -13,6 +16,8 @@ from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from typing import Optional
+
+from RUFAS.time import Time
 
 
 class Crop:
@@ -136,3 +141,91 @@ class Crop:
             )
             self.leaf_area_index.grow_canopy()
             self.biomass_allocation.allocate_biomass(incoming_light)
+
+    def should_harvest_based_on_heat(self) -> bool:
+        return self.data.use_heat_scheduling and self.data.heat_fraction >= self.data.harvest_heat_fraction
+
+    def manage_harvest_based_on_heat(self, field_name: str, field_size: float, time: Time, soil_data, feed_manager, rainfall: float) -> None:
+        self.crop_management.manage_harvest(
+            HarvestOperation.HARVEST_ONLY,
+            field_name,
+            field_size,
+            time,
+            soil_data,
+            feed_manager,
+        )
+        self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
+    
+    @staticmethod
+    def make_crop_from_config_dict(config: dict) -> Crop:
+        """
+        Initialize a new crop from a configuration dictionary.
+
+        Parameters
+        ----------
+        config : dict
+            A dictionary containing specifications for the crop to be initialized.
+
+        Details
+        -------
+        If the "species" key is present in the dictionary, that value is checked against the supported
+        crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
+        created (with 'custom' prepended to the species name, if given).
+
+        Returns
+        -------
+        Crop
+            A Crop object initialized with the desired attribute values.
+        """
+        print("make crop called")
+        if "species" in config.keys():
+            accepted_species = set(item.value for item in CropSpecies)
+            species = config.pop("species")
+
+            if species in accepted_species:
+                return Crop.make_supported_crop(species=species, **config)
+            else:
+                config["species"] = "custom " + str(species)
+
+        return Crop._make_custom_crop(**config)
+
+    @staticmethod
+    def make_supported_crop(species: str, **specs) -> Crop:
+        """
+        Create a crop instance with attributes determined by the species of the crop.
+
+        Parameters
+        ----------
+        species : str
+            One of the supported species.
+        **specs : optional
+            An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
+
+        Details
+        -------
+        Species attributes are read from species configuration files/classes. This method of creating a crop
+        does not allow for customizing crop values. It is limited to creating the default crops supported by the
+        CropSpecies Enum.
+
+        Returns
+        -------
+        Crop
+            A Crop object initialized with the desired attribute values.
+        """
+        crop_species = CropSpecies(species)
+        crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
+        return Crop(crop_data)
+
+    @staticmethod
+    def _make_custom_crop(**specs) -> Crop:
+        """creates a crop instance with customized attributes.
+
+        Args:
+            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
+              crop species
+
+        Details, this can be used to create a new ('unsupported') crop species/type
+        """
+        print("make custom crop called")
+        crop_data = CropData(**specs)
+        return Crop(crop_data)

@@ -973,19 +973,15 @@ class Field:
 
         """
         for crop in self.crops:
-            execute_heat_scheduled_harvest = (
-                crop.data.use_heat_scheduling and crop.data.heat_fraction >= crop.data.harvest_heat_fraction
-            )
-            if execute_heat_scheduled_harvest:
-                crop.crop_management.manage_harvest(
-                    HarvestOperation.HARVEST_ONLY,
+            if crop.should_harvest_based_on_heat():
+                crop.manage_harvest_based_on_heat(
                     self.field_data.name,
                     self.field_data.field_size,
                     time,
                     self.soil.data,
                     self.feed_manager,
+                    rainfall
                 )
-                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
     def _filter_events(
@@ -1060,7 +1056,7 @@ class Field:
         """
         supported_species = set(item.value for item in CropSpecies)
         if crop_reference in supported_species:
-            crop = self._make_supported_crop(crop_reference)
+            crop = Crop.make_supported_crop(crop_reference)
         else:
             try:
                 crop_specifications = copy(self.custom_crop_specifications[crop_reference])
@@ -1070,7 +1066,7 @@ class Field:
                     f"received specifications for '{tuple(self.custom_crop_specifications.keys())}' crop "
                     f"types."
                 )
-            crop = self._make_crop_from_config_dict(crop_specifications)
+            crop = Crop.make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
         crop.data.planting_year = time.current_calendar_year
@@ -1210,78 +1206,78 @@ class Field:
         for crop in self.crops:
             crop.data.field_proportion = field_coverage_fraction
 
-    @staticmethod
-    def _make_crop_from_config_dict(config: Dict) -> Crop:
-        """
-        Initialize a new crop from a configuration dictionary.
+    # @staticmethod
+    # def _make_crop_from_config_dict(config: Dict) -> Crop:
+    #     """
+    #     Initialize a new crop from a configuration dictionary.
 
-        Parameters
-        ----------
-        config : dict
-            A dictionary containing specifications for the crop to be initialized.
+    #     Parameters
+    #     ----------
+    #     config : dict
+    #         A dictionary containing specifications for the crop to be initialized.
 
-        Details
-        -------
-        If the "species" key is present in the dictionary, that value is checked against the supported
-        crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
-        created (with 'custom' prepended to the species name, if given).
+    #     Details
+    #     -------
+    #     If the "species" key is present in the dictionary, that value is checked against the supported
+    #     crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
+    #     created (with 'custom' prepended to the species name, if given).
 
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
-        """
-        if "species" in config.keys():
-            accepted_species = set(item.value for item in CropSpecies)
-            species = config.pop("species")
+    #     Returns
+    #     -------
+    #     Crop
+    #         A Crop object initialized with the desired attribute values.
+    #     """
+    #     if "species" in config.keys():
+    #         accepted_species = set(item.value for item in CropSpecies)
+    #         species = config.pop("species")
 
-            if species in accepted_species:
-                return Field._make_supported_crop(species=species, **config)
-            else:
-                config["species"] = "custom " + str(species)
+    #         if species in accepted_species:
+    #             return Field._make_supported_crop(species=species, **config)
+    #         else:
+    #             config["species"] = "custom " + str(species)
 
-        return Field._make_custom_crop(**config)
+    #     return Field._make_custom_crop(**config)
 
-    @staticmethod
-    def _make_supported_crop(species: str, **specs) -> Crop:
-        """
-        Create a crop instance with attributes determined by the species of the crop.
+    # @staticmethod
+    # def _make_supported_crop(species: str, **specs) -> Crop:
+    #     """
+    #     Create a crop instance with attributes determined by the species of the crop.
 
-        Parameters
-        ----------
-        species : str
-            One of the supported species.
-        **specs : optional
-            An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
+    #     Parameters
+    #     ----------
+    #     species : str
+    #         One of the supported species.
+    #     **specs : optional
+    #         An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
 
-        Details
-        -------
-        Species attributes are read from species configuration files/classes. This method of creating a crop
-        does not allow for customizing crop values. It is limited to creating the default crops supported by the
-        CropSpecies Enum.
+    #     Details
+    #     -------
+    #     Species attributes are read from species configuration files/classes. This method of creating a crop
+    #     does not allow for customizing crop values. It is limited to creating the default crops supported by the
+    #     CropSpecies Enum.
 
-        Returns
-        -------
-        Crop
-            A Crop object initialized with the desired attribute values.
-        """
+    #     Returns
+    #     -------
+    #     Crop
+    #         A Crop object initialized with the desired attribute values.
+    #     """
 
-        crop_species = CropSpecies(species)
-        crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
-        return Crop(crop_data)
+    #     crop_species = CropSpecies(species)
+    #     crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
+    #     return Crop(crop_data)
 
-    @staticmethod
-    def _make_custom_crop(**specs) -> Crop:
-        """creates a crop instance with customized attributes.
+    # @staticmethod
+    # def _make_custom_crop(**specs) -> Crop:
+    #     """creates a crop instance with customized attributes.
 
-        Args:
-            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
-              crop species
+    #     Args:
+    #         **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
+    #           crop species
 
-        Details, this can be used to create a new ('unsupported') crop species/type
-        """
-        crop_data = CropData(**specs)
-        return Crop(crop_data)
+    #     Details, this can be used to create a new ('unsupported') crop species/type
+    #     """
+    #     crop_data = CropData(**specs)
+    #     return Crop(crop_data)
 
     def _assess_dormancy(self, daylength: float, rainfall: float) -> None:
         """
