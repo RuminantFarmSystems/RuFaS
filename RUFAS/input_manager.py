@@ -1668,7 +1668,9 @@ class InputManager:
             self.om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
         elif not is_modifiable_during_runtime:
-            self.om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            self.om.add_warning(
+                "IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map
+            )
             return False
         return True
 
@@ -1997,7 +1999,9 @@ class InputManager:
                                 )
                                 raise ValueError(f"Properties 'type' value not in {list(type_to_validator_map.keys())}")
 
-        self.om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
+        self.om.add_log(
+            "Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map
+        )
         self.om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
 
     def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
@@ -2287,7 +2291,9 @@ class InputManager:
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
         path_to_save = output_dir / self.om.generate_file_name("InputManager_metadata_properties", extension="csv")
-        self.om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
+        self.om.add_log(
+            "CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map
+        )
         try:
             self.om.create_directory(output_dir)
             df.to_csv(path_to_save, index=False)
