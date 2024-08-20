@@ -6,7 +6,6 @@ from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.time import Time
-from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 from .sample_crop_data import sample_crop_data
