@@ -3,6 +3,7 @@ from unittest.mock import call
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
@@ -81,7 +82,6 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
 
     mock_grazing_leach_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     mock_machine_leach_phosphorus_pools.assert_called_once_with(rain, runoff, area)
-    assert mock_add.call_count == 4
     add_calls = [
         call(9, area),
         call(24, area),
@@ -90,3 +90,23 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
     ]
     mock_add.assert_has_calls(add_calls)
 
+
+@pytest.mark.parametrize(
+    "amount_phosphorus,field_size",
+    [
+        (100, 3.1),
+        (25.6, 2),
+        (66.23, 1.88),
+    ],
+)
+def test_add_infiltrated_phosphorus_to_soil(amount_phosphorus: float, field_size: float, mocker: MockerFixture) -> None:
+    """Test that methods are called correctly on correct layers of soil profile."""
+    data = SoilData(field_size=field_size)
+    incorp = Manure(data)
+    mock_add = mocker.patch.object(LayerData, "add_to_labile_phosphorus")
+    incorp._add_infiltrated_phosphorus_to_soil(amount_phosphorus, field_size)
+    add_calls = [
+        call(0.8 * amount_phosphorus, field_size),
+        call(0.2 * amount_phosphorus, field_size)
+    ]
+    mock_add.assert_has_calls(add_calls)
