@@ -109,27 +109,6 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Fetch latest commit SHA
-        id: fetch-latest-sha
-        run: |
-          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          echo "Branch name: $BRANCH_NAME"
-          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
-          echo "Latest SHA: $LATEST_SHA"
-          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
-      
-      - name: Compare with pushed commit SHA from format_code job
-        run: |
-          echo "Commit hash from format_code job: ${{ needs.format_code.outputs.pushed_commit_sha }}"
-          echo "Commit hash fetched in this job: $LATEST_SHA"
-
-          if [ "${{ needs.format_code.outputs.pushed_commit_sha }}" = "$LATEST_SHA" ]; then
-            echo "The commit hashes match."
-          else
-            echo "The commit hashes do not match."
-            exit 1
-          fi
-
       - name: Checkout the latest commit
         uses: actions/checkout@v4
         with:

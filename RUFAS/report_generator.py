@@ -729,7 +729,7 @@ class ReportGenerator:
         Parameters
         ----------
         report_data : Dict[str, List[float]]
-            The data pool to be aggregated; structured as a dictionary of lists.
+            The data pool to be aggregated, structured as a dictionary of lists.
         loop_list : List[str]
             List of keys indicating the order in which to aggregate data.
         aggregator : Callable[[List[float], float, str], float]
