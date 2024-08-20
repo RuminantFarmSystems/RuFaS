@@ -44,6 +44,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
     mock_weather = Weather({}, mock_time)
+    mock_weather.om = OutputManager()
     weather_data = {
         datetime(2023, 9, 24): CurrentDayConditions(
             incoming_light=1,
@@ -323,19 +324,17 @@ def test_record_weather(
     mock_weather: Weather,
     mock_current_day_conditions: CurrentDayConditions,
     mock_time: Time,
+    mocker: MockerFixture
 ) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
-    with (
-        patch("RUFAS.output_manager.OutputManager.add_variable") as add_var,
-        patch.object(
-            mock_weather,
-            "get_current_day_conditions",
-            return_value=mock_current_day_conditions,
-        ) as mock_current_day_conditions,
-    ):
-        mock_weather.record_weather(mock_time)
-        assert mock_current_day_conditions.call_count == 1
-        assert add_var.call_count == 8
+
+    add_var = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
+    mock_current_day_conditions = mocker.patch.object(mock_weather, "get_current_day_conditions",
+                                                      return_value=mock_current_day_conditions)
+
+    mock_weather.record_weather(mock_time)
+    assert mock_current_day_conditions.call_count == 1
+    assert add_var.call_count == 8
 
 
 @pytest.mark.parametrize("weather_file", [{"year": [2023], "jday": [267, 268, 269, 270, 271]}])
