@@ -11,7 +11,7 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 from .sample_crop_data import sample_crop_data
 
-#om = OutputManager()
+# om = OutputManager()
 
 
 @pytest.fixture
