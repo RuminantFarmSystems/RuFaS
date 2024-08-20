@@ -5,9 +5,8 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
-   RUFAS.routines.EEE
    RUFAS.routines.animal
    RUFAS.routines.feed
    RUFAS.routines.feed_storage

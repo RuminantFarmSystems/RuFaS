@@ -100,14 +100,6 @@ RUFAS.routines.animal.life\_cycle.hormone\_delivery\_schedule module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.animal.life\_cycle.lactation\_curve module
----------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.life_cycle.lactation_curve
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 RUFAS.routines.animal.life\_cycle.life\_cycle module
 ----------------------------------------------------
 
@@ -136,14 +128,6 @@ RUFAS.routines.animal.life\_cycle.repro\_protocol\_misc module
 --------------------------------------------------------------
 
 .. automodule:: RUFAS.routines.animal.life_cycle.repro_protocol_misc
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.life\_cycle.repro\_state\_manager module
---------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.life_cycle.repro_state_manager
    :members:
    :undoc-members:
    :show-inheritance:

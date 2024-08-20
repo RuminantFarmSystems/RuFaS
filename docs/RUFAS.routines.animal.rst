@@ -5,15 +5,22 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    RUFAS.routines.animal.life_cycle
    RUFAS.routines.animal.manure
    RUFAS.routines.animal.ration
-   RUFAS.routines.animal.types
 
 Submodules
 ----------
+
+RUFAS.routines.animal.animal\_combinations module
+-------------------------------------------------
+
+.. automodule:: RUFAS.routines.animal.animal_combinations
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 RUFAS.routines.animal.animal\_grouping\_scenarios module
 --------------------------------------------------------
@@ -75,14 +82,6 @@ RUFAS.routines.animal.pen module
 --------------------------------
 
 .. automodule:: RUFAS.routines.animal.pen
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-RUFAS.routines.animal.purchased\_feed\_emissions\_estimator module
-------------------------------------------------------------------
-
-.. automodule:: RUFAS.routines.animal.purchased_feed_emissions_estimator
    :members:
    :undoc-members:
    :show-inheritance:

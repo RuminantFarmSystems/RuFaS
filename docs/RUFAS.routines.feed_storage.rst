@@ -20,14 +20,6 @@ RUFAS.routines.feed\_storage.enums module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed\_storage.feed\_manager module
--------------------------------------------------
-
-.. automodule:: RUFAS.routines.feed_storage.feed_manager
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 RUFAS.routines.feed\_storage.grain module
 -----------------------------------------
 
@@ -52,10 +44,10 @@ RUFAS.routines.feed\_storage.hay module
    :undoc-members:
    :show-inheritance:
 
-RUFAS.routines.feed\_storage.silage module
-------------------------------------------
+RUFAS.routines.feed\_storage.sileage module
+-------------------------------------------
 
-.. automodule:: RUFAS.routines.feed_storage.silage
+.. automodule:: RUFAS.routines.feed_storage.sileage
    :members:
    :undoc-members:
    :show-inheritance:
