@@ -3,7 +3,7 @@ from __future__ import annotations
 import collections
 import math
 from random import random
-from typing import Dict, Any
+from typing import Dict, Any, TypedDict
 
 import numpy as np
 
@@ -30,12 +30,26 @@ from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 om = OutputManager()
 
 
-class MilkProductionHistory:
-    def __init__(self, sim_day: int, days_in_milk: int, milk_prod: float, days_born: int) -> None:
-        self.simulation_day: int = sim_day
-        self.days_in_milk: int = days_in_milk
-        self.milk_production: float = milk_prod
-        self.days_born: int = days_born
+class MilkProductionHistory(TypedDict):
+    """
+    A class to represent the milk production history entry of an animal.
+
+    Attributes
+    ----------
+    simulation_day : int
+        The simulate day that the milk production history entry is recorded.
+    days_in_milk : int
+        The number of days of the animal into milking.
+    milk_production : float
+        The amount of milk produced by the animal (kg).
+    days_born : int
+        The age of the animal in days.
+    """
+
+    simulation_day: int
+    days_in_milk: int
+    milk_production: float
+    days_born: int
 
 
 class Cow(HeiferIII):
@@ -281,18 +295,10 @@ class Cow(HeiferIII):
         Currently only set up for wood model.
         """
         if self.lactation_curve == "wood":
-            self.wood_l = self.determine_param_value(
-                AnimalBase.config["wood_l"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_l_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_m = self.determine_param_value(
-                AnimalBase.config["wood_m"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_m_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_n = self.determine_param_value(
-                AnimalBase.config["wood_n"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_n_std"][self.breed_index][self.parity_index],
-            )
+            lactation_parameters = AnimalBase.lactation_curve.get_wood_parameters(self.calves)
+            self.wood_l = lactation_parameters["l"]
+            self.wood_m = lactation_parameters["m"]
+            self.wood_n = lactation_parameters["n"]
 
     def calculate_daily_milk_produced(self) -> float:
         """Returns a float calculation of the milk produced based on a cow's lactation curve parameters"""
@@ -323,20 +329,20 @@ class Cow(HeiferIII):
             Day of simulation.
 
         """
-        if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
+        if len(self.milk_production_history) > 0 and self.milk_production_history[-1]["simulation_day"] == sim_day:
             del self.milk_production_history[-1]
 
         self.milk_production_history.append(
             MilkProductionHistory(
-                sim_day,
-                self.days_in_milk,
-                self.estimated_daily_milk_produced,
-                self.days_born,
+                simulation_day=sim_day,
+                days_in_milk=self.days_in_milk,
+                milk_production=self.estimated_daily_milk_produced,
+                days_born=self.days_born,
             )
         )
 
         if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
-            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            milk_history = [day["milk_production"] for day in self.milk_production_history[-305:]]
             self.latest_milk_production_305days = np.sum(milk_history)
 
     @staticmethod
