@@ -2,6 +2,7 @@ import pytest
 from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.EEE.EEE_manager import EEEManager
 from RUFAS.simulation_engine import SimulationEngine
@@ -34,13 +35,13 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     """
 
     # Arrange
-    # patch_for_output_manager = mocker.patch("RUFAS.simulation_engine.om")
-    # patch_for_output_manager.get_error_and_warning_counts.return_value = (1, 2)
+    patch_for_output_manager = mocker.patch("RUFAS.output_manager.OutputManager")
+    patch_for_output_manager.get_error_and_warning_counts.return_value = (1, 2)
     mocker.patch("RUFAS.simulation_engine.timer.time", side_effect=[start_time, end_time])
+    mocker.patch("RUFAS.time.Time")
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
-    patch_for_output_manager = mocker.patch.object(simulation_engine, "get_error_and_warning_counts",
-                                                   return_value = (1, 2))
+    simulation_engine.om = patch_for_output_manager
     simulation_engine.time = mocker.MagicMock()
     simulation_engine.time.simulation_day = 100
     simulation_engine.feed = mocker.MagicMock()
@@ -170,6 +171,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
 
     mock_feed_manager = mocker.MagicMock()
     patch_for_feed_manager = mocker.patch("RUFAS.simulation_engine.FeedManager", return_value=mock_feed_manager)
+    simulation_engine.om = OutputManager()
 
     # Act
     simulation_engine._initialize_simulation()
