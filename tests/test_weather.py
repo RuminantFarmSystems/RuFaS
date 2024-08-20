@@ -321,16 +321,14 @@ def test_get_conditions_series(
 
 
 def test_record_weather(
-    mock_weather: Weather,
-    mock_current_day_conditions: CurrentDayConditions,
-    mock_time: Time,
-    mocker: MockerFixture
+    mock_weather: Weather, mock_current_day_conditions: CurrentDayConditions, mock_time: Time, mocker: MockerFixture
 ) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
 
     add_var = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
-    mock_current_day_conditions = mocker.patch.object(mock_weather, "get_current_day_conditions",
-                                                      return_value=mock_current_day_conditions)
+    mock_current_day_conditions = mocker.patch.object(
+        mock_weather, "get_current_day_conditions", return_value=mock_current_day_conditions
+    )
 
     mock_weather.record_weather(mock_time)
     assert mock_current_day_conditions.call_count == 1
