@@ -36,6 +36,11 @@ def mock_alfalfa_silage_data() -> AlfalfaSilage:
     return AlfalfaSilage()
 
 
+@pytest.fixture
+def crop_manager() -> CropManagement:
+    return CropManagement()
+
+
 # ---- Test Static Functions ----
 @pytest.mark.parametrize(
     "heatfrac,optimal_index",
@@ -381,6 +386,8 @@ def test_record_yield(
     crop_manager.data.dry_matter_yield_collected = dry_mass
     crop_manager.data.yield_nitrogen = nitrogen
     crop_manager.data.yield_phosphorus = phosphorus
+    crop_manager.data.residue_nitrogen = 333.3
+    crop_manager.data.residue_phosphorus = 33.3
 
     expected_units = {
         "crop": MeasurementUnits.UNITLESS,
@@ -389,6 +396,8 @@ def test_record_yield(
         "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "residue_nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "residue_phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
         "harvest_index": MeasurementUnits.UNITLESS,
         "planting_year": MeasurementUnits.CALENDAR_YEAR,
         "planting_day": MeasurementUnits.ORDINAL_DAY,
@@ -413,6 +422,8 @@ def test_record_yield(
         "planting_year": 1995,
         "planting_day": 100,
         "yield_residue": crop_manager.data.yield_residue,
+        "residue_nitrogen": 333.3,
+        "residue_phosphorus": 33.3,
         "harvest_index": crop_manager.data.harvest_index,
         "harvest_year": year,
         "harvest_day": day,
@@ -431,20 +442,18 @@ def test_record_yield(
 
 
 @pytest.mark.parametrize(
-    "root_biomass,residue,killed,expected_root_depth,expected_surface_residue,expected_root_residue",
+    "root_biomass,residue,killed,expected_surface_residue",
     [
-        (150, 150, True, 100, 0.0, 150.0),
-        (100, 150, True, 100, 50, 100.0),
-        (100, 150, False, 0, 150, 0),
+        (150, 150, True, 0.0),
+        (100, 150, True, 50),
+        (100, 150, False, 150),
     ],
 )
 def test_transfer_residue(
     root_biomass: float,
     residue: float,
     killed: bool,
-    expected_root_depth: float,
     expected_surface_residue: float,
-    expected_root_residue: float,
 ) -> None:
     """Tests that residue and associated nutrients from harvests and not collected are properly transferred to the
     soil."""
@@ -460,10 +469,8 @@ def test_transfer_residue(
         crop_manage._transfer_residue(soil_data, killed)
         distribute_nutrients.assert_called_once() if killed else distribute_nutrients.assert_not_called()
 
-    assert soil_data.plant_surface_residue == expected_surface_residue
-    assert soil_data.plant_root_residue == expected_root_residue
-    assert soil_data.crop_root_depth == expected_root_depth
     if not killed:
+        assert soil_data.soil_layers[0].plant_residue == expected_surface_residue
         assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == 22
         assert soil_data.soil_layers[0].labile_inorganic_phosphorus_content == 23
     assert crop_data.yield_residue == 0.0
@@ -472,39 +479,18 @@ def test_transfer_residue(
 
 
 @pytest.mark.parametrize(
-    "root_depth,n,p,expected_n,expected_p,",
+    "root_depth,n,p,expected_n,expected_p",
     [
         (
-            100.0,
-            40.0,
-            20.0,
-            [24.0, 6.0, 10.0],
-            [12.0, 3.0, 5.0],
+            100.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]
         ),
         (
-            45.0,
-            40.0,
-            20.0,
-            [28.888888, 11.111111, 0.0],
-            [14.444444, 5.555555, 0.0],
-        ),
-        (
-            50.0,
-            40.0,
-            20.0,
-            [28.0, 12, 0.0],
-            [14.0, 6.0, 0.0],
-        ),
-        (
-            10.0,
-            50.0,
-            22.0,
-            [50.0, 0.0, 0.0],
-            [22.0, 0.0, 0.0],
-        ),
+            45.0, 40.0, 20.0, [22.0, 12.0, 2.0, 4.0], [11.0, 6.0, 1.0, 2.0]
+        )
     ],
 )
 def test_distribute_residue_nutrients(
+    mocker: MockerFixture,
     root_depth: float,
     n: float,
     p: float,
@@ -514,12 +500,13 @@ def test_distribute_residue_nutrients(
     """Tests that residue nutrients are correctly partitioned between the nutrient pools in a soil profile."""
     crop_data = CropData(
         yield_residue=100.0,
+        root_biomass=50.0,
         residue_nitrogen=n,
         residue_phosphorus=p,
-        root_depth=root_depth,
+        max_root_depth=root_depth,
     )
     crop_manager = CropManagement(crop_data)
-
+    mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 0.8, 1.0])
     field_size = 1.0
     top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
     second_soil_layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=field_size)
@@ -533,14 +520,45 @@ def test_distribute_residue_nutrients(
     soil_data.set_vectorized_layer_attribute("fresh_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("active_organic_nitrogen_content", [0.0] * 3)
     soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", [0.0] * 3)
+    soil_data.set_vectorized_layer_attribute("plant_residue", [0.0] * 3)
+    expected_plant_residue = [55.0, 30.0, 5.0, 10.0]
 
-    crop_manager._distribute_residue_nutrients(soil_data, 50.0)
+    crop_manager._distribute_residue_nutrients(soil_data)
 
     assert pytest.approx(soil_data.soil_layers[0].fresh_organic_nitrogen_content) == expected_n[0]
-    assert (
-        pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
-    )
-    assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
+    assert pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:3]) == expected_n[1:-1]
+    assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p[:-1]
+    assert pytest.approx(soil_data.get_vectorized_layer_attribute("plant_residue")) == expected_plant_residue[:-1]
+    
+    assert pytest.approx(soil_data.vadose_zone_layer.active_organic_nitrogen_content) == expected_n[-1]
+    assert pytest.approx(soil_data.vadose_zone_layer.labile_inorganic_phosphorus_content) == expected_p[-1]
+    assert pytest.approx(soil_data.vadose_zone_layer.plant_residue) == expected_plant_residue[-1]
+
+
+@pytest.mark.parametrize(
+    "d_a,c,root_depth,depth,expected",
+    [
+        (145.0, -1.165, 20.0, 20.0, 1.0),
+        (145.0, -1.165, 1500.0, 200.0, 0.6008058),
+        (145.0, -1.165, 2000.0, 1500.0, 0.9719949),
+        (145.0, -1.165, 2000.0, 2050.0, 1.0),
+        (116.0, -0.626, 500.0, 0.0, 0.0),
+        (116.0, -0.626, 500.0, 10.0, 0.1830823),
+        (116.0, -0.626, 1721.0, 150.0, 0.5537369),
+        (116.0, -0.626, 1721.0, 2000.0, 1.0),
+    ],
+)
+def test_calculate_root_mass_distribution(
+    crop_manager: CropManagement, d_a: float, c: float, root_depth: float, depth: float, expected: float
+) -> None:
+    """Tests _calculate_root_mass_distribution() in CropManagement."""
+    crop_manager.data.root_distribution_param_da = d_a
+    crop_manager.data.root_distribution_param_c = c
+    crop_manager.data.max_root_depth = root_depth
+
+    actual = crop_manager._calculate_root_mass_distribution(depth)
+
+    assert pytest.approx(actual) == expected
 
 
 def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
