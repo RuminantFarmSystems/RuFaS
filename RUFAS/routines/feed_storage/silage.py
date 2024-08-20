@@ -9,8 +9,6 @@ from ...units import MeasurementUnits
 from ...output_manager import OutputManager
 
 
-om = OutputManager()
-
 """Fraction of effluent that is dry matter by mass."""
 DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
 """Number of days that loss of effluent occurs over after a crop is ensiled."""
