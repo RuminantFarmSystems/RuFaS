@@ -407,7 +407,8 @@ class CropManagement:
         surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * root_frac_to_bottom_depth
 
         root_frac_to_top_depth = root_frac_to_bottom_depth
-        for layer in soil_data.soil_layers[1:]:
+        layers_to_iterate_over = soil_data.soil_layers[1:] + [soil_data.vadose_zone_layer]
+        for layer in layers_to_iterate_over:
             root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
             layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
             layer.plant_residue = subsurface_residue * layer_fraction
@@ -441,7 +442,7 @@ class CropManagement:
         will not contain any of the crop's root mass.
 
         """
-        if bottom_depth >= self.data.root_depth:
+        if bottom_depth >= self.data.max_root_depth:
             return 1.0
         if bottom_depth == 0.0:
             return 0.0
@@ -450,9 +451,9 @@ class CropManagement:
             1 + (bottom_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
         )
         second_term = 1 - 1 / (
-            1 + (self.data.root_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
+            1 + (self.data.max_root_depth / self.data.root_distribution_param_da) ** self.data.root_distribution_param_c
         )
-        third_term = bottom_depth / self.data.root_depth
+        third_term = bottom_depth / self.data.max_root_depth
 
         return first_term + second_term * third_term
 
