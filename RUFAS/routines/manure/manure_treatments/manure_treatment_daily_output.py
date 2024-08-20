@@ -193,6 +193,10 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         Carbon decomposition, kg.
     solid_manure_carbon_decomposition_unit: MeasurementUnits
         Unit for solid_manure_carbon_decomposition.
+    storage_methane_burned: float
+        Amount of storage methane burned, kg.
+    storage_methane_burned_unit: MeasurementUnits
+        Unit for storage_methane_burned.
     """
 
     pen_id: int = -1
@@ -327,6 +331,9 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
     solid_manure_carbon_decomposition: float = 0.0
     solid_manure_carbon_decomposition_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+
+    storage_methane_burned: float = 0.0
+    storage_methane_burned_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
 
     def __post_init__(self) -> None:
         """Ensures that the daily volume is set to the final manure volume."""

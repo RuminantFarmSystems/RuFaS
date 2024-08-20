@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
 from RUFAS.routines.animal.animal_manager import AnimalManager, Feed
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -359,6 +360,10 @@ class HerdFactory:
         """
         AnimalBase.set_config(AnimalManager.get_animal_config(self.im.get_data("animal.animal_config")))
         AnimalBase.set_nutrient_list(Feed(self.im.get_data("feed")).nutrient_rqmts)
+
+        time = Time()
+        AnimalBase.setup_lactation_curve_parameters(time)
+
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:
