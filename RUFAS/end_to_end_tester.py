@@ -20,8 +20,8 @@ results for testing that domain, and the prefix used when saving the test result
 DOMAINS = {
     "Feed Storage": TestResultPaths(
         "FeedStorageResults",
-        "end-to-end-testing_saved_variables_e2e_json_feed_storage_filter",
-        "input/data/end_to_end_testing/e2e_feed_storage.json",
+        "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
+        "end-to-end-testing_saved_variables_e2e_feed_storage_",
     )
 }
 
@@ -63,7 +63,7 @@ class EndToEndTester:
                     "End-to-end testing failed.",
                     info_map,
                 )
-                return
+                continue
             with open(path_to_actual_results, "r") as results:
                 actual_results = json.load(results)
             with open(f"{info.expected_results_path}", "r") as e_to_e_results:
