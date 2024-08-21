@@ -155,7 +155,7 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
 def test_apply_vertical_aggregation(
     report_data: dict[str, list[float]],
     aggregator_key: str,
-    expected: tuple[dict[str, float | None], list[dict[str, str]]],
+    expected: tuple[dict[str, list[float]], list[dict[str, str]]],
     mocker: MockerFixture,
 ) -> None:
     """
@@ -632,7 +632,7 @@ def test_combine_units(
     operation: str,
     expected_numerator: dict[str, int],
     expected_denominator: dict[str, int],
-    expected_logs: list[Any],
+    expected_logs: dict[str, str | dict[str, str]],
 ) -> None:
     generator = ReportGenerator()
     simplify_units = True
@@ -733,7 +733,7 @@ def test_handle_horizontal_and_vertical_aggregations(
     mocker: MockerFixture,
 ) -> None:
     report_generator = ReportGenerator()
-    aggregate_units_return: tuple[str, list[Any]] = ("dummy_units", {"mock_units_log": "mock_units_msg"})
+    aggregate_units_return: tuple[str, dict[str, str]] = ("dummy_units", {"mock_units_log": "mock_units_msg"})
 
     mocker.patch.object(
         report_generator, "_get_horizontal_first_value", return_value=filter_content["horizontal_first"]
@@ -1436,9 +1436,9 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
 )
 def test_handle_aggregation_errors(
     aggregator: Callable[[List[float]], float],
-    data: List[float | None],
+    data: dict[str, list[float | None]],
     key: str,
-    expected_result: float | None,
+    expected_result: dict[str, list[float | None] | float | None],
     expected_log: Dict[str, str | Dict[str, str]],
 ) -> None:
     """

@@ -679,7 +679,7 @@ class ReportGenerator:
         horizontal_agg_key: str,
         vertical_agg_key: str,
         filter_content: Dict[str, Any],
-    ) -> tuple[dict[str, list[Any]], dict[str, str | dict[str, str]]]:
+    ) -> tuple[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """
         Handles both horizontal and vertical aggregations on the report data.
 
@@ -832,7 +832,7 @@ class ReportGenerator:
         self,
         report_data: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
         aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
-    ) -> dict[str, list[float | None]]:
+    ) -> tuple[dict[str, list[float]], list[dict[str, str]]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -849,7 +849,7 @@ class ReportGenerator:
             The vertically aggregated data as a dictionary of lists.
         """
 
-        aggregated_data: Dict[str, List[float | None]] = {}
+        aggregated_data: dict[str, list[float | None]] = {}
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for key, data in report_data.items():
             non_null_data_points = list(filter(lambda x: x is not None, data))
