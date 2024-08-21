@@ -3,14 +3,14 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/default_config.json",
+      "path": "input/data/config/manure_config_MW.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/default_animal.json",
+      "path": "input/data/animal/MW0_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -59,7 +59,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/default_feed.json",
+      "path": "input/data/feed/feed_MW_Diet_15.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -80,7 +80,7 @@
     "manure_management": {
       "title": "Manure data",
       "description": "Manure management decisions, including bedding type, handler, separator, and treatment information.",
-      "path": "input/data/manure/manure_management.json",
+      "path": "input/data/manure/manure_management_scenarios.json",
       "type": "json",
       "properties": "manure_management_properties"
     },
@@ -129,7 +129,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/barnyard_weather.csv",
+      "path": "input/data/weather/MW_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
