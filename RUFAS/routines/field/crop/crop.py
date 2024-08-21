@@ -145,7 +145,8 @@ class Crop:
     def should_harvest_based_on_heat(self) -> bool:
         return self.data.use_heat_scheduling and self.data.heat_fraction >= self.data.harvest_heat_fraction
 
-    def manage_harvest_based_on_heat(self, field_name: str, field_size: float, time: Time, soil_data, feed_manager, rainfall: float) -> None:
+    def manage_harvest_based_on_heat(self, field_name: str, field_size: float, time: Time, soil_data, feed_manager,
+                                     rainfall: float) -> None:
         self.crop_management.manage_harvest(
             HarvestOperation.HARVEST_ONLY,
             field_name,
@@ -177,7 +178,6 @@ class Crop:
         Crop
             A Crop object initialized with the desired attribute values.
         """
-        print("make crop called")
         if "species" in config.keys():
             accepted_species = set(item.value for item in CropSpecies)
             species = config.pop("species")
@@ -226,6 +226,5 @@ class Crop:
 
         Details, this can be used to create a new ('unsupported') crop species/type
         """
-        print("make custom crop called")
         crop_data = CropData(**specs)
         return Crop(crop_data)
