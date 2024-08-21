@@ -13,6 +13,8 @@ env:
 jobs:
   format_code:
     runs-on: ubuntu-latest
+    outputs:
+      pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -82,9 +84,18 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add -A
           git commit -m "Apply Black Formatting" --allow-empty
+          COMMIT_HASH=$(git rev-parse HEAD)
+          echo "Pushed commit hash: $COMMIT_HASH"
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
           CLEAN_BRANCH_NAME=${BRANCH_NAME/refs\/heads\//}
           git push -f origin HEAD:$CLEAN_BRANCH_NAME
+          echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
+        
+      - name: Capture the commit hash
+        id: capture_commit_sha
+        run: |
+          COMMIT_HASH=$(git rev-parse HEAD)
+          echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
   
 
   lint_test_type_check:
@@ -98,19 +109,10 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Fetch latest commit SHA
-        id: fetch-latest-sha
-        run: |
-          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          echo "Branch name: $BRANCH_NAME"
-          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
-          echo "Latest SHA: $LATEST_SHA"
-          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
-
       - name: Checkout the latest commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.fetch-latest-sha.outputs.sha }}
+          ref: ${{ needs.format_code.outputs.pushed_commit_sha }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
