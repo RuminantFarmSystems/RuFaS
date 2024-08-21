@@ -155,11 +155,21 @@ class Denitrification:
         float
             Effect of the soil nitrate level on the ratio of nitrous oxide to dinitrogen (unitless).
 
+        Notes
+        -----
+        The equation here differs from what was published in Parton et al, [1]. During implementation it was discovered
+        that the equation they published was producing invalid results due to a missing pair of parentheses.
+
+        References
+        ----------
+        .. [1] Parton, W. J., et al. "Generalized model for N2 and N2O production from nitrification and
+           denitrification." Global biogeochemical cycles 10.3 (1996): 401-412.
+
         """
         nitrate_content_grams = nitrate_content * GeneralConstants.KG_TO_GRAMS
         fractional_term = atan(pi * 0.01 * (nitrate_content_grams - 190)) / pi
 
-        return 1 - (0.5 + fractional_term) * 25
+        return (0.5 - fractional_term) * 25
 
     def _calculate_carbon_effect(self, carbon_content: float) -> float:
         """
