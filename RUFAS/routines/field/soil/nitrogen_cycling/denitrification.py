@@ -51,6 +51,7 @@ class Denitrification:
 
         """
         self.data.set_vectorized_layer_attribute("nitrous_oxide_emissions", [0.0] * len(self.data.soil_layers))
+        self.data.set_vectorized_layer_attribute("dinitrogen_emissions", [0.0] * len(self.data.soil_layers))
         for layer in self.data.soil_layers:
             nutrient_is_below_threshold = (
                 layer.nutrient_cycling_water_factor < layer.denitrification_threshold_water_content
@@ -72,17 +73,6 @@ class Denitrification:
             partitioning_factor = self._calculate_partitioning_factor(
                 nitrate_effect, carbon_effect, moisture_effect, pH_effect
             )
-
-            info_map = {
-                "class": self.__class__.__name__,
-                "function": self.denitrify.__name__,
-                "units": MeasurementUnits.UNITLESS,
-            }
-            self.om.add_variable("nitrate_effect", nitrate_effect, info_map)
-            self.om.add_variable("carbon_effect", carbon_effect, info_map)
-            self.om.add_variable("moisture_effect", moisture_effect, info_map)
-            self.om.add_variable("pH_effect", pH_effect, info_map)
-            self.om.add_variable("partitioning_factor", partitioning_factor, info_map)
 
             nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
 
