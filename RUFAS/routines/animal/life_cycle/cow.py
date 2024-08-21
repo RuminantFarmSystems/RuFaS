@@ -114,9 +114,9 @@ class Cow(HeiferIII):
 
         """
         super().__init__(args)
-        if self.id == 168:
-            import remote_pdb
-            remote_pdb.set_trace("localhost", 4444)
+        # if self.id == 168:
+        #     import remote_pdb
+        #     remote_pdb.set_trace("localhost", 4444)
 
         # current hard-coded values necessary for nutrient requirement
         # calculations
@@ -360,6 +360,15 @@ class Cow(HeiferIII):
         Returns: a random value draw from distribution of parameters
         """
         return np.random.normal(mean, std)
+
+    def set_milking_attributes(self) -> None:
+        is_wacky = self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"] and not self.milking
+        if not is_wacky:
+            return
+
+        self.days_in_milk = self.days_in_preg + 20
+        self.milking = True
+        print(f"milk attributes set {self.id=} {self.days_in_preg=}")
 
     def milking_update(self, sim_day: int, calving_interval: int | float) -> None:
         """
