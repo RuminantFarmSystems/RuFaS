@@ -1,4 +1,4 @@
-from typing import List, Dict, TypedDict
+from typing import List, Dict, TypedDict, Any
 from typing_extensions import NotRequired
 
 
@@ -31,6 +31,8 @@ class PenTypedDict(TypedDict):
     manure_storage: str
     max_stocking_density: float
     ration: Dict[str, float | str]
+    ration_per_animal: Dict[str, float | str]
+    animals_in_pen: Dict[str, Any]
 
 
 class AnimalBaseInitArgsTypedDict(TypedDict):
@@ -253,7 +255,9 @@ class AvailableFeedsTypedDict(TypedDict):
     N_B: List[float]
     CP: List[float]
     dRUP: List[float]
+    lactating_cow_minimum: List[float]
     lactating_cow_limit: List[float]
+    dry_cow_minimum: List[float]
     dry_cow_limit: List[float]
     heiferIII_limit: List[float]
     heiferII_limit: List[float]
