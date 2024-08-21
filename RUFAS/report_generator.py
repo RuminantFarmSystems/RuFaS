@@ -711,9 +711,9 @@ class ReportGenerator:
             horizontally_aggregated, aggregate_units, event_logs = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator, simplify_units
             )
-            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(vertical_aggregator,
-                                                                                          horizontally_aggregated,
-                                                                                          next(iter(aggregate_report)))
+            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(
+                vertical_aggregator, horizontally_aggregated, next(iter(aggregate_report))
+            )
             if aggregation_log:
                 event_logs.append(aggregation_log)
             if display_units:
@@ -725,9 +725,7 @@ class ReportGenerator:
             ver_hor_aggregated = []
             for elements in zip(*vertically_aggregated.values()):
                 horizontally_aggregated_data, aggregation_log = self._handle_aggregation_errors(
-                    horizontal_aggregator,
-                    list(elements),
-                    next(iter(aggregate_report))
+                    horizontal_aggregator, list(elements), next(iter(aggregate_report))
                 )
                 if aggregation_log:
                     event_logs.append(aggregation_log)
@@ -816,9 +814,9 @@ class ReportGenerator:
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
-            horizontally_aggregated_data, aggregation_log = self._handle_aggregation_errors(aggregator,
-                                                                                            non_null_data_points,
-                                                                                            next(iter(report_data)))
+            horizontally_aggregated_data, aggregation_log = self._handle_aggregation_errors(
+                aggregator, non_null_data_points, next(iter(report_data))
+            )
             if aggregation_log:
                 event_logs.append(aggregation_log)
             aggregated_data.append(horizontally_aggregated_data)
@@ -855,19 +853,20 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for key, data in report_data.items():
             non_null_data_points = list(filter(lambda x: x is not None, data))
-            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(aggregator,
-                                                                                          non_null_data_points, key)
+            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(
+                aggregator, non_null_data_points, key
+            )
             if aggregation_log:
                 event_logs.append(aggregation_log)
             aggregated_data[key] = [vertically_aggregated_data]
         return aggregated_data, event_logs
 
-    def _handle_aggregation_errors(self,
-                                   aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
-                                   data: dict[str, list[float | None]],
-                                   key: str,
-                                   ) -> tuple[dict[str, list[float | None] | float | None],
-                                              dict[str, str | dict[str, str]]]:
+    def _handle_aggregation_errors(
+        self,
+        aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
+        data: dict[str, list[float | None]],
+        key: str,
+    ) -> tuple[dict[str, list[float | None] | float | None], dict[str, str | dict[str, str]]]:
         """Wrapper function for RG aggregators to catch bad data (None, NaNs, et al).
 
         Parameters

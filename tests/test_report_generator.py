@@ -1384,13 +1384,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
     "aggregator, data, key, expected_result, expected_log",
     [
         # Test with valid data and no errors
-        (
-            sum_aggregator,
-            [1.0, 2.0, 3.0],
-            "valid_key",
-            6.0,
-            {}
-        ),
+        (sum_aggregator, [1.0, 2.0, 3.0], "valid_key", 6.0, {}),
         # Test with None value in data
         (
             sum_aggregator,
@@ -1403,13 +1397,13 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {
                     "class": "ReportGenerator",
                     "function": "_handle_aggregation_errors",
-                }
-            }
+                },
+            },
         ),
         # Test with NaN value in data
         (
             sum_aggregator,
-            [1.0, float('nan'), 3.0],
+            [1.0, float("nan"), 3.0],
             "nan_key",
             None,
             {
@@ -1418,17 +1412,11 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {
                     "class": "ReportGenerator",
                     "function": "_handle_aggregation_errors",
-                }
-            }
+                },
+            },
         ),
         # Test with empty data
-        (
-            sum_aggregator,
-            [],
-            "empty_key",
-            0,
-            {}
-        ),
+        (sum_aggregator, [], "empty_key", 0, {}),
         # Test with exception in aggregator
         (
             lambda x: x[0] / 0,  # Aggregator that raises an error
@@ -1441,8 +1429,8 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "info_map": {
                     "class": "ReportGenerator",
                     "function": "_handle_aggregation_errors",
-                }
-            }
+                },
+            },
         ),
     ],
 )

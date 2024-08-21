@@ -16,7 +16,7 @@ def sum_aggregator(data: list[float]) -> float:
 
 
 try:
-    data = sum_aggregator([3, float('nan'), 5])
+    data = sum_aggregator([3, float("nan"), 5])
 except ValueError as e:
     print(f"i'm gonna return none because of {e}")
 
