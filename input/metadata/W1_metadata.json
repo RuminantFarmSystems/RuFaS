@@ -3,14 +3,14 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/manure_config_MW.json",
+      "path": "input/data/config/manure_config_W.json",
       "type": "json",
       "properties": "config_properties"
     },
     "animal": {
       "title": "Animal data",
       "description": "Input data and configuration information for animal management decisions, herd attributes, and housing properties.",
-      "path": "input/data/animal/MW1_animal.json",
+      "path": "input/data/animal/W1_animal.json",
       "type": "json",
       "properties": "animal_properties"
     },
@@ -59,7 +59,7 @@
     "feed": {
       "title": "Feed data",
       "description": "Feeds available for each animal combination, purchased feeds and their prices, feed storage options, and user-defined ration percentages and associated parameters.",
-      "path": "input/data/feed/feed_MW_Diet_15.json",
+      "path": "input/data/feed/feed_W_Diet_15.json",
       "type": "json",
       "properties": "feed_properties"
     },
@@ -129,7 +129,7 @@
     "weather": {
       "title": "Weather data",
       "description": "Weather data used during the simulation, including date, precipitation, temperature, etc.",
-      "path": "input/data/weather/MW_weather.csv",
+      "path": "input/data/weather/W_weather.csv",
       "type": "csv",
       "properties": "weather_properties"
     },
