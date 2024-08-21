@@ -24,8 +24,8 @@
       "do_not_breed_time": 185,
       "cull_milk_production": 30,
       "cow_times_milked_per_day": 3,
-	    "milk_fat_percent": 4.12,
-	    "milk_protein_percent": 3.16
+	    "milk_fat_percent": 3.93,
+	    "milk_protein_percent": 3.08
     },
     "farm_level": {
       "calf": {
