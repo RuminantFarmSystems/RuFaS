@@ -9,7 +9,7 @@ import seaborn as sns
 from RUFAS.input_manager import InputManager
 
 result = pd.DataFrame()
-res_summary = pd.DataFrame(columns=['time', 'average', 'std'])
+res_summary = pd.DataFrame(columns=["time", "average", "std"])
 
 im = InputManager()
 net_merit_csv = Path("NetMerit_percentile_HO.csv")
@@ -28,7 +28,7 @@ for date in net_merit.keys():
 
     fig1, ax1 = plt.subplots()
     sns.histplot(rand, bins=101, kde=True)
-    plt.savefig(rand_graph_path + date + '.png')
+    plt.savefig(rand_graph_path + date + ".png")
     plt.close()
 
     mean = np.mean(rand_nm)
@@ -39,13 +39,13 @@ for date in net_merit.keys():
 
     fig2, ax2 = plt.subplots()
     sns.histplot(rand_nm, bins=101, kde=True)
-    plt.savefig(population_graph_path + date+'.png')
+    plt.savefig(population_graph_path + date + ".png")
     plt.close()
 
     fig3, ax3 = plt.subplots()
     print(date, net_merit[date])
     plt.hist(net_merit[date], bins=101)
-    plt.savefig(population_graph_path + date + '1.png')
+    plt.savefig(population_graph_path + date + "1.png")
     plt.close()
 
     raise KeyError
