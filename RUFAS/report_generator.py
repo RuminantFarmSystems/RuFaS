@@ -30,7 +30,7 @@ def division_aggregator(data: List[float]) -> float | None:
 
     Parameters
     ----------
-    data : List[float]z
+    data : List[float]
         A list of numbers for the division operation.
 
     Returns
@@ -884,7 +884,7 @@ class ReportGenerator:
             The resulting aggregated data and the aggregation logs to be returned to OutputManager.
             Returns None and an error message if the data contains None or NaN values.
         """
-        if any(x is None or (isinstance(x, float) and math.isnan(x)) for x in data):
+        if any(x is None or math.isnan(x) for x in data):
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._handle_aggregation_errors.__name__,
