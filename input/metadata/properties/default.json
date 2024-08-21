@@ -1500,6 +1500,51 @@
       }
     }
   },
+  "animal_net_merit_properties": {
+    "year_month": {
+      "type": "array",
+      "description": "The birth year and month of the animal.",
+      "properties": {
+        "type": "string",
+        "description": "The birth year and month of the animal."
+      }
+    },
+    "average": {
+      "type": "array",
+      "description": "The average net-merit values of the animal.",
+      "properties": {
+        "type": "number",
+        "description": "The average net-merit values of the animal born on the given birth year and month."
+      }
+    },
+    "std": {
+      "type": "array",
+      "description": "The standard deviation of the net-merit values of the animal.",
+      "properties": {
+        "type": "number",
+        "description": "The standard deviation of the net-merit values of the animal born on the given birth year and month.",
+        "minimum": 0
+      }
+    }
+  },
+  "animal_top_listing_semen_properties": {
+    "Year_Month": {
+      "type": "array",
+      "description": "The birth year and month of the baby calf.",
+      "properties": {
+        "type": "string",
+        "description": "The birth year and month of the baby calf."
+      }
+    },
+    "Estimated PTA": {
+      "type": "array",
+      "description": "The estimated PTA value for the top listing semen.",
+      "properties": {
+        "type": "number",
+        "description": "The estimated PTA value for the top listing semen."
+      }
+    }
+  },
   "lactation_properties": {
     "adjustments": {
       "type": "object",
