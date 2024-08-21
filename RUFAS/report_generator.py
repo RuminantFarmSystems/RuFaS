@@ -867,7 +867,7 @@ class ReportGenerator:
         data: dict[str, list[float | None]],
         key: str,
     ) -> tuple[dict[str, list[float | None] | float | None], dict[str, str | dict[str, str]]]:
-        """Wrapper function for RG aggregators to catch bad data (None, NaNs, et al).
+        """Wrapper function for RG aggregators to catch Nones and NaNs.
 
         Parameters
         ----------
@@ -884,7 +884,6 @@ class ReportGenerator:
             The resulting aggregated data and the aggregation logs to be returned to OutputManager.
             Returns None and an error message if the data contains None or NaN values.
         """
-
         if any(x is None or (isinstance(x, float) and math.isnan(x)) for x in data):
             info_map = {
                 "class": self.__class__.__name__,
