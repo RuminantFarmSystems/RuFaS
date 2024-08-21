@@ -89,3 +89,9 @@ class AnimalModuleConstants:
 
     MINIMUM_HEIFER_DAILY_GROWTH_RATE: float = 0.5
     """Minimum daily growth for heifers, kg."""
+
+    PROTEIN_UPPER_LIMIT_FACTOR: float = 2.0
+    """Factor used to generate the upper limit for metabolizable protein content in ration formulation."""
+
+    MINIMUM_AVG_PEN_MILK: float = 15
+    """Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal"""
