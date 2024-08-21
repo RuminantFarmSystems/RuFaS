@@ -9,7 +9,6 @@ from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.units import MeasurementUnits
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.output_manager import OutputManager
 
 
 @pytest.fixture
