@@ -66,7 +66,7 @@ class Denitrification:
             )
 
             nitrate_effect = self._calculate_nitrate_effect(layer.nitrate_content)
-            carbon_effect = self._calculate_carbon_effect(layer.total_carbon_content)
+            carbon_effect = self._calculate_carbon_effect(layer.carbon_emissions)
             moisture_effect = self._calculate_moisture_effect(layer.water_filled_pore_space)
             pH_effect = self._calculate_pH_effect(layer.pH)
             partitioning_factor = self._calculate_partitioning_factor(
