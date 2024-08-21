@@ -1,3 +1,4 @@
+import math
 import re
 from typing import Dict, List, Any, Callable, Optional
 from RUFAS.general_constants import GeneralConstants
@@ -583,8 +584,6 @@ class ReportGenerator:
                 if function == aggregator:
                     aggregator_key = key
                     break
-            if aggregator_key is None:
-                raise ValueError(f"Invalid Aggregator Key, must be in {list(AGGREGATION_FUNCTIONS.keys())}")
             first_key, second_key = list(report_data.keys())[:2]
             first_key_numerator_units, first_key_denominator_units = MeasurementUnits.extract_units(first_key)
             second_key_numerator_units, second_key_denominator_units = MeasurementUnits.extract_units(second_key)
@@ -715,7 +714,8 @@ class ReportGenerator:
             vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(vertical_aggregator,
                                                                                           horizontally_aggregated,
                                                                                           next(iter(aggregate_report)))
-            event_logs.append(aggregation_log)
+            if aggregation_log:
+                event_logs.append(aggregation_log)
             if display_units:
                 aggregate_report = {f"hor_ver_agg_({aggregate_units})": [vertically_aggregated_data]}
             else:
@@ -729,12 +729,14 @@ class ReportGenerator:
                     list(elements),
                     next(iter(aggregate_report))
                 )
-                event_logs.append(aggregation_log)
+                if aggregation_log:
+                    event_logs.append(aggregation_log)
                 ver_hor_aggregated.append(horizontally_aggregated_data)
             aggregate_units, unit_log = self._aggregate_units(
                 vertically_aggregated, horizontal_aggregator, simplify_units
             )
-            event_logs.append(unit_log)
+            if unit_log:
+                event_logs.append(unit_log)
             if display_units:
                 aggregate_report = {f"ver_hor_agg_({aggregate_units})": ver_hor_aggregated}
             else:
@@ -817,13 +819,15 @@ class ReportGenerator:
             horizontally_aggregated_data, aggregation_log = self._handle_aggregation_errors(aggregator,
                                                                                             non_null_data_points,
                                                                                             next(iter(report_data)))
-            event_logs.append(aggregation_log)
+            if aggregation_log:
+                event_logs.append(aggregation_log)
             aggregated_data.append(horizontally_aggregated_data)
         ordered_report_data = {
             key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key in key
         }
         aggregated_units, unit_log = self._aggregate_units(ordered_report_data, aggregator, simplify_units)
-        event_logs.append(unit_log)
+        if unit_log:
+            event_logs.append(unit_log)
         return aggregated_data, aggregated_units, event_logs
 
     def _apply_vertical_aggregation(
@@ -853,7 +857,8 @@ class ReportGenerator:
             non_null_data_points = list(filter(lambda x: x is not None, data))
             vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(aggregator,
                                                                                           non_null_data_points, key)
-            event_logs.append(aggregation_log)
+            if aggregation_log:
+                event_logs.append(aggregation_log)
             aggregated_data[key] = [vertically_aggregated_data]
         return aggregated_data, event_logs
 
@@ -878,25 +883,35 @@ class ReportGenerator:
         -------
         tuple[dict[str, list[float | None] | float | None], dict[str, str | dict[str, str]]]
             The resulting aggregated data and the aggregation logs to be returned to OutputManager.
-
-        Raises
-        ------
-        ValueError
-            If any of the data sent to the aggregator is not aggregatable.
+            Returns None and an error message if the data contains None or NaN values.
         """
-        try:
-            aggregated_data = aggregator(data)
-        except ValueError as e:
+
+        if any(x is None or (isinstance(x, float) and math.isnan(x)) for x in data):
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._handle_aggregation_errors.__name__,
             }
             aggregation_error = {
                 "error": "ReportGenerator aggregation error",
-                "message": f"Unable to aggregate {key} data because of {e}, returning None instead.",
+                "message": f"Encountered unaggregatable values in {key} data, returning None instead.",
                 "info_map": info_map,
             }
             return None, aggregation_error
+
+        try:
+            aggregated_data = aggregator(data)
+        except Exception as e:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._handle_aggregation_errors.__name__,
+            }
+            aggregation_error = {
+                "error": "ReportGenerator aggregation error",
+                "message": f"Error during aggregation of {key} data: {str(e)}, returning None instead.",
+                "info_map": info_map,
+            }
+            return None, aggregation_error
+
         return aggregated_data, {}
 
     def _add_constants_to_report_data(
