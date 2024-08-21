@@ -991,7 +991,7 @@ class LayerData:
         return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
 
     @property
-    def residue_amount(self) -> float:
+    def carbon_residue_amount(self) -> float:
         """
 
         """
