@@ -173,9 +173,9 @@ class SimulationEngine:
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
-        are_animals_simulated: bool = self.im.get_data("config.simulate_animals")
+        simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager = ManureManager(
-            all_pen_manure_data, self.weather, self.time, manure_class_config, are_animals_simulated
+            all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
