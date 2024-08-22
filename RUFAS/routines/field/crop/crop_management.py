@@ -10,6 +10,7 @@ from RUFAS.routines.field.crop.crop_data import (
 )
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
@@ -393,28 +394,77 @@ class CropManagement:
         """
         surface_layer = soil_data.soil_layers[0]
         surface_fraction = (self.data.yield_residue - self.data.root_biomass) / self.data.yield_residue
-        surface_layer.plant_residue = self.data.yield_residue * surface_fraction
-        surface_layer.fresh_organic_nitrogen_content += self.data.residue_nitrogen * surface_fraction
-        surface_layer.labile_inorganic_phosphorus_content += self.data.residue_phosphorus * surface_fraction
+        self._add_yield_residue_to_layer(
+            surface_layer,
+            True,
+            surface_fraction,
+            self.data.yield_residue,
+            self.data.residue_nitrogen,
+            self.data.residue_phosphorus,
+        )
 
         subsurface_residue = self.data.yield_residue * (1 - surface_fraction)
         subsurface_nitrogen = self.data.residue_nitrogen * (1 - surface_fraction)
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
         root_frac_to_bottom_depth = self._calculate_root_mass_distribution(surface_layer.bottom_depth)
-        surface_layer.plant_residue += subsurface_residue * root_frac_to_bottom_depth
-        surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * root_frac_to_bottom_depth
-        surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * root_frac_to_bottom_depth
+        self._add_yield_residue_to_layer(
+            surface_layer,
+            True,
+            root_frac_to_bottom_depth,
+            subsurface_residue,
+            subsurface_nitrogen,
+            subsurface_phosphorus,
+        )
 
         root_frac_to_top_depth = root_frac_to_bottom_depth
         layers_to_iterate_over = soil_data.soil_layers[1:] + [soil_data.vadose_zone_layer]
         for layer in layers_to_iterate_over:
             root_frac_to_bottom_depth = self._calculate_root_mass_distribution(layer.bottom_depth)
             layer_fraction = root_frac_to_bottom_depth - root_frac_to_top_depth
-            layer.plant_residue += subsurface_residue * layer_fraction
-            layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
-            layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
+            self._add_yield_residue_to_layer(
+                layer, False, layer_fraction, subsurface_residue, subsurface_nitrogen, subsurface_phosphorus
+            )
             root_frac_to_top_depth = root_frac_to_bottom_depth
+
+    def _add_yield_residue_to_layer(
+        self,
+        layer: LayerData,
+        is_surface_layer: bool,
+        layer_fraction: float,
+        crop_biomass: float,
+        nitrogen: float,
+        phosphorus: float,
+    ) -> None:
+        """
+        Adds plant mass and nutrients left behind from a crop harvest into a soil layer.
+
+        Parameters
+        ----------
+        layer : LayerData
+            The soil layer into which nutrients and residue are being added.
+        is_surface_layer : bool
+            True if the layer being added to is at the soil's surface.
+        layer_fraction : float
+            Fraction of residue and nutrients going into the soil layer.
+        crop_biomass : float
+            Total crop biomass to be added into the soil profile (kg / ha).
+        nitrogen : float
+            Total nitrogen to be added into the soil profile (kg / ha).
+        phosphorus : float
+            Total phosphorus to be added into the soil profile (kg / ha).
+
+        """
+        plant_residue_to_add = crop_biomass * layer_fraction
+        nitrogen_to_add = nitrogen * layer_fraction
+        phosphorus_to_add = phosphorus * layer_fraction
+
+        layer.plant_residue += plant_residue_to_add
+        if is_surface_layer:
+            layer.fresh_organic_nitrogen_content += nitrogen_to_add
+        else:
+            layer.active_organic_nitrogen_content += nitrogen_to_add
+        layer.labile_inorganic_phosphorus_content += phosphorus_to_add
 
     def _calculate_root_mass_distribution(self, bottom_depth: float) -> float:
         """
