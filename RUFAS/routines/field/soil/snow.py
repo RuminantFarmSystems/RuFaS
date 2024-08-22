@@ -41,7 +41,6 @@ class Snow:
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         """object that tracks all soil variable throughout the simulation"""
         self.soil_data = soil_data or SoilData(field_size=field_size)
-        self.om = OutputManager
 
     @staticmethod
     def _calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayConditions) -> float:
