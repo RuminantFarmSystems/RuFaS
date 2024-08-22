@@ -256,7 +256,7 @@ class SoilData:
     crop_yield_nitrogen: float = 0
 
     @property
-    def all_residue(self) -> float:
+    def total_residue(self) -> float:
         """
         Amount of total plant residue, above and below-ground, on the field which is to be transferred to litter pools
         in the soil profile (kg/ha).

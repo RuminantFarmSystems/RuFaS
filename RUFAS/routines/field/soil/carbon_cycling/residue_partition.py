@@ -46,7 +46,7 @@ class ResiduePartition:
         )
         self.data.plant_lignin_nitrogen_ratio = self._determine_plant_lignin_nitrogen_fraction(
             self.data.plant_residue_lignin_composition,
-            self.data.all_residue,
+            self.data.total_residue,
             self.data.crop_yield_nitrogen,
         )
         self.data.plant_residue_metabolic_fraction = self._determine_plant_residue_metabolic_fraction(

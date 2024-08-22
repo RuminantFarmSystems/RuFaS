@@ -422,12 +422,12 @@ def test_profile_nitrates_total(layers: List[LayerData]) -> None:
     "residues,expected",
     [([0.5, 12.0, 15.0, 0.0], 27.5), ([0.0, 0.0, 0.0], 0.0), ([10.0, 10.0, 10.0], 30.0)],
 )
-def test_all_residue(mocker: MockerFixture, residues: list[float], expected: float) -> None:
-    """Tests the property method all_residue sums up the residues correctly"""
+def test_total_residue(mocker: MockerFixture, residues: list[float], expected: float) -> None:
+    """Tests the property method total_residue sums up the residues correctly"""
     soil_data = SoilData(field_size=0.98)
     get_vec_attr = mocker.patch.object(soil_data, "get_vectorized_layer_attribute", return_value=residues)
 
-    actual = soil_data.all_residue
+    actual = soil_data.total_residue
 
     assert actual == expected
     get_vec_attr.assert_called_once_with("plant_residue")
