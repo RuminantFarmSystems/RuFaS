@@ -15,7 +15,7 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 @pytest.fixture
-def layer(mocker: MockerFixture) -> None:
+def layer(mocker: MockerFixture) -> LayerData:
     mocker.patch.object(LayerData, "__init__", return_value=None)
     return LayerData()
 
