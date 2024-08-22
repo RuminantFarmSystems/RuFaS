@@ -2235,7 +2235,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     mock_manure_treatment_daily_output.clone.return_value = mock_manure_treatment_daily_output
 
     mock_manure_treatment_daily_input = mocker.MagicMock()
-    mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids = 35.0
+    mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids = total_volatile_solids = 35.0
     mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids = (
         liquid_manure_total_degradable_volatile_solids
     ) = 31.5
@@ -2292,8 +2292,14 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
     )
     expected_volatile_solids_destruction = expected_methane_generation_mass + expected_carbon_dioxide
-    expected_VSd = liquid_manure_total_degradable_volatile_solids - expected_volatile_solids_destruction
-    expected_VSnd = liquid_manure_total_non_degradable_volatile_solids
+    expected_degradable_vs_destruction = expected_volatile_solids_destruction * (
+        liquid_manure_total_degradable_volatile_solids / total_volatile_solids
+    )
+    expected_non_degradable_vs_destruction = expected_volatile_solids_destruction * (
+        liquid_manure_total_non_degradable_volatile_solids / total_volatile_solids
+    )
+    expected_VSd = liquid_manure_total_degradable_volatile_solids - expected_degradable_vs_destruction
+    expected_VSnd = liquid_manure_total_non_degradable_volatile_solids - expected_non_degradable_vs_destruction
     expected_total_VS = expected_VSd + expected_VSnd
     expected_total_solids = liquid_manure_total_solids - expected_volatile_solids_destruction
 
@@ -2512,9 +2518,9 @@ def test_create_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock()),
     )
     anaerobic_digestion_and_lagoon._manure_handler_daily_output = mock_manure_handler_daily_output = mocker.MagicMock()
-    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = mock_current_manure_treatment_daily_input = (
-        mocker.MagicMock()
-    )
+    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = (
+        mock_current_manure_treatment_daily_input
+    ) = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._current_pen = mock_current_pen = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._sim_day = mock_sim_day = mocker.MagicMock()
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
