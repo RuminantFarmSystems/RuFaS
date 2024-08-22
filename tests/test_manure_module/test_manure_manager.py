@@ -47,7 +47,7 @@ def test_manure_manager_init(mocker: MockFixture, simulate_animals: bool, log_ad
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
-        animals_are_simulated=simulate_animals,
+        simulate_animals=simulate_animals,
     )
 
     # Assert
@@ -58,7 +58,7 @@ def test_manure_manager_init(mocker: MockFixture, simulate_animals: bool, log_ad
     assert manure_manager.manure_treatments == {}
     assert manure_manager.weather == mock_weather
     assert manure_manager.time == mock_time
-    assert manure_manager.are_animals_simulated == simulate_animals
+    assert manure_manager.simulate_animals == simulate_animals
 
     patch_for_manure_manager_config_handler.assert_called_once_with(mock_manure_manager_config)
     assert manure_manager.manure_manager_config_handler == mock_manure_manager_config_handler
@@ -113,7 +113,7 @@ def test_configure_manure_manager_components(manure_separator: str, mocker: Mock
         weather=mock_weather,
         time=mock_time,
         manure_manager_config=mock_manure_manager_config,
-        animals_are_simulated=True,
+        simulate_animals=True,
     )
 
     mock_manure_manager_config_handler = mocker.MagicMock()
@@ -845,9 +845,9 @@ def test_request_nutrients(mocker: MockFixture, animals_simulated: bool) -> None
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
         manure_manager_config=mocker.MagicMock(),
-        animals_are_simulated=animals_simulated,
+        simulate_animals=animals_simulated,
     )
-    manure_manager.are_animals_simulated = animals_simulated
+    manure_manager.simulate_animals = animals_simulated
     mock_manure_nutrient_manager = mocker.MagicMock()
     mock_field_manure_supplier = mocker.MagicMock()
     manure_manager._manure_nutrient_manager = mock_manure_nutrient_manager

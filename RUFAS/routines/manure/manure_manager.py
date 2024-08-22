@@ -87,7 +87,7 @@ class ManureManager:
         A dictionary that maps an animal pen's id to a ManureSeparator object.
     manure_treatments : Dict
         A dictionary that maps an animal pen's id to a Treatment object.
-    animals_are_simulated : bool
+    simulate_animals : bool
         Records whether animals are being simulated.
 
     """
@@ -98,7 +98,7 @@ class ManureManager:
         weather: Weather,
         time: Time,
         manure_manager_config: dict[str, Any],
-        animals_are_simulated: bool,
+        simulate_animals: bool,
     ) -> None:
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
@@ -114,7 +114,7 @@ class ManureManager:
         manure_manager_config : dict[str, Any]
             A dictionary that contains the configuration data for
             different manure management scenarios.
-        animals_are_simulated : bool
+        simulate_animals : bool
             Indicates whether animals are being simulated.
 
         """
@@ -129,8 +129,8 @@ class ManureManager:
         self.manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config)
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
-        self.are_animals_simulated = animals_are_simulated
-        if not self.are_animals_simulated:
+        self.simulate_animals = simulate_animals
+        if not self.simulate_animals:
             info_map = {"class": self.__class__.__name__, "function": "__init__"}
             OutputManager().add_log(
                 "Animals not being simulated",
@@ -385,7 +385,7 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
-        if self.are_animals_simulated:
+        if self.simulate_animals:
             return self._manure_nutrient_manager.request_nutrients(request)
         else:
             return self._field_manure_supplier.request_nutrients(request)
