@@ -79,7 +79,28 @@ def test_calculate_pH_effect(denitrifier: Denitrification, pH: float, expected: 
     assert pytest.approx(actual) == expected
 
 
-# @pytest.mark.parametrize("nitrate,carbon,moisture,pH,expected", [(-0.3, 28.0, 0.4, 0.6, 0.0)])
+@pytest.mark.parametrize("nitrate,carbon,moisture,pH,expected", [
+    (25.0, 28.0, 0.4, 0.6, 6.0), (15.0, 4.0, 0.8, 0.1, 0.32), (18.0, 19.0, 1.1, 2.1, 41.58)
+])
+def test_calculate_partitioning_factor(
+    denitrifier: Denitrification, nitrate: float, carbon: float, moisture: float, pH: float, expected: float
+) -> None:
+    """Tests that the partitioning factor is correctly calculated."""
+    actual = denitrifier._calculate_partitioning_factor(nitrate, carbon, moisture, pH)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize("nitrates,factor,expected", [
+    (40.0, 0.0, 40.0), (100.0, 0.8, 55.555555), (20.0, 1.3, 8.695652), (30.0, 20.0, 1.428571), (35.0, 50.0, 0.686274)
+])
+def test_calculate_nitrous_oxide_emissions(
+    denitrifier: Denitrification, nitrates: float, factor: float, expected: float
+) -> None:
+    """Tests that the amount of nitrous oxide emissions are calculated correctly."""
+    actual = denitrifier._calculate_nitrous_oxide_emissions(denitrified_nitrates=nitrates, partitioning_factor=factor)
+
+    assert pytest.approx(actual) == expected
 
 
 def test_denitrify(mocker: MockerFixture) -> None:

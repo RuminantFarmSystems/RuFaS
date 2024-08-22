@@ -160,15 +160,15 @@ class Denitrification:
 
         return (0.5 - fractional_term) * 25
 
-    def _calculate_carbon_effect(self, carbon_content: float) -> float:
+    def _calculate_carbon_effect(self, carbon_respiration: float) -> float:
         """
         Calculates the effect that the soil carbon level has on the ratio of nitrous oxide to dinitrogen in denitrified
         nitrates.
 
         Parameters
         ----------
-        carbon_content : float
-            Total carbon content of the soil layer (kg / ha).
+        carbon_respiration : float
+            Carbon respiration from the soil layer (kg / ha).
 
         Returns
         -------
@@ -176,8 +176,8 @@ class Denitrification:
             Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
 
         """
-        carbon_content_grams = carbon_content * GeneralConstants.KG_TO_GRAMS
-        numerator = 30.78 * atan(pi * 0.07 * (carbon_content_grams - 13))
+        carbon_respiration_grams = carbon_respiration * GeneralConstants.KG_TO_GRAMS
+        numerator = 30.78 * atan(pi * 0.07 * (carbon_respiration_grams - 13))
 
         return 13 + numerator / pi
 
