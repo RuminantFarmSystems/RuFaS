@@ -1528,7 +1528,7 @@
     }
   },
   "animal_top_listing_semen_properties": {
-    "Year_Month": {
+    "year_month": {
       "type": "array",
       "description": "The birth year and month of the baby calf.",
       "properties": {
@@ -1536,7 +1536,7 @@
         "description": "The birth year and month of the baby calf."
       }
     },
-    "Estimated PTA": {
+    "estimated_PTA": {
       "type": "array",
       "description": "The estimated PTA value for the top listing semen.",
       "properties": {
