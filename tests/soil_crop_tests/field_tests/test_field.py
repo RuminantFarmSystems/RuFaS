@@ -1017,6 +1017,7 @@ def test_make_custom_crop(config: dict):
     ],
 )
 def test_make_crop_from_config_dict(config: dict):
+    """Tests that custom crops are configured correctly."""
     supported_crops = set(item.value for item in CropSpecies)
     has_supported_species = "species" in config.keys() and str(config["species"]) in supported_crops
     Field._make_supported_crop = MagicMock()
@@ -2283,7 +2284,7 @@ def test_cycle_water(
             water_sublimated=1.0,
             snow_content=snow_content,
         )
-        soil_data.plant_surface_residue = surface_residue
+        soil_data.soil_layers[0].plant_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(
             field_proportion=crop_1_proportion,
