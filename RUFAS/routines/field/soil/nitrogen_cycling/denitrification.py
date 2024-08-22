@@ -32,7 +32,6 @@ class Denitrification:
 
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
-        self.om = OutputManager()
 
     def denitrify(self) -> None:
         """
@@ -162,8 +161,8 @@ class Denitrification:
 
     def _calculate_carbon_effect(self, carbon_respiration: float) -> float:
         """
-        Calculates the effect that the soil carbon level has on the ratio of nitrous oxide to dinitrogen in denitrified
-        nitrates.
+        Calculates the effect that the soil carbon respiration has on the ratio of nitrous oxide to dinitrogen in
+        denitrified nitrates.
 
         Parameters
         ----------
@@ -174,6 +173,11 @@ class Denitrification:
         -------
         float
             Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        References
+        ----------
+        .. Wagena, Moges B., et al. "Development of a nitrous oxide routine for the SWAT model to assess greenhouse gas
+           emissions from agroecosystems." Environmental modelling & software 89 (2017): 131-143.
 
         """
         carbon_respiration_grams = carbon_respiration * GeneralConstants.KG_TO_GRAMS
@@ -200,6 +204,11 @@ class Denitrification:
         -----
         If the water-filled pore space is 0, then the moisture effect is 0.0.
 
+        References
+        ----------
+        .. Wagena, Moges B., et al. "Development of a nitrous oxide routine for the SWAT model to assess greenhouse gas
+           emissions from agroecosystems." Environmental modelling & software 89 (2017): 131-143.
+
         """
         if water_filled_pore_space == 0.0:
             return 0.0
@@ -221,6 +230,11 @@ class Denitrification:
         -------
         float
             Effect of the soil carbon level on the ratio of nitrous oxide to dinitrogen (unitless).
+
+        References
+        ----------
+        .. Wagena, Moges B., et al. "Development of a nitrous oxide routine for the SWAT model to assess greenhouse gas
+           emissions from agroecosystems." Environmental modelling & software 89 (2017): 131-143.
 
         """
         denominator = 1470 * e ** (-1.1 * pH)
@@ -249,10 +263,15 @@ class Denitrification:
         float
             Factor used to partition nitrified nitrates into nitrous oxide and dinitrogen.
 
+        References
+        ----------
+        .. Wagena, Moges B., et al. "Development of a nitrous oxide routine for the SWAT model to assess greenhouse gas
+           emissions from agroecosystems." Environmental modelling & software 89 (2017): 131-143.
+
         """
         partitioning_factor = min(nitrate_effect, carbon_effect) * moisture_effect * pH_effect
 
-        return max(partitioning_factor, 0.0)
+        return partitioning_factor
 
     def _calculate_nitrous_oxide_emissions(self, denitrified_nitrates: float, partitioning_factor: float) -> float:
         """
@@ -269,6 +288,11 @@ class Denitrification:
         -------
         float
             Amount of nitrous oxide emissions (kg / ha).
+
+        References
+        ----------
+        .. Wagena, Moges B., et al. "Development of a nitrous oxide routine for the SWAT model to assess greenhouse gas
+           emissions from agroecosystems." Environmental modelling & software 89 (2017): 131-143.
 
         """
         nitrates = denitrified_nitrates * GeneralConstants.KG_TO_GRAMS
