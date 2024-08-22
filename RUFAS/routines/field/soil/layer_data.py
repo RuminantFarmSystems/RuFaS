@@ -992,9 +992,7 @@ class LayerData:
 
     @property
     def carbon_residue_amount(self) -> float:
-        """
-
-        """
+        """ """
         return self.metabolic_litter_amount + self.structural_litter_amount
 
     def do_annual_reset(self) -> None:
