@@ -83,7 +83,6 @@ class AnimalManager:
         config.update(data["farm_level"]["repro"])
         config.update(data["farm_level"]["bodyweight"])
         config.update(data["from_literature"]["repro"])
-        config.update(data["from_literature"]["milking"])
         config.update(data["from_literature"]["culling"])
         config.update(data["from_literature"]["life_cycle"])
         return config
@@ -131,6 +130,7 @@ class AnimalManager:
 
         AnimalBase.set_config(animal_config)
         AnimalBase.set_nutrient_list(feed.nutrient_rqmts)
+        AnimalBase.setup_lactation_curve_parameters(time)
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)
@@ -414,7 +414,7 @@ class AnimalManager:
             calf.calc_nutrient_rqmts(feed, current_temperature)
 
         for heifer in heiferIs + heiferIIs + heiferIIIs:
-            latest_pen = heifer.pen_history[-1].pen
+            latest_pen = heifer.pen_history[-1]["pen"]
             heifer.set_nutrient_rqmts(
                 current_temperature,
                 self.ANIMAL_GROUPING_SCENARIO,
@@ -424,7 +424,7 @@ class AnimalManager:
             )
 
         for cow in cows:
-            latest_pen = cow.pen_history[-1].pen
+            latest_pen = cow.pen_history[-1]["pen"]
             cow.set_nutrient_rqmts(
                 self.ANIMAL_GROUPING_SCENARIO,
                 nutrient_conc=self.all_pens[latest_pen].ration_nutrient_conc,
