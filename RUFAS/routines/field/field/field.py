@@ -1495,8 +1495,9 @@ class Field:
 
             crop.adjust_canopy_water_for_excess(excess_water_in_canopy)
 
-            precipitation_reaching_soil = crop.store_water_in_canopy(canopy_water_excess_capacity,
-                                                                     precipitation_reaching_soil)
+            precipitation_reaching_soil = crop.store_water_in_canopy(
+                canopy_water_excess_capacity, precipitation_reaching_soil
+            )
 
         return precipitation_reaching_soil + excess_canopy_water
 

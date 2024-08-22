@@ -141,8 +141,9 @@ class Crop:
             self.leaf_area_index.grow_canopy()
             self.biomass_allocation.allocate_biomass(incoming_light)
 
-    def daily_crop_update(self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
-                          ) -> None:
+    def daily_crop_update(
+        self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
+    ) -> None:
         """
         Updates the crop for the current day.
 
@@ -177,8 +178,9 @@ class Crop:
         self.leaf_area_index.grow_canopy()
         self.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def cycle_water_for_crops(self, actual_evaporation: float, full_evapotranspirative_demand: float,
-                              soil_data: SoilData) -> None:
+    def cycle_water_for_crops(
+        self, actual_evaporation: float, full_evapotranspirative_demand: float, soil_data: SoilData
+    ) -> None:
         """
         Executes the daily water cycling for crops on a field.
 
