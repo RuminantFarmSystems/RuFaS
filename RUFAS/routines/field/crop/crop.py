@@ -144,18 +144,6 @@ class Crop:
 
     def should_harvest_based_on_heat(self) -> bool:
         return self.data.use_heat_scheduling and self.data.heat_fraction >= self.data.harvest_heat_fraction
-
-    def manage_harvest_based_on_heat(self, field_name: str, field_size: float, time: Time, soil_data, feed_manager,
-                                     rainfall: float) -> None:
-        self.crop_management.manage_harvest(
-            HarvestOperation.HARVEST_ONLY,
-            field_name,
-            field_size,
-            time,
-            soil_data,
-            feed_manager,
-        )
-        self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
     
     @staticmethod
     def make_crop_from_config_dict(config: dict) -> Crop:

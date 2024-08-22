@@ -974,14 +974,15 @@ class Field:
         """
         for crop in self.crops:
             if crop.should_harvest_based_on_heat():
-                crop.manage_harvest_based_on_heat(
+                crop.crop_management.manage_harvest(
+                    HarvestOperation.HARVEST_ONLY,
                     self.field_data.name,
                     self.field_data.field_size,
                     time,
                     self.soil.data,
                     self.feed_manager,
-                    rainfall
                 )
+                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     @staticmethod
     def _filter_events(
