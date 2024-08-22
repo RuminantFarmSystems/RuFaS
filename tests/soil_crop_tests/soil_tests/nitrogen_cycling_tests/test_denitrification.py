@@ -41,9 +41,10 @@ def test_calculate_denitrification_amount(
     assert actual == expected
 
 
-@pytest.mark.parametrize("nitrates,expected", [
-    (0.0, 23.679093), (0.05, 23.220937), (0.1, 22.294784), (0.2, 10.077695), (0.3, 2.241527), (0.5, 0.814252)
-])
+@pytest.mark.parametrize(
+    "nitrates,expected",
+    [(0.0, 23.679093), (0.05, 23.220937), (0.1, 22.294784), (0.2, 10.077695), (0.3, 2.241527), (0.5, 0.814252)],
+)
 def test_calculate_nitrate_effect(denitrifier: Denitrification, nitrates: float, expected: float) -> None:
     """Tests that the nitrate effect is correctly calculated."""
     actual = denitrifier._calculate_nitrate_effect(nitrates)
@@ -51,9 +52,10 @@ def test_calculate_nitrate_effect(denitrifier: Denitrification, nitrates: float,
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("carbon,expected", [
-    (0.0, 0.9067742), (0.005, 2.674054), (0.01, 7.286169), (0.015, 17.059710), (0.025, 24.841114), (0.04, 26.755253)
-])
+@pytest.mark.parametrize(
+    "carbon,expected",
+    [(0.0, 0.9067742), (0.005, 2.674054), (0.01, 7.286169), (0.015, 17.059710), (0.025, 24.841114), (0.04, 26.755253)],
+)
 def test_calculate_carbon_effect(denitrifier: Denitrification, carbon: float, expected: float) -> None:
     """Tests that the carbon effect is correctly calculated."""
     actual = denitrifier._calculate_carbon_effect(carbon)
