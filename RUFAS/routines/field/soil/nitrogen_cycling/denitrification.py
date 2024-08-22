@@ -236,7 +236,7 @@ class Denitrification:
            emissions from agroecosystems." Environmental modelling & software 89 (2017): 131-143.
 
         """
-        denominator = 1470 * e ** (-1.1 * pH)
+        denominator: float = 1470 * e ** (-1.1 * pH)
 
         return 1 / denominator
 
