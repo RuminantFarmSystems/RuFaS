@@ -4,10 +4,8 @@ from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.field.crop.crop import Crop
-from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.species_data_factory import (
     CropSpecies,
-    CropSpeciesDataFactory,
 )
 from RUFAS.routines.field.manager.events import (
     BaseFieldManagementEvent,
@@ -1207,79 +1205,6 @@ class Field:
         for crop in self.crops:
             crop.data.field_proportion = field_coverage_fraction
 
-    # @staticmethod
-    # def _make_crop_from_config_dict(config: Dict) -> Crop:
-    #     """
-    #     Initialize a new crop from a configuration dictionary.
-
-    #     Parameters
-    #     ----------
-    #     config : dict
-    #         A dictionary containing specifications for the crop to be initialized.
-
-    #     Details
-    #     -------
-    #     If the "species" key is present in the dictionary, that value is checked against the supported
-    #     crop species. If it is supported, that supported crop is initialized. Otherwise, a custom crop is
-    #     created (with 'custom' prepended to the species name, if given).
-
-    #     Returns
-    #     -------
-    #     Crop
-    #         A Crop object initialized with the desired attribute values.
-    #     """
-    #     if "species" in config.keys():
-    #         accepted_species = set(item.value for item in CropSpecies)
-    #         species = config.pop("species")
-
-    #         if species in accepted_species:
-    #             return Field._make_supported_crop(species=species, **config)
-    #         else:
-    #             config["species"] = "custom " + str(species)
-
-    #     return Field._make_custom_crop(**config)
-
-    # @staticmethod
-    # def _make_supported_crop(species: str, **specs) -> Crop:
-    #     """
-    #     Create a crop instance with attributes determined by the species of the crop.
-
-    #     Parameters
-    #     ----------
-    #     species : str
-    #         One of the supported species.
-    #     **specs : optional
-    #         An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
-
-    #     Details
-    #     -------
-    #     Species attributes are read from species configuration files/classes. This method of creating a crop
-    #     does not allow for customizing crop values. It is limited to creating the default crops supported by the
-    #     CropSpecies Enum.
-
-    #     Returns
-    #     -------
-    #     Crop
-    #         A Crop object initialized with the desired attribute values.
-    #     """
-
-    #     crop_species = CropSpecies(species)
-    #     crop_data = CropSpeciesDataFactory.create_species_data(crop_species, **specs)
-    #     return Crop(crop_data)
-
-    # @staticmethod
-    # def _make_custom_crop(**specs) -> Crop:
-    #     """creates a crop instance with customized attributes.
-
-    #     Args:
-    #         **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
-    #           crop species
-
-    #     Details, this can be used to create a new ('unsupported') crop species/type
-    #     """
-    #     crop_data = CropData(**specs)
-    #     return Crop(crop_data)
-
     def _assess_dormancy(self, daylength: float, rainfall: float) -> None:
         """
         Transition all crops to dormancy if they are capable of going dormant.
@@ -1343,27 +1268,7 @@ class Field:
         self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
-            if crop.data.is_mature or crop.data.is_dormant:
-                continue
-
-            crop.heat_units.absorb_heat_units(
-                current_conditions.mean_air_temperature,
-                current_conditions.min_air_temperature,
-                current_conditions.max_air_temperature,
-            )
-            crop.root_development.develop_roots()
-            crop.nitrogen_incorporation.incorporate_nitrogen(self.soil.data)
-            crop.phosphorus_incorporation.incorporate_phosphorus(self.soil.data)
-            crop.growth_constraints.constrain_growth(
-                crop.data.max_transpiration,
-                current_conditions.mean_air_temperature,
-                self.field_data.simulate_water_stress,
-                self.field_data.simulate_temp_stress,
-                self.field_data.simulate_nitrogen_stress,
-                self.field_data.simulate_phosphorus_stress,
-            )
-            crop.leaf_area_index.grow_canopy()
-            crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
+            crop.daily_crop_update(current_conditions, self.field_data, self.soil.data)
 
     def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
@@ -1474,18 +1379,7 @@ class Field:
         actual_evaporation = full_evapotranspirative_demand - remaining_evapotranspirative_demand
 
         for crop in self.crops:
-            if crop.data.in_growing_season:
-                crop.water_uptake.uptake_water(self.soil.data)
-                crop.water_dynamics.cycle_water(
-                    actual_evaporation,
-                    crop.data.water_uptake,
-                    full_evapotranspirative_demand,
-                )
-            else:
-                crop.data.cumulative_evaporation = 0.0
-                crop.data.cumulative_transpiration = 0.0
-                crop.data.cumulative_potential_evapotranspiration = 0.0
-                crop.data.cumulative_water_uptake = 0.0
+            crop.cycle_water_for_crops(actual_evaporation, full_evapotranspirative_demand, self.soil.data)
 
     def _determine_watering_amount(
         self, rainfall: float, manure_water: float, year: int, day: int, irrigation: float
@@ -1592,23 +1486,23 @@ class Field:
         """
         precipitation_reaching_soil = precipitation_total
         excess_canopy_water = 0
+
         for crop in self.crops:
-            canopy_water_excess_capacity = crop.data.water_canopy_storage_capacity - crop.data.canopy_water
+            canopy_water_excess_capacity = crop.get_canopy_water_excess_capacity()
 
-            excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
-            excess_canopy_water += -1 * excess_water_in_canopy
-            if excess_water_in_canopy != 0.0:
-                crop.data.canopy_water = crop.data.water_canopy_storage_capacity
+            excess_water_in_canopy = crop.calculate_canopy_excess_water(canopy_water_excess_capacity)
+            excess_canopy_water += -excess_water_in_canopy
 
-            water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
-            water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
-            crop.data.canopy_water += water_taken_to_be_stored
-            precipitation_reaching_soil -= water_taken_to_be_stored
+            crop.adjust_canopy_water_for_excess(excess_water_in_canopy)
+
+            precipitation_reaching_soil = crop.store_water_in_canopy(canopy_water_excess_capacity,
+                                                                     precipitation_reaching_soil)
 
         return precipitation_reaching_soil + excess_canopy_water
 
     def _evaporate_from_crop_canopies(self, evapotranspirative_demand: float) -> float:
-        """Evaporates water from crops' canopies and reduces evapotranspirative demand accordingly.
+        """
+        Evaporates water from crops' canopies and reduces evapotranspirative demand accordingly.
 
         Parameters
         ----------
@@ -1619,24 +1513,15 @@ class Field:
         -------
         float
             Evapotranspirative demand after evaporating water from crops' canopies (mm)
-
-        References
-        ----------
-        SWAT Theoretical documentation section 2:2.3.1
-
-        Notes
-        -----
-        This method iterates through the crops in the field, for each determines how much water was evaporated from its
-        canopy, then reduces the evapotranspirative demand by that amount. If the remaining evapotranspirative demand
-        reaches 0, then no more water should be evaporated so the method stops running.
-
         """
         remaining_evapotranspirative_demand = evapotranspirative_demand
+
         for crop in self.crops:
-            amount_evaporated = crop.water_dynamics.evaporate_from_canopy(remaining_evapotranspirative_demand)
+            amount_evaporated = crop.evaporate_from_canopy(remaining_evapotranspirative_demand)
             remaining_evapotranspirative_demand -= amount_evaporated
             if remaining_evapotranspirative_demand == 0.0:
                 break
+
         return remaining_evapotranspirative_demand
 
     def _determine_total_above_ground_biomass(self) -> float:
