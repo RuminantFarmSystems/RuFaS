@@ -538,6 +538,37 @@ def test_distribute_residue_nutrients(
 
 
 @pytest.mark.parametrize(
+    "is_surface,fraction,mass,n,p,expected_mass,expected_fresh_n,expected_active_n,expected_p",
+    [(True, 0.5, 100.0, 20.0, 10.0, 50.0, 10.0, 0.0, 5.0), (False, 0.25, 80.0, 12.0, 4.0, 20.0, 0.0, 3.0, 1.0)],
+)
+def test_add_residue_to_layer(
+    crop_manager: CropManagement,
+    is_surface: float,
+    fraction: float,
+    mass: float,
+    n: float,
+    p: float,
+    expected_mass: float,
+    expected_fresh_n: float,
+    expected_active_n: float,
+    expected_p: float,
+) -> None:
+    """Tests that _add_residue_to_layer in CropManagement."""
+    layer = LayerData(top_depth=20.0, bottom_depth=50.0, field_size=1.0)
+    layer.plant_residue = 0.0
+    layer.fresh_organic_nitrogen_content = 0.0
+    layer.active_organic_nitrogen_content = 0.0
+    layer.labile_inorganic_phosphorus_content = 0.0
+
+    crop_manager._add_yield_residue_to_layer(layer, is_surface, fraction, mass, n, p)
+
+    assert layer.plant_residue == expected_mass
+    assert layer.fresh_organic_nitrogen_content == expected_fresh_n
+    assert layer.active_organic_nitrogen_content == expected_active_n
+    assert layer.labile_inorganic_phosphorus_content == expected_p
+
+
+@pytest.mark.parametrize(
     "d_a,c,root_depth,depth,expected",
     [
         (145.0, -1.165, 20.0, 20.0, 1.0),
