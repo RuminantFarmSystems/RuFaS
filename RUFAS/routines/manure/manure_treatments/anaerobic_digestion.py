@@ -96,6 +96,11 @@ class AnaerobicDigestion(BaseManureTreatment):
         ) * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
         AD_VS_destruction = total_methane_generation_mass + AD_carbon_dioxide
 
+        degradable_volatile_solids_fraction = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            / self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
+        )
+
         new_daily_output.liquid_manure_total_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_solids - AD_VS_destruction
         )
@@ -104,10 +109,11 @@ class AnaerobicDigestion(BaseManureTreatment):
         )
         new_daily_output.liquid_manure_total_degradable_volatile_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            - AD_VS_destruction
+            - (AD_VS_destruction * degradable_volatile_solids_fraction)
         )
         new_daily_output.liquid_manure_total_non_degradable_volatile_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            - (AD_VS_destruction * (1 - degradable_volatile_solids_fraction))
         )
 
         new_daily_output.daily_final_manure_volume = (
