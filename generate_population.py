@@ -10,7 +10,7 @@ import seaborn as sns
 from RUFAS.input_manager import InputManager
 
 result = pd.DataFrame()
-res_summary = pd.DataFrame(columns=['time', 'average', 'std'])
+res_summary = pd.DataFrame(columns=["time", "average", "std"])
 
 im = InputManager()
 net_merit_csv = Path("NetMerit_percentile_HO.csv")
