@@ -781,10 +781,15 @@ class AnimalRequirements:
             gravid_uterine_weight = (calf_birth_weight * 1.825) * math.exp(
                 -0.0243 - (0.0000245 * day_of_pregnancy) * (280 - day_of_pregnancy)
             )
+            # if day_of_pregnancy > 350:
+            #     print('high day or pregnancy')
+            #     print(day_of_pregnancy)
             if days_in_milk is None:
                 days_in_milk = 0
             uterine_weight = ((calf_birth_weight * 0.2288 - 0.204) * math.exp(-0.2 * days_in_milk)) + 0.204
             net_energy_maintenance = 0.10 * (body_weight - gravid_uterine_weight - uterine_weight) ** 0.75
+        if type(net_energy_maintenance) is complex:
+            print("complex NE maint")
         return net_energy_maintenance, gravid_uterine_weight, uterine_weight
 
     def calculate_NRC_energy_growth_requirements(
