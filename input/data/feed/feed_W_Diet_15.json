@@ -151,102 +151,58 @@
     ],
     "growing": [
       {
-        "feed_type": 15,
-        "ration_percentage": 1.2
+        "feed_type": 51,
+        "ration_percentage": 14.67
       },
       {
-        "feed_type": 31,
-        "ration_percentage": 1.1
+        "feed_type": 108,
+        "ration_percentage": 19.36
       },
       {
-        "feed_type": 42,
-        "ration_percentage": 1.4
+        "feed_type": 95,
+        "ration_percentage": 32.22
       },
       {
         "feed_type": 44,
-        "ration_percentage": 4.5
+        "ration_percentage": 5.3
       },
       {
-        "feed_type": 51,
-        "ration_percentage": 30.8
+        "feed_type": 301,
+        "ration_percentage": 3.03
       },
       {
-        "feed_type": 66,
-        "ration_percentage": 2.2
-      },
-      {
-        "feed_type": 110,
-        "ration_percentage": 36.3
-      },
-      {
-        "feed_type": 176,
-        "ration_percentage": 17.5
-      },
-      {
-        "feed_type": 197,
-        "ration_percentage": 1.8
-      },
-      {
-        "feed_type": 210,
-        "ration_percentage": 0.1
-      },
-      {
-        "feed_type": 231,
-        "ration_percentage": 1.6
-      },
-      {
-        "feed_type": 234,
-        "ration_percentage": 1.5
+        "feed_type": 305,
+        "ration_percentage": 25.42
       }
     ],
     "close_up": [
       {
-        "feed_type": 15,
-        "ration_percentage": 1.5
+        "feed_type": 51,
+        "ration_percentage": 17.08
       },
       {
-        "feed_type": 31,
-        "ration_percentage": 1.5
+        "feed_type": 108,
+        "ration_percentage": 26.62
       },
       {
-        "feed_type": 42,
-        "ration_percentage": 1.8
+        "feed_type": 95,
+        "ration_percentage": 16.04
+      },
+      {
+        "feed_type": 100,
+        "ration_percentage": 16.04
       },
       {
         "feed_type": 44,
-        "ration_percentage": 3.7
+        "ration_percentage": 6.5
       },
       {
-        "feed_type": 51,
-        "ration_percentage": 40.6
+        "feed_type": 301,
+        "ration_percentage": 2
       },
       {
-        "feed_type": 66,
-        "ration_percentage": 2.8
-      },
-      {
-        "feed_type": 94,
-        "ration_percentage": 22.2
-      },
-      {
-        "feed_type": 110,
-        "ration_percentage": 21.5
-      },
-      {
-        "feed_type": 197,
-        "ration_percentage": 2.3
-      },
-      {
-        "feed_type": 210,
-        "ration_percentage": 0.2
-      },
-      {
-        "feed_type": 231,
-        "ration_percentage": 1.0
-      },
-      {
-        "feed_type": 234,
-        "ration_percentage": 0.9
+        "feed_type": 305,
+        "ration_percentage": 15.72
       }
     ],
     "lac_cow": [
