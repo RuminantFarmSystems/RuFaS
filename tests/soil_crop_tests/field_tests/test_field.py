@@ -3,6 +3,7 @@ from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 import pytest
 from pytest_mock import MockerFixture
+from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
@@ -408,12 +409,12 @@ def test_check_crop_harvest_schedule(
 
 
 @pytest.mark.parametrize(
-    "crop_num,heat_scheduled,expected_harvested,expected_harvest_count",
+    "crop_num,should_harvest_results,expected_harvest_count",
     [
-        (5, [True, False, True, True, False], [True, False, False, True, False], 2),
-        (2, [True, True], [False, True], 1),
-        (2, [False, False], [False, False], 0),
-        (0, [], [], 0),
+        (5, [True, False, True, True, False], 3),
+        (2, [True, True], 2),
+        (2, [False, False], 0),
+        (0, [], 0),
     ],
 )
 def test_harvest_heat_scheduled_crops(
@@ -421,25 +422,17 @@ def test_harvest_heat_scheduled_crops(
     mock_feed_manager: FeedManager,
     mock_field_data: FieldData,
     crop_num: int,
-    heat_scheduled: List[bool],
-    expected_harvested: List[bool],
+    should_harvest_results: List[bool],
     expected_harvest_count: int,
 ) -> None:
     """Tests that all crops which are set to be harvested based on heat level are."""
     crops = []
     for index in range(crop_num):
-        mock_data = MagicMock(CropData)
-        crops.append(MagicMock(Crop(mock_data)))
-        if heat_scheduled[index]:
-            crops[index].data.use_heat_scheduling = True
-        else:
-            crops[index].data.use_heat_scheduling = False
-        crops[index].data.harvest_heat_fraction = 1.0
-        if expected_harvested[index]:
-            crops[index].data.heat_fraction = crops[index].data.harvest_heat_fraction
-        else:
-            crops[index].data.heat_fraction = 0.0
-        crops[index].crop_management.manage_harvest = MagicMock()
+        mock_crop = MagicMock(Crop)
+        mock_crop.should_harvest_based_on_heat.return_value = should_harvest_results[index]
+        mock_crop_management = MagicMock()
+        mock_crop.crop_management = mock_crop_management
+        crops.append(mock_crop)
 
     field = Field(
         manure_supplier=MagicMock(ManureManager),
@@ -454,9 +447,10 @@ def test_harvest_heat_scheduled_crops(
     ) as add_residue:
         field._harvest_heat_scheduled_crops(10.0, mock_time)
 
-    for index in range(len(crops)):
-        if expected_harvested[index]:
-            crops[index].crop_management.manage_harvest.assert_called_once_with(
+    actual_harvest_count = 0
+    for index, crop in enumerate(crops):
+        if should_harvest_results[index]:
+            crop.crop_management.manage_harvest.assert_called_once_with(
                 HarvestOperation.HARVEST_ONLY,
                 mock_field_data.name,
                 mock_field_data.field_size,
@@ -464,9 +458,12 @@ def test_harvest_heat_scheduled_crops(
                 field.soil.data,
                 mock_feed_manager,
             )
+            actual_harvest_count += 1
         else:
-            crops[index].crop_management.manage_harvest.assert_not_called()
+            crop.crop_management.manage_harvest.assert_not_called()
+
     assert add_residue.call_count == expected_harvest_count
+    assert actual_harvest_count == expected_harvest_count
 
 
 @pytest.mark.parametrize(
