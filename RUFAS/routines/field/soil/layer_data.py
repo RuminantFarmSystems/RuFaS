@@ -990,6 +990,13 @@ class LayerData:
         """
         return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
 
+    @property
+    def carbon_residue_amount(self) -> float:
+        """
+
+        """
+        return self.metabolic_litter_amount + self.structural_litter_amount
+
     def do_annual_reset(self) -> None:
         """
         Reset the pools
