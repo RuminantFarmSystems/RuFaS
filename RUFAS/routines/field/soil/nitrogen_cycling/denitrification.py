@@ -3,7 +3,6 @@ from math import exp, pi, atan, e
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.output_manager import OutputManager
 
 
 class Denitrification:
