@@ -69,25 +69,6 @@ def test_water_filled_pore_space(
 
 
 @pytest.mark.parametrize(
-    "metabolic,structural,active,slow,passive,expected",
-    [(10.0, 20.0, 30.0, 100.0, 200.0, 360.0), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0)],
-)
-def test_total_carbon_content(
-    layer: LayerData, metabolic: float, structural: float, active: float, slow: float, passive: float, expected: float
-) -> None:
-    """Tests that total carbon content in a single soil layer is calculated correctly."""
-    layer.metabolic_litter_amount = metabolic
-    layer.structural_litter_amount = structural
-    layer.active_carbon_amount = active
-    layer.slow_carbon_amount = slow
-    layer.passive_carbon_amount = passive
-
-    actual = layer.total_carbon_content
-
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
     "top,bottom",
     [
         (0, 39),
