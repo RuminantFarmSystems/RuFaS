@@ -12,7 +12,6 @@ import pandas as pd
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
-om = OutputManager()
 
 """
 Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
@@ -82,6 +81,7 @@ class InputManager:
         return cls.instance
 
     def __init__(self, metadata_depth_limit: int | None = None) -> None:
+        self.om = OutputManager()
         if InputManager.__instance is None:
             InputManager.__instance = self
             self.__metadata: Dict[str, Any] = {}
@@ -153,7 +153,7 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_metadata.__name__,
         }
-        om.add_log(
+        self.om.add_log(
             "load_metadata_attempt",
             f"Attempting to load metadata from {metadata_path}.",
             info_map,
@@ -161,7 +161,7 @@ class InputManager:
         try:
             with open(metadata_path) as metadata_file:
                 self.__metadata = json.load(metadata_file)
-                om.add_log(
+                self.om.add_log(
                     "load_metadata_success",
                     f"Successfully loaded metadata from {metadata_path}",
                     info_map,
@@ -192,7 +192,7 @@ class InputManager:
         }
         try:
             properties_path = Path(self.__metadata["files"]["properties"]["path"])
-            om.add_log(
+            self.om.add_log(
                 "load_properties_attempt",
                 f"Attempting to load properties from {properties_path}",
                 info_map,
@@ -203,20 +203,20 @@ class InputManager:
             del self.__metadata["files"]["properties"]
 
             self.__metadata["properties"] = self._load_data_from_json(properties_path)
-            om.add_log(
+            self.om.add_log(
                 "load_properties_success",
                 f"Successfully loaded properties from {properties_path}",
                 info_map,
             )
 
         except FileNotFoundError as fnfe:
-            om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+            self.om.add_error("load_properties_file_not_found", str(fnfe), info_map)
             raise
         except json.JSONDecodeError as jde:
-            om.add_error("load_properties_json_error", str(jde), info_map)
+            self.om.add_error("load_properties_json_error", str(jde), info_map)
             raise
         except Exception as e:
-            om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+            self.om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
             raise
 
     def _load_data_from_json(self, file_path: Path) -> Dict[str, Any]:
@@ -243,11 +243,11 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_data_from_json.__name__,
         }
-        om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
+        self.om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path) as json_file:
                 data: Dict[str, Any] = json.load(json_file)
-                om.add_log(
+                self.om.add_log(
                     "load_data_successful",
                     f"Successfully loaded data from {file_path}.",
                     info_map,
@@ -282,13 +282,13 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_data_from_csv.__name__,
         }
-        om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
+        self.om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path, "r", encoding="utf-8") as csv_file:
                 data_frame = pd.read_csv(csv_file)
                 data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
                 if not data_frame.empty:
-                    om.add_log(
+                    self.om.add_log(
                         "load_data_successful",
                         f"Successfully loaded data from {file_path}.",
                         info_map,
@@ -406,7 +406,7 @@ class InputManager:
         try:
             return Modifiability.__getitem__("_".join(modifiability.strip().upper().split()))
         except KeyError:
-            om.add_warning(
+            self.om.add_warning(
                 "Unknown modifiability entry",
                 f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability should be "
                 f"one of {Modifiability.values()}. Using the default value: {default}",
@@ -498,11 +498,11 @@ class InputManager:
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
             error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
-            om.add_error("Missing required data", error_msg, info_map)
+            self.om.add_error("Missing required data", error_msg, info_map)
             raise KeyError(error_msg)
 
         if self._is_input_required_upon_initialization(variable_name=var_name, variable_properties=variable_properties):
-            om.add_error(
+            self.om.add_error(
                 "Missing required data",
                 f"Key {var_name} not found in input data. Input value is required for this "
                 "variable upon program initialization.",
@@ -512,7 +512,7 @@ class InputManager:
                 f"Key {var_name} not found in input data. Input value is required for this "
                 "variable upon program initialization."
             )
-        om.add_warning(
+        self.om.add_warning(
             "Validation: key not found in input data -- input not required upon initialization",
             f"Key {var_name} not found in input data. Input value is not required for this "
             "variable upon program initialization, setting the variable value to None.",
@@ -644,7 +644,7 @@ class InputManager:
         )
         variable_path_str = self._convert_variable_path_to_str(variable_path)
         if not isinstance(input_data, list):
-            om.add_warning(
+            self.om.add_warning(
                 "Validation: array container is not a list",
                 f"Variable: '{variable_path_str}' is not an array but has type: {type(input_data)}. "
                 f"{properties_violation_message}",
@@ -657,7 +657,7 @@ class InputManager:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(input_data)
             if not is_in_range:
-                om.add_warning(
+                self.om.add_warning(
                     "Validation: array length less than minimum",
                     f"Variable: '{variable_path_str}' has length: {len(input_data)}, less than minimum length: "
                     f"{minimum_length}. {properties_violation_message}",
@@ -668,7 +668,7 @@ class InputManager:
         if maximum_length is not None:
             is_in_range = len(input_data) <= variable_properties["maximum_length"]
             if not is_in_range:
-                om.add_warning(
+                self.om.add_warning(
                     "Validation: array length greater than maximum",
                     f"Variable: '{variable_path_str}' has length: {len(input_data)}, greater than maximum length: "
                     f"{maximum_length}. {properties_violation_message}",
@@ -792,7 +792,7 @@ class InputManager:
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
         if not isinstance(object_value, dict):
-            om.add_warning(
+            self.om.add_warning(
                 "Validation: object is not a dictionary",
                 f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
                 f"{properties_violation_message}",
@@ -819,7 +819,7 @@ class InputManager:
 
         extraneous_keys = [key for key in object_value.keys() if key not in variable_properties.keys()]
         for key in extraneous_keys:
-            om.add_warning(
+            self.om.add_warning(
                 "Validation: object contains extraneous data",
                 f"Variable: '{variable_path_str}' contains data at key '{key}' that is not specified in the metadata "
                 f"properties. {properties_violation_message}",
@@ -865,7 +865,7 @@ class InputManager:
                 f"Variable: '{variable_path_str}' has value: {input_data_value}, is type: "
                 f"{type(input_data_value)}. {properties_violation_message}"
             )
-            om.add_warning(warning_string, warning_message, info_map)
+            self.om.add_warning(warning_string, warning_message, info_map)
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= input_data_value
@@ -875,7 +875,7 @@ class InputManager:
                     f"Variable: '{variable_path_str}' has value: {input_data_value}, less than minimum value: "
                     f"{minimum_value: .2f}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_value is not None:
             is_in_range = input_data_value <= maximum_value
@@ -885,7 +885,7 @@ class InputManager:
                     f"Variable: '{variable_path_str}' has value: {input_data_value}, greater than maximum value: "
                     f"{maximum_value: .2f}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_string, info_map)
+                self.om.add_warning(warning_name, warning_string, info_map)
                 return False
 
         return True
@@ -923,7 +923,7 @@ class InputManager:
                 f"Variable: '{variable_path_str}' has value: {input_data_value}, is type: "
                 f"{type(input_data_value)}. {properties_violation_message}"
             )
-            om.add_warning(warning_name, warning_message, info_map)
+            self.om.add_warning(warning_name, warning_message, info_map)
             return False
 
         pattern_check = variable_properties.get("pattern")
@@ -935,7 +935,7 @@ class InputManager:
                     f"Variable: '{variable_path_str}' has value: '{input_data_value}', does not match pattern: "
                     f"{pattern_check}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -948,7 +948,7 @@ class InputManager:
                     f"Variable: '{variable_path_str}' has value: '{input_data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.om.add_warning(warning_name, warning_message, info_map)
                 return False
         if maximum_length is not None:
             is_valid_string = len(input_data_value) <= variable_properties["maximum_length"]
@@ -958,7 +958,7 @@ class InputManager:
                     f"Variable: '{variable_path_str}' has value: '{input_data_value}', length is greater than "
                     f"maximum length: {maximum_length}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.om.add_warning(warning_name, warning_message, info_map)
                 return False
 
         return True
@@ -994,7 +994,7 @@ class InputManager:
                 f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
                 f"'{type(input_data_value)}'. {properties_violation_message}"
             )
-            om.add_warning(warning_name, warning_message, info_map)
+            self.om.add_warning(warning_name, warning_message, info_map)
             return False
 
         return True
@@ -1194,7 +1194,7 @@ class InputManager:
                 f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
-            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
+            self.om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
             return False
 
         if type(variable_parent) is list:
@@ -1205,7 +1205,7 @@ class InputManager:
         warning_message = (
             f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
         )
-        om.add_warning("Validation: invalid data found", warning_message, info_map)
+        self.om.add_warning("Validation: invalid data found", warning_message, info_map)
 
         variable_parent[element_hierarchy[-1]] = variable_properties["default"]
 
@@ -1214,7 +1214,7 @@ class InputManager:
             f"{variable_properties['default']}. Fix enabled by default value specified in "
             f"'{properties_blob_key}'."
         )
-        om.add_warning("Validation: data fixed", warning_message, info_map)
+        self.om.add_warning("Validation: data fixed", warning_message, info_map)
         return True
 
     def get_data(self, data_address: str) -> Any:
@@ -1273,7 +1273,7 @@ class InputManager:
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
         except KeyError as key_error:
-            om.add_error("Validation: data not found", str(key_error), info_map)
+            self.om.add_error("Validation: data not found", str(key_error), info_map)
 
         return None
 
@@ -1372,7 +1372,7 @@ class InputManager:
             invalid_key = element_hierarchy[-1]
             parent_address = ".".join(element_hierarchy[:-1])
 
-            om.add_error(
+            self.om.add_error(
                 "Validation: data not found:",
                 f'Cannot find "{metadata_address}", '
                 f'"{parent_address}" does not have attribute '
@@ -1444,7 +1444,7 @@ class InputManager:
         except KeyError:
             error_name = "Cannot find data"
             error_message = "Could not find input metadata."
-            om.add_error(error_name, error_message, info_map)
+            self.om.add_error(error_name, error_message, info_map)
             return data_keys
 
         data_keys = [key for key, data in input_data.items() if data.get("properties") == target_properties]
@@ -1460,7 +1460,7 @@ class InputManager:
             "function": self.flush_pool.__name__,
         }
         self.__pool = {}
-        om.add_log("Clear variable pool", "The pool is emptied.", info_map)
+        self.om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
     def _metadata_properties_exist(self, variable_name: str, properties_blob_key: str) -> bool:
         """
@@ -1497,14 +1497,14 @@ class InputManager:
             "function": self._metadata_properties_exist.__name__,
         }
         if not self.__metadata:
-            om.add_error(
+            self.om.add_error(
                 "No metadata loaded",
                 "No metadata is loaded to the InputManager.",
                 info_map,
             )
             raise ValueError("No metadata loaded.")
         if properties_blob_key not in self.__metadata["properties"]:
-            om.add_error(
+            self.om.add_error(
                 "No metadata found",
                 f"No metadata is found for variable '{variable_name}' with given "
                 f"properties_blob_key {properties_blob_key}. Consider adding variable "
@@ -1581,7 +1581,7 @@ class InputManager:
             elements_counter += elements_counter
 
         if elements_counter.invalid_elements > 0:
-            om.add_error(
+            self.om.add_error(
                 "Invalid variable",
                 f"Variable {variable_name} has invalid components. Only successfully validated components are "
                 f"added to InputManager pool during runtime.",
@@ -1666,10 +1666,12 @@ class InputManager:
             variable_name=variable_name, variable_properties=metadata_properties
         )
         if not is_modifiable_during_runtime and eager_termination:
-            om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            self.om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
         elif not is_modifiable_during_runtime:
-            om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            self.om.add_warning(
+                "IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map
+            )
             return False
         return True
 
@@ -1743,7 +1745,7 @@ class InputManager:
                 "class": self.__class__.__name__,
                 "function": self._add_to_pool.__name__,
             }
-            om.add_warning(
+            self.om.add_warning(
                 "Overwriting existing variable",
                 f"Variable {variable_name} already exists in InputManager pool, overwriting the old value.",
                 info_map,
@@ -1793,7 +1795,7 @@ class InputManager:
             "function": self.add_dict_variable_to_pool.__name__,
         }
         if not (isinstance(data, Dict)):
-            om.add_error(
+            self.om.add_error(
                 "Incorrect variable type",
                 f"Variable {variable_name} has type {type(data)}, does not match "
                 f"the expected type of `Dict[str, Any]`.",
@@ -1860,7 +1862,7 @@ class InputManager:
             "function": self.add_tabular_variable_to_pool.__name__,
         }
         if not (isinstance(data, Dict) or isinstance(data, List)):
-            om.add_error(
+            self.om.add_error(
                 "Incorrect variable type",
                 f"Variable {variable_name} has type {type(data)}, does not match "
                 f"the expected type of `Dict[str, List[Any]] | List[Any]`.",
@@ -1895,10 +1897,10 @@ class InputManager:
             The directory path where the JSON file will be saved.
 
         """
-        file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
+        file_name = self.om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = path / file_name
-        om.create_directory(path)
-        om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+        self.om.create_directory(path)
+        self.om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
     def _validate_metadata(self) -> None:
         """Checks that top-level metadata has valid and required keys and values."""
@@ -1912,16 +1914,16 @@ class InputManager:
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
-                om.add_error(
+                self.om.add_error(
                     "Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'", info_map
                 )
                 raise ValueError
             if invalid_keys := (data.keys() - valid_keys):
-                om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
+                self.om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
                 raise ValueError
 
             if data["type"] not in VALID_INPUT_TYPES:
-                om.add_error(
+                self.om.add_error(
                     "Metadata Validation",
                     f"Invalid type '{data['type']}' in '{key}'. Expected one option from {VALID_INPUT_TYPES}",
                     info_map,
@@ -1929,14 +1931,14 @@ class InputManager:
                 raise ValueError
 
             if not os.path.isfile(data["path"]):
-                om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
+                self.om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
                 raise ValueError
 
             if data["properties"] is None or data["properties"] == "":
-                om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
+                self.om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
                 raise ValueError
 
-        om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
+        self.om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
 
     def _validate_properties(self) -> None:
         """Iteratively traverses the metadata properties to check the max depth and routes
@@ -1969,7 +1971,7 @@ class InputManager:
             current_obj, depth, path = stack.pop()
 
             if depth > self.metadata_depth_limit:
-                om.add_error(
+                self.om.add_error(
                     "Max metadata depth exceeded.",
                     f"Metadata depth exceeds maximum allowed depth of {self.metadata_depth_limit} at path {path}",
                     info_map,
@@ -1991,15 +1993,17 @@ class InputManager:
                             type_to_validator_map[value_type](path + [key], value)
                         else:
                             if value_type is not None:
-                                om.add_error(
+                                self.om.add_error(
                                     "Properties value type error",
                                     f"'type' value not in {type_to_validator_map.keys()}",
                                     info_map,
                                 )
                                 raise ValueError(f"Properties 'type' value not in {list(type_to_validator_map.keys())}")
 
-        om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
-        om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
+        self.om.add_log(
+            "Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map
+        )
+        self.om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
 
     def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> None:
         """Validates number type properties in metadata."""
@@ -2016,7 +2020,7 @@ class InputManager:
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
         if default is None and not nullable:
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata default number value.",
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.",
                 info_map,
@@ -2024,7 +2028,7 @@ class InputManager:
             raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.")
         if default is not None:
             if not isinstance(default, (int, float)) and not has_no_default:
-                om.add_error(
+                self.om.add_error(
                     "Invalid metadata default number value.",
                     f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
                     info_map,
@@ -2033,21 +2037,21 @@ class InputManager:
         minimum = value.get("minimum")
         maximum = value.get("maximum")
         if minimum is not None and not isinstance(minimum, (int, float)):
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata number properties minimum.",
                 f"Invalid 'minimum' for '{key_path}': Expected a number but got {type(minimum)}.",
                 info_map,
             )
             raise ValueError(f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}.")
         if maximum is not None and not isinstance(maximum, (int, float)):
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata number properties maximum.",
                 f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.",
                 info_map,
             )
             raise ValueError(f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.")
         if maximum is not None and minimum is not None and maximum < minimum:
-            om.add_error(
+            self.om.add_error(
                 "Invalid range of acceptable numbers.",
                 f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
                 f"greater than 'maximum' value {maximum}",
@@ -2059,7 +2063,7 @@ class InputManager:
             )
         if default is not None and not has_no_default:
             if minimum is not None and default < minimum:
-                om.add_error(
+                self.om.add_error(
                     "Invalid metadata default.",
                     f"Invalid 'default' for '{key_path}': 'default' {default} is less than 'minimum' {minimum}",
                     info_map,
@@ -2068,7 +2072,7 @@ class InputManager:
                     f"Invalid 'default' for '{key_path}': 'default' {default} is " f"less than 'minimum' {minimum}"
                 )
             if maximum is not None and default > maximum:
-                om.add_error(
+                self.om.add_error(
                     "Invalid metadata default.",
                     f"Invalid 'default' for '{key_path}': 'default' {default} is greater than 'maximum' {maximum}",
                     info_map,
@@ -2090,7 +2094,7 @@ class InputManager:
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
         if default is None and not nullable:
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata default string value.",
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                 info_map,
@@ -2098,7 +2102,7 @@ class InputManager:
             raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
         if default is not None and not has_no_default:
             if not isinstance(default, str):
-                om.add_error(
+                self.om.add_error(
                     "Invalid metadata default string value.",
                     f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
                     info_map,
@@ -2106,7 +2110,7 @@ class InputManager:
                 raise ValueError(f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}")
         pattern = value.get("pattern")
         if pattern is not None and not isinstance(pattern, str):
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata string properties pattern.",
                 f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
                 info_map,
@@ -2116,7 +2120,7 @@ class InputManager:
             if pattern is not None:
                 re.compile(pattern)
         except re.error:
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata string properties pattern.",
                 f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern.",
                 info_map,
@@ -2126,7 +2130,7 @@ class InputManager:
             )
         if default != "" and default is not None and not has_no_default:
             if pattern is not None and not re.match(pattern, default):
-                om.add_error(
+                self.om.add_error(
                     "Invalid metadata default string value.",
                     f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
                     f"match pattern {pattern}",
@@ -2152,14 +2156,14 @@ class InputManager:
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
         if default is None and not nullable:
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata default bool value.",
                 f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                 info_map,
             )
             raise ValueError(f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'")
         if default is not None and not isinstance(default, bool) and not has_no_default:
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata default bool value.",
                 f"Invalid 'default' for '{key_path}': Expected a bool but got {type(default)}",
                 info_map,
@@ -2180,7 +2184,7 @@ class InputManager:
         minimum_length = value.get("minimum_length")
         maximum_length = value.get("maximum_length")
         if minimum_length is not None and not isinstance(minimum_length, (int, float)):
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata default array minimum length.",
                 f"Invalid 'minimum_length' for '{key_path}': Expected a number but got {type(minimum_length)}",
                 info_map,
@@ -2189,7 +2193,7 @@ class InputManager:
                 f"Invalid 'minimum_length' for '{key_path}': " f"Expected a number but got {type(minimum_length)}"
             )
         if maximum_length is not None and not isinstance(maximum_length, (int, float)):
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata default array maximum length.",
                 f"Invalid 'maximum_length' for '{key_path}': Expected a number but got {type(maximum_length)}",
                 info_map,
@@ -2198,7 +2202,7 @@ class InputManager:
                 f"Invalid 'maximum_length' for '{key_path}': " f"Expected a number but got {type(maximum_length)}"
             )
         if maximum_length is not None and minimum_length is not None and maximum_length < minimum_length:
-            om.add_error(
+            self.om.add_error(
                 "Invalid metadata array length range.",
                 f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
                 f"greater than 'maximum_length' value {maximum_length}",
@@ -2230,7 +2234,7 @@ class InputManager:
             "function": self._validate_metadata_properties_keys.__name__,
         }
         if missing_required_keys := required_properties_keys - properties.keys():
-            om.add_error(
+            self.om.add_error(
                 "Metadata Validation",
                 f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
                 f" keys are {sorted(required_properties_keys)}.",
@@ -2244,7 +2248,7 @@ class InputManager:
         valid_properties_keys = required_properties_keys.union(optional_properties_keys)
         if property_type == "object":
             if not (set(properties.keys()) - valid_properties_keys):
-                om.add_error(
+                self.om.add_error(
                     "Metadata Validation",
                     f"No unique keys for {path}. At least one unique key is expected.",
                     info_map,
@@ -2252,7 +2256,7 @@ class InputManager:
                 raise ValueError(f"No unique keys for {path}. At least one unique key is expected.")
             return
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
-            om.add_error(
+            self.om.add_error(
                 "Metadata Validation",
                 f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
                 f" keys are {sorted(valid_properties_keys)}.",
@@ -2287,20 +2291,22 @@ class InputManager:
         }
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
-        path_to_save = output_dir / om.generate_file_name("InputManager_metadata_properties", extension="csv")
-        om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
+        path_to_save = output_dir / self.om.generate_file_name("InputManager_metadata_properties", extension="csv")
+        self.om.add_log(
+            "CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map
+        )
         try:
-            om.create_directory(output_dir)
+            self.om.create_directory(output_dir)
             df.to_csv(path_to_save, index=False)
-            om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
+            self.om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
         except FileNotFoundError as fnfe:
-            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
+            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
             raise fnfe
         except PermissionError as pe:
-            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
+            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
             raise pe
         except OSError as e:
-            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
+            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
             raise e
 
     def _parse_metadata_properties(
@@ -2407,7 +2413,7 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self.compare_metadata_properties.__name__,
         }
-        om.create_directory(output_directory)
+        self.om.create_directory(output_directory)
         self._load_metadata(properties_file_path)
         properties1 = deepcopy(self.meta_data)
         self.meta_data = {}
@@ -2421,7 +2427,7 @@ class InputManager:
         file_name = f"diff_results_{first_file_path}_vs_{second_file_path}"
 
         try:
-            om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
+            self.om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
             with open(f"{str(output_directory)}/{file_name}.txt", "w") as file:
                 file.write(
                     f"Comparing changes going from '{properties_file_path}'"
@@ -2444,17 +2450,17 @@ class InputManager:
                                 file.write(f"{sub_key}: {value}\n")
                             file.write("\n")
 
-            om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
+            self.om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
 
         except PermissionError:
-            om.add_error(
+            self.om.add_error(
                 "Permission error in saving file",
                 f"Permission denied when trying to write to {file_name}.txt.",
                 info_map,
             )
             raise
         except OSError as e:
-            om.add_error(
+            self.om.add_error(
                 "Unexpected error in saving file",
                 f"An unexpected OS error occurred: {e}",
                 info_map,
