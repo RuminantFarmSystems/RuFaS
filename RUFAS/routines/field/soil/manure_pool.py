@@ -537,7 +537,7 @@ class ManurePool:
 
         Returns
         -------
-        Dict (keys listed below)
+        dict (keys listed below)
             new_phosphorus_pool_amount: amount of phosphorus in the pool after leaching from it (kg).
             infiltrated_phosphorus: amount of phosphorus that infiltrates into the soil profile (kg).
             runoff_phosphorus: amount of phosphorus that leaves the field dissolved in runoff (kg).
