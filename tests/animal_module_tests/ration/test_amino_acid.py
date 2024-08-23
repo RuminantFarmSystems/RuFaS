@@ -1,6 +1,7 @@
 import pytest
 from pytest import approx
 
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.ration.amino_acid import (
     AminoAcidCalculator,
     EssentialAminoAcidRequirements,
@@ -129,10 +130,11 @@ def test_calculate_lactation(amino_acid: str, NPMilk: float, expected: float) ->
 
 
 @pytest.mark.parametrize(
-    "lactating, body_weight, frame_weight_gain, gravid_uterine_weight_gain, dry_matter_intake_estimate,"
+    "animal_type, lactating, body_weight, frame_weight_gain, gravid_uterine_weight_gain, dry_matter_intake_estimate,"
     "milk_true_protein, milk_production, NDF_conc, expected",
     [
         (
+            AnimalType.DRY_COW,
             True,
             256.7,
             100,
@@ -154,6 +156,7 @@ def test_calculate_lactation(amino_acid: str, NPMilk: float, expected: float) ->
             ),
         ),
         (
+            AnimalType.LAC_COW,
             True,
             1256.7,
             388.6,
@@ -175,6 +178,7 @@ def test_calculate_lactation(amino_acid: str, NPMilk: float, expected: float) ->
             ),
         ),
         (
+            AnimalType.DRY_COW,
             False,
             256.7,
             100,
@@ -196,6 +200,7 @@ def test_calculate_lactation(amino_acid: str, NPMilk: float, expected: float) ->
             ),
         ),
         (
+            AnimalType.LAC_COW,
             False,
             1256.7,
             388.6,
@@ -216,9 +221,98 @@ def test_calculate_lactation(amino_acid: str, NPMilk: float, expected: float) ->
                 valine=1101.746089120024,
             ),
         ),
+        (
+            AnimalType.CALF,
+            True,
+            256.7,
+            100,
+            30.68,
+            50.79,
+            15,
+            8.8,
+            80,
+            EssentialAminoAcidRequirements(
+                histidine=0.0,
+                isoleucine=0.0,
+                leucine=0.0,
+                lysine=0.0,
+                methionine=0.0,
+                phenylalanine=0.0,
+                threonine=0.0,
+                thryptophan=0.0,
+                valine=0.0,
+            ),
+        ),
+        (
+            AnimalType.HEIFER_I,
+            True,
+            1256.7,
+            388.6,
+            48.1,
+            89.9,
+            66,
+            18.18,
+            98,
+            EssentialAminoAcidRequirements(
+                histidine=0.0,
+                isoleucine=0.0,
+                leucine=0.0,
+                lysine=0.0,
+                methionine=0.0,
+                phenylalanine=0.0,
+                threonine=0.0,
+                thryptophan=0.0,
+                valine=0.0,
+            ),
+        ),
+        (
+            AnimalType.HEIFER_II,
+            False,
+            256.7,
+            100,
+            30.68,
+            50.79,
+            15,
+            8.8,
+            80,
+            EssentialAminoAcidRequirements(
+                histidine=0.0,
+                isoleucine=0.0,
+                leucine=0.0,
+                lysine=0.0,
+                methionine=0.0,
+                phenylalanine=0.0,
+                threonine=0.0,
+                thryptophan=0.0,
+                valine=0.0,
+            ),
+        ),
+        (
+            AnimalType.HEIFER_III,
+            False,
+            1256.7,
+            388.6,
+            48.1,
+            89.9,
+            66,
+            18.18,
+            98,
+            EssentialAminoAcidRequirements(
+                histidine=0.0,
+                isoleucine=0.0,
+                leucine=0.0,
+                lysine=0.0,
+                methionine=0.0,
+                phenylalanine=0.0,
+                threonine=0.0,
+                thryptophan=0.0,
+                valine=0.0,
+            ),
+        ),
     ],
 )
 def test_calculate_lactation_integration(
+    animal_type: AnimalType,
     lactating: bool,
     body_weight: float,
     frame_weight_gain: float,
@@ -234,6 +328,7 @@ def test_calculate_lactation_integration(
     """
     amino_acid_calculator = AminoAcidCalculator()
     actual_result = amino_acid_calculator.calculate_essential_amino_acid_requirements(
+        animal_type,
         lactating,
         body_weight,
         frame_weight_gain,

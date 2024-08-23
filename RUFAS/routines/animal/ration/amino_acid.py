@@ -1,6 +1,7 @@
 from typing import Dict, List, TypedDict
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.animal.animal_types import AnimalType
 
 
 class AminoAcidComposition(TypedDict):
@@ -134,6 +135,7 @@ ESSENTIAL_AMINO_ACID_TARGET_EFFICIENCIES: Dict[str, float] = {
 class AminoAcidCalculator:
     def calculate_essential_amino_acid_requirements(
         self,
+        animal_type: AnimalType,
         lactating: bool,
         body_weight: float,
         frame_weight_gain: float,
@@ -149,6 +151,8 @@ class AminoAcidCalculator:
 
         Parameters
         ----------
+        animal_type: AnimalType
+            A type or subtype of animal specified in AnimalType enum
         lactating : bool
             If the animal is lactating.
         body_weight : float
@@ -204,6 +208,9 @@ class AminoAcidCalculator:
             thryptophan=0.0,
             valine=0.0,
         )
+
+        if animal_type in [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
+            return total_amino_acid_requirements
 
         NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
         CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate

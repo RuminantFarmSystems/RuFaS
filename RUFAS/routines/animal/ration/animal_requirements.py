@@ -687,6 +687,7 @@ class AnimalRequirements:
             )
             AA_calculator = AminoAcidCalculator()
             essential_amino_acid_requirement = AA_calculator.calculate_essential_amino_acid_requirements(
+                animal_type,
                 lactating,
                 body_weight,
                 frame_weight_gain,
