@@ -106,10 +106,8 @@ class ManurePool:
         if rainfall < 1 or rainfall > 4:
             self.adjust_manure_moisture_factor(rainfall, temperature_factor)
 
-        # Calculate manure decomposition on soil surface
         decomposed_mass, decomposed_coverage = self.determine_decomposed_surface_manure(temperature_factor)
 
-        # Calculate phosphorus mineralization between pools
         mineralized_stable_organic = self.determine_mineralized_surface_phosphorus(
             self.stable_organic_phosphorus,
             0.01,
