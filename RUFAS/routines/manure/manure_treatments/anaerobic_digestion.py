@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
@@ -11,6 +12,7 @@ from RUFAS.routines.manure.gas_emissions.calculator import (
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
     BaseManureTreatment,
 )
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
@@ -18,6 +20,8 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
 from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class AnaerobicDigestion(BaseManureTreatment):
@@ -27,6 +31,16 @@ class AnaerobicDigestion(BaseManureTreatment):
         Same as BaseManureTreatment.
 
     """
+
+    def __init__(
+        self,
+        weather: Weather,
+        time: Time,
+        manure_treatment_config: ManureTreatmentConfig | Tuple[ManureTreatmentConfig, ManureTreatmentConfig],
+    ) -> None:
+        super().__init__(weather, time, manure_treatment_config)
+
+        self.om = OutputManager()
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Updates the daily output from anaerobic digestion.
@@ -177,7 +191,6 @@ class AnaerobicDigestion(BaseManureTreatment):
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._recalculate_solids_after_destruction.__name__}
-        om = OutputManager()
         degradable_volatile_solids_fraction = (
             self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
             / self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
@@ -188,11 +201,11 @@ class AnaerobicDigestion(BaseManureTreatment):
             - (volatile_solids_destruction * degradable_volatile_solids_fraction)
         )
         if degradable_volatile_solids_after_destruction < 0.0:
-            om.add_error(
+            self.om.add_error(
                 "Anaerobic digestion attempted to destroy too many degradable volatile solids",
                 f"Degradable volatile solids mass would have been {degradable_volatile_solids_after_destruction}, "
                 "setting this value to 0",
-                info_map
+                info_map,
             )
             manure_output.liquid_manure_total_degradable_volatile_solids = 0.0
         else:
@@ -203,11 +216,11 @@ class AnaerobicDigestion(BaseManureTreatment):
             - (volatile_solids_destruction * (1 - degradable_volatile_solids_fraction))
         )
         if non_degradable_volatile_solids_after_destruction < 0.0:
-            om.add_error(
+            self.om.add_error(
                 "Anaerobic digestion attempted to destroy too many non-degradable volatile solids",
                 "Non-degradable volatile solids mass would have been "
                 f"{non_degradable_volatile_solids_after_destruction}, setting this value to 0",
-                info_map
+                info_map,
             )
             manure_output.liquid_manure_total_non_degradable_volatile_solids = 0.0
         else:
