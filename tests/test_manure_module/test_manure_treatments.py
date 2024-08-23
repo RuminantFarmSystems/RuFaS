@@ -6,7 +6,7 @@ from mock import MagicMock
 import pytest
 from mock.mock import PropertyMock, call
 from pytest import approx
-from pytest_mock import MockFixture
+from pytest_mock import MockFixture, MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
@@ -2173,6 +2173,13 @@ def test_anaerobic_lagoon_freeboard_volume(
 # ========================================
 
 
+@pytest.fixture
+def anaerobic_digester(mocker: MockerFixture) -> AnaerobicDigestion:
+    """Creates an anaerobic digester for testing purposes."""
+    mocker.patch.object(AnaerobicDigestion, "__init__", return_value=None)
+    return AnaerobicDigestion()
+
+
 def test_daily_update_helper(mocker: MockFixture) -> None:
     """Unit test for _daily_update_helper() in anaerobic_lagoon.py."""
     # Arrange
@@ -2235,13 +2242,6 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     mock_manure_treatment_daily_output.clone.return_value = mock_manure_treatment_daily_output
 
     mock_manure_treatment_daily_input = mocker.MagicMock()
-    mock_manure_treatment_daily_input.liquid_manure_total_volatile_solids = total_volatile_solids = 35.0
-    mock_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids = (
-        liquid_manure_total_degradable_volatile_solids
-    ) = 31.5
-    mock_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids = (
-        liquid_manure_total_non_degradable_volatile_solids
-    ) = 3.5
     mock_manure_treatment_daily_input.liquid_manure_total_solids = liquid_manure_total_solids = 50.0
     anaerobic_digestion._current_manure_treatment_daily_input = mock_manure_treatment_daily_input
     mock_manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen = 5.0
@@ -2285,23 +2285,9 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         wraps=GasEmissionsCalculator.calculate_digester_methane_leakage,
     )
 
+    patch_recalculate_solids = mocker.patch.object(anaerobic_digestion, "_recalculate_solids_after_destruction")
+
     expected_methane_generation_mass = methane_generation_volume * GasEmissionConstants.AD_METHANE_DENSITY
-    expected_carbon_dioxide = (
-        methane_generation_volume
-        * GasEmissionConstants.AD_CARBON_DIOXIDE_TO_METHANE_RATIO
-        * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
-    )
-    expected_volatile_solids_destruction = expected_methane_generation_mass + expected_carbon_dioxide
-    expected_degradable_vs_destruction = expected_volatile_solids_destruction * (
-        liquid_manure_total_degradable_volatile_solids / total_volatile_solids
-    )
-    expected_non_degradable_vs_destruction = expected_volatile_solids_destruction * (
-        liquid_manure_total_non_degradable_volatile_solids / total_volatile_solids
-    )
-    expected_VSd = liquid_manure_total_degradable_volatile_solids - expected_degradable_vs_destruction
-    expected_VSnd = liquid_manure_total_non_degradable_volatile_solids - expected_non_degradable_vs_destruction
-    expected_total_VS = expected_VSd + expected_VSnd
-    expected_total_solids = liquid_manure_total_solids - expected_volatile_solids_destruction
 
     expected_heating_input_energy = (
         specific_input_energy * daily_final_manure_volume * GeneralConstants.LITERS_TO_CUBIC_METERS
@@ -2340,14 +2326,7 @@ def test_calc_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
     assert actual_anaerobic_digestion_daily_output.top_cover_volume == approx(expected_top_cover_volume)
     assert actual_anaerobic_digestion_daily_output.methane_generation_volume == approx(expected_captured_methane_volume)
     assert actual_anaerobic_digestion_daily_output.methane_leakage_mass == approx(expected_methane_leakage)
-    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_volatile_solids == approx(expected_total_VS)
-    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_degradable_volatile_solids == approx(
-        expected_VSd
-    )
-    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(
-        expected_VSnd
-    )
-    assert actual_anaerobic_digestion_daily_output.liquid_manure_total_solids == approx(expected_total_solids)
+    patch_recalculate_solids.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -2461,6 +2440,51 @@ def test_calc_manure_heat_capacity() -> None:
     assert actual_manure_heat_capacity == approx(expected_manure_heat_capacity)
 
 
+@pytest.mark.parametrize(
+    "destruction,degradable_vol_sols,nondegradable_vol_sols,non_vol_solids,expected_total_solids,"
+    "expected_total_vol_sols,expected_degradable_vol_sols,expected_nondegradable_vol_sols,is_error",
+    [
+        (100.0, 80.0, 20.0, 20.0, 20.0, 0.0, 0.0, 0.0, False),
+        (30.0, 40.0, 20.0, 0.0, 30.0, 30.0, 20.0, 10.0, False),
+        (110.0, 10.0, 90.0, 100.0, 90.0, -10.0, 0.0, 0.0, True),
+    ],
+)
+def test_recalculate_solids_after_destruction(
+    anaerobic_digester: AnaerobicDigestion,
+    mocker: MockerFixture,
+    destruction: float,
+    degradable_vol_sols: float,
+    nondegradable_vol_sols: float,
+    non_vol_solids: float,
+    expected_total_solids: float,
+    expected_total_vol_sols: float,
+    expected_degradable_vol_sols: float,
+    expected_nondegradable_vol_sols: float,
+    is_error: bool,
+) -> None:
+    """Tests that solids are properly recalculated and bounded in AnaerobicDigestion."""
+    anaerobic_digester.om = mocker.MagicMock()
+    add_error = mocker.patch.object(anaerobic_digester.om, "add_error")
+    anaerobic_digester._current_manure_treatment_daily_input = ManureTreatmentDailyOutput(
+        liquid_manure_total_solids=non_vol_solids + degradable_vol_sols + nondegradable_vol_sols,
+        liquid_manure_total_volatile_solids=degradable_vol_sols + nondegradable_vol_sols,
+        liquid_manure_total_degradable_volatile_solids=degradable_vol_sols,
+        liquid_manure_total_non_degradable_volatile_solids=nondegradable_vol_sols,
+    )
+    actual_output = ManureTreatmentDailyOutput()
+
+    anaerobic_digester._recalculate_solids_after_destruction(destruction, actual_output)
+
+    assert actual_output.liquid_manure_total_degradable_volatile_solids == expected_degradable_vol_sols
+    assert (
+        pytest.approx(actual_output.liquid_manure_total_non_degradable_volatile_solids)
+        == expected_nondegradable_vol_sols
+    )
+    assert actual_output.liquid_manure_total_solids == expected_total_solids
+    assert actual_output.liquid_manure_total_volatile_solids == expected_total_vol_sols
+    assert add_error.call_count == (2 if is_error else 0)
+
+
 # Test AnaerobicDigestionAndLagoon class
 # ======================================
 
@@ -2518,9 +2542,9 @@ def test_create_anaerobic_digestion_daily_output(mocker: MockFixture) -> None:
         manure_treatment_config=(mocker.MagicMock(), mocker.MagicMock()),
     )
     anaerobic_digestion_and_lagoon._manure_handler_daily_output = mock_manure_handler_daily_output = mocker.MagicMock()
-    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = (
-        mock_current_manure_treatment_daily_input
-    ) = mocker.MagicMock()
+    anaerobic_digestion_and_lagoon._current_manure_treatment_daily_input = mock_current_manure_treatment_daily_input = (
+        mocker.MagicMock()
+    )
     anaerobic_digestion_and_lagoon._current_pen = mock_current_pen = mocker.MagicMock()
     anaerobic_digestion_and_lagoon._sim_day = mock_sim_day = mocker.MagicMock()
     mock_anaerobic_digestion_daily_output = mocker.MagicMock()
