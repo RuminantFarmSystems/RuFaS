@@ -52,6 +52,7 @@ def test_task_manager_init(
 ) -> None:
     assert task_manager.output_manager is mock_output_manager
 
+
 @pytest.mark.parametrize(
     "verbosity, exclude_info_maps, clear_output_directory, produce_graphics, suppress_log_files, metadata_depth_limit,"
     "workers",
@@ -66,22 +67,24 @@ def test_task_manager_init(
         (LogVerbosity.ERRORS, False, True, True, True, 8, 8),
         (LogVerbosity.WARNINGS, False, True, True, True, 8, 9),
         (LogVerbosity.NONE, False, True, True, True, 8, 10),
-    ]
+    ],
 )
 def test_task_manager_start(
-        verbosity: LogVerbosity,
-        exclude_info_maps: bool,
-        clear_output_directory: bool,
-        produce_graphics: bool,
-        suppress_log_files: bool,
-        metadata_depth_limit: int,
-        workers: int,
-        mocker: MockerFixture,
-        mock_output_manager: Generator[Any, Any, Any]) -> None:
+    verbosity: LogVerbosity,
+    exclude_info_maps: bool,
+    clear_output_directory: bool,
+    produce_graphics: bool,
+    suppress_log_files: bool,
+    metadata_depth_limit: int,
+    workers: int,
+    mocker: MockerFixture,
+    mock_output_manager: Generator[Any, Any, Any],
+) -> None:
     mock_task_manager = TaskManager()
     mock_parse_input_tasks = mocker.patch.object(mock_task_manager, "_parse_input_tasks", return_value=([{}], [{}]))
-    mock_expand_multi_runs_to_single_runs = mocker.patch.object(mock_task_manager, "_expand_multi_runs_to_single_runs",
-                                                                return_value=[{}])
+    mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+        mock_task_manager, "_expand_multi_runs_to_single_runs", return_value=[{}]
+    )
     mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
 
     mock_input_manager = InputManager()
@@ -89,13 +92,27 @@ def test_task_manager_start(
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=workers)
     mock_task_manager.output_manager = mock_output_manager
 
-    mock_task_manager.start(Path('metadata/path'), verbosity, exclude_info_maps, Path('output/directory'),
-                            Path('logs/directory'), clear_output_directory, produce_graphics, suppress_log_files,
-                            metadata_depth_limit)
+    mock_task_manager.start(
+        Path("metadata/path"),
+        verbosity,
+        exclude_info_maps,
+        Path("output/directory"),
+        Path("logs/directory"),
+        clear_output_directory,
+        produce_graphics,
+        suppress_log_files,
+        metadata_depth_limit,
+    )
 
     mock_output_manager.run_startup_sequence.assert_called_once_with(
-        verbosity, exclude_info_maps, Path('output/directory'), clear_output_directory, Path(""), "Task Manager",
-        RUFAS_VERSION, "TASK MANAGER"
+        verbosity,
+        exclude_info_maps,
+        Path("output/directory"),
+        clear_output_directory,
+        Path(""),
+        "Task Manager",
+        RUFAS_VERSION,
+        "TASK MANAGER",
     )
 
     info_map = {
@@ -104,36 +121,22 @@ def test_task_manager_start(
         "units": MeasurementUnits.UNITLESS,
     }
     expected_add_log_calls = [
-        call(
-            "Task Manager Start",
-            "Task Manager Started.",
-            info_map
-        ),
-        call(
-            "Task Manager workers",
-            f"Task Manager is going to run {workers} in parallel.",
-            info_map
-        ),
-        call(
-            "Task Manager parsed tasks",
-            f"Parsed 2 tasks args.",
-            info_map
-        ),
-        call(
-            "Task Manager expanded tasks",
-            f"Expanded task args to 2. Starting the tasks...",
-            info_map
-        )
+        call("Task Manager Start", "Task Manager Started.", info_map),
+        call("Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map),
+        call("Task Manager parsed tasks", f"Parsed 2 tasks args.", info_map),
+        call("Task Manager expanded tasks", f"Expanded task args to 2. Starting the tasks...", info_map),
     ]
     mock_output_manager.add_log.assert_has_calls(expected_add_log_calls)
 
-    mock_start_data.assert_called_once_with(Path('metadata/path'))
+    mock_start_data.assert_called_once_with(Path("metadata/path"))
     mock_get_data.assert_called_once_with("tasks.parallel_workers")
 
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
-    mock_run_tasks.assert_called_once_with([{'task_id': '1/2'}, {'task_id': '2/2'}],
-                                           produce_graphics, metadata_depth_limit)
+    mock_run_tasks.assert_called_once_with(
+        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit
+    )
+
 
 def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
     mock_task_manager = TaskManager()
@@ -357,6 +360,7 @@ def test_task(
         mock_set_random_seed.assert_called_once()
         mock_handler.assert_called_once()
 
+
 def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
     task_manager = TaskManager()
     mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
@@ -394,7 +398,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         Path(""),
         args["output_prefix"],
         RUFAS_VERSION,
-        args["task_id"]
+        args["task_id"],
     )
     mock_im_init.assert_called_once_with(10)
     mock_handler.assert_not_called()
@@ -406,9 +410,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         "units": MeasurementUnits.UNITLESS,
     }
     mock_output_manager.add_error.assert_called_once_with(
-        "No task run",
-        f"Data not valid for {args['output_prefix']}, task not run",
-        info_map
+        "No task run", f"Data not valid for {args['output_prefix']}, task not run", info_map
     )
 
     mock_handle_post_processing.assert_called_once()
@@ -441,16 +443,17 @@ def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager
         (True, False, Path("dummy/path")),
         (False, True, Path("dummy/path")),
         (False, False, Path("dummy/path")),
-    ]
+    ],
 )
-def test_handle_herd_initialization(init_herd: bool, save_animals: bool, save_animals_directory: Path,
-                                    task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any],
-                                    mocker: MockerFixture) -> None:
-    args = {
-        "init_herd": init_herd,
-        "save_animals": save_animals,
-        "save_animals_directory": save_animals_directory
-    }
+def test_handle_herd_initialization(
+    init_herd: bool,
+    save_animals: bool,
+    save_animals_directory: Path,
+    task_manager: TaskManager,
+    mock_output_manager: Generator[Any, Any, Any],
+    mocker: MockerFixture,
+) -> None:
+    args = {"init_herd": init_herd, "save_animals": save_animals, "save_animals_directory": save_animals_directory}
 
     with patch("RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory") as mock_herd_factory:
         mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
@@ -465,7 +468,7 @@ def test_handle_herd_initialization(init_herd: bool, save_animals: bool, save_an
     }
     om_add_log_call_list = [
         call("Herd initialization start", "Initializing herd data...", info_map),
-        call("Herd initialization complete", "Herd data initialized.", info_map)
+        call("Herd initialization complete", "Herd data initialized.", info_map),
     ]
     mock_output_manager.add_log.assert_has_calls(om_add_log_call_list)
 
@@ -473,15 +476,17 @@ def test_handle_herd_initialization(init_herd: bool, save_animals: bool, save_an
     mock_initialize_herd.assert_called_once()
 
 
-def test_single_simulation_run(task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any],
-                               mocker: MockerFixture) -> None:
+def test_single_simulation_run(
+    task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
+) -> None:
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
 
     args = {}
 
     with patch("RUFAS.simulation_engine.SimulationEngine") as mock_simulation_engine:
-        mock_simulation_engine_init = mocker.patch("RUFAS.task_manager.SimulationEngine",
-                                                   return_value=mock_simulation_engine)
+        mock_simulation_engine_init = mocker.patch(
+            "RUFAS.task_manager.SimulationEngine", return_value=mock_simulation_engine
+        )
         mock_simulate = mocker.patch.object(mock_simulation_engine, "simulate")
 
         task_manager.handle_single_simulation_run(args, mock_output_manager)
@@ -495,7 +500,7 @@ def test_single_simulation_run(task_manager: TaskManager, mock_output_manager: G
     }
     om_add_log_call_list = [
         call("Starting the simulation", "Starting the simulation", info_map),
-        call("Simulation completed", "Simulation completed", info_map)
+        call("Simulation completed", "Simulation completed", info_map),
     ]
     mock_output_manager.add_log.assert_has_calls(om_add_log_call_list)
 
@@ -560,6 +565,7 @@ def test_expand_end_to_end_testing_args() -> None:
     task_manager = TaskManager()
     result = task_manager._expand_end_to_end_testing_args({})
     assert result == []
+
 
 @pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
 def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) -> None:
