@@ -323,7 +323,7 @@ class ManurePool:
 
         Returns
         -------
-        Tuple[float, float]
+        tuple[float, float]
             assimilated_manure: Amount of manure that is assimilated on a given day (kg).
             manure_coverage: Amount of decrease in the fraction of field covered by manure on a given day (unitless).
 
