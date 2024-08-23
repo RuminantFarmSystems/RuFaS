@@ -513,7 +513,7 @@ class ManurePool:
         field_coverage: float,
         water_extractable_phosphorus: float,
         is_organic: bool,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         This method determines how much phosphorus is leached from the given pool, how that phosphorus is distributed
         between runoff and soil infiltration, and how much phosphorus remains in the given pool.
