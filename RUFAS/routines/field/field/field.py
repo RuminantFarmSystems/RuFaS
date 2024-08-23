@@ -20,7 +20,7 @@ from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.field.tillage_application import TillageApplication
-from typing import Optional, List, Dict, Tuple
+from typing import Any, Optional, List, Dict, Tuple
 from math import exp
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.field.manure_application import ManureApplication
@@ -127,13 +127,13 @@ class Field:
         self.soil = soil or Soil(soil_data=None, field_size=self.field_data.field_size)  # default soil if not given.
 
         # crop attributes
-        self.crops: List[Crop] = list()  # empty crop list
+        self.crops: list[Crop] = list()  # empty crop list
 
-        self.planting_events: List[PlantingEvent] = plantings or []
+        self.planting_events: list[PlantingEvent] = plantings or []
 
-        self.harvest_events: List[HarvestEvent] = harvestings or []
+        self.harvest_events: list[HarvestEvent] = harvestings or []
 
-        self.custom_crop_specifications: Dict[str, Dict] = custom_crop_specifications or {}
+        self.custom_crop_specifications: dict[str, dict[str, Any]] = custom_crop_specifications or {}
 
         # Soil amendment attributes
         self.fertilizer_applicator = FertilizerApplication(self.soil)
@@ -147,11 +147,11 @@ class Field:
         self.ONLY_NITROGEN_MIX = "100_0_0"
         self.tiller = TillageApplication(self.field_data, self.soil.data)
 
-        self.tillage_events: List[TillageEvent] = tillage_events
+        self.tillage_events: list[TillageEvent] = tillage_events
 
         self.manure_applicator = ManureApplication(self.soil.data)
 
-        self.manure_events: List[ManureEvent] = manure_events or []
+        self.manure_events: list[ManureEvent] = manure_events or []
 
         info_map = {
             "class": self.__class__.__name__,
@@ -972,7 +972,7 @@ class Field:
         """
         for crop in self.crops:
             if crop.should_harvest_based_on_heat():
-                crop.crop_management.manage_harvest(
+                crop._crop_management.manage_harvest(
                     HarvestOperation.HARVEST_ONLY,
                     self.field_data.name,
                     self.field_data.field_size,
@@ -1268,7 +1268,7 @@ class Field:
         self._cycle_water(current_conditions, time)
 
         for crop in self.crops:
-            crop.daily_crop_update(current_conditions, self.field_data, self.soil.data)
+            crop.perform_daily_crop_update(current_conditions, self.field_data, self.soil.data)
 
     def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """

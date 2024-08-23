@@ -32,29 +32,29 @@ class Crop:
 
     Attributes
     ----------
-    data : CropData
+    _data : CropData
         Reference to the crop data; tracks all crop variables through the simulation.
-    growth_constraints : GrowthConstraints
+    _growth_constraints : GrowthConstraints
         Process component controlling growth constraints, limits plant growth as a function of stressors.
-    biomass_allocation : BiomassAllocation
+    _biomass_allocation : BiomassAllocation
         Process component controlling allocation of plant biomass as a function of growth and photosynthesis.
-    water_dynamics : WaterDynamics
+    _water_dynamics : WaterDynamics
         Process component controlling plant water dynamics.
-    water_uptake : WaterUptake
+    _water_uptake : WaterUptake
         Process component controlling water uptake from soil.
-    nitrogen_incorporation : NitrogenIncorporation
+    _nitrogen_incorporation : NitrogenIncorporation
         Process component controlling plant nitrogen incorporation, including uptake and fixation.
-    phosphorus_incorporation : PhosphorusIncorporation
+    _phosphorus_incorporation : PhosphorusIncorporation
         Process component controlling plant phosphorus uptake and incorporation.
-    heat_units : HeatUnits
+    _heat_units : HeatUnits
         Process component controlling plant heat accumulation.
-    leaf_area_index : LeafAreaIndex
+    _leaf_area_index : LeafAreaIndex
         Process component controlling canopy growth, including leaf area index.
-    root_development : RootDevelopment
+    _root_development : RootDevelopment
         Process component controlling plant root development.
-    crop_management : CropManagement
+    _crop_management : CropManagement
         Process component controlling calculation of end-of-season production.
-    dormancy : Dormancy
+    _dormancy : Dormancy
         Process component performing dormancy operations.
 
     Notes
@@ -68,80 +68,22 @@ class Crop:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         # Common data object that is updated throughout routines
-        self.data = crop_data or CropData()  # defaults if not given
+        self._data = crop_data or CropData()  # defaults if not given
 
         # growth process components
-        self.growth_constraints = GrowthConstraints(self.data)
-        self.biomass_allocation = BiomassAllocation(self.data)
-        self.water_dynamics = WaterDynamics(self.data)  # needs soil.evapotranspiration.evapotranspirate() called 1st
-        self.water_uptake = WaterUptake(self.data)
-        self.nitrogen_incorporation = NitrogenIncorporation(self.data)
-        self.phosphorus_incorporation = PhosphorusIncorporation(self.data)
-        self.heat_units = HeatUnits(self.data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
-        self.leaf_area_index = LeafAreaIndex(self.data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
-        self.root_development = RootDevelopment(self.data)
-        self.crop_management = CropManagement(self.data)
-        self.dormancy = Dormancy(self.data)
+        self._growth_constraints = GrowthConstraints(self._data)
+        self._biomass_allocation = BiomassAllocation(self._data)
+        self._water_dynamics = WaterDynamics(self._data)  # needs soil.evapotranspiration.evapotranspirate() called 1st
+        self._water_uptake = WaterUptake(self._data)
+        self._nitrogen_incorporation = NitrogenIncorporation(self._data)
+        self._phosphorus_incorporation = PhosphorusIncorporation(self._data)
+        self._heat_units = HeatUnits(self._data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
+        self._leaf_area_index = LeafAreaIndex(self._data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
+        self._root_development = RootDevelopment(self._data)
+        self._crop_management = CropManagement(self._data)
+        self._dormancy = Dormancy(self._data)
 
-    def grow_crop(
-        self,
-        soil_data: SoilData,
-        incoming_light: float,
-        mean_air_temperature: float,
-        min_air_temperature: float,
-        max_air_temperature: float,
-        simulate_water_stress: bool,
-        simulate_temp_stress: bool,
-        simulate_nitrogen_stress: bool,
-        simulate_phosphorus_stress: bool,
-    ) -> None:
-        """
-        Main function for growing the crop on a daily basis.
-
-        Parameters
-        ----------
-        soil_data : SoilData
-            The SoilData object that tracks soil properties.
-        incoming_light : float
-            Incoming light radiation energy (MJ/m).
-        mean_air_temperature : float
-            Average air temperature for the day (°C).
-        min_air_temperature : float
-            Minimum air temperature for the day (°C).
-        max_air_temperature : float
-            Maximum air temperature for the day (°C).
-        simulate_water_stress : bool
-            Whether water stress should affect crop growth.
-        simulate_temp_stress : bool
-            Whether temperature stress should affect crop growth.
-        simulate_nitrogen_stress : bool
-            Whether nitrogen stress should affect crop growth.
-        simulate_phosphorus_stress : bool
-            Whether phosphorus stress should affect crop growth.
-
-        Notes
-        -----
-        This function acts as a wrapper for all the Crop growth process sub-routines.
-        It should be called every day that the crop is alive and growing in the simulation.
-
-        """
-        if self.data.in_growing_season:
-            self.heat_units.absorb_heat_units(mean_air_temperature, min_air_temperature, max_air_temperature)
-            self.root_development.develop_roots()
-            self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
-            self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
-            self.growth_constraints.constrain_growth(
-                self.data.max_transpiration,
-                mean_air_temperature,
-                simulate_water_stress,
-                simulate_temp_stress,
-                simulate_nitrogen_stress,
-                simulate_phosphorus_stress,
-            )
-            self.leaf_area_index.grow_canopy()
-            self.biomass_allocation.allocate_biomass(incoming_light)
-
-    def daily_crop_update(
+    def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
     ) -> None:
         """
@@ -156,27 +98,27 @@ class Crop:
         soil_data : SoilData
             The SoilData object that tracks soil properties.
         """
-        if self.data.is_mature or self.data.is_dormant:
+        if self._data.is_mature or self._data.is_dormant:
             return
 
-        self.heat_units.absorb_heat_units(
+        self._heat_units.absorb_heat_units(
             current_conditions.mean_air_temperature,
             current_conditions.min_air_temperature,
             current_conditions.max_air_temperature,
         )
-        self.root_development.develop_roots()
-        self.nitrogen_incorporation.incorporate_nitrogen(soil_data)
-        self.phosphorus_incorporation.incorporate_phosphorus(soil_data)
-        self.growth_constraints.constrain_growth(
-            self.data.max_transpiration,
+        self._root_development.develop_roots()
+        self._nitrogen_incorporation.incorporate_nitrogen(soil_data)
+        self._phosphorus_incorporation.incorporate_phosphorus(soil_data)
+        self._growth_constraints.constrain_growth(
+            self._data.max_transpiration,
             current_conditions.mean_air_temperature,
             field_data.simulate_water_stress,
             field_data.simulate_temp_stress,
             field_data.simulate_nitrogen_stress,
             field_data.simulate_phosphorus_stress,
         )
-        self.leaf_area_index.grow_canopy()
-        self.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
+        self._leaf_area_index.grow_canopy()
+        self._biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
     def cycle_water_for_crops(
         self, actual_evaporation: float, full_evapotranspirative_demand: float, soil_data: SoilData
@@ -186,24 +128,26 @@ class Crop:
 
         Parameters
         ----------
-        acutal_evaporation : float
+        actual_evaporation : float
             Evaporation on a given day (mm).
         full_evapotranspirative_demand : float
             Potential evapotranspiration on a given day (mm).
+        soil_data : SoilData
+            An instance of the SoilData class (unitless).
         """
 
-        if self.data.in_growing_season:
-            self.water_uptake.uptake_water(soil_data)
-            self.water_dynamics.cycle_water(
+        if self._data.in_growing_season:
+            self._water_uptake.uptake_water(soil_data)
+            self._water_dynamics.cycle_water(
                 actual_evaporation,
-                self.data.water_uptake,
+                self._data.water_uptake,
                 full_evapotranspirative_demand,
             )
         else:
-            self.data.cumulative_evaporation = 0.0
-            self.data.cumulative_transpiration = 0.0
-            self.data.cumulative_potential_evapotranspiration = 0.0
-            self.data.cumulative_water_uptake = 0.0
+            self._data.cumulative_evaporation = 0.0
+            self._data.cumulative_transpiration = 0.0
+            self._data.cumulative_potential_evapotranspiration = 0.0
+            self._data.cumulative_water_uptake = 0.0
 
     def get_canopy_water_excess_capacity(self) -> float:
         """
@@ -215,7 +159,7 @@ class Crop:
         float
             The excess capacity in the canopy (can be negative if over capacity).
         """
-        return self.data.water_canopy_storage_capacity - self.data.canopy_water
+        return self._data.water_canopy_storage_capacity - self._data.canopy_water
 
     def calculate_canopy_excess_water(self, canopy_water_excess_capacity: float) -> float:
         """
@@ -243,7 +187,7 @@ class Crop:
             The excess water in the canopy to adjust (negative value).
         """
         if excess_water_in_canopy != 0.0:
-            self.data.canopy_water = self.data.water_canopy_storage_capacity
+            self._data.canopy_water = self._data.water_canopy_storage_capacity
 
     def store_water_in_canopy(self, canopy_water_excess_capacity: float, precipitation_reaching_soil: float) -> float:
         """
@@ -252,7 +196,7 @@ class Crop:
         Parameters
         ----------
         canopy_water_excess_capacity : float
-            The excess capacity of the canopy.
+            The excess capacity of the canopy (mm).
         precipitation_reaching_soil : float
             Amount of precipitation available to be stored in the canopy (mm).
 
@@ -262,7 +206,7 @@ class Crop:
             The amount of precipitation left after storing in the canopy (mm).
         """
         water_taken_to_be_stored = min(precipitation_reaching_soil, max(0.0, canopy_water_excess_capacity))
-        self.data.canopy_water += water_taken_to_be_stored
+        self._data.canopy_water += water_taken_to_be_stored
         return precipitation_reaching_soil - water_taken_to_be_stored
 
     def evaporate_from_canopy(self, evapotranspirative_demand: float) -> float:
@@ -279,11 +223,18 @@ class Crop:
         float
             The amount of water evaporated from the crop's canopy (mm).
         """
-        amount_evaporated = self.water_dynamics.evaporate_from_canopy(evapotranspirative_demand)
+        amount_evaporated = self._water_dynamics.evaporate_from_canopy(evapotranspirative_demand)
         return amount_evaporated
 
     def should_harvest_based_on_heat(self) -> bool:
-        return self.data.use_heat_scheduling and self.data.heat_fraction >= self.data.harvest_heat_fraction
+        """_summary_
+
+        Returns
+        -------
+        bool
+            _description_
+        """
+        return self._data.use_heat_scheduling and self._data.heat_fraction >= self._data.harvest_heat_fraction
 
     @staticmethod
     def make_crop_from_config_dict(config: dict) -> Crop:
