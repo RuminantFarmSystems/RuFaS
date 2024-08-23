@@ -1,15 +1,7 @@
-from typing import Any, Union, Dict
+from typing import Any, Union
 from math import exp, sqrt
 
-from RUFAS.routines.field.crop_and_soil_constants import (
-    MILLIMETERS_TO_CENTIMETERS,
-    KILOGRAMS_TO_GRAMS,
-    KILOGRAMS_TO_MILLIGRAMS,
-    HECTARES_TO_SQUARE_CENTIMETERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_LITERS,
-    MILLIGRAMS_TO_KILOGRAMS,
-)
+from RUFAS.general_constants import GeneralConstants
 
 
 class ManurePool:
@@ -366,8 +358,8 @@ class ManurePool:
 
         """
         calculated_temperature_factor = (
-            (2 * (32**2) * (mean_air_temperature**2)) - (mean_air_temperature**4)
-        ) / (32**4)
+                                            (2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)
+                                        ) / (32 ** 4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -390,7 +382,7 @@ class ManurePool:
         SurPhos [1], pseudocode_soil [S.5.D.III.4]
 
         """
-        return 0.003 * (temperature_factor**0.5)
+        return 0.003 * (temperature_factor ** 0.5)
 
     @staticmethod
     def _determine_dry_manure_matter_assimilation(
@@ -426,7 +418,7 @@ class ManurePool:
         """
         if is_dung:
             exponential_term = exp(3.5 * sqrt(moisture_factor))
-            temperature_term = temperature_factor**0.1
+            temperature_term = temperature_factor ** 0.1
         else:
             exponential_term = exp(2.5 * moisture_factor)
             temperature_term = temperature_factor
@@ -499,9 +491,9 @@ class ManurePool:
         SurPhos Theoretical Documentation [11]
 
         """
-        rain_in_centimeters = rainfall * MILLIMETERS_TO_CENTIMETERS
-        dry_matter_in_grams = manure_dry_matter * KILOGRAMS_TO_GRAMS
-        coverage_in_square_centimeters = manure_coverage * HECTARES_TO_SQUARE_CENTIMETERS
+        rain_in_centimeters = rainfall * GeneralConstants.MM_TO_CM
+        dry_matter_in_grams = manure_dry_matter * GeneralConstants.KG_TO_GRAMS
+        coverage_in_square_centimeters = manure_coverage * GeneralConstants.HECTARES_TO_SQUARE_CENTIMETERS
         return (rain_in_centimeters / dry_matter_in_grams) * coverage_in_square_centimeters
 
     @staticmethod
@@ -581,11 +573,13 @@ class ManurePool:
             )
         )
 
-        runoff_in_liters = runoff * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_LITERS
+        runoff_in_liters = (
+            runoff * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS)
 
         phosphorus_lost_to_runoff_in_kg = (
-            runoff_dissolved_phosphorus_concentration * runoff_in_liters
-        ) * MILLIGRAMS_TO_KILOGRAMS
+                                              runoff_dissolved_phosphorus_concentration * runoff_in_liters
+                                          ) * GeneralConstants.MILLIGRAMS_TO_KG
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 
@@ -755,12 +749,12 @@ class ManurePool:
             The concentration of water extractable phosphorus in runoff on the current day (milligrams per liter).
 
         """
-        manure_leached_in_mg = manure_leached * KILOGRAMS_TO_MILLIGRAMS
-        field_size_in_square_mm = field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        manure_leached_in_mg = manure_leached * GeneralConstants.KG_TO_MILLIGRAMS
+        field_size_in_square_mm = field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
         return (
             manure_leached_in_mg
             * (1 / rainfall)
             * (1 / field_size_in_square_mm)
-            * (1 / CUBIC_MILLIMETERS_TO_LITERS)
+            * (1 / GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS)
             * distribution_factor
         )

@@ -4,14 +4,28 @@ from unittest.mock import call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_LITERS,
-    MILLIGRAMS_TO_KILOGRAMS,
-)
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.manure_pool import ManurePool
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
 from RUFAS.routines.field.soil.soil_data import SoilData
+
+
+def test_equal() -> None:
+    pool1 = ManurePool()
+    pool2 = ManurePool()
+    assert pool2 == pool1
+
+
+def test_manure_pool_attribute_not_equal() -> None:
+    pool1 = ManurePool()
+    pool2 = ManurePool(manure_dry_mass=521)
+    assert not pool1 == pool2
+
+
+def test_instance_not_equal() -> None:
+    pool1 = ManurePool()
+    observed = pool1 == 3
+    assert not observed
 
 
 @pytest.mark.parametrize(
@@ -27,7 +41,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 def test_determine_temperature_factor(avg_air_temp: float) -> None:
     """Tests that the temperature factor is correctly calculated and bounded."""
     observe = ManurePool._determine_temperature_factor(avg_air_temp)
-    expect = min(1, max(0, (2 * 32**2 * avg_air_temp**2 - avg_air_temp**4) / 32**4))
+    expect = min(1, max(0, (2 * 32 ** 2 * avg_air_temp ** 2 - avg_air_temp ** 4) / 32 ** 4))
     assert observe == expect
 
 
@@ -43,7 +57,7 @@ def test_determine_temperature_factor(avg_air_temp: float) -> None:
 def test_determine_dry_matter_decomposition_rate(temp_factor: float) -> None:
     """Tests that the dry matter decomposition rate is calculated correctly for a given day."""
     observe = ManurePool._determine_dry_matter_decomposition_rate(temp_factor)
-    expect = 0.003 * temp_factor**0.5
+    expect = 0.003 * temp_factor ** 0.5
     assert observe == expect
 
 
@@ -64,7 +78,7 @@ def test_determine_dry_manure_matter_assimilation(
     """
     observe = ManurePool._determine_dry_manure_matter_assimilation(moisture, temp_factor, area, is_dung)
     if is_dung:
-        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor**0.1) * area
+        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor ** 0.1) * area
     else:
         expect = (30 * exp(2.5 * moisture)) * temp_factor * area
     assert observe == expect
@@ -216,10 +230,11 @@ def test_determine_phosphorus_leached_from_surface(
     observed = ManurePool._determine_phosphorus_leached_from_surface(
         rain, runoff, area, manure_mass, field_coverage, phosphorus_mass, organic
     )
-    runoff_in_liters = runoff * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+    runoff_in_liters = (runoff * area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS *
+                        GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS)
     expected_covered_area = area * field_coverage
     expected_water_extractable_phosphorus_leached = min(25.0, phosphorus_mass)
-    expected_runoff_phosphorus_in_kg = 5 * runoff_in_liters * MILLIGRAMS_TO_KILOGRAMS
+    expected_runoff_phosphorus_in_kg = 5 * runoff_in_liters * GeneralConstants.MILLIGRAMS_TO_KG
     expected_infiltrated_phosphorus = max(
         0,
         expected_water_extractable_phosphorus_leached - expected_runoff_phosphorus_in_kg,
@@ -492,3 +507,66 @@ def test_daily_manure_update(rain: float, area: float, mean_temp: float, mocker:
     assert pool.water_extractable_inorganic_phosphorus == 11
 
     assert observed == 16
+
+
+@pytest.mark.parametrize(
+    "rain,area,mean_temp",
+    [
+        (12, 2.1, 14),
+        (0, 3.4, 9),
+        (3, 2.4, 28),
+    ],
+)
+def test_daily_manure_update_with_dry_mass(rain: float, area: float, mean_temp: float, mocker: MockerFixture) -> None:
+    """Tests that the main manure update method correctly calls all subroutines when manure dry mass is not 0."""
+    pool = ManurePool(manure_dry_mass=100)
+
+    mock_determine_temperature_factor = mocker.patch.object(pool, "_determine_temperature_factor", return_value=0.1)
+    mock_determine_decomposed_surface_manure = mocker.patch.object(
+        pool, "determine_decomposed_surface_manure", return_value=(0, 0)
+    )
+    mock_determine_mineralized_surface_phosphorus = mocker.patch.object(
+        pool, "determine_mineralized_surface_phosphorus", return_value=4
+    )
+    mock_adjust_manure_moisture_factor = mocker.patch.object(pool, "adjust_manure_moisture_factor", return_value=0.2)
+    mock_determine_assimilated_surface_manure = mocker.patch.object(
+        pool, "determine_assimilated_surface_manure", return_value=(0, 0)
+    )
+    mock_determine_assimilated_phosphorus_amount = mocker.patch.object(
+        pool, "determine_assimilated_phosphorus_amount", return_value=4
+    )
+
+    mineralized_surface_phosphorus_calls = [
+        call(0, 0.01, 0.1, 0),
+        call(0, 0.0025, 0.1, 0),
+        call(0, 0.1, 0.1, 0),
+    ]
+
+    assimilated_phosphorus_amount_calls = [call(0, 0), call(0, 0), call(0, 0)]
+
+    observed = pool.daily_manure_update(rain, area, mean_temp)
+    if rain < 1 or rain > 4:
+        mock_adjust_manure_moisture_factor.assert_called_once_with(rain, 0.1)
+    mock_determine_temperature_factor.assert_called_once_with(mean_temp)
+    mock_determine_decomposed_surface_manure.assert_called_once_with(0.1)
+    assert mock_determine_mineralized_surface_phosphorus.call_count == 3
+    mock_determine_mineralized_surface_phosphorus.assert_has_calls(mineralized_surface_phosphorus_calls)
+    mock_determine_assimilated_surface_manure.assert_called_once_with(0.1, area)
+    assert mock_determine_assimilated_phosphorus_amount.call_count == 4
+    mock_determine_assimilated_phosphorus_amount.assert_has_calls(assimilated_phosphorus_amount_calls)
+    assert pool.manure_dry_mass == 100
+    assert pool.manure_field_coverage == 0
+    assert pool.stable_organic_phosphorus == 0
+    assert pool.stable_inorganic_phosphorus == 0
+    assert pool.water_extractable_organic_phosphorus == 1
+    assert pool.water_extractable_inorganic_phosphorus == 11
+
+    assert observed == 16
+
+
+def test_runoff_reset() -> None:
+    """Test that the runoffs were being reset correctly."""
+    pool = ManurePool(organic_phosphorus_runoff=250, inorganic_phosphorus_runoff=77)
+    pool.runoff_reset()
+    assert pool.organic_phosphorus_runoff == 0
+    assert pool.inorganic_phosphorus_runoff == 0
