@@ -90,15 +90,15 @@ def mock_weather(mocker: MockerFixture) -> Weather:
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_supplier=MagicMock(ManureManager),
+                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_supplier=MagicMock(ManureManager),
+                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_supplier=MagicMock(ManureManager),
+                manure_manager=MagicMock(ManureManager),
             ),
         ],
         [],
@@ -143,15 +143,15 @@ def test_daily_update_routine(
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_supplier=MagicMock(ManureManager),
+                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_supplier=MagicMock(ManureManager),
+                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_supplier=MagicMock(ManureManager),
+                manure_manager=MagicMock(ManureManager),
             ),
         ],
         [],
@@ -1827,7 +1827,7 @@ def test_setup_field(
             "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
             "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
         }
-        assert new_field.manure_supplier == mocked_manure_manager
+        assert new_field.manure_manager == mocked_manure_manager
 
         mock_input_manager.get_data.assert_called_once_with(field_name)
         patched_fertilizer_setup.assert_called_once_with(field_config.get("fertilizer_management_specification"))
