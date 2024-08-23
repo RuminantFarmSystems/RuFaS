@@ -123,8 +123,8 @@ def test_task_manager_start(
     expected_add_log_calls = [
         call("Task Manager Start", "Task Manager Started.", info_map),
         call("Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map),
-        call("Task Manager parsed tasks", f"Parsed 2 tasks args.", info_map),
-        call("Task Manager expanded tasks", f"Expanded task args to 2. Starting the tasks...", info_map),
+        call("Task Manager parsed tasks", "Parsed 2 tasks args.", info_map),
+        call("Task Manager expanded tasks", "Expanded task args to 2. Starting the tasks...", info_map),
     ]
     mock_output_manager.add_log.assert_has_calls(expected_add_log_calls)
 
