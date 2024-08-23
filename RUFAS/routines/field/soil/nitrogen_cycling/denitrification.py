@@ -63,12 +63,17 @@ class Denitrification:
                 layer.soil_overall_carbon_fraction,
             )
 
-            nitrate_effect = self._calculate_nitrate_effect(layer.nitrate_content)
-            carbon_effect = self._calculate_carbon_effect(layer.carbon_emissions)
-            moisture_effect = self._calculate_moisture_effect(layer.water_filled_pore_space)
-            pH_effect = self._calculate_pH_effect(layer.pH)
+            nitrate_denitrification_partitioning_effect = self._calculate_nitrate_effect(layer.nitrate_content)
+            carbon_denitrification_partitioning_effect = self._calculate_carbon_effect(layer.carbon_emissions)
+            moisture_denitrification_partitioning_effect = self._calculate_moisture_effect(
+                layer.water_filled_pore_space
+            )
+            pH_denitrification_partitioning_effect = self._calculate_pH_effect(layer.pH)
             partitioning_factor = self._calculate_partitioning_factor(
-                nitrate_effect, carbon_effect, moisture_effect, pH_effect
+                nitrate_denitrification_partitioning_effect,
+                carbon_denitrification_partitioning_effect,
+                moisture_denitrification_partitioning_effect,
+                pH_denitrification_partitioning_effect,
             )
 
             nitrous_oxide_emissions = self._calculate_nitrous_oxide_emissions(denitrified_nitrates, partitioning_factor)
@@ -156,7 +161,7 @@ class Denitrification:
         nitrate_content_grams = nitrate_content * GeneralConstants.KG_TO_GRAMS
         fractional_term = atan(pi * 0.01 * (nitrate_content_grams - 190)) / pi
 
-        return (0.5 - fractional_term) * 25
+        return (1.0 - (0.5 + fractional_term)) * 25
 
     def _calculate_carbon_effect(self, carbon_respiration: float) -> float:
         """
