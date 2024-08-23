@@ -41,7 +41,7 @@ def test_instance_not_equal() -> None:
 def test_determine_temperature_factor(avg_air_temp: float) -> None:
     """Tests that the temperature factor is correctly calculated and bounded."""
     observe = ManurePool._determine_temperature_factor(avg_air_temp)
-    expect = min(1, max(0, (2 * 32 ** 2 * avg_air_temp ** 2 - avg_air_temp ** 4) / 32 ** 4))
+    expect = min(1, max(0, (2 * 32**2 * avg_air_temp**2 - avg_air_temp**4) / 32**4))
     assert observe == expect
 
 
@@ -57,7 +57,7 @@ def test_determine_temperature_factor(avg_air_temp: float) -> None:
 def test_determine_dry_matter_decomposition_rate(temp_factor: float) -> None:
     """Tests that the dry matter decomposition rate is calculated correctly for a given day."""
     observe = ManurePool._determine_dry_matter_decomposition_rate(temp_factor)
-    expect = 0.003 * temp_factor ** 0.5
+    expect = 0.003 * temp_factor**0.5
     assert observe == expect
 
 
@@ -78,7 +78,7 @@ def test_determine_dry_manure_matter_assimilation(
     """
     observe = ManurePool._determine_dry_manure_matter_assimilation(moisture, temp_factor, area, is_dung)
     if is_dung:
-        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor ** 0.1) * area
+        expect = 30 * exp(3.5 * sqrt(moisture)) * (temp_factor**0.1) * area
     else:
         expect = (30 * exp(2.5 * moisture)) * temp_factor * area
     assert observe == expect
@@ -230,8 +230,9 @@ def test_determine_phosphorus_leached_from_surface(
     observed = ManurePool._determine_phosphorus_leached_from_surface(
         rain, runoff, area, manure_mass, field_coverage, phosphorus_mass, organic
     )
-    runoff_in_liters = (runoff * area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS *
-                        GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS)
+    runoff_in_liters = (
+        runoff * area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+    )
     expected_covered_area = area * field_coverage
     expected_water_extractable_phosphorus_leached = min(25.0, phosphorus_mass)
     expected_runoff_phosphorus_in_kg = 5 * runoff_in_liters * GeneralConstants.MILLIGRAMS_TO_KG
