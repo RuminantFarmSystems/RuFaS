@@ -99,9 +99,7 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _setup_field(
-        field_name: str, manure_manager: ManureManager, feed_manager: FeedManager
-    ) -> Field:
+    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
         """
 
         Parameters
