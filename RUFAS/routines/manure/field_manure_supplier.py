@@ -1,7 +1,6 @@
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.output_manager import OutputManager
 
 
 """
@@ -45,9 +44,6 @@ TYPE_TO_CONSTANTS_MAP = {
         "phosphorus": PHOSPHORUS_TO_SOLID_MANURE_DRY_MASS,
     },
 }
-
-
-om = OutputManager()
 
 
 class FieldManureSupplier:
