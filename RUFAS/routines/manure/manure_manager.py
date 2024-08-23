@@ -137,7 +137,7 @@ class ManureManager:
                 "Manure for field applications will be created by the FieldManureSupplier",
                 info_map,
             )
-        self._field_manure_supplier = FieldManureSupplier()
+            self._field_manure_supplier = FieldManureSupplier()
         self.configure_manure_manager_components(pen_list)
 
     def configure_manure_manager_components(self, pen_list: List[PenManureData]) -> None:
