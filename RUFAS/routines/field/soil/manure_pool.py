@@ -356,8 +356,8 @@ class ManurePool:
 
         """
         calculated_temperature_factor = (
-                                            (2 * (32 ** 2) * (mean_air_temperature ** 2)) - (mean_air_temperature ** 4)
-                                        ) / (32 ** 4)
+            (2 * (32**2) * (mean_air_temperature**2)) - (mean_air_temperature**4)
+        ) / (32**4)
         return min(1.0, max(0.0, calculated_temperature_factor))
 
     @staticmethod
@@ -380,7 +380,7 @@ class ManurePool:
         SurPhos [1], pseudocode_soil [S.5.D.III.4]
 
         """
-        return 0.003 * (temperature_factor ** 0.5)
+        return 0.003 * (temperature_factor**0.5)
 
     @staticmethod
     def _determine_dry_manure_matter_assimilation(
@@ -416,7 +416,7 @@ class ManurePool:
         """
         if is_dung:
             exponential_term = exp(3.5 * sqrt(moisture_factor))
-            temperature_term = temperature_factor ** 0.1
+            temperature_term = temperature_factor**0.1
         else:
             exponential_term = exp(2.5 * moisture_factor)
             temperature_term = temperature_factor
@@ -572,12 +572,14 @@ class ManurePool:
         )
 
         runoff_in_liters = (
-            runoff * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
-            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS)
+            runoff
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+        )
 
         phosphorus_lost_to_runoff_in_kg = (
-                                              runoff_dissolved_phosphorus_concentration * runoff_in_liters
-                                          ) * GeneralConstants.MILLIGRAMS_TO_KG
+            runoff_dissolved_phosphorus_concentration * runoff_in_liters
+        ) * GeneralConstants.MILLIGRAMS_TO_KG
 
         infiltrated_phosphorus = max(0, water_extractable_phosphorus_leached - phosphorus_lost_to_runoff_in_kg)
 
