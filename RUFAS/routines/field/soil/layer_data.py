@@ -30,6 +30,8 @@ class LayerData:
         Top depth of the layer (mm).
     bottom_depth : float, optional
         Bottom depth of the layer (mm).
+    pH : float, default 7.0
+        pH of the soil layer.
     soil_water_concentration : float, optional, default 0.25
         Soil water concentration of the layer (mm water / mm soil).
     water_content : float, optional
@@ -224,6 +226,8 @@ class LayerData:
         Amount of nitrous oxide emitted from this soil layer on the current day (kg/ha).
     annual_nitrous_oxide_emissions_total : float, default 0.0
         Cumulative total amount of nitrates that have denitrified in a year (kg/ha).
+    dinitrogen_emissions : float, default 0.0
+        Amount of dinitrogen emitted from this soil layer on the current day (kg/ha).
     humus_mineralization_rate_factor : float, default 0.0003
         Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
         Reference: SWAT Input .BSN file, see "CMN" on page 101.
@@ -266,6 +270,8 @@ class LayerData:
     residue: InitVar[float] = 0
     top_depth: Optional[float] = None
     bottom_depth: Optional[float] = None
+
+    pH: float = 7.0
 
     # --- Water
     soil_water_concentration: float = 0.25  # arbitrary
@@ -403,6 +409,8 @@ class LayerData:
 
     nitrous_oxide_emissions: float = 0.0
     annual_nitrous_oxide_emissions_total: float = 0.0
+
+    dinitrogen_emissions: float = 0.0
 
     humus_mineralization_rate_factor: float = 0.0003
     denitrification_rate_coefficient: float = 1.4
@@ -958,6 +966,11 @@ class LayerData:
             return (self.saturation_content - self.water_content) / (
                 self.saturation_content - self.field_capacity_content
             )
+
+    @property
+    def water_filled_pore_space(self) -> float:
+        """Returns the fraction of pore space that is currently filled by water (unitless)."""
+        return self.water_content / self.saturation_content
 
     @property
     def silt_clay_content(self):
