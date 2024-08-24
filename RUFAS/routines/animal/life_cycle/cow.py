@@ -114,6 +114,9 @@ class Cow(HeiferIII):
 
         """
         super().__init__(args)
+        # if self.id == 168:
+        #     import remote_pdb
+        #     remote_pdb.set_trace("localhost", 4444)
 
         # current hard-coded values necessary for nutrient requirement
         # calculations
@@ -158,8 +161,6 @@ class Cow(HeiferIII):
 
         self._num_conception_rate_decreases: int = 0
         self._repro_state_manager: ReproStateManager = ReproStateManager()
-        if self.is_pregnant:
-            self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
 
         self.wood_l = 0
         self.wood_m = 0
@@ -184,6 +185,18 @@ class Cow(HeiferIII):
             self.CI = args["calving_interval"]
             self.set_parity_index()
             self.set_lactation_curve_params()
+
+        if self.is_pregnant:
+            self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
+            if not self.milking and self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]:
+                date_of_last_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+                self.days_in_milk = self.days_born - date_of_last_birth
+                self.milking = True
+                om.add_warning(
+                    f"Cow {self.id} has dried off before reaching dry period of pregnancy",
+                    f"Setting cow {self.id}'s milking status to true and days_in_milk to be {self.days_in_milk}",
+                    {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__}
+                )
 
     def get_cow_values(self) -> Dict[str, Any]:
         return {
@@ -314,6 +327,25 @@ class Cow(HeiferIII):
             )
         return 0.0
 
+    def check_management_attributes(self) -> None:
+        """Verifies that the state of the cow is acceptable given the management conditions of the simulation."""
+        if not self.is_pregnant:
+            return
+
+        is_valid_milking_status = self.milking and self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]
+        if is_valid_milking_status:
+            return
+
+        date_of_last_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+        self.days_in_milk = self.days_born - date_of_last_birth
+
+        om.add_warning(
+            f"Cow {self.id} has dried off before reaching dry period of pregnancy",
+            f"Setting cow {self.id}'s milking status to be milking and days_in_milk to be {self.days_in_milk}",
+            {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__}
+
+        )
+
     def update_milk_production_history(self, sim_day: int) -> None:
         """
         Updates the animal's milk production history by appending a
@@ -357,6 +389,15 @@ class Cow(HeiferIII):
         Returns: a random value draw from distribution of parameters
         """
         return np.random.normal(mean, std)
+
+    def set_milking_attributes(self) -> None:
+        is_wacky = self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"] and not self.milking
+        if not is_wacky:
+            return
+
+        self.days_in_milk = self.days_in_preg + 20
+        self.milking = True
+        print(f"milk attributes set {self.id=} {self.days_in_preg=}")
 
     def milking_update(self, sim_day: int, calving_interval: int | float) -> None:
         """
@@ -719,9 +760,14 @@ class Cow(HeiferIII):
                 if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
                     self.tissue_changed = 40 * self.days_in_milk / 70 * math.exp(1 - self.days_in_milk / 70)
         else:  # dry period
-            bodyweight_tissue = self.tissue_changed / (
-                self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
-            )
+            if self.gestation_length <= AnimalBase.config["days_in_preg_when_dry"]:
+                print(f"\n{self.days_born=} {self.id=} {self.events.events}")
+            try:
+                bodyweight_tissue = self.tissue_changed / (
+                    self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
+                )
+            except ZeroDivisionError:
+                bodyweight_tissue = 0.0
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
