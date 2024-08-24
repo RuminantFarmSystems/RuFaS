@@ -186,10 +186,11 @@ class Cow(HeiferIII):
         if self.is_pregnant:
             self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
             is_valid_milking_status = not self.milking and (self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"])
-            entered_herd_through_init = self.events.get_most_recent_date(const.INIT_HERD)
+            entered_herd_through_init = -1 != self.events.get_most_recent_date(const.INIT_HERD)
             if not is_valid_milking_status and entered_herd_through_init:
-                print(f"{self.milking} {self.days_in_milk} {self.days_born} {self.days_in_preg}")
                 date_of_last_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+                print(f"{self.milking=} {self.days_in_milk=} {self.days_born=} {self.days_in_preg=} {date_of_last_birth=}")
+                print(f"{self.events}")
                 self.days_in_milk = self.days_born - date_of_last_birth
                 self.milking = True
                 om.add_warning(
@@ -732,7 +733,9 @@ class Cow(HeiferIII):
                 if self.days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
                     self.tissue_changed = 40 * self.days_in_milk / 70 * math.exp(1 - self.days_in_milk / 70)
         else:  # dry period
-            bodyweight_tissue = self.tissue_changed / self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
+            bodyweight_tissue = self.tissue_changed / (
+                self.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
+            )
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue
 
