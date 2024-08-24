@@ -84,9 +84,6 @@ class Pen:
     animals_in_pen : dictionary
         A dictionary of all animals in this pen that maps animal id to animal object.
 
-    populated : bool
-        True iff there is at least 1 animal in the pen, and false otherwise.
-
     avg_DBW : float
         The average daily change in (delta) body weight of the animals in the pen.
         Used for ration formulation.
@@ -302,6 +299,7 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
+        # the animal_grouping_scenario in this pen, utilizes the AnimalGroupingScenario Enum
         if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
             self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
         else:
@@ -510,11 +508,8 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if AnimalType.DRY_COW or AnimalType.LAC_COW in list(self.animal_grouping_scenario.values()):  # CHECK
-            for animal in list(self.animals_in_pen.values()):
-                if type(animal).__name__ == "Cow":
-                    animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
-        if self.animal_combination == 2 or self.animal_combination == 3 or self.animal_combination == 4:  # CHECK
+        contains_cows = self.animal_combination == 2 or self.animal_combination == 3 or self.animal_combination == 4
+        if contains_cows:
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)

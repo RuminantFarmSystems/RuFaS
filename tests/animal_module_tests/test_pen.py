@@ -82,8 +82,6 @@ def mock_animal_list_combined(mock_animal_list, mock_animal_list_ii) -> List[Mag
 def pen_with_animals(pen: Pen, mock_animal_list: List[MagicMock]) -> Pen:
     for animal in mock_animal_list:
         pen.animals_in_pen[animal.id] = animal
-    # pen.animals_in_pen = mock_animal_list
-
     return pen
 
 
@@ -385,9 +383,37 @@ def test_calc_avg_growth(pen: Pen, pen_animals, expected) -> None:
     assert actual == expected
 
 
-def test_calc_daily_walking_dist():
+@pytest.mark.parametrize(
+    "animal_combination, animals",
+    [
+        (AnimalCombination.CALF)[],
+        (AnimalCombination.GROWING),
+        (AnimalCombination.LAC_COW),
+        (AnimalCombination.CLOSE_UP),
+        (AnimalCombination.GROWING_AND_CLOSE_UP),
+    ]
+)
+def test_calc_daily_walking_dist(pen: Pen, animal_combination : AnimalCombination, mocker : MockerFixture) -> None:
     """Unit test for function calc_daily_walking_dist in file routines/animal/pen.py"""
-    pass
+    pen.add_new_animals(animal_list(mocker))
+    pen.animal_combination = animal_combination
+    mocker.patch("RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist")
+    # cow = mocker.MagicMock(autospec=Cow)
+    # mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Cow", return_value=cow)
+    # cow.calc_daily_walking_dist = mocker.MagicMock()
+
+    has_cows = animal_combination == AnimalCombination.LAC_COW or animal_combination == AnimalCombination.CLOSE_UP or animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP
+    for animal in list(pen.animals_in_pen.values()):
+        if type(animal).__name__ == "Cow":
+            # animal.calc_daily_walking_dist = mocker.MagicMock()
+            # mock_calc = mocker.patch.object(Cow, "calc_daily_walking_dist", return_value=mocker.MagicMock())
+            animal.calc_daily_walking_dist = MagicMock()
+            pen.calc_daily_walking_dist()
+            if has_cows:
+                animal.calc_daily_walking_dist.assert_called()
+            else:
+                animal.calc_daily_walking_dist.assert_not_called()
+    # assert
 
 
 def test_call_p_rqmts():
@@ -432,7 +458,7 @@ def dict_to_tuple_list(d: Dict) -> List[Tuple]:
     return list(d.items())
 
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     "test_animal_combination, expected_feed_allocation",
     dict_to_tuple_list(feed_allocations()),
 )
@@ -451,7 +477,7 @@ def test_subset_class_feeds(
     assert pen.allocated_feeds == expected_feed_allocation
 
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     "animal_type, is_lactating_cow, expected_prefix",
     [
         # Testing with each animal type and its corresponding prefix
@@ -499,7 +525,7 @@ def test_get_prefix_and_default_manure_excretion(
         patch_for_get_default_animal_manure_excretions.assert_called_once()
 
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     "animal_class, is_lactating",
     [
         (Calf, False),
@@ -572,7 +598,7 @@ def test_calc_animal_manure_excretion(
         )
 
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     "initial_dict, prefix, default_manure, initial_pen_manure, animal_manure_excretion, expected_dict, expected_manure",
     [
         # Existing Prefix
@@ -682,7 +708,7 @@ def test_update_animal_manure_excretion_data(
         patch_for_add_animal_manure_excretions.assert_has_calls([mocker.call(default_manure, animal_manure_excretion)])
 
 
-@pytest.mark.parametrize(
+@ pytest.mark.parametrize(
     "is_populated, animals_in_pen, mock_pen_manure",
     [
         # Testing with two distinct animal types and two manure properties

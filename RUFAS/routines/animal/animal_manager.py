@@ -1186,26 +1186,6 @@ class AnimalManager:
 
         return animal_types_in_pen
 
-    @classmethod
-    def _determine_classes_in_pen(cls, pen: Pen) -> Set[str]:
-        """
-        Get the classes of animals in the pen.
-
-        Parameters
-        ----------
-        pen : Pen
-            The pen to get the classes of animals from.
-
-        Returns
-        -------
-        Set
-            The set of classes of animals in the pen.
-
-        """
-
-        animal_types_in_pen = cls._get_animal_types_in_pen(pen)
-        return {animal_type.value for animal_type in animal_types_in_pen}
-
     def _get_animals_snapshot(self) -> Dict[str, set]:
         """
         Create a snapshot of the current state of all the animals in the system.

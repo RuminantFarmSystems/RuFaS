@@ -1,6 +1,5 @@
 import pytest
 from pytest_mock import MockerFixture
-import random
 
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.pen import Pen
@@ -87,17 +86,17 @@ def test_count_lactating_cows(
 
 
 @pytest.mark.parametrize(
-    "pen_type, has_cows, expected_area, raises_error",
+    "pen_type, has_cows, expected_area, raises_error, animal_combination",
     [
-        ("freestall", True, 3.5, False),
-        ("freestall", False, 2.5, False),
-        ("tiestall", True, 1.2, False),
-        ("tiestall", False, 1.0, False),
-        ("compost bedded pack barn", True, 5.0, False),
-        ("compost bedded pack barn", False, 3.0, False),
-        ("open lot", True, 5.0, False),
-        ("open lot", False, 3.0, False),
-        ("dummy", True, None, True),
+        ("freestall", True, 3.5, False, AnimalCombination.GROWING_AND_CLOSE_UP),
+        ("freestall", False, 2.5, False, AnimalCombination.LAC_COW),
+        ("tiestall", True, 1.2, False, AnimalCombination.CLOSE_UP),
+        ("tiestall", False, 1.0, False, AnimalCombination.GROWING_AND_CLOSE_UP),
+        ("compost bedded pack barn", True, 5.0, False, AnimalCombination.LAC_COW),
+        ("compost bedded pack barn", False, 3.0, False, AnimalCombination.CLOSE_UP),
+        ("open lot", True, 5.0, False, AnimalCombination.GROWING_AND_CLOSE_UP),
+        ("open lot", False, 3.0, False, AnimalCombination.LAC_COW),
+        ("dummy", True, None, True, AnimalCombination.CLOSE_UP),
     ],
 )
 def test_barn_area_from_pen_type(
@@ -105,6 +104,7 @@ def test_barn_area_from_pen_type(
     has_cows: bool,
     expected_area: float | None,
     raises_error: bool,
+    animal_combination: AnimalCombination,
     mocker: MockerFixture,
 ):
     """Unit test for barn_area_from_pen_type property in file manure_manager_pen.py"""
@@ -117,13 +117,8 @@ def test_barn_area_from_pen_type(
     mock_pen = ManureManagerPen(mocker.MagicMock())
     mock_pen.pen_type = pen_type
     mock_pen.num_stalls = 1
-    animal_combinations = [
-        AnimalCombination.LAC_COW,
-        AnimalCombination.GROWING_AND_CLOSE_UP,
-        AnimalCombination.CLOSE_UP,
-    ]
 
-    mock_pen.animal_combination = random.choice(animal_combinations) if has_cows else AnimalCombination.CALF
+    mock_pen.animal_combination = animal_combination if has_cows else AnimalCombination.CALF
 
     # Act & Assert
     if raises_error:
