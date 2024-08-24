@@ -9,8 +9,6 @@ from ...units import MeasurementUnits
 from ...output_manager import OutputManager
 
 
-om = OutputManager()
-
 """Fraction of effluent that is dry matter by mass."""
 DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
 """Number of days that loss of effluent occurs over after a crop is ensiled."""
@@ -40,6 +38,7 @@ class Silage(Storage):
             CropCategory.GRASS,
             CropCategory.SMALL_GRAIN,
         ]
+        self.om = OutputManager()
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
@@ -87,8 +86,8 @@ class Silage(Storage):
 
             self.reset_mass_attributes_after_loss(crop, dry_matter_loss, moisture_loss)
 
-        om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
-        om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
+        self.om.add_variable("total_effluent_dry_matter_loss", total_effluent_dry_matter_loss, info_map)
+        self.om.add_variable("total_effluent_moisture_loss", total_effluent_moisture_loss, info_map)
 
         super().process_degradations(weather, time)
 
