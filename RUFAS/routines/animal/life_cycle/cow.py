@@ -161,8 +161,6 @@ class Cow(HeiferIII):
 
         self._num_conception_rate_decreases: int = 0
         self._repro_state_manager: ReproStateManager = ReproStateManager()
-        if self.is_pregnant:
-            self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
 
         self.wood_l = 0
         self.wood_m = 0
@@ -187,6 +185,18 @@ class Cow(HeiferIII):
             self.CI = args["calving_interval"]
             self.set_parity_index()
             self.set_lactation_curve_params()
+
+        if self.is_pregnant:
+            self._repro_state_manager.enter(ReproStateEnum.PREGNANT)
+            if not self.milking and self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]:
+                date_of_last_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+                self.days_in_milk = self.days_born - date_of_last_birth
+                self.milking = True
+                om.add_warning(
+                    f"Cow {self.id} has dried off before reaching dry period of pregnancy",
+                    f"Setting cow {self.id}'s milking status to true and days_in_milk to be {self.days_in_milk}",
+                    {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__}
+                )
 
     def get_cow_values(self) -> Dict[str, Any]:
         return {
@@ -316,6 +326,25 @@ class Cow(HeiferIII):
                 * math.exp((0 - AnimalBase.config["d"]) * self.days_in_milk)
             )
         return 0.0
+
+    def check_management_attributes(self) -> None:
+        """Verifies that the state of the cow is acceptable given the management conditions of the simulation."""
+        if not self.is_pregnant:
+            return
+
+        is_valid_milking_status = self.milking and self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]
+        if is_valid_milking_status:
+            return
+
+        date_of_last_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
+        self.days_in_milk = self.days_born - date_of_last_birth
+
+        om.add_warning(
+            f"Cow {self.id} has dried off before reaching dry period of pregnancy",
+            f"Setting cow {self.id}'s milking status to be milking and days_in_milk to be {self.days_in_milk}",
+            {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__}
+
+        )
 
     def update_milk_production_history(self, sim_day: int) -> None:
         """
