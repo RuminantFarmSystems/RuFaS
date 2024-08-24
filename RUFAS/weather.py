@@ -1,73 +1,43 @@
+import datetime
+
 import numpy as np
 
-from RUFAS.config import Config
+from RUFAS.units import MeasurementUnits
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
-from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
-from RUFAS.util import Utility
 
-im = InputManager()
 om = OutputManager()
-
-
-def is_leap_year(year):
-    """
-    Description:
-        Helper method determines if the given year is a leap year
-    Args:
-        year: an int of the year
-    Returns:
-        bool: True if the year is a leap year
-    """
-    if year % 400 == 0:
-        return True
-    elif year % 100 == 0:
-        return False
-    elif year % 4 == 0:
-        return True
-    else:
-        return False
 
 
 class Weather:
     """
     The `Weather` class manages all weather data used to run a single simulation.
 
+    Parameters
+    ----------
+    weather_file : dict[str, List[Any]]
+        The weather dictionary read from the provided weather input source.
+
     Attributes
     ----------
-    __precipitation : list
-        Amounts of precipitation that fall on given days (mm).
-    __max_daily_temperature : list
-        Maximum temperatures of days (°C).
-    __min_daily_temperature : list
-        Minimum temperatures of days (°C).
-    __mean_daily_temperature : list
-        Mean temperatures of days (°C).
-    __radiation : list
-        Energy from the sun (MJ/m^2).
-    __irrigation : list
-        Amounts of irrigation applied to fields on given days (mm).
-    __mean_annual_temperature : float
+    weather_data : dict[datetime, CurrentDayCondition]
+        A dictionary that maps a date to the corresponding CurrentDayCondition.
+    mean_annual_temperature : int
         Mean of mean daily temperatures over all the weather data used by the simulation (°C).
-
-    Notes
-    -----
-    All attributes besides the mean annual temperature are held as two-dimensional arrays, with the first array being
-    the year, and the second being the day.
 
     """
 
-    def __init__(self, weather_file: dict, config: Config):
+    def __init__(self, weather_file: dict, time: Time):
         """
-        Initializes the a `Weather` instance using user-supplied whether data and overall simulation parameters.
+        Initializes the `Weather` instance using user-supplied whether data and overall simulation parameters.
 
         Parameters
         ----------
         weather_file : dict
             All the weather data available to be used by the simulation.
-        config : Config
-            Config instance containing information about the configuration of the simulation.
+        time : Time
+            The Time instance containing time configuration information of the simulation.
 
         Notes
         -----
@@ -76,83 +46,53 @@ class Weather:
         time starts at 1).
 
         """
+        self.weather_data = {}
 
-        years = config.years
-        w_start_year = config.w_start_year
-        w_start_day = config.w_start_day
-        start_year = config.start_year
-        start_day = config.start_day
+        self.check_adequate_weather_data(weather_file, time)
 
-        # initialize data sets
-        self.__precipitation = []
-        self.__max_daily_temperature = []
-        self.__min_daily_temperature = []
-        self.__mean_daily_temperature = []
-        self.__radiation = []
-        self.__irrigation = []
-        self.__mean_annual_temperature: float = None
-        self.__latitude: float = self._get_latitude()
+        start_time = time.start_date
+        end_time = time.end_date
 
-        year_length = config.year_length
-        leap_year_length = config.leap_year_length
+        for i in range(len(weather_file["year"])):
+            year = weather_file["year"][i]
+            jday = weather_file["jday"][i]
+            date_key = Time.convert_year_jday_to_date(year, jday)
 
-        # calculate the number of days between the beginning of
-        # the weather file and the next year
-        if is_leap_year(w_start_year):
-            w_day_offset = leap_year_length - w_start_day
-        else:
-            w_day_offset = year_length - w_start_day
+            # Only include dates within the simulation period to save on space
+            if start_time <= date_key <= end_time:
+                conditions = CurrentDayConditions(
+                    incoming_light=weather_file["Hday"][i],
+                    min_air_temperature=weather_file["low"][i],
+                    mean_air_temperature=weather_file["avg"][i],
+                    max_air_temperature=weather_file["high"][i],
+                    precipitation=weather_file["precip"][i],
+                    irrigation=weather_file["irrigation"][i],
+                )
+                if date_key in self.weather_data.keys():
+                    info_map = {
+                        "class": self.__class__.__name__,
+                        "function": "__init__",
+                        "prefix": "Weather",
+                    }
+                    om.add_warning(
+                        "Duplicate weather", f"duplicate weather data found for the date {date_key}", info_map
+                    )
+                self.weather_data[date_key] = conditions
 
-        # calculates the amount of days between the start day of the weather
-        # file and the start day of the simulation
-        if start_year == w_start_year:
-            days_to_start = start_day - w_start_day
-        elif start_year == w_start_year + 1:
-            days_to_start = w_day_offset + start_day
-        else:
-            days_to_start = w_day_offset + start_day
-            temp_year = w_start_year + 1
-            while temp_year != start_year:
-                if is_leap_year(temp_year):
-                    days_to_start += leap_year_length
-                else:
-                    days_to_start += year_length
-                temp_year += 1
+        self.mean_annual_temperature = self._calculate_average_annual_temperature(weather_file["avg"])
 
-        # fill the weather arrays with zeros for the size of each year in years[]
-        for year in years:
-            self.__precipitation.append([0.0 for _ in range(len(year))])
-            self.__max_daily_temperature.append([0.0 for _ in range(len(year))])
-            self.__min_daily_temperature.append([0.0 for _ in range(len(year))])
-            self.__mean_daily_temperature.append([0.0 for _ in range(len(year))])
-            self.__radiation.append([0.0 for _ in range(len(year))])
-            self.__irrigation.append([0.0 for _ in range(len(year))])
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": "__init__",
+            "prefix": "Weather",
+        }
+        om.add_variable(
+            "average_annual_temperature",
+            self.mean_annual_temperature,
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
+        )
 
-        for i in range(len(weather_file['year'])):
-            current_year = weather_file['year'][i]
-            current_day = weather_file['jday'][i]
-
-            current_year_index = current_year - start_year
-            current_day_index = current_day - 1
-
-            if not start_year <= current_year <= config.end_year:
-                continue
-            elif current_year == config.end_year and current_day > config.end_day:
-                break
-
-            self.__precipitation[current_year_index][current_day_index] = weather_file['precip'][i]
-            self.__max_daily_temperature[current_year_index][current_day_index] = weather_file['high'][i]
-            self.__min_daily_temperature[current_year_index][current_day_index] = weather_file['low'][i]
-            self.__mean_daily_temperature[current_year_index][current_day_index] = weather_file['avg'][i]
-            self.__radiation[current_year_index][current_day_index] = weather_file['Hday'][i]
-            self.__irrigation[current_year_index][current_day_index] = weather_file['irrigation'][i]
-
-        self.__mean_annual_temperature = self._calculate_average_annual_temperature(weather_file['avg'])
-
-        info_map = {"class": self.__class__.__name__, "function": self.__init__.__name__, "prefix": "Weather"}
-        om.add_variable("average_annual_temperature", self.__mean_annual_temperature, info_map)
-
-    def get_current_day_conditions(self, time: Time) -> CurrentDayConditions:
+    def get_current_day_conditions(self, time: Time, latitude: float | None = None) -> CurrentDayConditions:
         """
         Creates a CurrentDayConditions object containing all the weather conditions on the current day.
 
@@ -160,6 +100,9 @@ class Weather:
         ----------
         time: Time
             Time object containing the current time of the simulation.
+        latitude : float | None, default None
+            Latitude of the location which weather data is being collected for (degrees). If no latitude is provided,
+            then the daylength will not be provided in the returned CurrentDayConditions instance.
 
         Returns
         -------
@@ -168,29 +111,64 @@ class Weather:
 
         Raises
         ------
-        IndexError
+        KeyError
             While attempting to collect weather conditions that are not contained in the Weather object.
 
         """
-        year = time.year
-        day = time.day
-        month = Utility.day_to_month_conversion(day, time.calendar_year)
-        daylength = CurrentDayConditions.determine_daylength(day, self.__latitude, month)
-        try:
-            current_conditions = CurrentDayConditions(
-                incoming_light=self.__radiation[year - 1][day - 1],
-                min_air_temperature=self.__min_daily_temperature[year - 1][day - 1],
-                mean_air_temperature=self.__mean_daily_temperature[year - 1][day - 1],
-                max_air_temperature=self.__max_daily_temperature[year - 1][day - 1],
-                annual_mean_air_temperature=self.__mean_annual_temperature,
-                precipitation=self.__precipitation[year - 1][day - 1],
-                irrigation=self.__irrigation[year - 1][day - 1],
-                daylength=daylength
+        if latitude:
+            daylength = CurrentDayConditions.determine_daylength(
+                time.current_julian_day, latitude, time.current_calendar_year
             )
-        except IndexError:
-            raise IndexError(f"Attempted to get weather conditions for day: {day}, year: {year}.")
+        else:
+            daylength = None
+        try:
+            self.weather_data[time.current_date].daylength = daylength
+            self.weather_data[time.current_date].annual_mean_air_temperature = self.mean_annual_temperature
+        except KeyError:
+            raise KeyError(
+                f"Attempted to get weather conditions for day: {time.current_julian_day},"
+                f" year: {time.current_calendar_year}."
+            )
 
-        return current_conditions
+        return self.weather_data[time.current_date]
+
+    def get_conditions_series(
+        self, time: Time, starting_offset: int, ending_offset: int, latitude: float | None = None
+    ) -> list[CurrentDayConditions]:
+        """
+        Generates a series of CurrentDayConditions.
+
+        Parameters
+        ----------
+        time : Time
+            A time instance containing the current time information of the simulation.
+        starting_offset : int
+            Number of days before or after the given date to start the weather conditions series.
+        ending_offset : int
+            Number of days before or after the given date to end the weather conditions series.
+        latitude : float | None, default None
+            The latitude of the location that weather conditions are being collected for (degrees). If no latitude is
+            provided, then no daylengths will be included in weather conditions returned.
+
+        Returns
+        -------
+        list[CurrentDayConditions]
+            Series of current day conditions in chronological order.
+
+        """
+        conditions_list = []
+
+        for i in range(starting_offset, ending_offset + 1):
+            date = time.current_date + datetime.timedelta(days=i)
+            if latitude:
+                daylength = CurrentDayConditions.determine_daylength(int(date.strftime("%j")), latitude, date.year)
+            else:
+                daylength = None
+            self.weather_data[date].daylength = daylength
+            self.weather_data[date].annual_mean_air_temperature = self.mean_annual_temperature
+            conditions_list.append(self.weather_data[date])
+
+        return conditions_list
 
     def record_weather(self, time: Time) -> None:
         """
@@ -202,20 +180,47 @@ class Weather:
             Time object containing the current time of the simulation.
 
         """
-        info_map = {"class": self.__class__.__name__, "function": self.record_weather.__name__, "prefix": "Weather"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.record_weather.__name__,
+            "prefix": "Weather",
+        }
         current_weather = self.get_current_day_conditions(time)
-        om.add_variable("precipitation", current_weather.rainfall, info_map)
-        om.add_variable("rainfall", current_weather.rainfall, info_map)
-        om.add_variable("snowfall", current_weather.snowfall, info_map)
-        om.add_variable("daylength", current_weather.daylength, info_map)
-        om.add_variable("maximum_temperature", current_weather.max_air_temperature, info_map)
-        om.add_variable("minimum_temperature", current_weather.min_air_temperature, info_map)
-        om.add_variable("average_temperature", current_weather.mean_air_temperature, info_map)
-        om.add_variable("radiation", current_weather.incoming_light, info_map)
-        om.add_variable("irrigation", current_weather.irrigation, info_map)
+        om.add_variable(
+            "precipitation",
+            current_weather.precipitation,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        om.add_variable("rainfall", current_weather.rainfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable("snowfall", current_weather.snowfall, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}))
+        om.add_variable(
+            "maximum_temperature",
+            current_weather.max_air_temperature,
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
+        )
+        om.add_variable(
+            "minimum_temperature",
+            current_weather.min_air_temperature,
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
+        )
+        om.add_variable(
+            "average_temperature",
+            current_weather.mean_air_temperature,
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
+        )
+        om.add_variable(
+            "radiation",
+            current_weather.incoming_light,
+            dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
+        )
+        om.add_variable(
+            "irrigation", current_weather.irrigation, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
+        )
 
     @staticmethod
-    def _calculate_average_annual_temperature(daily_average_temperatures: list[float]) -> float:
+    def _calculate_average_annual_temperature(
+        daily_average_temperatures: list[float],
+    ) -> float:
         """
         Calculates the average annual air temperature based on the daily average air temperatures.
 
@@ -245,41 +250,41 @@ class Weather:
         return np.mean(np.array(daily_average_temperatures))
 
     @staticmethod
-    def _get_latitude() -> float:
+    def check_adequate_weather_data(weather_file: dict, time: Time) -> None:
         """
-        Retrieves (one of) the latitudes stored in the InputManager.
+        Checks that there is enough weather data to cover the whole simulation time.
+
+        Parameters
+        ----------
+        weather_file: dict
+            File containing weather data.
+        time: Time
+            The Time instance containing time configuration information of the simulation.
 
         Returns
         -------
-        float
-            The latitude of the location that is being simulated (degrees).
-
-        Notes
-        -----
-        If no field files have been specified for this simulation, then the latitude defaults to 43.0723 degrees (the
-        latitude of Madison, WI).
-
-        This method will use the latitude from the first field input key that is returned to it by the Input Manager.
-
-        As of writing this, only the absolute latitude is stored in field input files, so simulations of farms in the
-        southern hemisphere will use incorrect daylength values.
+        None
 
         """
-        info_map = {
-            "class": Weather.__name__,
-            "function": Weather._get_latitude.__name__
-        }
+        years_list = weather_file["year"]
+        days_list = weather_file["jday"]
+        date_range = (time.end_date - time.start_date).days + 1
 
-        field_input_keys = im.get_data_keys_by_properties("field_properties")
+        for i in range(date_range):
+            current_date = time.start_date + datetime.timedelta(days=i)
+            current_date_year = current_date.year
+            current_date_jday = current_date.timetuple().tm_yday
 
-        if not field_input_keys:
-            om.add_warning(
-                "No location data provided to Weather.",
-                "Defaulting to latitude 43.0723 (location of Madison, WI).",
-                info_map
-            )
-            return 43.0723
-
-        first_field_key = field_input_keys[0]
-        latitude = im.get_data(f"{first_field_key}.absolute_latitude")
-        return latitude
+            if (current_date_jday in days_list) and (current_date_year in years_list):
+                continue
+            else:
+                info_map = {
+                    "class": "Weather",
+                    "function": Weather.check_adequate_weather_data.__name__,
+                }
+                om.add_error(
+                    "Inadequate weather data.",
+                    "Not enough weather data provided to support the duration of simulation period",
+                    info_map,
+                )
+                raise ValueError("Not enough weather data provided to support the duration of simulation period")

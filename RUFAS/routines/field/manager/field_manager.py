@@ -1,3 +1,4 @@
+from .field_manure_supplier import FieldManureSupplier
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
@@ -10,6 +11,7 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.weather import Weather
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
@@ -17,33 +19,47 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
 
-"""
-This module is responsible for initializing the `Field` instances that will be simulated and providing an interface to
-the `SimulationEngine` for executing daily and annual routines in the field module.
-"""
-
-im = InputManager()
-om = OutputManager()
-
 
 class FieldManager:
+    """
+    Manages the initialization and simulation of field instances within the simulation environment. This class is
+    responsible for creating `Field` instances based on input data, managing these fields across the simulation
+    lifecycle, and interfacing with the `SimulationEngine` to execute daily and annual routines.
+
+    Parameters
+    ----------
+    manure_manager : ManureManager
+        An instance of `ManureManager` responsible for managing manure-related activities and data across the fields.
+    feed_manager : FeedManager
+        An instance of `FeedManager` responsible for managing feed-related activities and data across the fields.
+
+    Attributes
+    ----------
+    fields : List[Field]
+        A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
+    output_gatherer : FieldDataReporter
+        An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
+    om : OutputManager
+        Instance of the OutputManager.
+
+    """
+
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__
+            "function": "__init__",
         }
-
+        self.im = InputManager()
+        self.om = OutputManager()
         self.fields: List[Field] = []
-        fields = im.get_data_keys_by_properties("field_properties")
+        fields = self.im.get_data_keys_by_properties("field_properties")
         if not fields:
-            om.add_warning(
-                "No field input files.",
-                "No fields will be simulated.",
-                info_map
-            )
+            self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
+
+        manure_supplier = self._get_manure_supplier(manure_manager)
 
         for field in fields:
-            new_field = self._setup_field(field, manure_manager, feed_manager)
+            new_field = self._setup_field(field, manure_supplier, feed_manager)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
@@ -64,8 +80,15 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
-        current_conditions = weather.get_current_day_conditions(time)
         for field in self.fields:
+            current_conditions = weather.get_current_day_conditions(time, field.field_data.absolute_latitude)
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.daily_update_routine.__name__,
+                "suffix": f"field='{field.field_data.name}'",
+                "units": MeasurementUnits.HOURS,
+            }
+            self.om.add_variable("daylength", current_conditions.daylength, info_map)
             field.manage_field(time, current_conditions=current_conditions)
         self.output_gatherer.send_daily_variables()
 
@@ -78,16 +101,43 @@ class FieldManager:
         for field in self.fields:
             field.perform_annual_reset()
 
+    def _get_manure_supplier(self, manure_manager: ManureManager) -> ManureManager | FieldManureSupplier:
+        """
+        Determines whether manure used in field applications will be sourced from manure simulated in RuFaS or will be
+        created on the fly.
+
+        Returns
+        -------
+        ManureManager | FieldManureSupplier
+            The Manure Manager if animals are to be simulated, otherwise a Field Manure Supplier instance.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._get_manure_supplier.__name__}
+
+        animals_simulated = self.im.get_data("config.simulate_animals")
+
+        if animals_simulated:
+            return manure_manager
+
+        self.om.add_log(
+            "Animals not being simulated",
+            "Manure for field applications will be created by the FieldManureSupplier",
+            info_map,
+        )
+        return FieldManureSupplier()
+
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
+    def _setup_field(
+        field_name: str, manure_supplier: ManureManager | FieldManureSupplier, feed_manager: FeedManager
+    ) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_manager : ManureManager
-            Instance of the ManureManager class.
+        manure_supplier : ManureManager | FieldManureSupplier
+            Entity that will provide manure for field applications.
         feed_manager : FeedManager
             Instance of the FeedManager class which receives and manages harvested crops.
 
@@ -97,6 +147,7 @@ class FieldManager:
             A `Field` instance configured with the specified input data
 
         """
+        im = InputManager()
         field_configuration_data = im.get_data(field_name)
         field_size = field_configuration_data.get("field_size")
         absolute_latitude = field_configuration_data.get("absolute_latitude")
@@ -106,10 +157,16 @@ class FieldManager:
         watering_amount_in_liters = field_configuration_data.get("watering_amount_in_liters")
         watering_interval = field_configuration_data.get("watering_interval")
         supplement_manure = field_configuration_data.get("supplement_manure_nutrient_deficiencies")
+        simulate_water_stress = field_configuration_data.get("simulate_water_stress")
+        simulate_temp_stress = field_configuration_data.get("simulate_temp_stress")
+        simulate_nitrogen_stress = field_configuration_data.get("simulate_nitrogen_stress")
+        simulate_phosphorus_stress = field_configuration_data.get("simulate_phosphorus_stress")
 
         fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
-        available_fertilizer_mixes, fertilizer_schedule = FieldManager._setup_fertilizer_schedule(
-            fertilizer_configuration)
+        (
+            available_fertilizer_mixes,
+            fertilizer_schedule,
+        ) = FieldManager._setup_fertilizer_schedule(fertilizer_configuration)
         fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
 
         manure_configuration = field_configuration_data.get("manure_management_specification")
@@ -131,19 +188,39 @@ class FieldManager:
         soil_configuration = field_configuration_data.get("soil_specification")
         soil_profile = FieldManager._setup_soil(soil_configuration, field_size)
 
-        field_data = FieldData(name=field_name, field_size=field_size, absolute_latitude=absolute_latitude,
-                               longitude=longitude, minimum_daylength=minimum_daylength,
-                               seasonal_high_water_table=seasonal_high_water_table,
-                               watering_amount_in_liters=watering_amount_in_liters, watering_interval=watering_interval,
-                               supplement_manure_nutrient_deficiencies=supplement_manure)
+        field_data = FieldData(
+            name=field_name,
+            field_size=field_size,
+            absolute_latitude=absolute_latitude,
+            longitude=longitude,
+            minimum_daylength=minimum_daylength,
+            seasonal_high_water_table=seasonal_high_water_table,
+            watering_amount_in_liters=watering_amount_in_liters,
+            watering_interval=watering_interval,
+            supplement_manure_nutrient_deficiencies=supplement_manure,
+            simulate_water_stress=simulate_water_stress,
+            simulate_temp_stress=simulate_temp_stress,
+            simulate_nitrogen_stress=simulate_nitrogen_stress,
+            simulate_phosphorus_stress=simulate_phosphorus_stress,
+        )
 
-        return Field(field_data=field_data, soil=soil_profile, plantings=all_planting_events,
-                     harvestings=all_harvest_events, tillage_events=tillage_events, fertilizer_events=fertilizer_events,
-                     fertilizer_mixes=available_fertilizer_mixes, manure_events=manure_events,
-                     manure_manager=manure_manager, feed_manager=feed_manager)
+        return Field(
+            field_data=field_data,
+            soil=soil_profile,
+            plantings=all_planting_events,
+            harvestings=all_harvest_events,
+            tillage_events=tillage_events,
+            fertilizer_events=fertilizer_events,
+            fertilizer_mixes=available_fertilizer_mixes,
+            manure_events=manure_events,
+            manure_supplier=manure_supplier,
+            feed_manager=feed_manager,
+        )
 
     @staticmethod
-    def _setup_fertilizer_schedule(fertilizer_schedule: str) -> Tuple[Dict, FertilizerSchedule]:
+    def _setup_fertilizer_schedule(
+        fertilizer_schedule: str,
+    ) -> Tuple[Dict, FertilizerSchedule]:
         """
         Sets up the fertilizer schedule and the list of available fertilizer mixes.
 
@@ -158,6 +235,7 @@ class FieldManager:
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
+        im = InputManager()
         fertilizer_data = im.get_data(fertilizer_schedule)
         available_fertilizer_mixes = {}
         fertilizer_mix_data = fertilizer_data.get("available_fertilizer_mixes")
@@ -165,7 +243,7 @@ class FieldManager:
             available_fertilizer_mixes[mix.get("name")] = {
                 "N": mix.get("N"),
                 "P": mix.get("P"),
-                "K": mix.get("K")
+                "K": mix.get("K"),
             }
 
         fertilizer_application_schedule = FertilizerSchedule(
@@ -175,10 +253,11 @@ class FieldManager:
             days=fertilizer_data.get("days"),
             nitrogen_masses=fertilizer_data.get("nitrogen_masses"),
             phosphorus_masses=fertilizer_data.get("phosphorus_masses"),
+            potassium_masses=fertilizer_data.get("potassium_masses"),
             application_depths=fertilizer_data.get("application_depths"),
             surface_remainder_fractions=fertilizer_data.get("surface_remainder_fractions"),
             pattern_skip=fertilizer_data.get("pattern_skip"),
-            pattern_repeat=fertilizer_data.get("pattern_repeat")
+            pattern_repeat=fertilizer_data.get("pattern_repeat"),
         )
 
         return available_fertilizer_mixes, fertilizer_application_schedule
@@ -199,6 +278,7 @@ class FieldManager:
             ManureSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         manure_schedule_data = im.get_data(manure_schedule)
         manure_type_strings = manure_schedule_data.get("manure_types")
         manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
@@ -233,6 +313,7 @@ class FieldManager:
             TillageSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         tillage_schedule_data = im.get_data(tillage_schedule)
         tillage_schedule_instance = TillageSchedule(
             name="tillage_schedule",
@@ -241,8 +322,9 @@ class FieldManager:
             incorporation_fractions=tillage_schedule_data.get("incorporation_fractions"),
             mixing_fractions=tillage_schedule_data.get("mixing_fractions"),
             tillage_depths=tillage_schedule_data.get("tillage_depths"),
+            implements=tillage_schedule_data.get("implements"),
             pattern_skip=tillage_schedule_data.get("pattern_skip"),
-            pattern_repeat=tillage_schedule_data.get("pattern_repeat")
+            pattern_repeat=tillage_schedule_data.get("pattern_repeat"),
         )
         return tillage_schedule_instance
 
@@ -262,6 +344,7 @@ class FieldManager:
             List of all crop schedules that have been created from the input specifications.
 
         """
+        im = InputManager()
         schedules = []
         crop_rotation_data = im.get_data(f"{crop_rotation}.crop_schedules")
 
@@ -270,17 +353,19 @@ class FieldManager:
                 heat_scheduled_harvest = False
             else:
                 heat_scheduled_harvest = True
-            new_schedule = CropSchedule(name=f"crop_schedule_{index}",
-                                        crop_reference=rotation.get("crop_species"),
-                                        planting_years=rotation.get("planting_years"),
-                                        planting_days=rotation.get("planting_days"),
-                                        harvest_years=rotation.get("harvest_years"),
-                                        harvest_days=rotation.get("harvest_days"),
-                                        harvest_operations=rotation.get("harvest_operations"),
-                                        use_heat_scheduling=heat_scheduled_harvest,
-                                        pattern_repeat=rotation.get("pattern_repeat"),
-                                        planting_skip=rotation.get("planting_skip"),
-                                        harvesting_skip=rotation.get("harvesting_skip"))
+            new_schedule = CropSchedule(
+                name=f"crop_schedule_{index}",
+                crop_reference=rotation.get("crop_species"),
+                planting_years=rotation.get("planting_years"),
+                planting_days=rotation.get("planting_days"),
+                harvest_years=rotation.get("harvest_years"),
+                harvest_days=rotation.get("harvest_days"),
+                harvest_operations=rotation.get("harvest_operations"),
+                use_heat_scheduling=heat_scheduled_harvest,
+                pattern_repeat=rotation.get("pattern_repeat"),
+                planting_skip=rotation.get("planting_skip"),
+                harvesting_skip=rotation.get("harvesting_skip"),
+            )
             schedules.append(new_schedule)
         return schedules
 
@@ -307,6 +392,7 @@ class FieldManager:
             If no specification is provided for soil layers.
 
         """
+        im = InputManager()
         soil_configuration_data = im.get_data(soil_configuration)
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")
@@ -326,7 +412,7 @@ class FieldManager:
             "second_moisture_condition_parameter",
             "average_subbasin_slope",
             "slope_length",
-            "albedo"
+            "albedo",
         ]
 
         for value in expected_values:
@@ -378,11 +464,11 @@ class FieldManager:
             "saturation_point_water_concentration",
             "saturated_hydraulic_conductivity",
             "bulk_density",
-            "percent_organic_carbon_content",
-            "percent_clay_content",
-            "percent_silt_content",
-            "percent_sand_content",
-            "percent_rock_content",
+            "organic_carbon_fraction",
+            "clay_fraction",
+            "silt_fraction",
+            "sand_fraction",
+            "rock_fraction",
             "initial_labile_inorganic_phosphorus_concentration",
             "initial_soil_nitrate_concentration",
             "initial_soil_ammonium_concentration",
@@ -390,7 +476,7 @@ class FieldManager:
             "ammonium_volatilization_cation_exchange_factor",
             "denitrification_rate_coefficient",
             "denitrification_threshold_water_content",
-            "residue_fresh_organic_mineralization_rate"
+            "residue_fresh_organic_mineralization_rate",
         ]
 
         for value in expected_values:

@@ -6,16 +6,17 @@ import pytest
 from pytest_mock import MockerFixture
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
-from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
+from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import (
+    ManureNutrientManager,
+)
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
+    NutrientRequestResults,
+)
 
 
-@pytest.mark.parametrize('manure_type', [
-    ManureType.LIQUID,
-    ManureType.SOLID
-])
+@pytest.mark.parametrize("manure_type", [ManureType.LIQUID, ManureType.SOLID])
 def test_add_nutrients(manure_type: ManureType) -> None:
     """
     Unit test for the add_nutrients() method of the ManureNutrientManager class
@@ -27,8 +28,13 @@ def test_add_nutrients(manure_type: ManureType) -> None:
     """
     # Arrange
     manager = ManureNutrientManager()
-    nutrients = ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=2,
-                                manure_type=manure_type)
+    nutrients = ManureNutrients(
+        nitrogen=1,
+        phosphorus=1,
+        total_manure_mass=2,
+        dry_matter=2,
+        manure_type=manure_type,
+    )
 
     # Act
     manager.add_nutrients(nutrients)
@@ -37,14 +43,35 @@ def test_add_nutrients(manure_type: ManureType) -> None:
     assert manager.get_values(manure_type) == nutrients
 
 
-@pytest.mark.parametrize('eval_return, expected_result, remove_called', [
-    (NutrientRequestResults(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=2, dry_matter_fraction=0.5),
-     NutrientRequestResults(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=2, dry_matter_fraction=0.5),
-     True),
-    (None, None, False)
-])
-def test_request_nutrients(mocker: MockerFixture, eval_return: NutrientRequestResults,
-                           expected_result: NutrientRequestResults, remove_called: bool) -> None:
+@pytest.mark.parametrize(
+    "eval_return, expected_result, remove_called",
+    [
+        (
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=1,
+                total_manure_mass=2,
+                dry_matter=2,
+                dry_matter_fraction=0.5,
+            ),
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=1,
+                total_manure_mass=2,
+                dry_matter=2,
+                dry_matter_fraction=0.5,
+            ),
+            True,
+        ),
+        (None, None, False),
+    ],
+)
+def test_request_nutrients(
+    mocker: MockerFixture,
+    eval_return: NutrientRequestResults,
+    expected_result: NutrientRequestResults,
+    remove_called: bool,
+) -> None:
     """
     Unit test for the request_nutrients() method of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
@@ -63,8 +90,9 @@ def test_request_nutrients(mocker: MockerFixture, eval_return: NutrientRequestRe
     nutrient_request = NutrientRequest(nitrogen=1, phosphorus=1, manure_type=dummy_manure_type)
 
     patch_for_evaluate_nutrient_request = mocker.patch.object(
-        manager, '_evaluate_nutrient_request', return_value=eval_return)
-    patch_for_remove_nutrients = mocker.patch.object(manager, '_remove_nutrients')
+        manager, "_evaluate_nutrient_request", return_value=eval_return
+    )
+    patch_for_remove_nutrients = mocker.patch.object(manager, "_remove_nutrients")
 
     # Act
     actual_result = manager.request_nutrients(nutrient_request)
@@ -81,28 +109,58 @@ def test_request_nutrients(mocker: MockerFixture, eval_return: NutrientRequestRe
 
 
 @pytest.mark.parametrize(
-    'projected_manure_mass, manure_type, current_nutrient_values, expected_no_results',
+    "projected_manure_mass, manure_type, current_nutrient_values, expected_no_results",
     [
         # Scenario when there is no projected manure mass
         (0, ManureType.LIQUID, ManureNutrients(manure_type=ManureType.LIQUID), True),
-
         # Scenario when projected manure mass is greater than the total manure mass
-        (10, ManureType.LIQUID, ManureNutrients(nitrogen=2, phosphorus=2, total_manure_mass=5, dry_matter=1,
-                                                manure_type=ManureType.LIQUID), False),
-
+        (
+            10,
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=2,
+                phosphorus=2,
+                total_manure_mass=5,
+                dry_matter=1,
+                manure_type=ManureType.LIQUID,
+            ),
+            False,
+        ),
         # Scenario when projected manure mass is less than the total manure mass
-        (2, ManureType.SOLID, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=3, dry_matter=1,
-                                              manure_type=ManureType.SOLID), False),
-
+        (
+            2,
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=1,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.SOLID,
+            ),
+            False,
+        ),
         # Scenario when projected manure mass is equal to the total manure mass
-        (5, ManureType.SOLID, ManureNutrients(nitrogen=2, phosphorus=2, total_manure_mass=5, dry_matter=1,
-                                              manure_type=ManureType.SOLID), False)
-    ]
+        (
+            5,
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=2,
+                phosphorus=2,
+                total_manure_mass=5,
+                dry_matter=1,
+                manure_type=ManureType.SOLID,
+            ),
+            False,
+        ),
+    ],
 )
-def test_evaluate_nutrient_request(mocker: MockerFixture, projected_manure_mass: float,
-                                   manure_type: ManureType,
-                                   current_nutrient_values: ManureNutrients,
-                                   expected_no_results: bool) -> None:
+def test_evaluate_nutrient_request(
+    mocker: MockerFixture,
+    projected_manure_mass: float,
+    manure_type: ManureType,
+    current_nutrient_values: ManureNutrients,
+    expected_no_results: bool,
+) -> None:
     """
     Unit test for the _evaluate_nutrient_request() method of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
@@ -120,15 +178,20 @@ def test_evaluate_nutrient_request(mocker: MockerFixture, projected_manure_mass:
     nitrogen_derived_manure_mass = mocker.MagicMock()
     phosphorus_derived_manure_mass = mocker.MagicMock()
     patch_for_calculate_projected_manure_mass = mocker.patch.object(
-        manager, '_calculate_projected_manure_mass',
-        side_effect=[nitrogen_derived_manure_mass, phosphorus_derived_manure_mass])
+        manager,
+        "_calculate_projected_manure_mass",
+        side_effect=[nitrogen_derived_manure_mass, phosphorus_derived_manure_mass],
+    )
 
     patch_for_select_projected_manure_mass = mocker.patch.object(
-        manager, '_select_projected_manure_mass', return_value=projected_manure_mass)
+        manager, "_select_projected_manure_mass", return_value=projected_manure_mass
+    )
     expected_request_result = mocker.MagicMock() if not expected_no_results else None
     patch_for_create_nutrient_request_results = mocker.patch.object(
-        manager, '_create_nutrient_request_results',
-        return_value=expected_request_result)
+        manager,
+        "_create_nutrient_request_results",
+        return_value=expected_request_result,
+    )
 
     mock_nutrient_request = mocker.MagicMock()
     mock_nutrient_request.nitrogen = requested_nitrogen = 1
@@ -139,40 +202,43 @@ def test_evaluate_nutrient_request(mocker: MockerFixture, projected_manure_mass:
     actual_result = manager._evaluate_nutrient_request(mock_nutrient_request)
 
     # Assert
-    patch_for_calculate_projected_manure_mass.assert_any_call(requested_nitrogen,
-                                                              current_nutrient_values.nitrogen_composition)
-    patch_for_calculate_projected_manure_mass.assert_any_call(requested_phosphorus,
-                                                              current_nutrient_values.phosphorus_composition)
+    patch_for_calculate_projected_manure_mass.assert_any_call(
+        requested_nitrogen, current_nutrient_values.nitrogen_composition
+    )
+    patch_for_calculate_projected_manure_mass.assert_any_call(
+        requested_phosphorus, current_nutrient_values.phosphorus_composition
+    )
 
     patch_for_select_projected_manure_mass.assert_called_once_with(
-        [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass])
+        [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
+    )
 
     if expected_no_results:
         patch_for_create_nutrient_request_results.assert_not_called()
     elif projected_manure_mass <= current_nutrient_values.total_manure_mass:
         patch_for_create_nutrient_request_results.assert_called_once_with(projected_manure_mass, manure_type)
     else:
-        patch_for_create_nutrient_request_results.assert_called_once_with(current_nutrient_values.total_manure_mass,
-                                                                          manure_type)
+        patch_for_create_nutrient_request_results.assert_called_once_with(
+            current_nutrient_values.total_manure_mass, manure_type
+        )
 
     assert actual_result == expected_request_result
 
 
 @pytest.mark.parametrize(
-    'request_nutrient, nutrient_composition, expected_result',
+    "request_nutrient, nutrient_composition, expected_result",
     [
         # Scenario when nutrient composition > 0 and request > 0
         (2.0, 0.5, 4.0),
-
         # Scenario when nutrient composition > 0 and request = 0
         (0, 0.5, 0),
-
         # Scenario when nutrient composition = 0
         (2.0, 0, 0),
-    ]
+    ],
 )
-def test_calculate_projected_manure_mass(request_nutrient: float, nutrient_composition: float,
-                                         expected_result: float) -> None:
+def test_calculate_projected_manure_mass(
+    request_nutrient: float, nutrient_composition: float, expected_result: float
+) -> None:
     """
     Unit test for the method _calculate_projected_manure_mass() of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
@@ -182,32 +248,41 @@ def test_calculate_projected_manure_mass(request_nutrient: float, nutrient_compo
 
     """
     # Act
-    actual_result = ManureNutrientManager._calculate_projected_manure_mass(
-        request_nutrient, nutrient_composition)
+    actual_result = ManureNutrientManager._calculate_projected_manure_mass(request_nutrient, nutrient_composition)
 
     # Assert
     assert actual_result == expected_result
 
 
 @pytest.mark.parametrize(
-    'request_nutrient, nutrient_composition, expected_exception, expected_error_msg',
+    "request_nutrient, nutrient_composition, expected_exception, expected_error_msg",
     [
         # Scenario when request_nutrient is negative
-        (-2.0, 0.5, ValueError, 'Request for nutrient cannot be negative: -2.0'),
-
+        (-2.0, 0.5, ValueError, "Request for nutrient cannot be negative: -2.0"),
         # Scenario when nutrient composition is negative
-        (2.0, -1.0, ValueError, 'Nutrient composition must be between 0 and 1 (inclusive): -1.0'),
-
+        (
+            2.0,
+            -1.0,
+            ValueError,
+            "Nutrient composition must be between 0 and 1 (inclusive): -1.0",
+        ),
         # Scenario when nutrient composition and request are both negative
-        (-2.0, -1.0, ValueError, 'Request for nutrient cannot be negative: -2.0'),
-
+        (-2.0, -1.0, ValueError, "Request for nutrient cannot be negative: -2.0"),
         # Scenario when nutrient composition is above 1
-        (2.0, 1.5, ValueError, 'Nutrient composition must be between 0 and 1 (inclusive): 1.5'),
-    ]
+        (
+            2.0,
+            1.5,
+            ValueError,
+            "Nutrient composition must be between 0 and 1 (inclusive): 1.5",
+        ),
+    ],
 )
-def test_calculate_projected_manure_mass_exceptions(request_nutrient: float, nutrient_composition: float,
-                                                    expected_exception: type[Exception],
-                                                    expected_error_msg: str) -> None:
+def test_calculate_projected_manure_mass_exceptions(
+    request_nutrient: float,
+    nutrient_composition: float,
+    expected_exception: type[Exception],
+    expected_error_msg: str,
+) -> None:
     """
     Unit test for the method _calculate_projected_manure_mass() of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
@@ -222,17 +297,15 @@ def test_calculate_projected_manure_mass_exceptions(request_nutrient: float, nut
 
 
 @pytest.mark.parametrize(
-    'projected_manure_masses, expected_result',
+    "projected_manure_masses, expected_result",
     [
         # Scenario when all masses are positive
         ([330, 315, 300], 300),
-
         # Scenario when one mass is zero
         ([330, 315, 0], 315),
-
         # Scenario when all masses are zero
         ([0, 0, 0], 0),
-    ]
+    ],
 )
 def test_select_projected_manure_mass(projected_manure_masses: list[float], expected_result: float) -> None:
     """
@@ -251,15 +324,21 @@ def test_select_projected_manure_mass(projected_manure_masses: list[float], expe
 
 
 @pytest.mark.parametrize(
-    'projected_manure_masses, expected_exception, expected_error_msg',
+    "projected_manure_masses, expected_exception, expected_error_msg",
     [
         # Scenario when one mass is negative
-        ([330, 315, -300], ValueError, 'Projected manure mass cannot be negative: -300'),
-    ]
+        (
+            [330, 315, -300],
+            ValueError,
+            "Projected manure mass cannot be negative: -300",
+        ),
+    ],
 )
-def test_select_projected_manure_mass_exceptions(projected_manure_masses: list[float],
-                                                 expected_exception: type[Exception],
-                                                 expected_error_msg: str) -> None:
+def test_select_projected_manure_mass_exceptions(
+    projected_manure_masses: list[float],
+    expected_exception: type[Exception],
+    expected_error_msg: str,
+) -> None:
     """
     Unit test for the method _select_projected_manure_mass() of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
@@ -274,35 +353,85 @@ def test_select_projected_manure_mass_exceptions(projected_manure_masses: list[f
 
 
 @pytest.mark.parametrize(
-    'projected_manure_mass, manure_type, nutrients',
+    "projected_manure_mass, manure_type, nutrients",
     [
         # Scenario when projected manure mass is zero
-        (0.0, ManureType.LIQUID, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1,
-                                                 manure_type=ManureType.LIQUID)),
-
+        (
+            0.0,
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=1,
+                total_manure_mass=2,
+                dry_matter=1,
+                manure_type=ManureType.LIQUID,
+            ),
+        ),
         # Scenario when projected manure mass is very small
-        (1e-8, ManureType.LIQUID, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1,
-                                                  manure_type=ManureType.LIQUID)),
-
+        (
+            1e-8,
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=1,
+                total_manure_mass=2,
+                dry_matter=1,
+                manure_type=ManureType.LIQUID,
+            ),
+        ),
         # Scenario when projected manure mass is large
-        (1e6, ManureType.LIQUID, ManureNutrients(nitrogen=1, phosphorus=1, total_manure_mass=2, dry_matter=1,
-                                                 manure_type=ManureType.LIQUID)),
-
+        (
+            1e6,
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=1,
+                total_manure_mass=2,
+                dry_matter=1,
+                manure_type=ManureType.LIQUID,
+            ),
+        ),
         # Scenario when nutrient compositions are zero
-        (2.0, ManureType.SOLID, ManureNutrients(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0,
-                                                manure_type=ManureType.SOLID)),
-
+        (
+            2.0,
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=0,
+                phosphorus=0,
+                total_manure_mass=0,
+                dry_matter=0,
+                manure_type=ManureType.SOLID,
+            ),
+        ),
         # Scenario when nutrient values are large
-        (2.0, ManureType.SOLID, ManureNutrients(nitrogen=1e6, phosphorus=1e6, total_manure_mass=1e6, dry_matter=1e6,
-                                                manure_type=ManureType.SOLID)),
-
+        (
+            2.0,
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=1e6,
+                phosphorus=1e6,
+                total_manure_mass=1e6,
+                dry_matter=1e6,
+                manure_type=ManureType.SOLID,
+            ),
+        ),
         # Normal scenario when projected manure mass is > 0
-        (2.0, ManureType.SOLID, ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=4, dry_matter=1,
-                                                manure_type=ManureType.SOLID)),
-    ]
+        (
+            2.0,
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=4,
+                dry_matter=1,
+                manure_type=ManureType.SOLID,
+            ),
+        ),
+    ],
 )
-def test_create_nutrient_request_results(projected_manure_mass: float, manure_type: ManureType,
-                                         nutrients: ManureNutrients) -> None:
+def test_create_nutrient_request_results(
+    projected_manure_mass: float, manure_type: ManureType, nutrients: ManureNutrients
+) -> None:
     """
     Unit test for the _create_nutrient_request_results() method of the ManureNutrientManager class in the
     manure_nutrient_manager.py file.
@@ -327,16 +456,23 @@ def test_create_nutrient_request_results(projected_manure_mass: float, manure_ty
 
 
 @pytest.mark.parametrize(
-    'projected_manure_mass, nutrients, expected_exception, expected_error_msg',
+    "projected_manure_mass, nutrients, expected_exception, expected_error_msg",
     [
         # Scenario when projected manure mass is negative
-        (-2.0, ManureNutrients(manure_type=ManureType.LIQUID), ValueError,
-         'Projected manure mass cannot be negative: -2.0'),
-    ]
+        (
+            -2.0,
+            ManureNutrients(manure_type=ManureType.LIQUID),
+            ValueError,
+            "Projected manure mass cannot be negative: -2.0",
+        ),
+    ],
 )
-def test_create_nutrient_request_results_exceptions(projected_manure_mass: float, nutrients: ManureNutrients,
-                                                    expected_exception: type[Exception],
-                                                    expected_error_msg: str) -> None:
+def test_create_nutrient_request_results_exceptions(
+    projected_manure_mass: float,
+    nutrients: ManureNutrients,
+    expected_exception: type[Exception],
+    expected_error_msg: str,
+) -> None:
     """
     Test the _create_nutrient_request_results() method of the ManureNutrientManager class for expected
     exception scenarios.
@@ -355,29 +491,91 @@ def test_create_nutrient_request_results_exceptions(projected_manure_mass: float
 
 
 @pytest.mark.parametrize(
-    'manure_type, initial_nutrients, nutrients_to_remove, expected_nutrients',
+    "manure_type, initial_nutrients, nutrients_to_remove, expected_nutrients",
     [
         # Scenario when removing zero nutrients
-        (ManureType.SOLID,
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID),
-         NutrientRequestResults(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0, dry_matter_fraction=0.5),
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID)),
-
+        (
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.SOLID,
+            ),
+            NutrientRequestResults(
+                nitrogen=0,
+                phosphorus=0,
+                total_manure_mass=0,
+                dry_matter=0,
+                dry_matter_fraction=0.5,
+            ),
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.SOLID,
+            ),
+        ),
         # Scenario when removing some nutrients
-        (ManureType.LIQUID,
-         ManureNutrients(nitrogen=5, phosphorus=10, total_manure_mass=15, dry_matter=5, manure_type=ManureType.LIQUID),
-         NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
-         ManureNutrients(nitrogen=4, phosphorus=8, total_manure_mass=12, dry_matter=4, manure_type=ManureType.LIQUID)),
-
+        (
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=5,
+                phosphorus=10,
+                total_manure_mass=15,
+                dry_matter=5,
+                manure_type=ManureType.LIQUID,
+            ),
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            ManureNutrients(
+                nitrogen=4,
+                phosphorus=8,
+                total_manure_mass=12,
+                dry_matter=4,
+                manure_type=ManureType.LIQUID,
+            ),
+        ),
         # Scenario when removing all nutrients
-        (ManureType.LIQUID,
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.LIQUID),
-         NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
-         ManureNutrients(nitrogen=0, phosphorus=0, total_manure_mass=0, dry_matter=0, manure_type=ManureType.LIQUID)),
-    ]
+        (
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.LIQUID,
+            ),
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            ManureNutrients(
+                nitrogen=0,
+                phosphorus=0,
+                total_manure_mass=0,
+                dry_matter=0,
+                manure_type=ManureType.LIQUID,
+            ),
+        ),
+    ],
 )
-def test_remove_nutrients(manure_type: ManureType, initial_nutrients: ManureNutrients,
-                          nutrients_to_remove: NutrientRequestResults, expected_nutrients: ManureNutrients) -> None:
+def test_remove_nutrients(
+    manure_type: ManureType,
+    initial_nutrients: ManureNutrients,
+    nutrients_to_remove: NutrientRequestResults,
+    expected_nutrients: ManureNutrients,
+) -> None:
     """
     Unit test for the _remove_nutrients() method of the ManureNutrientManager class.
 
@@ -398,39 +596,131 @@ def test_remove_nutrients(manure_type: ManureType, initial_nutrients: ManureNutr
 
 
 @pytest.mark.parametrize(
-    'manure_type, initial_nutrients, nutrients_to_remove, exceeding_nutrient_type',
+    "manure_type, initial_nutrients, nutrients_to_remove, exceeding_nutrient_type",
     [
-        (ManureType.LIQUID,
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.LIQUID),
-         NutrientRequestResults(nitrogen=2, phosphorus=2, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
-         'nitrogen'),
-        (ManureType.LIQUID,
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.LIQUID),
-         NutrientRequestResults(nitrogen=1, phosphorus=3, total_manure_mass=3, dry_matter=1, dry_matter_fraction=0.5),
-         'phosphorus'),
-        (ManureType.SOLID,
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID),
-         NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=4, dry_matter=1, dry_matter_fraction=0.5),
-         'total_manure_mass'),
-        (ManureType.SOLID,
-         ManureNutrients(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=1, manure_type=ManureType.SOLID),
-         NutrientRequestResults(nitrogen=1, phosphorus=2, total_manure_mass=3, dry_matter=2, dry_matter_fraction=0.5),
-         'dry_matter'),
-    ]
+        (
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.LIQUID,
+            ),
+            NutrientRequestResults(
+                nitrogen=2,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            "nitrogen",
+        ),
+        (
+            ManureType.LIQUID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.LIQUID,
+            ),
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=3,
+                total_manure_mass=3,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            "phosphorus",
+        ),
+        (
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.SOLID,
+            ),
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=4,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            "total_manure_mass",
+        ),
+        (
+            ManureType.SOLID,
+            ManureNutrients(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                manure_type=ManureType.SOLID,
+            ),
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=2,
+                dry_matter_fraction=0.5,
+            ),
+            "dry_matter",
+        ),
+        (
+            "InvalidManureType",
+            None,
+            NutrientRequestResults(
+                nitrogen=1,
+                phosphorus=2,
+                total_manure_mass=3,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            None,
+        ),
+    ],
 )
-def test_remove_nutrients_exceptions(manure_type: ManureType, initial_nutrients: ManureNutrients,
-                                     nutrients_to_remove: NutrientRequestResults, exceeding_nutrient_type: str):
+def test_remove_nutrients_more_than_available(
+    manure_type: ManureType,
+    initial_nutrients: ManureNutrients,
+    nutrients_to_remove: NutrientRequestResults,
+    exceeding_nutrient_type: str,
+    mocker: MockerFixture,
+) -> None:
     """
     Unit test for the _remove_nutrients() method of the ManureNutrientManager class in exception scenarios.
 
-    This test verifies that the _remove_nutrients() method raises appropriate exceptions when trying to remove
+    This test verifies that the _remove_nutrients() method adds a warning to the OM when trying to remove
     more nutrients than available in the manager.
 
     """
     # Arrange
     manager = ManureNutrientManager()
-    manager.add_nutrients(initial_nutrients)
+    if initial_nutrients:
+        manager.add_nutrients(initial_nutrients)
+    patch_for_om_add_warning = mocker.patch(
+        "RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.om.add_warning"
+    )
 
     # Act & Assert
-    with pytest.raises(ValueError, match=f'Remove more nutrients than available: {exceeding_nutrient_type}'):
+    if isinstance(manure_type, ManureType):
         manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+        removed_amount = getattr(nutrients_to_remove, exceeding_nutrient_type)
+        available_amount = getattr(initial_nutrients, exceeding_nutrient_type)
+        patch_for_om_add_warning.assert_called_once_with(
+            "Remove more nutrients than available",
+            f"Requested {exceeding_nutrient_type} ({removed_amount}) is more than available "
+            f"({float(available_amount)})",
+            {
+                "class": "ManureNutrientManager",
+                "function": "_remove_nutrients",
+            },
+        )
+    else:
+        with pytest.raises(ValueError) as exc_info:
+            manager._remove_nutrients(nutrients_to_remove, manure_type=manure_type)
+        assert str(exc_info.value) == f"Invalid manure type: {manure_type}. Supported types are: {ManureType}"

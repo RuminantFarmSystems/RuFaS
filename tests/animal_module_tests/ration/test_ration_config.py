@@ -6,7 +6,7 @@ from pytest import approx
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 
 
-def test_default_initialization():
+def test_default_initialization() -> None:
     """
     Test the default initialization of the RationConfig class.
 
@@ -18,7 +18,6 @@ def test_default_initialization():
 
     # Assert
     assert ration_config.price_list == []
-    assert ration_config.n == 0
     assert ration_config.NEmaint_requirement == 0
     assert ration_config.NEa_requirement == 0
     assert ration_config.NEpreg_requirement == 0
@@ -44,38 +43,107 @@ def test_default_initialization():
     assert ration_config.dRUP_list == []
     assert ration_config.feed_limit_list == []
     assert not ration_config.lactating
-    assert ration_config.DMIest_requirement is None
+    assert ration_config.DMIest_requirement == 0.0
 
 
 @pytest.mark.parametrize(
-    'price, NEmaint, NEa, NEpreg, NEl, NEg,'
-    'MP_req, C_req, P_req, TDN, DE, EE,'
-    'is_fat, BW, calcium, phosphorus, NDF, type_input,'
-    'is_wetforage, Kd, N_A, N_B, CP, dRUP,'
-    'limit, lactating, DMIest',
+    "price, NEmaint, NEa, NEpreg, NEl, NEg,"
+    "MP_req, C_req, P_req, TDN, DE, EE,"
+    "is_fat, BW, calcium, phosphorus, NDF, type_input,"
+    "is_wetforage, Kd, N_A, N_B, CP, dRUP,"
+    "limit, lactating, DMIest",
     [
         # Default values
-        ([], 0, 0, 0, 0, 0,
-         0, 0, 0, [], [], [],
-         [], 0, [], [], [], [],
-         [], [], [], [], [], [],
-         [], False, None),
-
+        (
+            [],
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            [],
+            [],
+            [],
+            [],
+            0,
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            False,
+            None,
+        ),
         # Custom values
-        ([1, 2], 3, 4, 5, 6, 7,
-         8, 9, 10, [11, 12], [13, 14], [15, 16],
-         [True, False], 17, [18, 19], [20, 21], [22, 23], [24, 25],
-         [True, False], [26, 27], [28, 29], [30, 31], [32, 33], [34, 35],
-         [36, 37], True, 38),
+        (
+            [1, 2],
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            [11, 12],
+            [13, 14],
+            [15, 16],
+            [True, False],
+            17,
+            [18, 19],
+            [20, 21],
+            [22, 23],
+            [24, 25],
+            [True, False],
+            [26, 27],
+            [28, 29],
+            [30, 31],
+            [32, 33],
+            [34, 35],
+            [36, 37],
+            True,
+            38,
+        ),
     ],
 )
-def test_custom_initialization(price: list[float], NEmaint: float, NEa: float, NEpreg: float, NEl: float, NEg: float,
-                               MP_req: float, C_req: float, P_req: float, TDN: list[float], DE: list[float],
-                               EE: list[float], is_fat: list[bool], BW: float, calcium: list[float],
-                               phosphorus: list[float], NDF: list[float], type_input: list[str],
-                               is_wetforage: list[bool], Kd: list[float], N_A: list[float], N_B: list[float],
-                               CP: list[float], dRUP: list[float], limit: list[float], lactating: bool, DMIest: float) \
-        -> None:
+def test_custom_initialization(
+    price: list[float],
+    NEmaint: float,
+    NEa: float,
+    NEpreg: float,
+    NEl: float,
+    NEg: float,
+    MP_req: float,
+    C_req: float,
+    P_req: float,
+    TDN: list[float],
+    DE: list[float],
+    EE: list[float],
+    is_fat: list[bool],
+    BW: float,
+    calcium: list[float],
+    phosphorus: list[float],
+    NDF: list[float],
+    type_input: list[str],
+    is_wetforage: list[bool],
+    Kd: list[float],
+    N_A: list[float],
+    N_B: list[float],
+    CP: list[float],
+    dRUP: list[float],
+    limit: list[float],
+    lactating: bool,
+    DMIest: float,
+) -> None:
     """
     Test the initialization of the RationConfig class with custom values.
 
@@ -115,7 +183,6 @@ def test_custom_initialization(price: list[float], NEmaint: float, NEa: float, N
 
     # Assert
     assert ration_config.price_list == price
-    assert ration_config.n == len(price)
     assert ration_config.NEmaint_requirement == NEmaint
     assert ration_config.NEa_requirement == NEa
     assert ration_config.NEpreg_requirement == NEpreg

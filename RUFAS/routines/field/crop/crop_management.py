@@ -1,8 +1,12 @@
 from math import exp
 from typing import Optional
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_data import CropData, DEFAULT_DRY_MATTER_DIGESTIBILITY
+from RUFAS.routines.field.crop.crop_data import (
+    CropData,
+    DEFAULT_DRY_MATTER_DIGESTIBILITY,
+)
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
@@ -38,13 +42,13 @@ class CropManagement:
 
     # ---- Main Methods ----
     def manage_harvest(
-            self,
-            harvest_op: HarvestOperation,
-            field_name: str,
-            field_size: float,
-            time: Time,
-            soil_data: SoilData,
-            feed_manager: FeedManager,
+        self,
+        harvest_op: HarvestOperation,
+        field_name: str,
+        field_size: float,
+        time: Time,
+        soil_data: SoilData,
+        feed_manager: FeedManager,
     ) -> None:
         """
         Executes the harvest operation passed on the crop that contains this module.
@@ -74,7 +78,7 @@ class CropManagement:
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
-        self._record_yield(field_name, field_size, time.calendar_year, time.day)
+        self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
     # ---- Sub Methods ----
@@ -94,7 +98,7 @@ class CropManagement:
         self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
         self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
 
-    def determine_harvest_index(self):
+    def determine_harvest_index(self) -> None:
         """
         Sets the crop's harvest index based on various conditions.
 
@@ -111,25 +115,14 @@ class CropManagement:
         if self.data.do_harvest_index_override:
             self.data.harvest_index = self.data.user_harvest_index  # SWAT 5:3.3.1
         else:
-            self.data.potential_harvest_index = self._determine_potential_harvest_index(self.data.heat_fraction,
-                                                                                        self.data.optimal_harvest_index)
-            self.data.harvest_index = self._adjust_harvest_index(self.data.potential_harvest_index,
-                                                                 self.data.min_harvest_index,
-                                                                 self.data.water_deficiency)
-
-    def dry_down(self) -> None:
-        """
-        Adjusts crop biomass for water loss during the dry-down process.
-
-        Notes
-        -----
-        This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
-        based on species-specific water content, simulating the natural dry-down process.
-
-        """
-        # TODO: stand in for more sophisticated dry down method - GitHub Issue #162
-        #   The dry down method is not currently used
-        self.data.above_ground_biomass -= (self.data.above_ground_biomass * self.data.dry_down_fraction)
+            self.data.potential_harvest_index = self._determine_potential_harvest_index(
+                self.data.heat_fraction, self.data.optimal_harvest_index
+            )
+            self.data.harvest_index = self._adjust_harvest_index(
+                self.data.potential_harvest_index,
+                self.data.min_harvest_index,
+                self.data.water_deficiency,
+            )
 
     def cut_crop(self, collected_fraction: float = 0) -> None:
         """
@@ -176,14 +169,28 @@ class CropManagement:
             raise ValueError(
                 f"Expected collected_fraction to be between 0 and 1 (inclusive), received '{collected_fraction}'."
             )
-
         roots_harvested = self.data.harvest_index > 1.0
         if not roots_harvested:
             self.data.cut_biomass = self.data.above_ground_biomass * self.data.harvest_index
         else:
-            self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(self.data.biomass,
-                                                                                self.data.harvest_index)
-        fraction_cut = self.data.cut_biomass / self.data.biomass
+            self.data.cut_biomass = self.determine_biomass_cut_from_whole_plant(
+                self.data.biomass, self.data.harvest_index
+            )
+
+        try:
+            fraction_cut = self.data.cut_biomass / self.data.biomass
+        except ZeroDivisionError:
+            info_map = {"class": self.__class__.__name__, "function": self.cut_crop.__name__}
+            warning_name = "Zero division error in crop management"
+            warning_message = (
+                f"A zero division error occurred in the harvesting process of crop management when calculating "
+                f"fraction cut."
+                f"The variable 'biomass' in CropData has an invalid value: '{self.data.biomass}'. "
+            )
+
+            om.add_warning(warning_name, warning_message, info_map)
+            return None
+
         self.data.biomass -= self.data.cut_biomass
         self._recalculate_biomass_distribution(roots_harvested)
 
@@ -197,8 +204,7 @@ class CropManagement:
 
         if self.data.do_harvest_index_override:
             self.data.yield_nitrogen = self.data.optimal_nitrogen_fraction * self.data.wet_yield_collected
-            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * \
-                self.data.wet_yield_collected
+            self.data.yield_phosphorus = self.data.optimal_phosphorus_fraction * self.data.wet_yield_collected
             self.data.residue_nitrogen = self.data.optimal_nitrogen_fraction * self.data.yield_residue
             self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
         else:
@@ -293,18 +299,46 @@ class CropManagement:
             Julian day on which this harvest occurred.
 
         """
+        units = {
+            "crop": MeasurementUnits.UNITLESS,
+            "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
+            "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+            "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+            "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+            "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+            "harvest_index": MeasurementUnits.UNITLESS,
+            "planting_year": MeasurementUnits.CALENDAR_YEAR,
+            "planting_day": MeasurementUnits.ORDINAL_DAY,
+            "harvest_year": MeasurementUnits.CALENDAR_YEAR,
+            "harvest_day": MeasurementUnits.ORDINAL_DAY,
+            "field_size": MeasurementUnits.HECTARE,
+            "field_name": MeasurementUnits.UNITLESS,
+        }
         wet_yield_collected = self.data.wet_yield_collected
         dry_yield_collected = self.data.dry_matter_yield_collected
         nitrogen_harvested = self.data.yield_nitrogen
         phosphorus_harvested = self.data.yield_phosphorus
-        info_map = {"class": self.__class__.__name__, "function": self._record_yield.__name__,
-                    "suffix": f"field='{field_name}'", "field_size": field_size,
-                    "species": f"'{self.data.species}'"}
-        value = {"crop": self.data.name, "wet_yield": wet_yield_collected, "dry_yield": dry_yield_collected,
-                 "nitrogen": nitrogen_harvested, "phosphorus": phosphorus_harvested,
-                 "yield_residue": self.data.yield_residue, "harvest_index": self.data.harvest_index,
-                 "planting_date": {"year": self.data.planting_year, "day": self.data.planting_day},
-                 "harvest_date": {"year": year, "day": day}}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._record_yield.__name__,
+            "suffix": f"field='{field_name}'",
+            "units": units,
+        }
+        value = {
+            "crop": self.data.species,
+            "wet_yield": wet_yield_collected,
+            "dry_yield": dry_yield_collected,
+            "nitrogen": nitrogen_harvested,
+            "phosphorus": phosphorus_harvested,
+            "yield_residue": self.data.yield_residue,
+            "harvest_index": self.data.harvest_index,
+            "planting_year": self.data.planting_year,
+            "planting_day": self.data.planting_day,
+            "harvest_year": year,
+            "harvest_day": day,
+            "field_size": field_size,
+            "field_name": field_name,
+        }
         om.add_variable("harvest_yield", value, info_map)
 
     def _transfer_residue(self, soil_data: SoilData, killed: bool) -> None:
@@ -333,7 +367,10 @@ class CropManagement:
             soil_data.plant_surface_residue = self.data.yield_residue - dry_matter_root_biomass
             soil_data.plant_root_residue = dry_matter_root_biomass
             soil_data.crop_root_depth = self.data.root_depth
-            self._distribute_residue_nutrients(soil_data, dry_matter_root_biomass,)
+            self._distribute_residue_nutrients(
+                soil_data,
+                dry_matter_root_biomass,
+            )
         else:
             soil_data.plant_surface_residue = self.data.yield_residue
             soil_data.plant_root_residue = 0
@@ -369,46 +406,25 @@ class CropManagement:
         subsurface_phosphorus = self.data.residue_phosphorus * (1 - surface_fraction)
 
         surface_layer = soil_data.soil_layers[0]
-        surface_root_fraction = (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth \
-            if surface_layer.bottom_depth <= self.data.root_depth \
-            else max(0.0, (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth)
+        surface_root_fraction = (
+            (surface_layer.bottom_depth - surface_layer.top_depth) / self.data.root_depth
+            if surface_layer.bottom_depth <= self.data.root_depth
+            else max(
+                0.0,
+                (self.data.root_depth - surface_layer.top_depth) / self.data.root_depth,
+            )
+        )
         surface_layer.fresh_organic_nitrogen_content += subsurface_nitrogen * surface_root_fraction
         surface_layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * surface_root_fraction
 
         for layer in soil_data.soil_layers[1:]:
-            layer_fraction = \
-                (layer.bottom_depth - layer.top_depth) / self.data.root_depth \
-                if layer.bottom_depth <= self.data.root_depth \
+            layer_fraction = (
+                (layer.bottom_depth - layer.top_depth) / self.data.root_depth
+                if layer.bottom_depth <= self.data.root_depth
                 else max(0.0, (self.data.root_depth - layer.top_depth) / self.data.root_depth)
+            )
             layer.active_organic_nitrogen_content += subsurface_nitrogen * layer_fraction
             layer.labile_inorganic_phosphorus_content += subsurface_phosphorus * layer_fraction
-
-    # ---- Harvest Scheduling ----
-
-    def check_harvest_schedule(self, current_day, current_year):
-        """checks if the crop should be harvested today and sets the corresponding is_harvest_day attribute.
-
-        If the heat unit scheduling is used for this crop (`use_heat_scheduling = True`), then the current heat
-        fraction is used to decide if the crop should be harvested today. Otherwise, we simply check if the current
-        day is the day on which the harvest is scheduled.
-
-        References
-        ----------
-        SWAT 5:1.1.1 (Heat Unit Scheduling)
-
-        Parameters
-        ----------
-        current_day : int
-            the current (julian) day
-        current_year : int
-            the current year
-        """
-        if self.data.use_heat_scheduling:
-            self.data.is_harvest_day = self.data.heat_fraction >= self.data.harvest_heat_fraction
-        else:
-            is_harvest_year = current_day == self.data.next_harvest_day
-            is_harvest_day = current_year == self.data.next_harvest_year
-            self.data.is_harvest_day = is_harvest_year & is_harvest_day
 
     # ---- Helper Methods ----
     @staticmethod
@@ -476,8 +492,9 @@ class CropManagement:
         harvest_index = max(harvest_index, 0)
         harvest_index = max(harvest_index, min_harvest_index)
 
-        adj_harvest_index = (harvest_index - min_harvest_index) * water_deficiency / \
-                            (water_deficiency + exp(6.13 - 0.883 * water_deficiency)) + min_harvest_index
+        adj_harvest_index = (harvest_index - min_harvest_index) * water_deficiency / (
+            water_deficiency + exp(6.13 - 0.883 * water_deficiency)
+        ) + min_harvest_index
         return max(adj_harvest_index, 0)
 
     @staticmethod

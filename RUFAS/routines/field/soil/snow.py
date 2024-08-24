@@ -64,9 +64,11 @@ class Snow:
         References
         ----------
         Equation 1:2.5.1 in SWAT 2009 Theoretical Documentation.
+
         """
-        return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + \
-               (current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor)
+        return (soil_data.previous_day_snow_temperature * (1 - soil_data.snow_lag_factor)) + (
+            current_day_conditions.mean_air_temperature * soil_data.snow_lag_factor
+        )
 
     @staticmethod
     def _melt_snow(soil_data: SoilData, current_day_conditions: CurrentDayConditions, day: int) -> float:
@@ -90,6 +92,7 @@ class Snow:
         References
         ----------
         Equation 1:2.5.2 in SWAT 2009 Theoretical Documentation.
+
         """
 
         melt_factor = Snow._melt_factor(soil_data=soil_data, day=day)
@@ -98,8 +101,11 @@ class Snow:
         max_air_temperature = current_day_conditions.max_air_temperature
         snow_melt_base_temperature = soil_data.snow_melt_base_temperature
 
-        snow_melt_amount = melt_factor * snow_coverage_fraction * ((snow_temperature + max_air_temperature) / 2 -
-                                                                   snow_melt_base_temperature)
+        snow_melt_amount = (
+            melt_factor
+            * snow_coverage_fraction
+            * ((snow_temperature + max_air_temperature) / 2 - snow_melt_base_temperature)
+        )
 
         if snow_melt_amount > soil_data.snow_content:
             return soil_data.snow_content
@@ -124,6 +130,7 @@ class Snow:
         References
         ----------
         Equation 1:2.5.3 in SWAT 2009 Theoretical Documentation.
+
         """
         mlt6 = soil_data.snow_melt_factor_maximum
         mlt12 = soil_data.snow_melt_factor_minimum
@@ -170,11 +177,17 @@ class Snow:
         self.soil_data.snow_content += current_day_conditions.snowfall
 
         if self.soil_data.snow_content == 0.0:
-            self.soil_data.previous_day_snow_temperature, self.soil_data.current_day_snow_temperature = None, None
+            (
+                self.soil_data.previous_day_snow_temperature,
+                self.soil_data.current_day_snow_temperature,
+            ) = (None, None)
             self.soil_data.snow_content, self.soil_data.snow_melt_amount = 0.0, 0.0
         else:
-            self.soil_data.previous_day_snow_temperature = self.soil_data.current_day_snow_temperature if \
-                self.soil_data.current_day_snow_temperature is not None else current_day_conditions.mean_air_temperature
+            self.soil_data.previous_day_snow_temperature = (
+                self.soil_data.current_day_snow_temperature
+                if self.soil_data.current_day_snow_temperature is not None
+                else current_day_conditions.mean_air_temperature
+            )
             self.soil_data.current_day_snow_temperature = self._calc_snow_temp(self.soil_data, current_day_conditions)
 
             self.soil_data.snow_melt_amount = self._melt_snow(self.soil_data, current_day_conditions, day)

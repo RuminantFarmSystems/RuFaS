@@ -7,14 +7,14 @@ from .enums import CropType, CropCategory
 from .baleage import Baleage
 from .grain import Grain, Dry, HighMoisture
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
-from .sileage import Sileage, Bag, Bunker, Pile
+from .silage import Silage, Bag, Bunker, Pile
 
 # Defines the compatilibty between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
-    CropCategory.ALFALFA: [Hay, Sileage, Baleage],
-    CropCategory.CORN: [Grain, Sileage],
-    CropCategory.GRASS: [Hay, Sileage, Baleage],
-    CropCategory.SMALL_GRAIN: [Hay, Grain, Sileage, Baleage],
+    CropCategory.ALFALFA: [Hay, Silage, Baleage],
+    CropCategory.CORN: [Grain, Silage],
+    CropCategory.GRASS: [Hay, Silage, Baleage],
+    CropCategory.SMALL_GRAIN: [Hay, Grain, Silage, Baleage],
     CropCategory.SOY: [Grain],
 }
 
@@ -82,12 +82,9 @@ class FeedManager:
         ValueError
             If the crop type is not compatible with the storage type.
         """
-        compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(
-            harvested_crop.category, []
-        )
+        compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
         is_crop_compatible_with_storage = any(
-            issubclass(storage_type.value, storage_class)
-            for storage_class in compatible_storage_classes
+            issubclass(storage_type.value, storage_class) for storage_class in compatible_storage_classes
         )
 
         if not is_crop_compatible_with_storage:
@@ -155,19 +152,12 @@ class FeedManager:
         results: List[QUERY_RESULT_DATA_TYPE] = []
 
         for storage_type, storage in self.active_storages.items():
-            is_storage_queryable = (
-                query_all_storage_types or storage_type in query_storage_types
-            )
+            is_storage_queryable = query_all_storage_types or storage_type in query_storage_types
             if not is_storage_queryable:
                 continue
             for stored_crop in storage.stored:
-                is_crop_type_queryable = (
-                    query_all_crop_types or stored_crop.type in query_crop_types
-                )
-                is_crop_category_queryable = (
-                    query_all_crop_categories
-                    or stored_crop.category in query_crop_categories
-                )
+                is_crop_type_queryable = query_all_crop_types or stored_crop.type in query_crop_types
+                is_crop_category_queryable = query_all_crop_categories or stored_crop.category in query_crop_categories
                 if not (is_crop_type_queryable and is_crop_category_queryable):
                     continue
                 for previous_result in results:

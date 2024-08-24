@@ -1,5 +1,4 @@
 flake8
-deprecated
 matplotlib
 mock
 numpy
@@ -16,3 +15,7 @@ juliandate
 freezegun
 salib
 tqdm
+mypy
+black
+coverage
+deepdiff

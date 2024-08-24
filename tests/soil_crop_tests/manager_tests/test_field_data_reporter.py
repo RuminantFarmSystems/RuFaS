@@ -29,8 +29,8 @@ def test_send_daily_variables(
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager))
-    field_2 = Field(field_data=field_data_2, manure_manager=MagicMock(ManureManager))
+    field_1 = Field(field_data=field_data_1, manure_supplier=MagicMock(ManureManager))
+    field_2 = Field(field_data=field_data_2, manure_supplier=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
@@ -54,64 +54,34 @@ def test_send_daily_variables(
     pool = om.variables_pool
 
     # Testing layer variables
-    assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.current_residue.field='name 1'"
-            ]["info_maps"]
-        )
-        == 3
-    )
-    assert pool[
-        "FieldDataReporter.send_daily_variables.current_residue.field='name 1'"
-    ]["values"] == [1.3, 4.2, 6.94]
-    assert (
-        "FieldDataReporter.send_daily_variables.current_residue.field='name 2'"
-        in pool.keys()
-    )
-    assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.current_residue.field='name 2'"
-            ]["info_maps"]
-        )
-        == 3
-    )
-    assert pool[
-        "FieldDataReporter.send_daily_variables.current_residue.field='name 2'"
-    ]["values"] == [1.3, 4.2, 6.94]
+    assert len(pool["FieldDataReporter.send_daily_variables.current_residue.field='name 1'"]["info_maps"]) == 3
+    assert pool["FieldDataReporter.send_daily_variables.current_residue.field='name 1'"]["values"] == [1.3, 4.2, 6.94]
+    assert "FieldDataReporter.send_daily_variables.current_residue.field='name 2'" in pool.keys()
+    assert len(pool["FieldDataReporter.send_daily_variables.current_residue.field='name 2'"]["info_maps"]) == 3
+    assert pool["FieldDataReporter.send_daily_variables.current_residue.field='name 2'"]["values"] == [1.3, 4.2, 6.94]
 
     # Testing soil variables
-    assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 1'"
-            ]["info_maps"]
-        )
-        == 3
-    )
-    assert pool[
-        "FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 1'"
-    ]["values"] == [1.3, 2.4, 1.22]
+    assert len(pool["FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 1'"]["info_maps"]) == 3
+    assert pool["FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 1'"]["values"] == [
+        1.3,
+        2.4,
+        1.22,
+    ]
 
-    assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 2'"
-            ]["info_maps"]
-        )
-        == 3
-    )
-    assert pool[
-        "FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 2'"
-    ]["values"] == [1.3, 2.4, 1.22]
+    assert len(pool["FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 2'"]["info_maps"]) == 3
+    assert pool["FieldDataReporter.send_daily_variables.accumulated_runoff.field='name 2'"]["values"] == [
+        1.3,
+        2.4,
+        1.22,
+    ]
 
     # Testing vadose data
     assert (
         len(
             pool[
                 "FieldDataReporter.send_daily_variables.active_organic_nitrogen_content.field='name 1',"
-                "vadose_zone_layer"]["info_maps"]
+                "vadose_zone_layer"
+            ]["info_maps"]
         )
         == 3
     )
@@ -121,139 +91,115 @@ def test_send_daily_variables(
 
     # Testing layer data
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='0'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='0'"]["info_maps"]) == 3
     )
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='1'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='1'"]["info_maps"]) == 3
     )
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='2'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='2'"]["info_maps"]) == 3
     )
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='3'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='3'"]["info_maps"]) == 3
     )
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='0'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='0'"]["info_maps"]) == 3
     )
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='1'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='1'"]["info_maps"]) == 3
     )
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='2'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='2'"]["info_maps"]) == 3
     )
     assert (
-        len(
-            pool[
-                "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='3'"
-            ]["info_maps"]
-        )
-        == 3
+        len(pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='3'"]["info_maps"]) == 3
     )
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='0'"
-    ]["values"] == [11.4, 11.4, 11.4]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='1'"
-    ]["values"] == [20.6, 20.6, 20.6]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='2'"
-    ]["values"] == [29.8, 29.8, 29.8]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='3'"
-    ]["values"] == [50, 50, 50]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='0'"
-    ]["values"] == [11.4, 11.4, 11.4]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='1'"
-    ]["values"] == [20.6, 20.6, 20.6]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='2'"
-    ]["values"] == [29.8, 29.8, 29.8]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='3'"
-    ]["values"] == [50, 50, 50]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='0'"]["values"] == [
+        11.4,
+        11.4,
+        11.4,
+    ]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='1'"]["values"] == [
+        20.6,
+        20.6,
+        20.6,
+    ]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='2'"]["values"] == [
+        29.8,
+        29.8,
+        29.8,
+    ]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 1',layer='3'"]["values"] == [
+        50,
+        50,
+        50,
+    ]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='0'"]["values"] == [
+        11.4,
+        11.4,
+        11.4,
+    ]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='1'"]["values"] == [
+        20.6,
+        20.6,
+        20.6,
+    ]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='2'"]["values"] == [
+        29.8,
+        29.8,
+        29.8,
+    ]
+    assert pool["FieldDataReporter.send_daily_variables.percolated_water.field='name 2',layer='3'"]["values"] == [
+        50,
+        50,
+        50,
+    ]
 
     # Testing crop data
     assert (
         len(
-            pool[
-                "FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 1',planted=100,1993"
-            ]["info_maps"]
+            pool["FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 1',planted=100,1993"][
+                "info_maps"
+            ]
         )
         == 3
     )
     assert (
         len(
-            pool[
-                "FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 2',planted=215,1993"
-            ]["info_maps"]
+            pool["FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 2',planted=215,1993"][
+                "info_maps"
+            ]
         )
         == 3
     )
     assert (
         len(
-            pool[
-                "FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 1',planted=100,1993"
-            ]["info_maps"]
+            pool["FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 1',planted=100,1993"][
+                "info_maps"
+            ]
         )
         == 3
     )
     assert (
         len(
-            pool[
-                "FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 2',planted=215,1993"
-            ]["info_maps"]
+            pool["FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 2',planted=215,1993"][
+                "info_maps"
+            ]
         )
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 1',planted=100,1993"
-    ]["values"] == [18.7, 18.7, 18.7]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 2',planted=215,1993"
-    ]["values"] == [20.5, 20.5, 20.5]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 1',planted=100,1993"
-    ]["values"] == [18.7, 18.7, 18.7]
-    assert pool[
-        "FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 2',planted=215,1993"
-    ]["values"] == [20.5, 20.5, 20.5]
+    assert pool["FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 1',planted=100,1993"][
+        "values"
+    ] == [18.7, 18.7, 18.7]
+    assert pool["FieldDataReporter.send_daily_variables.root_depth.field='name 1',crop='crop 2',planted=215,1993"][
+        "values"
+    ] == [20.5, 20.5, 20.5]
+    assert pool["FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 1',planted=100,1993"][
+        "values"
+    ] == [18.7, 18.7, 18.7]
+    assert pool["FieldDataReporter.send_daily_variables.root_depth.field='name 2',crop='crop 2',planted=215,1993"][
+        "values"
+    ] == [20.5, 20.5, 20.5]
 
 
 @pytest.mark.parametrize(
@@ -285,8 +231,8 @@ def test_send_annual_variables(
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data_1, manure_manager=MagicMock(ManureManager))
-    field_2 = Field(field_data_2, manure_manager=MagicMock(ManureManager))
+    field_1 = Field(field_data_1, manure_supplier=MagicMock(ManureManager))
+    field_2 = Field(field_data_2, manure_supplier=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
@@ -299,31 +245,19 @@ def test_send_annual_variables(
             profile_soil_water_content=PropertyMock(return_value=2),
             profile_nitrates_total=PropertyMock(return_value=8.5),
         ):
-            field_1.field_data.annual_irrigation_water_use_total = (
-                annual_irrigation_water_use_total[i]
-            )
-            field_2.field_data.annual_irrigation_water_use_total = (
-                annual_irrigation_water_use_total[i]
-            )
-            field_1.soil.data.annual_soil_evaporation_total = (
-                annual_soil_evaporation_total[i]
-            )
-            field_2.soil.data.annual_soil_evaporation_total = (
-                annual_soil_evaporation_total[i]
-            )
+            field_1.field_data.annual_irrigation_water_use_total = annual_irrigation_water_use_total[i]
+            field_2.field_data.annual_irrigation_water_use_total = annual_irrigation_water_use_total[i]
+            field_1.soil.data.annual_soil_evaporation_total = annual_soil_evaporation_total[i]
+            field_2.soil.data.annual_soil_evaporation_total = annual_soil_evaporation_total[i]
             field_1.soil.data.initial_water_content = initial_water_content[i]
             field_2.soil.data.initial_water_content = initial_water_content[i]
             field_1.soil.data.initial_nitrates_total = initial_nitrates_total[i]
             field_2.soil.data.initial_nitrates_total = initial_nitrates_total[i]
 
             for index, layer in enumerate(field_1.soil.data.soil_layers):
-                layer.annual_nitrous_oxide_emissions_total = (
-                    annual_nitrous_oxide_emissions_total[index]
-                )
+                layer.annual_nitrous_oxide_emissions_total = annual_nitrous_oxide_emissions_total[index]
             for index, layer in enumerate(field_2.soil.data.soil_layers):
-                layer.annual_nitrous_oxide_emissions_total = (
-                    annual_nitrous_oxide_emissions_total[index]
-                )
+                layer.annual_nitrous_oxide_emissions_total = annual_nitrous_oxide_emissions_total[index]
             og.send_annual_variables()
     print(om.variables_pool)
     pool = om.variables_pool
@@ -332,122 +266,146 @@ def test_send_annual_variables(
         len(pool["FieldDataReporter.send_annual_variables.annual_water_content_change.field='name 1'"]["info_maps"])
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_annual_variables.annual_water_content_change.field='name 1'"
-    ]["values"] == [0, -1, -2]
+    assert pool["FieldDataReporter.send_annual_variables.annual_water_content_change.field='name 1'"]["values"] == [
+        0,
+        -1,
+        -2,
+    ]
     assert (
         len(pool["FieldDataReporter.send_annual_variables.annual_water_content_change.field='name 1'"]["info_maps"])
         == 3
     )
-    assert pool["FieldDataReporter.send_annual_variables.annual_water_content_change.field='name 1'"
-                ]["values"] == [0, -1, -2]
+    assert pool["FieldDataReporter.send_annual_variables.annual_water_content_change.field='name 1'"]["values"] == [
+        0,
+        -1,
+        -2,
+    ]
 
     assert (
         len(pool["FieldDataReporter.send_annual_variables.annual_nitrates_content_change.field='name 1'"]["info_maps"])
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_annual_variables.annual_nitrates_content_change.field='name 1'"
-    ]["values"] == [4.3, 3.2, 2.0]
+    assert pool["FieldDataReporter.send_annual_variables.annual_nitrates_content_change.field='name 1'"]["values"] == [
+        4.3,
+        3.2,
+        2.0,
+    ]
     assert (
         len(pool["FieldDataReporter.send_annual_variables.annual_nitrates_content_change.field='name 1'"]["info_maps"])
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_annual_variables.annual_nitrates_content_change.field='name 1'"
-    ]["values"] == [4.3, 3.2, 2.0]
+    assert pool["FieldDataReporter.send_annual_variables.annual_nitrates_content_change.field='name 1'"]["values"] == [
+        4.3,
+        3.2,
+        2.0,
+    ]
     # Testing field variables
     assert (
-        len(pool[
-                "FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"]["info_maps"]
-            )
+        len(
+            pool["FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"][
+                "info_maps"
+            ]
+        )
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"
-    ]["values"] == [1.3, 2.4, 1.22]
+    assert pool["FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"][
+        "values"
+    ] == [1.3, 2.4, 1.22]
     assert (
-        len(pool["FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"]
-            ["info_maps"])
+        len(
+            pool["FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"][
+                "info_maps"
+            ]
+        )
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"
-        ]["values"] == [1.3, 2.4, 1.22]
+    assert pool["FieldDataReporter.send_annual_variables.annual_irrigation_water_use_total.field='name 1'"][
+        "values"
+    ] == [1.3, 2.4, 1.22]
 
     # Testing soil variables
     assert (
         len(pool["FieldDataReporter.send_annual_variables.annual_soil_evaporation_total.field='name 1'"]["info_maps"])
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_annual_variables.annual_soil_evaporation_total.field='name 1'"
-    ]["values"] == [1.5, 2.4, 3.8]
+    assert pool["FieldDataReporter.send_annual_variables.annual_soil_evaporation_total.field='name 1'"]["values"] == [
+        1.5,
+        2.4,
+        3.8,
+    ]
 
     assert (
-        len(
-            pool["FieldDataReporter.send_annual_variables.annual_soil_evaporation_total.field='name 1'"]["info_maps"]
-        )
+        len(pool["FieldDataReporter.send_annual_variables.annual_soil_evaporation_total.field='name 1'"]["info_maps"])
         == 3
     )
-    assert pool[
-        "FieldDataReporter.send_annual_variables.annual_soil_evaporation_total.field='name 1'"
-    ]["values"] == [1.5, 2.4, 3.8]
+    assert pool["FieldDataReporter.send_annual_variables.annual_soil_evaporation_total.field='name 1'"]["values"] == [
+        1.5,
+        2.4,
+        3.8,
+    ]
 
     # Testing layer data
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='0'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='0'"
+            ]["info_maps"]
         )
         == 3
     )
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='1'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='1'"
+            ]["info_maps"]
         )
         == 3
     )
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='2'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='2'"
+            ]["info_maps"]
         )
         == 3
     )
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='3'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 1',layer='3'"
+            ]["info_maps"]
         )
         == 3
     )
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='0'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='0'"
+            ]["info_maps"]
         )
         == 3
     )
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='1'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='1'"
+            ]["info_maps"]
         )
         == 3
     )
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='2'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='2'"
+            ]["info_maps"]
         )
         == 3
     )
     assert (
         len(
-            pool["FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='3'"
-                 ]["info_maps"]
+            pool[
+                "FieldDataReporter.send_annual_variables.annual_nitrous_oxide_emissions_total.field='name 2',layer='3'"
+            ]["info_maps"]
         )
         == 3
     )

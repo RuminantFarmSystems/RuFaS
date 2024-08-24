@@ -115,6 +115,7 @@
   ],
   "bedding_configs": [
     {
+      "name": "sawdust",
       "bedding_type": "sawdust",
       "bedding_mass_per_day": 1.97,
       "bedding_density": 250.0,
@@ -125,6 +126,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "CBPB sawdust",
       "bedding_type": "CBPB sawdust",
       "bedding_mass_per_day": 12,
       "bedding_density": 350.0,
@@ -135,6 +137,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "manure solids",
       "bedding_type": "manure solids",
       "bedding_mass_per_day": 2.50,
       "bedding_density": 400.0,
@@ -145,6 +148,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "straw",
       "bedding_type": "straw",
       "bedding_mass_per_day": 1.97,
       "bedding_density": 100.0,
@@ -155,6 +159,7 @@
       "sand_removal_efficiency": 0.0
     },
     {
+      "name": "sand",
       "bedding_type": "sand",
       "bedding_mass_per_day": 25.0,
       "bedding_density": 1500.0,
@@ -165,6 +170,7 @@
       "sand_removal_efficiency": 1.0
     },
     {
+      "name": "none",
       "bedding_type": "none",
       "bedding_mass_per_day": 0.0,
       "bedding_density": 0.0,
@@ -177,6 +183,7 @@
   ],
   "manure_handler_configs": [
     {
+      "name": "flush system",
       "manure_handler_type": "flush system",
       "cleaning_water_use_rate": 757.0,
       "minutes_per_cleaning": 8,
@@ -185,6 +192,7 @@
       "cleaning_water_recycle_fraction": 0.80
     },
     {
+      "name": "manual scraping",
       "manure_handler_type": "manual scraping",
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
@@ -193,6 +201,7 @@
       "cleaning_water_recycle_fraction": 0.10
     },
     {
+      "name": "alley scraper",
       "manure_handler_type": "alley scraper",
       "cleaning_water_use_rate": 10.0,
       "minutes_per_cleaning": 8,
@@ -201,6 +210,7 @@
       "cleaning_water_recycle_fraction": 0.10
     },
     {
+      "name": "tillage",
       "manure_handler_type": "tillage",
       "cleaning_water_use_rate": 0.0,
       "minutes_per_cleaning": 0.0,
@@ -209,6 +219,7 @@
       "cleaning_water_recycle_fraction": 0.0
     },
     {
+      "name": "harrowing",
       "manure_handler_type": "harrowing",
       "cleaning_water_use_rate": 0.0,
       "minutes_per_cleaning": 0.0,
@@ -219,6 +230,7 @@
   ],
   "manure_separator_configs": [
     {
+      "name": "rotary screen",
       "manure_separator_type": "rotary screen",
       "percent_dry_solids": 0.20,
       "total_solids_removal_efficiency_for_separator": 0.35,
@@ -229,6 +241,7 @@
       "potassium_removal_efficiency_for_separator": 0.15
     },
     {
+      "name": "screw press",
       "manure_separator_type": "screw press",
       "percent_dry_solids": 0.35,
       "total_solids_removal_efficiency_for_separator": 0.25,
@@ -241,6 +254,7 @@
   ],
   "manure_treatment_configs": [
     {
+      "name": "slurry storage underfloor",
       "manure_treatment_type": "slurry storage underfloor",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "volatile_solids_removal_efficiency_for_treatment": 0.0,
@@ -249,9 +263,10 @@
       "phosphorus_removal_efficiency_for_treatment": 0.0,
       "potassium_removal_efficiency_for_treatment": 0.0,
       "storage_time_period": 120,
-      "manure_cover": "cover"
+      "manure_cover": "crust"
     },
     {
+      "name": "slurry storage outdoor",
       "manure_treatment_type": "slurry storage outdoor",
       "total_solids_removal_efficiency_for_treatment": 0.00,
       "volatile_solids_removal_efficiency_for_treatment": 0.0,
@@ -261,9 +276,10 @@
       "potassium_removal_efficiency_for_treatment": 0.00,
       "storage_time_period": 120,
       "freeboard_input": 0.3048,
-      "manure_cover": "cover"
+      "manure_cover": "crust"
     },
     {
+      "name": "anaerobic lagoon",
       "manure_treatment_type": "anaerobic lagoon",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "volatile_solids_removal_efficiency_for_treatment": 0.0,
@@ -279,6 +295,7 @@
       "manure_cover": "cover"
     },
     {
+      "name": "anaerobic digestion",
       "manure_treatment_type": "anaerobic digestion",
       "total_solids_removal_efficiency_for_treatment": 0.45,
       "volatile_solids_removal_efficiency_for_treatment": 0.40,
@@ -290,14 +307,14 @@
       "sludge_accumulation_period": 1.0,
       "sludge_accumulation_volume_fraction": 0.03,
       "top_cover_volume_fraction": 0.2,
-      "biogas_generation_ratio": 0.38,
-      "methane_generation_ratio": 0.65,
       "evaporation_fraction": 0.02,
       "anaerobic_digestion_temperature_set_point": 37.5,
       "anaerobic_digestion_temperature_celsius": 37.5,
-      "manure_cover": "N/A"
+      "manure_cover": "N/A",
+      "digester_methane_leakage_fraction": 0.01
     },
     {
+      "name": "compost bedded pack barn",
       "manure_treatment_type": "compost bedded pack barn",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
@@ -308,21 +325,25 @@
       "hydraulic_retention_time": 365,
       "sludge_accumulation_period": 10.0,
       "sludge_accumulation_volume_fraction": 0.00251,
-      "storage_time_period": 365,
+      "storage_time_period": 120,
       "freeboard_input": 0.3048
     },
     {
+      "name": "open lots",
       "manure_treatment_type": "open lots",
       "total_solids_removal_efficiency_for_treatment": 0.0,
       "nitrogen_removal_efficiency_for_treatment": 0.0,
       "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
       "phosphorus_removal_efficiency_for_treatment": 0.0,
       "potassium_removal_efficiency_for_treatment": 0.0,
-      "volatile_solids_removal_efficiency_for_treatment": 0.0
+      "volatile_solids_removal_efficiency_for_treatment": 0.0,
+      "storage_time_period": 365
     },
     {
+      "name": "composting",
       "manure_treatment_type": "composting",
-      "composting_type": "intensive windrow"
+      "composting_type": "intensive windrow",
+      "storage_time_period": 365
     }
   ]
 }

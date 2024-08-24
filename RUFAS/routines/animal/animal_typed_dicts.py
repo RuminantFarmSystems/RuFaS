@@ -1,10 +1,10 @@
-from typing import List
-from typing import TypedDict
+from typing import List, Dict, TypedDict, Any
 from typing_extensions import NotRequired
 
 
 class HerdInfoTypedDict(TypedDict):
     """List of expected keys for herd information dictionary"""
+
     calf_num: int
     heiferI_num: int
     heiferII_num: int
@@ -17,6 +17,7 @@ class HerdInfoTypedDict(TypedDict):
 
 class PenTypedDict(TypedDict):
     """List of expected keys for pen information dictionary"""
+
     id: int
     animal_combination: str
     vertical_dist_to_milking_parlor: float
@@ -29,6 +30,9 @@ class PenTypedDict(TypedDict):
     manure_separator: str
     manure_storage: str
     max_stocking_density: float
+    ration: Dict[str, float | str]
+    ration_per_animal: Dict[str, float | str]
+    animals_in_pen: Dict[str, Any]
 
 
 class AnimalBaseInitArgsTypedDict(TypedDict):
@@ -48,6 +52,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
 
 class CalfValuesTypedDict(TypedDict):
     """List of expected keys for calf values dictionary"""
+
     id: int
     breed: str
     birth_date: int
@@ -62,6 +67,7 @@ class CalfValuesTypedDict(TypedDict):
 
 class HeiferIValuesTypedDict(TypedDict):
     """List of expected keys for heifer I values dictionary"""
+
     id: int
     breed: str
     birth_date: int
@@ -98,7 +104,7 @@ class HeiferIIValuesTypedDict(TypedDict):
     abortion_day: int
     days_in_preg: int
     gestation_length: int
-    p_gest_for_calf: int
+    p_gest_for_calf: float
     calf_birth_weight: float
 
 
@@ -112,6 +118,7 @@ class AnimalConfigTypedDict(TypedDict):
     compared to the structure of the JSON object.
 
     """
+
     # management decisions
     breeding_start_day_h: int
     heifer_repro_cull_time: int
@@ -195,7 +202,7 @@ class AnimalConfigTypedDict(TypedDict):
 
     # from_literature -> culling
     parity_death_prob: List[float]
-    death_cull_prob: List[float]
+    death_day_prob: List[float]
     parity_cull_prob: List[float]
     mastitis_cull_prob: List[float]
     feet_leg_cull_prob: List[float]
@@ -228,3 +235,53 @@ class InitialHerdSummaryTypedDict(TypedDict):
     cow_avg_days_in_milk: float
     cow_avg_parity: float
     cow_avg_CI: float
+
+
+class AvailableFeedsTypedDict(TypedDict):
+    feed_id: List[int]
+    feed_key: List[str]
+    price: List[float]
+    TDN: List[float]
+    EE: List[float]
+    DE: List[float]
+    is_fat: List[bool]
+    calcium: List[float]
+    phosphorus: List[float]
+    NDF: List[float]
+    feed_type: List[str]
+    is_wetforage: List[bool]
+    Kd: List[float]
+    N_A: List[float]
+    N_B: List[float]
+    CP: List[float]
+    dRUP: List[float]
+    lactating_cow_minimum: List[float]
+    lactating_cow_limit: List[float]
+    dry_cow_minimum: List[float]
+    dry_cow_limit: List[float]
+    heiferIII_limit: List[float]
+    heiferII_limit: List[float]
+    heiferI_limit: List[float]
+    calf_limit: List[float]
+
+
+class FeedInfoTypedDict(TypedDict):
+    feed_type: str
+    is_fat: bool
+    calcium: float
+    EE: float
+    DE: float
+    DE_Base: float
+    de_key: float
+    phosphorus: float
+    NDF: float
+
+
+class SoldAnimalTypedDict(TypedDict):
+    id: int
+    animal_type: str
+    sold_at_day: int
+    body_weight: float
+    cull_reason: str | None
+    days_in_milk: int | str
+    parity: int | str

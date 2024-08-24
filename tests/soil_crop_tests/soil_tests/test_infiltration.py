@@ -8,30 +8,37 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 # --- static function tests ---
-@pytest.mark.parametrize("curve_num_2", [
-    10,
-    40,
-    60,
-    77,
-    81,
-    95,
-])
+@pytest.mark.parametrize(
+    "curve_num_2",
+    [
+        10,
+        40,
+        60,
+        77,
+        81,
+        95,
+    ],
+)
 def test_determine_curve_number_1(curve_num_2):
     """test _determine_curve_number_1() in infiltration.py"""
     observe = Infiltration._determine_first_moisture_condition_parameter(curve_num_2)
-    expect = curve_num_2 - ((20 * (100 - curve_num_2)) /
-                            (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2)))))
+    expect = curve_num_2 - (
+        (20 * (100 - curve_num_2)) / (100 - curve_num_2 + exp(2.533 - (0.0636 * (100 - curve_num_2))))
+    )
     assert expect == observe
 
 
-@pytest.mark.parametrize("curve_num_2", [
-    10,
-    40,
-    60,
-    77,
-    81,
-    95,
-])
+@pytest.mark.parametrize(
+    "curve_num_2",
+    [
+        10,
+        40,
+        60,
+        77,
+        81,
+        95,
+    ],
+)
 def test_determine_curve_number_3(curve_num_2):
     """test _determine_curve_number_3() in infiltration.py"""
     observe = Infiltration._determine_third_moisture_condition_parameter(curve_num_2)
@@ -39,14 +46,17 @@ def test_determine_curve_number_3(curve_num_2):
     assert expect == observe
 
 
-@pytest.mark.parametrize("curve_num", [
-    10,
-    20,
-    40,
-    56,
-    78,
-    99,
-])
+@pytest.mark.parametrize(
+    "curve_num",
+    [
+        10,
+        20,
+        40,
+        56,
+        78,
+        99,
+    ],
+)
 def test_determine_max_retention_parameter(curve_num):
     """test _determine_retention_parameter() in infiltration.py"""
     observe = Infiltration._determine_retention_parameter_for_moisture_condition(curve_num)
@@ -55,62 +65,88 @@ def test_determine_max_retention_parameter(curve_num):
     assert expect == observe
 
 
-@pytest.mark.parametrize("field_capacity,saturation,max_retention_param,curve_3_retention_param", [
-    (0.8, 1.4, 380, 250),
-    (1.1, 2.8, 459.84, 345.134),
-    (0.2, 0.83, 138.9, 100.3),
-    (0.74, 0.965, 608.783, 435.678),
-])
+@pytest.mark.parametrize(
+    "field_capacity,saturation,max_retention_param,curve_3_retention_param",
+    [
+        (0.8, 1.4, 380, 250),
+        (1.1, 2.8, 459.84, 345.134),
+        (0.2, 0.83, 138.9, 100.3),
+        (0.74, 0.965, 608.783, 435.678),
+    ],
+)
 def test_determine_second_shape_coefficient(field_capacity, saturation, max_retention_param, curve_3_retention_param):
     """test _determine_second_shape_coefficient() in infiltration.py"""
-    top_first_term = log((field_capacity / (1 - (curve_3_retention_param * (max_retention_param ** (-1))))) -
-                         field_capacity)
+    top_first_term = log(
+        (field_capacity / (1 - (curve_3_retention_param * (max_retention_param ** (-1))))) - field_capacity
+    )
     top_second_term = log((saturation / (1 - (2.54 * (max_retention_param ** (-1))))) - saturation)
     expect = (top_first_term - top_second_term) / (saturation - field_capacity)
-    observe = Infiltration._determine_second_shape_coefficient(field_capacity, saturation, max_retention_param,
-                                                               curve_3_retention_param)
+    observe = Infiltration._determine_second_shape_coefficient(
+        field_capacity, saturation, max_retention_param, curve_3_retention_param
+    )
     assert pytest.approx(observe) == expect
 
 
-@pytest.mark.parametrize("field_capacity,max_retention_param,curve_3_retention_param,second_shape_coeff", [
-    (0.8, 400, 210, 21.44),
-    (0.9, 506, 453, 29.889),
-    (0.4, 254, 167, 12.343),
-    (1.5, 607.34, 587.4345, 37.891),
-])
-def test_determine_first_shape_coefficient(field_capacity, max_retention_param, curve_3_retention_param,
-                                           second_shape_coeff):
+@pytest.mark.parametrize(
+    "field_capacity,max_retention_param,curve_3_retention_param,second_shape_coeff",
+    [
+        (0.8, 400, 210, 21.44),
+        (0.9, 506, 453, 29.889),
+        (0.4, 254, 167, 12.343),
+        (1.5, 607.34, 587.4345, 37.891),
+    ],
+)
+def test_determine_first_shape_coefficient(
+    field_capacity, max_retention_param, curve_3_retention_param, second_shape_coeff
+):
     """test _determine_first_shape_coefficient() in infiltration.py"""
-    observe = Infiltration._determine_first_shape_coefficient(field_capacity, max_retention_param,
-                                                              curve_3_retention_param, second_shape_coeff)
-    expect = log((field_capacity / (1 - (curve_3_retention_param / max_retention_param))) - field_capacity
-                 ) + (second_shape_coeff * field_capacity)
+    observe = Infiltration._determine_first_shape_coefficient(
+        field_capacity, max_retention_param, curve_3_retention_param, second_shape_coeff
+    )
+    expect = log((field_capacity / (1 - (curve_3_retention_param / max_retention_param))) - field_capacity) + (
+        second_shape_coeff * field_capacity
+    )
     assert expect == observe
 
 
-@pytest.mark.parametrize("water_content,max_retention_param,first_shape_coefficient,second_shape_coefficient", [
-    (0.4, 400, 26.834, 24.586),
-    (0.85, 450, 29.596, 28.495),
-    (0.61, 502, 30.502, 27.8586),
-    (0, 104, 15.678, 12.395),
-])
-def test_determine_retention_parameter(water_content, max_retention_param, first_shape_coefficient,
-                                       second_shape_coefficient):
+@pytest.mark.parametrize(
+    "water_content,max_retention_param,first_shape_coefficient,second_shape_coefficient",
+    [
+        (0.4, 400, 26.834, 24.586),
+        (0.85, 450, 29.596, 28.495),
+        (0.61, 502, 30.502, 27.8586),
+        (0, 104, 15.678, 12.395),
+    ],
+)
+def test_determine_retention_parameter(
+    water_content,
+    max_retention_param,
+    first_shape_coefficient,
+    second_shape_coefficient,
+):
     """test _determine_retention_parameter() in infiltration.py"""
-    observe = Infiltration._determine_retention_parameter(water_content, max_retention_param, first_shape_coefficient,
-                                                          second_shape_coefficient)
-    expect_quotient = water_content / (water_content + exp(first_shape_coefficient - (second_shape_coefficient *
-                                                                                      water_content)))
+    observe = Infiltration._determine_retention_parameter(
+        water_content,
+        max_retention_param,
+        first_shape_coefficient,
+        second_shape_coefficient,
+    )
+    expect_quotient = water_content / (
+        water_content + exp(first_shape_coefficient - (second_shape_coefficient * water_content))
+    )
     expect = max_retention_param * (1 - expect_quotient)
     assert observe == expect
 
 
-@pytest.mark.parametrize("max_retention_param,retention_param", [
-    (400, 388),
-    (406.596, 391.9495),
-    (201.495, 198.596),
-    (306.295, 294.96),
-])
+@pytest.mark.parametrize(
+    "max_retention_param,retention_param",
+    [
+        (400, 388),
+        (406.596, 391.9495),
+        (201.495, 198.596),
+        (306.295, 294.96),
+    ],
+)
 def test_determine_frozen_retention_parameter(max_retention_param, retention_param):
     """test _determine_frozen_retention_param() in infiltration.py"""
     observe = Infiltration._determine_frozen_retention_parameter(max_retention_param, retention_param)
@@ -118,26 +154,16 @@ def test_determine_frozen_retention_parameter(max_retention_param, retention_par
     assert expect == observe
 
 
-@pytest.mark.parametrize("slope_frac,curve_2,curve_3", [
-    (0.01, 40.0, 38),
-    (0.15, 51.3, 45.6),
-    (0.114, 49.8, 45.9),
-    (0.09, 31.5, 29.5),
-    (0.123, 67.4, 58.7),
-])
-def test_determine_curve_2_adjusted(slope_frac, curve_2, curve_3):
-    observe = Infiltration._determine_second_moisture_condition_adjusted(slope_frac, curve_2, curve_3)
-    expect = (((curve_3 - curve_2) / 3) * (1 - (2 * exp(-13.86 * slope_frac)))) + curve_2
-    assert expect == observe
-
-
-@pytest.mark.parametrize("rainfall,retention_param", [
-    (1.3, 12.5),
-    (8.3, 56.939),
-    (4.3, 20.118),
-    (0, 0),
-    (12.6, 40.95),
-])
+@pytest.mark.parametrize(
+    "rainfall,retention_param",
+    [
+        (1.3, 12.5),
+        (8.3, 56.939),
+        (4.3, 20.118),
+        (0, 0),
+        (12.6, 40.95),
+    ],
+)
 def test_determine_runoff(rainfall, retention_param):
     """test _determine_excess_rainfall() in infiltration.py"""
     observe = Infiltration._determine_accumulated_runoff(rainfall, retention_param)
@@ -149,46 +175,23 @@ def test_determine_runoff(rainfall, retention_param):
         assert (expect_top / expect_bottom) == observe
 
 
-@pytest.mark.parametrize(
-    "prev_retention_param,potential_evapotranspiration,max_retention_param,rainfall,runoff,coefficient",
-    [
-        (12.4, 1.6, 16.8, 1.3, 0.4, 0.83),  # all arbitrary coefficients
-        (14.8, 2.4, 20.1, 1.8, 1.1, 0.72),
-        (8.93, 1.02, 12.19, 0.3, 0.05, 0.91),
-    ])
-def test_determine_updated_retention_parameter(prev_retention_param, potential_evapotranspiration, max_retention_param,
-                                               rainfall, runoff, coefficient):
-    """test _determine_updated_retention_parameter() in infiltration.py"""
-    observe = Infiltration._determine_updated_retention_parameter(prev_retention_param, potential_evapotranspiration,
-                                                                  max_retention_param, rainfall, runoff, coefficient)
-    expect = prev_retention_param + (potential_evapotranspiration * exp(((-1) * coefficient * prev_retention_param) /
-                                                                        max_retention_param)) - rainfall + runoff
-    assert pytest.approx(observe) == expect
-
-
-@pytest.mark.parametrize("retention_param", [
-    25,
-    9.54,
-    1.23,
-    15.395,
-])
-def test_determine_moisture_condition_parameter(retention_param):
-    """test _determine_moisture_condition_parameter() in infiltration.py"""
-    observe = Infiltration._determine_moisture_condition_parameter(retention_param)
-    expect_bottom = retention_param + 254
-    expect = 25400 / expect_bottom
-    assert expect == observe
-
-
 # --- Integration tests ----
-@pytest.mark.parametrize("rainfall,is_top_frozen,expected_runoff,expected_infiltration,expected_total_runoff", [
-                             (1.4, False, 1.4, 0.0, 2.7),
-                             (3.5, True, 3.0, 0.5, 4.3),
-                             (20.0, False, 3.0, 17.0, 4.3),
-                             (0.0, False, 0.0, 0.0, 1.3)
-                         ])
-def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float, expected_infiltration: float,
-                    expected_total_runoff: float) -> None:
+@pytest.mark.parametrize(
+    "rainfall,is_top_frozen,expected_runoff,expected_infiltration,expected_total_runoff",
+    [
+        (1.4, False, 1.4, 0.0, 2.7),
+        (3.5, True, 3.0, 0.5, 4.3),
+        (20.0, False, 3.0, 17.0, 4.3),
+        (0.0, False, 0.0, 0.0, 1.3),
+    ],
+)
+def test_infiltrate(
+    rainfall: float,
+    is_top_frozen: bool,
+    expected_runoff: float,
+    expected_infiltration: float,
+    expected_total_runoff: float,
+) -> None:
     """Test that infiltrate() correctly stores all values in SoilData object and calls all the methods it should."""
     surface_layer = MagicMock(LayerData)
     if is_top_frozen:
@@ -208,22 +211,41 @@ def test_infiltrate(rainfall: float, is_top_frozen: bool, expected_runoff: float
     setattr(data, "annual_runoff_total", 1.3)
     incorp = Infiltration(data)
 
-    with patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_third_moisture_condition_parameter",
-               return_value=90) as third_curve_num, \
-            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_moisture_condition_parameter",
-                  return_value=10) as first_curve_num, \
-            patch("RUFAS.routines.field.soil.infiltration.Infiltration."
-                  "_determine_retention_parameter_for_moisture_condition", return_value=0.5) as moisture_param, \
-            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",
-                  return_value=1.1) as second_shape, \
-            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_shape_coefficient",
-                  return_value=1.2) as first_shape, \
-            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_retention_parameter",
-                  return_value=0.6) as retention_param, \
-            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_frozen_retention_parameter",
-                  return_value=0.6) as frozen_retention_param, \
-            patch("RUFAS.routines.field.soil.infiltration.Infiltration._determine_accumulated_runoff",
-                  return_value=3.0) as runoff:
+    with (
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_third_moisture_condition_parameter",
+            return_value=90,
+        ) as third_curve_num,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_moisture_condition_parameter",
+            return_value=10,
+        ) as first_curve_num,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration."
+            "_determine_retention_parameter_for_moisture_condition",
+            return_value=0.5,
+        ) as moisture_param,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_second_shape_coefficient",
+            return_value=1.1,
+        ) as second_shape,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_first_shape_coefficient",
+            return_value=1.2,
+        ) as first_shape,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_retention_parameter",
+            return_value=0.6,
+        ) as retention_param,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_frozen_retention_parameter",
+            return_value=0.6,
+        ) as frozen_retention_param,
+        patch(
+            "RUFAS.routines.field.soil.infiltration.Infiltration._determine_accumulated_runoff",
+            return_value=3.0,
+        ) as runoff,
+    ):
         incorp.infiltrate(rainfall)
 
         third_curve_num.assert_called_once_with(85.0)

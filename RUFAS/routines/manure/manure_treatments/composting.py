@@ -1,11 +1,19 @@
 import math
 
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
+    GasEmissionConstants,
+)
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
+    BaseManureTreatment,
+)
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
+    ManureTreatmentConfig,
+)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
+    ManureTreatmentDailyOutput,
+)
 
 
 class Composting(BaseManureTreatment):
@@ -106,8 +114,9 @@ class Composting(BaseManureTreatment):
         methane_emission = self.calc_methane_emission(volatile_solid=manure_volatile_solids)
         carbon_decomposition = self._calculate_carbon_decomposition(total_solid=manure_total_solids)
 
-        daily_dry_matter_loss = self._calculate_dry_matter_loss(methane_emission=methane_emission,
-                                                                carbon_decomposition=carbon_decomposition)
+        daily_dry_matter_loss = self._calculate_dry_matter_loss(
+            methane_emission=methane_emission, carbon_decomposition=carbon_decomposition
+        )
 
         remaining_manure_total_solids = manure_total_solids - daily_dry_matter_loss
         remaining_manure_volatile_solids = manure_volatile_solids - methane_emission
@@ -115,9 +124,11 @@ class Composting(BaseManureTreatment):
         Nitrogen_loss_to_ammonia_emission = self.calc_ammonia_emission()
         Nitrogen_loss_to_leaching = self._calculate_nitrogen_loss_to_leaching()
         Nitrogen_loss_to_direct_N2O_emission = self._calculate_nitrogen_loss_to_direct_nitrous_Oxide_Emission()
-        total_Nitrogen_mass = self._calculate_total_nitrogen_mass(Nitrogen_loss_to_ammonia_emission,
-                                                                  Nitrogen_loss_to_leaching,
-                                                                  Nitrogen_loss_to_direct_N2O_emission)
+        total_Nitrogen_mass = self._calculate_total_nitrogen_mass(
+            Nitrogen_loss_to_ammonia_emission,
+            Nitrogen_loss_to_leaching,
+            Nitrogen_loss_to_direct_N2O_emission,
+        )
         organic_Nitrogen_mass = self._calculate_organic_nitrogen_mass(total_Nitrogen_mass)
         inorganic_Nitrogen_mass = self._calculate_inorganic_nitrogen_mass(total_Nitrogen_mass)
         ammoniacal_nitrogen_mass = self._calculate_ammoniacal_nitrogen_mass(inorganic_Nitrogen_mass)
@@ -138,10 +149,10 @@ class Composting(BaseManureTreatment):
             solid_manure_nitrogen=total_Nitrogen_mass,
             solid_manure_inorganic_nitrogen=inorganic_Nitrogen_mass,
             solid_manure_organic_nitrogen=organic_Nitrogen_mass,
-            solid_manure_total_ammoniacal_nitrogen=ammoniacal_nitrogen_mass
+            solid_manure_total_ammoniacal_nitrogen=ammoniacal_nitrogen_mass,
         )
 
-        self._accumulate_daily_output(daily_output)
+        self._adjust_accumulated_output(daily_output)
         return daily_output
 
     def calc_methane_emission(self, *args, **kwargs) -> float:
@@ -169,7 +180,8 @@ class Composting(BaseManureTreatment):
         """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         fraction_Nitrogen_lost_as_ammonia = GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_AMMONIA_EMISSION[
-            self.composting_type]
+            self.composting_type
+        ]
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t
 
@@ -203,12 +215,14 @@ class Composting(BaseManureTreatment):
         float
             The max microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants. \
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        effectiveness_of_microbial_decomposition_rate = (
+            GasEmissionConstants.DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        )
         decomposition_temperature = GasEmissionConstants.DEFAULT_COMPOSTING_DECOMPOSITION_TEMPERATURE
 
-        return effectiveness_of_microbial_decomposition_rate * (1.066 ** (decomposition_temperature - 10) - 1.21 **
-                                                                (decomposition_temperature - 50))
+        return effectiveness_of_microbial_decomposition_rate * (
+            1.066 ** (decomposition_temperature - 10) - 1.21 ** (decomposition_temperature - 50)
+        )
 
     def _calculate_slow_microbial_decomposition_rate(self) -> float:
         """
@@ -219,12 +233,14 @@ class Composting(BaseManureTreatment):
         float
             The slow microbial decomposition rate of the current day, per day.
         """
-        effectiveness_of_microbial_decomposition_rate = GasEmissionConstants. \
-            DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        effectiveness_of_microbial_decomposition_rate = (
+            GasEmissionConstants.DEFAULT_EFFECTIVENESS_OF_MICROBIAL_DECOMPOSITION_RATE
+        )
         compost_pile_pack_temperature = self._get_current_day_average_temperature_celsius()
 
-        return effectiveness_of_microbial_decomposition_rate * (1.066 ** (compost_pile_pack_temperature - 10) - 1.21 **
-                                                                (compost_pile_pack_temperature - 50))
+        return effectiveness_of_microbial_decomposition_rate * (
+            1.066 ** (compost_pile_pack_temperature - 10) - 1.21 ** (compost_pile_pack_temperature - 50)
+        )
 
     def _calculate_carbon_decomposition_rate(self) -> float:
         """
@@ -242,8 +258,11 @@ class Composting(BaseManureTreatment):
         last_turning_or_addition = self.config.last_compost_turning_or_addition
         lag = ManureConstants.DEFAULT_LAG_TIME
 
-        return (max_microbial_decomposition_rate - slow_microbial_decomposition_rate) * \
-               (math.e ** (decay * (last_turning_or_addition - lag))) * slow_microbial_decomposition_rate
+        return (
+            (max_microbial_decomposition_rate - slow_microbial_decomposition_rate)
+            * (math.e ** (decay * (last_turning_or_addition - lag)))
+            * slow_microbial_decomposition_rate
+        )
 
     @staticmethod
     def _calculate_anaerobic_coefficient() -> float:
@@ -259,8 +278,9 @@ class Composting(BaseManureTreatment):
         oxygen_half_saturation = GasEmissionConstants.OXYGEN_HALF_SATURATION_CONSTANT
         ambient_air_mole_fraction_of_oxygen = GasEmissionConstants.DEFAULT_AMBIENT_AIR_MOLE_FRACTION_OF_OXYGEN
 
-        return (mole_fraction_of_oxygen / (oxygen_half_saturation + mole_fraction_of_oxygen)) * \
-               ((oxygen_half_saturation + ambient_air_mole_fraction_of_oxygen) / ambient_air_mole_fraction_of_oxygen)
+        return (mole_fraction_of_oxygen / (oxygen_half_saturation + mole_fraction_of_oxygen)) * (
+            (oxygen_half_saturation + ambient_air_mole_fraction_of_oxygen) / ambient_air_mole_fraction_of_oxygen
+        )
 
     def _calculate_carbon_decomposition(self, total_solid: float) -> float:
         """
@@ -280,8 +300,12 @@ class Composting(BaseManureTreatment):
         carbon_decomposition_rate = self._calculate_carbon_decomposition_rate()
         anaerobic_coefficient = self._calculate_anaerobic_coefficient()
 
-        return (total_solid * c_manure +
-                q_bedding * c_bedding) * carbon_decomposition_rate * effect_moist * anaerobic_coefficient
+        return (
+            (total_solid * c_manure + q_bedding * c_bedding)
+            * carbon_decomposition_rate
+            * effect_moist
+            * anaerobic_coefficient
+        )
 
     @staticmethod
     def _calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
@@ -306,7 +330,8 @@ class Composting(BaseManureTreatment):
         """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         fraction_Nitrogen_lost_as_ammonia = GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_LEACHING[
-            self.composting_type]
+            self.composting_type
+        ]
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t
 
@@ -321,12 +346,17 @@ class Composting(BaseManureTreatment):
         """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
         fraction_Nitrogen_lost_as_ammonia = GasEmissionConstants.FRACTION_NITROGEN_LOST_TO_DIRECT_N2O_EMISSION[
-            self.composting_type]
+            self.composting_type
+        ]
 
         return fraction_Nitrogen_lost_as_ammonia * N_prior_t * 44 / 28
 
-    def _calculate_total_nitrogen_mass(self, Nitrogen_loss_to_ammonia_emission,
-                                       Nitrogen_loss_to_leaching, Nitrogen_loss_to_direct_N2O_emission) -> float:
+    def _calculate_total_nitrogen_mass(
+        self,
+        Nitrogen_loss_to_ammonia_emission,
+        Nitrogen_loss_to_leaching,
+        Nitrogen_loss_to_direct_N2O_emission,
+    ) -> float:
         """
         This function calculates the total mass of Nitrogen in the manure-bedding mix of the current day.
 
@@ -337,9 +367,12 @@ class Composting(BaseManureTreatment):
         """
         N_prior_t = self._current_manure_treatment_daily_input.liquid_manure_nitrogen
 
-        return \
-            N_prior_t - Nitrogen_loss_to_ammonia_emission - Nitrogen_loss_to_leaching - \
-            Nitrogen_loss_to_direct_N2O_emission
+        return (
+            N_prior_t
+            - Nitrogen_loss_to_ammonia_emission
+            - Nitrogen_loss_to_leaching
+            - Nitrogen_loss_to_direct_N2O_emission
+        )
 
     @staticmethod
     def _calculate_organic_nitrogen_mass(total_Nitrogen_mass) -> float:

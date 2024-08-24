@@ -2,16 +2,14 @@ from dataclasses import dataclass
 
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.feed_manager import StorageType
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    PlantCategory
-)
+from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 
 @dataclass(kw_only=True)
 class Soybean(CropData):
     """crop data class with default values for soy bean"""
-    species: str = "soybean"
+
     name: str = "default soybean"
     plant_code: str = "SOYB"
     scientific_name: str = "Glycine max"
@@ -80,7 +78,8 @@ class SoybeanGrain(Soybean):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "soybean_grain"
+
+    species: CropSpecies = CropSpecies.SOYBEAN_GRAIN
     name: str = "soybean grain"
 
     crop_type: CropType = CropType.GRAIN
@@ -135,7 +134,8 @@ class SoybeanHay(Soybean):
         Fraction of wet crop yield that is phosphorus (unitless).
 
     """
-    species: str = "soybean_hay"
+
+    species: CropSpecies = CropSpecies.SOYBEAN_HAY
     name: str = "soybean hay"
 
     crop_type: CropType = CropType.FORAGE

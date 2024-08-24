@@ -34,18 +34,13 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
         self,
         weather,
         time,
-        manure_treatment_config: Union[
-            ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]
-        ],
+        manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> None:
         super().__init__(weather, time, manure_treatment_config)
-        self._anaerobic_digestion = AnaerobicDigestion(
-            weather, time, manure_treatment_config[0]
-        )
+        self.storage_time_period = self.config[1].storage_time_period
+        self._anaerobic_digestion = AnaerobicDigestion(weather, time, manure_treatment_config[0])
         self.anaerobic_digestion_daily_output = None
-        self._anaerobic_lagoon = AnaerobicLagoon(
-            weather, time, manure_treatment_config[1]
-        )
+        self._anaerobic_lagoon = AnaerobicLagoon(weather, time, manure_treatment_config[1])
 
     def _create_anaerobic_digestion_daily_output(self) -> ManureTreatmentDailyOutput:
         """Creates the daily output for the anaerobic digestion model.
@@ -69,9 +64,7 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
             the anaerobic digestion and lagoon model.
 
         """
-        self.anaerobic_digestion_daily_output = (
-            self._create_anaerobic_digestion_daily_output()
-        )
+        self.anaerobic_digestion_daily_output = self._create_anaerobic_digestion_daily_output()
 
         self._manure_separator_after_digestion_daily_output = (
             self._manure_separator_after_digestion.daily_update(
@@ -83,14 +76,32 @@ class AnaerobicDigestionAndLagoon(BaseManureTreatment):
 
         anaerobic_lagoon_daily_output = self._anaerobic_lagoon.daily_update(
             manure_handler_daily_output=self._manure_handler_daily_output,
-            manure_treatment_daily_input=(
-                self._manure_separator_after_digestion_daily_output
-                or self.anaerobic_digestion_daily_output
-            ),
+            manure_treatment_daily_input=self._manure_separator_after_digestion_daily_output
+            or self.anaerobic_digestion_daily_output,
             pen=self._current_pen,
             sim_day=self._sim_day,
         )
 
-        self._accumulate_daily_output(self.anaerobic_digestion_daily_output)
-        self._accumulate_daily_output(anaerobic_lagoon_daily_output)
+        self._adjust_accumulated_output(anaerobic_lagoon_daily_output)
+
+        self._accumulated_output.liquid_manure_nitrogen = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_nitrogen
+        )
+        self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_ammoniacal_nitrogen
+        )
+        self._accumulated_output.liquid_manure_total_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_solids
+        )
+        self._accumulated_output.liquid_manure_total_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_volatile_solids
+        )
+        self._accumulated_output.liquid_manure_total_degradable_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids
+        )
+        self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids = (
+            self._anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids
+        )
+
+        anaerobic_lagoon_daily_output.biogas = self.anaerobic_digestion_daily_output.biogas
         return anaerobic_lagoon_daily_output

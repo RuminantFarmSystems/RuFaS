@@ -41,6 +41,7 @@ class CurrentDayConditions:
     will be revisited for a more accurate implementation post v1
 
     """
+
     incoming_light: Optional[float] = None
     min_air_temperature: Optional[float] = None
     mean_air_temperature: Optional[float] = None
@@ -84,11 +85,12 @@ class CurrentDayConditions:
         SWAT 1:1.1.6
         """
         geographic_latitude = math.radians(geographic_latitude)
-        month = Utility.day_to_month_conversion(day_number, year)
         solar_declination_radians = CurrentDayConditions.calculate_solar_declination_radians(day_number)
         tangent_product = -math.tan(solar_declination_radians) * math.tan(geographic_latitude)
         is_polar_solstice = abs(tangent_product) > 1
         if is_polar_solstice:
+            date = Utility.convert_ordinal_date_to_month_date(year, day_number)
+            month = date.month
             is_summer = 6 <= month <= 9
             in_northern_hemisphere = geographic_latitude > 0
             if is_summer and in_northern_hemisphere:
@@ -121,4 +123,4 @@ class CurrentDayConditions:
         ----------
         SWAT 1:1.1.2
         """
-        return math.asin(0.4*(math.sin((2*math.pi/365)*(day_number-82))))
+        return math.asin(0.4 * (math.sin((2 * math.pi / 365) * (day_number - 82))))

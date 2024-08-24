@@ -29,8 +29,8 @@ def test_reception_pit_daily_output() -> None:
     assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == 0.0
     assert reception_pit_daily_output.liquid_manure_nitrogen == 0.0
     assert reception_pit_daily_output.liquid_manure_total_solids == 0.0
-    assert reception_pit_daily_output.manure_degradable_volatile_solids == 0.0
-    assert reception_pit_daily_output.manure_non_degradable_volatile_solids == 0.0
+    assert reception_pit_daily_output.liquid_manure_total_degradable_volatile_solids == 0.0
+    assert reception_pit_daily_output.liquid_manure_total_non_degradable_volatile_solids == 0.0
     assert reception_pit_daily_output.liquid_manure_total_volatile_solids == 0.0
     assert reception_pit_daily_output.liquid_manure_phosphorus == 0.0
     assert reception_pit_daily_output.liquid_manure_potassium == 0.0
@@ -48,8 +48,8 @@ def test_reception_pit_daily_output() -> None:
         liquid_manure_total_ammoniacal_nitrogen=2.0,
         liquid_manure_nitrogen=3.0,
         liquid_manure_total_solids=4.0,
-        manure_degradable_volatile_solids=5.0,
-        manure_non_degradable_volatile_solids=6.0,
+        liquid_manure_total_degradable_volatile_solids=5.0,
+        liquid_manure_total_non_degradable_volatile_solids=6.0,
         liquid_manure_total_volatile_solids=7.0,
         liquid_manure_phosphorus=8.0,
         liquid_manure_potassium=9.0,
@@ -63,8 +63,8 @@ def test_reception_pit_daily_output() -> None:
     assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == 2.0
     assert reception_pit_daily_output.liquid_manure_nitrogen == 3.0
     assert reception_pit_daily_output.liquid_manure_total_solids == 4.0
-    assert reception_pit_daily_output.manure_degradable_volatile_solids == 5.0
-    assert reception_pit_daily_output.manure_non_degradable_volatile_solids == 6.0
+    assert reception_pit_daily_output.liquid_manure_total_degradable_volatile_solids == 5.0
+    assert reception_pit_daily_output.liquid_manure_total_non_degradable_volatile_solids == 6.0
     assert reception_pit_daily_output.liquid_manure_total_volatile_solids == 7.0
     assert reception_pit_daily_output.liquid_manure_phosphorus == 8.0
     assert reception_pit_daily_output.liquid_manure_potassium == 9.0
@@ -82,8 +82,8 @@ def test_reception_pit_daily_output() -> None:
         "liquid_manure_total_ammoniacal_nitrogen": 2.0,
         "liquid_manure_nitrogen": 3.0,
         "liquid_manure_total_solids": 4.0,
-        "manure_degradable_volatile_solids": 5.0,
-        "manure_non_degradable_volatile_solids": 6.0,
+        "liquid_manure_total_degradable_volatile_solids": 5.0,
+        "liquid_manure_total_non_degradable_volatile_solids": 6.0,
         "liquid_manure_total_volatile_solids": 7.0,
         "liquid_manure_phosphorus": 8.0,
         "liquid_manure_potassium": 9.0,
@@ -100,8 +100,8 @@ def test_reception_pit_daily_output() -> None:
     assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == 2.0
     assert reception_pit_daily_output.liquid_manure_nitrogen == 3.0
     assert reception_pit_daily_output.liquid_manure_total_solids == 4.0
-    assert reception_pit_daily_output.manure_degradable_volatile_solids == 5.0
-    assert reception_pit_daily_output.manure_non_degradable_volatile_solids == 6.0
+    assert reception_pit_daily_output.liquid_manure_total_degradable_volatile_solids == 5.0
+    assert reception_pit_daily_output.liquid_manure_total_non_degradable_volatile_solids == 6.0
     assert reception_pit_daily_output.liquid_manure_total_volatile_solids == 7.0
     assert reception_pit_daily_output.liquid_manure_phosphorus == 8.0
     assert reception_pit_daily_output.liquid_manure_potassium == 9.0
@@ -116,33 +116,25 @@ def test_reception_pit_daily_output() -> None:
 def test_daily_update(mocker: MockerFixture) -> None:
     """Unit test for the ReceptionPit.daily_update method in file reception_pit.py."""
     # Arrange
-    mock_manure_handler_daily_output = mocker.MagicMock(
-        auto_spec=ManureHandlerDailyOutput
-    )
+    mock_manure_handler_daily_output = mocker.MagicMock(auto_spec=ManureHandlerDailyOutput)
     mock_manure_handler_daily_output.simulation_day = sim_day = 1
     mock_manure_handler_daily_output.pen_id = pen_id = 1
     mock_manure_handler_daily_output.manure_urea = urea = 1.0
     mock_manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen = TAN = 2.0
     mock_manure_handler_daily_output.liquid_manure_nitrogen = N = 3.0
     mock_manure_handler_daily_output.liquid_manure_total_solids = TS = 4.0
-    mock_manure_handler_daily_output.manure_degradable_volatile_solids = VSd = 5.0
-    mock_manure_handler_daily_output.manure_non_degradable_volatile_solids = VSnd = 6.0
-    mock_manure_handler_daily_output.liquid_manure_total_volatile_solids = (
-        VS_total
-    ) = 7.0
+    mock_manure_handler_daily_output.liquid_manure_total_degradable_volatile_solids = VSd = 5.0
+    mock_manure_handler_daily_output.liquid_manure_total_non_degradable_volatile_solids = VSnd = 6.0
+    mock_manure_handler_daily_output.liquid_manure_total_volatile_solids = VS_total = 7.0
     mock_manure_handler_daily_output.liquid_manure_phosphorus = P = 8.0
     mock_manure_handler_daily_output.liquid_manure_potassium = K = 9.0
-    mock_manure_handler_daily_output.total_daily_manure_volume = (
-        total_daily_manure_volume
-    ) = 10.0
+    mock_manure_handler_daily_output.total_daily_manure_volume = total_daily_manure_volume = 10.0
 
     mock_pen = mocker.MagicMock(auto_spec=ManureManagerPen)
     mock_pen.num_animals = num_animals = 100
 
     mock_bedding = mocker.MagicMock(auto_spec=BaseBedding)
-    mock_bedding.calc_total_bedding_dry_solids.return_value = (
-        total_bedding_dry_solids
-    ) = 11.0
+    mock_bedding.calc_total_bedding_dry_solids.return_value = total_bedding_dry_solids = 11.0
 
     expected_TS = TS + total_bedding_dry_solids
 
@@ -157,25 +149,15 @@ def test_daily_update(mocker: MockerFixture) -> None:
     assert reception_pit_daily_output.simulation_day == sim_day
     assert reception_pit_daily_output.pen_id == pen_id
     assert reception_pit_daily_output.manure_urea == approx(urea)
-    assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == approx(
-        TAN
-    )
+    assert reception_pit_daily_output.liquid_manure_total_ammoniacal_nitrogen == approx(TAN)
     assert reception_pit_daily_output.liquid_manure_nitrogen == approx(N)
     assert reception_pit_daily_output.liquid_manure_total_solids == approx(expected_TS)
-    assert reception_pit_daily_output.manure_degradable_volatile_solids == approx(VSd)
-    assert reception_pit_daily_output.manure_non_degradable_volatile_solids == approx(
-        VSnd
-    )
-    assert reception_pit_daily_output.liquid_manure_total_volatile_solids == approx(
-        VS_total
-    )
+    assert reception_pit_daily_output.liquid_manure_total_degradable_volatile_solids == approx(VSd)
+    assert reception_pit_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(VSnd)
+    assert reception_pit_daily_output.liquid_manure_total_volatile_solids == approx(VS_total)
     assert reception_pit_daily_output.liquid_manure_phosphorus == approx(P)
     assert reception_pit_daily_output.liquid_manure_potassium == approx(K)
-    assert reception_pit_daily_output.total_daily_manure_volume == approx(
-        total_daily_manure_volume
-    )
-    assert reception_pit_daily_output.liquid_manure_daily_volume == approx(
-        total_daily_manure_volume
-    )
+    assert reception_pit_daily_output.total_daily_manure_volume == approx(total_daily_manure_volume)
+    assert reception_pit_daily_output.liquid_manure_daily_volume == approx(total_daily_manure_volume)
 
     mock_bedding.calc_total_bedding_dry_solids.assert_called_once_with(num_animals)

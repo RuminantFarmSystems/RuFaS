@@ -7,9 +7,17 @@ from typing import Tuple
 from typing import Union
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
+    GasEmissionConstants,
+)
+from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
+    ManureTreatmentType,
+)
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
+    ManureModuleOutputManagerHelper,
+)
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
@@ -47,9 +55,7 @@ class BaseManureTreatment(ABC):
         self,
         weather: Weather,
         time: Time,
-        manure_treatment_config: Union[
-            ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]
-        ],
+        manure_treatment_config: Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]],
     ) -> None:
         """Initializes the BaseManureTreatment class.
 
@@ -77,13 +83,15 @@ class BaseManureTreatment(ABC):
         self._sim_day = -1
         self._current_pen: Optional[ManureManagerPen] = None
         self._manure_handler_daily_output = None
-        self._current_manure_treatment_daily_input: Optional[
-            LiquidManurePortionProtocol
-        ] = None
+        self._current_manure_treatment_daily_input: Optional[LiquidManurePortionProtocol] = None
         self._manure_separator: Optional[BaseManureSeparator] = None
         self._manure_separator_daily_output: Optional[ManureSeparatorDailyOutput] = None
         self._manure_separator_after_digestion: Optional[BaseManureSeparator] = None
         self._manure_separator_after_digestion_daily_output: Optional[ManureSeparatorDailyOutput] = None
+        try:
+            self.storage_time_period = self.config.storage_time_period
+        except AttributeError:
+            self.storage_time_period = None
         self._accumulated_output = ManureTreatmentDailyOutput()
 
     @property
@@ -97,7 +105,9 @@ class BaseManureTreatment(ABC):
         return self._accumulated_output
 
     @property
-    def manure_separator_after_digestion_daily_output(self) -> Optional[ManureSeparatorDailyOutput]:
+    def manure_separator_after_digestion_daily_output(
+        self,
+    ) -> Optional[ManureSeparatorDailyOutput]:
         """Returns the daily output of the intervening separator in the digester - separator - lagoon scenario.
 
         Returns:
@@ -156,38 +166,40 @@ class BaseManureTreatment(ABC):
 
         liquid_manure_total_ammoniacal_nitrogen = (
             manure_treatment_daily_input.liquid_manure_total_ammoniacal_nitrogen
-            * (
-                1
-                - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment
-            )
+            * (1 - self.config.total_ammoniacal_nitrogen_removal_efficiency_for_treatment)
         )
 
         liquid_manure_nitrogen = manure_treatment_daily_input.liquid_manure_nitrogen * (
             1 - self.config.nitrogen_removal_efficiency_for_treatment
         )
 
-        liquid_manure_total_solids = (
-            manure_treatment_daily_input.liquid_manure_total_solids
-            * (1 - self.config.total_solids_removal_efficiency_for_treatment)
+        liquid_manure_total_solids = manure_treatment_daily_input.liquid_manure_total_solids * (
+            1 - self.config.total_solids_removal_efficiency_for_treatment
         )
 
-        liquid_manure_total_volatile_solids = (
-            manure_treatment_daily_input.liquid_manure_total_volatile_solids
+        liquid_manure_total_volatile_solids = manure_treatment_daily_input.liquid_manure_total_volatile_solids * (
+            1 - self.config.volatile_solids_removal_efficiency_for_treatment
+        )
+
+        liquid_manure_total_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
             * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
         )
 
-        liquid_manure_phosphorus = (
-            manure_treatment_daily_input.liquid_manure_phosphorus
-            * (1 - self.config.phosphorus_removal_efficiency_for_treatment)
+        liquid_manure_total_non_degradable_volatile_solids = (
+            manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            * (1 - self.config.volatile_solids_removal_efficiency_for_treatment)
         )
 
-        liquid_manure_potassium = (
-            manure_treatment_daily_input.liquid_manure_potassium
-            * (1 - self.config.potassium_removal_efficiency_for_treatment)
+        liquid_manure_phosphorus = manure_treatment_daily_input.liquid_manure_phosphorus * (
+            1 - self.config.phosphorus_removal_efficiency_for_treatment
         )
 
-        final_manure_volume = (
-            manure_treatment_daily_input.liquid_manure_daily_volume)
+        liquid_manure_potassium = manure_treatment_daily_input.liquid_manure_potassium * (
+            1 - self.config.potassium_removal_efficiency_for_treatment
+        )
+
+        final_manure_volume = manure_treatment_daily_input.liquid_manure_daily_volume
 
         return ManureTreatmentDailyOutput(
             simulation_day=simulation_day,
@@ -196,6 +208,8 @@ class BaseManureTreatment(ABC):
             liquid_manure_nitrogen=liquid_manure_nitrogen,
             liquid_manure_total_solids=liquid_manure_total_solids,
             liquid_manure_total_volatile_solids=liquid_manure_total_volatile_solids,
+            liquid_manure_total_degradable_volatile_solids=liquid_manure_total_degradable_volatile_solids,
+            liquid_manure_total_non_degradable_volatile_solids=liquid_manure_total_non_degradable_volatile_solids,
             liquid_manure_phosphorus=liquid_manure_phosphorus,
             liquid_manure_potassium=liquid_manure_potassium,
             daily_final_manure_volume=final_manure_volume,
@@ -278,10 +292,10 @@ class BaseManureTreatment(ABC):
         return 0.0
 
     def _calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            self,
-            manure_treatment_type: ManureTreatmentType,
-            manure_cover: str,
-            manure_nitrogen_kg_N_per_day: float,
+        self,
+        manure_treatment_type: ManureTreatmentType,
+        manure_cover: str,
+        manure_nitrogen_kg_N_per_day: float,
     ) -> float:
         """
         Calculate the empirical nitrogen loss from nitrous oxide emission.
@@ -297,7 +311,7 @@ class BaseManureTreatment(ABC):
         manure_treatment_type : ManureTreatmentType
             The type of manure treatment.
         manure_cover : str
-            The type of cover for the manure. Options are: cover, no cover, and N/A.
+            The type of cover for the manure. Options are: cover, crust, no cover, and N/A.
         manure_nitrogen_kg_N_per_day
             The amount of manure nitrogen entering the manure treatment and storage system (kg N/day).
 
@@ -310,7 +324,8 @@ class BaseManureTreatment(ABC):
         return GasEmissionsCalculator.empirical_nitrogen_loss_from_nitrous_oxide_emission(
             emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=(
                 GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
-                    manure_treatment_type][manure_cover]
+                    manure_treatment_type
+                ][manure_cover]
             ),
             manure_nitrogen_kg_N_per_day=manure_nitrogen_kg_N_per_day,
         )
@@ -339,14 +354,56 @@ class BaseManureTreatment(ABC):
         precipitation = current_conditions.precipitation
         return precipitation * GeneralConstants.MM_TO_M
 
-    def _accumulate_daily_output(
-        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    ) -> None:
-        """Accumulates the daily output of the manure treatment.
+    def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
+        """Adjust the accumulated output by either resetting it or adding the daily output to it.
 
-        Args:
-            manure_treatment_daily_output: A ManureTreatmentDailyOutput object containing
-                the daily output of the manure treatment.
+        Notes
+        -----
+
+        The accumulated output will be reset on the first day of every storage time period.
+
+        Parameters
+        ----------
+        manure_treatment_daily_output : ManureTreatmentDailyOutput
+            The daily output from the manure treatment system.
 
         """
-        self._accumulated_output += manure_treatment_daily_output
+        if self._sim_day % self.storage_time_period == 1:
+            if self._accumulated_output.pen_id >= 0:
+                ManureModuleOutputManagerHelper.add_dataclass_object(
+                    self._accumulated_output,
+                    info_maps={
+                        "class": self.__class__.__name__,
+                        "function": self._adjust_accumulated_output.__name__,
+                        "prefix": f"{self.__class__.__name__}_emptying_amount_pen_"
+                        f"{self._accumulated_output.pen_id}",
+                        "simulation_day": self._sim_day,
+                    },
+                )
+            self._accumulated_output = manure_treatment_daily_output.clone()
+        else:
+            self._accumulated_output += manure_treatment_daily_output
+
+    @staticmethod
+    def calculate_cover_and_flare_methane(methane_loss: float) -> tuple[float, float]:
+        """
+        Adjust the methane burned and lost when using cover and flare cover type.
+
+        Parameters
+        ----------
+        methane_loss: float
+            The amount of methane lost (kg).
+
+        Returns
+        -------
+        tuple[float, float]
+            The amount of storage methane burned and the adjusted methane loss (kg).
+
+        """
+        storage_methane_burned = (
+            methane_loss * ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        adjusted_methane_loss = methane_loss * (
+            1 - ManureConstants.METHANE_DESTRUCTION_EFFICIENCY * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        return storage_methane_burned, adjusted_methane_loss

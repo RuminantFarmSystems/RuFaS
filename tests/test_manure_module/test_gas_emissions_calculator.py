@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import math
+from typing import Tuple
 
 import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
 )
@@ -16,10 +16,7 @@ from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculato
 def test_mcf() -> None:
     """Tests _methane_conversion_factor() in calculator.py."""
     assert GasEmissionsCalculator._methane_conversion_factor(1.0) == pytest.approx(
-        (
-                GasEmissionConstants.MCF_CONSTANT_A
-                * math.exp(GasEmissionConstants.MCF_CONSTANT_B)
-        )
+        (GasEmissionConstants.MCF_CONSTANT_A - GasEmissionConstants.MCF_CONSTANT_B)
     )
 
 
@@ -37,9 +34,7 @@ def test_ifsm_methane_emission(mocker: MockerFixture) -> None:
     expected = (manure_volatile_solids * 0.24 * 0.67 * 1.0) / 100
 
     # Actual
-    actual = GasEmissionsCalculator.ifsm_methane_emission(
-        manure_volatile_solids, ambient_barn_temp
-    )
+    actual = GasEmissionsCalculator.ifsm_methane_emission(manure_volatile_solids, ambient_barn_temp)
 
     # Assert
     patch_for_ifsm_methane_emission.assert_called_once_with(mcf)
@@ -61,10 +56,10 @@ def test_ifsm_methane_emission(mocker: MockerFixture) -> None:
     ],
 )
 def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
-        daily_nitrogen_input: float,
-        is_bedding_tilled: bool,
-        expected: float,
-        expected_error: type[Exception],
+    daily_nitrogen_input: float,
+    is_bedding_tilled: bool,
+    expected: float,
+    expected_error: type[Exception],
 ) -> None:
     """
     Unit test for nitrogen_loss_in_compost_bedded_pack_barn_from_ammonia_emission() method in calculator.py.
@@ -98,7 +93,7 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_ammonia_emission(
     ],
 )
 def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
-        daily_nitrogen_input: float, expected: float, expected_error: type[Exception]
+    daily_nitrogen_input: float, expected: float, expected_error: type[Exception]
 ) -> None:
     """
     Unit test for _nitrogen_loss_from_leaching() method in calculator.py.
@@ -110,13 +105,9 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
     # Act and Assert
     if expected_error:
         with pytest.raises(expected_error):
-            GasEmissionsCalculator._nitrogen_loss_from_leaching(
-                daily_nitrogen_input
-            )
+            GasEmissionsCalculator._nitrogen_loss_from_leaching(daily_nitrogen_input)
     else:
-        actual = GasEmissionsCalculator._nitrogen_loss_from_leaching(
-            daily_nitrogen_input
-        )
+        actual = GasEmissionsCalculator._nitrogen_loss_from_leaching(daily_nitrogen_input)
         assert actual == pytest.approx(expected)
 
 
@@ -135,10 +126,10 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_leaching(
     ],
 )
 def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission(
-        daily_nitrogen_input: float,
-        is_bedding_tilled: bool,
-        expected: float,
-        expected_error: type[Exception],
+    daily_nitrogen_input: float,
+    is_bedding_tilled: bool,
+    expected: float,
+    expected_error: type[Exception],
 ) -> None:
     """
     Unit test for nitrogen_loss_in_compost_bedded_pack_barn_from_nitrous_oxide_emission() method in calculator.py.
@@ -176,13 +167,13 @@ def test_nitrogen_loss_in_compost_bedded_pack_barn_due_to_nitrous_oxide_emission
     ],
 )
 def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
-        daily_nitrogen_input: float,
-        is_bedding_tilled: bool,
-        expected_ammonia: float,
-        expected_nitrous_oxide: float,
-        expected_leaching: float,
-        expected_error: type[Exception],
-        mocker: MockerFixture,
+    daily_nitrogen_input: float,
+    is_bedding_tilled: bool,
+    expected_ammonia: float,
+    expected_nitrous_oxide: float,
+    expected_leaching: float,
+    expected_error: type[Exception],
+    mocker: MockerFixture,
 ) -> None:
     """
     Unit test for the `total_nitrogen_loss_from_compost_bedded_pack_barn` method in calculator.py.
@@ -199,8 +190,7 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
         return_value=expected_ammonia,
     )
     mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator"
-        "._nitrogen_loss_from_leaching",
+        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator" "._nitrogen_loss_from_leaching",
         return_value=expected_leaching,
     )
     mocker.patch(
@@ -216,10 +206,8 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
                 daily_nitrogen_input, is_bedding_tilled
             )
     else:
-        total_nitrogen_loss = (
-            GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
-                daily_nitrogen_input, is_bedding_tilled
-            )
+        total_nitrogen_loss = GasEmissionsCalculator.total_nitrogen_loss_from_compost_bedded_pack_barn(
+            daily_nitrogen_input, is_bedding_tilled
         )
         expected = expected_ammonia + expected_leaching + expected_nitrous_oxide
         assert total_nitrogen_loss == pytest.approx(expected)
@@ -229,15 +217,12 @@ def test_total_nitrogen_loss_from_compost_bedded_pack_barn(
 def test_microbial_decomp_rate(temperature: float) -> None:
     """Tests _microbial_decomp_rate() in calculator.py."""
     assert GasEmissionsCalculator._microbial_decomp_rate(temperature) == pytest.approx(
-        2.37e-3
-        * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50)))
+        2.37e-3 * (math.pow(1.066, (temperature - 10)) - math.pow(1.21, (temperature - 50)))
     )
 
 
 @pytest.mark.parametrize("days_since_last_tillage, lag", [(1, 1), (10, 2), (1, 3)])
-def test_carbon_decomposition_rate(
-        mocker: MockerFixture, days_since_last_tillage: int, lag: int
-) -> None:
+def test_carbon_decomposition_rate(mocker: MockerFixture, days_since_last_tillage: int, lag: int) -> None:
     """Tests _carbon_decomposition_rate() in calculator.py."""
 
     # Arrange
@@ -249,9 +234,7 @@ def test_carbon_decomposition_rate(
     )
     expected = math.exp(0.1 * (days_since_last_tillage - lag))
 
-    assert GasEmissionsCalculator._carbon_decomposition_rate(
-        days_since_last_tillage, lag
-    ) == pytest.approx(expected)
+    assert GasEmissionsCalculator._carbon_decomposition_rate(days_since_last_tillage, lag) == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
@@ -265,9 +248,9 @@ def test_carbon_decomposition_rate(
     ],
 )
 def test_aneerobic_coefficient(
-        oxygen_mole_fraction: float,
-        oxygen_ambient_air_mole_fraction: float,
-        should_throw: bool,
+    oxygen_mole_fraction: float,
+    oxygen_ambient_air_mole_fraction: float,
+    should_throw: bool,
 ) -> None:
     """Tests _aneerobic_coefficient() in calculator.py."""
     if should_throw:
@@ -278,7 +261,7 @@ def test_aneerobic_coefficient(
             )
     else:
         expected = (oxygen_mole_fraction / (0.02 + oxygen_mole_fraction)) * (
-                (0.02 + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction
+            (0.02 + oxygen_ambient_air_mole_fraction) / oxygen_ambient_air_mole_fraction
         )
         assert GasEmissionsCalculator._anaerobic_effect(
             oxygen_mole_fraction=oxygen_mole_fraction,
@@ -302,12 +285,7 @@ def test_total_carbon_decomposition(mocker: MockerFixture) -> None:
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._anaerobic_effect",
         return_value=anaerobic_effect,
     )
-    expected = (
-            (total_solids * 0.5 + bedding_mass * 0.35)
-            * c_decomp_rate
-            * 0.65
-            * anaerobic_effect
-    )
+    expected = (total_solids * 0.5 + bedding_mass * 0.35) * c_decomp_rate * 0.65 * anaerobic_effect
 
     assert GasEmissionsCalculator.total_carbon_decomposition(
         total_solids, bedding_mass, days_since_last_tillage, lag
@@ -333,59 +311,26 @@ def test_modified_hours(hours: float) -> None:
     assert actual == expected
 
 
-def test_ambient_temp(mocker: MockerFixture) -> None:
-    """Tests _ambient_temp() in calculator.py."""
-
-    # Arrange
-    hours = 10.0
-    modified_hours = 8.0
-    patch_for_modified_hours = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._modified_hours",
-        return_value=modified_hours,
-    )
-    t_min = 20.0
-    t_max = 30.0
-    expected = modified_hours * (t_max - t_min) / 2 + (t_max + t_min) / 2
-
-    # Act
-    actual = GasEmissionsCalculator._ambient_temperature(hours, t_min, t_max)
-
-    # Assert
-    patch_for_modified_hours.assert_called_once_with(hours)
-    assert actual == expected
-
-
 @pytest.mark.parametrize(
-    "num_animals, barn_area, barn_temp, expected, error_message",
+    "barn_area, barn_temp, expected, error_message",
     [
         (
-                10,
-                100.0,
-                25.0,
-                10 * (0.0065 + 0.0192 * 25.0) * 100.0 / 1000,
-                None,
+            100.0,
+            25.0,
+            (0.0065 + 0.0192 * 25.0) * 100.0 / 1000,
+            None,
         ),  # Standard case
-        (0, 100.0, 25.0, 0, None),  # Edge case: no animals
-        (10, 0.0, 25.0, 0, None),  # Edge case: no area
-        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
-        (
-                -1,
-                100.0,
-                25.0,
-                ValueError,
-                "Number of animals must be greater than or equal to 0.",
-        ),
-        # Exception case: negative number of animals
-        (10, -100.0, 25.0, ValueError, "Barn area must be greater than or equal to 0."),
+        (0.0, 25.0, 0, None),  # Edge case: no area
+        (100.0, -20.0, 0, None),  # Edge case: negative barn_temp
+        (-100.0, 25.0, ValueError, "Barn area must be greater than or equal to 0."),
         # Exception case: negative barn area
     ],
 )
 def test_housing_carbon_dioxide_emission(
-        num_animals: int,
-        barn_area: float,
-        barn_temp: float,
-        expected: float | Exception,
-        error_message: str | None,
+    barn_area: float,
+    barn_temp: float,
+    expected: float | Exception,
+    error_message: str | None,
 ) -> None:
     """
     Unit test for housing_carbon_dioxide_emission() method in calculator.py.
@@ -397,13 +342,9 @@ def test_housing_carbon_dioxide_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_carbon_dioxide_emission(
-                num_animals, barn_area, barn_temp
-            )
+            GasEmissionsCalculator.housing_carbon_dioxide_emission(barn_area, barn_temp)
     else:
-        actual = GasEmissionsCalculator.housing_carbon_dioxide_emission(
-            num_animals, barn_area, barn_temp
-        )
+        actual = GasEmissionsCalculator.housing_carbon_dioxide_emission(barn_area, barn_temp)
         assert actual == pytest.approx(expected)
 
 
@@ -492,51 +433,29 @@ def test_convert_tempC_to_tempK() -> None:
     assert actual == expected
 
 
-def test_methane_volume_via_Chen_equation() -> None:
-    """Tests _methane_volume_via_Chen_equation() in calculator.py."""
+@pytest.mark.parametrize("volatile_solids,expected", [(0.0, 0.0), (10.0, 2.4), (1000.0, 240.0)])
+def test_CSTR_methane_volume(volatile_solids: float, expected: float) -> None:
+    """Tests calculate_CSTR_methane_volume() in calculator.py."""
+    actual = GasEmissionsCalculator.calculate_CSTR_methane_volume(volatile_solids)
 
-    # Arrange
-    VS_total = 10.0
-    hydraulic_retention_time = 20
-    expected = (
-            GasEmissionConstants.METHANE_POTENTIAL_Go
-            * (
-                    1
-                    - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                    / (
-                            hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
-                            + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                            - 1
-                    )
-            )
-            * VS_total
-            * GeneralConstants.GRAMS_TO_KG
-    )
-
-    # Act
-    actual = GasEmissionsCalculator.methane_volume_via_Chen_equation(
-        VS_total, hydraulic_retention_time
-    )
-
-    # Assert
     assert actual == expected
 
 
-def test_biogas_energy_content() -> None:
-    """Tests biogas_energy_content() in calculator.py."""
+@pytest.mark.parametrize(
+    "methane_vol,leakage_frac,expected", [(100.0, 0.01, 1.0), (200.0, 0.05, 10.0), (150.0, 0.13, 19.5)]
+)
+def test_calculate_digester_methane_leakage(methane_vol: float, leakage_frac: float, expected: float) -> None:
+    """Tests caculate_digester_methane_leakage() in calculator.py"""
+    actual = GasEmissionsCalculator.calculate_digester_methane_leakage(methane_vol, leakage_frac)
 
-    # Arrange
-    CH4_volume = 10.0
-    expected = (
-            CH4_volume
-            * GasEmissionConstants.METHANE_DENSITY
-            * GasEmissionConstants.METHANE_ENERGY_DENSITY
-    )
+    assert actual == expected
 
-    # Act
-    actual = GasEmissionsCalculator.biogas_energy_content(CH4_volume)
 
-    # Assert
+@pytest.mark.parametrize("mass,expected", [(10.0, 550.0), (0.0, 0.0)])
+def test_methane_energy_content(mass: float, expected: float) -> None:
+    """Tests calculate_methane_energy_content() in calculator.py."""
+    actual = GasEmissionsCalculator.calculate_methane_energy_content(mass)
+
     assert actual == expected
 
 
@@ -546,53 +465,40 @@ def test_methane_emission_for_anaerobic_lagoon() -> None:
     # Arrange
     manure_volatile_solids = 10.0
     expected = (
-            manure_volatile_solids
-            * GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
-            * GasEmissionConstants.METHANE_CONVERSION_FACTOR
-            * GasEmissionConstants.FRACTION_OF_HANDLED_MANURE
-            * GasEmissionConstants.METHANE_FACTOR
+        manure_volatile_solids
+        * GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION
+        * GasEmissionConstants.METHANE_CONVERSION_FACTOR
+        * GasEmissionConstants.FRACTION_OF_HANDLED_MANURE
+        * GasEmissionConstants.METHANE_FACTOR
     )
 
     # Act
-    actual = GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon(
-        manure_volatile_solids
-    )
+    actual = GasEmissionsCalculator.methane_emission_from_anaerobic_lagoon(manure_volatile_solids)
 
     # Assert
     assert actual == approx(expected)
 
 
 @pytest.mark.parametrize(
-    "num_animals, barn_area, barn_temp, expected, error_message",
+    "barn_area, barn_temp, expected, error_message",
     [
         (
-                10,
-                100.0,
-                30.0,
-                10 * max(0.0, 0.13 * 30.0) * 100.0 / 1000,
-                None,
+            100.0,
+            30.0,
+            max(0.0, 0.13 * 30.0) * 100.0 / 1000,
+            None,
         ),  # Standard case
-        (0, 100.0, 30.0, 0, None),  # Edge case: no animals
-        (10, 0.0, 30.0, 0, None),  # Edge case: no area
-        (10, 100.0, -20.0, 0, None),  # Edge case: negative barn_temp
-        # Exception case: negative number of animals
-        (
-                -1,
-                100.0,
-                30.0,
-                ValueError,
-                "Number of animals must be greater than or equal to 0.",
-        ),
+        (0.0, 30.0, 0, None),  # Edge case: no area
+        (100.0, -20.0, 0, None),  # Edge case: negative barn_temp
         # Exception case: negative barn area
-        (10, -100.0, 30.0, ValueError, "Barn area must be greater than or equal to 0."),
+        (-100.0, 30.0, ValueError, "Barn area must be greater than or equal to 0."),
     ],
 )
 def test_housing_methane_emission(
-        num_animals: int,
-        barn_area: float,
-        barn_temp: float,
-        expected: float | Exception,
-        error_message: str | None,
+    barn_area: float,
+    barn_temp: float,
+    expected: float | Exception,
+    error_message: str | None,
 ) -> None:
     """
     Unit test for housing_methane_emission() method in calculator.py.
@@ -604,13 +510,9 @@ def test_housing_methane_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_methane_emission(
-                num_animals, barn_area, barn_temp
-            )
+            GasEmissionsCalculator.housing_methane_emission(barn_area, barn_temp)
     else:
-        actual = GasEmissionsCalculator.housing_methane_emission(
-            num_animals, barn_area, barn_temp
-        )
+        actual = GasEmissionsCalculator.housing_methane_emission(barn_area, barn_temp)
         assert actual == pytest.approx(expected)
 
 
@@ -626,61 +528,61 @@ def test_housing_methane_emission(
         (10, 100.0, 25.0, 0.0, 20.0, 7.7, 260.0, 0.0, None),
         # Exception cases: Negative input values for num_animals, barn_area, urine_tan, urine
         (
-                -1,
-                100.0,
-                25.0,
-                30.0,
-                20.0,
-                7.7,
-                260.0,
-                ValueError,
-                "Number of animals must be greater than or equal to 0.",
+            -1,
+            100.0,
+            25.0,
+            30.0,
+            20.0,
+            7.7,
+            260.0,
+            ValueError,
+            "Number of animals must be greater than or equal to 0.",
         ),
         (
-                10,
-                -100.0,
-                25.0,
-                30.0,
-                20.0,
-                7.7,
-                260.0,
-                ValueError,
-                "Barn area must be greater than or equal to 0.",
+            10,
+            -100.0,
+            25.0,
+            30.0,
+            20.0,
+            7.7,
+            260.0,
+            ValueError,
+            "Barn area must be greater than or equal to 0.",
         ),
         (
-                10,
-                100.0,
-                -25.0,
-                30.0,
-                20.0,
-                7.7,
-                260.0,
-                ValueError,
-                "Manure total ammoniacal nitrogen must be greater than or equal to 0.",
+            10,
+            100.0,
+            -25.0,
+            30.0,
+            20.0,
+            7.7,
+            260.0,
+            ValueError,
+            "Manure total ammoniacal nitrogen must be greater than or equal to 0.",
         ),
         (
-                10,
-                100.0,
-                25.0,
-                -30.0,
-                20.0,
-                7.7,
-                260.0,
-                ValueError,
-                "Manure must be greater than or equal to 0.",
+            10,
+            100.0,
+            25.0,
+            -30.0,
+            20.0,
+            7.7,
+            260.0,
+            ValueError,
+            "Manure must be greater than or equal to 0.",
         ),
     ],
 )
 def test_housing_ammonia_emission(
-        num_animals: int,
-        barn_area: float,
-        urine_tan: float,
-        urine: float,
-        temp: float,
-        pH: float,
-        hsc: float,
-        expected: float | Exception,
-        error_message: str | None,
+    num_animals: int,
+    barn_area: float,
+    urine_tan: float,
+    urine: float,
+    temp: float,
+    pH: float,
+    hsc: float,
+    expected: float | Exception,
+    error_message: str | None,
 ) -> None:
     """
     Unit test for housing_ammonia_emission() method in calculator.py.
@@ -693,9 +595,7 @@ def test_housing_ammonia_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_ammonia_emission(
-                num_animals, barn_area, urine_tan, urine, temp, pH, hsc
-            )
+            GasEmissionsCalculator.housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
     else:
         actual = GasEmissionsCalculator.housing_ammonia_emission(
             num_animals, barn_area, urine_tan, urine, temp, pH, hsc
@@ -707,28 +607,28 @@ def test_housing_ammonia_emission(
     "temp, expected, error_message",
     [
         # Standard case
-        (20.0, 0.05443994340019855, None),
+        (20.0, 0.13078635869235153, None),
         # Edge cases: Lower and upper bound temperatures
-        (-40.0, 3.6974151606958807e-07, None),
-        (60.0, 14.031085750034068, None),
+        (-40.0, 2.5245953154632027e-05, None),
+        (60.0, 7.071745539498552, None),
         # Exception case: Temperature outside the defined range
         (
-                -41.0,
-                ValueError,
-                "Temperature must be between -40 and 60 degrees Celsius. Temperature provided: -41.0",
+            -41.0,
+            ValueError,
+            "Temperature must be between -40 and 60 degrees Celsius. Temperature provided: -41.0",
         ),
         (
-                61.0,
-                ValueError,
-                "Temperature must be between -40 and 60 degrees Celsius. Temperature provided: 61.0",
+            61.0,
+            ValueError,
+            "Temperature must be between -40 and 60 degrees Celsius. Temperature provided: 61.0",
         ),
     ],
 )
 def test_arrhenius_exponent(
-        mocker: MockerFixture,
-        temp: float,
-        expected: float | Exception,
-        error_message: str | None,
+    mocker: MockerFixture,
+    temp: float,
+    expected: float | Exception,
+    error_message: str | None,
 ) -> None:
     """
     Unit test for _arrhenius_exponent() method in calculator.py.
@@ -751,9 +651,9 @@ def test_arrhenius_exponent(
         with pytest.raises(expected, match=error_message):  # type: ignore
             GasEmissionsCalculator._arrhenius_exponent(temp)
         if (
-                GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE
-                <= temp
-                <= GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE
+            GasEmissionConstants.GENERAL_LOWER_BOUND_TEMPERATURE
+            <= temp
+            <= GasEmissionConstants.GENERAL_UPPER_BOUND_TEMPERATURE
         ):
             patch_for_convert_temp.assert_called_once_with(temp)
     else:
@@ -763,71 +663,35 @@ def test_arrhenius_exponent(
 
 
 @pytest.mark.parametrize(
-    "total_volatile_solids, expected, error_message",
-    [
-        # Standard case
-        (1.0, (0.5, 0.5), None),
-        (45.0, (22.5, 22.5), None),
-        # Edge cases: Zero and very large volatile solids
-        (0.0, (0.0, 0.0), None),
-        (1e6, (5e5, 5e5), None),
-        # Exception case: Negative volatile solids
-        (
-                -1.0,
-                ValueError,
-                "Total volatile solids must be non-negative. Total volatile solids provided: -1.0",
-        ),
-    ],
-)
-def test_volatile_solid_components(
-        total_volatile_solids: float,
-        expected: tuple[float, float] | Exception,
-        error_message: str | None,
-) -> None:
-    """
-    Unit test for _volatile_solid_components() method in calculator.py.
-
-    This test verifies that the method correctly calculates the degradable and non-degradable
-    volatile solids given the total volatile solids. It also checks that the method raises an
-    exception for total volatile solids that are negative.
-
-    """
-    # Act and assert
-    if isinstance(expected, type) and issubclass(expected, Exception):
-        with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator._volatile_solid_components(total_volatile_solids)
-    else:
-        actual = GasEmissionsCalculator._volatile_solid_components(
-            total_volatile_solids
-        )
-        assert actual == approx(expected, rel=1e-6)
-
-
-@pytest.mark.parametrize(
     "total_volatile_solids, temp, expected, error_message",
     [
         # Standard case
-        (1.0, 20.0, 4.848, None),
-        (10.0, 20.0, 4.848, None),
-        # Edge case: Zero total volatile solids
-        (0.0, 20.0, 0.0, None),
+        (1.0, 20.0, (0.00155838924852, 0.001542959652), None),
+        (10.0, 20.0, (0.015583892485199996, 0.015429596519999997), None),
         # Case when temperature is not provided, default should be used
-        (1.0, None, 4.848, None),
+        (1.0, None, (0.00155838924852, 0.001542959652), None),
+        # Exception case: Zero total volatile solids
+        (
+            0.0,
+            20.0,
+            ValueError,
+            "Total degradable volatile solids must be positive. Total degradable volatile solids " "provided: 0.0",
+        ),
         # Exception case: Negative total volatile solids
         (
-                -1.0,
-                20.0,
-                ValueError,
-                "Total volatile solids must be greater than 0. Total volatile solids provided: -1.0",
+            -1.0,
+            20.0,
+            ValueError,
+            "Total degradable volatile solids must be positive. Total degradable volatile solids provided: -0.5",
         ),
     ],
 )
 def test_methane_emission_from_slurry_storage(
-        mocker: MockerFixture,
-        total_volatile_solids: float,
-        temp: float | None,
-        expected: float | Exception,
-        error_message: str | None,
+    mocker: MockerFixture,
+    total_volatile_solids: float,
+    temp: float | None,
+    expected: Tuple[float, float] | Exception,
+    error_message: str | None,
 ) -> None:
     """
     Unit test for methane_emission_from_slurry_storage() method in calculator.py.
@@ -840,45 +704,34 @@ def test_methane_emission_from_slurry_storage(
     # Arrange
     patch_for_arrhenius_exponent = mocker.patch(
         "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._arrhenius_exponent",
-        return_value=0.2,  # Dummy return value
+        return_value=0.128579971,  # Dummy return value
     )
-    patch_for_volatile_solid_components = mocker.patch(
-        "RUFAS.routines.manure.gas_emissions.calculator.GasEmissionsCalculator._volatile_solid_components",
-        return_value=(1.0, 1.0)
-        if total_volatile_solids != 0.0
-        else (0.0, 0.0),  # Dummy return value
-    )
+    total_degradable_volatile_solids = total_non_degradable_volatile_solids = 0.5 * total_volatile_solids
 
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):
             GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_volatile_solids, temp
+                total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
     else:
         if temp is None:
             actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_volatile_solids
+                total_degradable_volatile_solids, total_non_degradable_volatile_solids
             )
         else:
             actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_volatile_solids, temp
+                total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
         assert actual == approx(expected, rel=1e-6)
 
         patch_for_arrhenius_exponent.assert_called_once_with(
-            temp
-            if temp is not None
-            else GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE
-        )
-        patch_for_volatile_solid_components.assert_called_once_with(
-            total_volatile_solids
+            temp if temp is not None else GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE
         )
 
 
 @pytest.mark.parametrize(
-    "num_animals, storage_area, manure_tan, manure_volume, manure_density,"
-    "temp, pH, expected, error_message",
+    "num_animals, storage_area, manure_tan, manure_volume, manure_density," "temp, pH, expected, error_message",
     [
         # Standard case
         (10, 100.0, 25.0, 30.0, 1000.0, 20.0, 7.7, 25.0, None),
@@ -893,72 +746,72 @@ def test_methane_emission_from_slurry_storage(
         # Exception cases: Negative input values for num_animals, storage_area,
         # manure_tan, manure_volume, manure_density, total_solids
         (
-                -1,
-                100.0,
-                25.0,
-                30.0,
-                1000.0,
-                20.0,
-                7.7,
-                ValueError,
-                "Number of animals must be greater than or equal to 0.",
+            -1,
+            100.0,
+            25.0,
+            30.0,
+            1000.0,
+            20.0,
+            7.7,
+            ValueError,
+            "Number of animals must be greater than or equal to 0.",
         ),
         (
-                10,
-                -100.0,
-                25.0,
-                30.0,
-                1000.0,
-                20.0,
-                7.7,
-                ValueError,
-                "Storage area per animal must be greater than or equal to 0.",
+            10,
+            -100.0,
+            25.0,
+            30.0,
+            1000.0,
+            20.0,
+            7.7,
+            ValueError,
+            "Storage area per animal must be greater than or equal to 0.",
         ),
         (
-                10,
-                100.0,
-                -25.0,
-                30.0,
-                1000.0,
-                20.0,
-                7.7,
-                ValueError,
-                "Manure total ammoniacal nitrogen must be greater than or equal to 0.",
+            10,
+            100.0,
+            -25.0,
+            30.0,
+            1000.0,
+            20.0,
+            7.7,
+            ValueError,
+            "Manure total ammoniacal nitrogen must be greater than or equal to 0.",
         ),
         (
-                10,
-                100.0,
-                25.0,
-                -30.0,
-                1000.0,
-                20.0,
-                7.7,
-                ValueError,
-                "Manure volume must be greater than or equal to 0.",
+            10,
+            100.0,
+            25.0,
+            -30.0,
+            1000.0,
+            20.0,
+            7.7,
+            ValueError,
+            "Manure volume must be greater than or equal to 0.",
         ),
         (
-                10,
-                100.0,
-                25.0,
-                30.0,
-                -1000.0,
-                20.0,
-                7.7,
-                ValueError,
-                "Manure density must be greater than or equal to 0.",
+            10,
+            100.0,
+            25.0,
+            30.0,
+            -1000.0,
+            20.0,
+            7.7,
+            ValueError,
+            "Manure density must be greater than or equal to 0.",
         ),
     ],
 )
 def test_storage_ammonia_emission(
-        num_animals: int,
-        storage_area: float,
-        manure_tan: float,
-        manure_volume: float,
-        manure_density: float,
-        temp: float,
-        pH: float,
-        expected: float | Exception,
-        error_message: str | None,
+    num_animals: int,
+    storage_area: float,
+    manure_tan: float,
+    manure_volume: float,
+    manure_density: float,
+    temp: float,
+    pH: float,
+    expected: float | Exception,
+    error_message: str | None,
 ) -> None:
     """
     Unit test for storage_ammonia_emission() method in calculator.py.
@@ -998,14 +851,18 @@ def test_storage_ammonia_emission(
     [
         (0, 0, False),
         (10, GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS * 10, False),
-        (1000, GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS * 1000, False),
+        (
+            1000,
+            GasEmissionConstants.NITROUS_OXIDE_COEFFICIENT_IN_OPEN_LOTS * 1000,
+            False,
+        ),
         (-1, None, True),
         (-10, None, True),
-    ]
+    ],
 )
-def test_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input: float,
-                                                                expected_output: float,
-                                                                expect_exception: bool) -> None:
+def test_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(
+    daily_nitrogen_input: float, expected_output: float, expect_exception: bool
+) -> None:
     """
     Unit test for nitrogen_loss_in_open_lots_from_nitrous_oxide_emission() method in calculator.py.
     """
@@ -1014,23 +871,33 @@ def test_nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_i
         with pytest.raises(ValueError):
             GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input)
     else:
-        assert GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(
-            daily_nitrogen_input) == expected_output
+        assert (
+            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_nitrous_oxide_emission(daily_nitrogen_input)
+            == expected_output
+        )
 
 
 @pytest.mark.parametrize(
     "daily_nitrogen_input, expected_output, expect_exception",
     [
         (0, 0, False),
-        (10, GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * 10, False),
-        (1000, GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * 1000, False),
+        (
+            10,
+            GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * 10,
+            False,
+        ),
+        (
+            1000,
+            GasEmissionConstants.AMMONIA_EMISSION_COEFFICIENT_IN_OPEN_LOTS * 1000,
+            False,
+        ),
         (-1, None, True),
         (-10, None, True),
-    ]
+    ],
 )
-def test_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input: float,
-                                                          expected_output: float,
-                                                          expect_exception: bool) -> None:
+def test_nitrogen_loss_in_open_lots_from_ammonia_emission(
+    daily_nitrogen_input: float, expected_output: float, expect_exception: bool
+) -> None:
     """
     Unit test for nitrogen_loss_in_open_lots_from_ammonia_emission() method in calculator.py.
     """
@@ -1039,5 +906,7 @@ def test_nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input: 
         with pytest.raises(ValueError):
             GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
     else:
-        assert GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(
-            daily_nitrogen_input) == expected_output
+        assert (
+            GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
+            == expected_output
+        )

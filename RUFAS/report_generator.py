@@ -1,5 +1,8 @@
-from typing import Dict, List, Any, Callable
-
+import re
+from typing import Dict, List, Any, Callable, Optional
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.graph_generator import GraphGenerator
+from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
@@ -20,7 +23,7 @@ def average_aggregator(data: List[float]) -> float:
     return sum(data) / len(data) if data else 0
 
 
-def division_aggregator(data: List[float]) -> float:
+def division_aggregator(data: List[float]) -> float | None:
     """
     Divides the first number in the list by each of the subsequent numbers.
 
@@ -100,7 +103,7 @@ def sum_aggregator(data: List[float]) -> float:
     return sum(data)
 
 
-def subtraction_aggregator(data: List[float]) -> float:
+def subtraction_aggregator(data: list[float]) -> float | None:
     """
     Subtracts each subsequent number in the list from the first number.
 
@@ -123,7 +126,7 @@ def subtraction_aggregator(data: List[float]) -> float:
     return result
 
 
-AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
+AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float] | Callable[[list[float]], float | None]] = {
     "average": average_aggregator,
     "division": division_aggregator,
     "product": product_aggregator,
@@ -136,14 +139,22 @@ AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float]] = {
 class ReportGenerator:
     """
     A class to generate reports based on filtered data and aggregation criteria and store them in a dictionary.
+
+    Attributes
+    ----------
+    reports : Dict[str, Dict[str, List[Any]]]
+        A dictionary containing the generated reports, with the report name as the key and the report data as the value.
+    time : Time | None
+        A Time object used to track the simulation time
     """
 
-    def __init__(self):
+    def __init__(self, time=None) -> None:
         """
         Initializes the ReportGenerator.
         """
 
         self.reports: Dict[str, Dict[str, List[Any]]] = {}
+        self.time = time
 
     def clear_reports(self) -> None:
         """
@@ -154,13 +165,13 @@ class ReportGenerator:
         None
         """
 
-        self.reports: Dict[str, Dict[str, List[Any]]] = {}
+        self.reports = {}
 
     def generate_report(
-            self,
-            filter_content: Dict[str, Any],
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-    ) -> List[Dict[str, str | Dict[str, str]]]:
+        self,
+        filter_content: Dict[str, Any],
+        filtered_pool: dict[str, dict[str, list[Any]]],
+    ) -> list[dict[str, str | dict[str, str]]]:
         """
         Generates a report specified by the given filter content.
 
@@ -170,16 +181,16 @@ class ReportGenerator:
             A dictionary containing the configuration for the report, including details
             such as 'name', 'filters', 'cross_references', and aggregation instructions.
 
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The data pool from which reports are generated.
 
         Returns
         -------
-        List[Dict[str, str | Dict[str, str]]]
+        list[dict[str, str | dict[str, str]]]
             A list of log events.
         """
 
-        event_logs: List[Dict[str, str | Dict[str, str]]] = []
+        event_logs: list[dict[str, str | dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
             "function": self.generate_report.__name__,
@@ -187,38 +198,134 @@ class ReportGenerator:
 
         individual_report_name = self._ensure_unique_report_name_with_timestamp(filter_content.get("name"))
 
-        init_event_log = {
-            "log": "start_generate_individual_report",
-            "message": f"Start generating individual report: {individual_report_name}",
-            "info_map": info_map,
-        }
-        event_logs.append(init_event_log)
+        event_logs.append(
+            {
+                "log": "start_generate_individual_report",
+                "message": f"Start generating individual report: {individual_report_name}",
+                "info_map": info_map,
+            }
+        )
 
         try:
+            report_filter_data = {}
             if "cross_references" in filter_content.keys():
                 self._check_for_missing_references(filter_content["cross_references"])
-                cross_reference_data = {ref: self.reports[ref] for ref in filter_content["cross_references"]}
+                cross_reference_data = self._get_reports_by_regex(filter_content["cross_references"])
                 cross_reference_data.update(filtered_pool)
-                report_data = self._perform_aggregations(cross_reference_data, filter_content)
+                report_data, aggregation_logs = self._perform_aggregations(cross_reference_data, filter_content)
             else:
-                report_data = self._perform_aggregations(filtered_pool, filter_content)
-
+                report_data, aggregation_logs = self._perform_aggregations(filtered_pool, filter_content)
+            event_logs.extend(aggregation_logs)
+            should_graph_report_data = filter_content.get("graph_details")
+            enable_graph_and_report = filter_content.get("graph_and_report", False)
             for col, values in report_data.items():
                 column_name = self._ensure_unique_report_name_with_timestamp(
-                    f"{individual_report_name}_{col}"
-                    if len(individual_report_name) > 0 else col)
-                self.reports[column_name] = {"values": values}
+                    f"{individual_report_name}_{col}" if len(individual_report_name) > 0 else col
+                )
+                report_filter_data[column_name] = {"values": values}
+            if should_graph_report_data:
+                if enable_graph_and_report:
+                    self.reports.update(report_filter_data)
+                graph_event_log = self._prepare_report_data_to_be_graphed(
+                    report_filter_data, filter_content, individual_report_name
+                )
+                event_logs.extend(graph_event_log)
+            elif not should_graph_report_data:
+                self.reports.update(report_filter_data)
+                report_filter_data = {}
+                if enable_graph_and_report:
+                    event_logs.append(
+                        {
+                            "warning": "report_generation_warning",
+                            "message": "Request to graph and report data not fulfilled "
+                            "- no graph_details present in report filter file.",
+                            "info_map": info_map,
+                        }
+                    )
 
         except (KeyError, ValueError) as e:
             error_type = e.__class__.__name__
-            error_event_log = {
-                "error": "report_generation_error",
-                "message": f"Error generating the individual report ({individual_report_name}) => {error_type}: {e}",
-                "info_map": info_map,
-            }
-            event_logs.append(error_event_log)
+            event_logs.append(
+                {
+                    "error": "report_generation_error",
+                    "message": f"Error generating report ({individual_report_name}) => {error_type}: {e}",
+                    "info_map": info_map,
+                }
+            )
 
         return event_logs
+
+    def _get_horizontal_first_value(
+        self,
+        filter_content: Dict[str, Any],
+    ) -> bool:
+        """
+        Check if the 'horizontal_first' property (when present) in the report filter is a boolean.
+        If not, raise an error. Return the value of 'horizontal_first' or False as the default value.
+
+        Parameters
+        ----------
+        filter_content : Dict[str, Any]
+            A dictionary containing the configuration for the report, including details such as 'name', 'filters',
+            'cross_references', and aggregation instructions.
+
+        Returns
+        -------
+        bool
+            The value of 'horizontal_first' in the report filter, or False if it is not present.
+
+        Raises
+        ------
+        ValueError
+            If the value of 'horizontal_first' in the report filter is not a boolean.
+        """
+
+        horizontal_first = filter_content.get("horizontal_first", False)
+        if not horizontal_first:
+            return False
+
+        if not isinstance(horizontal_first, bool):
+            raise ValueError(
+                f"The value of 'horizontal_first' in the report filter should be a boolean. "
+                f"Value provided: {repr(filter_content['horizontal_first'])} "
+                f"(type {type(filter_content['horizontal_first'])})"
+            )
+
+        return horizontal_first
+
+    def _prepare_report_data_to_be_graphed(
+        self, graph_data: Dict[str, Any], filter_content: Dict[str, Any], individual_report_name: str
+    ) -> list[dict[str, str | dict[str, str]]]:
+        """Prepare and send aggregated report data to Graph Generator to be graphed.
+        Parameters
+        ----------
+        graph_data : Dict[str, Any]
+            The report data to be graphed.
+        filter_content : Dict[str, Any]
+            A dictionary containing the configuration for the report, including details
+            such as 'name', 'filters', 'cross_references', and aggregation instructions.
+        individual_report_name : str
+            The name of the report to be graphed.
+
+        Returns
+        -------
+        list[dict[str, str | dict[str, str]]]
+            Returns the logs from GraphGenerator.generate_graph()
+        """
+
+        graph_generator = GraphGenerator(filter_content["graph_details"]["metadata_prefix"])
+        graph_details = {
+            **filter_content["graph_details"],
+            "title": filter_content["name"],
+            "filters": filter_content["filters"],
+            "is_aggregated_report_data": True,
+        }
+        graphics_dir = graph_details.pop("graphics_dir", None)
+        produce_graphics = graph_details.get("produce_graphics", True)
+        graph_event_log = graph_generator.generate_graph(
+            graph_data, graph_details, individual_report_name, graphics_dir, produce_graphics
+        )
+        return graph_event_log
 
     def _ensure_unique_report_name_with_timestamp(self, report_name: str | None) -> str:
         """
@@ -266,34 +373,66 @@ class ReportGenerator:
         KeyError
             If any of the report references are missing.
         """
-        missing_references = [ref for ref in references if ref not in self.reports]
+
+        missing_references = []
+
+        for ref in references:
+            if not any(re.fullmatch(ref, report_name) for report_name in self.reports):
+                missing_references.append(ref)
+
         if missing_references:
-            raise KeyError(f"Missing referenced reports: {', '.join(missing_references)}")
+            raise KeyError(
+                f"Missing referenced reports matching the following pattern(s): {', '.join(missing_references)}"
+            )
+
+    def _get_reports_by_regex(self, regex_patterns: List[str]) -> Dict[str, Dict[str, List[Any]]]:
+        """
+        Retrieve reports based on matching the existing report names with the given regex patterns.
+
+        Notes
+        -----
+        Each pattern is checked for a full match against the report names. A "full match"
+        means that the regex must match the entire string of the report name from start to finish,
+        without partial matches. This reduces the potential for false positives.
+
+        Parameters
+        ----------
+        regex_patterns : List[str]
+            A list of regex patterns to match with the existing report names.
+        """
+
+        matched_reports = {}
+        for pattern in regex_patterns:
+            for report_name in self.reports:
+                if re.fullmatch(pattern, report_name):
+                    matched_reports[report_name] = self.reports[report_name]
+        return matched_reports
 
     def _perform_aggregations(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            filter_content: Dict[str, Any]
-    ) -> Dict[str, List[Any]]:
+        self,
+        filtered_pool: dict[str, dict[str, list[Any]]],
+        filter_content: Dict[str, Any],
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """
         Fetches aggregation keys from the filter content and applies aggregation to the data.
 
         Parameters
         ----------
-        filtered_pool : Dict[str, Dict[str, List[Any]]]
+        filtered_pool : dict[str, dict[str, list[Any]]]
             The data pool from which the report is to be generated, structured as a dictionary.
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
 
         Returns
         -------
-        Dict[str, List[Any]]
+        tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]]
             If no aggregation is specified, all the columns will be returned.
             If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
                 that is either "hor_ver_agg" or "ver_hor_agg" depending on the value of the "horizontal_first" key
                 in the filter content.
             If only horizontal aggregation is specified, the returned dictionary will have one key "hor_agg".
             If only vertical aggregation is specified, the returned dictionary will have one key "ver_agg".
+            The second element is the event logs.
 
         Raises
         ------
@@ -304,8 +443,17 @@ class ReportGenerator:
         """
 
         try:
-            horizontal_agg_key, vertical_agg_key = self._extract_and_check_aggregation_keys(filter_content)
-            report_data = self._prepare_report_data_with_constants(filtered_pool, filter_content)
+            (
+                horizontal_agg_key,
+                vertical_agg_key,
+            ) = self._extract_and_check_aggregation_keys(filter_content)
+            report_data: dict[str, dict[str, list[Any]]] = filtered_pool
+            if filter_content.get("display_units", False):
+                report_data = self._add_var_units(report_data)
+            report_data = {key: report_data[key]["values"] for key in report_data.keys()}
+            if not all(report_data[key] for key in report_data.keys()):
+                raise ValueError
+            constants_event_logs = self._add_constants_to_report_data(report_data, filter_content)
         except ValueError:
             raise
 
@@ -315,86 +463,226 @@ class ReportGenerator:
             )
 
         if not horizontal_agg_key and not vertical_agg_key:
-            return report_data
+            return report_data, [] if not constants_event_logs else constants_event_logs
 
-        horizontally_aggregated = None
-        vertically_aggregated = None
+        aggregate_report, event_logs = self._route_aggregator_functions(
+            report_data, filter_content, horizontal_agg_key, vertical_agg_key
+        )
 
-        if horizontal_agg_key:
-            horizontal_aggregator = AGGREGATION_FUNCTIONS.get(horizontal_agg_key)
-            loop_list = filter_content.get("horizontal_order", report_data.keys())
-            horizontally_aggregated = self._apply_horizontal_aggregation(report_data, loop_list,
-                                                                         horizontal_aggregator)
+        event_logs = event_logs + constants_event_logs
 
-        if vertical_agg_key:
-            vertical_aggregator = AGGREGATION_FUNCTIONS.get(vertical_agg_key)
-            vertically_aggregated = self._apply_vertical_aggregation(report_data, vertical_aggregator)
+        return aggregate_report, event_logs
 
-        aggregate_report = self._combine_aggregate_report_data(horizontally_aggregated,
-                                                               vertically_aggregated,
-                                                               filter_content)
+    def _route_aggregator_functions(
+        self,
+        report_data: dict[str, dict[str, list[Any]]],
+        filter_content: Dict[str, Any],
+        horizontal_agg_key: Optional[str] = None,
+        vertical_agg_key: Optional[str] = None,
+    ) -> tuple[dict[str, dict[str, list[Any]]] | dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
+        """Routes report data to appropriate vertical and horizontal aggregator functions."""
+        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]] = report_data
+        event_logs: list[dict[str, str | dict[str, str]]] = []
+        display_units: bool = filter_content.get("display_units", False)
 
-        return aggregate_report
+        if horizontal_agg_key and vertical_agg_key:
+            aggregate_report, event_logs = self._handle_horizontal_and_vertical_aggregations(
+                aggregate_report, horizontal_agg_key, vertical_agg_key, filter_content
+            )
 
-    def _combine_aggregate_report_data(
-            self,
-            horizontally_aggregated: List[float] | None,
-            vertically_aggregated: Dict[str, List[float]] | None,
-            filter_content: Dict[str, Any]
-    ) -> Dict[str, List[float]] | None:
-        """
-        Combines horizontally and vertically aggregated data based on specified aggregation criteria
-        from filter_content.
+        elif horizontal_agg_key:
+            horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
+            loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
+            horizontally_aggregated, aggregated_units, event_logs = self._apply_horizontal_aggregation(
+                aggregate_report, loop_list, horizontal_aggregator, filter_content.get("simplify_units", True)
+            )
+            if display_units:
+                aggregate_report = {f"hor_agg_({aggregated_units})": horizontally_aggregated}
+            else:
+                aggregate_report = {"hor_agg": horizontally_aggregated}
+
+        elif vertical_agg_key:
+            vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
+            vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
+
+            has_dict_variables = filter_content.get("variables") is not None
+            has_multiple_columns = len(vertically_aggregated) > 1
+            if display_units:
+                if has_dict_variables or has_multiple_columns:
+                    aggregate_report = {self._update_key(key): value for key, value in vertically_aggregated.items()}
+                else:
+                    units = re.search(r"\(.*\)", next(iter(report_data)))
+                    if units is not None:
+                        aggregate_report = {f"ver_agg_{units.group(0)}": list(vertically_aggregated.values())[0]}
+                    else:
+                        aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+            else:
+                if has_dict_variables or has_multiple_columns:
+                    aggregate_report = {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
+                else:
+                    aggregate_report = {"ver_agg": list(vertically_aggregated.values())[0]}
+
+        return aggregate_report, event_logs
+
+    @staticmethod
+    def _update_key(key: str) -> str:
+        """Updates dictionary keys to keep units at the end of the key.
 
         Parameters
         ----------
-        horizontally_aggregated : List[float] | None
-            The horizontally aggregated data.
-        vertically_aggregated : List[float] | None
-            The vertically aggregated data.
+        key : str
+            The key to be updated
+
+        Returns
+        -------
+        str
+            The updated key.
+        """
+        match = re.search(r"\(.*?\)", key)
+        if match:
+            units = match.group(0)
+            base_key = key[: match.start()].strip()
+            updated_key = f"{base_key}_ver_agg_{units}"
+        else:
+            updated_key = f"{key}_ver_agg"
+        return updated_key
+
+    @staticmethod
+    def _combine_units(
+        numerator1: dict[str, int],
+        denominator1: dict[str, int],
+        numerator2: dict[str, int],
+        denominator2: dict[str, int],
+        operation: str,
+        simplify_units: bool,
+    ) -> tuple[dict[str, int], dict[str, int], list[dict[str, str | dict[str, str]]]]:
+        """
+        Combines two sets of units (numerator and denominator) based on the specified operation.
+
+        Parameters
+        ----------
+        numerator1 : dict
+            First set of numerator units, where keys are unit names (str) and values are exponents (int).
+        denominator1 : dict
+            First set of denominator units, where keys are unit names (str) and values are exponents (int).
+        numerator2 : dict
+            Second set of numerator units, where keys are unit names (str) and values are exponents (int).
+        denominator2 : dict
+            Second set of denominator units, where keys are unit names (str) and values are exponents (int).
+        operation : str
+            The operation to combine the units. Can be one of 'product', 'division', 'sum', 'subtraction',
+            'average', 'SD'.
+
+        Returns
+        -------
+        (dict, dict, list[dict[str, str | dict[str, str]]]])
+            Two dictionaries representing the combined numerator and denominator units along with the event logs.
+
+        Raises
+        ------
+        ValueError
+            If the operation is addition or subtraction and the units are not the same.
+        """
+        event_logs: list[dict[str, str | dict[str, str]]] = []
+        info_map = {
+            "class": ReportGenerator.__class__.__name__,
+            "function": ReportGenerator._combine_units.__name__,
+        }
+
+        if operation in ["product", "division"]:
+            if operation == "product":
+                combined_numerator = MeasurementUnits.adjust_unit_exponents(numerator1, numerator2)
+                combined_denominator = MeasurementUnits.adjust_unit_exponents(denominator1, denominator2)
+            elif operation == "division":
+                combined_numerator = MeasurementUnits.adjust_unit_exponents(numerator1, denominator2)
+                combined_denominator = MeasurementUnits.adjust_unit_exponents(denominator1, numerator2)
+            if simplify_units:
+                combined_numerator, combined_denominator = MeasurementUnits.simplify_units(
+                    combined_numerator, combined_denominator
+                )
+
+        elif operation in ["sum", "subtraction", "average", "SD"]:
+            if numerator1 != numerator2 or denominator1 != denominator2:
+                event_logs.append(
+                    {
+                        "warning": "Report Generator Units Warning",
+                        "message": f"Report units do not match for operation {operation}.",
+                        "info_map": info_map,
+                    }
+                )
+            combined_numerator = numerator1.copy()
+            combined_denominator = denominator1.copy()
+        else:
+            event_logs.append(
+                {
+                    "warning": "Report Generator Aggregator Operation Warning",
+                    "message": f"Aggregator operation {operation} does not match any current aggregator functions: "
+                    f"{list(AGGREGATION_FUNCTIONS.keys())}.",
+                    "info_map": info_map,
+                }
+            )
+            combined_numerator = numerator1.copy()
+            combined_denominator = denominator1.copy()
+
+        return combined_numerator, combined_denominator, event_logs
+
+    def _handle_horizontal_and_vertical_aggregations(
+        self,
+        aggregate_report: Dict[str, List[Any]],
+        horizontal_agg_key: str,
+        vertical_agg_key: str,
+        filter_content: Dict[str, Any],
+    ) -> tuple[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
+        """
+        Handles both horizontal and vertical aggregations on the report data.
+
+        Parameters
+        ----------
+        aggregate_report : Dict[str, List[Any]]
+            The report data to be aggregated.
+        horizontal_agg_key : str
+            The key for the horizontal aggregation function.
+        vertical_agg_key : str
+            The key for the vertical aggregation function.
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
 
         Returns
         -------
-        Dict[str, List[float]] | None
-            If no aggregation is specified, returns None.
-            If both horizontal and vertical aggregations are specified, the returned dictionary will have one key
-                that is either "hor_ver_agg" or "ver_hor_agg" depending on the value of the "horizontal_first" key
-                in the filter content.
-            If only horizontal aggregation is specified, the returned dictionary will have one key "hor_agg".
-            If only vertical aggregation is specified, the returned dictionary will have one key "ver_agg".
+        tuple[dict[str, list[any]], list[dict[str, str | dict[str, str]]]
+            The aggregated report data and the event logs.
         """
 
-        horizontal_agg_key = filter_content.get("horizontal_aggregation")
-        vertical_agg_key = filter_content.get("vertical_aggregation")
-
-        if horizontal_agg_key and vertical_agg_key:
-            horizontal_first = filter_content.get("horizontal_first", True)
-            aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key if horizontal_first else horizontal_agg_key]
-            if horizontal_first:
-                return {"hor_ver_agg": [aggregator(horizontally_aggregated)]}
+        horizontal_first = self._get_horizontal_first_value(filter_content)
+        horizontal_aggregator = AGGREGATION_FUNCTIONS[horizontal_agg_key]
+        vertical_aggregator = AGGREGATION_FUNCTIONS[vertical_agg_key]
+        event_logs: list[dict[str, str | dict[str, str]]] = []
+        display_units = filter_content.get("display_units", False)
+        simplify_units = filter_content.get("simplify_units", True)
+        if horizontal_first:
+            loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
+            horizontally_aggregated, aggregate_units, event_logs = self._apply_horizontal_aggregation(
+                aggregate_report, loop_list, horizontal_aggregator, simplify_units
+            )
+            if display_units:
+                aggregate_report = {f"hor_ver_agg_({aggregate_units})": [vertical_aggregator(horizontally_aggregated)]}
             else:
-                ver_hor_aggregated = []
-                for elements in zip(*vertically_aggregated.values()):
-                    ver_hor_aggregated.append(aggregator(list(elements)))
-                return {"ver_hor_agg": ver_hor_aggregated}
+                aggregate_report = {"hor_ver_agg": [vertical_aggregator(horizontally_aggregated)]}
+        else:
+            vertically_aggregated = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
+            ver_hor_aggregated = []
+            for elements in zip(*vertically_aggregated.values()):
+                ver_hor_aggregated.append(horizontal_aggregator(list(elements)))
+            aggregate_units, event_logs = self._aggregate_units(
+                vertically_aggregated, horizontal_aggregator, simplify_units
+            )
+            if display_units:
+                aggregate_report = {f"ver_hor_agg_({aggregate_units})": ver_hor_aggregated}
+            else:
+                aggregate_report = {"ver_hor_agg": ver_hor_aggregated}
+        return aggregate_report, event_logs
 
-        if horizontal_agg_key:
-            return {"hor_agg": horizontally_aggregated}
-
-        if vertical_agg_key:
-            if filter_content.get("variables") is not None or len(vertically_aggregated) > 1:
-                return {f"{key}_ver_agg": value for key, value in vertically_aggregated.items()}
-            elif len(vertically_aggregated) == 1:
-                return {"ver_agg": list(vertically_aggregated.values())[0]}
-
-        return None
-
-    def _extract_and_check_aggregation_keys(
-            self,
-            filter_content: Dict[str, Any]
-    ) -> tuple[str | None, str | None]:
+    def _extract_and_check_aggregation_keys(self, filter_content: Dict[str, Any]) -> tuple[str | None, str | None]:
         """
         Extracts horizontal and vertical aggregation keys from the filter content and validates them against
         supported aggregation types.
@@ -429,9 +717,12 @@ class ReportGenerator:
         return horizontal_agg_key, vertical_agg_key
 
     def _apply_horizontal_aggregation(
-            self,
-            report_data: Dict[str, List[float]], loop_list: List[str],
-            aggregator: Callable[[List[float]], float]) -> List[float]:
+        self,
+        report_data: dict[str, list[float]],
+        loop_list: List[str],
+        aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
+        simplify_units: bool,
+    ) -> tuple[List[float], str, list[dict[str, str | dict[str, str]]]]:
         """
         Performs horizontal aggregation on report data using a specified aggregator function.
 
@@ -455,22 +746,79 @@ class ReportGenerator:
             If the data to be aggregated has different lengths.
         """
 
-        lengths = [len(report_data[key]) for key in loop_list]
+        lengths = [len(report_data[key]) for key in report_data if any(loop_key in key for loop_key in loop_list)]
         if len(set(lengths)) != 1:
             raise ValueError("Can't aggregate data with different lengths")
         max_length = max(lengths)
         aggregated_data: List[float] = []
         for i in range(max_length):
-            temp_data = [report_data[key][i] for key in loop_list]
+            temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             aggregated_data.append(aggregator(non_null_data_points))
-        return aggregated_data
+        ordered_report_data = {
+            key: report_data[key] for ordered_key in loop_list for key in report_data if ordered_key in key
+        }
+        aggregated_units, event_logs = self._aggregate_units(ordered_report_data, aggregator, simplify_units)
+        return aggregated_data, aggregated_units, event_logs
+
+    def _aggregate_units(
+        self,
+        report_data: dict[str, list[float]],
+        aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
+        simplify_units: bool,
+    ) -> tuple[str, list[dict[str, str | dict[str, str]]]]:
+        """Creates the appropriate units for the associated aggregator function used.
+
+        Parameters
+        ----------
+        report_data : Dict[str, List[float]]
+            The data pool to be aggregated, structured as a dictionary of lists.
+        aggregator : Callable[[List[float]], float]
+            The aggregation function to be used.
+
+        Returns
+        -------
+        tuple[str, list[dict[str, str | dict[str, str]]]
+            The expected units of aggregating the report data using the accompanying aggregator function and
+            the event logs.
+        """
+        event_logs: list[dict[str, str | dict[str, str]]] = []
+        if len(report_data) == 0:
+            raise ValueError("No report data available to aggregate units from.")
+        elif len(report_data) == 1 or len(report_data) > 2:
+            var_units_match = re.search(r"\((.*?)\)", next(iter(report_data)))
+            if var_units_match:
+                return var_units_match.group(1), event_logs
+            else:
+                return "", event_logs
+        else:
+            aggregator_key = None
+            for key, function in AGGREGATION_FUNCTIONS.items():
+                if function == aggregator:
+                    aggregator_key = key
+                    break
+            if aggregator_key is None:
+                raise ValueError(f"Invalid Aggregator Key, must be in {list(AGGREGATION_FUNCTIONS.keys())}")
+            first_key, second_key = list(report_data.keys())[:2]
+            first_key_numerator_units, first_key_denominator_units = MeasurementUnits.extract_units(first_key)
+            second_key_numerator_units, second_key_denominator_units = MeasurementUnits.extract_units(second_key)
+            combined_numerator, combined_denominator, event_logs = self._combine_units(
+                first_key_numerator_units,
+                first_key_denominator_units,
+                second_key_numerator_units,
+                second_key_denominator_units,
+                aggregator_key,
+                simplify_units,
+            )
+            stringified_combined_units = MeasurementUnits.units_to_string(combined_numerator, combined_denominator)
+
+        return stringified_combined_units, event_logs
 
     def _apply_vertical_aggregation(
-            self,
-            report_data: Dict[str, List[float]],
-            aggregator: Callable[[List[float]], float]
-    ) -> Dict[str, List[float]]:
+        self,
+        report_data: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
+        aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
+    ) -> Dict[str, List[float | None]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -487,81 +835,15 @@ class ReportGenerator:
             The vertically aggregated data as a dictionary of lists.
         """
 
-        aggregate_data_dict: Dict[str, List[float]] = {}
+        aggregate_data_dict: Dict[str, List[float | None]] = {}
         for key, data in report_data.items():
             non_null_data_points = list(filter(lambda x: x is not None, data))
             aggregate_data_dict[key] = [aggregator(non_null_data_points)]
         return aggregate_data_dict
 
-    def _prepare_report_data_with_constants(
-            self,
-            filtered_pool: Dict[str, Dict[str, List[Any]]],
-            filter_content: Dict[str, Any]) -> Dict[str, List[Any]]:
-        """
-        Processes and structures a filtered data pool for report generation.
-
-        Notes
-        -----
-        This method organizes data from a filtered pool based on selected variables and slicing parameters.
-        It caters to different data structures within the pool, ensuring data is formatted appropriately
-        for report inclusion.
-
-        Parameters
-        ----------
-        filtered_pool : Dict[str, pool_element_type]
-            The filtered data pool with each key mapping to its respective data element.
-
-        filter_content : Dict[str, Any]
-            A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
-
-        Returns
-        -------
-        Dict[str, List[Any]]
-            Processed data suitable for report generation, keyed by selected variables.
-
-        Raises
-        ------
-        KeyError
-            If selected_variables is None and the data within the pool requires variable selection.
-        ValueError
-            If the name or value of any constant is not valid.
-        """
-        filter_by_exclusion = filter_content.get("filter_by_exclusion", False)
-        selected_variables = filter_content.get("variables")
-        slice_start = filter_content.get("slice_start", 0)
-        slice_end = filter_content.get("slice_end")
-        report_data: Dict[str, List[Any]] = {}
-
-        for key in filtered_pool.keys():
-            is_data_in_dict = isinstance(filtered_pool[key]["values"][0], dict)
-            if is_data_in_dict and (selected_variables is None or not isinstance(selected_variables, list)):
-                raise KeyError(
-                    "Can't generate report, use 'variables' arg to select items from data"
-                )
-            if is_data_in_dict:
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(
-                    filtered_pool[key]["values"][slice_start:slice_end]
-                )
-                filtered_data = Utility.filter_pool(temp_data, selected_variables, filter_by_exclusion)
-                for filtered_key, filtered_value in filtered_data.items():
-                    if filtered_key in report_data:
-                        report_data[filtered_key].extend(filtered_value)
-                    else:
-                        report_data[filtered_key] = filtered_value
-            else:
-                report_data[key] = filtered_pool[key]["values"][slice_start:slice_end]
-
-        try:
-            self._add_constants_to_report_data(report_data, filter_content)
-        except ValueError:
-            raise
-
-        return report_data
-
     def _add_constants_to_report_data(
-            self,
-            report_data: Dict[str, List[Any]],
-            filter_content: Dict[str, Any]) -> None:
+        self, report_data: dict[str, list[float]], filter_content: Dict[str, Any]
+    ) -> list[dict[str, str | dict[str, str]]]:
         """
         Add constants to the report data.
 
@@ -580,29 +862,87 @@ class ReportGenerator:
         filter_content : Dict[str, Any]
             A dictionary containing filter criteria, aggregation instructions, and scalar operation details.
 
+        Returns
+        -------
+        list[dict[str, str | dict[str, str]]]
+            A list of warnings, logs, and errors to be returned to Output Manager for logging.
+
         Raises
         ------
         ValueError
             If the name or value of any constant is not valid.
         """
-
+        event_logs: list[dict[str, str | dict[str, str]]] = []
         constants_config = filter_content.get("constants")
         if not constants_config:
-            return
+            return []
 
         try:
             self._validate_constants(report_data, constants_config)
         except ValueError:
             raise
 
+        if filter_content.get("display_units", False):
+            constants_config, event_logs = self._add_units_to_constants(constants_config)
+
         max_length = max([len(lst) for lst in report_data.values()])
         for name, value in constants_config.items():
             report_data[name] = [value] * max_length
 
+        return event_logs
+
+    def _add_units_to_constants(
+        self, constants_config: dict[str, int | float]
+    ) -> tuple[dict[str, int | float], list[dict[str, str | dict[str, str]]]]:
+        """Checks constants provided in filter file against GeneralConstants and adds appropriate measurement units.
+
+        Parameters
+        ----------
+        constants_config : dict[str, int | float]
+            A dictionary containing the names and values of the constants to be added to the report data.
+
+        Returns
+        -------
+        dict[str, int | float]
+            A dictionary containing the names and values of the constants to be added to the report data. The names
+            of the constants will have units appended at the end.
+        """
+        updated_constants_config: dict[str, int | float] = {}
+        event_logs: list[dict[str, str | dict[str, str]]] = []
+        for name in constants_config.keys():
+            normalized_provided_name = self._normalize_constant_name(name)
+            matching_constant = None
+            for attribute in dir(GeneralConstants):
+                if attribute.startswith("__"):
+                    continue
+                normalized_attribute_name = self._normalize_constant_name(attribute)
+                if normalized_attribute_name == normalized_provided_name:
+                    matching_constant = str(attribute)
+                    break
+            else:
+                info_map = {
+                    "class": self.__class__.__name__,
+                    "function": self.generate_report.__name__,
+                }
+                constant_units_warning = {
+                    "warning": "report_generation_warning",
+                    "message": f"No matching GeneralConstant found for filter constant {name}.",
+                    "info_map": info_map,
+                }
+                event_logs.append(constant_units_warning)
+            unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
+            constant_with_units = f"{name}_({unit_for_constant})"
+            updated_constants_config[constant_with_units] = constants_config[name]
+
+        return (
+            updated_constants_config if len(updated_constants_config) > 0 else constants_config,
+            event_logs if event_logs else [],
+        )
+
     def _validate_constants(
-            self,
-            existing_reports: Dict[str, List[Any]],
-            constants_config: Dict[str, int | float]
+        self,
+        existing_reports: Dict[str, List[Any]],
+        constants_config: Dict[str, int | float],
     ) -> None:
         """
         Validates the names and values of the constants in the constants_config.
@@ -617,6 +957,8 @@ class ReportGenerator:
             The dictionary containing the names and values of the reports that have already been generated.
         constants_config : Dict[str, int | float]
             A dictionary containing the names and values of the constants to be added to the report data.
+        display_units : bool
+            Whether or not the report filter specifies to display units in the report header.
 
         Raises
         ------
@@ -639,10 +981,44 @@ class ReportGenerator:
                 raise ValueError("Constant value cannot be None.")
 
             if not isinstance(name, str):
-                raise ValueError(f"Constant name {name} must be a string.")
+                raise ValueError(f"Constant name {name} must be a string and cannot be empty.")
 
             if len(name) == 0:
-                raise ValueError("Constant name cannot be empty.")
+                raise ValueError(f"Constant name {name} cannot be empty.")
 
             if not isinstance(value, (int, float)):
                 raise ValueError(f"Constant value {value} must be a number.")
+
+    @staticmethod
+    def _normalize_constant_name(name: str) -> str:
+        """Normalize the constant name by converting to lowercase and removing underscores and spaces."""
+        return re.sub(r"[\s_]", "", name).lower()
+
+    @staticmethod
+    def _add_var_units(report_data: dict[str, dict[str, list[Any]]]) -> dict[str, dict[str, list[Any]]]:
+        """Adds variable units to variable name.
+
+        Parameters
+        ----------
+        report_data : dict[str, dict[str, list[Any]]]
+            The data to be reported.
+
+        Returns
+        -------
+        dict[str, List[Any]]
+            The updated data with units added.
+        """
+        updated_data: dict[str, dict[str, list[Any]]] = {}
+        if not any("info_maps" in details for details in report_data.values()):
+            return report_data
+        for var_name, details in report_data.items():
+            unit_info = details["info_maps"][0]["units"]
+            if isinstance(unit_info, dict):
+                unit = unit_info.get(var_name, "not available")
+            else:
+                unit = unit_info
+
+            new_var_name = f"{var_name} ({unit})"
+            updated_data[new_var_name] = details
+
+        return updated_data
