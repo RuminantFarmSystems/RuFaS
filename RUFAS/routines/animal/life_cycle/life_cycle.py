@@ -237,6 +237,7 @@ class LifeCycleManager:
             if animal_type == Cow:
                 animal.set_milking_attributes()
                 import remote_pdb
+
                 remote_pdb.set_trace("localhost", 4444)
 
         return animals

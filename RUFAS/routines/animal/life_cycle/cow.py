@@ -195,7 +195,7 @@ class Cow(HeiferIII):
                 om.add_warning(
                     f"Cow {self.id} has dried off before reaching dry period of pregnancy",
                     f"Setting cow {self.id}'s milking status to true and days_in_milk to be {self.days_in_milk}",
-                    {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__}
+                    {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__},
                 )
 
     def get_cow_values(self) -> Dict[str, Any]:
@@ -342,8 +342,7 @@ class Cow(HeiferIII):
         om.add_warning(
             f"Cow {self.id} has dried off before reaching dry period of pregnancy",
             f"Setting cow {self.id}'s milking status to be milking and days_in_milk to be {self.days_in_milk}",
-            {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__}
-
+            {"class": self.__class__.__name__, "function": self.check_management_attributes.__name__},
         )
 
     def update_milk_production_history(self, sim_day: int) -> None:
