@@ -234,6 +234,11 @@ class LifeCycleManager:
         animals = animal_getter_by_animal_type[animal_type]()
         for animal in animals:
             animal.events.add_event(animal.days_born, 0, animal_constants.INIT_HERD)
+            if animal_type == Cow:
+                animal.set_milking_attributes()
+                import remote_pdb
+                remote_pdb.set_trace("localhost", 4444)
+
         return animals
 
     def daily_update(
