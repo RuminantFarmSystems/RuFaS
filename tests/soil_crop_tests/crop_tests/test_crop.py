@@ -15,12 +15,13 @@ import pytest
         (False, True, False),  # Crop is dormant, should not update
     ],
 )
-def test_daily_crop_update(
-    mocker: MockerFixture, is_mature, is_dormant, should_update
+def test_perform_daily_crop_update(
+    mocker: MockerFixture, is_mature: bool, is_dormant: bool, should_update: bool
 ) -> None:
     crop_data = CropData()
-    crop_data.__setattr__(is_mature, is_mature)
-    crop = Crop(crop_data=CropData())
+    crop_data.__setattr__("is_mature", is_mature)
+    crop_data.__setattr__("is_dormant", is_dormant)
+    crop = Crop(crop_data)
 
     # Mock the methods that should be called during the update
     mocker.patch.object(crop.heat_units, "absorb_heat_units")
