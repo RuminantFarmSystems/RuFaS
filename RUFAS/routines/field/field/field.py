@@ -972,7 +972,7 @@ class Field:
         """
         for crop in self.crops:
             if crop.should_harvest_based_on_heat():
-                crop._crop_management.manage_harvest(
+                crop.manage_crop_harvest(
                     HarvestOperation.HARVEST_ONLY,
                     self.field_data.name,
                     self.field_data.field_size,
