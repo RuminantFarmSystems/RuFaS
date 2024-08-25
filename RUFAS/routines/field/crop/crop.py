@@ -18,6 +18,7 @@ from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from typing import Optional
 
@@ -468,7 +469,7 @@ class Crop:
         self._water_dynamics.set_maximum_transpiration(evapotranspirative_demand)
 
     def assess_dormancy(self, daylength: float, dormancy_threshold_daylength: float, rainfall: float,
-                        soil_data: SoilData) -> None:
+                        soil: Soil) -> None:
         """
         Assess and manage dormancy status based on the daylength.
 
@@ -480,15 +481,15 @@ class Crop:
             The threshold daylength below which the crop should enter dormancy.
         rainfall : float
             Amount of rain that fell on the current day (mm).
-        soil_data : SoilData
+        soil : Soil
             The soil data relevant for dormancy and biomass partitioning.
         """
         if daylength <= dormancy_threshold_daylength:
-            self.enter_dormancy(rainfall, soil_data)
+            self.enter_dormancy(rainfall, soil)
         else:
             self.exit_dormancy()
 
-    def enter_dormancy(self, rainfall: float, soil_data) -> None:
+    def enter_dormancy(self, rainfall: float, soil: Soil) -> None:
         """
         Puts the crop into dormancy and handles biomass partitioning and residue addition.
 
@@ -496,12 +497,12 @@ class Crop:
         ----------
         rainfall : float
             Amount of rain that fell on the current day (mm).
-        soil_data : SoilData
+        soil : Soil
             The soil data relevant for dormancy and biomass partitioning.
         """
-        self._dormancy.enter_dormancy(soil_data)
+        self._dormancy.enter_dormancy(soil)
         self._biomass_allocation.partition_biomass()
-        soil_data.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
+        soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
     def exit_dormancy(self) -> None:
         """
