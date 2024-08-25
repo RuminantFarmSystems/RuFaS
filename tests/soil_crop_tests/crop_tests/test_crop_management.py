@@ -1,5 +1,6 @@
 import pytest
 from mock.mock import MagicMock, patch, PropertyMock
+from pytest_mock import MockerFixture
 from RUFAS.units import MeasurementUnits
 from RUFAS.time import Time
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -48,7 +49,7 @@ def mock_alfalfa_silage_data() -> AlfalfaSilage:
         (0.326, 12.2),  # arbitrary
     ],
 )
-def test_determine_potential_harvest_index(heatfrac: float, optimal_index: float):
+def test_determine_potential_harvest_index(heatfrac: float, optimal_index: float) -> None:
     """ensure that the potential harvest index is properly calculated"""
     top = 100 * heatfrac
     bottom = (100 * heatfrac) + exp(11.1 - (10 * heatfrac))
@@ -70,7 +71,7 @@ def test_determine_potential_harvest_index(heatfrac: float, optimal_index: float
         (1.35, 0.83, 0.29),  # arbitrary
     ],
 )
-def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float):
+def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float) -> None:
     """ensure that actual harvest index is properly calculated by calc_actual_harvest_index()"""
     if min_index < 0:
         adj_min = 0
@@ -99,14 +100,14 @@ def test_adjust_harvest_index(idx: float, min_index: float, deficiency: float):
         (136.5, 1.22),  # arbitrary
     ],
 )
-def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float):
+def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float) -> None:
     """ensure that yield is correctly calculated by determine_yield_from_total_biomass()"""
     frac = 1 / (1 + harv_ind)
     assert CropManagement.determine_biomass_cut_from_whole_plant(bmass, harv_ind) == bmass * (1 - frac)
 
 
 # ---- Test Member functions
-def test_kill():
+def test_kill() -> None:
     """tests that a crop is properly killed by kill()"""
     crop = CropManagement(crop_data=CropData(yield_residue=5.29, biomass=192.33))
     crop.kill()
@@ -131,7 +132,7 @@ def test_kill():
         (0.85, 0.5, 0.33),  # user-defined, ignore others
     ],
 )
-def test_determine_harvest_index(harvest, heat_frac, water_def):
+def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
     """ensure that the harvest index is properly evaluated"""
     data = CropData(
         user_harvest_index=harvest,
@@ -199,7 +200,9 @@ def test_manage_harvest(
             kill.assert_called_once()
             store_crop.assert_not_called()
 
-        record_yield.assert_called_once_with(field_name, field_size, mock_time.calendar_year, mock_time.day)
+        record_yield.assert_called_once_with(
+            field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
+        )
         transfer_residue.assert_called_once_with(soil_data, killed)
 
 
@@ -340,6 +343,7 @@ def test_store_harvested_crop(
         lignin=mock_alfalfa_silage_data.lignin_dry_matter_percentage,
         ash=mock_alfalfa_silage_data.ash,
     )
+    expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
     with patch.object(mock_feed_manager, "receive_crop") as receive_crop:
         crop_management._store_harvested_crop(mock_time, field_size, mock_feed_manager)
@@ -379,19 +383,19 @@ def test_record_yield(
     crop_manager.data.yield_phosphorus = phosphorus
 
     expected_units = {
-        "crop": MeasurementUnits.UNITLESS.value,
-        "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE.value,
-        "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-        "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-        "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE.value,
-        "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE.value,
-        "harvest_index": MeasurementUnits.UNITLESS.value,
-        "planting_date": {
-            "year": MeasurementUnits.CALENDAR_YEAR.value,
-            "day": MeasurementUnits.ORDINAL_DAY.value,
-        },
-        "harvest_date": {"year": MeasurementUnits.CALENDAR_YEAR.value, "day": MeasurementUnits.ORDINAL_DAY.value},
-        "field_size": MeasurementUnits.HECTARE.value,
+        "crop": MeasurementUnits.UNITLESS,
+        "wet_yield": MeasurementUnits.WET_KILOGRAMS_PER_HECTARE,
+        "dry_yield": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "nitrogen": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "phosphorus": MeasurementUnits.KILOGRAMS_PER_HECTARE,
+        "yield_residue": MeasurementUnits.DRY_KILOGRAMS_PER_HECTARE,
+        "harvest_index": MeasurementUnits.UNITLESS,
+        "planting_year": MeasurementUnits.CALENDAR_YEAR,
+        "planting_day": MeasurementUnits.ORDINAL_DAY,
+        "harvest_year": MeasurementUnits.CALENDAR_YEAR,
+        "harvest_day": MeasurementUnits.ORDINAL_DAY,
+        "field_size": MeasurementUnits.HECTARE,
+        "field_name": MeasurementUnits.UNITLESS,
     }
 
     expected_info_map = {
@@ -406,11 +410,14 @@ def test_record_yield(
         "dry_yield": dry_mass,
         "nitrogen": nitrogen,
         "phosphorus": phosphorus,
-        "planting_date": {"year": 1995, "day": 100},
+        "planting_year": 1995,
+        "planting_day": 100,
         "yield_residue": crop_manager.data.yield_residue,
         "harvest_index": crop_manager.data.harvest_index,
-        "harvest_date": {"year": year, "day": day},
+        "harvest_year": year,
+        "harvest_day": day,
         "field_size": field_size,
+        "field_name": field_name,
     }
 
     with patch.object(om, "add_variable") as add_variable:
@@ -534,3 +541,35 @@ def test_distribute_residue_nutrients(
         pytest.approx(soil_data.get_vectorized_layer_attribute("active_organic_nitrogen_content")[1:]) == expected_n[1:]
     )
     assert pytest.approx(soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")) == expected_p
+
+
+def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
+    """Ensure that the crop cutting routines have division error"""
+    # setup
+    data = CropData(
+        harvest_index=3,
+        biomass=0,
+        leaf_area_index=2.3,
+        accumulated_heat_units=1.1,
+        optimal_nitrogen_fraction=0.09,
+        optimal_phosphorus_fraction=0.02,
+        yield_nitrogen_fraction=0.12,
+        yield_phosphorus_fraction=0.0092,
+        above_ground_biomass=75.0,
+    )
+
+    crop = CropManagement(data)
+    crop._recalculate_biomass_distribution = MagicMock()
+    crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
+
+    patch_for_add_warning = mocker.patch("tests.soil_crop_tests.crop_tests.test_crop_management.om.add_warning")
+    crop.cut_crop(0.5)
+    crop.determine_biomass_cut_from_whole_plant.assert_called_once()
+    info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}
+    warning_name = "Zero division error in crop management"
+    warning_message = (
+        "A zero division error occurred in the harvesting process of crop management when calculating "
+        "fraction cut."
+        "The variable 'biomass' in CropData has an invalid value: '0'. "
+    )
+    patch_for_add_warning.assert_called_once_with(warning_name, warning_message, info_map)

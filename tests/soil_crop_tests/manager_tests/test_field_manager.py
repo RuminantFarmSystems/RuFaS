@@ -90,12 +90,6 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     return mock_weather
 
 
-@pytest.fixture
-def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]:
-    """Fixture to store unmocked methods of Weather."""
-    return {"get_current_day_conditions": mock_weather.get_current_day_conditions}
-
-
 @pytest.mark.parametrize(
     "fields",
     [
@@ -119,7 +113,7 @@ def weather_original_method_states(mock_weather: Weather) -> Dict[str, Callable]
 def test_daily_update_routine(
     fields: List[Field],
     mock_weather: Weather,
-    weather_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
@@ -130,9 +124,12 @@ def test_daily_update_routine(
 
     mocked_manure_manager = MagicMock(ManureManager)
     mocked_feed_manager = MagicMock(FeedManager)
-    mock_weather.get_current_day_conditions = MagicMock(return_value=MagicMock(CurrentDayConditions))
+    get_conditions = mocker.patch.object(
+        mock_weather, "get_current_day_conditions", return_value=MagicMock(CurrentDayConditions)
+    )
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
         fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
+        mock_add_var = mocker.patch.object(fm.om, "add_variable")
 
         fm.fields = fields
         for field in fields:
@@ -141,9 +138,9 @@ def test_daily_update_routine(
         fm.daily_update_routine(weather=mock_weather, time=mocked_time)
         for field in fields:
             assert field.manage_field.call_count == 1
-        assert mock_weather.get_current_day_conditions.call_count == 1
+        assert get_conditions.call_count == len(fields)
         assert fm.output_gatherer.send_daily_variables.call_count == 1
-    mock_weather.get_current_day_conditions = weather_original_method_states["get_current_day_conditions"]
+        assert mock_add_var.call_count == len(fields)
 
 
 @pytest.mark.parametrize(
@@ -186,14 +183,17 @@ def test_annual_update_routine(fields: List[Field]):
 def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
     """Tests that the correct manure supplier is provided for setting up Fields."""
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
-    get_data = mocker.patch.object(im, "get_data", return_value=animals)
-    add_log = mocker.patch.object(om, "add_log")
     mocker.patch("RUFAS.routines.field.manager.field_manager.FieldManager.__init__", return_value=None)
+
     field_manager = FieldManager()
+    field_manager.im = mocker.MagicMock()
+    field_manager.im.get_data = mocker.MagicMock(return_value=animals)
+    field_manager.om = mocker.MagicMock()
+    add_log = mocker.patch.object(field_manager.om, "add_log")
 
     actual = field_manager._get_manure_supplier(mock_manure_manager)
 
-    get_data.assert_called_once_with("config.simulate_animals")
+    field_manager.im.get_data.assert_called_once_with("config.simulate_animals")
     if animals:
         assert actual == mock_manure_manager
         add_log.assert_not_called()
@@ -295,6 +295,15 @@ def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
                     6.904443,
                     6.904443,
                 ],
+                potassium_masses=[
+                    22.417,
+                    22.417,
+                    27.90919,
+                    39.072871,
+                    39.072871,
+                    39.072871,
+                    39.072871,
+                ],
                 application_depths=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
                 surface_remainder_fractions=[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
                 pattern_repeat=0,
@@ -323,6 +332,7 @@ def test_get_manure_supplier(mocker: MockerFixture, animals: bool) -> None:
                 days=[200],
                 nitrogen_masses=[1000],
                 phosphorus_masses=[5],
+                potassium_masses=[400.0],
                 application_depths=[0.0],
                 surface_remainder_fractions=[1.0],
                 pattern_repeat=0,
@@ -1324,11 +1334,11 @@ def test_crop_schedule_setup(
                 "saturated_hydraulic_conductivity": 9.17,
                 "initial_temperature": 15.77575,
                 "bulk_density": 1.34,
-                "percent_organic_carbon_content": 0.012,
-                "percent_clay_content": 21.95,
-                "percent_silt_content": 63.42,
-                "percent_sand_content": 14.63,
-                "percent_rock_content": 0.0,
+                "organic_carbon_fraction": 0.012,
+                "clay_fraction": 0.2195,
+                "silt_fraction": 0.6342,
+                "sand_fraction": 0.1463,
+                "rock_fraction": 0.0,
                 "initial_labile_inorganic_phosphorus_concentration": 2.7,
                 "initial_fresh_organic_phosphorus_concentration": 0.0,
                 "initial_soil_nitrate_concentration": 1,
@@ -1348,10 +1358,10 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.29,
                 saturation_point_water_concentration=0.58,
                 saturated_hydraulic_conductivity=9.17,
-                percent_clay_content=21.95,
+                clay_fraction=0.2195,
                 temperature=15.77575,
                 bulk_density=1.34,
-                percent_organic_carbon_content=0.012,
+                organic_carbon_fraction=0.012,
                 initial_soil_ammonium_concentration=1.0,
                 initial_soil_nitrate_concentration=1.0,
                 initial_labile_inorganic_phosphorus_concentration=2.7,
@@ -1359,9 +1369,9 @@ def test_crop_schedule_setup(
                 ammonium_volatilization_cation_exchange_factor=0.15,
                 denitrification_rate_coefficient=1.4,
                 soil_water_concentration=0.3,
-                percent_sand_content=14.63,
-                percent_silt_content=63.42,
-                percent_rock_content=0.0,
+                sand_fraction=0.1463,
+                silt_fraction=0.6342,
+                rock_fraction=0.0,
                 residue=0.0,
                 residue_fresh_organic_mineralization_rate=0.05,
             ),
@@ -1379,11 +1389,11 @@ def test_crop_schedule_setup(
                 "saturated_hydraulic_conductivity": 9.17,
                 "initial_temperature": 14.50797297,
                 "bulk_density": 1.42,
-                "percent_organic_carbon_content": 0.012,
-                "percent_clay_content": 27.27,
-                "percent_silt_content": 59.09,
-                "percent_sand_content": 13.64,
-                "percent_rock_content": 0.0,
+                "organic_carbon_fraction": 0.012,
+                "clay_fraction": 0.2727,
+                "silt_fraction": 0.5909,
+                "sand_fraction": 0.1364,
+                "rock_fraction": 0.0,
                 "initial_labile_inorganic_phosphorus_concentration": 2.7,
                 "initial_fresh_organic_phosphorus_concentration": 0.0,
                 "initial_soil_nitrate_concentration": 1,
@@ -1403,10 +1413,10 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.306,
                 saturation_point_water_concentration=0.5,
                 saturated_hydraulic_conductivity=9.17,
-                percent_clay_content=27.27,
+                clay_fraction=0.2727,
                 temperature=14.50797297,
                 bulk_density=1.42,
-                percent_organic_carbon_content=0.012,
+                organic_carbon_fraction=0.012,
                 initial_soil_ammonium_concentration=1,
                 initial_soil_nitrate_concentration=1,
                 initial_labile_inorganic_phosphorus_concentration=2.7,
@@ -1414,9 +1424,9 @@ def test_crop_schedule_setup(
                 ammonium_volatilization_cation_exchange_factor=0.15,
                 denitrification_rate_coefficient=1.4,
                 soil_water_concentration=0.3,
-                percent_sand_content=13.64,
-                percent_silt_content=59.09,
-                percent_rock_content=0.0,
+                sand_fraction=0.1364,
+                silt_fraction=0.5909,
+                rock_fraction=0.0,
                 residue=0.0,
                 residue_fresh_organic_mineralization_rate=0.05,
             ),
@@ -1480,11 +1490,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 9.17,
                     "initial_temperature": 15.77575,
                     "bulk_density": 1.34,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 21.95,
-                    "percent_silt_content": 63.42,
-                    "percent_sand_content": 14.63,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.2195,
+                    "silt_fraction": 0.6342,
+                    "sand_fraction": 0.1463,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1505,11 +1515,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 9.17,
                     "initial_temperature": 14.50797297,
                     "bulk_density": 1.42,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 27.27,
-                    "percent_silt_content": 59.09,
-                    "percent_sand_content": 13.64,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.2727,
+                    "silt_fraction": 0.5909,
+                    "sand_fraction": 0.1364,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1530,11 +1540,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 23.29,
                     "initial_temperature": 13.38623,
                     "bulk_density": 1.6,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 22.33,
-                    "percent_silt_content": 63.11,
-                    "percent_sand_content": 14.56,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.2233,
+                    "silt_fraction": 0.6311,
+                    "sand_fraction": 0.1456,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1555,11 +1565,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 23.29,
                     "initial_temperature": 13.38623,
                     "bulk_density": 1.5,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 13.04,
-                    "percent_silt_content": 70.66,
-                    "percent_sand_content": 16.30,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.1304,
+                    "silt_fraction": 0.7066,
+                    "sand_fraction": 0.1630,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 2.7,
                     "initial_fresh_organic_phosphorus_concentration": 0.0,
                     "initial_soil_nitrate_concentration": 1,
@@ -1592,11 +1602,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 20,
                     "initial_temperature": 15.77575,
                     "bulk_density": 1.3,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 20,
-                    "percent_silt_content": 65,
-                    "percent_sand_content": 15,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.20,
+                    "silt_fraction": 0.65,
+                    "sand_fraction": 0.15,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 23.7,
                     "initial_soil_nitrate_concentration": 0.0,
                     "initial_soil_ammonium_concentration": 1,
@@ -1616,11 +1626,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 20,
                     "initial_temperature": 14.50797297,
                     "bulk_density": 1.3,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 20,
-                    "percent_silt_content": 65,
-                    "percent_sand_content": 15,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.20,
+                    "silt_fraction": 0.65,
+                    "sand_fraction": 0.15,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 10,
                     "initial_soil_nitrate_concentration": 0.0,
                     "initial_soil_ammonium_concentration": 1,
@@ -1640,11 +1650,11 @@ def test_setup_soil_layer_error(config: Dict) -> None:
                     "saturated_hydraulic_conductivity": 20,
                     "initial_temperature": 13.38623,
                     "bulk_density": 1.3,
-                    "percent_organic_carbon_content": 0.012,
-                    "percent_clay_content": 20,
-                    "percent_silt_content": 65,
-                    "percent_sand_content": 15,
-                    "percent_rock_content": 0.0,
+                    "organic_carbon_fraction": 0.012,
+                    "clay_fraction": 0.20,
+                    "silt_fraction": 0.65,
+                    "sand_fraction": 0.15,
+                    "rock_fraction": 0.0,
                     "initial_labile_inorganic_phosphorus_concentration": 10,
                     "initial_soil_nitrate_concentration": 0.0,
                     "initial_soil_ammonium_concentration": 1,

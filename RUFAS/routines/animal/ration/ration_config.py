@@ -1,4 +1,6 @@
 from __future__ import annotations
+from typing import List
+import numpy as np
 
 
 class RationConfig:
@@ -25,6 +27,8 @@ class RationConfig:
     C_requirement : float
         Calcium requirement (g).
     P_requirement : float
+        Phosphorus requirement (g).
+    P_requirement_process : float
         Phosphorus requirement (g).
     TDN_list : list
         Total digestible nutrient in each feed (% of DM).
@@ -89,7 +93,7 @@ class RationConfig:
 
     def __init__(
         self,
-        price__list: list[float] | None = None,
+        price__list: list[float] = [],
         NEmaint__requirement: float = 0,
         NEa__requirement: float = 0,
         NEpreg__requirement: float = 0,
@@ -98,24 +102,26 @@ class RationConfig:
         MP__requirement: float = 0,
         C__requirement: float = 0,
         P__requirement: float = 0,
-        TDN__list: list[float] | None = None,
-        DE__list: list[float] | None = None,
-        EE__list: list[float] | None = None,
-        is_fat__list: list[bool] | None = None,
+        P__process__requirement: float = 0,
+        TDN__list: list[float] = [],
+        DE__list: list[float] = [],
+        EE__list: list[float] = [],
+        is_fat__list: list[bool] = [],
         BW_: float = 0,
-        calcium__list: list[float] | None = None,
-        phosphorus__list: list[float] | None = None,
-        NDF__list: list[float] | None = None,
-        feed_type__list: list[str] | None = None,
-        is_wetforage__list: list[bool] | None = None,
-        Kd__list: list[float] | None = None,
-        N_A__list: list[float] | None = None,
-        N_B__list: list[float] | None = None,
-        CP__list: list[float] | None = None,
-        dRUP__list: list[float] | None = None,
-        feed_limit__list: list[float] | None = None,
+        calcium__list: list[float] = [],
+        phosphorus__list: list[float] = [],
+        NDF__list: list[float] = [],
+        feed_type__list: list[str] = [],
+        is_wetforage__list: list[bool] = [],
+        Kd__list: list[float] = [],
+        N_A__list: list[float] = [],
+        N_B__list: list[float] = [],
+        CP__list: list[float] = [],
+        dRUP__list: list[float] = [],
+        feed_minimum__list: list[float] = [],
+        feed_limit__list: list[float] = [],
         lactating_: bool = False,
-        DMIest__requirement: float | None = None,
+        DMIest__requirement: float = 0.0,
     ) -> None:
         """
         Initialize the RationConfig class with the provided feed information. If the input
@@ -123,60 +129,64 @@ class RationConfig:
 
         Parameters
         ----------
-        price__list : list, optional
+        price__list : list, default []
             The price of each feed.
-        NEmaint__requirement : float, optional
+        NEmaint__requirement : float, default 0
             Net energy for maintenance requirement (Mcal).
-        NEa__requirement : float, optional
+        NEa__requirement : float, default 0
             Net energy for activity requirement (Mcal).
-        NEpreg__requirement : float, optional
+        NEpreg__requirement : float, default 0
             Net energy requirement for pregnancy (Mcal).
-        NEl__requirement : float, optional
+        NEl__requirement : float, default 0
             Net energy requirement for lactation (Mcal).
-        NEg__requirement : float, optional
+        NEg__requirement : float, default 0
             Net energy for growth requirement (Mcal).
-        MP__requirement : float, optional
+        MP__requirement : float, default 0
             Metabolizable protein requirement for growth (g).
-        C__requirement : float, optional
+        C__requirement : float, default 0
             Calcium requirement (g).
-        P__requirement : float, optional
-            Phosphorus requirement (g).
-        TDN__list : list, optional
+        P__requirement : float, default 0
+            Phosphorus requirement (g) as calculated by NRC or NASEM.
+        P__process__requirement : float, default 0
+            Phosphorus requirement (g) as calculated by process-based P methods.
+        TDN__list : list, default []
             Total digestible nutrient in each feed (% of DM).
-        DE__list : list, optional
+        DE__list : list, default []
             Digestible energy in each feed (Mcal/kg).
-        EE__list : list, optional
+        EE__list : list, default []
             Ether extract, crude fat in each feed (% of DM).
-        is_fat__list : list of bool, optional
+        is_fat__list : list of bool, default []
             Indicates if the feed is a fat supplement (yes = True; no = False).
-        BW_ : float, optional
+        BW_ : float, default 0
             The average body weight of the pen.
-        calcium__list : list, optional
+        calcium__list : list, default []
             Calcium content of each feed (% of DM).
-        phosphorus__list : list, optional
+        phosphorus__list : list, default []
             Phosphorus content of each feed (% of DM).
-        NDF__list : list, optional
+        NDF__list : list, default []
             Neutral detergent fiber in each feed (% of DM).
         feed_type__list : list, optional
             Feed types (Forage, Concentrate, or Mineral).
-        is_wetforage__list : list of bool, optional
+        is_wetforage__list : list of bool, default []
             Indicates if the feed is wet forage (yes = True; no = False).
-        Kd__list : list, optional
+        Kd__list : list, default []
             Rumen protein degradation rate in each feed (%/h).
-        N_A__list : list, optional
+        N_A__list : list, default []
             Fraction A of protein, degraded immediately in rumen for each feed (% of CP).
-        N_B__list : list, optional
+        N_B__list : list, default []
             Fraction B of protein, potentially degradable protein, requires time to degrade
             in rumen for each feed (% of CP).
-        CP__list : list, optional
+        CP__list : list, default []
             Crude protein in each feed (% of DM).
-        dRUP__list : list, optional
+        dRUP__list : list, default []
             RUP degradability in each feed (% of RUP).
-        limit__list : list, optional
+        feed_limit__list : list, default []
             Limiting upper bounds for each feed (kg).
-        lactating_ : bool, optional
+        feed_minimum_list : list, default []
+            Limiting lower bounds for each feed (kg).
+        lactating_ : bool, default False
             True if the cow is lactating, False otherwise.
-        DMIest__requirement : float, optional
+        DMIest__requirement : float, default []
             Dry matter intake estimation (kg).
 
         Returns
@@ -184,8 +194,7 @@ class RationConfig:
         None
         """
 
-        self.price_list = price__list if price__list is not None else []
-        self.n = len(self.price_list)
+        self.price_list = price__list
         self.NEmaint_requirement = NEmaint__requirement
         self.NEa_requirement = NEa__requirement
         self.NEpreg_requirement = NEpreg__requirement
@@ -194,41 +203,46 @@ class RationConfig:
         self.MP_requirement = MP__requirement
         self.C_requirement = C__requirement
         self.P_requirement = P__requirement
-        self.TDN_list = TDN__list if TDN__list is not None else []
-        self.DE_list = DE__list if DE__list is not None else []
-        self.EE_list = EE__list if EE__list is not None else []
-        self.is_fat_list = is_fat__list if is_fat__list is not None else []
+        self.P_requirement_process = P__process__requirement
+        self.TDN_list = TDN__list
+        self.DE_list = DE__list
+        self.EE_list = EE__list
+        self.is_fat_list = is_fat__list
         self.BW = BW_
-        self.calcium_list = calcium__list if calcium__list is not None else []
-        self.phosphorus_list = phosphorus__list if phosphorus__list is not None else []
-        self.NDF_list = NDF__list if NDF__list is not None else []
-        self.feed_type_list = feed_type__list if feed_type__list is not None else []
-        self.is_wetforage_list = is_wetforage__list if is_wetforage__list is not None else []
-        self.Kd_list = Kd__list if Kd__list is not None else []
-        self.N_A_list = N_A__list if N_A__list is not None else []
-        self.N_B_list = N_B__list if N_B__list is not None else []
-        self.CP_list = CP__list if CP__list is not None else []
-        self.dRUP_list = dRUP__list if dRUP__list is not None else []
-        self.feed_limit_list = feed_limit__list if feed_limit__list is not None else []
+        self.calcium_list = calcium__list
+        self.phosphorus_list = phosphorus__list
+        self.NDF_list = NDF__list
+        self.feed_type_list = feed_type__list
+        self.is_wetforage_list = is_wetforage__list
+        self.Kd_list = Kd__list
+        self.N_A_list = N_A__list
+        self.N_B_list = N_B__list
+        self.CP_list = CP__list
+        self.dRUP_list = dRUP__list
+        self.feed_minimum_list = feed_minimum__list
+        self.feed_limit_list = feed_limit__list
         self.lactating = lactating_
         self.DMIest_requirement = DMIest__requirement
 
-        self.NElact_list = []
-        self.MEact_list = []
-        self.NEgact_list = []
-        self.NEm_act_list = []
-        self.is_forage_list = []
-        self.MPbact = None
-        self.RUP_diet = None
-        self.dP_list = []
-        self.TDNact_list = []
-        self.dCa_list = []
-        self.is_conc_list = []
-        self.RDP_list = []
-        self.RUP_list = []
-        self.TDNact_diet = None
-        self.RDP_diet = None
-        self.MPbact = None
-        self.MP_supply = None
-        self.DEact_list = []
-        self.Discount = None
+    Discount: float = 0
+    TDNact_diet: float = 0
+
+    TDNact_list: List[float] | np.ndarray = []
+    DEact_list: List[float] | np.ndarray = []
+    MEact_list: List[float] = []
+
+    NEm_act_list: List[float] | np.ndarray = []
+    NElact_list: List[float] | np.ndarray = []
+    NEgact_list: List[float] = []
+    is_forage_list: List[float] | np.ndarray = []
+
+    dP_list: List[float] = []
+    dCa_list: List[float] = []
+    is_conc_list: List[int] = []
+
+    RDP_list: List[float] | np.ndarray = []
+    RUP_list: List[float] | np.ndarray = []
+    MPbact: float = 0
+    RUP_diet: float = 0
+    RDP_diet: float = 0
+    MP_supply: float = 0

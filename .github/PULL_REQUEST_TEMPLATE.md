@@ -5,6 +5,10 @@
 Issue(s) closed by this pull request: closes #
 
 - [ ] The [changelog](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit#gid=0) has been updated.
+      
+How big are the changes in the PR? Would you nominate it for a major version upgrade?
+- [ ] Yes
+- [ ] No
 
 ### What
 <!-- Add more detail about the changes that are being made in the pull request. -->

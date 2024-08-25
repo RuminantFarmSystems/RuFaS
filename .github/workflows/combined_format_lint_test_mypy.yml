@@ -2,13 +2,12 @@ name: Format, Lint, Test, Coverage, and Type Checking
 
 on:
   push:
-    branches: [ main ]
+    branches: [ dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ dev ]
   workflow_dispatch:
 
 env:
-  BRANCH_NAME: ${{ github.head_ref || github.ref }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -22,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -31,32 +30,35 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Set up dependency for getting changed files
-        id: files
-        uses: jitterbit/get-changed-files@v1
-
       - name: Get all added or modified files
-        id: get_files
         run: |
-          echo "FILES=$( echo ${{ steps.files.outputs.added_modified }} |
-            tr " " "\n" |
-            grep -E "\.py$" |
-            tr "\n" " ")" >> "$GITHUB_ENV"
-          echo "OTHER_FILES=$( echo ${{ steps.files.outputs.added_modified }} |
-            tr " " "\n" |
-            grep -E "^(?!.*\.py$).*"  |
-            tr "\n" " ")" >> "$GITHUB_ENV"
+          BASE_BRANCH=${{ github.base_ref }} || "dev"
+          git fetch origin $BASE_BRANCH
+          if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
+            echo "Fallback to dev branch because $BASE_BRANCH does not exist."
+            BASE_BRANCH="dev"
+            git fetch origin $BASE_BRANCH
+          fi
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
+          echo "All Changed Files: $ALL_CHANGED_FILES"
+
+          FILES=$(echo "$ALL_CHANGED_FILES" | grep '\.py$' | tr '\n' ' ')
+          echo "FILES=$FILES" >> $GITHUB_ENV
+
+          OTHER_FILES=$(echo "$ALL_CHANGED_FILES" | grep -v '\.py$' | tr '\n' ' ')
+          echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
         run: |
           paths_to_protect=(
-            'RUFAS/scenario_manager.py'
+            "input/data/tasks/default_task.json"
           )
           unauthorized_changes=false
+          unauthorized_paths=""
           
           # Check if any of the protected paths have been changed
           for path in "${paths_to_protect[@]}"; do
-            if (echo ${{ env.FILES }}; echo ${{ env.OTHER_FILES }}) | grep -q "$path"; then
+            if echo "${FILES} ${OTHER_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
@@ -71,7 +73,9 @@ jobs:
           fi
 
       - name: Format code with Black and commit changes
-        if: ${{ env.FILES != '' && github.ref != 'refs/heads/main' }}
+        if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
           black ${{ env.FILES }}
           git config --global user.name 'github-actions[bot]'
@@ -97,11 +101,11 @@ jobs:
       - name: Fetch latest commit SHA
         id: fetch-latest-sha
         run: |
-          echo "Branch name: ${{ env.BRANCH_NAME }}"
-          LATEST_SHA=$(git rev-parse origin/"${{ env.BRANCH_NAME }}")
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          echo "Branch name: $BRANCH_NAME"
+          LATEST_SHA=$(git rev-parse origin/"$BRANCH_NAME")
           echo "Latest SHA: $LATEST_SHA"
           echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
-          echo "::set-output name=sha::$LATEST_SHA"
 
       - name: Checkout the latest commit
         uses: actions/checkout@v4
@@ -109,7 +113,7 @@ jobs:
           ref: ${{ steps.fetch-latest-sha.outputs.sha }}
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -143,27 +147,27 @@ jobs:
         id: set_current_branch_error_count
         run: echo "error_count=$(cat mypy_current_branch_error_count.txt)" >> $GITHUB_OUTPUT
 
-      - name: Run mypy on the main branch
-        if: github.ref != 'refs/heads/main'
+      - name: Run mypy on the dev branch
+        if: github.ref != 'refs/heads/dev'
         run: |
-          git checkout main
-          python -m mypy . 2>&1 | tee mypy_main_branch_report.txt || true
-          grep -c "error:" mypy_main_branch_report.txt > mypy_main_branch_error_count.txt
+          git checkout dev
+          python -m mypy . 2>&1 | tee mypy_dev_branch_report.txt || true
+          grep -c "error:" mypy_dev_branch_report.txt > mypy_dev_branch_error_count.txt
 
-      - name: Set main branch error count as output
-        id: set_main_branch_error_count
-        if: github.ref != 'refs/heads/main'
-        run: echo "error_count=$(cat mypy_main_branch_error_count.txt)" >> $GITHUB_OUTPUT
+      - name: Set dev branch error count as output
+        id: set_dev_branch_error_count
+        if: github.ref != 'refs/heads/dev'
+        run: echo "error_count=$(cat mypy_dev_branch_error_count.txt)" >> $GITHUB_OUTPUT
 
       - name: Compare mypy reports
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/dev'
         run: |
           CURRENT_ERRORS=${{ steps.set_current_branch_error_count.outputs.error_count }}
-          MAIN_ERRORS=${{ steps.set_main_branch_error_count.outputs.error_count }}
+          dev_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
           echo "Current branch mypy errors: $CURRENT_ERRORS"
-          echo "Main branch mypy errors: $MAIN_ERRORS"
-          if [ $CURRENT_ERRORS -gt $MAIN_ERRORS ]; then
-            echo "Mypy error count has increased from the main branch to the current branch ($MAIN_ERRORS -> $CURRENT_ERRORS)."
+          echo "dev branch mypy errors: $dev_ERRORS"
+          if [ $CURRENT_ERRORS -gt $dev_ERRORS ]; then
+            echo "Mypy error count has increased from the dev branch to the current branch ($dev_ERRORS -> $CURRENT_ERRORS)."
             exit 1
           else
             echo "No increase in mypy errors found."
@@ -171,7 +175,7 @@ jobs:
         continue-on-error: true
 
       - name: Checkout current branch
-        if: github.ref != 'refs/heads/main'
+        if: github.ref != 'refs/heads/dev'
         run: git checkout ${{ github.head_ref }}
 
       - name: Set color and status for Flake8 badge
@@ -210,12 +214,11 @@ jobs:
           ./.github/workflows/update_coverage_mypy_badges.sh
 
       - name: Commit & Push Badge Updates
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v9
         with:
           message: "Update badges on README"
           add: "README.md"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.head_ref }}
 
       - name: Check for Flake8 Errors
         if: ${{ steps.flake8.outcome == 'failure' }}
@@ -234,13 +237,13 @@ jobs:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
           MY_ERROR_COUNT=${{ steps.set_current_branch_error_count.outputs.error_count }}
-          MAIN_ERRORS=${{ steps.set_main_branch_error_count.outputs.error_count }}
+          dev_ERRORS=${{ steps.set_dev_branch_error_count.outputs.error_count }}
           if [ -n "$URL" ]; then
             PYTEST_COVERAGE="Current Coverage: ${{ steps.coverage.outputs.coverage_percentage }}%"
             echo "$PYTEST_COVERAGE"
             MYPY_ERRORS="Mypy errors on ${{ github.head_ref }} branch: $MY_ERROR_COUNT"
-            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on main branch: $MAIN_ERRORS"
-            DIFF=$((MY_ERROR_COUNT - MAIN_ERRORS))
+            MYPY_ERRORS="$MYPY_ERRORS\nMypy errors on dev branch: $dev_ERRORS"
+            DIFF=$((MY_ERROR_COUNT - dev_ERRORS))
             if [ $DIFF -gt 0 ]; then
               MYPY_ERRORS="$MYPY_ERRORS\n$DIFF more errors on ${{ github.head_ref }} branch"
             elif [ $DIFF -lt 0 ]; then

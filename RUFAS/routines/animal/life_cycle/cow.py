@@ -3,14 +3,14 @@ from __future__ import annotations
 import collections
 import math
 from random import random
-from typing import Dict, Any
+from typing import Dict, Any, TypedDict
 
 import numpy as np
 
-from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
@@ -28,15 +28,28 @@ from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 
 om = OutputManager()
-im = InputManager()
 
 
-class MilkProductionHistory:
-    def __init__(self, sim_day: int, days_in_milk: int, milk_prod: float, days_born: int) -> None:
-        self.simulation_day: int = sim_day
-        self.days_in_milk: int = days_in_milk
-        self.milk_production: float = milk_prod
-        self.days_born: int = days_born
+class MilkProductionHistory(TypedDict):
+    """
+    A class to represent the milk production history entry of an animal.
+
+    Attributes
+    ----------
+    simulation_day : int
+        The simulate day that the milk production history entry is recorded.
+    days_in_milk : int
+        The number of days of the animal into milking.
+    milk_production : float
+        The amount of milk produced by the animal (kg).
+    days_born : int
+        The age of the animal in days.
+    """
+
+    simulation_day: int
+    days_in_milk: int
+    milk_production: float
+    days_born: int
 
 
 class Cow(HeiferIII):
@@ -184,8 +197,6 @@ class Cow(HeiferIII):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
@@ -220,8 +231,6 @@ class Cow(HeiferIII):
             "events": str(self.events),
             "repro_program": self.repro_program,
             "repro_sub_protocol": self.repro_sub_protocol,
-            "tai_method_h": self.tai_method_h,
-            "synch_ed_method_h": self.synch_ed_method_h,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.estrus_count,
             "estrus_day": self.estrus_day,
@@ -286,18 +295,10 @@ class Cow(HeiferIII):
         Currently only set up for wood model.
         """
         if self.lactation_curve == "wood":
-            self.wood_l = self.determine_param_value(
-                AnimalBase.config["wood_l"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_l_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_m = self.determine_param_value(
-                AnimalBase.config["wood_m"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_m_std"][self.breed_index][self.parity_index],
-            )
-            self.wood_n = self.determine_param_value(
-                AnimalBase.config["wood_n"][self.breed_index][self.parity_index],
-                AnimalBase.config["wood_n_std"][self.breed_index][self.parity_index],
-            )
+            lactation_parameters = AnimalBase.lactation_curve.get_wood_parameters(self.calves)
+            self.wood_l = lactation_parameters["l"]
+            self.wood_m = lactation_parameters["m"]
+            self.wood_n = lactation_parameters["n"]
 
     def calculate_daily_milk_produced(self) -> float:
         """Returns a float calculation of the milk produced based on a cow's lactation curve parameters"""
@@ -328,20 +329,20 @@ class Cow(HeiferIII):
             Day of simulation.
 
         """
-        if len(self.milk_production_history) > 0 and self.milk_production_history[-1].simulation_day == sim_day:
+        if len(self.milk_production_history) > 0 and self.milk_production_history[-1]["simulation_day"] == sim_day:
             del self.milk_production_history[-1]
 
         self.milk_production_history.append(
             MilkProductionHistory(
-                sim_day,
-                self.days_in_milk,
-                self.estimated_daily_milk_produced,
-                self.days_born,
+                simulation_day=sim_day,
+                days_in_milk=self.days_in_milk,
+                milk_production=self.estimated_daily_milk_produced,
+                days_born=self.days_born,
             )
         )
 
         if self.days_in_milk == 305 and len(self.milk_production_history) > 305:
-            milk_history = [day.milk_production for day in self.milk_production_history[-305:]]
+            milk_history = [day["milk_production"] for day in self.milk_production_history[-305:]]
             self.latest_milk_production_305days = np.sum(milk_history)
 
     @staticmethod
@@ -592,11 +593,10 @@ class Cow(HeiferIII):
         Parameters
         ----------
         DMI : float
-            The Dry Matter Intake (kg).
-
+            Dry Matter Intake (kg).
         """
         # amount of P required for endogenous losses (g) (A.1EF.E.1)
-        self.p_maint_feces = 0.001 * DMI * 1000
+        self.p_maint_feces = 0.001 * DMI * GeneralConstants.KG_TO_GRAMS
 
         # absorbed P retained for growth (g) (A.1EF.E.3)
         if self.body_weight < self.mature_body_weight:
@@ -604,26 +604,26 @@ class Cow(HeiferIII):
                 (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
                 * self.daily_growth
                 / 0.96
-                * 1000
+                * GeneralConstants.KG_TO_GRAMS
             )
         else:
             self.p_growth = 0
 
         # amount pf P required for urine production (g) (A.1EF.E.2)
-        p_urine = 0.000002 * self.body_weight * 1000
+        p_urine = 0.000002 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
         # absorbed P retained for fetal growth (g) (A.1EF.E.4)
         if self.days_in_preg >= 190:
             exp_1 = (0.05527 - 0.000075 * self.days_in_preg) * self.days_in_preg
             exp_2 = (0.05527 - 0.000075 * (self.days_in_preg - 1)) * (self.days_in_preg - 1)
-            self.p_gest = (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * 1000
+            self.p_gest = (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * GeneralConstants.KG_TO_GRAMS
             self.p_gest_for_calf += self.p_gest
         else:
             self.p_gest = 0
 
         # amount of P in milk per animal (g) (A.1E.E.5)
         if self.milking:
-            p_milk = 0.0009 * self.estimated_daily_milk_produced * 1000
+            p_milk = 0.0009 * self.estimated_daily_milk_produced * GeneralConstants.KG_TO_GRAMS
         else:
             p_milk = 0
 
@@ -2150,16 +2150,16 @@ class Cow(HeiferIII):
         if death_rand <= death_rate:
             death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
             death_date_random = random()
-            for i in range(len(AnimalBase.config["death_cull_prob"]) - 1):
+            for i in range(len(AnimalBase.config["death_day_prob"]) - 1):
                 if (
-                    AnimalBase.config["death_cull_prob"][i]
+                    AnimalBase.config["death_day_prob"][i]
                     <= death_date_random
-                    < AnimalBase.config["death_cull_prob"][i + 1]
+                    < AnimalBase.config["death_day_prob"][i + 1]
                 ):
-                    death_lower_limit = AnimalBase.config["death_cull_prob"][i]
-                    death_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
-                    death_time_lower_limit = AnimalBase.config["death_cull_prob"][i]
-                    death_time_upper_limit = AnimalBase.config["death_cull_prob"][i + 1]
+                    death_lower_limit = AnimalBase.config["death_day_prob"][i]
+                    death_upper_limit = AnimalBase.config["death_day_prob"][i + 1]
+                    death_time_lower_limit = AnimalBase.config["death_day_prob"][i]
+                    death_time_upper_limit = AnimalBase.config["death_day_prob"][i + 1]
             n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
             self.future_death_date = round(
                 death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
@@ -2180,24 +2180,29 @@ class Cow(HeiferIII):
         cull_rand = random()
         if cull_rand <= inv_cull_rate:
             cull_reason_rand = random()
-            # cull_reason_cull_prob = []
-            if cull_reason_rand <= 0.1633:
-                cull_reason_cull_prob = AnimalBase.config["feet_leg_cull_prob"]
+            cull_prob = 0
+            if cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["feet_leg_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["feet_leg_cull"]["cull_day_prob"]
                 self.cull_reason = const.LAMENESS_CULL
-            elif cull_reason_rand <= 0.4516:
-                cull_reason_cull_prob = AnimalBase.config["injury_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["injury_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["injury_cull"]["cull_day_prob"]
                 self.cull_reason = const.INJURY_CULL
-            elif cull_reason_rand <= 0.6955:
-                cull_reason_cull_prob = AnimalBase.config["mastitis_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["mastitis_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["mastitis_cull"]["cull_day_prob"]
                 self.cull_reason = const.MASTITIS_CULL
-            elif cull_reason_rand <= 0.8346:
-                cull_reason_cull_prob = AnimalBase.config["disease_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalBase.config["disease_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["disease_cull"]["cull_day_prob"]
                 self.cull_reason = const.DISEASE_CULL
-            elif cull_reason_rand <= 0.8991:
-                cull_reason_cull_prob = AnimalBase.config["udder_cull_prob"]
+
+            elif cull_reason_rand <= (cull_prob + AnimalBase.config["udder_cull"]["probability"]):
+                cull_reason_cull_prob = AnimalBase.config["udder_cull"]["cull_day_prob"]
                 self.cull_reason = const.UDDER_CULL
+
             else:
-                cull_reason_cull_prob = AnimalBase.config["unknown_cull_prob"]
+                cull_reason_cull_prob = AnimalBase.config["unknown_cull"]["cull_day_prob"]
                 self.cull_reason = const.UNKNOWN_CULL
 
             cull_time_rand = random()

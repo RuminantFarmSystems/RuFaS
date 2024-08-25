@@ -1,5 +1,4 @@
 flake8
-deprecated
 matplotlib
 mock
 numpy
@@ -19,3 +18,4 @@ tqdm
 mypy
 black
 coverage
+deepdiff

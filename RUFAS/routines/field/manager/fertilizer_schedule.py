@@ -12,7 +12,7 @@ class FertilizerSchedule(Schedule):
     """
     A Schedule child class that defines the timing and amounts of fertilizer application to a field. Inherits from the
     Schedule class to manage and validate a schedule for applying specific fertilizer mixes to a field, including the
-    timing (years and days) and amounts (masses of nitrogen and phosphorus) of each application.
+    timing (years and days) and amounts (masses of nitrogen, phosphorus, and potassium) of each application.
 
     Parameters
     ----------
@@ -28,6 +28,8 @@ class FertilizerSchedule(Schedule):
         The minimum masses of nitrogen to be applied in each fertilizer application (kg).
     phosphorus_masses : List[float]
         The minimum masses of phosphorus to be applied in each fertilizer application (kg).
+    potassium_masses : List[float]
+        The minimum masses of potassium to be applied in each fertilizer application (kg).
     application_depths : List[float], optional, default None
         The depths at which the fertilizer is to be injected into the soil for each application (mm).
     surface_remainder_fractions : List[float], optional, default None
@@ -47,6 +49,9 @@ class FertilizerSchedule(Schedule):
         application year.
     phosphorus_masses : List[float]
         Elongated list of phosphorus masses to match the length of the years list, ensuring a phosphorus mass for each
+        application year.
+    potassium_masses : List[float]
+        Elongated list of potassium masses to match the length of the years list, ensuring a potassium mass for each
         application year.
     application_depths : List[float]
         Elongated list or default value [0.0] for application depths, ensuring an application depth for each application
@@ -70,6 +75,7 @@ class FertilizerSchedule(Schedule):
         days: List[int],
         nitrogen_masses: List[float],
         phosphorus_masses: List[float],
+        potassium_masses: List[float],
         application_depths: List[float] = None,
         surface_remainder_fractions: List[float] = None,
         pattern_skip: int = 0,
@@ -80,6 +86,7 @@ class FertilizerSchedule(Schedule):
         self.mix_names = self._elongate_list(mix_names, len(years))
         self.nitrogen_masses = self._elongate_list(nitrogen_masses, len(years))
         self.phosphorus_masses = self._elongate_list(phosphorus_masses, len(years))
+        self.potassium_masses = self._elongate_list(potassium_masses, len(years))
 
         if application_depths is None:
             application_depths = [0.0]
@@ -104,6 +111,7 @@ class FertilizerSchedule(Schedule):
             If not all fertilizer application days are valid.
             If not all fertilizer nitrogen masses are valid.
             If not all fertilizer phosphorus masses are valid.
+            If not all fertilizer potassium masses are valid.
             If not all fertilizer application depths are valid.
             If not all fertilizer surface retention fractions are valid.
             If not all fertilizer application parameters have the same length.
@@ -133,6 +141,12 @@ class FertilizerSchedule(Schedule):
                 error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
             )
 
+        valid_potassium_masses = self._determine_if_all_non_negative_values(self.potassium_masses)
+        if not valid_potassium_masses:
+            raise ValueError(
+                error_header + f"expected all potassium masses to be >= 0, received '{self.potassium_masses}'."
+            )
+
         valid_depths = self._determine_if_all_non_negative_values(self.application_depths)
         if not valid_depths:
             raise ValueError(
@@ -152,6 +166,7 @@ class FertilizerSchedule(Schedule):
             == len(self.mix_names)
             == len(self.nitrogen_masses)
             == len(self.phosphorus_masses)
+            == len(self.potassium_masses)
             == len(self.application_depths)
             == len(self.surface_remainder_fractions)
         )
@@ -160,8 +175,8 @@ class FertilizerSchedule(Schedule):
                 error_header + f"expected equal numbers of fertilizer application parameters, received "
                 f"'{self.years}' years, '{self.days}' days, '{self.mix_names}' mix names, "
                 f"'{self.nitrogen_masses}' nitrogen masses, '{self.phosphorus_masses}' "
-                f"phosphorus masses, '{self.application_depths}' application depths, and "
-                f"'{self.surface_remainder_fractions}' surface remainder fractions."
+                f"phosphorus masses, '{self.potassium_masses}' potassium masses, '{self.application_depths}' "
+                f"application depths, and '{self.surface_remainder_fractions}' surface remainder fractions."
             )
 
     def generate_fertilizer_events(self) -> List[FertilizerEvent]:
@@ -179,6 +194,7 @@ class FertilizerSchedule(Schedule):
         all_mix_names = self.mix_names * (self.pattern_repeat + 1)
         all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
         all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
+        all_potassium_masses = self.potassium_masses * (self.pattern_repeat + 1)
         all_depths = self.application_depths * (self.pattern_repeat + 1)
         all_surface_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
         all_events = list(
@@ -188,6 +204,7 @@ class FertilizerSchedule(Schedule):
                 all_days,
                 all_nitrogen_masses,
                 all_phosphorus_masses,
+                all_potassium_masses,
                 all_depths,
                 all_surface_fractions,
             )
@@ -201,8 +218,9 @@ class FertilizerSchedule(Schedule):
                 day=event[2],
                 nitrogen_mass=event[3],
                 phosphorus_mass=event[4],
-                depth=event[5],
-                surface_remainder_fraction=event[6],
+                potassium_mass=event[5],
+                depth=event[6],
+                surface_remainder_fraction=event[7],
             )
             fertilizer_events.append(new_event)
         return fertilizer_events

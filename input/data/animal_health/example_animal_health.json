@@ -1,0 +1,29 @@
+{
+    "disease1": {
+        "incidence": {
+            "baseline_incidence_rate": 1.8
+        },
+        "immediate_effects": {
+            "effect_1": {
+                "name": "milk_production_decrease",
+                "percent": 5 
+            },
+            "effect_2": {
+                "name": "miscarriage_likelihood_increase",
+                "percent": 3.5
+            }
+        },
+        "intermediate_effects": {
+            "effect_1": {
+                "name": "weightloss",
+                "percent": 3.42
+            }
+        },
+        "lasting_effects": {},
+        "risk_factors": [
+            "risk_factor1", "risk_factor2", "risk_factor3", "risk_factor4"
+        ]
+    },
+    "disease2": {},
+    "diseaseN": {}
+}

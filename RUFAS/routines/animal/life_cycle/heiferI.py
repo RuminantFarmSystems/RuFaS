@@ -8,6 +8,7 @@ from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.general_constants import GeneralConstants
 
 om = OutputManager()
 
@@ -131,20 +132,20 @@ class HeiferI(Calf):
         Parameters
         ----------
         DMI : float
-            The Dry Matter Intake (kg).
+            Dry Matter Intake (kg).
         """
         # amount of P required for endogenous losses (g) (A.1A-D.E.1)
-        self.p_maint_feces = 0.0008 * DMI * 1000
+        self.p_maint_feces = 0.0008 * DMI * GeneralConstants.KG_TO_GRAMS
 
         # amount of P required for urine production (g) (A.1A-F.E.2)
-        p_urine = 0.000002 * self.body_weight * 1000
+        p_urine = 0.000002 * self.body_weight * GeneralConstants.KG_TO_GRAMS
 
         # absorbed P retained for growth (g) (A.1A-F.E.3)
         self.p_growth = (
             (0.0012 + 0.004635 * (self.mature_body_weight**0.22) * (self.body_weight ** (-0.22)))
             * self.daily_growth
             / 0.96
-            * 1000
+            * GeneralConstants.KG_TO_GRAMS
         )
 
         # absorbed P required by the animal (g) (A.1A-F.E.6)

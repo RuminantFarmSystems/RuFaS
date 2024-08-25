@@ -52,18 +52,18 @@ def test_determine_phosphorus_runoff_from_top_soil(
 
 
 @pytest.mark.parametrize(
-    "percent_clay",
+    "proportion_clay",
     [
-        99.1,
-        55.42,
-        9.13,
+        0.991,
+        0.5542,
+        0.0913,
         0.0,
     ],
 )
-def test_determine_isotherm_slope(percent_clay: float) -> None:
+def test_determine_isotherm_slope(proportion_clay: float) -> None:
     """Tests that the slope of the phosphorus sorption isotherm is calculated correctly."""
-    observed = SolublePhosphorus._determine_isotherm_slope(percent_clay)
-    expected = (173.51 * (percent_clay / 100)) + 8.48
+    observed = SolublePhosphorus._determine_isotherm_slope(proportion_clay)
+    expected = (173.51 * proportion_clay) + 8.48
     assert observed == expected
 
 

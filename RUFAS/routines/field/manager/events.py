@@ -11,6 +11,7 @@ crop that is presently growing in a field will be harvested.
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.time import Time
 
 
 class BaseFieldManagementEvent:
@@ -51,7 +52,7 @@ class BaseFieldManagementEvent:
         """Overrides the hash method for BaseFieldManagementEvent objects."""
         return hash((self.year, self.day))
 
-    def occurs_today(self, time) -> bool:
+    def occurs_today(self, time: Time) -> bool:
         """
         Checks if the event occurs on the current day in the current year..
 
@@ -66,7 +67,7 @@ class BaseFieldManagementEvent:
             True if event occurs on the current day and year, false if not.
 
         """
-        return self.year == time.calendar_year and self.day == time.day
+        return self.year == time.current_calendar_year and self.day == time.current_julian_day
 
 
 class PlantingEvent(BaseFieldManagementEvent):
@@ -286,6 +287,8 @@ class FertilizerEvent(BaseFieldManagementEvent):
         Minimum mass of nitrogen that should be in this application (kg).
     phosphorus_mass : float
         Minimum mass of phosphorus that should be in this application (kg).
+    potassium_mass : float
+        Minimum mass of potassium that should be in this application (kg).
     depth : float
         Depth at which fertilizer is injected into the soil.
     surface_remainder_fraction : float
@@ -299,6 +302,7 @@ class FertilizerEvent(BaseFieldManagementEvent):
         day: int,
         nitrogen_mass: float,
         phosphorus_mass: float,
+        potassium_mass: float,
         depth: float,
         surface_remainder_fraction: float,
     ):
@@ -306,6 +310,7 @@ class FertilizerEvent(BaseFieldManagementEvent):
         self.mix_name = mix_name
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
+        self.potassium_mass = potassium_mass
         self.depth = depth
         self.surface_remainder_fraction = surface_remainder_fraction
 
@@ -317,6 +322,7 @@ class FertilizerEvent(BaseFieldManagementEvent):
                 and other.mix_name == self.mix_name
                 and other.nitrogen_mass == self.nitrogen_mass
                 and other.phosphorus_mass == self.phosphorus_mass
+                and other.potassium_mass == self.potassium_mass
                 and other.depth == self.depth
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
             )
@@ -331,6 +337,7 @@ class FertilizerEvent(BaseFieldManagementEvent):
                 self.mix_name,
                 self.nitrogen_mass,
                 self.phosphorus_mass,
+                self.potassium_mass,
                 self.depth,
                 self.surface_remainder_fraction,
             )

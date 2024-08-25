@@ -11,15 +11,13 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.weather import Weather
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
-
-im = InputManager()
-om = OutputManager()
 
 
 class FieldManager:
@@ -41,19 +39,22 @@ class FieldManager:
         A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
     output_gatherer : FieldDataReporter
         An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
+    om : OutputManager
+        Instance of the OutputManager.
 
     """
 
     def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.__init__.__name__,
+            "function": "__init__",
         }
-
+        self.im = InputManager()
+        self.om = OutputManager()
         self.fields: List[Field] = []
-        fields = im.get_data_keys_by_properties("field_properties")
+        fields = self.im.get_data_keys_by_properties("field_properties")
         if not fields:
-            om.add_warning("No field input files.", "No fields will be simulated.", info_map)
+            self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         manure_supplier = self._get_manure_supplier(manure_manager)
 
@@ -79,8 +80,15 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
-        current_conditions = weather.get_current_day_conditions(time)
         for field in self.fields:
+            current_conditions = weather.get_current_day_conditions(time, field.field_data.absolute_latitude)
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.daily_update_routine.__name__,
+                "suffix": f"field='{field.field_data.name}'",
+                "units": MeasurementUnits.HOURS,
+            }
+            self.om.add_variable("daylength", current_conditions.daylength, info_map)
             field.manage_field(time, current_conditions=current_conditions)
         self.output_gatherer.send_daily_variables()
 
@@ -106,12 +114,12 @@ class FieldManager:
         """
         info_map = {"class": self.__class__.__name__, "function": self._get_manure_supplier.__name__}
 
-        animals_simulated = im.get_data("config.simulate_animals")
+        animals_simulated = self.im.get_data("config.simulate_animals")
 
         if animals_simulated:
             return manure_manager
 
-        om.add_log(
+        self.om.add_log(
             "Animals not being simulated",
             "Manure for field applications will be created by the FieldManureSupplier",
             info_map,
@@ -139,6 +147,7 @@ class FieldManager:
             A `Field` instance configured with the specified input data
 
         """
+        im = InputManager()
         field_configuration_data = im.get_data(field_name)
         field_size = field_configuration_data.get("field_size")
         absolute_latitude = field_configuration_data.get("absolute_latitude")
@@ -226,6 +235,7 @@ class FieldManager:
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
+        im = InputManager()
         fertilizer_data = im.get_data(fertilizer_schedule)
         available_fertilizer_mixes = {}
         fertilizer_mix_data = fertilizer_data.get("available_fertilizer_mixes")
@@ -243,6 +253,7 @@ class FieldManager:
             days=fertilizer_data.get("days"),
             nitrogen_masses=fertilizer_data.get("nitrogen_masses"),
             phosphorus_masses=fertilizer_data.get("phosphorus_masses"),
+            potassium_masses=fertilizer_data.get("potassium_masses"),
             application_depths=fertilizer_data.get("application_depths"),
             surface_remainder_fractions=fertilizer_data.get("surface_remainder_fractions"),
             pattern_skip=fertilizer_data.get("pattern_skip"),
@@ -267,6 +278,7 @@ class FieldManager:
             ManureSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         manure_schedule_data = im.get_data(manure_schedule)
         manure_type_strings = manure_schedule_data.get("manure_types")
         manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
@@ -301,6 +313,7 @@ class FieldManager:
             TillageSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         tillage_schedule_data = im.get_data(tillage_schedule)
         tillage_schedule_instance = TillageSchedule(
             name="tillage_schedule",
@@ -331,6 +344,7 @@ class FieldManager:
             List of all crop schedules that have been created from the input specifications.
 
         """
+        im = InputManager()
         schedules = []
         crop_rotation_data = im.get_data(f"{crop_rotation}.crop_schedules")
 
@@ -378,6 +392,7 @@ class FieldManager:
             If no specification is provided for soil layers.
 
         """
+        im = InputManager()
         soil_configuration_data = im.get_data(soil_configuration)
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")
@@ -449,11 +464,11 @@ class FieldManager:
             "saturation_point_water_concentration",
             "saturated_hydraulic_conductivity",
             "bulk_density",
-            "percent_organic_carbon_content",
-            "percent_clay_content",
-            "percent_silt_content",
-            "percent_sand_content",
-            "percent_rock_content",
+            "organic_carbon_fraction",
+            "clay_fraction",
+            "silt_fraction",
+            "sand_fraction",
+            "rock_fraction",
             "initial_labile_inorganic_phosphorus_concentration",
             "initial_soil_nitrate_concentration",
             "initial_soil_ammonium_concentration",

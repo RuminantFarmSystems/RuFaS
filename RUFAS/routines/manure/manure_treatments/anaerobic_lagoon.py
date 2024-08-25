@@ -64,7 +64,6 @@ class AnaerobicLagoon(BaseManureTreatment):
         )
         # fmt: on
         methane_emission = max(methane_emission, 0.0)
-        accumulated_output.storage_methane += methane_emission
 
         return methane_emission, methane_emission_from_degradable_volatile_solids
 
@@ -88,7 +87,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         storage_ammonia_emission = GasEmissionsCalculator.storage_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
-            manure_volume=daily_output.daily_final_manure_volume,
+            manure_volume=self._accumulated_output.liquid_manure_daily_volume,
             manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
             temp=self._get_current_day_average_temperature_celsius(),
         )
@@ -116,11 +115,17 @@ class AnaerobicLagoon(BaseManureTreatment):
         methane_loss, methane_emission_from_degradable_volatile_solids = self._update_methane_emission(
             self._accumulated_output
         )
+
+        daily_output.storage_methane = methane_loss
+
+        if self.config.manure_cover == ManureCoverEnum.COVER_AND_FLARE.value:
+            daily_output.storage_methane_burned, daily_output.storage_methane = self.calculate_cover_and_flare_methane(
+                methane_loss
+            )
+
         methane_emission_from_non_degradable_volatile_solids = (
             methane_loss - methane_emission_from_degradable_volatile_solids
         )
-
-        daily_output.storage_methane = methane_loss
 
         new_daily_output_liquid_manure_nitrogen = max(
             daily_output.liquid_manure_nitrogen - daily_output.storage_ammonia, 0.0
@@ -175,12 +180,13 @@ class AnaerobicLagoon(BaseManureTreatment):
             0.0,
         )
         self._accumulated_output.liquid_manure_nitrogen = new_accumulated_liquid_manure_nitrogen
-        new_accumulated_liquid_total_ammoniacal_nitrogen = max(
+
+        new_accumulated_liquid_manure_total_ammoniacal_nitrogen = max(
             self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen - daily_output.storage_ammonia,
             0.0,
         )
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
-            new_accumulated_liquid_total_ammoniacal_nitrogen
+            new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
 
         daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
@@ -425,55 +431,3 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         return self.freeboard_input * self.lagoon_surface_area
-
-    def _bound_sludge_accumulation_volume(
-        self,
-        calculated_sludge_accumulation_volume: float,
-        lower_bound: float,
-        upper_bound: float,
-    ) -> float:
-        """
-        Calculate a value for sludge accumulation volume bounded by the specified lower and upper bounds.
-
-        This method constrains the calculated sludge accumulation volume such that it does not exceed the specified
-        limits, given as a proportion of the current sludge accumulation volume.
-
-        Parameters
-        ----------
-        calculated_sludge_accumulation_volume : float
-            The value to be bounded, derived from a prior calculation.
-        lower_bound : float
-            The lower bound, given as a proportion of the current sludge accumulation volume.
-            Must be nonnegative, and less than or equal to the upper bound.
-        upper_bound : float
-            The upper bound, given as a proportion of the current sludge accumulation volume.
-            Must be nonnegative, and greater than or equal to the lower bound.
-
-        Returns
-        -------
-        float
-            The bounded value of sludge accumulation volume, ranging between the specified
-            lower and upper bounds.
-
-        Raises
-        ------
-        ValueError
-            If the calculated_sludge_accumulation_volume is negative.
-            If the lower_bound is negative.
-            If the upper_bound is less than the lower_bound.
-
-        """
-        if calculated_sludge_accumulation_volume < 0:
-            raise ValueError("The calculated sludge accumulation volume must be nonnegative.")
-        if lower_bound < 0:
-            raise ValueError("The lower bound must be nonnegative.")
-        if upper_bound < lower_bound:
-            raise ValueError("The upper bound must be greater than or equal to the lower bound.")
-
-        return min(
-            max(
-                self.sludge_accumulation_volume * lower_bound,
-                calculated_sludge_accumulation_volume,
-            ),
-            self.sludge_accumulation_volume * upper_bound,
-        )

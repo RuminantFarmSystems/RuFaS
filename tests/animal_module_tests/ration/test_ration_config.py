@@ -6,7 +6,7 @@ from pytest import approx
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 
 
-def test_default_initialization():
+def test_default_initialization() -> None:
     """
     Test the default initialization of the RationConfig class.
 
@@ -18,7 +18,6 @@ def test_default_initialization():
 
     # Assert
     assert ration_config.price_list == []
-    assert ration_config.n == 0
     assert ration_config.NEmaint_requirement == 0
     assert ration_config.NEa_requirement == 0
     assert ration_config.NEpreg_requirement == 0
@@ -44,7 +43,7 @@ def test_default_initialization():
     assert ration_config.dRUP_list == []
     assert ration_config.feed_limit_list == []
     assert not ration_config.lactating
-    assert ration_config.DMIest_requirement is None
+    assert ration_config.DMIest_requirement == 0.0
 
 
 @pytest.mark.parametrize(
@@ -184,7 +183,6 @@ def test_custom_initialization(
 
     # Assert
     assert ration_config.price_list == price
-    assert ration_config.n == len(price)
     assert ration_config.NEmaint_requirement == NEmaint
     assert ration_config.NEa_requirement == NEa
     assert ration_config.NEpreg_requirement == NEpreg
