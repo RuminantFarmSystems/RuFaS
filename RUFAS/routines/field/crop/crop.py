@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import copy
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -262,8 +263,310 @@ class Crop:
         """
         self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
 
-    @staticmethod
-    def make_crop_from_config_dict(config: dict) -> Crop:
+    @property
+    def name(self) -> str:
+        return self._data.name
+
+    @property
+    def species(self) -> str:
+        return self._data.species
+
+    @property
+    def id(self) -> str:
+        return self._data.id
+
+    @property
+    def is_alive(self) -> bool:
+        return self._data.is_alive
+
+    @property
+    def max_transpiration(self) -> float:
+        return self._data.max_transpiration
+
+    @property
+    def field_proportion(self) -> float:
+        return self._data.field_proportion
+
+    @property
+    def above_ground_biomass(self) -> float:
+        return self._data.above_ground_biomass
+
+    @property
+    def planting_day(self) -> int:
+        return self._data.planting_day
+
+    @property
+    def planting_year(self) -> int:
+        return self._data.planting_year
+
+    @property
+    def root_depth(self) -> float:
+        return self._data.root_depth
+
+    @property
+    def biomass(self) -> float:
+        return self._data.biomass
+
+    @property
+    def usable_light(self) -> float:
+        return self._data.usable_light
+
+    @property
+    def biomass_growth_max(self) -> float:
+        return self._data.biomass_growth_max
+
+    @property
+    def biomass_growth(self) -> float:
+        return self._data.biomass_growth
+
+    @property
+    def root_biomass(self) -> float:
+        return self._data.root_biomass
+
+    @property
+    def growth_factor(self) -> float:
+        return self._data.growth_factor
+
+    @property
+    def water_uptake(self) -> float:
+        return self._data.water_uptake
+
+    @property
+    def water_stress(self) -> float:
+        return self._data.water_stress
+
+    @property
+    def temp_stress(self) -> float:
+        return self._data.temp_stress
+
+    @property
+    def nitrogen_stress(self) -> float:
+        return self._data.nitrogen_stress
+
+    @property
+    def phosphorus_stress(self) -> float:
+        return self._data.phosphorus_stress
+
+    @property
+    def accumulated_heat_units(self) -> float:
+        return self._data.accumulated_heat_units
+
+    @property
+    def heat_fraction(self) -> float:
+        return self._data.heat_fraction
+
+    @property
+    def is_growing(self) -> float:
+        return self._data.is_growing
+
+    @property
+    def is_dormant(self) -> float:
+        return self._data.is_dormant
+
+    @property
+    def leaf_area_index(self) -> float:
+        return self._data.leaf_area_index
+
+    @property
+    def canopy_height(self) -> float:
+        return self._data.canopy_height
+
+    @property
+    def leaf_area_added(self) -> float:
+        return self._data.leaf_area_added
+
+    @property
+    def optimal_leaf_area_change(self) -> float:
+        return self._data.optimal_leaf_area_change
+
+    @property
+    def potential_nitrogen_uptake(self) -> float:
+        return self._data.potential_nitrogen_uptake
+
+    @property
+    def total_phosphorus_uptake(self) -> float:
+        return self._data.total_phosphorus_uptake
+
+    @property
+    def total_nitrogen_uptake(self) -> float:
+        return self._data.total_nitrogen_uptake
+
+    @property
+    def optimal_nitrogen_fraction(self) -> float:
+        return self._data.optimal_nitrogen_fraction
+
+    @property
+    def potential_phosphorus_uptake(self) -> float:
+        return self._data.potential_phosphorus_uptake
+
+    @property
+    def actual_phosphorus_uptakes(self) -> float:
+        return self._data.actual_phosphorus_uptakes
+
+    @property
+    def actual_nitrogen_uptakes(self) -> float:
+        return self._data.actual_nitrogen_uptakes
+
+    @property
+    def cumulative_evaporation(self) -> float:
+        return self._data.cumulative_evaporation
+
+    @property
+    def cumulative_transpiration(self) -> float:
+        return self._data.cumulative_transpiration
+
+    @property
+    def cumulative_evapotranspiration(self) -> float:
+        return self._data.cumulative_evapotranspiration
+
+    @property
+    def water_deficiency(self) -> float:
+        return self._data.water_deficiency
+
+    @property
+    def canopy_water(self) -> float:
+        return self._data.canopy_water
+
+    @property
+    def cut_biomass(self) -> float:
+        return self._data.cut_biomass
+
+    @property
+    def wet_yield_collected(self) -> float:
+        return self._data.wet_yield_collected
+
+    @property
+    def yield_residue(self) -> float:
+        return self._data.yield_residue
+
+    @property
+    def yield_nitrogen(self) -> float:
+        return self._data.yield_nitrogen
+
+    @property
+    def yield_phosphorus(self) -> float:
+        return self._data.yield_phosphorus
+
+    @property
+    def residue_nitrogen(self) -> float:
+        return self._data.residue_nitrogen
+
+    @property
+    def residue_phosphorus(self) -> float:
+        return self._data.residue_phosphorus
+
+    @field_proportion.setter
+    def field_proportion(self, field_proportion: float) -> None:
+        self._data.field_proportion = field_proportion
+
+    def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
+        """Sets the max transpiration for a crop."""
+        self._water_dynamics.set_maximum_transpiration(evapotranspirative_demand)
+
+    def assess_dormancy(self, daylength: float, dormancy_threshold_daylength: float, rainfall: float,
+                        soil_data: SoilData) -> None:
+        """
+        Assess and manage dormancy status based on the daylength.
+
+        Parameters
+        ----------
+        daylength : float
+            Length of time from sunup to sundown on the current day (hours).
+        dormancy_threshold_daylength : float
+            The threshold daylength below which the crop should enter dormancy.
+        rainfall : float
+            Amount of rain that fell on the current day (mm).
+        soil_data : SoilData
+            The soil data relevant for dormancy and biomass partitioning.
+        """
+        if daylength <= dormancy_threshold_daylength:
+            self.enter_dormancy(rainfall, soil_data)
+        else:
+            self.exit_dormancy()
+
+    def enter_dormancy(self, rainfall: float, soil_data) -> None:
+        """
+        Puts the crop into dormancy and handles biomass partitioning and residue addition.
+
+        Parameters
+        ----------
+        rainfall : float
+            Amount of rain that fell on the current day (mm).
+        soil_data : SoilData
+            The soil data relevant for dormancy and biomass partitioning.
+        """
+        self._dormancy.enter_dormancy(soil_data)
+        self._biomass_allocation.partition_biomass()
+        soil_data.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
+
+    def exit_dormancy(self) -> None:
+        """
+        Brings the crop out of dormancy.
+        """
+        self._data.is_dormant = False
+
+    @classmethod
+    def create_crop(cls, crop_reference: str, custom_crop_specifications: dict, use_heat_scheduled_harvesting: bool,
+                    time: Time) -> Crop:
+        """
+        Factory method to create a crop instance based on the crop reference.
+
+        Parameters
+        ----------
+        crop_reference : str
+            The reference for the crop to be planted.
+        custom_crop_specifications : dict
+            Dictionary of custom crop specifications, if any.
+        use_heat_scheduled_harvesting : bool
+            Whether heat-scheduled harvesting should be used.
+        time : Time
+            The current time in the simulation.
+
+        Returns
+        -------
+        Crop
+            A fully initialized Crop instance.
+
+        Raises
+        ------
+        KeyError
+            If the crop reference is for a custom crop that does not exist in the specifications.
+        """
+        supported_species = set(item.value for item in CropSpecies)
+        if crop_reference in supported_species:
+            crop = cls.make_supported_crop(crop_reference)
+        else:
+            try:
+                crop_specifications = copy(custom_crop_specifications[crop_reference])
+            except KeyError:
+                raise KeyError(
+                    f"Expected to have crop specification for '{crop_reference}', "
+                    f"received specifications for '{tuple(custom_crop_specifications.keys())}' crop types."
+                )
+            crop = cls.make_crop_from_config_dict(crop_specifications)
+
+        crop.initialize_crop(crop_reference, use_heat_scheduled_harvesting, time)
+        return crop
+
+    def initialize_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
+        """
+        Initializes the crop's attributes related to planting.
+
+        Parameters
+        ----------
+        crop_reference : str
+            The reference for the crop to be planted.
+        use_heat_scheduled_harvesting : bool
+            Whether heat-scheduled harvesting should be used.
+        time : Time
+            The current time in the simulation.
+        """
+        self._data.use_heat_scheduling = use_heat_scheduled_harvesting
+        self._data.id = crop_reference
+        self._data.planting_year = time.current_calendar_year
+        self._data.planting_day = time.current_julian_day
+
+    def make_crop_from_config_dict(self, config: dict) -> Crop:
         """
         Initialize a new crop from a configuration dictionary.
 
@@ -288,11 +591,11 @@ class Crop:
             species = config.pop("species")
 
             if species in accepted_species:
-                return Crop.make_supported_crop(species=species, **config)
+                return self.make_supported_crop(species=species, **config)
             else:
                 config["species"] = "custom " + str(species)
 
-        return Crop._make_custom_crop(**config)
+        return self._make_custom_crop(**config)
 
     @staticmethod
     def make_supported_crop(species: str, **specs) -> Crop:

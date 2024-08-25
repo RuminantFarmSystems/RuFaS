@@ -29,7 +29,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.time import Time
-from copy import copy
 
 om = OutputManager()
 
@@ -1023,8 +1022,7 @@ class Field:
     # <editor-fold desc="--- Crop Management Methods ---">
     def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
-        Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
-        list of current crops.
+        Plants a crop in the field by creating a new Crop instance and adding it to the field's list of current crops.
 
         Parameters
         ----------
@@ -1040,42 +1038,13 @@ class Field:
         KeyError
             If the crop reference is to a custom crop specification, but that specification is not present in the list
             of custom crop specifications.
-
-        Notes
-        -----
-        The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
-        reference to a custom crop that has user-defined attributes. This method starts by trying to determine if the
-        crop is of a supported species, if so it passes it to the supported crop creation method. If not, it passes it
-        to the custom crop creation method.
-
-        The harvest method is overwritten for the crop created because that is specified directly by the user, and the
-        crop id is set so that the HarvestEvents will be able to identify the correct crop in the field's list of active
-        crops.
-
         """
-        supported_species = set(item.value for item in CropSpecies)
-        if crop_reference in supported_species:
-            crop = Crop.make_supported_crop(crop_reference)
-        else:
-            try:
-                crop_specifications = copy(self.custom_crop_specifications[crop_reference])
-            except KeyError:
-                raise KeyError(
-                    f"'{self.field_data.name}': expected to have crop specification for '{crop_reference}', "
-                    f"received specifications for '{tuple(self.custom_crop_specifications.keys())}' crop "
-                    f"types."
-                )
-            crop = Crop.make_crop_from_config_dict(crop_specifications)
-        crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
-        crop.data.id = crop_reference
-        crop.data.planting_year = time.current_calendar_year
-        crop.data.planting_day = time.current_julian_day
-
+        crop = Crop.create_crop(crop_reference, self.custom_crop_specifications, use_heat_scheduled_harvesting, time)
         self.crops.append(crop)
 
         self._record_planting(
             use_heat_scheduled_harvesting,
-            crop.data.species,
+            crop.species,
             time.current_calendar_year,
             time.current_julian_day,
         )
@@ -1155,7 +1124,7 @@ class Field:
         that killed off a crop before it could be harvested.
 
         """
-        crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
+        crops_to_be_harvested = [crop for crop in self.crops if crop.id == crop_reference]
 
         info_map = {
             "class": self.__class__.__name__,
@@ -1177,7 +1146,7 @@ class Field:
             )
 
         for crop in crops_to_be_harvested:
-            crop.crop_management.manage_harvest(
+            crop.manage_crop_harvest(
                 harvest_operation,
                 self.field_data.name,
                 self.field_data.field_size,
@@ -1191,7 +1160,7 @@ class Field:
         """
         This method removes any crops from the field's list of active crops if they are no longer alive.
         """
-        self.crops = [crop for crop in self.crops if crop.data.is_alive]
+        self.crops = [crop for crop in self.crops if crop.is_alive]
 
     def _reset_crop_field_coverage_fractions(self) -> None:
         """
@@ -1203,7 +1172,7 @@ class Field:
 
         field_coverage_fraction = 1 / number_of_crops_in_field
         for crop in self.crops:
-            crop.data.field_proportion = field_coverage_fraction
+            crop.field_proportion = field_coverage_fraction
 
     def _assess_dormancy(self, daylength: float, rainfall: float) -> None:
         """
@@ -1215,23 +1184,9 @@ class Field:
             Length of time from sunup to sundown on the current day (hours).
         rainfall : float
             Amount of rain that fell on the current day (mm).
-
-        Notes
-        -----
-        If the length of the current day is at or below the dormancy threshold length, all crops that can go dormant
-        should be put into dormancy. If the length is greater than the threshold length, all crops should be brought out
-        of dormancy.
-
         """
-
-        if daylength <= self.field_data.dormancy_threshold_daylength:
-            for crop in self.crops:
-                crop.dormancy.enter_dormancy(self.soil.data)
-                crop.biomass_allocation.partition_biomass()
-                self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
-        else:
-            for crop in self.crops:
-                crop.data.is_dormant = False
+        for crop in self.crops:
+            crop.assess_dormancy(daylength, self.field_data.dormancy_threshold_daylength, rainfall, self.soil.data)
 
     # </editor-fold>
 
@@ -1348,9 +1303,10 @@ class Field:
         weighted_transpiration_total = 0.0
         weights_sum = 0.0
         for crop in self.crops:
-            crop.water_dynamics.set_maximum_transpiration(remaining_evapotranspirative_demand)
-            weighted_transpiration_total += crop.data.max_transpiration * crop.data.field_proportion
-            weights_sum += crop.data.field_proportion
+            crop.set_maximum_transpiration(remaining_evapotranspirative_demand)
+            field_proportion = crop.field_proportion
+            weighted_transpiration_total += remaining_evapotranspirative_demand * field_proportion
+            weights_sum += field_proportion
 
         if weights_sum == 0.0:
             weighted_average_transpiration = 0.0
@@ -1529,7 +1485,7 @@ class Field:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0
         for crop in self.crops:
-            total_above_ground_biomass += crop.data.above_ground_biomass
+            total_above_ground_biomass += crop.above_ground_biomass
         return total_above_ground_biomass
 
     @staticmethod
