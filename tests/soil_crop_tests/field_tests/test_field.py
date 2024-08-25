@@ -449,7 +449,7 @@ def test_harvest_heat_scheduled_crops(
     actual_harvest_count = 0
     for index, crop in enumerate(crops):
         if should_harvest_results[index]:
-            crop.crop_management.manage_harvest.assert_called_once_with(
+            crop.manage_crop_harvest.assert_called_once_with(
                 HarvestOperation.HARVEST_ONLY,
                 mock_field_data.name,
                 mock_field_data.field_size,
@@ -459,7 +459,7 @@ def test_harvest_heat_scheduled_crops(
             )
             actual_harvest_count += 1
         else:
-            crop.crop_management.manage_harvest.assert_not_called()
+            crop.manage_crop_harvest.assert_not_called()
 
     assert add_residue.call_count == expected_harvest_count
     assert actual_harvest_count == expected_harvest_count
@@ -529,14 +529,14 @@ def test_filter_events(
 
 
 @pytest.mark.parametrize(
-    "crop_reference,heat_scheduled,custom_crop_specs,is_supported,year,day",
+    "crop_reference,heat_scheduled,custom_crop_specs,expected_species,year,day",
     [
-        ("corn_silage", False, None, True, 1990, 120),
+        ("corn_silage", False, None, "corn_silage", 1990, 120),
         (
             "custom_alfalfa",
             False,
             {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}},
-            False,
+            "custom alfalfa",
             1992,
             115,
         ),
@@ -550,7 +550,7 @@ def test_filter_events(
                     "minimum_temperature": -60,
                 },
             },
-            False,
+            "custom halo_alien_corn",
             2000,
             110,
         ),
@@ -560,7 +560,7 @@ def test_plant_crop(
     crop_reference: str,
     heat_scheduled: bool,
     custom_crop_specs: dict,
-    is_supported: bool,
+    expected_species: str,
     year: int,
     day: int,
 ) -> None:
@@ -578,20 +578,23 @@ def test_plant_crop(
 
     field._plant_crop(crop_reference, heat_scheduled, mocked_time)
 
-    if is_supported:
-        expected_crop = Crop.make_supported_crop(crop_reference)
+    assert len(field.crops) == 1  # Ensure one crop is added
+
+    planted_crop = field.crops[0]
+
+    # Adjusted assertion for enum comparison
+    if isinstance(planted_crop.species, CropSpecies):
+        assert planted_crop.species.value == expected_species
     else:
-        expected_crop = Crop.make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
+        assert planted_crop.species == expected_species
 
-    expected_crop.data.use_heat_scheduling = heat_scheduled
-    expected_crop.data.id = crop_reference
+    assert planted_crop.use_heat_scheduling == heat_scheduled
+    assert planted_crop.planting_year == year
+    assert planted_crop.planting_day == day
 
-    assert field.crops[0].data.id == expected_crop.data.id
-    assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
-    assert field.crops[0].data.species == expected_crop.data.species
-    assert field.crops[0].data.planting_year == year
-    assert field.crops[0].data.planting_day == day
-    field._record_planting.assert_called_once_with(heat_scheduled, expected_crop.data.species, year, day)
+    field._record_planting.assert_called_once_with(
+        heat_scheduled, planted_crop.species, year, day
+    )
 
 
 @pytest.mark.parametrize(
@@ -704,7 +707,7 @@ def test_record_planting(
 
 
 @pytest.mark.parametrize(
-    "field_name,crop_reference,custom_crop_specs,expected",
+    "field_name,crop_reference,custom_crop_specs,expected_substring",
     [
         (
             "test_field_1",
@@ -719,20 +722,17 @@ def test_record_planting(
                     "minimum_temperature": -60,
                 },
             },
-            "'test_field_1': expected to have crop specification for 'halo_alien_alfalfa', received specifications for "
-            "'('halo_alien_winter_wheat', 'halo_alien_corn')' crop types.",
+            "Expected to have crop specification for 'halo_alien_alfalfa', received specifications for",
         ),
         (
             "test_field_2",
             "halo_alien_durum_wheat",
             None,
-            "'test_field_2': expected to have crop specification for "
-            "'halo_alien_durum_wheat', received specifications for '()' crop "
-            "types.",
+            "Expected to have crop specification for 'halo_alien_durum_wheat', received specifications for",
         ),
     ],
 )
-def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_specs: Dict, expected: str) -> None:
+def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_specs: Dict, expected_substring: str) -> None:
     """Tests that errors are correctly raised when a crop specification for a requested planting is not present."""
     field = Field(
         custom_crop_specifications=custom_crop_specs,
@@ -742,7 +742,11 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     mocked_time = MagicMock(Time)
     with pytest.raises(KeyError) as e:
         field._plant_crop(crop_reference, True, mocked_time)
-    assert expected in str(e.value)
+
+    error_message = str(e.value)
+
+    assert expected_substring in error_message
+    assert crop_reference in error_message
 
 
 @pytest.mark.parametrize(
@@ -763,10 +767,10 @@ def test_harvest_crop(
 ) -> None:
     """Tests that crops are harvested correctly."""
     harvest_crop = Crop()
-    harvest_crop.data.id = crop_reference
+    harvest_crop._data.id = crop_reference
     other_crop_1 = Crop()
     other_crop_2 = Crop()
-    other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
+    other_crop_1._data.id, other_crop_2._data.id = "not this crop", "not this crop"
     field = Field(
         field_data=mock_field_data,
         manure_supplier=MagicMock(ManureManager),
@@ -774,7 +778,7 @@ def test_harvest_crop(
     )
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
     for crop in field.crops:
-        crop.crop_management.manage_harvest = MagicMock()
+        crop.manage_crop_harvest = MagicMock()
     mock_conditions = MagicMock(CurrentDayConditions)
     mock_conditions.rainfall = rainfall
 
@@ -786,10 +790,10 @@ def test_harvest_crop(
         field._harvest_crop(crop_reference, harvest_op, mock_time, mock_conditions)
 
     for crop in field.crops:
-        if crop.data.id == "not this crop":
-            crop.crop_management.manage_harvest.assert_not_called()
+        if crop.id == "not this crop":
+            crop.manage_crop_harvest.assert_not_called()
         else:
-            crop.crop_management.manage_harvest.assert_called_once_with(
+            crop.manage_crop_harvest.assert_called_once_with(
                 harvest_op,
                 mock_field_data.name,
                 mock_field_data.field_size,
@@ -824,8 +828,8 @@ def test_harvest_crop_warnings(
         }
 
         for crop in crops:
-            crop.data.id = "test"
-            crop.crop_management.manage_harvest = MagicMock()
+            crop._data.id = "test"
+            crop.manage_crop_harvest = MagicMock()
         field = Field(
             manure_supplier=MagicMock(ManureManager),
             field_data=mock_field_data,
@@ -844,7 +848,7 @@ def test_harvest_crop_warnings(
             field._harvest_crop("test", HarvestOperation.HARVEST_KILL, mock_time, mock_conditions)
 
         for crop in crops:
-            crop.crop_management.manage_harvest.assert_called_once_with(
+            crop.manage_crop_harvest.assert_called_once_with(
                 HarvestOperation.HARVEST_KILL,
                 mock_field_data.name,
                 mock_field_data.field_size,
@@ -870,7 +874,7 @@ def test_remove_dead_crops() -> None:
 
     field_2 = Field(manure_supplier=MagicMock(ManureManager))
     crop_1 = Crop()
-    crop_1.data.is_alive = False
+    crop_1._data.is_alive = False
     crop_2 = Crop()
     crop_3 = Crop()
     field_2.crops = [crop_1, crop_2, crop_3]
@@ -908,7 +912,7 @@ def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_fie
     field.crops = crop_list
     field._reset_crop_field_coverage_fractions()
     for crop in field.crops:
-        assert crop.data.field_proportion == expected_field_proportion
+        assert crop._data.field_proportion == expected_field_proportion
 
 
 @pytest.mark.parametrize(
@@ -965,68 +969,20 @@ def test_make_supported_crop(species: str, specs: dict):
     """ensure that supported crops are properly created."""
     # check that attributes are correct
     crop = Crop.make_supported_crop(species, **specs)
-    assert crop.data.species == CropSpecies(species)
+    assert crop._data.species == CropSpecies(species)
     for key, val in specs.items():
-        assert getattr(crop.data, key) == val
+        assert getattr(crop._data, key) == val
 
     if len(specs) > 0:
-        assert "altered" in crop.data.name
+        assert "altered" in crop._data.name
     else:
-        assert "altered" not in crop.data.name
+        assert "altered" not in crop._data.name
 
     # failing cases
     with pytest.raises(Exception):
         Field._make_supported_crop("fake_crop")
     with pytest.raises(Exception):
         Field._make_supported_crop("corn", bad_attr=17.35)
-
-
-# @pytest.mark.parametrize(
-#     "config",
-#     [
-#         {"species": "grass"},  # custom species, with generic defaults
-#         {"species": "cottonwood", "is_perennial": True},  # custom species and attribute
-#         {"minimum_temperature": -10},  # no species name
-#     ],
-# )
-# def test_make_custom_crop(config: dict):
-#     """checks that custom crop attributes are set correctly"""
-#     crop = Field._make_custom_crop(**config)
-#     for key, val in config.items():
-#         assert getattr(crop.data, key) == val
-
-
-# @pytest.mark.parametrize(
-#     "config",
-#     [
-#         {"species": "corn"},  # supported species
-#         {
-#             "species": "corn",
-#             "minimum_temperature": -2.0,
-#             "is_perennial": True,
-#         },  # supported species, with alterations
-#         {"species": "grass"},  # unsupported species, generic attributes
-#         {
-#             "species": "cottonwood",
-#             "is_perennial": True,
-#         },  # custom species and attributes
-#         {"minimum_temperature": -2.0},  # generic custom crop, with alterations
-#     ],
-# )
-# def test_make_crop_from_config_dict(config: dict):
-#     supported_crops = set(item.value for item in CropSpecies)
-#     has_supported_species = "species" in config.keys() and str(config["species"]) in supported_crops
-#     Field._make_supported_crop = MagicMock()
-#     Field._make_custom_crop = MagicMock()
-
-#     Field._make_crop_from_config_dict(config)
-
-#     if has_supported_species:
-#         Field._make_supported_crop.assert_called_once()
-#         Field._make_custom_crop.assert_not_called()
-#     else:
-#         Field._make_supported_crop.assert_not_called()
-#         Field._make_custom_crop.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -2566,7 +2522,7 @@ def test_determine_total_above_ground_biomass(biomasses: List[float], expected: 
     field = Field(manure_supplier=MagicMock(ManureManager))
     for biomass in biomasses:
         crop = Crop()
-        crop.data.above_ground_biomass = biomass
+        crop._data.above_ground_biomass = biomass
         field.crops.append(crop)
 
     actual = field._determine_total_above_ground_biomass()

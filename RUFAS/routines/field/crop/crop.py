@@ -268,7 +268,7 @@ class Crop:
         return self._data.name
 
     @property
-    def species(self) -> str:
+    def species(self) -> CropSpecies:
         return self._data.species
 
     @property
@@ -455,6 +455,10 @@ class Crop:
     def residue_phosphorus(self) -> float:
         return self._data.residue_phosphorus
 
+    @property
+    def use_heat_scheduling(self) -> bool:
+        return self._data.use_heat_scheduling
+
     @field_proportion.setter
     def field_proportion(self, field_proportion: float) -> None:
         self._data.field_proportion = field_proportion
@@ -543,7 +547,7 @@ class Crop:
                     f"Expected to have crop specification for '{crop_reference}', "
                     f"received specifications for '{tuple(custom_crop_specifications.keys())}' crop types."
                 )
-            crop = cls.make_crop_from_config_dict(crop_specifications)
+            crop = cls().make_crop_from_config_dict(crop_specifications)
 
         crop.initialize_crop(crop_reference, use_heat_scheduled_harvesting, time)
         return crop
