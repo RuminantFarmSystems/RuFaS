@@ -19,18 +19,18 @@ def test_perform_daily_crop_update(
     mocker: MockerFixture, is_mature: bool, is_dormant: bool, should_update: bool
 ) -> None:
     crop_data = CropData()
-    crop_data.__setattr__("is_mature", is_mature)
-    crop_data.__setattr__("is_dormant", is_dormant)
     crop = Crop(crop_data)
+    mocker.patch.object(CropData, 'is_dormant', new_callable=mocker.PropertyMock, return_value=is_dormant)
+    mocker.patch.object(CropData, 'is_mature', new_callable=mocker.PropertyMock, return_value=is_mature)
 
     # Mock the methods that should be called during the update
-    mocker.patch.object(crop.heat_units, "absorb_heat_units")
-    mocker.patch.object(crop.root_development, "develop_roots")
-    mocker.patch.object(crop.nitrogen_incorporation, "incorporate_nitrogen")
-    mocker.patch.object(crop.phosphorus_incorporation, "incorporate_phosphorus")
-    mocker.patch.object(crop.growth_constraints, "constrain_growth")
-    mocker.patch.object(crop.leaf_area_index, "grow_canopy")
-    mocker.patch.object(crop.biomass_allocation, "allocate_biomass")
+    mocker.patch.object(crop._heat_units, "absorb_heat_units")
+    mocker.patch.object(crop._root_development, "develop_roots")
+    mocker.patch.object(crop._nitrogen_incorporation, "incorporate_nitrogen")
+    mocker.patch.object(crop._phosphorus_incorporation, "incorporate_phosphorus")
+    mocker.patch.object(crop._growth_constraints, "constrain_growth")
+    mocker.patch.object(crop._leaf_area_index, "grow_canopy")
+    mocker.patch.object(crop._biomass_allocation, "allocate_biomass")
 
     # Create mock objects for the conditions, field data, and soil data
     mock_conditions = mocker.Mock(spec=CurrentDayConditions)
@@ -42,29 +42,29 @@ def test_perform_daily_crop_update(
 
     # Assertions
     if should_update:
-        crop.heat_units.absorb_heat_units.assert_called_once_with(
+        crop._heat_units.absorb_heat_units.assert_called_once_with(
             mock_conditions.mean_air_temperature,
             mock_conditions.min_air_temperature,
             mock_conditions.max_air_temperature,
         )
-        crop.root_development.develop_roots.assert_called_once()
-        crop.nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(mock_soil_data)
-        crop.phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(mock_soil_data)
-        crop.growth_constraints.constrain_growth.assert_called_once_with(
-            crop.data.max_transpiration,
+        crop._root_development.develop_roots.assert_called_once()
+        crop._nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(mock_soil_data)
+        crop._phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(mock_soil_data)
+        crop._growth_constraints.constrain_growth.assert_called_once_with(
+            crop._data.max_transpiration,
             mock_conditions.mean_air_temperature,
             mock_field_data.simulate_water_stress,
             mock_field_data.simulate_temp_stress,
             mock_field_data.simulate_nitrogen_stress,
             mock_field_data.simulate_phosphorus_stress,
         )
-        crop.leaf_area_index.grow_canopy.assert_called_once()
-        crop.biomass_allocation.allocate_biomass.assert_called_once_with(mock_conditions.incoming_light)
+        crop._leaf_area_index.grow_canopy.assert_called_once()
+        crop._biomass_allocation.allocate_biomass.assert_called_once_with(mock_conditions.incoming_light)
     else:
-        crop.heat_units.absorb_heat_units.assert_not_called()
-        crop.root_development.develop_roots.assert_not_called()
-        crop.nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
-        crop.phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
-        crop.growth_constraints.constrain_growth.assert_not_called()
-        crop.leaf_area_index.grow_canopy.assert_not_called()
-        crop.biomass_allocation.allocate_biomass.assert_not_called()
+        crop._heat_units.absorb_heat_units.assert_not_called()
+        crop._root_development.develop_roots.assert_not_called()
+        crop._nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
+        crop._phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
+        crop._growth_constraints.constrain_growth.assert_not_called()
+        crop._leaf_area_index.grow_canopy.assert_not_called()
+        crop._biomass_allocation.allocate_biomass.assert_not_called()
