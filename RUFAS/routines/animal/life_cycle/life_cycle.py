@@ -201,6 +201,8 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII)
         heiferIIIs = self._get_animals(HeiferIII)
         cows = self._get_animals(Cow)
+        for cow in cows:
+            cow.set_milking_management_attributes()
         self.replacement_market = self.animal_population.get_replacement_cows()
         return calves, heiferIs, heiferIIs, heiferIIIs, cows
 
