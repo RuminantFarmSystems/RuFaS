@@ -72,10 +72,13 @@ def test_leach_and_update_phosphorus_pools(rain: float, runoff: float, area: flo
     mock_machine_leach_phosphorus_pools = mocker.patch.object(
         data.machine_manure, "leach_phosphorus_pools", return_value=(9, 24)
     )
+    mock_detemine_phosphorus_operation = mocker.patch.object(
+        ManurePool, "determine_phosphorus_leach", return_value=(9, 24)
+    )
     mock_add = mocker.patch.object(incorp, "_add_infiltrated_phosphorus_to_soil")
 
     incorp._leach_and_update_phosphorus_pools(rain, runoff, area)
-
+    assert mock_detemine_phosphorus_operation.call_count == 2
     mock_grazing_leach_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     mock_machine_leach_phosphorus_pools.assert_called_once_with(rain, runoff, area)
     add_calls = [

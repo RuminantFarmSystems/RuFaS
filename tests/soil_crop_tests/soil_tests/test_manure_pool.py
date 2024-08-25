@@ -570,3 +570,18 @@ def test_runoff_reset() -> None:
     pool.runoff_reset()
     assert pool.organic_phosphorus_runoff == 0
     assert pool.inorganic_phosphorus_runoff == 0
+
+
+@pytest.mark.parametrize(
+    "manure_dry_mass,manure_field_coverage,expected",
+    [
+        (12, 2.1, True),
+        (0, 3.4, False),
+        (3, 0, False),
+    ],
+)
+def test_determine_phosphorus_leach(manure_dry_mass: float, manure_field_coverage: float, expected: bool) -> None:
+    """Tests that the phosphorus leaching run status is being correctly determined."""
+    pool = ManurePool(manure_dry_mass=manure_dry_mass, manure_field_coverage=manure_field_coverage)
+    observed = pool.determine_phosphorus_leach()
+    assert observed == expected
