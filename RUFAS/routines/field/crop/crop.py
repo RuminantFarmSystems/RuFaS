@@ -1,8 +1,10 @@
 from __future__ import annotations
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
 from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
@@ -17,6 +19,8 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil_data import SoilData
 from typing import Optional
+
+from RUFAS.time import Time
 
 
 class Crop:
@@ -227,14 +231,36 @@ class Crop:
         return amount_evaporated
 
     def should_harvest_based_on_heat(self) -> bool:
-        """_summary_
-
-        Returns
-        -------
-        bool
-            _description_
-        """
+        """Checks if any of the active plants in the field should be harvested based on their heat schedule."""
         return self._data.use_heat_scheduling and self._data.heat_fraction >= self._data.harvest_heat_fraction
+
+    def manage_crop_harvest(
+        self,
+        harvest_op: HarvestOperation,
+        field_name: str,
+        field_size: float,
+        time: Time,
+        soil_data: SoilData,
+        feed_manager: FeedManager,
+    ) -> None:
+        """Wrapper function for the Crop's CropManagement harvesting operation.
+
+        Parameters
+        ----------
+        harvest_op : HarvestOperation
+            The operation to be executed on this crop.
+        field_name : str
+            The name of the field that contains this crop.
+        field_size : float
+            Size of the field that contains this crop (ha)
+        time : Time
+            Time instance containing the current time of the simulation.
+        soil_data : SoilData
+            The object tracking the attributes of the soil profile.
+        feed_manager : FeedManager
+            Instance of the FeedManager that receives harvested crops.
+        """
+        self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
 
     @staticmethod
     def make_crop_from_config_dict(config: dict) -> Crop:
