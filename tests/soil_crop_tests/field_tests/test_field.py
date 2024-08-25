@@ -2136,9 +2136,9 @@ def test_execute_daily_processes(
 
         incorp = Field(field_data=field_data, manure_supplier=MagicMock(ManureManager))
         crop_1 = Crop()
-        crop_1.data.max_transpiration = transpiration
+        crop_1._data.max_transpiration = transpiration
         crop_2 = Crop()
-        crop_2.data.max_transpiration = transpiration
+        crop_2._data.max_transpiration = transpiration
         incorp.crops = [crop_1, crop_2]
         current_conditions = CurrentDayConditions(
             incoming_light=light,
@@ -2153,13 +2153,13 @@ def test_execute_daily_processes(
         incorp.soil.soil_temp.daily_soil_temperature_update = MagicMock()
         incorp._cycle_water = MagicMock()
         for crop in incorp.crops:
-            crop.heat_units.absorb_heat_units = MagicMock()
-            crop.root_development = MagicMock()
-            crop.nitrogen_incorporation.incorporate_nitrogen = MagicMock()
-            crop.phosphorus_incorporation.incorporate_phosphorus = MagicMock()
-            crop.growth_constraints.constrain_growth = MagicMock()
-            crop.leaf_area_index.grow_canopy = MagicMock()
-            crop.biomass_allocation.allocate_biomass = MagicMock()
+            crop._heat_units.absorb_heat_units = MagicMock()
+            crop._root_development = MagicMock()
+            crop._nitrogen_incorporation.incorporate_nitrogen = MagicMock()
+            crop._phosphorus_incorporation.incorporate_phosphorus = MagicMock()
+            crop._growth_constraints.constrain_growth = MagicMock()
+            crop._leaf_area_index.grow_canopy = MagicMock()
+            crop._biomass_allocation.allocate_biomass = MagicMock()
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "current_calendar_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
@@ -2176,25 +2176,25 @@ def test_execute_daily_processes(
         incorp._cycle_water.assert_called_once_with(current_conditions, mocked_time)
         for crop in incorp.crops:
             if crops_growing:
-                crop.heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
-                crop.root_development.develop_roots.assert_called_once()
-                crop.nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(incorp.soil.data)
-                crop.phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(incorp.soil.data)
-                crop.growth_constraints.constrain_growth.assert_called_once_with(
+                crop._heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
+                crop._root_development.develop_roots.assert_called_once()
+                crop._nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(incorp.soil.data)
+                crop._phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(incorp.soil.data)
+                crop._growth_constraints.constrain_growth.assert_called_once_with(
                     transpiration,
                     mean_temp,
                     *[stressors] * 4,
                 )
-                crop.leaf_area_index.grow_canopy.assert_called_once()
-                crop.biomass_allocation.allocate_biomass.assert_called_once_with(light)
+                crop._leaf_area_index.grow_canopy.assert_called_once()
+                crop._biomass_allocation.allocate_biomass.assert_called_once_with(light)
             else:
-                crop.heat_units.absorb_heat_units.assert_not_called()
-                crop.root_development.develop_roots.assert_not_called()
-                crop.nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
-                crop.phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
-                crop.growth_constraints.constrain_growth.assert_not_called()
-                crop.leaf_area_index.grow_canopy.assert_not_called()
-                crop.biomass_allocation.allocate_biomass.assert_not_called()
+                crop._heat_units.absorb_heat_units.assert_not_called()
+                crop._root_development.develop_roots.assert_not_called()
+                crop._nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
+                crop._phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
+                crop._growth_constraints.constrain_growth.assert_not_called()
+                crop._leaf_area_index.grow_canopy.assert_not_called()
+                crop._biomass_allocation.allocate_biomass.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -2290,12 +2290,12 @@ def test_cycle_water(
         incorp._determine_maximum_soil_evaporation = MagicMock(return_value=5.0)
         incorp._get_manure_water = MagicMock(return_value=manure_water)
 
-        crop_1.water_dynamics.set_maximum_transpiration = MagicMock()
-        crop_1.water_dynamics.cycle_water = MagicMock()
-        crop_1.water_uptake.uptake_water = MagicMock()
-        crop_2.water_dynamics.set_maximum_transpiration = MagicMock()
-        crop_2.water_dynamics.cycle_water = MagicMock()
-        crop_2.water_uptake.uptake_water = MagicMock()
+        crop_1._water_dynamics.set_maximum_transpiration = MagicMock()
+        crop_1._water_dynamics.cycle_water = MagicMock()
+        crop_1._water_uptake.uptake_water = MagicMock()
+        crop_2._water_dynamics.set_maximum_transpiration = MagicMock()
+        crop_2._water_dynamics.cycle_water = MagicMock()
+        crop_2._water_uptake.uptake_water = MagicMock()
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "current_simulation_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
@@ -2321,8 +2321,8 @@ def test_cycle_water(
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
         incorp.soil.carbon_cycling.cycle_carbon.assert_called_once_with(2.0, mean_temp, field_size)
         expected_remaining_demand = 30.5
-        crop_1.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
-        crop_2.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
+        crop_1._water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
+        crop_2._water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
         expected_average_transpiration = 44.1 * crop_1_proportion + 39.5 * crop_2_proportion
         incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
             40.0,
@@ -2336,17 +2336,17 @@ def test_cycle_water(
         incorp.soil.evaporation.evaporate.assert_called_once_with(5.0)
         expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
-            crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
-            crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
-            crop_2.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
-            crop_2.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
+            crop_1._water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
+            crop_1._water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
+            crop_2._water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
+            crop_2._water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
         else:
-            assert crop_1.data.cumulative_evaporation == 0
-            assert crop_1.data.cumulative_transpiration == 0
-            assert crop_1.data.cumulative_potential_evapotranspiration == 0
-            assert crop_2.data.cumulative_evaporation == 0
-            assert crop_2.data.cumulative_transpiration == 0
-            assert crop_2.data.cumulative_potential_evapotranspiration == 0
+            assert crop_1._data.cumulative_evaporation == 0
+            assert crop_1._data.cumulative_transpiration == 0
+            assert crop_1._data.cumulative_potential_evapotranspiration == 0
+            assert crop_2._data.cumulative_evaporation == 0
+            assert crop_2._data.cumulative_transpiration == 0
+            assert crop_2._data.cumulative_potential_evapotranspiration == 0
 
 
 @pytest.mark.parametrize(
@@ -2482,8 +2482,8 @@ def test_handle_water_in_crop_canopies(
 
         actual = field._handle_water_in_crop_canopies(precipitation)
         assert actual == expected_return
-        assert field.crops[0].data.canopy_water == expected_first
-        assert field.crops[1].data.canopy_water == expected_second
+        assert field.crops[0]._data.canopy_water == expected_first
+        assert field.crops[1]._data.canopy_water == expected_second
 
 
 @pytest.mark.parametrize(
@@ -2512,8 +2512,8 @@ def test_evaporate_from_crop_canopies(
 
     actual_demand = field._evaporate_from_crop_canopies(demand)
     assert pytest.approx(actual_demand) == expected_demand
-    assert pytest.approx(expected_canopy_water1) == field.crops[0].data.canopy_water
-    assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
+    assert pytest.approx(expected_canopy_water1) == field.crops[0]._data.canopy_water
+    assert pytest.approx(expected_canopy_water2) == field.crops[1]._data.canopy_water
 
 
 @pytest.mark.parametrize("biomasses,expected", [([30, 20, 14], 64), ([22.1], 22.1), ([], 0.0)])
