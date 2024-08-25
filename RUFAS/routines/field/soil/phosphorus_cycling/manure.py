@@ -80,14 +80,14 @@ class Manure:
             The size of the field (ha).
 
         """
-        if self.data.machine_manure.manure_dry_mass > 0 and self.data.machine_manure.manure_field_coverage > 0:
+        if self.data.machine_manure.determine_phosphorus_leach():
             organic_phosphorus, inorganic_phosphorus = self.data.machine_manure.leach_phosphorus_pools(
                 rainfall, runoff, field_size
             )
             self._add_infiltrated_phosphorus_to_soil(organic_phosphorus, field_size)
             self._add_infiltrated_phosphorus_to_soil(inorganic_phosphorus, field_size)
 
-        if self.data.grazing_manure.manure_dry_mass > 0 and self.data.grazing_manure.manure_field_coverage > 0:
+        if self.data.grazing_manure.determine_phosphorus_leach():
             organic_phosphorus, inorganic_phosphorus = self.data.grazing_manure.leach_phosphorus_pools(
                 rainfall, runoff, field_size
             )

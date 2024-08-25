@@ -756,3 +756,14 @@ class ManurePool:
             * (1 / GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS)
             * distribution_factor
         )
+
+    def determine_phosphorus_leach(self) -> bool:
+        """
+        Determine if phosphorus leaching operations should run.
+
+        Returns
+        -------
+        bool
+            The status to determine if phosphorus leaching should run.
+        """
+        return self.manure_dry_mass > 0 and self.manure_field_coverage > 0
