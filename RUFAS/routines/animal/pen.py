@@ -18,6 +18,7 @@ from RUFAS.routines.animal.manure.general_manure import (
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from ...enums import AnimalCombination
 from ...data_structures.pen_manure_data import PenManureData
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 
 om = OutputManager()
 
@@ -199,6 +200,8 @@ class Pen:
                 the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
             max_stocking_density : float
                 maximum stocking density allowed for pen
+            animal_grouping_scenario : AnimalGroupingScenario
+                the animal grouping scenario for the pen
         """
         self.id = pen_id
 
@@ -299,6 +302,12 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
+        # the animal_grouping_scenario in this pen, utilizes the AnimalGroupingScenario Enum
+        if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
+            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
+        else:
+            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
+
     @property
     def current_stocking_density(self) -> float:
         """
@@ -391,7 +400,7 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
+    # # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
     def update_classes_in_pen(self) -> None:
         """
         Updates the classes contained within the pen
