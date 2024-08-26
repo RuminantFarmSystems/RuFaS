@@ -84,45 +84,97 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
     "report_data, aggregator_key, expected",
     [
         # Tests with sum aggregator
-        ({"a": [1, 2], "b": [3, 4]}, "sum", {"a": [3], "b": [7]}),
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "sum", {"a": [6], "b": [15]}),
+        (
+            {"a": [1, 2], "b": [3, 4]},
+            "sum",
+            ({"a": [3], "b": [7]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
+        (
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            "sum",
+            ({"a": [6], "b": [15]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
         # Tests with product aggregator
-        ({"a": [1, 2], "b": [3, 4]}, "product", {"a": [2], "b": [12]}),
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "product", {"a": [6], "b": [120]}),
+        (
+            {"a": [1, 2], "b": [3, 4]},
+            "product",
+            ({"a": [2], "b": [12]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
+        (
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            "product",
+            ({"a": [6], "b": [120]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
         # Tests with average aggregator
-        ({"a": [1, 2, 3], "b": [4, 5, 6]}, "average", {"a": [2.0], "b": [5.0]}),
-        ({"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]}, "average", {"a": [2.5], "b": [6.5]}),
+        (
+            {"a": [1, 2, 3], "b": [4, 5, 6]},
+            "average",
+            ({"a": [2.0], "b": [5.0]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
+        (
+            {"a": [1, 2, 3, 4], "b": [5, 6, 7, 8]},
+            "average",
+            ({"a": [2.5], "b": [6.5]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
         # Tests with division aggregator
-        ({"a": [8, 4], "b": [2, 1]}, "division", {"a": [2.0], "b": [2.0]}),
-        ({"a": [8, 4, 2], "b": [2, 1, 1]}, "division", {"a": [1.0], "b": [2.0]}),
+        (
+            {"a": [8, 4], "b": [2, 1]},
+            "division",
+            ({"a": [2.0], "b": [2.0]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
+        (
+            {"a": [8, 4, 2], "b": [2, 1, 1]},
+            "division",
+            ({"a": [1.0], "b": [2.0]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
         # Tests with standard deviation aggregator
         (
             {"a": [10, 12, 23, 23], "b": [17, 15, 22, 20]},
             "SD",
-            {"a": [6.041522986797286], "b": [2.692582403567252]},
+            (
+                {"a": [6.041522986797286], "b": [2.692582403567252]},
+                [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}],
+            ),
         ),
         (
             {"a": [10, 12, 23, 23, 23], "b": [17, 15, 22, 20, 20]},
             "SD",
-            {"a": [5.912698199637793], "b": [2.481934729198171]},
+            (
+                {"a": [5.912698199637793], "b": [2.481934729198171]},
+                [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}],
+            ),
         ),
-        # Test with empty data
-        ({"a": [], "b": []}, "sum", {"a": [0], "b": [0]}),
         # Test with None values in data
-        ({"a": [1, None], "b": [None, 4]}, "sum", {"a": [1], "b": [4]}),
+        (
+            {"a": [1, None], "b": [None, 4]},
+            "sum",
+            ({"a": [1], "b": [4]}, [{"mock_log": "mock_log_msg"}, {"mock_log": "mock_log_msg"}]),
+        ),
     ],
 )
 def test_apply_vertical_aggregation(
-    report_data: Dict[str, List[float]], aggregator_key: str, expected: Dict[str, List[float]], mocker: MockerFixture
+    report_data: dict[str, list[float]],
+    aggregator_key: str,
+    expected: tuple[dict[str, list[float]], list[dict[str, str]]],
+    mocker: MockerFixture,
 ) -> None:
     """
-    Unit test for _apply_vertical_aggregation() static method in report_generator.py file.
+    Unit test for _apply_vertical_aggregation() method in report_generator.py file.
     """
 
     # Arrange
     aggregator = AGGREGATION_FUNCTIONS[aggregator_key]
     mock_time = mocker.MagicMock()
     report_generator = ReportGenerator(time=mock_time)
+
+    mocker.patch.object(
+        report_generator,
+        "_handle_aggregation_errors",
+        side_effect=[
+            (expected[0]["a"][0], {"mock_log": "mock_log_msg"}),
+            (expected[0]["b"][0], {"mock_log": "mock_log_msg"}),
+        ],
+    )
 
     # Act
     result = report_generator._apply_vertical_aggregation(report_data, aggregator)
@@ -334,12 +386,12 @@ def test_validate_constants(
                     {
                         "warning": "report_generation_warning",
                         "message": "No matching GeneralConstant found for filter constant SomeConstant.",
-                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                        "info_map": {"class": "ReportGenerator", "function": "_add_units_to_constants"},
                     },
                     {
                         "warning": "report_generation_warning",
                         "message": "No matching GeneralConstant found for filter constant AnotherConstant.",
-                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                        "info_map": {"class": "ReportGenerator", "function": "_add_units_to_constants"},
                     },
                 ],
             ),
@@ -354,7 +406,7 @@ def test_validate_constants(
                 {"UnknownConstant_(unit_not_found)": 100},
                 [
                     {
-                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                        "info_map": {"class": "ReportGenerator", "function": "_add_units_to_constants"},
                         "message": "No matching GeneralConstant found for filter constant " "UnknownConstant.",
                         "warning": "report_generation_warning",
                     }
@@ -485,7 +537,7 @@ def test_perform_aggregations(
     ],
 )
 def test_route_aggregator_functions(
-    report_data: dict[str, list[Any]],
+    report_data: dict[str, dict[str, list[Any]]],
     filter_content: dict[str, Any],
     horizontal_agg_key: str,
     vertical_agg_key: str,
@@ -523,8 +575,8 @@ def test_update_key(key: str, expected: str) -> None:
     "numerator1, denominator1, numerator2, denominator2, operation, expected_numerator, expected_denominator,"
     "expected_logs",
     [
-        ({"m": 1}, {"s": -1}, {"m": 1}, {"s": -1}, "product", {"m": 2}, {"s": -2}, []),
-        ({"m": 1}, {"s": -1}, {"s": -1}, {"m": 1}, "division", {"m": 2}, {"s": -2}, []),
+        ({"m": 1}, {"s": -1}, {"m": 1}, {"s": -1}, "product", {"m": 2}, {"s": -2}, {}),
+        ({"m": 1}, {"s": -1}, {"s": -1}, {"m": 1}, "division", {"m": 2}, {"s": -2}, {}),
         (
             {"m": 1},
             {"ks": -1},
@@ -533,16 +585,14 @@ def test_update_key(key: str, expected: str) -> None:
             "sum",
             {"m": 1},
             {"ks": -1},
-            [
-                {
-                    "warning": "Report Generator Units Warning",
-                    "message": "Report units do not match for operation sum.",
-                    "info_map": {"class": "type", "function": "_combine_units"},
-                }
-            ],
+            {
+                "warning": "Report Generator Units Warning",
+                "message": "Report units do not match for operation sum.",
+                "info_map": {"class": "type", "function": "_combine_units"},
+            },
         ),
-        ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "product", {"kg": 1}, {"s": -1}, []),
-        ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "division", {"m": 2}, {"s": -1, "kg": 1}, []),
+        ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "product", {"kg": 1}, {"s": -1}, {}),
+        ({"m": 1}, {"s": -1}, {"kg": 1}, {"m": 1}, "division", {"m": 2}, {"s": -1, "kg": 1}, {}),
         (
             {"km": 1},
             {"s": -1},
@@ -551,13 +601,11 @@ def test_update_key(key: str, expected: str) -> None:
             "subtraction",
             {"km": 1},
             {"s": -1},
-            [
-                {
-                    "warning": "Report Generator Units Warning",
-                    "message": "Report units do not match for operation subtraction.",
-                    "info_map": {"class": "type", "function": "_combine_units"},
-                }
-            ],
+            {
+                "warning": "Report Generator Units Warning",
+                "message": "Report units do not match for operation subtraction.",
+                "info_map": {"class": "type", "function": "_combine_units"},
+            },
         ),
         (
             {"km": 1},
@@ -567,14 +615,12 @@ def test_update_key(key: str, expected: str) -> None:
             "bad_aggregator_function",
             {"km": 1},
             {"s": -1},
-            [
-                {
-                    "warning": "Report Generator Aggregator Operation Warning",
-                    "message": "Aggregator operation bad_aggregator_function does not match any current "
-                    "aggregator functions: ['average', 'division', 'product', 'SD', 'sum', 'subtraction'].",
-                    "info_map": {"class": "type", "function": "_combine_units"},
-                }
-            ],
+            {
+                "warning": "Report Generator Aggregator Operation Warning",
+                "message": "Aggregator operation bad_aggregator_function does not match any current "
+                "aggregator functions: ['average', 'division', 'product', 'SD', 'sum', 'subtraction'].",
+                "info_map": {"class": "type", "function": "_combine_units"},
+            },
         ),
     ],
 )
@@ -586,7 +632,7 @@ def test_combine_units(
     operation: str,
     expected_numerator: dict[str, int],
     expected_denominator: dict[str, int],
-    expected_logs: list[Any],
+    expected_logs: dict[str, str | dict[str, str]],
 ) -> None:
     generator = ReportGenerator()
     simplify_units = True
@@ -597,8 +643,8 @@ def test_combine_units(
     f" expected numerator {expected_numerator} but got {result_numerator}"
     assert result_denominator == expected_denominator, f"For operation '{operation}', "
     f"expected denominator {expected_denominator} but got {result_denominator}"
-    assert result_logs == expected_logs, f"For operation '{operation}', expected logs {expected_logs} "
-    f"but got {result_logs}"
+    assert result_logs == expected_logs, f"For operation '{operation}', expected logs {expected_logs}"
+    f" but got {result_logs}"
 
 
 @pytest.mark.parametrize(
@@ -613,7 +659,7 @@ def test_combine_units(
             {"horizontal_first": True, "display_units": False},
             ([10], "units", []),
             21,
-            ({"hor_ver_agg": [10]}, []),
+            ({"hor_ver_agg": [21]}, [{"mock_log": "mock_log_msg"}]),
         ),
         (
             # Test case 2: Vertical first with sum aggregations
@@ -622,8 +668,18 @@ def test_combine_units(
             "sum",
             {"horizontal_first": False, "display_units": False},
             None,
-            {"col1": [5], "col2": [7]},
-            ({"ver_hor_agg": [12]}, []),
+            ({"col1": [5], "col2": [7]}, []),
+            (
+                {
+                    "ver_hor_agg": [
+                        (
+                            {"col1": [5], "col2": [7]},
+                            [{"mock_log": "mock_log_msg"}, {"mock_units_log": "mock_units_msg"}],
+                        )
+                    ]
+                },
+                [{"mock_log": "mock_log_msg"}, {"mock_units_log": "mock_units_msg"}],
+            ),
         ),
         (
             # Test case 3: horizontal first with sum aggregations, displays units
@@ -633,7 +689,16 @@ def test_combine_units(
             {"horizontal_first": True, "display_units": True},
             None,
             {"col1_(kg)": [5], "col2_(Mj)": [7]},
-            ({"hor_ver_agg_(dummy_units)": [21]}, []),
+            (
+                {"hor_ver_agg_(dummy_units)": [{"col1_(kg)": [5], "col2_(Mj)": [7]}]},
+                [
+                    {"mock_log": "mock_log_msg"},
+                    {"mock_log": "mock_log_msg"},
+                    {"mock_log": "mock_log_msg"},
+                    {"mock_units_log": "mock_units_msg"},
+                    {"mock_log": "mock_log_msg"},
+                ],
+            ),
         ),
         (
             # Test case 2: Vertical first with sum aggregations
@@ -642,8 +707,18 @@ def test_combine_units(
             "sum",
             {"horizontal_first": False, "display_units": True},
             None,
-            {"col1": [5], "col2": [7]},
-            ({"ver_hor_agg_(dummy_units)": [12]}, []),
+            ({"col1": [5], "col2": [7]}, []),
+            (
+                {
+                    "ver_hor_agg_(dummy_units)": [
+                        (
+                            {"col1": [5], "col2": [7]},
+                            [{"mock_log": "mock_log_msg"}, {"mock_units_log": "mock_units_msg"}],
+                        )
+                    ]
+                },
+                [{"mock_log": "mock_log_msg"}, {"mock_units_log": "mock_units_msg"}],
+            ),
         ),
     ],
 )
@@ -658,12 +733,14 @@ def test_handle_horizontal_and_vertical_aggregations(
     mocker: MockerFixture,
 ) -> None:
     report_generator = ReportGenerator()
-    aggregate_units_return: tuple[str, list[Any]] = ("dummy_units", [])
+    aggregate_units_return: tuple[str, dict[str, str]] = ("dummy_units", {"mock_units_log": "mock_units_msg"})
 
     mocker.patch.object(
         report_generator, "_get_horizontal_first_value", return_value=filter_content["horizontal_first"]
     )
-
+    mocker.patch.object(
+        report_generator, "_handle_aggregation_errors", return_value=(mock_vertical_agg, {"mock_log": "mock_log_msg"})
+    )
     if mock_horizontal_agg is not None:
         mocker.patch.object(report_generator, "_apply_horizontal_aggregation", return_value=mock_horizontal_agg)
 
@@ -1260,17 +1337,17 @@ def test_add_var_units(
 @pytest.mark.parametrize(
     "report_data, aggregator, simplify_units, expected_output, raises_error",
     [
-        ({"temperature (Celsius)": [23.0, 24.0, 25.0]}, sum, False, ("Celsius", []), False),
-        ({"pressure (Pascal)": [101325.0, 101300.0]}, sum, False, ("Pascal", []), False),
-        ({"wind_speed (m/s)": [10.0, 12.0, 15.0]}, sum, False, ("m/s", []), False),
-        ({}, sum, False, ("", []), True),
+        ({"temperature (Celsius)": [23.0, 24.0, 25.0]}, sum, False, ("Celsius", {}), False),
+        ({"pressure (Pascal)": [101325.0, 101300.0]}, sum, False, ("Pascal", {}), False),
+        ({"wind_speed (m/s)": [10.0, 12.0, 15.0]}, sum, False, ("m/s", {}), False),
+        ({}, sum, False, ("", {}), True),
     ],
 )
 def test_aggregate_units(
     report_data: dict[str, list[float]],
     aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
     simplify_units: bool,
-    expected_output: tuple[str, list[dict[str, str | Dict[str, str]]]],
+    expected_output: tuple[str | Any, dict[str, str | dict[str, str]]],
     raises_error: bool,
 ) -> None:
     report_generator = ReportGenerator()
@@ -1301,3 +1378,79 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
     """
     report_generator = ReportGenerator()
     assert report_generator._normalize_constant_name(input_name) == expected_output
+
+
+@pytest.mark.parametrize(
+    "aggregator, data, key, expected_result, expected_log",
+    [
+        # Test with valid data and no errors
+        (sum_aggregator, [1.0, 2.0, 3.0], "valid_key", 6.0, {}),
+        # Test with None value in data
+        (
+            sum_aggregator,
+            [1.0, None, 3.0],
+            "none_key",
+            None,
+            {
+                "error": "ReportGenerator aggregation error",
+                "message": "Encountered unaggregatable values in none_key data, returning None instead.",
+                "info_map": {
+                    "class": "ReportGenerator",
+                    "function": "_handle_aggregation_errors",
+                },
+            },
+        ),
+        # Test with NaN value in data
+        (
+            sum_aggregator,
+            [1.0, float("nan"), 3.0],
+            "nan_key",
+            None,
+            {
+                "error": "ReportGenerator aggregation error",
+                "message": "Encountered unaggregatable values in nan_key data, returning None instead.",
+                "info_map": {
+                    "class": "ReportGenerator",
+                    "function": "_handle_aggregation_errors",
+                },
+            },
+        ),
+        # Test with empty data
+        (sum_aggregator, [], "empty_key", 0, {}),
+        # Test with exception in aggregator
+        (
+            lambda x: x[0] / 0,  # Aggregator that raises an error
+            [1.0, 2.0, 3.0],
+            "key",
+            None,
+            {
+                "error": "ReportGenerator aggregation error",
+                "message": "Error during aggregation of key data: float division by zero, returning None instead.",
+                "info_map": {
+                    "class": "ReportGenerator",
+                    "function": "_handle_aggregation_errors",
+                },
+            },
+        ),
+    ],
+)
+def test_handle_aggregation_errors(
+    aggregator: Callable[[List[float]], float],
+    data: dict[str, list[float | None]],
+    key: str,
+    expected_result: dict[str, list[float | None] | float | None],
+    expected_log: Dict[str, str | Dict[str, str]],
+) -> None:
+    """
+    Unit test for the _handle_aggregation_errors method in ReportGenerator.
+    """
+
+    # Arrange
+    report_generator = ReportGenerator()
+
+    # Act
+    result, log = report_generator._handle_aggregation_errors(aggregator, data, key)
+
+    # Assert
+    assert result == expected_result
+    assert log == expected_log
