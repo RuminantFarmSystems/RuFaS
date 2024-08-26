@@ -40,10 +40,12 @@ def task_manager(mock_output_manager: MagicMock) -> TaskManager:
     ],
 )
 def test_task_type_from_string(input_str: str, expected: TaskType) -> None:
+    """Unit test for TaskType.from_string() with valid task types"""
     assert TaskType.from_string(input_str) == expected
 
 
 def test_invalid_task_type_from_string() -> None:
+    """Unit test for TaskType.from_string() with invalid task type"""
     with pytest.raises(ValueError):
         TaskType.from_string("non existing task type")
 
@@ -52,6 +54,7 @@ def test_task_manager_init(
         task_manager: TaskManager,
         mock_output_manager: Generator[Any, Any, Any],
 ) -> None:
+    """Unit test for TaskManager.__init__()"""
     assert task_manager.output_manager is mock_output_manager
 
 
@@ -82,6 +85,7 @@ def test_task_manager_start(
         mocker: MockerFixture,
         mock_output_manager: Generator[Any, Any, Any],
 ) -> None:
+    """Unit test for TaskManager.start()"""
     mock_task_manager = TaskManager()
     mock_parse_input_tasks = mocker.patch.object(mock_task_manager, "_parse_input_tasks", return_value=([{}], [{}]))
     mock_expand_multi_runs_to_single_runs = mocker.patch.object(
@@ -141,6 +145,7 @@ def test_task_manager_start(
 
 
 def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Unit test for TaskManager.start() with exception raised"""
     mock_task_manager = TaskManager()
     mock_input_manager = InputManager()
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
@@ -164,6 +169,7 @@ def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager
 
 
 def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Unit test for TaskManager.set_random_seed() with no specified random seed."""
     TaskManager.set_random_seed(1234, mock_output_manager)
     mock_output_manager.add_log.assert_called_with(
         "Random seed used",
@@ -173,6 +179,7 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
 
 
 def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Unit test for TaskManager.set_random_seed() when 0 is passed as random seed."""
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(0, mock_output_manager)
         mock_randint.assert_called_once_with(0, 2 ** 32 - 1)
@@ -187,6 +194,7 @@ def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> 
 def test_set_random_seed_with_parameters(
         seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
 ) -> None:
+    """Unit test for TaskManager.set_random_seed() with specified random seed."""
     with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
         TaskManager.set_random_seed(seed, mock_output_manager)
         if seed == 0:
@@ -199,6 +207,7 @@ def test_set_random_seed_with_parameters(
 
 
 def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> None:
+    """Unit test for TaskManager._parse_input_tasks()"""
     task_data = [
         {
             "task_type": "Herd Initialization",
@@ -245,6 +254,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
 
 
 def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
+    """Unit test for TaskManager._expand_multi_runs_to_single_runs()"""
     multi_run_args = [{"task_type": TaskType.SIMULATION_MULTI_RUN, "multi_run_counts": 3, "output_prefix": "sim"}]
     results = task_manager._expand_multi_runs_to_single_runs(multi_run_args)
     assert len(results) == 3
@@ -258,6 +268,7 @@ def test_handle_post_processing(
         suppress_logs: bool,
         mocker: MockerFixture,
 ) -> None:
+    """Unit test for TaskManager.handle_post_processing()"""
     args = {
         "filters_directory": Path("/fake/filters"),
         "exclude_info_maps": False,
@@ -351,6 +362,7 @@ def test_input_data_audit(
         mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool,
         mocker: MockerFixture
 ) -> None:
+    """Unit test for TaskManager.handle_input_data_audit()"""
     args = {
         "metadata_file_path": Path("/fake/metadata"),
         "output_prefix": "test",
@@ -427,6 +439,7 @@ def test_task(
 
 
 def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Unit test for TaskManager.task() with invalid data"""
     task_manager = TaskManager()
     mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
 
@@ -518,6 +531,7 @@ def test_handle_herd_initialization(
         mock_output_manager: Generator[Any, Any, Any],
         mocker: MockerFixture,
 ) -> None:
+    """Unit test for TaskManager.handle_herd_initializaition()"""
     args = {"init_herd": init_herd, "save_animals": save_animals, "save_animals_directory": save_animals_directory}
 
     with patch("RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory") as mock_herd_factory:
@@ -544,6 +558,7 @@ def test_handle_herd_initialization(
 def test_single_simulation_run(
         task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
 ) -> None:
+    """Unit test for TaskManager.handle_single_simulation_run()"""
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
 
     args = {}
@@ -628,6 +643,7 @@ def test_herd_init_tasks() -> None:
 
 
 def test_expand_end_to_end_testing_args() -> None:
+    """Unit test for TaskManager._expand_end_to_end_testing_args()"""
     task_manager = TaskManager()
     result = task_manager._expand_end_to_end_testing_args({})
     assert result == []
