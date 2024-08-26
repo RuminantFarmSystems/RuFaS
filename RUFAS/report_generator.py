@@ -738,7 +738,7 @@ class ReportGenerator:
                 aggregate_report, loop_list, horizontal_aggregator, simplify_units
             )
             vertically_aggregated_data, aggregation_log = self._handle_aggregation(
-                vertical_aggregator, horizontally_aggregated, next(iter(aggregate_report))
+                vertical_aggregator, horizontally_aggregated, str(list(aggregate_report.keys()))
             )
             if aggregation_log:
                 event_logs.append(aggregation_log)
@@ -751,7 +751,7 @@ class ReportGenerator:
             ver_hor_aggregated = []
             for elements in zip(*vertically_aggregated.values()):
                 horizontally_aggregated_data, aggregation_log = self._handle_aggregation(
-                    horizontal_aggregator, list(elements), next(iter(aggregate_report))
+                    horizontal_aggregator, list(elements), str(list(aggregate_report.keys()))
                 )
                 if aggregation_log:
                     event_logs.append(aggregation_log)
@@ -843,7 +843,7 @@ class ReportGenerator:
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             horizontally_aggregated_data, aggregation_log = self._handle_aggregation(
-                aggregator, temp_data, next(iter(report_data))
+                aggregator, temp_data, str(list(report_data.keys()))
             )
             if aggregation_log:
                 event_logs.append(aggregation_log)
