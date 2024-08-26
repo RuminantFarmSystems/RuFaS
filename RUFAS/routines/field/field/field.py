@@ -1431,29 +1431,20 @@ class Field:
         -------
         float
             Amount of water that reaches the soil surface (mm)
-
+        
         Notes
         -----
         This method accounts for the edge case that no water was lost from the crop canopy yesterday and the capacity in
         the canopy went down overnight, so water is lost from the canopy to the ground before any evapotranspiration can
         happen. A caveat is that if there is excess water in the canopy of one crop, it cannot be transferred to the
         canopy of another.
-
         """
         precipitation_reaching_soil = precipitation_total
         excess_canopy_water = 0
 
         for crop in self.crops:
-            canopy_water_excess_capacity = crop.get_canopy_water_excess_capacity()
-
-            excess_water_in_canopy = crop.calculate_canopy_excess_water(canopy_water_excess_capacity)
-            excess_canopy_water += -excess_water_in_canopy
-
-            crop.adjust_canopy_water_for_excess(excess_water_in_canopy)
-
-            precipitation_reaching_soil = crop.store_water_in_canopy(
-                canopy_water_excess_capacity, precipitation_reaching_soil
-            )
+            precipitation_reaching_soil, excess_water = crop.handle_water_in_canopy(precipitation_reaching_soil)
+            excess_canopy_water += excess_water
 
         return precipitation_reaching_soil + excess_canopy_water
 

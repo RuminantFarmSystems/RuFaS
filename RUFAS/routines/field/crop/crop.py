@@ -155,65 +155,36 @@ class Crop:
             self._data.cumulative_potential_evapotranspiration = 0.0
             self._data.cumulative_water_uptake = 0.0
 
-    def get_canopy_water_excess_capacity(self) -> float:
+    def handle_water_in_canopy(self, precipitation_reaching_soil: float) -> tuple:
         """
-        Returns the excess capacity of the canopy water storage.
-        This is the difference between the storage capacity and the current water stored in the canopy.
-
-        Returns
-        -------
-        float
-            The excess capacity in the canopy (can be negative if over capacity).
-        """
-        return self._data.water_canopy_storage_capacity - self._data.canopy_water
-
-    def calculate_canopy_excess_water(self, canopy_water_excess_capacity: float) -> float:
-        """
-        Calculates the excess water in the canopy based on the canopy storage capacity.
+        Handles the water addition to the crop's canopy and calculates excess water.
 
         Parameters
         ----------
-        canopy_water_excess_capacity : float
-            The excess capacity of the canopy.
+        precipitation_reaching_soil : float
+            Amount of water available to reach the soil after considering other crops.
 
         Returns
         -------
-        float
-            The excess water in the canopy (negative if there is excess).
+        tuple
+            A tuple containing:
+                - Amount of precipitation that reaches the soil after this crop (float)
+                - Excess water that could not be stored in the canopy (float)
         """
-        return min(0.0, canopy_water_excess_capacity)
+        canopy_water_excess_capacity = self._data.water_canopy_storage_capacity - self._data.canopy_water
 
-    def adjust_canopy_water_for_excess(self, excess_water_in_canopy: float) -> None:
-        """
-        Adjusts the canopy water based on the calculated excess.
-
-        Parameters
-        ----------
-        excess_water_in_canopy : float
-            The excess water in the canopy to adjust (negative value).
-        """
+        excess_water_in_canopy = min(0.0, canopy_water_excess_capacity)
         if excess_water_in_canopy != 0.0:
             self._data.canopy_water = self._data.water_canopy_storage_capacity
 
-    def store_water_in_canopy(self, canopy_water_excess_capacity: float, precipitation_reaching_soil: float) -> float:
-        """
-        Stores water in the canopy and returns the amount of precipitation that remains to reach the soil.
-
-        Parameters
-        ----------
-        canopy_water_excess_capacity : float
-            The excess capacity of the canopy (mm).
-        precipitation_reaching_soil : float
-            Amount of precipitation available to be stored in the canopy (mm).
-
-        Returns
-        -------
-        float
-            The amount of precipitation left after storing in the canopy (mm).
-        """
-        water_taken_to_be_stored = min(precipitation_reaching_soil, max(0.0, canopy_water_excess_capacity))
+        water_taken_to_be_stored = max(0.0, canopy_water_excess_capacity)
+        water_taken_to_be_stored = min(precipitation_reaching_soil, water_taken_to_be_stored)
         self._data.canopy_water += water_taken_to_be_stored
-        return precipitation_reaching_soil - water_taken_to_be_stored
+
+        precipitation_reaching_soil -= water_taken_to_be_stored
+        excess_canopy_water = -1 * excess_water_in_canopy
+
+        return precipitation_reaching_soil, excess_canopy_water
 
     def evaporate_from_canopy(self, evapotranspirative_demand: float) -> float:
         """
