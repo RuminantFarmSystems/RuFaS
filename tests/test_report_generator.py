@@ -386,12 +386,12 @@ def test_validate_constants(
                     {
                         "warning": "report_generation_warning",
                         "message": "No matching GeneralConstant found for filter constant SomeConstant.",
-                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                        "info_map": {"class": "ReportGenerator", "function": "_add_units_to_constants"},
                     },
                     {
                         "warning": "report_generation_warning",
                         "message": "No matching GeneralConstant found for filter constant AnotherConstant.",
-                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                        "info_map": {"class": "ReportGenerator", "function": "_add_units_to_constants"},
                     },
                 ],
             ),
@@ -406,7 +406,7 @@ def test_validate_constants(
                 {"UnknownConstant_(unit_not_found)": 100},
                 [
                     {
-                        "info_map": {"class": "ReportGenerator", "function": "generate_report"},
+                        "info_map": {"class": "ReportGenerator", "function": "_add_units_to_constants"},
                         "message": "No matching GeneralConstant found for filter constant " "UnknownConstant.",
                         "warning": "report_generation_warning",
                     }
@@ -1390,7 +1390,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             sum_aggregator,
             [1.0, None, 3.0],
             "none_key",
-            None,
+            {},
             {
                 "error": "ReportGenerator aggregation error",
                 "message": "Encountered unaggregatable values in none_key data, returning None instead.",
@@ -1405,7 +1405,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             sum_aggregator,
             [1.0, float("nan"), 3.0],
             "nan_key",
-            None,
+            {},
             {
                 "error": "ReportGenerator aggregation error",
                 "message": "Encountered unaggregatable values in nan_key data, returning None instead.",
@@ -1422,7 +1422,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             lambda x: x[0] / 0,  # Aggregator that raises an error
             [1.0, 2.0, 3.0],
             "key",
-            None,
+            {},
             {
                 "error": "ReportGenerator aggregation error",
                 "message": "Error during aggregation of key data: float division by zero, returning None instead.",

@@ -553,7 +553,7 @@ class ReportGenerator:
         report_data: dict[str, list[float]],
         aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
         simplify_units: bool,
-    ) -> tuple[str, list[dict[str, str | dict[str, str]]]]:
+    ) -> tuple[str | Any, dict[str, str | dict[str, str]]]:
         """Creates the appropriate units for the associated aggregator function used.
 
         Parameters
@@ -675,17 +675,17 @@ class ReportGenerator:
 
     def _handle_horizontal_and_vertical_aggregations(
         self,
-        aggregate_report: Dict[str, List[Any]],
+        aggregate_report: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
         horizontal_agg_key: str,
         vertical_agg_key: str,
-        filter_content: Dict[str, Any],
+        filter_content: dict[str, Any],
     ) -> tuple[dict[str, list[Any]], list[dict[str, str | dict[str, str]]]]:
         """
         Handles both horizontal and vertical aggregations on the report data.
 
         Parameters
         ----------
-        aggregate_report : Dict[str, List[Any]]
+        aggregate_report : dict[str, dict[str, list[Any]]] | dict[str, list[Any]]
             The report data to be aggregated.
         horizontal_agg_key : str
             The key for the horizontal aggregation function.
@@ -813,9 +813,8 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
-            non_null_data_points = list(filter(lambda x: x is not None, temp_data))
             horizontally_aggregated_data, aggregation_log = self._handle_aggregation_errors(
-                aggregator, non_null_data_points, next(iter(report_data))
+                aggregator, temp_data, next(iter(report_data))
             )
             if aggregation_log:
                 event_logs.append(aggregation_log)
@@ -845,16 +844,15 @@ class ReportGenerator:
 
         Returns
         -------
-        Dict[str, List[float]]
-            The vertically aggregated data as a dictionary of lists.
+        tuple[dict[str, list[float]], list[dict[str, str]]]
+            The vertically aggregated data as a dictionary of lists and the logs to be passed to OutputManager.
         """
 
         aggregated_data: dict[str, list[float | None]] = {}
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for key, data in report_data.items():
-            non_null_data_points = list(filter(lambda x: x is not None, data))
             vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(
-                aggregator, non_null_data_points, key
+                aggregator, data, key
             )
             if aggregation_log:
                 event_logs.append(aggregation_log)
@@ -885,7 +883,7 @@ class ReportGenerator:
             Returns None and an error message if the data contains None or NaN values.
         """
         aggregated_data = {}
-        if any(x is None or math.isnan(x) for x in data):
+        if any(not isinstance(x, (int, float)) or math.isnan(x) for x in data):
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self._handle_aggregation_errors.__name__,
@@ -1004,6 +1002,8 @@ class ReportGenerator:
                 event_logs.append(constant_units_warning)
             if matching_constant:
                 unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
+            else:
+                unit_for_constant = "unit_not_found"
             constant_with_units = f"{name}_({unit_for_constant})"
             updated_constants_config[constant_with_units] = constants_config[name]
 
