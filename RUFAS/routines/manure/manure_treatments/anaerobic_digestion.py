@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Tuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
@@ -11,12 +12,16 @@ from RUFAS.routines.manure.gas_emissions.calculator import (
 from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
     BaseManureTreatment,
 )
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
     ManureTreatmentDailyOutput,
 )
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
+from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class AnaerobicDigestion(BaseManureTreatment):
@@ -26,6 +31,16 @@ class AnaerobicDigestion(BaseManureTreatment):
         Same as BaseManureTreatment.
 
     """
+
+    def __init__(
+        self,
+        weather: Weather,
+        time: Time,
+        manure_treatment_config: ManureTreatmentConfig | Tuple[ManureTreatmentConfig, ManureTreatmentConfig],
+    ) -> None:
+        super().__init__(weather, time, manure_treatment_config)
+
+        self.om = OutputManager()
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         """Updates the daily output from anaerobic digestion.
@@ -96,19 +111,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         ) * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
         AD_VS_destruction = total_methane_generation_mass + AD_carbon_dioxide
 
-        new_daily_output.liquid_manure_total_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_solids - AD_VS_destruction
-        )
-        new_daily_output.liquid_manure_total_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids - AD_VS_destruction
-        )
-        new_daily_output.liquid_manure_total_degradable_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            - AD_VS_destruction
-        )
-        new_daily_output.liquid_manure_total_non_degradable_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
-        )
+        self._recalculate_solids_after_destruction(AD_VS_destruction, new_daily_output)
 
         new_daily_output.daily_final_manure_volume = (
             self._current_manure_treatment_daily_input.liquid_manure_daily_volume
@@ -171,6 +174,66 @@ class AnaerobicDigestion(BaseManureTreatment):
             self.config.anaerobic_digestion_temperature_set_point - effluent_temperature
         )
         return heating_input_energy
+
+    def _recalculate_solids_after_destruction(
+        self, volatile_solids_destruction: float, manure_output: ManureTreatmentDailyOutput
+    ) -> None:
+        """
+        Adjusts the pools of solids in the manure after volatile solids are destroyed.
+
+        Parameters
+        ----------
+        volatile_solids_destruction : float
+            Amount of volatile solids removed from the manure (kg).
+        manure_output : ManureTreatmentDailyOutput
+            ManureTreatmentDailyOutput which will have the solids pools after accounting for volatile solids
+            destruction.
+
+        """
+        info_map = {"class": self.__class__.__name__, "function": self._recalculate_solids_after_destruction.__name__}
+        degradable_volatile_solids_fraction = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            / self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
+        )
+
+        degradable_volatile_solids_after_destruction = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+            - (volatile_solids_destruction * degradable_volatile_solids_fraction)
+        )
+        if degradable_volatile_solids_after_destruction < 0.0:
+            self.om.add_error(
+                "Anaerobic digestion attempted to destroy too many degradable volatile solids",
+                f"Degradable volatile solids mass would have been {degradable_volatile_solids_after_destruction}, "
+                "setting this value to 0",
+                info_map,
+            )
+            manure_output.liquid_manure_total_degradable_volatile_solids = 0.0
+        else:
+            manure_output.liquid_manure_total_degradable_volatile_solids = degradable_volatile_solids_after_destruction
+
+        non_degradable_volatile_solids_after_destruction = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            - (volatile_solids_destruction * (1 - degradable_volatile_solids_fraction))
+        )
+        if non_degradable_volatile_solids_after_destruction < 0.0:
+            self.om.add_error(
+                "Anaerobic digestion attempted to destroy too many non-degradable volatile solids",
+                "Non-degradable volatile solids mass would have been "
+                f"{non_degradable_volatile_solids_after_destruction}, setting this value to 0",
+                info_map,
+            )
+            manure_output.liquid_manure_total_non_degradable_volatile_solids = 0.0
+        else:
+            manure_output.liquid_manure_total_non_degradable_volatile_solids = (
+                non_degradable_volatile_solids_after_destruction
+            )
+
+        manure_output.liquid_manure_total_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_solids - volatile_solids_destruction
+        )
+        manure_output.liquid_manure_total_volatile_solids = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids - volatile_solids_destruction
+        )
 
     @classmethod
     def _bound_influent_temperature(cls, average_temperature_celsius: float) -> float:
