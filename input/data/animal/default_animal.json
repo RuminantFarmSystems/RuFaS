@@ -47,7 +47,7 @@
         "conception_rate_decrease": 0.026,
         "decrease_conception_rate_in_rebreeding": false,
         "decrease_conception_rate_by_parity": false,
-        "avg_gestation_len": 276,
+        "avg_gestation_len": 320,
         "std_gestation_len": 6,
         "prefresh_day": 21,
         "calving_interval": 400,
