@@ -77,7 +77,7 @@ class Dormancy:
             residue = self.data.biomass * self.data.dormancy_loss_fraction * (self.data.dry_matter_percentage / 100)
             nitrogen = residue * self.data.yield_nitrogen_fraction
             soil_data.crop_yield_nitrogen = nitrogen
-            soil_data.plant_surface_residue = residue
+            soil_data.soil_layers[0].plant_residue = residue
             soil_data.plant_residue_lignin_composition = self.data.lignin_dry_matter_percentage / 100
 
             self.data.biomass *= 1 - self.data.dormancy_loss_fraction
