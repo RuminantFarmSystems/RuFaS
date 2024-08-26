@@ -185,24 +185,6 @@ class Cow(HeiferIII):
             self.set_parity_index()
             self.set_lactation_curve_params()
 
-    def set_milking_management_attributes(self) -> None:
-        """
-        Checks if a cow should still be in milk based on the time she last bore a calf and when the farm's dry off day
-        is.
-        """
-        if not self.is_pregnant:
-            return
-        is_valid_milking_status = not self.milking and (self.days_in_preg < AnimalBase.config["days_in_preg_when_dry"])
-        if not is_valid_milking_status:
-            date_of_last_birth = self.events.get_most_recent_date(const.NEW_BIRTH)
-            self.days_in_milk = self.days_born - date_of_last_birth
-            self.milking = True
-            om.add_warning(
-                "Cow in initialization herd has dried off before reaching dry period of pregnancy",
-                f"Setting cow {self.id}'s milking status to true and days_in_milk to be {self.days_in_milk}",
-                {"class": self.__class__.__name__, "function": "__init__"}
-            )
-
     def get_cow_values(self) -> Dict[str, Any]:
         return {
             "id": self.id,
