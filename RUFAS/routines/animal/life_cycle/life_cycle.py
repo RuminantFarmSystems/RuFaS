@@ -242,15 +242,25 @@ class LifeCycleManager:
         """
         Corrects any attributes from cows entering the herd at initization for conditions incompatible with the
         user-specified management practices.
+
+        Parameters
+        ----------
+        cows : list[Cow]
+            Cow instances that need to be checked for invalid attribute/state combinations before the simulations
+            starts.
+
+        Returns
+        -------
+        list[Cow]
+            The list of Cow instances with their milking attributes checked and corrected.
+
         """
         for cow in cows:
             if not cow.is_pregnant:
                 continue
             is_milking_expected = cow.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]
-            valid_milking_status = cow.milking and is_milking_expected
-            valid_dry_status = not cow.milking and not is_milking_expected
-            should_set_to_milking = (not valid_milking_status or not valid_dry_status) and is_milking_expected
-            if should_set_to_milking:
+            valid_milking_status = cow.milking == is_milking_expected
+            if not valid_milking_status and is_milking_expected:
                 date_of_last_birth = cow.events.get_most_recent_date(animal_constants.NEW_BIRTH)
                 cow.days_in_milk = cow.days_born - date_of_last_birth
                 cow.milking = True
