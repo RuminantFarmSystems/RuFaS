@@ -47,9 +47,9 @@ def test_send_daily_variables(
         for index, layer in enumerate(field_2.soil.data.soil_layers):
             layer.percolated_water = percolated_waters[index]
         for index, crop in enumerate(field_1.crops):
-            crop.data.root_depth = root_depths[index]
+            crop._data.root_depth = root_depths[index]
         for index, crop in enumerate(field_2.crops):
-            crop.data.root_depth = root_depths[index]
+            crop._data.root_depth = root_depths[index]
         og.send_daily_variables()
     pool = om.variables_pool
 
