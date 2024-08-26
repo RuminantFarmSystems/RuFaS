@@ -32,7 +32,6 @@ NON_ALFALFA_FERMENTATION_CONSTANTS: dict[str, float] = {
     "loss_coefficient": 0.0193,
     "base_loss_fraction": 0.00864,
 }
-om = OutputManager()
 
 
 class Storage:
@@ -92,6 +91,7 @@ class Storage:
         self.adf_loss_coefficient = 0.0
         self.ndf_loss_coefficient = 0.0
         self.sugar_loss_coefficient = 0.0
+        self.om = OutputManager()
 
     @property
     def stored_mass(self) -> float:
@@ -183,7 +183,7 @@ class Storage:
 
             crop.last_time_degraded = copy.deepcopy(time)
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
-        om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
+        self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops(time.simulation_day)
 
     def give_feed(self, amount: float, crop_type: CropType) -> None:
@@ -239,37 +239,37 @@ class Storage:
             "units": MeasurementUnits.KILOGRAMS,
             "simulation_day": sim_day,
         }
-        om.add_variable("total_fresh_mass", self.stored_mass, info_map)
+        self.om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
         total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])
-        om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
+        self.om.add_variable("total_dry_matter_mass", total_dry_matter_mass, info_map)
 
         total_digestible_dry_matter = self._get_total_nutritive_amount("dry_matter_digestibility")
-        om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
+        self.om.add_variable("total_digestible_dry_matter", total_digestible_dry_matter, info_map)
 
         total_crude_protein = self._get_total_nutritive_amount("crude_protein_percent")
-        om.add_variable("total_crude_protein", total_crude_protein, info_map)
+        self.om.add_variable("total_crude_protein", total_crude_protein, info_map)
 
         total_non_protein_nitrogen = self._get_total_nutritive_amount("non_protein_nitrogen")
-        om.add_variable("total_non_protein_nitrogen", total_non_protein_nitrogen, info_map)
+        self.om.add_variable("total_non_protein_nitrogen", total_non_protein_nitrogen, info_map)
 
         total_starch = self._get_total_nutritive_amount("starch")
-        om.add_variable("total_starch", total_starch, info_map)
+        self.om.add_variable("total_starch", total_starch, info_map)
 
         total_adf = self._get_total_nutritive_amount("adf")
-        om.add_variable("total_adf", total_adf, info_map)
+        self.om.add_variable("total_adf", total_adf, info_map)
 
         total_ndf = self._get_total_nutritive_amount("ndf")
-        om.add_variable("total_ndf", total_ndf, info_map)
+        self.om.add_variable("total_ndf", total_ndf, info_map)
 
         total_lignin = self._get_total_nutritive_amount("lignin")
-        om.add_variable("total_lignin", total_lignin, info_map)
+        self.om.add_variable("total_lignin", total_lignin, info_map)
 
         total_sugar = self._get_total_nutritive_amount("sugar")
-        om.add_variable("total_sugar", total_sugar, info_map)
+        self.om.add_variable("total_sugar", total_sugar, info_map)
 
         total_ash = self._get_total_nutritive_amount("ash")
-        om.add_variable("total_ash", total_ash, info_map)
+        self.om.add_variable("total_ash", total_ash, info_map)
 
     def _get_total_nutritive_amount(self, nutrient_name: str) -> float:
         """
@@ -435,7 +435,7 @@ class Storage:
                 + f"{fraction_of_nutrient_in_lost_dry_matter}"
             )
             warning_message = "Calculating updated percentage of nutrient in stored crop dry matter to be 0"
-            om.add_warning(warning_title, warning_message, info_map)
+            self.om.add_warning(warning_title, warning_message, info_map)
             return 0.0
 
         updated_nutrient_fraction = (initial_nutrient_fraction - fraction_of_nutrient_in_lost_dry_matter) / (

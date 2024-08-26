@@ -7,14 +7,13 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-om = OutputManager()
-
 
 class Time:
     def __init__(self):
         """
         This object is responsible for creating and tracking time in the simulation.
         """
+        self.om = OutputManager()
         self.im = InputManager()
         self.config_data: Dict[str, str | int | bool] = self.im.get_data("config")
         self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], "%Y:%j")
@@ -93,14 +92,16 @@ class Time:
             "function": self.record_time.__name__,
             "prefix": "Time",
         }
-        om.add_variable("day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
-        om.add_variable(
+        self.om.add_variable(
+            "day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+        )
+        self.om.add_variable(
             "year", self.current_simulation_year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR})
         )
-        om.add_variable(
+        self.om.add_variable(
             "calendar_year", self.current_calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR})
         )
-        om.add_variable(
+        self.om.add_variable(
             "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
         )
 

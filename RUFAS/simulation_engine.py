@@ -17,8 +17,6 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 from .routines.EEE.EEE_manager import EEEManager
 
-om = OutputManager()
-
 
 class SimulationEngine:
     """
@@ -56,6 +54,7 @@ class SimulationEngine:
         """
         Initializes the simulation engine.
         """
+        self.om = OutputManager()
         self.im = InputManager()
         self.time = Time()
 
@@ -88,7 +87,7 @@ class SimulationEngine:
             "amount": MeasurementUnits.KILOGRAMS,
         }
         for available_feed in available_feeds_on_final_day:
-            om.add_variable(
+            self.om.add_variable(
                 "available_feeds_on_final_day",
                 available_feed,
                 dict(info_map, **{"units": available_feeds_units}),
@@ -96,10 +95,10 @@ class SimulationEngine:
         EEEManager.estimate_all()
         t_end_sim = timer.time()
 
-        om.add_log("Simulation complete", "Simulation Completed.", info_map)
+        self.om.add_log("Simulation complete", "Simulation Completed.", info_map)
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
-        om.add_log("total_simulation_time", total_simulation_time_log, info_map)
+        self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
     def _run_simulation_main_loop(self) -> None:
         """
@@ -175,7 +174,7 @@ class SimulationEngine:
         """
 
         weather_data = self.im.get_data("weather")
-        om.time = self.time
+        self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
         self.feed_manager = FeedManager()
 
@@ -188,7 +187,10 @@ class SimulationEngine:
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
-        self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
+        simulate_animals: bool = self.im.get_data("config.simulate_animals")
+        self.manure_manager = ManureManager(
+            all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
+        )
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
 
