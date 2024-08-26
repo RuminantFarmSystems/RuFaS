@@ -10,13 +10,12 @@ import seaborn as sns
 from RUFAS.input_manager import InputManager
 
 result = pd.DataFrame()
-res_summary = pd.DataFrame(columns=["time", "average", "std"])
+res_summary = pd.DataFrame(columns=["year_month", "average", "std"])
 
 im = InputManager()
 net_merit_csv = Path("NetMerit_percentile_HO.csv")
 net_merit = im._load_data_from_csv(net_merit_csv)
 population_graph_path = "population_graph/"
-percentile_graph_path = "percentile_graph/"
 
 for date in net_merit.keys():
     if date == "percentile":
@@ -30,19 +29,22 @@ for date in net_merit.keys():
     result.insert(len(result.columns), date, rand_nm)
     res_summary.loc[len(res_summary.index)] = [date, mean, std]
 
-    fig2, ax2 = plt.subplots()
-    sns.histplot(rand_nm, bins=101, kde=True)
-    xmin, xmax = min(rand_nm), max(rand_nm)
-    x = np.linspace(xmin, xmax, 101)
-    p = scipy.stats.norm.pdf(x, mean, std)
-    p = [val * 25000000 for val in p]
-    plt.plot(x, p, 'r')
-    plt.savefig(population_graph_path + date+'.png')
-    plt.close()
+    fig, axes = plt.subplots(2, 1, sharex=True)
+    fig.set_figheight(8)
+    fig.set_figwidth(12)
 
-    fig3, ax3 = plt.subplots()
-    plt.hist(net_merit[date], bins=101)
-    plt.savefig(percentile_graph_path + date + '.png')
+    sns.histplot(rand_nm, ax=axes[0], bins=101, kde=True)
+    axes[0].set_title("Population Distribution")
+
+    axes[1].hist(net_merit[date], bins=101)
+    axes[1].set_title("Percentile Distribution")
+
+    # xmin, xmax = min(rand_nm), max(rand_nm)
+    # x = np.linspace(xmin, xmax, 101)
+    # p = scipy.stats.norm.pdf(x, mean, std)
+    # p = [val * 25000000 for val in p]
+    # plt.plot(x, p, 'r')
+    plt.savefig(population_graph_path + date+'.png')
     plt.close()
 
     print(date)

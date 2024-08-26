@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
@@ -19,24 +20,38 @@ base_change_lookup_table = {
 class AnimalGenetics:
     def __init__(self) -> None:
         im = InputManager()
-        net_merit_HO = im.get_data('animal_net_merit')
+        net_merit_HO: dict[str, list[float]] = im.get_data('animal_net_merit')
         top_listing_semen_HO: dict[str, list[str | float]] = im.get_data('animal_top_listing_semen')
-        self.net_merit = {
+        self.net_merit: dict[str, dict[str, dict[str, float]]] = {
             "HO": {
                 net_merit_HO["year_month"][i]: {
                     "average": net_merit_HO["average"][i],
                     "std": net_merit_HO["std"][i]} for i in range(len(net_merit_HO["year_month"]))
             }
         }
-        self.plot_net_merit('plot0.png', 20)
+        self.plot_net_merit('original.png', 20, "Original Net Merit")
 
         self.net_merit_base_change()
-        self.plot_net_merit('plot1.png', 20)
+        self.plot_net_merit('base_change.png', 20, "Net Merit with Base Change")
+
         self.net_merit_fill_gap()
-        self.plot_net_merit('plot2.png', 50)
-        self.top_semen = {
-            "HO": top_listing_semen_HO
+        self.plot_net_merit('expanded.png', 50, "Expanded Net Merit with Base Change")
+
+        self.top_semen: dict[str, dict[str, str | float]] = {
+            "HO": {
+                top_listing_semen_HO["year_month"][i]: top_listing_semen_HO["estimated_PTA"][i]
+                for i in range(len(top_listing_semen_HO["year_month"]))
+            }
         }
+
+        year_months = list(self.net_merit["HO"].keys())
+        df_net_merit = pd.DataFrame(columns=["year_month", "average", "std"])
+        for i in range(len(year_months)):
+            year_month = year_months[i]
+            df_net_merit.loc[i] = [year_month,
+                                   self.net_merit["HO"][year_month]["average"],
+                                   self.net_merit["HO"][year_month]["std"]]
+        df_net_merit.to_csv("updated_net_merit_HO.csv", index=False)
 
     def net_merit_base_change(self) -> None:
         total_adjustment_value = sum([base_change_lookup_table[i] for i in base_change_lookup_table.keys()])
@@ -92,11 +107,12 @@ class AnimalGenetics:
             k: self.net_merit["HO"][k] for k in updated_keys
         }
 
-    def plot_net_merit(self, filename: str, width: float) -> None:
+    def plot_net_merit(self, filename: str, width: float, title: str) -> None:
         year_months = list(self.net_merit["HO"].keys())
         means = [self.net_merit["HO"][year_month]["average"] for year_month in self.net_merit["HO"].keys()]
         stds = [self.net_merit["HO"][year_month]["std"] for year_month in self.net_merit["HO"].keys()]
 
+        plt.title(title)
         plt.figure(figsize=(width, 7))
         plt.errorbar(year_months, means, fmt='.', yerr=stds)
         plt.xticks(rotation=90)
@@ -110,9 +126,9 @@ class AnimalGenetics:
         return Utility.generate_random_number(average, std)
 
     def assign_net_merit_value_to_newborn_calf(self, time: Time, breed: str, dam_net_merit_value: float) -> float:
-        birth_year_month = str(time.current_calendar_year) + str(time.current_month)
+        birth_year_month = str(time.current_calendar_year) + "-" + str(time.current_month).zfill(2)
         semen_PTA: float = self.top_semen[breed][birth_year_month]
         semen_net_merit = semen_PTA * 2
         average_net_merit = (semen_net_merit + dam_net_merit_value) / 2
-        variance = ((self.net_merit[breed][birth_year_month]["std"]) ^ 2) / 2
+        variance = ((self.net_merit[breed][birth_year_month]["std"]) ** 2) / 2
         return Utility.generate_random_number(average_net_merit, np.sqrt(variance))
