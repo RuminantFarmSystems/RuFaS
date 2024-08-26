@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
 import numpy as np
 import pandas as pd
+import psutil
 
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
@@ -139,6 +140,13 @@ class OutputManager(object):
             self.saved_pool_chunks_num: int = 0
             self.saved_pool_chunks_path: Path | None = None
 
+            self.available_memory: int = 0
+            self.average_add_variable_call_addition: int | None = None
+            self.add_variable_call = 0
+            self.save_chunk_threshold_call_count: int | None = None
+            self.current_pool_size: int = 0
+            self.maximum_pool_size: int = 0
+
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -149,6 +157,48 @@ class OutputManager(object):
             )
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
+
+    def setup_pool_overflow_control(
+            self, output_dir: Path, max_memory_usage_percent: int, max_memory_usage: int | None = None,
+            save_chunk_threshold_call_count: int | None = None,
+    ) -> None:
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.setup_pool_overflow_control.__name__,
+        }
+        self.chunkification = True
+
+        self.available_memory = psutil.virtual_memory().available
+        available_memory_gb = self.available_memory / (1024 ** 3)
+
+        self.saved_pool_chunks_path = Path.joinpath(
+            output_dir,
+            f"saved_pool/{Utility.get_timestamp(include_millis=True)}"
+        )
+        self.create_directory(self.saved_pool_chunks_path)
+
+        log_message = f"Created {self.saved_pool_chunks_path} for saved pools during simulation.\n" \
+                      f"Current system available memory: {available_memory_gb:.2f} GB = " \
+                      f"{self.available_memory} Bytes.\n"
+
+        self.saved_pool_chunks_num = 0
+        if save_chunk_threshold_call_count:
+            self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
+            log_message += "The threshold add_variable_call count for saving pool chunk is set to " \
+                           f"{self.save_chunk_threshold_call_count}"
+        elif max_memory_usage:
+            self.maximum_pool_size = max_memory_usage
+            log_message += "The maximum output variable pool size is set to " \
+                           f"{self.maximum_pool_size} Bytes"
+        else:
+            self.maximum_pool_size = (max_memory_usage_percent / 100) * self.available_memory
+            log_message += "The maximum output variable pool size is set to " \
+                           f"{self.maximum_pool_size} Bytes"
+        self.add_log(
+            "Pool Overflow Control Setup",
+            log_message,
+            info_map,
+        )
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -227,6 +277,7 @@ class OutputManager(object):
             for that variable.
 
         """
+        self.add_variable_call += 1
         units = info_map.get("units")
         if units is None:
             raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
@@ -238,6 +289,17 @@ class OutputManager(object):
         if isinstance(value, dict):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
+
+        if self.chunkification:
+            self.current_pool_size += self.average_add_variable_call_addition
+            if (
+                    self.save_chunk_threshold_call_count and
+                    self.add_variable_call % self.save_chunk_threshold_call_count == 0
+            ) or (
+                    self.save_chunk_threshold_call_count is None and self.current_pool_size >= self.maximum_pool_size
+            ):
+                self._save_current_variable_pool()
+
 
     def _save_current_variable_pool(self) -> None:
         """
@@ -1729,6 +1791,10 @@ class OutputManager(object):
         exclude_info_maps: bool,
         output_directory: Path,
         clear_output_directory: bool,
+        chunkification: bool,
+        max_memory_usage_percent: int,
+        max_memory_usage: int,
+        save_chunk_threshold_call_count: int,
         variables_file_path: Path,
         output_prefix: str,
         version_number: str,
@@ -1743,3 +1809,11 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+
+        if chunkification:
+            self.setup_pool_overflow_control(
+                output_directory,
+                max_memory_usage_percent,
+                max_memory_usage,
+                save_chunk_threshold_call_count
+            )
