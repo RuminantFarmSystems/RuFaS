@@ -153,7 +153,7 @@ def sample_filtered_pool() -> Dict[str, Dict[str, List[Dict[str, int]]]]:
     ],
 )
 def test_apply_vertical_aggregation(
-    report_data: dict[str, list[float]],
+    report_data: dict[str, dict[str, list[float | None]]] | dict[str, list[float | None]],
     aggregator_key: str,
     expected: tuple[dict[str, list[float]], list[dict[str, str]]],
     mocker: MockerFixture,
@@ -1436,9 +1436,9 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
 )
 def test_handle_aggregation_errors(
     aggregator: Callable[[List[float]], float],
-    data: dict[str, list[float | None]],
+    data: list[float],
     key: str,
-    expected_result: dict[str, list[float | None] | float | None],
+    expected_result: float | None,
     expected_log: Dict[str, str | Dict[str, str]],
 ) -> None:
     """
