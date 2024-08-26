@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import typing
-from typing import Dict, List
+from typing import Dict, List, Any
 from typing import Optional
 from typing import Tuple
 
 from RUFAS.weather import Weather
 from RUFAS.time import Time
-from RUFAS.routines.animal.pen import Pen
 
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.IO_helpers.manure_manager_config_handler import (
     ManureManagerConfigHandler,
 )
@@ -18,6 +19,7 @@ from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
+from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     BaseManureHandler,
 )
@@ -85,23 +87,35 @@ class ManureManager:
         A dictionary that maps an animal pen's id to a ManureSeparator object.
     manure_treatments : Dict
         A dictionary that maps an animal pen's id to a Treatment object.
+    simulate_animals : bool
+        Records whether animals are being simulated.
+
     """
 
-    def __init__(self, pen_list: List[Pen], weather: Weather, time: Time, manure_manager_config: Dict) -> None:
+    def __init__(
+        self,
+        pen_list: List[PenManureData],
+        weather: Weather,
+        time: Time,
+        manure_manager_config: dict[str, Any],
+        simulate_animals: bool,
+    ) -> None:
         """Initializes a ManureManager object by setting up the appropriate manure
         manager components as specified by the data in the animal_manager object.
 
         Parameters
         ----------
-        pen_list : List[Pen]
-            List of pens found in AnimalManager object.
+        pen_list : List[PenManureData]
+            List of pen manure data instances containing all needed manure information.
         weather : Weather
             The Weather object used to initialize State variables.
         time : Time
             The Time object used to initialize State variables.
-        manure_manager_config : dict
+        manure_manager_config : dict[str, Any]
             A dictionary that contains the configuration data for
             different manure management scenarios.
+        simulate_animals : bool
+            Indicates whether animals are being simulated.
 
         """
         self.beddings: Dict[int, BaseBedding] = {}
@@ -115,9 +129,18 @@ class ManureManager:
         self.manure_manager_config_handler = ManureManagerConfigHandler(manure_manager_config)
         self._daily_output_per_pen = []
         self._manure_nutrient_manager = ManureNutrientManager()
+        self.simulate_animals = simulate_animals
+        if not self.simulate_animals:
+            info_map = {"class": self.__class__.__name__, "function": "__init__"}
+            OutputManager().add_log(
+                "Animals not being simulated",
+                "Manure for field applications will be created by the FieldManureSupplier",
+                info_map,
+            )
+            self._field_manure_supplier = FieldManureSupplier()
         self.configure_manure_manager_components(pen_list)
 
-    def configure_manure_manager_components(self, pen_list: List[Pen]) -> None:
+    def configure_manure_manager_components(self, pen_list: List[PenManureData]) -> None:
         """Configures the manure manager components for each animal pen.
 
         Each pen is associated with the following components - bedding, manure handler,
@@ -125,8 +148,8 @@ class ManureManager:
 
         Parameters
         ----------
-        pen_list : List[Pen]
-            List of pens found in AnimalManager object.
+        pen_list : List[PenManureData]
+            List of PenManureData instances that contain all needed manure information.
         """
         for pen in pen_list:
             mm_pen = ManureManagerPen(pen)
@@ -142,7 +165,7 @@ class ManureManager:
                 configuration_name=mm_pen.manure_handler,
                 weather=self.weather,
                 time=self.time,
-                manure_handler_config=manure_handler_config,  # type: ignore
+                manure_handler_config=manure_handler_config,
             )
 
             self.reception_pits[mm_pen.id] = ReceptionPit()
@@ -171,17 +194,17 @@ class ManureManager:
             )
             self.manure_separators_after_digestion[mm_pen.id] = separator_post_digester
 
-            custom_manure_treatment_config = self.manure_manager_config_handler.get_custom_manure_treatment_config(
+            manure_treatment_config = self.manure_manager_config_handler.get_manure_treatment_config(
                 mm_pen.manure_treatment
             )
             self.manure_treatments[mm_pen.id] = ManureTreatmentFactory.get_instance(
-                manure_treatment_type_name=mm_pen.manure_treatment,
+                configuration_name=mm_pen.manure_treatment,
                 weather=self.weather,
                 time=self.time,
-                custom_manure_treatment_config=custom_manure_treatment_config,  # type: ignore
+                manure_treatment_config=manure_treatment_config,
             )
 
-    def daily_update(self, pen_list: List[Pen], simulation_day: int) -> None:
+    def daily_update(self, pen_list: List[PenManureData], simulation_day: int) -> None:
         """Calculates daily output data for each manure manager component for each animal pen.
 
         Notes
@@ -362,9 +385,12 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
-        return self._manure_nutrient_manager.request_nutrients(request)
+        if self.simulate_animals:
+            return self._manure_nutrient_manager.request_nutrients(request)
+        else:
+            return self._field_manure_supplier.request_nutrients(request)
 
-    def _pen_daily_update(self, simulation_day: int, pen) -> None:
+    def _pen_daily_update(self, simulation_day: int, pen: PenManureData) -> None:
         """
         Calculate daily output data for each manure manager component for a given animal pen.
 
@@ -372,7 +398,7 @@ class ManureManager:
         ----------
         simulation_day : int
             The current simulation day.
-        pen
+        pen : PenManureData
             The animal pen for which the daily output data will be calculated.
 
         Returns
@@ -520,6 +546,7 @@ class ManureManager:
         Optional[ManureSeparatorDailyOutput],
         ManureTreatmentDailyOutput,
         ManureTreatmentDailyOutput,
+        ManureTreatmentDailyOutput,
     ]:
         """Calculates daily output for the manure separator and treatment components of a pen.
 
@@ -583,12 +610,11 @@ class ManureManager:
             True if the manure treatment is a compound anaerobic manure treatment, False otherwise.
 
         """
-        manure_treatment_type = ManureTreatmentType.get_type(manure_treatment_name)
-        compound_anaerobic_manure_treatment_types = [
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON,
-            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR,
-        ]
-        return manure_treatment_type in compound_anaerobic_manure_treatment_types
+        compound_anaerobic_manure_treatment_types = {
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON.value,
+            ManureTreatmentType.ANAEROBIC_DIGESTION_AND_LAGOON_WITH_SEPARATOR.value,
+        }
+        return manure_treatment_name in compound_anaerobic_manure_treatment_types
 
     def _handle_daily_update_for_compound_anaerobic_manure_treatment(
         self,
@@ -713,21 +739,3 @@ class ManureManager:
             manure_treatment_daily_output,
             manure_treatment_accumulated_output,
         )
-
-
-def simulate_daily_manure_manager(manure_manager: ManureManager, pen_list: list[Pen], simulation_day: int) -> None:
-    """A wrapper function for the daily_update method of the ManureManager class.
-
-    There is no strict reason why this function is needed. It is simply to make the code
-    in the SimulationEngine more readable. It is OK to remove this function and call the
-    daily_update method directly from the SimulationEngine.
-
-    Parameters
-    ----------
-    manure_manager : ManureManager
-        A reference to the ManureManager object stored in the SimulationEngine.
-    pen_list : List[Pen]
-        A list of Pens.
-
-    """
-    manure_manager.daily_update(pen_list, simulation_day)

@@ -10,10 +10,7 @@
             "harvest_years": [1989],
             "harvest_days": [305],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -25,9 +22,7 @@
             "harvest_years": [1990, 1991, 1992],
             "harvest_days": [237],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "corn_grain",
@@ -39,10 +34,7 @@
             "harvest_years": [1993],
             "harvest_days": [305],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -54,9 +46,7 @@
             "harvest_years": [1994, 1995, 1996],
             "harvest_days": [302],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "corn_grain",
@@ -68,10 +58,7 @@
             "harvest_years": [1997],
             "harvest_days": [305],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -83,10 +70,7 @@
             "harvest_years": [1998, 1999, 2000],
             "harvest_days": [250],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "corn_grain",
@@ -98,10 +82,7 @@
             "harvest_years": [2001],
             "harvest_days": [288],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -113,10 +94,7 @@
             "harvest_years": [2002, 2003, 2004],
             "harvest_days": [253],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "corn_grain",
@@ -128,9 +106,7 @@
             "harvest_years": [2005],
             "harvest_days": [293],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -142,10 +118,7 @@
             "harvest_years": [2006, 2007, 2008],
             "harvest_days": [256],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "corn_grain",
@@ -157,9 +130,7 @@
             "harvest_years": [2009],
             "harvest_days": [281],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -171,9 +142,7 @@
             "harvest_years": [2010, 2011, 2012],
             "harvest_days": [179],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "corn_grain",
@@ -185,9 +154,7 @@
             "harvest_years": [2013],
             "harvest_days": [298],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -199,9 +166,7 @@
             "harvest_years": [2014, 2015, 2016],
             "harvest_days": [179],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "optimal"
         },
         {
             "crop_species": "corn_grain",
@@ -213,9 +178,7 @@
             "harvest_years": [2017],
             "harvest_days": [300],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_hay",
@@ -227,9 +190,7 @@
             "harvest_years": [2018, 2019],
             "harvest_days": [180],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "optimal",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "optimal"
         }
     ]
 }

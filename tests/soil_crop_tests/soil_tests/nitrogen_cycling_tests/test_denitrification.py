@@ -61,7 +61,7 @@ def test_denitrify() -> None:
 
         incorp.denitrify()
 
-        nitrification_amount_calls = [call(35, 1.5, 0.89, 65)] * 3
+        nitrification_amount_calls = [call(35, 1.5, 0.89, 0.65)] * 3
         incorp._calculate_denitrification_amount.assert_has_calls(nitrification_amount_calls)
         for index in [0, 2, 3]:
             assert incorp.data.soil_layers[index].nitrate_content == 20
