@@ -851,9 +851,7 @@ class ReportGenerator:
         aggregated_data: dict[str, list[float | None]] = {}
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for key, data in report_data.items():
-            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(
-                aggregator, data, key
-            )
+            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(aggregator, data, key)
             if aggregation_log:
                 event_logs.append(aggregation_log)
             aggregated_data[key] = [vertically_aggregated_data]
