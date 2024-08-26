@@ -82,6 +82,7 @@ class AnimalBase:
         self.calf_birth_weight = 0.0
         self.tissue_changed = 0.0
         self.sold_at_day: int | None = None
+        self.net_merit: float = 0.0
         if "body_weight_history" in args:
             self.body_weight_history = args["body_weight_history"]
             self.pen_history = args["pen_history"]
