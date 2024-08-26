@@ -1,3 +1,4 @@
+import multiprocessing
 from typing import Any, Generator
 import pytest
 from unittest.mock import patch, MagicMock, call
@@ -633,7 +634,100 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
         )
 
 
-def test_call_handler():
+@pytest.mark.parametrize(
+    'single_run_task, produce_graphics, metadata_depth_limit, task_return_value',
+    [
+        ([
+            {
+                'task_type': TaskType.SIMULATION_SINGLE_RUN,
+                'metadata_file_path': Path('input/metadata/default_metadata.json'),
+                'output_prefix': 'default',
+                'log_verbosity': LogVerbosity.LOGS,
+                'random_seed': 42,
+                'properties_file_path': Path('input/metadata/properties/default.json'),
+                'comparison_properties_file_path': Path('input/metadata/properties/default.json'),
+                'variable_name_style': 'basic',
+                'exclude_info_maps': False,
+                'init_herd': False,
+                'save_animals': False,
+                'save_animals_directory': Path('output'),
+                'filters_directory': Path('output/output_filters'),
+                'csv_output_directory': Path('output/CSVs'),
+                'json_output_directory': Path('output/JSONs'),
+                'report_directory': Path('output/reports'),
+                'graphics_directory': Path('output/graphics'),
+                'logs_directory': Path('output/logs'),
+                'suppress_log_files': False,
+                'output_pool_path': Path('.'),
+                'multi_run_counts': 4,
+                'sampler': 'saltelli_sobol',
+                'saltelli_skip': 0,
+                'saltelli_number': 2,
+                'SA_load_balancing_start': 0,
+                'SA_load_balancing_stop': 1,
+                'input_patch': None,
+                'task_id': 1
+            },
+{
+                'task_type': TaskType.SIMULATION_SINGLE_RUN,
+                'metadata_file_path': Path('input/metadata/default_metadata.json'),
+                'output_prefix': 'default',
+                'log_verbosity': LogVerbosity.LOGS,
+                'random_seed': 42,
+                'properties_file_path': Path('input/metadata/properties/default.json'),
+                'comparison_properties_file_path': Path('input/metadata/properties/default.json'),
+                'variable_name_style': 'basic',
+                'exclude_info_maps': False,
+                'init_herd': False,
+                'save_animals': False,
+                'save_animals_directory': Path('output'),
+                'filters_directory': Path('output/output_filters'),
+                'csv_output_directory': Path('output/CSVs'),
+                'json_output_directory': Path('output/JSONs'),
+                'report_directory': Path('output/reports'),
+                'graphics_directory': Path('output/graphics'),
+                'logs_directory': Path('output/logs'),
+                'suppress_log_files': False,
+                'output_pool_path': Path('.'),
+                'multi_run_counts': 4,
+                'sampler': 'saltelli_sobol',
+                'saltelli_skip': 0,
+                'saltelli_number': 2,
+                'SA_load_balancing_start': 0,
+                'SA_load_balancing_stop': 1,
+                'input_patch': None,
+                'task_id': 1
+            }
+        ],
+            True,
+            10,
+            None
+        ),
+    ]
+)
+def test_run_task(single_run_task: list[dict[str, Any]],
+                  produce_graphics: bool,
+                  metadata_depth_limit: int,
+                  task_return_value: str | None,
+                  mock_output_manager: Generator[Any, Any, Any],
+                  task_manager: TaskManager,
+                  mocker: MockerFixture) -> None:
+    mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
+
+    mock_run_startup_sequence = mocker.patch.object(mock_output_manager, "run_startup_sequence")
+    mock_om_init = mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+    mock_task = mocker.patch.object(task_manager, "task", return_value=None)
+
+    mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
+    mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
+    mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+
+    task_manager.pool = multiprocessing.Pool(2, maxtasksperchild=1)
+    task_manager._run_tasks(single_run_task, produce_graphics, metadata_depth_limit)
+
+
+def test_call_handler() -> None:
     """Tests that wrapper handler function were handled"""
     args = {
         "log_verbosity": "logs",
