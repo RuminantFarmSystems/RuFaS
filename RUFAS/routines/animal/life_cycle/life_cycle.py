@@ -201,10 +201,9 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII)
         heiferIIIs = self._get_animals(HeiferIII)
         cows = self._get_animals(Cow)
-        for cow in cows:
-            cow.set_milking_management_attributes()
+        corrected_cows = self._correct_cow_attributes(cows)
         self.replacement_market = self.animal_population.get_replacement_cows()
-        return calves, heiferIs, heiferIIs, heiferIIIs, cows
+        return calves, heiferIs, heiferIIs, heiferIIIs, corrected_cows
 
     def _set_avg_CI(self) -> None:
         if "use_input_calving_interval" in self.animal_config and self.animal_config["use_input_calving_interval"]:
@@ -238,6 +237,29 @@ class LifeCycleManager:
             animal.events.add_event(animal.days_born, 0, animal_constants.INIT_HERD)
 
         return animals
+
+    def _correct_cows_milking_attributes(self, cows: list[Cow]) -> list[Cow]:
+        """
+        Corrects any attributes from cows entering the herd at initization for conditions incompatible with the
+        user-specified management practices.
+        """
+        for cow in cows:
+            if not cow.is_pregnant:
+                continue
+            is_milking_expected = cow.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]
+            valid_milking_status = cow.milking and is_milking_expected
+            valid_dry_status = not cow.milking and not is_milking_expected
+            should_set_to_milking = (not valid_milking_status or not valid_dry_status) and is_milking_expected
+            if should_set_to_milking:
+                date_of_last_birth = cow.events.get_most_recent_date(animal_constants.NEW_BIRTH)
+                cow.days_in_milk = cow.days_born - date_of_last_birth
+                cow.milking = True
+                om.add_warning(
+                    "Cow in initialization herd has dried off before reaching dry period of pregnancy",
+                    f"Setting cow {cow.id}'s milking status to true and days_in_milk to be {cow.days_in_milk}",
+                    {"class": self.__class__.__name__, "function": "__init__"}
+                )
+        return cows
 
     def daily_update(
         self,
