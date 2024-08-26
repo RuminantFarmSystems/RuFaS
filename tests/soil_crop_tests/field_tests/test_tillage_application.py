@@ -70,7 +70,7 @@ def test_remove_amount_incorporated(
     [
         ([1, 2, 3], "<class 'list'>"),
         (
-            Field(manure_supplier=MagicMock(ManureManager)),
+            Field(manure_manager=MagicMock(ManureManager)),
             "<class 'RUFAS.routines.field.field.field.Field'>",
         ),
     ],
