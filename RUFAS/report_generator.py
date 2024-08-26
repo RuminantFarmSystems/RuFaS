@@ -49,7 +49,7 @@ def division_aggregator(data: List[float]) -> float | None:
     return result
 
 
-def product_aggregator(data: List[float]) -> float:
+def product_aggregator(data: list[float]) -> float:
     """
     Returns the product of a list of numbers.
 
@@ -63,13 +63,13 @@ def product_aggregator(data: List[float]) -> float:
     float
         The product of the input numbers. Returns 1 for an empty list.
     """
-    product = 1
+    product = 1.0
     for num in data:
         product *= num
     return product
 
 
-def sd_aggregator(data: List[float]) -> float:
+def sd_aggregator(data: list[float]) -> float:
     """
     Calculates the standard deviation of a list of numbers.
 
@@ -84,7 +84,7 @@ def sd_aggregator(data: List[float]) -> float:
         The standard deviation of the input numbers.
     """
     mean = average_aggregator(data)
-    return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0
+    return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0.0
 
 
 def sum_aggregator(data: List[float]) -> float:
@@ -884,6 +884,7 @@ class ReportGenerator:
             The resulting aggregated data and the aggregation logs to be returned to OutputManager.
             Returns None and an error message if the data contains None or NaN values.
         """
+        aggregated_data = {}
         if any(x is None or math.isnan(x) for x in data):
             info_map = {
                 "class": self.__class__.__name__,
@@ -894,7 +895,7 @@ class ReportGenerator:
                 "message": f"Encountered unaggregatable values in {key} data, returning None instead.",
                 "info_map": info_map,
             }
-            return None, aggregation_error
+            return aggregated_data, aggregation_error
 
         try:
             aggregated_data = aggregator(data)
@@ -908,7 +909,7 @@ class ReportGenerator:
                 "message": f"Error during aggregation of {key} data: {str(e)}, returning None instead.",
                 "info_map": info_map,
             }
-            return None, aggregation_error
+            return aggregated_data, aggregation_error
 
         return aggregated_data, {}
 
@@ -991,17 +992,18 @@ class ReportGenerator:
                     matching_constant = str(attribute)
                     break
             else:
-                info_map = {
+                info_map: dict[str, str] = {
                     "class": self.__class__.__name__,
-                    "function": self.generate_report.__name__,
+                    "function": self._add_units_to_constants.__name__,
                 }
-                constant_units_warning = {
+                constant_units_warning: dict[str, str | dict[str, str]] = {
                     "warning": "report_generation_warning",
                     "message": f"No matching GeneralConstant found for filter constant {name}.",
                     "info_map": info_map,
                 }
                 event_logs.append(constant_units_warning)
-            unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
+            if matching_constant:
+                unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
             constant_with_units = f"{name}_({unit_for_constant})"
             updated_constants_config[constant_with_units] = constants_config[name]
 
