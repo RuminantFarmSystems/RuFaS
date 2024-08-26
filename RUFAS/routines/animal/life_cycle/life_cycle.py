@@ -201,7 +201,7 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII)
         heiferIIIs = self._get_animals(HeiferIII)
         cows = self._get_animals(Cow)
-        corrected_cows = self._correct_cow_attributes(cows)
+        corrected_cows = self._correct_cows_milking_attributes(cows)
         self.replacement_market = self.animal_population.get_replacement_cows()
         return calves, heiferIs, heiferIIs, heiferIIIs, corrected_cows
 
@@ -257,7 +257,7 @@ class LifeCycleManager:
                 om.add_warning(
                     "Cow in initialization herd has dried off before reaching dry period of pregnancy",
                     f"Setting cow {cow.id}'s milking status to true and days_in_milk to be {cow.days_in_milk}",
-                    {"class": self.__class__.__name__, "function": "__init__"}
+                    {"class": self.__class__.__name__, "function": "__init__"},
                 )
         return cows
 
