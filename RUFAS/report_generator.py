@@ -661,11 +661,11 @@ class ReportGenerator:
         ValueError
             If the operation is addition or subtraction and the units are not the same.
         """
-        info_map = {
+        info_map: dict[str, str] = {
             "class": ReportGenerator.__class__.__name__,
             "function": ReportGenerator._combine_units.__name__,
         }
-        event_log = {}
+        event_log: dict[str, str | dict[str, str]] = {}
         if operation in ["product", "division"]:
             if operation == "product":
                 combined_numerator = MeasurementUnits.adjust_unit_exponents(numerator1, numerator2)
@@ -737,7 +737,7 @@ class ReportGenerator:
             horizontally_aggregated, aggregate_units, event_logs = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator, simplify_units
             )
-            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(
+            vertically_aggregated_data, aggregation_log = self._handle_aggregation(
                 vertical_aggregator, horizontally_aggregated, next(iter(aggregate_report))
             )
             if aggregation_log:
@@ -750,7 +750,7 @@ class ReportGenerator:
             vertically_aggregated, event_logs = self._apply_vertical_aggregation(aggregate_report, vertical_aggregator)
             ver_hor_aggregated = []
             for elements in zip(*vertically_aggregated.values()):
-                horizontally_aggregated_data, aggregation_log = self._handle_aggregation_errors(
+                horizontally_aggregated_data, aggregation_log = self._handle_aggregation(
                     horizontal_aggregator, list(elements), next(iter(aggregate_report))
                 )
                 if aggregation_log:
@@ -842,7 +842,7 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
-            horizontally_aggregated_data, aggregation_log = self._handle_aggregation_errors(
+            horizontally_aggregated_data, aggregation_log = self._handle_aggregation(
                 aggregator, temp_data, next(iter(report_data))
             )
             if aggregation_log:
@@ -881,13 +881,13 @@ class ReportGenerator:
         aggregated_data: dict[str, list[float | None]] = {}
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for key, data in report_data.items():
-            vertically_aggregated_data, aggregation_log = self._handle_aggregation_errors(aggregator, data, key)
+            vertically_aggregated_data, aggregation_log = self._handle_aggregation(aggregator, data, key)
             if aggregation_log:
                 event_logs.append(aggregation_log)
             aggregated_data[key] = [vertically_aggregated_data]
         return aggregated_data, event_logs
 
-    def _handle_aggregation_errors(
+    def _handle_aggregation(
         self,
         aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
         data: list[float],
@@ -911,11 +911,11 @@ class ReportGenerator:
             Returns None and an error message if the data contains any values that cannot be aggregated.
         """
         aggregated_data = None
+        info_map: dict[str, str] = {
+            "class": self.__class__.__name__,
+            "function": self._handle_aggregation.__name__,
+        }
         if any(not isinstance(x, (int, float)) or math.isnan(x) for x in data):
-            info_map: dict[str, str] = {
-                "class": self.__class__.__name__,
-                "function": self._handle_aggregation_errors.__name__,
-            }
             aggregation_error: dict[str, str | dict[str, str]] = {
                 "error": "ReportGenerator aggregation error",
                 "message": f"Encountered unaggregatable values in {key} data, returning None instead.",
@@ -926,10 +926,6 @@ class ReportGenerator:
         try:
             aggregated_data = aggregator(data)
         except Exception as e:
-            info_map = {
-                "class": self.__class__.__name__,
-                "function": self._handle_aggregation_errors.__name__,
-            }
             aggregation_error = {
                 "error": "ReportGenerator aggregation error",
                 "message": f"Error during aggregation of {key} data: {str(e)}, returning None instead.",

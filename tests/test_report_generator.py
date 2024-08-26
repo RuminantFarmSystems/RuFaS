@@ -169,7 +169,7 @@ def test_apply_vertical_aggregation(
 
     mocker.patch.object(
         report_generator,
-        "_handle_aggregation_errors",
+        "_handle_aggregation",
         side_effect=[
             (expected[0]["a"][0], {"mock_log": "mock_log_msg"}),
             (expected[0]["b"][0], {"mock_log": "mock_log_msg"}),
@@ -739,7 +739,7 @@ def test_handle_horizontal_and_vertical_aggregations(
         report_generator, "_get_horizontal_first_value", return_value=filter_content["horizontal_first"]
     )
     mocker.patch.object(
-        report_generator, "_handle_aggregation_errors", return_value=(mock_vertical_agg, {"mock_log": "mock_log_msg"})
+        report_generator, "_handle_aggregation", return_value=(mock_vertical_agg, {"mock_log": "mock_log_msg"})
     )
     if mock_horizontal_agg is not None:
         mocker.patch.object(report_generator, "_apply_horizontal_aggregation", return_value=mock_horizontal_agg)
@@ -1396,7 +1396,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "message": "Encountered unaggregatable values in none_key data, returning None instead.",
                 "info_map": {
                     "class": "ReportGenerator",
-                    "function": "_handle_aggregation_errors",
+                    "function": "_handle_aggregation",
                 },
             },
         ),
@@ -1411,7 +1411,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "message": "Encountered unaggregatable values in nan_key data, returning None instead.",
                 "info_map": {
                     "class": "ReportGenerator",
-                    "function": "_handle_aggregation_errors",
+                    "function": "_handle_aggregation",
                 },
             },
         ),
@@ -1428,13 +1428,13 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
                 "message": "Error during aggregation of key data: float division by zero, returning None instead.",
                 "info_map": {
                     "class": "ReportGenerator",
-                    "function": "_handle_aggregation_errors",
+                    "function": "_handle_aggregation",
                 },
             },
         ),
     ],
 )
-def test_handle_aggregation_errors(
+def test_handle_aggregation(
     aggregator: Callable[[List[float]], float],
     data: list[float],
     key: str,
@@ -1442,14 +1442,14 @@ def test_handle_aggregation_errors(
     expected_log: Dict[str, str | Dict[str, str]],
 ) -> None:
     """
-    Unit test for the _handle_aggregation_errors method in ReportGenerator.
+    Unit test for the _handle_aggregation method in ReportGenerator.
     """
 
     # Arrange
     report_generator = ReportGenerator()
 
     # Act
-    result, log = report_generator._handle_aggregation_errors(aggregator, data, key)
+    result, log = report_generator._handle_aggregation(aggregator, data, key)
 
     # Assert
     assert result == expected_result
