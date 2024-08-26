@@ -164,7 +164,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
         return_value=mock_animal_population,
     )
 
-    patch_correct_cow_attributes = mocker.patch.object(life_cycle_manager, "_correct_cow_attributes")
+    patch_correct_cow_attributes = mocker.patch.object(life_cycle_manager, "_correct_cows_milking_attributes")
     patch_set_avg_CI = mocker.patch.object(life_cycle_manager, "_set_avg_CI")
     patch_get_animals = mocker.patch.object(life_cycle_manager, "_get_animals")
 
@@ -187,9 +187,17 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
 
 @pytest.mark.parametrize(
     "days_pregnant,days_in_preg_dry,is_milking,expected_milking,expected_warning",
-    [(100, 120, False, True, True), (140, 133, False, False, False)]
+    [(100, 120, False, True, True), (140, 133, False, False, False)],
 )
-def test_correct_cow_attributes(mocker: MockerFixture, life_cycle_manager: LifeCycleManager, days_pregnant: int, days_in_preg_dry: int, is_milking: bool, expected_milking: bool, expected_warning: bool) -> None:
+def test_correct_cows_milking_attributes(
+    mocker: MockerFixture,
+    life_cycle_manager: LifeCycleManager,
+    days_pregnant: int,
+    days_in_preg_dry: int,
+    is_milking: bool,
+    expected_milking: bool,
+    expected_warning: bool,
+) -> None:
     """Tests _correct_cow_attributes in LifeCycleManager."""
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.is_pregnant = True
@@ -201,7 +209,7 @@ def test_correct_cow_attributes(mocker: MockerFixture, life_cycle_manager: LifeC
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_base_config)
     patch_warning = mocker.patch.object(life_cycle_manager.om, "add_warning")
 
-    actual_cow = life_cycle_manager._correct_cow_attributes([mock_cow])[0]
+    actual_cow = life_cycle_manager._correct_cows_milking_attributes([mock_cow])[0]
 
     assert actual_cow.milking == expected_milking
     if expected_warning:
