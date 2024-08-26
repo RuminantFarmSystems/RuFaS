@@ -537,7 +537,7 @@ def test_perform_aggregations(
     ],
 )
 def test_route_aggregator_functions(
-    report_data: dict[str, list[Any]],
+    report_data: dict[str, dict[str, list[Any]]],
     filter_content: dict[str, Any],
     horizontal_agg_key: str,
     vertical_agg_key: str,
@@ -1347,7 +1347,7 @@ def test_aggregate_units(
     report_data: dict[str, list[float]],
     aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
     simplify_units: bool,
-    expected_output: tuple[str, list[dict[str, str | Dict[str, str]]]],
+    expected_output: tuple[str | Any, dict[str, str | dict[str, str]]],
     raises_error: bool,
 ) -> None:
     report_generator = ReportGenerator()
@@ -1390,7 +1390,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             sum_aggregator,
             [1.0, None, 3.0],
             "none_key",
-            {},
+            None,
             {
                 "error": "ReportGenerator aggregation error",
                 "message": "Encountered unaggregatable values in none_key data, returning None instead.",
@@ -1405,7 +1405,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             sum_aggregator,
             [1.0, float("nan"), 3.0],
             "nan_key",
-            {},
+            None,
             {
                 "error": "ReportGenerator aggregation error",
                 "message": "Encountered unaggregatable values in nan_key data, returning None instead.",
@@ -1422,7 +1422,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             lambda x: x[0] / 0,  # Aggregator that raises an error
             [1.0, 2.0, 3.0],
             "key",
-            {},
+            None,
             {
                 "error": "ReportGenerator aggregation error",
                 "message": "Error during aggregation of key data: float division by zero, returning None instead.",

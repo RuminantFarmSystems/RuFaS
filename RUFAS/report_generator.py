@@ -882,7 +882,7 @@ class ReportGenerator:
             The resulting aggregated data and the aggregation logs to be returned to OutputManager.
             Returns None and an error message if the data contains None or NaN values.
         """
-        aggregated_data = {}
+        aggregated_data = None
         if any(not isinstance(x, (int, float)) or math.isnan(x) for x in data):
             info_map = {
                 "class": self.__class__.__name__,
