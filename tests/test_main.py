@@ -27,7 +27,7 @@ def test_main_success(mock_task_manager, monkeypatch) -> None:  # type: ignore
     main()
 
     mock_instance.start.assert_called_once_with(
-        Path("input/metadata/task_manager_metadata.json"),
+        metadata_path=Path("input/metadata/task_manager_metadata.json"),
         verbosity=LogVerbosity.ERRORS,
         exclude_info_maps=False,
         output_directory=Path("output"),
@@ -51,7 +51,7 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
     actual_args = parse_gnu_args()
 
     # Assert
-    assert mock_add_argument.call_count == 8
+    assert mock_add_argument.call_count == 9
     assert mock_add_argument.call_args_list == [
         mocker.call(
             "-g",
@@ -101,6 +101,12 @@ def test_parse_gnu_args(mocker: MockerFixture) -> None:
             "--metadata-depth-limit",
             type=int,
             help="Overrides the default metadata depth limit in the Input Manager",
+        ),
+        mocker.call(
+            "-p",
+            "--path-to-metadata",
+            help="Path to the task manager metadata that will determine the tasks run",
+            default="input/metadata/task_manager_metadata.json",
         ),
     ]
     mock_parse_args.assert_called_once()

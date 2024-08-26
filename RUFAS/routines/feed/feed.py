@@ -7,11 +7,8 @@ from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
-from RUFAS.routines.animal.animal_combinations import AnimalCombination
+from ...enums import AnimalCombination
 import math
-
-im = InputManager()
-om = OutputManager()
 
 udrm = UserDefinedRationManager()
 
@@ -49,7 +46,9 @@ class Feed:
         Args:
             data: the feed information from the input JSON file
         """
-        self.nutrient_standard = im.get_data("config.nutrient_standard")
+        self.om = OutputManager()
+        self.im = InputManager()
+        self.nutrient_standard = self.im.get_data("config.nutrient_standard")
         self.nutrient_table = "NASEM_Comp" if self.nutrient_standard == "NASEM" else "NRC_Comp"
 
         self.all_feed_units = self._retrieve_data(data_source="user_feeds", var_names=["rufas_id", "Name", "units"])
@@ -128,7 +127,7 @@ class Feed:
             target_user_defined_ration_percentage_sum,
             abs_tol=user_defined_ration_percentage_sum_tolerance,
         ):
-            om.add_warning(
+            self.om.add_warning(
                 "User defined calf_ration percentages do not sum to 100",
                 f"User defined calf_ration sums to {sum(udrm.calf_ration.values())}",
                 info_map,
@@ -143,7 +142,7 @@ class Feed:
             target_user_defined_ration_percentage_sum,
             abs_tol=user_defined_ration_percentage_sum_tolerance,
         ):
-            om.add_warning(
+            self.om.add_warning(
                 "User defined growing_ration percentages do not sum to 100",
                 f"User defined growing_ration sums to {sum(udrm.growing_ration.values())}",
                 info_map,
@@ -158,7 +157,7 @@ class Feed:
             target_user_defined_ration_percentage_sum,
             abs_tol=user_defined_ration_percentage_sum_tolerance,
         ):
-            om.add_warning(
+            self.om.add_warning(
                 "User defined close_up_ration percentages do not sum to 100",
                 f"User defined close_up_ration sums to {sum(udrm.close_up_ration.values())}",
                 info_map,
@@ -173,7 +172,7 @@ class Feed:
             target_user_defined_ration_percentage_sum,
             abs_tol=user_defined_ration_percentage_sum_tolerance,
         ):
-            om.add_warning(
+            self.om.add_warning(
                 "User defined lactating_cow_ration percentages do not sum to 100",
                 f"User defined lactating_cow_ration sums to {sum(udrm.lactating_cow_ration.values())}",
                 info_map,
@@ -222,7 +221,7 @@ class Feed:
             nutrients_dict["crude_protein"] = self.CP
             nutrients_dict["carbon_loss"] = self.C_loss
             nutrients_dict["crude_protein_loss"] = self.CP_loss
-            om.add_variable("nutrients_summary", nutrients_dict, dict(info_map, **{"units": nutrient_dict_units}))
+            self.om.add_variable("nutrients_summary", nutrients_dict, dict(info_map, **{"units": nutrient_dict_units}))
 
     class Storage:
         def __init__(self, data):
@@ -1201,7 +1200,7 @@ class Feed:
 
         result_list = []
         values = []
-        data = im.get_data(data_source)
+        data = self.im.get_data(data_source)
         if not var_names:
             var_names = list(data.keys())
 
@@ -1219,7 +1218,7 @@ class Feed:
                 values.append(var_values)
                 result_list.append(self._pack_into_dict(var_names, var_values))
             except IndexError as e:
-                om.add_error("Length mismatch", str(e), info_map=info_map)
+                self.om.add_error("Length mismatch", str(e), info_map=info_map)
                 raise e
 
         return result_list

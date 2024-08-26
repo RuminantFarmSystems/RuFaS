@@ -16,7 +16,6 @@ from RUFAS.routines.field.manager.events import (
     FertilizerEvent,
     ManureEvent,
 )
-from ..manager.field_manure_supplier import FieldManureSupplier
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
@@ -63,7 +62,7 @@ class Field:
         List of all fertilizer mixes available for application to this field.
     manure_events : List[ManureEvent], default=None
         Manure application interface.
-    manure_supplier : ManureManager | FieldManureSupplier, default=None
+    manure_manager : ManureManager, default=None
         Object that will to be used during simulation to get manure for field applications.
 
     Attributes
@@ -97,8 +96,8 @@ class Field:
         List of ManureApplication objects
     manure_events: List[ManureEvent]
         List of all manure applications that will be applied to this field
-    manure_supplier: ManureManager | FieldManureSupplier
-        Manure supplier from which manure is requested for application to the field.
+    manure_manager: ManureManager
+        Manure Manager instance from which manure is requested for application to the field.
     feed_manager: FeedManager
         FeedManager instance which receives harvested crops.
 
@@ -119,7 +118,7 @@ class Field:
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
         manure_events: Optional[List[ManureEvent]] = None,
-        manure_supplier: Optional[ManureManager | FieldManureSupplier] = None,
+        manure_manager: Optional[ManureManager] = None,
         feed_manager: Optional[FeedManager] = None,
     ):
         # field-wide attributes
@@ -160,7 +159,7 @@ class Field:
             "function": "__init__",
         }
 
-        if manure_supplier is None:
+        if manure_manager is None:
             om.add_error(
                 "field_initialization_error",
                 f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
@@ -169,7 +168,7 @@ class Field:
             )
             raise ValueError("Manure supplier cannot be None.")
 
-        self.manure_supplier: ManureManager | FieldManureSupplier = manure_supplier
+        self.manure_manager: ManureManager = manure_manager
 
         if feed_manager is None:
             om.add_error(
@@ -583,7 +582,7 @@ class Field:
             manure_type=requested_manure_type,
         )
 
-        manure_supplied = self.manure_supplier.request_nutrients(nutrient_request)
+        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
             self._add_manure_water(manure_supplied, requested_manure_type)
@@ -639,10 +638,25 @@ class Field:
                 surface_remainder_fraction=surface_remainder_fraction,
                 year=year,
                 day=day,
+                output_name="manure_application",
             )
         else:
             supplied_nitrogen = 0.0
             supplied_phosphorus = 0.0
+
+        self._record_manure_application(
+            dry_matter_mass=0.0,
+            dry_matter_fraction=0.0,
+            field_coverage=field_coverage,
+            nitrogen=requested_nitrogen,
+            phosphorus=requested_phosphorus,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
+            day=day,
+            output_name="manure_request",
+        )
 
         unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
         unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
@@ -671,6 +685,7 @@ class Field:
             optimal_mix,
             unmet_nitrogen_demand,
             unmet_phosphorus_demand,
+            0,
             application_depth,
             surface_remainder_fraction,
             year,
@@ -688,6 +703,7 @@ class Field:
         surface_remainder_fraction: float,
         year: int,
         day: int,
+        output_name: str,
         potassium: Optional[float] = None,
     ) -> None:
         """
@@ -753,7 +769,7 @@ class Field:
             "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("manure_application", value, info_map)
+        om.add_variable(output_name, value, info_map)
 
     def _add_manure_water(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
         """
@@ -835,7 +851,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Scheduling Methods ---">
-    def _check_crop_planting_schedule(self, time) -> None:
+    def _check_crop_planting_schedule(self, time: Time) -> None:
         """
         Checks the list of PlantingEvents, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -850,7 +866,7 @@ class Field:
         for event in todays_planting_events:
             self._plant_crop(event.crop_reference, event.use_heat_scheduled_harvest, time)
 
-    def _check_fertilizer_application_schedule(self, time) -> None:
+    def _check_fertilizer_application_schedule(self, time: Time) -> None:
         """
         Checks list of FertilizerEvents, and removes all that occur on the current day from the list.
 
@@ -873,7 +889,7 @@ class Field:
                 event.day,
             )
 
-    def _check_tillage_schedule(self, time) -> None:
+    def _check_tillage_schedule(self, time: Time) -> None:
         """
         Checks the list of Events, and all that are scheduled to happen are passed on to another method to be
         executed.
@@ -890,11 +906,11 @@ class Field:
                 event.incorporation_fraction,
                 event.mixing_fraction,
                 event.implement,
-                time.calendar_year,
-                time.day,
+                time.current_calendar_year,
+                time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time) -> None:
+    def _check_manure_application_schedule(self, time: Time) -> None:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -972,7 +988,7 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: List[BaseFieldManagementEvent], time
+        all_events: List[BaseFieldManagementEvent], time: Time
     ) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
@@ -1009,7 +1025,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Crop Management Methods ---">
-    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time) -> None:
+    def _plant_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
         Takes the information necessary to plant a crop, creates a new Crop based on it, then adds it to the field's
         list of current crops.
@@ -1056,16 +1072,16 @@ class Field:
             crop = self._make_crop_from_config_dict(crop_specifications)
         crop.data.use_heat_scheduling = use_heat_scheduled_harvesting
         crop.data.id = crop_reference
-        crop.data.planting_year = time.calendar_year
-        crop.data.planting_day = time.day
+        crop.data.planting_year = time.current_calendar_year
+        crop.data.planting_day = time.current_julian_day
 
         self.crops.append(crop)
 
         self._record_planting(
             use_heat_scheduled_harvesting,
             crop.data.species,
-            time.calendar_year,
-            time.day,
+            time.current_calendar_year,
+            time.current_julian_day,
         )
 
     def _record_planting(
@@ -1149,7 +1165,7 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._harvest_crop.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"day": time.day, "year": time.calendar_year},
+            "date": {"day": time.current_julian_day, "year": time.current_calendar_year},
         }
         if len(crops_to_be_harvested) > 1:
             om.add_warning(
@@ -1313,7 +1329,7 @@ class Field:
         it will allow subject-matter experts to more easily experiment with different orders.
 
         """
-        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.day)
+        self.soil.snow.update_snow(current_day_conditions=current_conditions, day=time.current_julian_day)
 
         total_plant_cover = self.field_data.current_residue + self._determine_total_above_ground_biomass()
         self.soil.soil_temp.daily_soil_temperature_update(
@@ -1351,7 +1367,7 @@ class Field:
             crop.leaf_area_index.grow_canopy()
             crop.biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def _cycle_water(self, current_conditions: CurrentDayConditions, time) -> None:
+    def _cycle_water(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """
         Allow water to cycle through the field.
 
@@ -1385,8 +1401,8 @@ class Field:
         watering_amount = self._determine_watering_amount(
             rainfall=current_conditions.rainfall,
             manure_water=manure_water,
-            year=time.year,
-            day=time.day,
+            year=time.current_simulation_year,
+            day=time.current_julian_day,
             irrigation=current_conditions.irrigation,
         )
         total_water = current_conditions.rainfall + watering_amount + manure_water
@@ -1442,7 +1458,7 @@ class Field:
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
             above_ground_biomass,
-            self.soil.data.plant_surface_residue,
+            self.soil.data.soil_layers[0].plant_residue,
             self.soil.data.snow_content,
             remaining_evapotranspirative_demand,
             weighted_average_transpiration,

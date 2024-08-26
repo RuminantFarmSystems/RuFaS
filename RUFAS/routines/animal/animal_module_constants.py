@@ -49,12 +49,6 @@ class AnimalModuleConstants:
     DEFAULT_MANURE_STORAGE: str = "slurry storage outdoor"
     """The default type of manure storage system used in those pens created dynamically during the simulation."""
 
-    URINE_UREA_NITROGEN_CONCENTRATION_LOWER_BOUND: float = 2
-    """The lower bound of the urine urea nitrogen concentration."""
-
-    URINE_UREA_NITROGEN_CONCENTRATION_UPPER_BOUND: float = 12
-    """The upper bound of the urine urea nitrogen concentration."""
-
     DAILY_MILK_VARIATION_MEAN: float = 0
     """Mean of the daily milk production variation from the estimated milk production, kg/day"""
 
@@ -95,3 +89,9 @@ class AnimalModuleConstants:
 
     MINIMUM_HEIFER_DAILY_GROWTH_RATE: float = 0.5
     """Minimum daily growth for heifers, kg."""
+
+    PROTEIN_UPPER_LIMIT_FACTOR: float = 2.0
+    """Factor used to generate the upper limit for metabolizable protein content in ration formulation."""
+
+    MINIMUM_AVG_PEN_MILK: float = 15
+    """Minimum allowable average milk production, for a given pen, as used in ration formulation, kg/animal"""

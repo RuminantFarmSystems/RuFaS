@@ -1,4 +1,3 @@
-from .field_manure_supplier import FieldManureSupplier
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
@@ -11,15 +10,13 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.weather import Weather
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from typing import Dict, List, Tuple
-
-im = InputManager()
-om = OutputManager()
 
 
 class FieldManager:
@@ -41,6 +38,8 @@ class FieldManager:
         A list of `Field` instances that have been initialized and are managed by this `FieldManager`.
     output_gatherer : FieldDataReporter
         An instance of `FieldDataReporter` responsible for gathering and reporting data from the managed fields.
+    om : OutputManager
+        Instance of the OutputManager.
 
     """
 
@@ -49,16 +48,15 @@ class FieldManager:
             "class": self.__class__.__name__,
             "function": "__init__",
         }
-
+        self.im = InputManager()
+        self.om = OutputManager()
         self.fields: List[Field] = []
-        fields = im.get_data_keys_by_properties("field_properties")
+        fields = self.im.get_data_keys_by_properties("field_properties")
         if not fields:
-            om.add_warning("No field input files.", "No fields will be simulated.", info_map)
-
-        manure_supplier = self._get_manure_supplier(manure_manager)
+            self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         for field in fields:
-            new_field = self._setup_field(field, manure_supplier, feed_manager)
+            new_field = self._setup_field(field, manure_manager, feed_manager)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
@@ -79,8 +77,15 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
-        current_conditions = weather.get_current_day_conditions(time)
         for field in self.fields:
+            current_conditions = weather.get_current_day_conditions(time, field.field_data.absolute_latitude)
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.daily_update_routine.__name__,
+                "suffix": f"field='{field.field_data.name}'",
+                "units": MeasurementUnits.HOURS,
+            }
+            self.om.add_variable("daylength", current_conditions.daylength, info_map)
             field.manage_field(time, current_conditions=current_conditions)
         self.output_gatherer.send_daily_variables()
 
@@ -93,43 +98,16 @@ class FieldManager:
         for field in self.fields:
             field.perform_annual_reset()
 
-    def _get_manure_supplier(self, manure_manager: ManureManager) -> ManureManager | FieldManureSupplier:
-        """
-        Determines whether manure used in field applications will be sourced from manure simulated in RuFaS or will be
-        created on the fly.
-
-        Returns
-        -------
-        ManureManager | FieldManureSupplier
-            The Manure Manager if animals are to be simulated, otherwise a Field Manure Supplier instance.
-
-        """
-        info_map = {"class": self.__class__.__name__, "function": self._get_manure_supplier.__name__}
-
-        animals_simulated = im.get_data("config.simulate_animals")
-
-        if animals_simulated:
-            return manure_manager
-
-        om.add_log(
-            "Animals not being simulated",
-            "Manure for field applications will be created by the FieldManureSupplier",
-            info_map,
-        )
-        return FieldManureSupplier()
-
     @staticmethod
-    def _setup_field(
-        field_name: str, manure_supplier: ManureManager | FieldManureSupplier, feed_manager: FeedManager
-    ) -> Field:
+    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_supplier : ManureManager | FieldManureSupplier
-            Entity that will provide manure for field applications.
+        manure_manager : ManureManager
+            Instance of the Manure Manager that will provide manure for field applications.
         feed_manager : FeedManager
             Instance of the FeedManager class which receives and manages harvested crops.
 
@@ -139,6 +117,7 @@ class FieldManager:
             A `Field` instance configured with the specified input data
 
         """
+        im = InputManager()
         field_configuration_data = im.get_data(field_name)
         field_size = field_configuration_data.get("field_size")
         absolute_latitude = field_configuration_data.get("absolute_latitude")
@@ -204,7 +183,7 @@ class FieldManager:
             fertilizer_events=fertilizer_events,
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
-            manure_supplier=manure_supplier,
+            manure_manager=manure_manager,
             feed_manager=feed_manager,
         )
 
@@ -226,6 +205,7 @@ class FieldManager:
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
+        im = InputManager()
         fertilizer_data = im.get_data(fertilizer_schedule)
         available_fertilizer_mixes = {}
         fertilizer_mix_data = fertilizer_data.get("available_fertilizer_mixes")
@@ -268,6 +248,7 @@ class FieldManager:
             ManureSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         manure_schedule_data = im.get_data(manure_schedule)
         manure_type_strings = manure_schedule_data.get("manure_types")
         manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
@@ -302,6 +283,7 @@ class FieldManager:
             TillageSchedule instance created using data pulled from the Input Manager.
 
         """
+        im = InputManager()
         tillage_schedule_data = im.get_data(tillage_schedule)
         tillage_schedule_instance = TillageSchedule(
             name="tillage_schedule",
@@ -332,6 +314,7 @@ class FieldManager:
             List of all crop schedules that have been created from the input specifications.
 
         """
+        im = InputManager()
         schedules = []
         crop_rotation_data = im.get_data(f"{crop_rotation}.crop_schedules")
 
@@ -379,6 +362,7 @@ class FieldManager:
             If no specification is provided for soil layers.
 
         """
+        im = InputManager()
         soil_configuration_data = im.get_data(soil_configuration)
         residue = soil_configuration_data["initial_residue"]
         soil_layers_config = soil_configuration_data.get("soil_layers")

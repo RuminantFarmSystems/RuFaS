@@ -59,7 +59,7 @@ class Denitrification:
                 layer.nitrate_content,
                 layer.denitrification_rate_coefficient,
                 layer.nutrient_cycling_temp_factor,
-                layer.soil_overall_carbon_fraction * 100,
+                layer.soil_overall_carbon_fraction,
             )
             layer.nitrate_content -= nitrified_nitrates
             layer.nitrous_oxide_emissions = nitrified_nitrates

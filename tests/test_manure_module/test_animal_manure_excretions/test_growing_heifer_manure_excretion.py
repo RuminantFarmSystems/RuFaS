@@ -3,7 +3,7 @@ from pytest import approx
 from pytest_mock import MockerFixture
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.manure.general_manure import AnimalManureExcretions
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
     manure_calculations,
 )
@@ -60,18 +60,8 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
     urine_nitrogen = manure_nitrogen - fecal_nitrogen
     urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
-    urine_urea_nitrogen_concentration_lower_bound = 2
-    urine_urea_nitrogen_concentration_upper_bound = 12
-    if urine_urea_nitrogen_concentration < urine_urea_nitrogen_concentration_lower_bound:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_lower_bound
-    elif urine_urea_nitrogen_concentration > urine_urea_nitrogen_concentration_upper_bound:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration_upper_bound
-    else:
-        urine_urea_nitrogen_concentration = urine_urea_nitrogen_concentration
-    tan_percent_of_urea = 48.2 - 2.9 * urine_urea_nitrogen_concentration
-    total_ammoniacal_nitrogen_concentration = (
-        tan_percent_of_urea / GeneralConstants.FRACTION_TO_PERCENTAGE
-    ) * urine_urea_nitrogen_concentration
+
+    manure_total_ammoniacal_nitrogen = urine_nitrogen
     potassium = (
         dry_matter_intake
         * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
@@ -128,9 +118,7 @@ def test_growing_heifer_manure_calculations(methane_model: str, mocker: MockerFi
     assert actual_total_phosphorus_excreted == approx(total_phosphorus_excreted)
     assert manure_excretion_values["urea"] == approx(urine_urea_nitrogen_concentration)
     assert manure_excretion_values["urine"] == approx(urine)
-    assert manure_excretion_values["total_ammoniacal_nitrogen_concentration"] == approx(
-        total_ammoniacal_nitrogen_concentration
-    )
+    assert manure_excretion_values["manure_total_ammoniacal_nitrogen"] == approx(manure_total_ammoniacal_nitrogen)
     assert manure_excretion_values["urine_nitrogen"] == approx(urine_nitrogen)
     assert manure_excretion_values["manure_nitrogen"] == approx(manure_nitrogen)
     assert manure_excretion_values["manure_mass"] == approx(total_manure_excreted)

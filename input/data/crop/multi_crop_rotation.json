@@ -10,10 +10,7 @@
             "harvest_years": [1990],
             "harvest_days": [305],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -25,9 +22,7 @@
             "harvest_years": [1991],
             "harvest_days": [296],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -39,10 +34,7 @@
             "harvest_years": [1992],
             "harvest_days": [323],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -54,9 +46,7 @@
             "harvest_years": [1993, 1994],
             "harvest_days": [273],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -68,10 +58,7 @@
             "harvest_years": [1993],
             "harvest_days": [225],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -83,10 +70,7 @@
             "harvest_years": [1995],
             "harvest_days": [286],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -98,10 +82,7 @@
             "harvest_years": [1996],
             "harvest_days": [237],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -113,10 +94,7 @@
             "harvest_years": [1996,1997],
             "harvest_days": [274],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -128,10 +106,7 @@
             "harvest_years": [1998],
             "harvest_days": [293],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -143,10 +118,7 @@
             "harvest_years": [1999],
             "harvest_days": [231],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -158,10 +130,7 @@
             "harvest_years": [1999,2000],
             "harvest_days": [250],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -173,9 +142,7 @@
             "harvest_years": [2001],
             "harvest_days": [288],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -187,10 +154,7 @@
             "harvest_years": [2002],
             "harvest_days": [231],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -202,9 +166,7 @@
             "harvest_years": [2002, 2003],
             "harvest_days": [250],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -216,9 +178,7 @@
             "harvest_years": [2004],
             "harvest_days": [300],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -230,10 +190,7 @@
             "harvest_years": [2005],
             "harvest_days": [193],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -245,9 +202,7 @@
             "harvest_years": [2005,2006],
             "harvest_days": [251],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -259,9 +214,7 @@
             "harvest_years": [2007],
             "harvest_days": [290],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -273,10 +226,7 @@
             "harvest_years": [2008],
             "harvest_days": [193],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -288,9 +238,7 @@
             "harvest_years": [2008, 2009],
             "harvest_days": [292],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -302,9 +250,7 @@
             "harvest_years": [2010],
             "harvest_days": [286],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -316,10 +262,7 @@
             "harvest_years": [2011],
             "harvest_days": [193],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -331,9 +274,7 @@
             "harvest_years": [2011,2012],
             "harvest_days": [236],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -345,9 +286,7 @@
             "harvest_years": [2013],
             "harvest_days": [286],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -359,10 +298,7 @@
             "harvest_years": [2014],
             "harvest_days": [246],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -374,9 +310,7 @@
             "harvest_years": [2014,2015],
             "harvest_days": [245],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -388,9 +322,7 @@
             "harvest_years": [2016],
             "harvest_days": [294],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "winter_wheat_hay",
@@ -402,10 +334,7 @@
             "harvest_years": [2017],
             "harvest_days": [240],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
-
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "alfalfa_silage",
@@ -417,9 +346,7 @@
             "harvest_years": [2017,2018],
             "harvest_days": [251],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         },
         {
             "crop_species": "corn_grain",
@@ -431,9 +358,7 @@
             "harvest_years": [2019],
             "harvest_days": [303],
             "harvest_operations": ["harvest_kill"],
-            "harvest_type": "scheduled",
-            "planting_order": "1st",
-            "extracted": true
+            "harvest_type": "scheduled"
         }
     ]
 }
