@@ -7,13 +7,13 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
 
-def average_aggregator(data: List[float]) -> float:
+def average_aggregator(data: list[float]) -> float:
     """
     Calculates the average of a list of numbers.
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A list of numbers whose average is to be calculated.
 
     Returns
@@ -24,13 +24,13 @@ def average_aggregator(data: List[float]) -> float:
     return sum(data) / len(data) if data else 0
 
 
-def division_aggregator(data: List[float]) -> float | None:
+def division_aggregator(data: list[float]) -> float | None:
     """
     Divides the first number in the list by each of the subsequent numbers.
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A list of numbers for the division operation.
 
     Returns
@@ -55,7 +55,7 @@ def product_aggregator(data: list[float]) -> float:
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A list of numbers whose product is to be calculated.
 
     Returns
@@ -75,7 +75,7 @@ def sd_aggregator(data: list[float]) -> float:
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A list of numbers whose standard deviation is to be calculated.
 
     Returns
@@ -87,13 +87,13 @@ def sd_aggregator(data: list[float]) -> float:
     return (sum((x - mean) ** 2 for x in data) / len(data)) ** 0.5 if data else 0.0
 
 
-def sum_aggregator(data: List[float]) -> float:
+def sum_aggregator(data: list[float]) -> float:
     """
     Returns the sum of a list of numbers.
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A list of numbers whose sum is to be calculated.
 
     Returns
@@ -110,7 +110,7 @@ def subtraction_aggregator(data: list[float]) -> float | None:
 
     Parameters
     ----------
-    data : List[float]
+    data : list[float]
         A list of numbers for the subtraction operation.
 
     Returns
@@ -127,7 +127,7 @@ def subtraction_aggregator(data: list[float]) -> float | None:
     return result
 
 
-AGGREGATION_FUNCTIONS: Dict[str, Callable[[List[float]], float] | Callable[[list[float]], float | None]] = {
+AGGREGATION_FUNCTIONS: dict[str, Callable[[list[float]], float] | Callable[[list[float]], float | None]] = {
     "average": average_aggregator,
     "division": division_aggregator,
     "product": product_aggregator,
@@ -829,9 +829,9 @@ class ReportGenerator:
 
     def _apply_vertical_aggregation(
         self,
-        report_data: dict[str, dict[str, list[Any]]] | dict[str, list[Any]],
+        report_data: dict[str, dict[str, list[float | None]]] | dict[str, list[float | None]],
         aggregator: Callable[[List[float]], float] | Callable[[list[float]], float | None],
-    ) -> tuple[dict[str, list[float]], list[dict[str, str]]]:
+    ) -> tuple[dict[str, list[float | None]], list[dict[str, str | dict[str, str]]]]:
         """
         Performs vertical aggregation on report data using a specified aggregator function.
 
@@ -844,7 +844,7 @@ class ReportGenerator:
 
         Returns
         -------
-        tuple[dict[str, list[float]], list[dict[str, str]]]
+        tuple[dict[str, list[float | None]], list[dict[str, str | dict[str, str]]]]
             The vertically aggregated data as a dictionary of lists and the logs to be passed to OutputManager.
         """
 
@@ -860,33 +860,33 @@ class ReportGenerator:
     def _handle_aggregation_errors(
         self,
         aggregator: Callable[[list[float]], float] | Callable[[list[float]], float | None],
-        data: dict[str, list[float | None]],
+        data: list[float],
         key: str,
-    ) -> tuple[dict[str, list[float | None] | float | None], dict[str, str | dict[str, str]]]:
+    ) -> tuple[float | None, dict[str, str | dict[str, str]]]:
         """Wrapper function for RG aggregators to catch Nones and NaNs.
 
         Parameters
         ----------
         aggregator : Callable[[list[float]], float] | Callable[[list[float]], float  |  None]
             The aggregator function being called from the report filter.
-        data : dict[str, list[float  |  None]]
+        data : list[float]
             The data to be aggregated.
         key : str
             The key for the data being aggregated.
 
         Returns
         -------
-        tuple[dict[str, list[float | None] | float | None], dict[str, str | dict[str, str]]]
+        tuple[float | None, dict[str, str | dict[str, str]]]
             The resulting aggregated data and the aggregation logs to be returned to OutputManager.
-            Returns None and an error message if the data contains None or NaN values.
+            Returns None and an error message if the data contains any values that cannot be aggregated.
         """
         aggregated_data = None
         if any(not isinstance(x, (int, float)) or math.isnan(x) for x in data):
-            info_map = {
+            info_map: dict[str, str] = {
                 "class": self.__class__.__name__,
                 "function": self._handle_aggregation_errors.__name__,
             }
-            aggregation_error = {
+            aggregation_error: dict[str, str | dict[str, str]] = {
                 "error": "ReportGenerator aggregation error",
                 "message": f"Encountered unaggregatable values in {key} data, returning None instead.",
                 "info_map": info_map,
@@ -979,7 +979,7 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         for name in constants_config.keys():
             normalized_provided_name = self._normalize_constant_name(name)
-            matching_constant = None
+            matching_constant = ""
             for attribute in dir(GeneralConstants):
                 if attribute.startswith("__"):
                     continue
@@ -998,10 +998,7 @@ class ReportGenerator:
                     "info_map": info_map,
                 }
                 event_logs.append(constant_units_warning)
-            if matching_constant:
-                unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
-            else:
-                unit_for_constant = "unit_not_found"
+            unit_for_constant = GeneralConstants.CONSTANTS_TO_UNITS.get(matching_constant, "unit_not_found")
             constant_with_units = f"{name}_({unit_for_constant})"
             updated_constants_config[constant_with_units] = constants_config[name]
 
