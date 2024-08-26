@@ -29,21 +29,23 @@ for date in net_merit.keys():
     result.insert(len(result.columns), date, rand_nm)
     res_summary.loc[len(res_summary.index)] = [date, mean, std]
 
-    fig, axes = plt.subplots(2, 1, sharex=True)
+    fig, axes = plt.subplots(3, 1, sharex=True)
     fig.set_figheight(8)
     fig.set_figwidth(12)
 
     sns.histplot(rand_nm, ax=axes[0], bins=101, kde=True)
     axes[0].set_title("Population Distribution")
+    xmin, xmax = min(rand_nm), max(rand_nm)
+    x = np.linspace(xmin, xmax, 101)
+    p = scipy.stats.norm.pdf(x, mean, std)
+    scaled_p = [val * 25000000 for val in p]
+    axes[0].plot(x, scaled_p, 'r')
 
     axes[1].hist(net_merit[date], bins=101)
     axes[1].set_title("Percentile Distribution")
 
-    # xmin, xmax = min(rand_nm), max(rand_nm)
-    # x = np.linspace(xmin, xmax, 101)
-    # p = scipy.stats.norm.pdf(x, mean, std)
-    # p = [val * 25000000 for val in p]
-    # plt.plot(x, p, 'r')
+    axes[2].plot(x, p, 'r')
+    axes[2].set_title("PDF")
     plt.savefig(population_graph_path + date+'.png')
     plt.close()
 
