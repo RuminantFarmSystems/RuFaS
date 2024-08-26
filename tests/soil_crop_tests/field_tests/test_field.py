@@ -76,9 +76,9 @@ def test_init(
     with patch.object(om, "add_error") as add_error:
         if should_fail:
             with pytest.raises(ValueError, match="Manure supplier cannot be None."):
-                Field(manure_supplier=manure_manager, feed_manager=feed_manager)
+                Field(manure_manager=manure_manager, feed_manager=feed_manager)
         else:
-            Field(manure_supplier=manure_manager, feed_manager=feed_manager)
+            Field(manure_manager=manure_manager, feed_manager=feed_manager)
             assert True
 
         assert add_error.call_count == error_count
@@ -86,7 +86,7 @@ def test_init(
 
 def test_manage_field() -> None:
     """Tests that all subroutines are correctly called by the main routine in field."""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field._check_fertilizer_application_schedule = MagicMock()
     field._check_manure_application_schedule = MagicMock()
     field._check_tillage_schedule = MagicMock()
@@ -172,7 +172,7 @@ def test_check_crop_planting_schedule(
     contains four cases: some planting events occur on the current day, all planting events occur on the current day,
     no planting events occur on the current day, and no planting events left.
     """
-    field = Field(plantings=all_events, manure_supplier=MagicMock(ManureManager))
+    field = Field(plantings=all_events, manure_manager=MagicMock(ManureManager))
     field._filter_events = MagicMock(return_value=(events_remaining, events_occurring_today))
 
     field._plant_crop = MagicMock()
@@ -235,7 +235,7 @@ def test_check_fertilizer_application_schedule(
     current_events: List[FertilizerEvent],
 ) -> None:
     """Tests that fertilizer events that occur on the current day are properly selected and executed."""
-    field = Field(fertilizer_events=events, manure_supplier=MagicMock(ManureManager))
+    field = Field(fertilizer_events=events, manure_manager=MagicMock(ManureManager))
     field._filter_events = MagicMock(return_value=(remaining_events, current_events))
     field._execute_fertilizer_application = MagicMock()
     mocked_time = MagicMock(Time)
@@ -311,7 +311,7 @@ def test_check_manure_application_schedule(
     current_events: List[ManureEvent],
 ) -> None:
     """Tests that ManureEvents are correctly checked for and executed when scheduled."""
-    field = Field(manure_events=events, manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_events=events, manure_manager=MagicMock(ManureManager))
     field._filter_events = MagicMock(return_value=(remaining_events, current_events))
     field._execute_manure_application = MagicMock()
     mocked_time = MagicMock(Time)
@@ -384,7 +384,7 @@ def test_check_crop_harvest_schedule(
     current_harvest_events: List[HarvestEvent],
 ) -> None:
     """Tests that the schedule of crop harvests is determined correctly for any given day."""
-    field = Field(harvestings=all_harvest_events, manure_supplier=MagicMock(ManureManager))
+    field = Field(harvestings=all_harvest_events, manure_manager=MagicMock(ManureManager))
 
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
@@ -442,7 +442,7 @@ def test_harvest_heat_scheduled_crops(
         crops[index].crop_management.manage_harvest = MagicMock()
 
     field = Field(
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
         feed_manager=mock_feed_manager,
         field_data=mock_field_data,
     )
@@ -573,7 +573,7 @@ def test_plant_crop(
     field = Field(
         field_data=field_data,
         custom_crop_specifications=custom_crop_specs,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "current_calendar_year", year)
@@ -690,7 +690,7 @@ def test_record_planting(
     """Tests that crop plantings are correctly recorded to the OutputManager."""
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     with patch(
         "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
@@ -739,7 +739,7 @@ def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_spec
     """Tests that errors are correctly raised when a crop specification for a requested planting is not present."""
     field = Field(
         custom_crop_specifications=custom_crop_specs,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     field.field_data.name = field_name
     mocked_time = MagicMock(Time)
@@ -772,7 +772,7 @@ def test_harvest_crop(
     other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
     field = Field(
         field_data=mock_field_data,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
         feed_manager=mock_feed_manager,
     )
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
@@ -830,7 +830,7 @@ def test_harvest_crop_warnings(
             crop.data.id = "test"
             crop.crop_management.manage_harvest = MagicMock()
         field = Field(
-            manure_supplier=MagicMock(ManureManager),
+            manure_manager=MagicMock(ManureManager),
             field_data=mock_field_data,
             feed_manager=mock_feed_manager,
         )
@@ -867,11 +867,11 @@ def test_remove_dead_crops() -> None:
     This test contains four cases: there are no crops in the field, some crops in the field are dead, no crops in the
     field are dead, and all crops in the field are dead.
     """
-    field_1 = Field(manure_supplier=MagicMock(ManureManager))
+    field_1 = Field(manure_manager=MagicMock(ManureManager))
     field_1._remove_dead_crops()
     assert field_1.crops == []
 
-    field_2 = Field(manure_supplier=MagicMock(ManureManager))
+    field_2 = Field(manure_manager=MagicMock(ManureManager))
     crop_1 = Crop()
     crop_1.data.is_alive = False
     crop_2 = Crop()
@@ -880,7 +880,7 @@ def test_remove_dead_crops() -> None:
     field_2._remove_dead_crops()
     assert field_2.crops == [crop_2, crop_3]
 
-    field_3 = Field(manure_supplier=MagicMock(ManureManager))
+    field_3 = Field(manure_manager=MagicMock(ManureManager))
     crop_4 = Crop()
     crop_5 = Crop()
     crop_6 = Crop()
@@ -888,7 +888,7 @@ def test_remove_dead_crops() -> None:
     field_3._remove_dead_crops()
     assert field_3.crops == [crop_4, crop_5, crop_6]
 
-    field_4 = Field(manure_supplier=MagicMock(ManureManager))
+    field_4 = Field(manure_manager=MagicMock(ManureManager))
     crop_7 = Crop()
     crop_8 = Crop()
     field_4.crops = [crop_7, crop_8]
@@ -907,7 +907,7 @@ def test_remove_dead_crops() -> None:
 )
 def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_field_proportion: float) -> None:
     """Tests that crops in a field correctly have their proportion reset when there are other crops present."""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.crops = crop_list
     field._reset_crop_field_coverage_fractions()
     for crop in field.crops:
@@ -925,7 +925,7 @@ def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_fie
 def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     """Tests that each crop's dormancy method is called."""
     crop = Crop()
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
     rainfall = 10.3
@@ -1017,6 +1017,7 @@ def test_make_custom_crop(config: dict):
     ],
 )
 def test_make_crop_from_config_dict(config: dict):
+    """Tests that custom crops are configured correctly."""
     supported_crops = set(item.value for item in CropSpecies)
     has_supported_species = "species" in config.keys() and str(config["species"]) in supported_crops
     Field._make_supported_crop = MagicMock()
@@ -1061,7 +1062,7 @@ def test_execute_fertilizer_application(
     field = Field(
         field_data=field_data,
         fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}},
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     formulate = mocker.patch.object(
         field,
@@ -1127,7 +1128,7 @@ def test_execute_fertilizer_application_error(
     field = Field(
         field_data=FieldData(name=field_name),
         fertilizer_mixes=available_mixes,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     with pytest.raises(KeyError) as e:
         field._execute_fertilizer_application(mix_name, 10.0, 10.0, 10.0, 0.0, 1.0, 1994, 120)
@@ -1153,7 +1154,7 @@ def test_execute_fertilizer_application_with_invalid_args(
     with corrected values takes place."""
     field = Field(
         field_data=FieldData(name="test", field_size=1.2),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     with (
@@ -1380,7 +1381,7 @@ def test_record_fertilizer_application(
     """Tests that fertilizer applications are correctly recorded in the OutputManager."""
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
 
     with patch(
@@ -1639,7 +1640,7 @@ def test_execute_manure_application(
             field_size=1.4,
             supplement_manure_nutrient_deficiencies=supplement,
         ),
-        manure_supplier=mocked_manure_manager,
+        manure_manager=mocked_manure_manager,
     )
     field._add_manure_water = mocker.MagicMock()
     field.manure_applicator.apply_machine_manure = MagicMock()
@@ -1778,7 +1779,7 @@ def test_execute_manure_application_with_invalid_args(
     mocked_manure_manager.request_nutrients = MagicMock(return_value=supplied_nutrients)
     field = Field(
         field_data=FieldData(name="test", field_size=1.89),
-        manure_supplier=mocked_manure_manager,
+        manure_manager=mocked_manure_manager,
     )
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     expected_total_inorganic_fraction = 0.15  # equal to (50.0 / 100.0) * 0.3
@@ -2030,7 +2031,7 @@ def test_record_manure_application(
     """Tests that manure applications are recorded correctly."""
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
 
     with patch(
@@ -2078,7 +2079,7 @@ def test_add_manure_water(
     """Tests that manure water is correctly calculated and stored."""
     field_data = FieldData(field_size=2.3)
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
-    field = Field(field_data=field_data, manure_supplier=mock_manure_manager)
+    field = Field(field_data=field_data, manure_manager=mock_manure_manager)
     mocked_converter = mocker.patch.object(field.field_data, "convert_liters_to_millimeters", return_value=10.0)
 
     field._add_manure_water(manure_application, manure_type)
@@ -2135,7 +2136,7 @@ def test_record_nutrient_application_error(
 ) -> None:
     """Tests that manure and fertilizer application errors are correctly recorded to the OutputManager."""
     with patch("RUFAS.output_manager.Utility.get_timestamp") as mocked_timestamp:
-        field = Field(field_data=FieldData(name="test"), manure_supplier=MagicMock(ManureManager))
+        field = Field(field_data=FieldData(name="test"), manure_manager=MagicMock(ManureManager))
         mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
 
         field._record_nutrient_application_error(depth, remainder, name, year, day)
@@ -2181,7 +2182,7 @@ def test_execute_daily_processes(
             simulate_phosphorus_stress=stressors,
         )
 
-        incorp = Field(field_data=field_data, manure_supplier=MagicMock(ManureManager))
+        incorp = Field(field_data=field_data, manure_manager=MagicMock(ManureManager))
         crop_1 = Crop()
         crop_1.data.max_transpiration = transpiration
         crop_2 = Crop()
@@ -2283,7 +2284,7 @@ def test_cycle_water(
             water_sublimated=1.0,
             snow_content=snow_content,
         )
-        soil_data.plant_surface_residue = surface_residue
+        soil_data.soil_layers[0].plant_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(
             field_proportion=crop_1_proportion,
@@ -2315,7 +2316,7 @@ def test_cycle_water(
             current_residue=residue,
             seasonal_high_water_table=high_water_table,
         )
-        incorp = Field(field_data=field_data, soil=soil, manure_supplier=MagicMock(ManureManager))
+        incorp = Field(field_data=field_data, soil=soil, manure_manager=MagicMock(ManureManager))
         incorp.crops = [crop_1, crop_2]
 
         incorp.soil.infiltration.infiltrate = MagicMock()
@@ -2432,7 +2433,7 @@ def test_determine_watering_amount(
     data.watering_amount_in_mm = 5.0
     data.watering_occurs = watering_occurs
     data.current_water_deficit = water_deficit
-    incorp = Field(field_data=data, manure_supplier=MagicMock(ManureManager))
+    incorp = Field(field_data=data, manure_manager=MagicMock(ManureManager))
 
     actual = incorp._determine_watering_amount(rainfall, manure_water, mocked_time.year, mocked_time.day, irrigation)
     if old_method:
@@ -2465,7 +2466,7 @@ def test_determine_watering_amount(
 def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name: str) -> None:
     """Tests that manure water is correctly retrieved and logged."""
     field_data = FieldData(name=field_name, manure_water=water_amount)
-    field = Field(field_data=field_data, manure_supplier=MagicMock(autospec=ManureManager))
+    field = Field(field_data=field_data, manure_manager=MagicMock(autospec=ManureManager))
 
     with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
         actual = field._get_manure_water()
@@ -2524,7 +2525,7 @@ def test_handle_water_in_crop_canopies(
         crop1 = Crop(crop_data1)
         crop_data2 = CropData(canopy_water=second_canopy_amount)
         crop2 = Crop(crop_data2)
-        field = Field(manure_supplier=MagicMock(ManureManager))
+        field = Field(manure_manager=MagicMock(ManureManager))
         field.crops = [crop1, crop2]
 
         actual = field._handle_water_in_crop_canopies(precipitation)
@@ -2554,7 +2555,7 @@ def test_evaporate_from_crop_canopies(
     crop1 = Crop(data1)
     data2 = CropData(canopy_water=canopy_water_2)
     crop2 = Crop(data2)
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.crops = [crop1, crop2]
 
     actual_demand = field._evaporate_from_crop_canopies(demand)
@@ -2566,7 +2567,7 @@ def test_evaporate_from_crop_canopies(
 @pytest.mark.parametrize("biomasses,expected", [([30, 20, 14], 64), ([22.1], 22.1), ([], 0.0)])
 def test_determine_total_above_ground_biomass(biomasses: List[float], expected: float) -> None:
     """Tests that total above ground biomass on the field is correctly calculated."""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     for biomass in biomasses:
         crop = Crop()
         crop.data.above_ground_biomass = biomass
@@ -2703,7 +2704,7 @@ def test_determine_soil_cover_index(above_ground_biomass: float, residue: float,
 
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.soil.data.do_annual_reset = MagicMock()
     field.field_data.perform_annual_field_reset = MagicMock()
 
@@ -2774,7 +2775,7 @@ def test_check_tillage_schedule(
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
 
-    field = Field(tillage_events=events, manure_supplier=MagicMock(ManureManager))
+    field = Field(tillage_events=events, manure_manager=MagicMock(ManureManager))
     todays_count = len(is_today)
     field.tiller.till_soil = MagicMock()
     field._check_tillage_schedule(mocked_time)
@@ -2910,7 +2911,7 @@ def test_record_field_watering(
 ) -> None:
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     field._record_field_watering(year=year, day=day, watering_amount=watering_amount)
 
