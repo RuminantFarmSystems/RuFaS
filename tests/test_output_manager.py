@@ -627,12 +627,7 @@ def test_add_variable(
         # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
         ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
         # Case 3: Value is a dict, should process sub-keys
-        (
-            "var3",
-            {"sub1": 10, "sub2": 20},
-            {"class": "TestClass", "function": "test_function", "units": "kg"},
-            True
-        ),
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
     ],
 )
 def test_add_variable_chunkification_save_chunk_threshold_specified(
@@ -680,7 +675,6 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
     patched_save_current_variable_pool.assert_called_once()
 
 
-
 @pytest.mark.parametrize(
     "name, value, info_map, first_map",
     [
@@ -689,12 +683,7 @@ def test_add_variable_chunkification_save_chunk_threshold_specified(
         # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
         ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
         # Case 3: Value is a dict, should process sub-keys
-        (
-            "var3",
-            {"sub1": 10, "sub2": 20},
-            {"class": "TestClass", "function": "test_function", "units": "kg"},
-            True
-        ),
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
     ],
 )
 def test_add_variable_chunkification_save_chunk_threshold_no_call(
@@ -750,12 +739,7 @@ def test_add_variable_chunkification_save_chunk_threshold_no_call(
         # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
         ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
         # Case 3: Value is a dict, should process sub-keys
-        (
-            "var3",
-            {"sub1": 10, "sub2": 20},
-            {"class": "TestClass", "function": "test_function", "units": "kg"},
-            True
-        ),
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
     ],
 )
 def test_add_variable_chunkification_save_chunk_threshold_unspecified(
@@ -804,7 +788,6 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     patched_save_current_variable_pool.assert_called_once()
 
 
-
 @pytest.mark.parametrize(
     "name, value, info_map, first_map",
     [
@@ -813,12 +796,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
         # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
         ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
         # Case 3: Value is a dict, should process sub-keys
-        (
-            "var3",
-            {"sub1": 10, "sub2": 20},
-            {"class": "TestClass", "function": "test_function", "units": "kg"},
-            True
-        ),
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
     ],
 )
 def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
@@ -3125,7 +3103,7 @@ def test_run_startup_sequence_not_clear_output_directory(
         dummy_version_number,
         dummy_task_id,
     )
-    
+
     mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
     mock_flush_pools.assert_called_once()
     mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
@@ -3185,16 +3163,14 @@ def test_run_startup_sequence_chunkification(
         dummy_output_directory,
         dummy_max_memory_usage_percent,
         dummy_max_memory_usage,
-        dummy_save_chunk_threshold_call_count
+        dummy_save_chunk_threshold_call_count,
     )
 
 
 def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count(
-        mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
-    info_map = {
-        'class': 'OutputManager', 'function': 'setup_pool_overflow_control'
-    }
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
     mock_output_manager.saved_pool_chunks_path = Path("")
@@ -3208,7 +3184,6 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     psutil_virtual_memory_return.available = 1024
     psutil.virtual_memory = MagicMock(return_value=psutil_virtual_memory_return)
 
-
     dummy_output_directory: Path = Path("dummy/path")
     dummy_max_memory_usage_percent: int = 80
     dummy_max_memory_usage: int = 0
@@ -3219,20 +3194,21 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
             dummy_output_directory,
             dummy_max_memory_usage_percent,
             dummy_max_memory_usage,
-            dummy_save_chunk_threshold_call_count
+            dummy_save_chunk_threshold_call_count,
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory,
-        f"saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, f"saved_pool/20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
-    expected_log_message = f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n" \
-                           f"Current system available memory: {expected_available_memory_gb:.2f} GB = " \
-                           f"{expected_available_memory} Bytes.\n" \
-                           "The threshold add_variable_call count for saving pool chunk is set to " \
-                           f"{dummy_save_chunk_threshold_call_count}"
+    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_log_message = (
+        f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
+        f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
+        f"{expected_available_memory} Bytes.\n"
+        "The threshold add_variable_call count for saving pool chunk is set to "
+        f"{dummy_save_chunk_threshold_call_count}"
+    )
 
     assert mock_output_manager.chunkification is True
     assert mock_output_manager.available_memory == expected_available_memory
@@ -3246,11 +3222,9 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
 
 
 def test_setup_pool_overflow_control_user_define_max_memory_usage(
-        mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
-    info_map = {
-        'class': 'OutputManager', 'function': 'setup_pool_overflow_control'
-    }
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
     mock_output_manager.saved_pool_chunks_path = Path("")
@@ -3264,7 +3238,6 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
     psutil_virtual_memory_return.available = 1024
     psutil.virtual_memory = MagicMock(return_value=psutil_virtual_memory_return)
 
-
     dummy_output_directory: Path = Path("dummy/path")
     dummy_max_memory_usage_percent: int = 80
     dummy_max_memory_usage: int = 1024
@@ -3275,20 +3248,21 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
             dummy_output_directory,
             dummy_max_memory_usage_percent,
             dummy_max_memory_usage,
-            dummy_save_chunk_threshold_call_count
+            dummy_save_chunk_threshold_call_count,
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory,
-        f"saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, f"saved_pool/20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
-    expected_log_message = f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n" \
-                           f"Current system available memory: {expected_available_memory_gb:.2f} GB = " \
-                           f"{expected_available_memory} Bytes.\n" \
-                           "The maximum output variable pool size is set to " \
-                           f"{dummy_max_memory_usage} Bytes"
+    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_log_message = (
+        f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
+        f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
+        f"{expected_available_memory} Bytes.\n"
+        "The maximum output variable pool size is set to "
+        f"{dummy_max_memory_usage} Bytes"
+    )
 
     assert mock_output_manager.chunkification is True
     assert mock_output_manager.available_memory == expected_available_memory
@@ -3302,11 +3276,9 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
 
 
 def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
-        mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
 ) -> None:
-    info_map = {
-        'class': 'OutputManager', 'function': 'setup_pool_overflow_control'
-    }
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     mock_output_manager.chunkification = False
     mock_output_manager.available_memory = 0
     mock_output_manager.saved_pool_chunks_path = Path("")
@@ -3320,7 +3292,6 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
     psutil_virtual_memory_return.available = 1024
     psutil.virtual_memory = MagicMock(return_value=psutil_virtual_memory_return)
 
-
     dummy_output_directory: Path = Path("dummy/path")
     dummy_max_memory_usage_percent: int = 80
     dummy_max_memory_usage: int = 0
@@ -3331,21 +3302,22 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
             dummy_output_directory,
             dummy_max_memory_usage_percent,
             dummy_max_memory_usage,
-            dummy_save_chunk_threshold_call_count
+            dummy_save_chunk_threshold_call_count,
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory,
-        f"saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, f"saved_pool/20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
-    expected_available_memory_gb = expected_available_memory / (1024 ** 3)
+    expected_available_memory_gb = expected_available_memory / (1024**3)
     expected_max_pool_size = (dummy_max_memory_usage_percent / 100) * expected_available_memory
-    expected_log_message = f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n" \
-                           f"Current system available memory: {expected_available_memory_gb:.2f} GB = " \
-                           f"{expected_available_memory} Bytes.\n" \
-                           "The maximum output variable pool size is set to " \
-                           f"{expected_max_pool_size} Bytes"
+    expected_log_message = (
+        f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
+        f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
+        f"{expected_available_memory} Bytes.\n"
+        "The maximum output variable pool size is set to "
+        f"{expected_max_pool_size} Bytes"
+    )
 
     assert mock_output_manager.chunkification is True
     assert mock_output_manager.available_memory == expected_available_memory
