@@ -17,10 +17,8 @@ class Time:
         self.im = InputManager()
         self.config_data: Dict[str, str | int | bool] = self.im.get_data("config")
 
-        start_date_str: str = self.config_data["start_date"]
-        end_date_str: str = self.config_data["end_date"]
-        self.start_date: datetime.datetime = datetime.datetime.strptime(start_date_str, "%Y:%j")
-        self.end_date: datetime.datetime = datetime.datetime.strptime(end_date_str, "%Y:%j")
+        self.start_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["start_date"]), "%Y:%j")
+        self.end_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["end_date"]), "%Y:%j")
 
         self.current_date: datetime.datetime = self.start_date
         self.simulation_length_days: int = (self.end_date - self.start_date).days
