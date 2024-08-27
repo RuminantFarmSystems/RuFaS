@@ -9,7 +9,7 @@ from SALib.sample import saltelli as saltelli_sampler
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
-from RUFAS.end_to_end_tester import EndToEndTester
+from RUFAS.end_to_end_tester import EndToEndTestResultsComparer
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -457,16 +457,16 @@ class TaskManager:
             "produce_graphics": produce_graphics,
         }
 
-        output_manager.add_log("End-to-end testing", "Starting end-to-end testing simulation.", info_map)
+        output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
 
         TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
 
-        output_manager.add_log("End-to-end testing", "Completed end-to-end testing simulation", info_map)
+        output_manager.add_log("End-to-end testing", "Completed simulation for end-to-end testing", info_map)
 
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
 
-        EndToEndTester.compare_actual_and_expected_test_results(args["json_output_directory"])
+        EndToEndTestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
             args, input_manager, output_manager, task_id, produce_graphics, save_results=True
