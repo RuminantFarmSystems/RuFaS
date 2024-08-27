@@ -1766,7 +1766,7 @@ def test_adjust_accumulated_output_empty_manure_pit(
         time=mocker.MagicMock(),
         manure_treatment_config=mock_treatment_config,
     )
-    manure_treatment._sim_day = 51
+    manure_treatment._sim_day = 50
     manure_treatment.storage_time_period = 50
     manure_treatment_daily_output = ManureTreatmentDailyOutput()
     dummy_value = 10

@@ -41,6 +41,8 @@ class WinterWheat(CropData):
     mature_phosphorus_fraction: float = 0.0012
 
     max_root_depth: float = 1_300
+    root_distribution_param_da: float = 172.0
+    root_distribution_param_c: float = -1.286
 
 
 @dataclass(kw_only=True)
