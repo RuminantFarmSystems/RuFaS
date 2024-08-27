@@ -352,6 +352,11 @@ class FieldDataReporter:
                 field.soil.data.vadose_zone_layer.fresh_organic_phosphorus_content,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
             )
+            om.add_variable(
+                "plant_residue",
+                field.soil.data.vadose_zone_layer.plant_residue,
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+            )
 
             # ----------------------------adding layer data
             for index, layer in enumerate(field.soil.data.soil_layers):
@@ -913,22 +918,22 @@ class FieldDataReporter:
             )
             om.add_variable(
                 "annual_runoff_machine_manure_inorganic_phosphorus",
-                field.soil.data.annual_runoff_machine_manure_inorganic_phosphorus,
+                field.soil.data.machine_manure.annual_runoff_manure_inorganic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "annual_runoff_machine_manure_organic_phosphorus",
-                field.soil.data.annual_runoff_machine_manure_organic_phosphorus,
+                field.soil.data.machine_manure.annual_runoff_manure_organic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "annual_runoff_grazing_manure_inorganic_phosphorus",
-                field.soil.data.annual_runoff_grazing_manure_inorganic_phosphorus,
+                field.soil.data.grazing_manure.annual_runoff_manure_inorganic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
                 "annual_runoff_grazing_manure_organic_phosphorus",
-                field.soil.data.annual_runoff_grazing_manure_organic_phosphorus,
+                field.soil.data.grazing_manure.annual_runoff_manure_organic_phosphorus,
                 dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             om.add_variable(
