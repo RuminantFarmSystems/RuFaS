@@ -7,6 +7,13 @@
       "type": "json",
       "properties": "end_to_end_testing_input_properties"
     },
+    "end_to_end_testing_result_paths": {
+      "title": "Actual and Expected end-to-end testing results paths",
+      "description": "Specifies how to find actual and expected results for end-to-end testing of different RuFaS domains.",
+      "path": "input/data/end_to_end_testing/end_to_end_testing_result_paths.json",
+      "type": "json",
+      "properties": "end_to_end_test_result_path_properties"
+    },
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
