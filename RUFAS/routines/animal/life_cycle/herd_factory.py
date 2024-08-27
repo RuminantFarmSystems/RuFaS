@@ -276,7 +276,7 @@ class HerdFactory:
                 self._init_animal_from_data,
                 ["heiferI"] * len(herd_data["heiferIs"]),
                 herd_data["heiferIs"],
-                [time] * len(herd_data["calves"]),
+                [time] * len(herd_data["heiferIs"]),
             )
         )
         heiferIIs = list(
@@ -284,7 +284,7 @@ class HerdFactory:
                 self._init_animal_from_data,
                 ["heiferII"] * len(herd_data["heiferIIs"]),
                 herd_data["heiferIIs"],
-                [time] * len(herd_data["calves"]),
+                [time] * len(herd_data["heiferIIs"]),
             )
         )
         heiferIIIs = list(
@@ -292,7 +292,7 @@ class HerdFactory:
                 self._init_animal_from_data,
                 ["heiferIII"] * len(herd_data["heiferIIIs"]),
                 herd_data["heiferIIIs"],
-                [time] * len(herd_data["calves"]),
+                [time] * len(herd_data["heiferIIIs"]),
             )
         )
         cows = list(
@@ -300,7 +300,7 @@ class HerdFactory:
                 self._init_animal_from_data,
                 ["cow"] * len(herd_data["cows"]),
                 herd_data["cows"],
-                [time] * len(herd_data["calves"]),
+                [time] * len(herd_data["cows"]),
             )
         )
         replacement = list(
@@ -308,7 +308,7 @@ class HerdFactory:
                 self._init_animal_from_data,
                 ["replacement"] * len(herd_data["replacement"]),
                 herd_data["replacement"],
-                [time] * len(herd_data["calves"]),
+                [time] * len(herd_data["replacement"]),
             )
         )
 
