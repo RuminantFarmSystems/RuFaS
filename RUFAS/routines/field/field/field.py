@@ -14,7 +14,6 @@ from RUFAS.routines.field.manager.events import (
     FertilizerEvent,
     ManureEvent,
 )
-from ..manager.field_manure_supplier import FieldManureSupplier
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.field.field_data import FieldData
@@ -60,7 +59,7 @@ class Field:
         List of all fertilizer mixes available for application to this field.
     manure_events : List[ManureEvent], default=None
         Manure application interface.
-    manure_supplier : ManureManager | FieldManureSupplier, default=None
+    manure_manager : ManureManager, default=None
         Object that will to be used during simulation to get manure for field applications.
 
     Attributes
@@ -94,8 +93,8 @@ class Field:
         List of ManureApplication objects
     manure_events: List[ManureEvent]
         List of all manure applications that will be applied to this field
-    manure_supplier: ManureManager | FieldManureSupplier
-        Manure supplier from which manure is requested for application to the field.
+    manure_manager: ManureManager
+        Manure Manager instance from which manure is requested for application to the field.
     feed_manager: FeedManager
         FeedManager instance which receives harvested crops.
 
@@ -116,7 +115,7 @@ class Field:
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
         manure_events: Optional[List[ManureEvent]] = None,
-        manure_supplier: Optional[ManureManager | FieldManureSupplier] = None,
+        manure_manager: Optional[ManureManager] = None,
         feed_manager: Optional[FeedManager] = None,
     ):
         # field-wide attributes
@@ -157,7 +156,7 @@ class Field:
             "function": "__init__",
         }
 
-        if manure_supplier is None:
+        if manure_manager is None:
             om.add_error(
                 "field_initialization_error",
                 f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
@@ -166,7 +165,7 @@ class Field:
             )
             raise ValueError("Manure supplier cannot be None.")
 
-        self.manure_supplier: ManureManager | FieldManureSupplier = manure_supplier
+        self.manure_manager: ManureManager = manure_manager
 
         if feed_manager is None:
             om.add_error(
@@ -580,7 +579,7 @@ class Field:
             manure_type=requested_manure_type,
         )
 
-        manure_supplied = self.manure_supplier.request_nutrients(nutrient_request)
+        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
             self._add_manure_water(manure_supplied, requested_manure_type)
@@ -1317,7 +1316,7 @@ class Field:
 
         soil_evaporation_and_sublimation_amount = self._determine_soil_evaporation_and_sublimation_adjusted(
             above_ground_biomass,
-            self.soil.data.plant_surface_residue,
+            self.soil.data.soil_layers[0].plant_residue,
             self.soil.data.snow_content,
             remaining_evapotranspirative_demand,
             weighted_average_transpiration,
