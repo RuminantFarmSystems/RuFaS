@@ -2177,7 +2177,7 @@ def test_anaerobic_lagoon_freeboard_volume(
 def anaerobic_digester(mocker: MockerFixture) -> AnaerobicDigestion:
     """Creates an anaerobic digester for testing purposes."""
     mocker.patch.object(AnaerobicDigestion, "__init__", return_value=None)
-    return AnaerobicDigestion()
+    return AnaerobicDigestion(mocker.MagicMock(), mocker.MagicMock(), mocker.MagicMock())
 
 
 def test_daily_update_helper(mocker: MockFixture) -> None:
