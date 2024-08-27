@@ -732,13 +732,14 @@ class ReportGenerator:
         event_logs: list[dict[str, str | dict[str, str]]] = []
         display_units = filter_content.get("display_units", False)
         simplify_units = filter_content.get("simplify_units", True)
+        aggregate_report_keys = ", ".join(f"'{key}'" for key in aggregate_report.keys())
         if horizontal_first:
             loop_list = filter_content.get("horizontal_order", list(aggregate_report.keys()))
             horizontally_aggregated, aggregate_units, event_logs = self._apply_horizontal_aggregation(
                 aggregate_report, loop_list, horizontal_aggregator, simplify_units
             )
             vertically_aggregated_data, aggregation_log = self._handle_aggregation(
-                vertical_aggregator, horizontally_aggregated, str(list(aggregate_report.keys()))
+                vertical_aggregator, horizontally_aggregated, aggregate_report_keys
             )
             if aggregation_log:
                 event_logs.append(aggregation_log)
@@ -751,7 +752,7 @@ class ReportGenerator:
             ver_hor_aggregated = []
             for elements in zip(*vertically_aggregated.values()):
                 horizontally_aggregated_data, aggregation_log = self._handle_aggregation(
-                    horizontal_aggregator, list(elements), str(list(aggregate_report.keys()))
+                    horizontal_aggregator, list(elements), aggregate_report_keys
                 )
                 if aggregation_log:
                     event_logs.append(aggregation_log)
@@ -840,10 +841,11 @@ class ReportGenerator:
         max_length = max(lengths)
         aggregated_data: list[float] = []
         event_logs: list[dict[str, str | dict[str, str]]] = []
+        report_data_keys = ", ".join(f"'{key}'" for key in report_data.keys())
         for i in range(max_length):
             temp_data = [report_data[key][i] for loop_key in loop_list for key in report_data if loop_key in key]
             horizontally_aggregated_data, aggregation_log = self._handle_aggregation(
-                aggregator, temp_data, str(list(report_data.keys()))
+                aggregator, temp_data, report_data_keys
             )
             if aggregation_log:
                 event_logs.append(aggregation_log)
@@ -918,7 +920,7 @@ class ReportGenerator:
         if any(not isinstance(x, (int, float)) or math.isnan(x) for x in data):
             aggregation_error: dict[str, str | dict[str, str]] = {
                 "error": "ReportGenerator aggregation error",
-                "message": f"Encountered unaggregatable values in {key} data, returning None instead.",
+                "message": f"Encountered unaggregatable values in variable(s): {key}. Returning None instead.",
                 "info_map": info_map,
             }
             return aggregated_data, aggregation_error
