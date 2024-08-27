@@ -68,3 +68,84 @@ def test_perform_daily_crop_update(
         crop._growth_constraints.constrain_growth.assert_not_called()
         crop._leaf_area_index.grow_canopy.assert_not_called()
         crop._biomass_allocation.allocate_biomass.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "in_growing_season, should_update",
+    [
+        (True, True),  # Crop is in growing season, should update
+        (False, False),  # Crop is not in growing season, should not update
+    ],
+)
+def test_cycle_water_for_crops(
+    mocker: MockerFixture, in_growing_season: bool, should_update: bool
+) -> None:
+    crop_data = CropData()
+    mocker.patch.object(CropData, 'in_growing_season', new_callable=mocker.PropertyMock,
+                        return_value=in_growing_season)
+    crop = Crop(crop_data)
+
+    mocker.patch.object(crop._water_uptake, "uptake_water")
+    mocker.patch.object(crop._water_dynamics, "cycle_water")
+    mock_soil_data = mocker.Mock(spec=SoilData)
+
+    if should_update:
+        crop._data.water_uptake = 5.0
+
+    crop.cycle_water_for_crops(10.0, 20.0, mock_soil_data)
+
+    # Assertions
+    if should_update:
+        crop._water_uptake.uptake_water.assert_called_once_with(mock_soil_data)
+        crop._water_dynamics.cycle_water.assert_called_once_with(
+            10.0, 5.0, 20.0
+        )
+    else:
+        crop._water_uptake.uptake_water.assert_not_called()
+        crop._water_dynamics.cycle_water.assert_not_called()
+        assert crop._data.cumulative_evaporation == 0.0
+        assert crop._data.cumulative_transpiration == 0.0
+        assert crop._data.cumulative_potential_evapotranspiration == 0.0
+        assert crop._data.cumulative_water_uptake == 0.0
+
+
+@pytest.mark.parametrize(
+    "water_canopy_storage_capacity, canopy_water, precipitation_reaching_soil, expected_precipitation_reaching_soil,"
+    "expected_excess_canopy_water",
+    [
+        (10.0, 5.0, 8.0, 3.0, 0.0),   # Partial canopy storage, no excess water
+        (10.0, 10.0, 5.0, 5.0, 0.0),  # Full canopy storage, no excess water
+        (10.0, 15.0, 10.0, 10.0, 5.0),  # Canopy overfilled, excess water
+    ],
+)
+def test_handle_water_in_canopy(
+    mocker: MockerFixture,
+    water_canopy_storage_capacity: float,
+    canopy_water: float,
+    precipitation_reaching_soil: float,
+    expected_precipitation_reaching_soil: float,
+    expected_excess_canopy_water: float,
+) -> None:
+    crop_data = CropData()
+    crop = Crop(crop_data)
+
+    # Use PropertyMock to mock crop_data attributes
+    mocker.patch.object(CropData, 'water_canopy_storage_capacity', new_callable=mocker.PropertyMock,
+                        return_value=water_canopy_storage_capacity)
+    mocker.patch.object(CropData, 'canopy_water', new_callable=mocker.PropertyMock, return_value=canopy_water)
+
+    # Call the method
+    actual_precipitation_reaching_soil, actual_excess_canopy_water = \
+        crop.handle_water_in_canopy(precipitation_reaching_soil)
+
+    # Assertions
+    assert actual_precipitation_reaching_soil == expected_precipitation_reaching_soil
+    assert actual_excess_canopy_water == expected_excess_canopy_water
+
+    if water_canopy_storage_capacity > canopy_water:
+        expected_canopy_water = min(water_canopy_storage_capacity, canopy_water + min(precipitation_reaching_soil,
+                                                                                      water_canopy_storage_capacity
+                                                                                      - canopy_water))
+        assert crop._data.canopy_water == expected_canopy_water
+    else:
+        assert crop._data.canopy_water == water_canopy_storage_capacity
