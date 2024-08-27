@@ -1,4 +1,4 @@
 {
     "name": "feed_storage_e2e_results",
-    "filters": ["FeedStorageResults.*"]
+    "filters": ["FeedStorage.*"]
 }

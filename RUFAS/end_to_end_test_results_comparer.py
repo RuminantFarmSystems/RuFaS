@@ -3,6 +3,7 @@ from deepdiff import DeepDiff
 from pathlib import Path
 from typing import Any
 
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
@@ -10,20 +11,7 @@ import json
 import re
 
 
-TestResultPathType = namedtuple("TestResultPaths", ["domain_prefix", "expected_results_path", "actual_results_path"])
-
-
-"""
-Maps a RuFaS domain that is supported for end-to-end testing to information needed to collect actual and expected
-results for testing that domain, and the prefix used when saving the test results to the Output Manager.
-"""
-TEST_DOMAINS = {
-    "Feed Storage": TestResultPathType(
-        "FeedStorageResults",
-        "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
-        "end-to-end-testing_saved_variables_e2e_feed_storage_",
-    )
-}
+TestResultPathType = namedtuple("TestResultPaths", ["domain", "expected_results_path", "actual_results_path"])
 
 
 class EndToEndTestResultsComparer:
@@ -47,26 +35,29 @@ class EndToEndTestResultsComparer:
             "class": EndToEndTestResultsComparer.__class__.__name__,
             "function": EndToEndTestResultsComparer.compare_actual_and_expected_test_results.__name__,
         }
-        for domain, info in TEST_DOMAINS.items():
+        test_result_path_sets = EndToEndTestResultsComparer._get_test_result_paths()
+        for path_set in test_result_path_sets:
             om.add_log(
-                f"End-to-end testing for {domain}", "Collecting and comparing actual and expected results", info_map
+                f"End-to-end testing for {path_set.domain}",
+                "Collecting and comparing actual and expected results",
+                info_map
             )
             path_to_actual_results = None
             for path in json_output_path.iterdir():
-                is_a_match = re.match(f"{str(json_output_path)}/{info.actual_results_path}.*", str(path))
+                is_a_match = re.match(f"{str(json_output_path)}/{path_set.actual_results_path}.*", str(path))
                 if is_a_match:
                     path_to_actual_results = path
                     break
             else:
                 om.add_error(
-                    f"Could not find actual end-to-end testing results for {domain}",
+                    f"Could not find actual end-to-end testing results for {path_set.domain}",
                     "End-to-end testing failed.",
                     info_map,
                 )
                 continue
             with open(path_to_actual_results, "r") as results:
                 actual_results = json.load(results)
-            with open(f"{info.expected_results_path}", "r") as e_to_e_results:
+            with open(f"{path_set.expected_results_path}", "r") as e_to_e_results:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
 
@@ -75,17 +66,29 @@ class EndToEndTestResultsComparer:
             is_difference_in_results = diff == {}
             if is_difference_in_results:
                 om.add_log(
-                    f"End-to-end testing succeeded for {domain}",
+                    f"End-to-end testing succeeded for {path_set.domain}",
                     "No differences found between actual and expected end-to-end testing results.",
                     info_map,
                 )
             else:
                 om.add_error(
-                    f"Failed end-to-end testing for {domain}",
+                    f"Failed end-to-end testing for {path_set.domain}",
                     "Identified differences between actual and expected results.",
                     info_map,
                 )
             diff.update({"end_to_end_testing_passing": is_difference_in_results})
-            info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": info.domain_prefix})
+            info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": path_set.domain})
             for comparison_type, difference in diff.items():
                 om.add_variable(comparison_type, difference, info_map)
+
+    @staticmethod
+    def _get_test_result_paths() -> list[TestResultPathType]:
+        """Retrieves the paths to test results and associated information from the InputManager."""
+        im = InputManager()
+        result_paths: list[dict[str, str]] = im.get_data("end_to_end_testing_result_paths.end_to_end_test_result_paths")
+        test_result_paths: list[TestResultPathType] = []
+        for path_set in result_paths:
+            test_result_paths.append(TestResultPathType(
+                path_set["domain"], path_set["expected_results_path"], path_set["actual_results_path"]
+            ))
+        return test_result_paths
