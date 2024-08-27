@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -398,67 +398,66 @@ def test_field_proportion_setter(mocker: MockerFixture) -> None:
     field_proportion_mock.assert_called_with(new_field_proportion)
 
 
-# @pytest.mark.parametrize(
-#     "crop_reference, custom_crop_specifications, expected_method, expected_args, should_raise_keyerror,
-#     "expected_crop",
-#     [
-#         # Supported species case
-#         ("winter_wheat_grain", {}, "make_supported_crop", ("winter_wheat_grain",), False, Mock(spec=Crop)),
+@pytest.mark.parametrize(
+    "crop_reference,heat_scheduled,custom_crop_specs,is_supported,should_raise_keyerror",
+    [
+        ("corn_silage", False, None, True, False),
+        (
+            "custom_alfalfa",
+            False,
+            {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}},
+            False,
+            False,
+        ),
+        (
+            "alien_crop",
+            True,
+            {
+                "custom_corn": {"species": "corn", "is_nitrogen_fixer": True},
+                "alien_crop": {
+                    "species": "halo_alien_corn",
+                    "minimum_temperature": -60,
+                },
+            },
+            False,
+            False,
+        ),
+        (
+            "unknown_crop",
+            False,
+            {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}},
+            False,
+            True,
+        ),
+    ],
+)
+def test_create_crop(
+    crop_reference: str,
+    heat_scheduled: bool,
+    custom_crop_specs: dict,
+    is_supported: bool,
+    should_raise_keyerror: bool
+) -> None:
+    """Tests that a new Crop instance is properly created or raises KeyError if crop_reference is invalid."""
+    mocked_time = MagicMock(Time)
 
-#         # Custom species case
-#         (
-#             "CustomWheat",
-#             {"CustomWheat": {"some_key": "some_value"}},
-#             "make_crop_from_config_dict",
-#             ({"some_key": "some_value"},),
-#             False,
-#             Mock(spec=Crop)
-#         ),
+    if should_raise_keyerror:
+        with pytest.raises(KeyError) as exc_info:
+            Crop.create_crop(crop_reference, custom_crop_specs, heat_scheduled, mocked_time)
+        assert crop_reference in str(exc_info.value)
+    else:
+        crop = Crop.create_crop(crop_reference, custom_crop_specs, heat_scheduled, mocked_time)
 
-#         # KeyError case
-#         ("NonExistentCustomCrop", {"CustomWheat": {"some_key": "some_value"}}, None, None, True, None),
-#     ]
-# )
-# def test_create_crop(
-#     mocker: MockerFixture,
-#     crop_reference: str,
-#     custom_crop_specifications: dict,
-#     expected_method: str,
-#     expected_args: tuple,
-#     should_raise_keyerror: bool,
-#     expected_crop: Mock,
-# ) -> None:
-#     use_heat_scheduled_harvesting = True
-#     mock_time = mocker.Mock(spec=Time)
+        if is_supported:
+            expected_crop = Crop.make_supported_crop(crop_reference)
+        else:
+            expected_crop = Crop().make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
+        expected_crop._data.use_heat_scheduling = heat_scheduled
+        expected_crop._data.id = crop_reference
 
-#     if should_raise_keyerror:
-#         with pytest.raises(KeyError) as excinfo:
-#             Crop.create_crop(crop_reference, custom_crop_specifications, use_heat_scheduled_harvesting, mock_time)
-
-#         assert str(excinfo.value).strip() == (
-#             f"Expected to have crop specification for '{crop_reference}', "
-#             f"received specifications for '{tuple(custom_crop_specifications.keys())}' crop types."
-#         ).strip()
-#     else:
-#         # Mock the methods that could be called
-#         method_mock = None
-#         if expected_method == "make_supported_crop":
-#             method_mock = mocker.patch.object(Crop, expected_method, return_value=expected_crop)
-#         elif expected_method == "make_crop_from_config_dict":
-#             method_mock = mocker.patch.object(Crop, expected_method, return_value=expected_crop)
-#             mocker.patch("copy.copy", return_value=deepcopy(expected_args[0]))
-
-#         initialize_crop_mock = mocker.patch.object(Crop, 'initialize_crop')
-
-#         # Call the method
-#         created_crop = Crop.create_crop(crop_reference, custom_crop_specifications, use_heat_scheduled_harvesting,
-#                                         mock_time)
-
-#         # Ensure the method was called with correct arguments
-#         if method_mock:
-#             method_mock.assert_called_once_with(*expected_args)
-#         initialize_crop_mock.assert_called_once_with(crop_reference, use_heat_scheduled_harvesting, mock_time)
-#         assert created_crop == expected_crop
+        assert crop._data.id == expected_crop._data.id
+        assert crop._data.use_heat_scheduling == expected_crop._data.use_heat_scheduling
+        assert crop._data.species == expected_crop._data.species
 
 
 def test_initialize_crop(mocker: MockerFixture) -> None:
