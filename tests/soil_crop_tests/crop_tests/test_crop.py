@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -399,7 +399,8 @@ def test_field_proportion_setter(mocker: MockerFixture) -> None:
 
 
 # @pytest.mark.parametrize(
-#     "crop_reference, custom_crop_specifications, expected_method, expected_args, should_raise_keyerror, expected_crop",
+#     "crop_reference, custom_crop_specifications, expected_method, expected_args, should_raise_keyerror,
+#     "expected_crop",
 #     [
 #         # Supported species case
 #         ("winter_wheat_grain", {}, "make_supported_crop", ("winter_wheat_grain",), False, Mock(spec=Crop)),
@@ -527,11 +528,12 @@ def test_make_crop_from_config_dict(mocker: MockerFixture, config: dict[str, str
 
 
 def test_make_supported_crop(mocker: MockerFixture) -> None:
-    # Setup
+    """Test make_supported_crop() in crop.py()"""
     species = "winter_wheat_grain"
     mock_crop_data = Mock(spec=CropData)
 
-    mocker.patch('RUFAS.routines.field.crop.species_data_factory.CropSpeciesDataFactory.create_species_data', return_value=mock_crop_data)
+    mocker.patch('RUFAS.routines.field.crop.species_data_factory.CropSpeciesDataFactory.create_species_data',
+                 return_value=mock_crop_data)
 
     result = Crop.make_supported_crop(species, some_spec="some_value")
 
@@ -540,18 +542,16 @@ def test_make_supported_crop(mocker: MockerFixture) -> None:
     assert result._data == mock_crop_data
 
 
-def test_make_custom_crop(mocker: MockerFixture):
-    """Test make_custom_crop() method in crop.py."""
-    custom_crop_specs = {
-        "halo_alien_winter_wheat": {
-            "species": "halo_alien_winter_wheat",
-            "minimum_temperature": -75,
-        },
-        "halo_alien_corn": {
-            "species": "halo_alien_corn",
-            "minimum_temperature": -60,
-        },
-    }
-    custom_crop = Crop._make_custom_crop(custom_crop_specs)
-
-    assert "halo_alien_winter_wheat" in custom_crop.keys()
+@pytest.mark.parametrize(
+    "config",
+    [
+        {"species": "grass"},  # custom species, with generic defaults
+        {"species": "cottonwood", "is_perennial": True},  # custom species and attribute
+        {"minimum_temperature": -10},  # no species name
+    ],
+)
+def test_make_custom_crop(config: dict):
+    """Checks that custom crop attributes are set correctly"""
+    crop = Crop._make_custom_crop(**config)
+    for key, val in config.items():
+        assert getattr(crop._data, key) == val
