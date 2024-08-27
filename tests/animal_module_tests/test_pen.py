@@ -213,14 +213,12 @@ def test_update_animals(pen: Pen, mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.routines.animal.pen.Pen.add_new_animals")
     mocker.patch("RUFAS.routines.animal.pen.Pen.update_animal_combination")
     mocker.patch("RUFAS.routines.animal.pen.Pen.calc_daily_walking_dist")
-    mocker.patch("RUFAS.routines.animal.pen.Pen.update_classes_in_pen")
 
     pen.update_animals(MagicMock(), MagicMock())
 
     pen.add_new_animals.assert_called_once()
     pen.update_animal_combination.assert_called_once()
     pen.calc_daily_walking_dist.assert_called_once()
-    pen.update_classes_in_pen.assert_called_once()
 
 
 def test_set_avg_nutrient_rqmts(pen: Pen) -> None:

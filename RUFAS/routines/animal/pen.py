@@ -200,8 +200,6 @@ class Pen:
                 the valid animal combinations inside this pen, an instance of the AnimalCombination Enum
             max_stocking_density : float
                 maximum stocking density allowed for pen
-            animal_grouping_scenario : AnimalGroupingScenario
-                the animal grouping scenario for the pen
         """
         self.id = pen_id
 
@@ -302,12 +300,6 @@ class Pen:
         # the animal_combinations in this pen, utilizes the AnimalCombination Enum
         self.animal_combination = animal_combination
 
-        # the animal_grouping_scenario in this pen, utilizes the AnimalGroupingScenario Enum
-        if self.animal_combination == AnimalCombination.GROWING_AND_CLOSE_UP:
-            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
-        else:
-            self.animal_grouping_scenario = AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW
-
     @property
     def current_stocking_density(self) -> float:
         """
@@ -400,16 +392,6 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
-    def update_classes_in_pen(self) -> None:
-        """
-        Updates the classes contained within the pen
-        """
-        self.classes_in_pen = set()
-        for animal in list(self.animals_in_pen.values()):
-            life_cycle_stage = type(animal).__name__
-            self.classes_in_pen.add(life_cycle_stage)
-
     def update_animals(self, new_animals: List[Any], animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
@@ -425,7 +407,6 @@ class Pen:
         self.add_new_animals(new_animals)
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
-        self.update_classes_in_pen()
 
     def manure_sums(
         self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
@@ -537,7 +518,7 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if "Cow" in self.classes_in_pen:
+        if self.animal_combination == AnimalCombination.LAC_COW or self.animal_combination == AnimalCombination.CLOSE_UP:
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
