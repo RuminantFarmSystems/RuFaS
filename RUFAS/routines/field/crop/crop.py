@@ -439,8 +439,9 @@ class Crop:
         """Sets the max transpiration for a crop."""
         self._water_dynamics.set_maximum_transpiration(evapotranspirative_demand)
 
-    def assess_dormancy(self, daylength: float, dormancy_threshold_daylength: float, rainfall: float,
-                        soil: Soil) -> None:
+    def assess_dormancy(
+        self, daylength: float, dormancy_threshold_daylength: float, rainfall: float, soil: Soil
+    ) -> None:
         """
         Assess and manage dormancy status based on the daylength.
 
@@ -482,8 +483,9 @@ class Crop:
         self._data.is_dormant = False
 
     @classmethod
-    def create_crop(cls, crop_reference: str, custom_crop_specifications: dict, use_heat_scheduled_harvesting: bool,
-                    time: Time) -> Crop:
+    def create_crop(
+        cls, crop_reference: str, custom_crop_specifications: dict, use_heat_scheduled_harvesting: bool, time: Time
+    ) -> Crop:
         """
         Factory method to create a crop instance based on the crop reference.
 
