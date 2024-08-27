@@ -1431,7 +1431,7 @@ class Field:
         -------
         float
             Amount of water that reaches the soil surface (mm)
-        
+
         Notes
         -----
         This method accounts for the edge case that no water was lost from the crop canopy yesterday and the capacity in

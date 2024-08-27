@@ -732,7 +732,8 @@ def test_record_planting(
         ),
     ],
 )
-def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_specs: Dict, expected_substring: str) -> None:
+def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_specs: Dict, expected_substring: str
+                          ) -> None:
     """Tests that errors are correctly raised when a crop specification for a requested planting is not present."""
     field = Field(
         custom_crop_specifications=custom_crop_specs,
