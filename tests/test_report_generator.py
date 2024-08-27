@@ -1391,14 +1391,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             [1.0, None, 3.0],
             "none_key",
             None,
-            {
-                "error": "ReportGenerator aggregation error",
-                "message": "Encountered unaggregatable values in none_key data, returning None instead.",
-                "info_map": {
-                    "class": "ReportGenerator",
-                    "function": "_handle_aggregation",
-                },
-            },
+            {'error': 'ReportGenerator aggregation error', 'message': 'Encountered unaggregatable values in variable(s): none_key. Returning None instead.', 'info_map': {'class': 'ReportGenerator', 'function': '_handle_aggregation'}},
         ),
         # Test with NaN value in data
         (
@@ -1406,14 +1399,7 @@ def test_normalize_constant_name(input_name: str, expected_output: str) -> None:
             [1.0, float("nan"), 3.0],
             "nan_key",
             None,
-            {
-                "error": "ReportGenerator aggregation error",
-                "message": "Encountered unaggregatable values in nan_key data, returning None instead.",
-                "info_map": {
-                    "class": "ReportGenerator",
-                    "function": "_handle_aggregation",
-                },
-            },
+            {'error': 'ReportGenerator aggregation error', 'message': 'Encountered unaggregatable values in variable(s): nan_key. Returning None instead.', 'info_map': {'class': 'ReportGenerator', 'function': '_handle_aggregation'}},
         ),
         # Test with empty data
         (sum_aggregator, [], "empty_key", 0, {}),
