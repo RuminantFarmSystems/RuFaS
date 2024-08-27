@@ -17,7 +17,7 @@ TestResultPathType = namedtuple("TestResultPaths", ["domain_prefix", "expected_r
 Maps a RuFaS domain that is supported for end-to-end testing to information needed to collect actual and expected
 results for testing that domain, and the prefix used when saving the test results to the Output Manager.
 """
-DOMAINS = {
+TEST_DOMAINS = {
     "Feed Storage": TestResultPathType(
         "FeedStorageResults",
         "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
@@ -47,7 +47,7 @@ class EndToEndTestResultsComparer:
             "class": EndToEndTestResultsComparer.__class__.__name__,
             "function": EndToEndTestResultsComparer.compare_actual_and_expected_test_results.__name__,
         }
-        for domain, info in DOMAINS.items():
+        for domain, info in TEST_DOMAINS.items():
             om.add_log(
                 f"End-to-end testing for {domain}", "Collecting and comparing actual and expected results", info_map
             )
