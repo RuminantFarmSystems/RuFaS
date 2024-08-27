@@ -1426,7 +1426,7 @@ def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: Lif
             patch_for_handle_cow_CI.assert_any_call(cow, calving_interval_avail_num)
             patch_for_extract_repro_stats_from_cow.assert_any_call(cow)
         if has_new_born:
-            patch_for_handle_new_born.assert_any_call(mock_time.simulation_day, cow, calves_born)
+            patch_for_handle_new_born.assert_any_call(mock_time, cow, calves_born)
 
     assert patch_for_cull_cow.call_count == num_cows_culled
     assert patch_for_handle_cow_body_weight_and_parity.call_count == num_cows_not_culled
@@ -1797,6 +1797,7 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
                 "mature_body_weight": 2.0,
                 "birth_weight": 2.0,
                 "p_init": 1,
+                "net_merit": 0.0
             }
         ),
         (
@@ -1810,6 +1811,7 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
                 "days_born": 1,
                 "birth_weight": 2,
                 "p_init": 1,
+                "net_merit": 0.0
             }
         ),
     ],
@@ -1844,6 +1846,7 @@ def test_init_calf(mocker: MockerFixture, args: dict) -> None:
     assert calf.birth_weight == 2.0
     assert calf.animal_intake == 0
     assert calf.DBW == 0
+    assert calf.net_merit == 0.0
 
     if "body_weight" in args:
         assert calf.gender == "female"
