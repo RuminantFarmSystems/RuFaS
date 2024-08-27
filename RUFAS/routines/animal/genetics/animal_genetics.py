@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
@@ -20,7 +19,7 @@ base_change_lookup_table = {
 class AnimalGenetics:
     def __init__(self) -> None:
         im = InputManager()
-        net_merit_HO: dict[str, list[float]] = im.get_data('animal_net_merit')
+        net_merit_HO: dict[str, list[str | float]] = im.get_data('animal_net_merit')
         top_listing_semen_HO: dict[str, list[str | float]] = im.get_data('animal_top_listing_semen')
         self.net_merit: dict[str, dict[str, dict[str, float]]] = {
             "HO": {
@@ -30,78 +29,102 @@ class AnimalGenetics:
             }
         }
 
-        self.net_merit_base_change()
-        self.net_merit_fill_gap()
+        self.net_merit = self.net_merit_base_change(self.net_merit)
+        self.net_merit = self.net_merit_fill_gap(self.net_merit)
 
-        self.top_semen: dict[str, dict[str, str | float]] = {
+        self.top_semen: dict[str, dict[str, float]] = {
             "HO": {
                 top_listing_semen_HO["year_month"][i]: top_listing_semen_HO["estimated_PTA"][i]
                 for i in range(len(top_listing_semen_HO["year_month"]))
             }
         }
 
-        year_months = list(self.net_merit["HO"].keys())
-        df_net_merit = pd.DataFrame(columns=["year_month", "average", "std"])
-        for i in range(len(year_months)):
-            year_month = year_months[i]
-            df_net_merit.loc[i] = [year_month,
-                                   self.net_merit["HO"][year_month]["average"],
-                                   self.net_merit["HO"][year_month]["std"]]
-        df_net_merit.to_csv("updated_net_merit_HO.csv", index=False)
+        print(self.top_semen)
 
-    def net_merit_base_change(self) -> None:
+        # year_months = list(self.net_merit["HO"].keys())
+        # df_net_merit = pd.DataFrame(columns=["year_month", "average", "std"])
+        # for i in range(len(year_months)):
+        #     year_month = year_months[i]
+        #     df_net_merit.loc[i] = [year_month,
+        #                            self.net_merit["HO"][year_month]["average"],
+        #                            self.net_merit["HO"][year_month]["std"]]
+        # df_net_merit.to_csv("updated_net_merit_HO.csv", index=False)
+
+    @staticmethod
+    def net_merit_base_change(
+            original_net_merit: dict[str, dict[str, dict[str, float]]]
+    ) -> dict[str, dict[str, dict[str, float]]]:
+        adjusted_net_merit: dict[str, dict[str, dict[str, float]]] = {}
         total_adjustment_value = sum([base_change_lookup_table[i] for i in base_change_lookup_table.keys()])
-        for year_month in self.net_merit["HO"].keys():
-            datetime_year_month = datetime.date.fromisoformat(year_month + '-01')
-            increase = sum([base_change_lookup_table[base_change_time]
-                            for base_change_time in base_change_lookup_table.keys()
-                            if datetime_year_month >= base_change_time])
-            original_value = self.net_merit["HO"][year_month]["average"] + increase
-            adjusted_value = original_value - total_adjustment_value
-            self.net_merit["HO"][year_month]["average"] = adjusted_value
+        for breed in original_net_merit.keys():
+            adjusted_net_merit[breed] = {}
+            for year_month in original_net_merit[breed].keys():
+                adjusted_net_merit[breed][year_month] = {}
+                datetime_year_month = datetime.date.fromisoformat(year_month + '-01')
+                increase = sum([base_change_lookup_table[base_change_time]
+                                for base_change_time in base_change_lookup_table.keys()
+                                if datetime_year_month >= base_change_time])
+                original_value = original_net_merit[breed][year_month]["average"] + increase
+                adjusted_value = original_value - total_adjustment_value
+                adjusted_net_merit[breed][year_month]["average"] = adjusted_value
+                adjusted_net_merit[breed][year_month]["std"] = original_net_merit[breed][year_month]["std"]
+        return adjusted_net_merit
 
-    def net_merit_fill_gap(self) -> None:
+    @staticmethod
+    def net_merit_fill_gap(
+            original_net_merit: dict[str, dict[str, dict[str, float]]]
+    ) -> dict[str, dict[str, dict[str, float]]]:
+        expanded_net_merit: dict[str, dict[str, dict[str, float]]] = {}
         monthly_increase_lookup = {
             2005: 140 / 60,
             2010: 253 / 60,
             2015: 369 / 60,
             2020: (538 - 396) / 24
         }
-        years = [int(year_month[:4]) for year_month in self.net_merit["HO"].keys()]
-        min_year, max_year = min(years), max(years)
-        current_keys = list(self.net_merit["HO"].keys())
-        for year_month in current_keys:
-            year = int(year_month[:4])
-            month = int(year_month[5:])
-            if month < 12:
-                month += 1
-            else:
-                year += 1
-                month = 1
-            next_year_month = str(year) + "-" + str(month).zfill(2)
-            num_inc = 1
-            while next_year_month not in current_keys:
-                average_monthly_increase_key = year - (year % 5)
-                average_monthly_increase = monthly_increase_lookup[average_monthly_increase_key]
-                self.net_merit["HO"][next_year_month] = {
-                    "average": self.net_merit["HO"][year_month]["average"] + num_inc * average_monthly_increase,
-                    "std": self.net_merit["HO"][year_month]["std"]
+
+        for breed in original_net_merit.keys():
+            expanded_net_merit[breed] = {}
+            years = [int(year_month[:4]) for year_month in original_net_merit[breed].keys()]
+            min_year, max_year = min(years), max(years)
+            current_keys = list(original_net_merit[breed].keys())
+            for year_month in current_keys:
+                expanded_net_merit[breed][year_month] = {
+                    "average": original_net_merit[breed][year_month]["average"],
+                    "std": original_net_merit[breed][year_month]["std"],
                 }
+                year, month = int(year_month[:4]), int(year_month[5:])
+
                 if month < 12:
                     month += 1
                 else:
                     year += 1
                     month = 1
                 next_year_month = str(year) + "-" + str(month).zfill(2)
-                num_inc += 1
-                if year > max_year:
-                    break
+                num_inc = 1
+                while next_year_month not in current_keys:
+                    average_monthly_increase_key = year - (year % 5)
+                    average_monthly_increase = monthly_increase_lookup[average_monthly_increase_key]
+                    expanded_net_merit[breed][next_year_month] = {
+                        "average":
+                            original_net_merit[breed][year_month]["average"] + num_inc * average_monthly_increase,
+                        "std": original_net_merit[breed][year_month]["std"]
+                    }
+                    if month < 12:
+                        month += 1
+                    else:
+                        year += 1
+                        month = 1
+                    next_year_month = str(year) + "-" + str(month).zfill(2)
+                    num_inc += 1
+                    if year > max_year:
+                        break
 
-        updated_keys = list(self.net_merit["HO"].keys())
-        updated_keys.sort()
-        self.net_merit["HO"] = {
-            k: self.net_merit["HO"][k] for k in updated_keys
-        }
+            updated_keys = list(expanded_net_merit[breed].keys())
+            updated_keys.sort()
+            expanded_net_merit[breed] = {
+                k: expanded_net_merit[breed][k] for k in updated_keys
+            }
+        return expanded_net_merit
 
     def plot_net_merit(self, filename: str, width: float, title: str) -> None:
         year_months = list(self.net_merit["HO"].keys())
