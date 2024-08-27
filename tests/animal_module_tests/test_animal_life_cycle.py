@@ -14,6 +14,7 @@ from RUFAS.routines.animal.animal_typed_dicts import (
     AnimalConfigTypedDict,
     HerdInfoTypedDict,
 )
+from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
 from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
@@ -34,10 +35,12 @@ from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenar
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.time import Time
 
 
 @fixture
 def life_cycle_manager(mocker: MockerFixture) -> LifeCycleManager:
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalGenetics")
     return LifeCycleManager(data=mocker.MagicMock(autospec=AnimalConfigTypedDict))
 
 
@@ -1101,12 +1104,18 @@ def test_handle_new_born(
     is_calf_sold: bool,
 ) -> None:
     # Arrange
-    sim_day = 1
+    time = mocker.MagicMock(autospec=Time)
+    time.simulation_day = 1
     life_cycle_manager.sold_calf_num = sold_calf_num = 0
     life_cycle_manager.sold_calves_info = []
     mock_animal_population = mocker.MagicMock(autospec=AnimalPopulation)
     mock_animal_population.next_id.return_value = calf_id = 100
     life_cycle_manager.animal_population = mock_animal_population
+
+    mock_genetics = mocker.MagicMock(autospec=AnimalGenetics)
+    mock_genetics.assign_net_merit_value_to_newborn_calf.return_value = 0.0
+    life_cycle_manager.genetics_calculator = mock_genetics
+
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.p_animal = p_animal = 1.0
     mock_cow.p_gest_for_calf = p_gest_for_calf = 2.0
@@ -1134,9 +1143,10 @@ def test_handle_new_born(
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", {"breed": "HO"})
 
     # Act
-    life_cycle_manager._handle_new_born(sim_day, mock_cow, calves_born)
+    life_cycle_manager._handle_new_born(time, mock_cow, calves_born)
 
     # Assert
+    mock_genetics.assign_net_merit_value_to_newborn_calf.assert_called_once_with(time, "HO", mock_cow.net_merit)
     assert mock_cow.p_animal == expected_cow_p_animal
     assert mock_cow.p_gest_for_calf == approx(0.0)
     assert mock_cow.calf_birth_weight == approx(0.0)
@@ -1144,21 +1154,23 @@ def test_handle_new_born(
         {
             "id": calf_id,
             "breed": "HO",
-            "birth_date": sim_day,
+            "birth_date": time.simulation_day,
             "days_born": 0,
             "p_init": p_gest_for_calf,
             "birth_weight": calf_birth_weight,
+            "net_merit": 0.0
         }
     )
     if not is_calf_culled and not is_calf_sold:
-        mock_calf.events.add_event.assert_called_once_with(calf_days_born, sim_day, animal_constants.ENTER_HERD)
+        mock_calf.events.add_event.assert_called_once_with(calf_days_born, time.simulation_day,
+                                                           animal_constants.ENTER_HERD)
         assert len(calves_born) == 1
         assert calves_born[0] == mock_calf
     if is_calf_sold:
         assert life_cycle_manager.sold_calf_num == sold_calf_num + 1
         assert len(life_cycle_manager.sold_calves_info) == 1
         assert life_cycle_manager.sold_calves_info[0] == calf_info_dict
-        assert mock_calf.sold_at_day == sim_day
+        assert mock_calf.sold_at_day == time.simulation_day
 
 
 @pytest.mark.parametrize("cow_calves", [1, 2, 3, 4])
@@ -1338,7 +1350,8 @@ def test_calc_percent_cow_per_parity(mocker: MockerFixture, life_cycle_manager: 
 def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for _evaluate_and_update_cows in life_cycle.py"""
     # Arrange
-    sim_day = 1
+    mock_time = mocker.MagicMock(auto_spec=Time)
+    mock_time.simulation_day = 1
     mock_cows = []
     num_cows = 10
     calves_born: List[Calf] = []
@@ -1395,12 +1408,12 @@ def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: Lif
 
     # Act
     actual_total_animal_num = life_cycle_manager._evaluate_and_update_cows(
-        sim_day, mock_cows, calves_born, animals_removed, total_animal_num_start
+        mock_time, mock_cows, calves_born, animals_removed, total_animal_num_start
     )
 
     # Assert
     for cow in mock_cows_original:
-        cow.update.assert_called_once_with(sim_day, avg_CI)
+        cow.update.assert_called_once_with(mock_time.simulation_day, avg_CI)
         has_new_born = cow.update.return_value
         if cow.culled:
             assert cow in animals_removed
@@ -1413,7 +1426,7 @@ def test_evaluate_and_update_cows(mocker: MockerFixture, life_cycle_manager: Lif
             patch_for_handle_cow_CI.assert_any_call(cow, calving_interval_avail_num)
             patch_for_extract_repro_stats_from_cow.assert_any_call(cow)
         if has_new_born:
-            patch_for_handle_new_born.assert_any_call(sim_day, cow, calves_born)
+            patch_for_handle_new_born.assert_any_call(mock_time.simulation_day, cow, calves_born)
 
     assert patch_for_cull_cow.call_count == num_cows_culled
     assert patch_for_handle_cow_body_weight_and_parity.call_count == num_cows_not_culled
