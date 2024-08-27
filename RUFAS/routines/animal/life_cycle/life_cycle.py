@@ -791,6 +791,9 @@ class LifeCycleManager:
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
             replacement.set_p_purchased()
+            replacement.net_merit = self.genetics_calculator.assign_net_merit_value_to_animals_entering_herd(
+                replacement.birth_date, replacement.breed
+            )
             animals_added.append(replacement)
             self.bought_heifer_num += 1
 
@@ -1004,6 +1007,8 @@ class LifeCycleManager:
 
     def _handle_new_born(self, time: Time, cow: Cow, calves_born: List[Calf]) -> None:
         sim_day = time.simulation_day
+        net_merit = self.genetics_calculator.assign_net_merit_value_to_newborn_calf(
+                time, AnimalBase.config["breed"], cow.net_merit)
         args = {
             "id": self.animal_population.next_id(),
             "breed": AnimalBase.config["breed"],
@@ -1011,6 +1016,7 @@ class LifeCycleManager:
             "days_born": 0,
             "p_init": cow.p_gest_for_calf,
             "birth_weight": cow.calf_birth_weight,
+            "net_merit": net_merit
         }
         # at parturition, the sum of P absorbed for gestation rqmts is
         # subtracted from the animal value. the sum of P absorbed for
@@ -1022,8 +1028,6 @@ class LifeCycleManager:
         cow.calf_birth_weight = 0
         if not (new_calf.culled or new_calf.sold):
             new_calf.events.add_event(new_calf.days_born, sim_day, animal_constants.ENTER_HERD)
-            new_calf.net_merit = self.genetics_calculator.assign_net_merit_value_to_newborn_calf(
-                time, AnimalBase.config["breed"], cow.net_merit)
             calves_born.append(new_calf)
         if new_calf.sold:
             new_calf.sold_at_day = sim_day

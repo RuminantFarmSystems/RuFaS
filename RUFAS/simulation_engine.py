@@ -177,5 +177,3 @@ class SimulationEngine:
         self.manure_manager = ManureManager(all_pen_manure_data, self.weather, self.time, manure_class_config)
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
-
-        animal_genetics = AnimalGenetics()
