@@ -191,48 +191,43 @@ class AnaerobicDigestion(BaseManureTreatment):
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._recalculate_solids_after_destruction.__name__}
-        degradable_volatile_solids_fraction = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            / self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
-        )
 
-        degradable_volatile_solids_after_destruction = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
-            - (volatile_solids_destruction * degradable_volatile_solids_fraction)
+        volatile_solids_available_to_degrade = (
+            self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+            + self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
         )
-        if degradable_volatile_solids_after_destruction < 0.0:
+        if volatile_solids_available_to_degrade < volatile_solids_destruction:
             self.om.add_error(
-                "Anaerobic digestion attempted to destroy too many degradable volatile solids",
-                f"Degradable volatile solids mass would have been {degradable_volatile_solids_after_destruction}, "
-                "setting this value to 0",
+                "Anaerobic digestion attempted to destroy more volatile solids than are present in the digester",
+                "Setting degradable volatile solids, non-degradable volatile solids, and total volatile solids pools"
+                " to be 0.0.",
                 info_map,
             )
             manure_output.liquid_manure_total_degradable_volatile_solids = 0.0
-        else:
-            manure_output.liquid_manure_total_degradable_volatile_solids = degradable_volatile_solids_after_destruction
-
-        non_degradable_volatile_solids_after_destruction = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
-            - (volatile_solids_destruction * (1 - degradable_volatile_solids_fraction))
-        )
-        if non_degradable_volatile_solids_after_destruction < 0.0:
-            self.om.add_error(
-                "Anaerobic digestion attempted to destroy too many non-degradable volatile solids",
-                "Non-degradable volatile solids mass would have been "
-                f"{non_degradable_volatile_solids_after_destruction}, setting this value to 0",
-                info_map,
-            )
             manure_output.liquid_manure_total_non_degradable_volatile_solids = 0.0
+            manure_output.liquid_manure_total_volatile_solids = 0.0
         else:
+            degradable_volatile_solids_fraction = (
+                self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+                / volatile_solids_available_to_degrade
+            )
+
+            manure_output.liquid_manure_total_degradable_volatile_solids = (
+                self._current_manure_treatment_daily_input.liquid_manure_total_degradable_volatile_solids
+                - (volatile_solids_destruction * degradable_volatile_solids_fraction)
+            )
+
             manure_output.liquid_manure_total_non_degradable_volatile_solids = (
-                non_degradable_volatile_solids_after_destruction
+                self._current_manure_treatment_daily_input.liquid_manure_total_non_degradable_volatile_solids
+                - (volatile_solids_destruction * (1 - degradable_volatile_solids_fraction))
+            )
+            manure_output.liquid_manure_total_volatile_solids = (
+                self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids
+                - volatile_solids_destruction
             )
 
         manure_output.liquid_manure_total_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_solids - volatile_solids_destruction
-        )
-        manure_output.liquid_manure_total_volatile_solids = (
-            self._current_manure_treatment_daily_input.liquid_manure_total_volatile_solids - volatile_solids_destruction
         )
 
     @classmethod

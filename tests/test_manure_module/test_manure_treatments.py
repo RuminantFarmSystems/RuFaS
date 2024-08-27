@@ -2446,7 +2446,7 @@ def test_calc_manure_heat_capacity() -> None:
     [
         (100.0, 80.0, 20.0, 20.0, 20.0, 0.0, 0.0, 0.0, False),
         (30.0, 40.0, 20.0, 0.0, 30.0, 30.0, 20.0, 10.0, False),
-        (110.0, 10.0, 90.0, 100.0, 90.0, -10.0, 0.0, 0.0, True),
+        (110.0, 10.0, 90.0, 100.0, 90.0, 0.0, 0.0, 0.0, True),
     ],
 )
 def test_recalculate_solids_after_destruction(
@@ -2482,7 +2482,7 @@ def test_recalculate_solids_after_destruction(
     )
     assert actual_output.liquid_manure_total_solids == expected_total_solids
     assert actual_output.liquid_manure_total_volatile_solids == expected_total_vol_sols
-    assert add_error.call_count == (2 if is_error else 0)
+    assert add_error.call_count == (1 if is_error else 0)
 
 
 # Test AnaerobicDigestionAndLagoon class
