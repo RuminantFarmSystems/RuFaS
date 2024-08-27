@@ -186,12 +186,13 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
 
 
 @pytest.mark.parametrize(
-    "days_pregnant,days_in_preg_dry,is_milking,expected_milking,expected_warning",
-    [(100, 120, False, True, True), (140, 133, False, False, False)],
+    "is_pregnant,days_pregnant,days_in_preg_dry,is_milking,expected_milking,expected_warning",
+    [(True, 100, 120, False, True, True), (True, 140, 133, False, False, False), (False, 0, 120, True, True, False)],
 )
 def test_correct_cows_milking_attributes(
     mocker: MockerFixture,
     life_cycle_manager: LifeCycleManager,
+    is_pregnant: bool,
     days_pregnant: int,
     days_in_preg_dry: int,
     is_milking: bool,
@@ -200,7 +201,7 @@ def test_correct_cows_milking_attributes(
 ) -> None:
     """Tests _correct_cow_attributes in LifeCycleManager."""
     mock_cow = mocker.MagicMock(autospec=Cow)
-    mock_cow.is_pregnant = True
+    mock_cow.is_pregnant = is_pregnant
     mock_cow.days_in_preg = days_pregnant
     mock_cow.milking = is_milking
     mock_cow.events = mocker.MagicMock()
