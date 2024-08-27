@@ -49,7 +49,7 @@ class AnimalBase:
         """
         self.id = args["id"]
         self.breed = args["breed"]
-        self.birth_date = args["birth_date"]
+        self.birth_date: str = args["birth_date"]
         self.days_born = args["days_born"]
         self.semen_used = self.config["semen_type"]
         self.culled = False
@@ -82,7 +82,7 @@ class AnimalBase:
         self.calf_birth_weight = 0.0
         self.tissue_changed = 0.0
         self.sold_at_day: int | None = None
-        self.net_merit: float = 0.0
+        self.net_merit: float = args["net_merit"]
         if "body_weight_history" in args:
             self.body_weight_history = args["body_weight_history"]
             self.pen_history = args["pen_history"]
