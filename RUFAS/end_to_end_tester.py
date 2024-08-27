@@ -10,7 +10,7 @@ import json
 import re
 
 
-TestResultPaths = namedtuple("TestResultPaths", ["domain_prefix", "expected_results_path", "actual_results_path"])
+TestResultPathType = namedtuple("TestResultPaths", ["domain_prefix", "expected_results_path", "actual_results_path"])
 
 
 """
@@ -18,7 +18,7 @@ Maps a RuFaS domain that is supported for end-to-end testing to information need
 results for testing that domain, and the prefix used when saving the test results to the Output Manager.
 """
 DOMAINS = {
-    "Feed Storage": TestResultPaths(
+    "Feed Storage": TestResultPathType(
         "FeedStorageResults",
         "input/data/end_to_end_testing/e2e_json_feed_storage_filter.json",
         "end-to-end-testing_saved_variables_e2e_feed_storage_",
@@ -26,7 +26,7 @@ DOMAINS = {
 }
 
 
-class EndToEndTester:
+class EndToEndTestResultsComparer:
     """
     Contains routines to handle comparing actual and expected results for end-to-end testing of various RuFaS modules.
     """
@@ -44,8 +44,8 @@ class EndToEndTester:
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
-            "class": EndToEndTester.__class__.__name__,
-            "function": EndToEndTester.compare_actual_and_expected_test_results.__name__,
+            "class": EndToEndTestResultsComparer.__class__.__name__,
+            "function": EndToEndTestResultsComparer.compare_actual_and_expected_test_results.__name__,
         }
         for domain, info in DOMAINS.items():
             om.add_log(
