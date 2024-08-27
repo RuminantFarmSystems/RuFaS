@@ -29,13 +29,9 @@ class AnimalGenetics:
                     "std": net_merit_HO["std"][i]} for i in range(len(net_merit_HO["year_month"]))
             }
         }
-        self.plot_net_merit('original.png', 20, "Original Net Merit")
 
         self.net_merit_base_change()
-        self.plot_net_merit('base_change.png', 20, "Net Merit with Base Change")
-
         self.net_merit_fill_gap()
-        self.plot_net_merit('expanded.png', 50, "Expanded Net Merit with Base Change")
 
         self.top_semen: dict[str, dict[str, str | float]] = {
             "HO": {
