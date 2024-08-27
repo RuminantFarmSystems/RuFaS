@@ -100,6 +100,11 @@ class SimulationEngine:
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
 
+    # TODO: remove this setter when Animal and Feed Storage modules are connected - #1878
+    def set_is_end_to_end_test_run(self, is_end_to_end_test_run: bool) -> None:
+        """Setter for the is_end_to_end_test_run attribute of SimulationEngine."""
+        self.is_end_to_end_test_run = is_end_to_end_test_run
+
     def _run_simulation_main_loop(self) -> None:
         """
         The main loop for simulation.
@@ -195,8 +200,7 @@ class SimulationEngine:
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
-        is_end_to_end_test_run = self.im.get_data("end_to_end_testing_inputs")
-        if is_end_to_end_test_run:
-            self.feed_manager.setup_stored_feeds(is_end_to_end_test_run, self.time)
-            self.is_end_to_end_test_run = True
+        if self.is_end_to_end_test_run:
+            end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
+            self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)
             self.feed_manager.process_degradations(self.weather, self.time)

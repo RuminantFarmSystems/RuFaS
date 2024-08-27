@@ -433,6 +433,11 @@ class TaskManager:
 
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
         simulator = SimulationEngine()
+
+        # TODO: Remove this if statement and setter call when Animal and Feed Storage modules are completed - #1878.
+        if args["task_type"] == TaskType.END_TO_END_TESTING:
+            simulator.set_is_end_to_end_test_run(True)
+
         simulator.simulate()
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
 
