@@ -1305,7 +1305,7 @@ class Field:
         for crop in self.crops:
             crop.set_maximum_transpiration(remaining_evapotranspirative_demand)
             field_proportion = crop.field_proportion
-            weighted_transpiration_total += remaining_evapotranspirative_demand * field_proportion
+            weighted_transpiration_total += crop.max_transpiration * field_proportion
             weights_sum += field_proportion
 
         if weights_sum == 0.0:
