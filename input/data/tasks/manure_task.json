@@ -3,8 +3,8 @@
   "tasks": [
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "metadata_file_path": "input/metadata/MW0_metadata.json",
-      "output_prefix": "MW0",
+      "metadata_file_path": "input/metadata/W3_metadata.json",
+      "output_prefix": "W_3",
       "log_verbosity": "errors",
       "random_seed": 42,
       "multi_run_counts": 4
