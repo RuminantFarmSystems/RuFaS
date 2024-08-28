@@ -145,7 +145,7 @@ class OutputManager(object):
             self.add_variable_call = 0
             self.save_chunk_threshold_call_count: int = 0
             self.current_pool_size: int = 0
-            self.maximum_pool_size: int = 0
+            self.maximum_pool_size: int = np.inf
 
             self.add_log(
                 "init_log",
@@ -296,9 +296,9 @@ class OutputManager(object):
         if self.chunkification:
             self.current_pool_size += self.average_add_variable_call_addition
             if (
-                self.save_chunk_threshold_call_count
+                self.save_chunk_threshold_call_count > 0
                 and self.add_variable_call % self.save_chunk_threshold_call_count == 0
-            ) or (self.save_chunk_threshold_call_count is None and self.current_pool_size >= self.maximum_pool_size):
+            ) or (self.save_chunk_threshold_call_count == 0 and self.current_pool_size >= self.maximum_pool_size):
                 self._save_current_variable_pool()
 
     def _save_current_variable_pool(self) -> None:
@@ -310,7 +310,6 @@ class OutputManager(object):
             "function": self._save_current_variable_pool.__name__,
         }
 
-        self.create_directory(self.saved_pool_chunks_path)
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
         self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=True)
