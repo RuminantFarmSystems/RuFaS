@@ -279,6 +279,7 @@ def animal_manager(
     input_manager: InputManager, mock_im_pool: Dict[str, Dict[str, Any]], mocker: MockerFixture
 ) -> AnimalManager:
     mocker.patch.object(AnimalBase, "setup_lactation_curve_parameters")
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalGenetics")
     init_pens_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_pens")
     init_animals_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_animals")
     init_nutrient_rqmts_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_nutrient_rqmts")
@@ -326,6 +327,7 @@ def test_init_pens(
     animal_manager: AnimalManager,
     mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
     mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
+    mocker: MockerFixture
 ) -> None:
     """Unit test for function init_pens in file routines/animal/animal_manager.py"""
     # Act
@@ -2590,7 +2592,7 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
     patch_for_get_animals_snapshot.assert_has_calls([mocker.call(), mocker.call()])
 
     mock_life_cycle_manager.daily_update.assert_called_once_with(
-        mock_animal_manager.simulation_day,
+        mock_time,
         mock_calves,
         mock_heiferIs,
         mock_heiferIIs,
