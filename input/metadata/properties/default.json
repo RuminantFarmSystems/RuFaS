@@ -836,7 +836,7 @@
           "description": "Maximum Stocking Density -- The maximum ratio of the number of animals in the pen to the number of stalls in the pen",
           "type": "number",
           "minimum": 0.5,
-          "maximum": 3,
+          "maximum": 5,
           "default": 1.2
         },
         "manure_management_scenario_id": {
