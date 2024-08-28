@@ -368,7 +368,7 @@ class BaseManureTreatment(ABC):
             The daily output from the manure treatment system.
 
         """
-        if self._sim_day % self.storage_time_period == 1:
+        if self._sim_day % self.storage_time_period == 0:
             if self._accumulated_output.pen_id >= 0:
                 ManureModuleOutputManagerHelper.add_dataclass_object(
                     self._accumulated_output,

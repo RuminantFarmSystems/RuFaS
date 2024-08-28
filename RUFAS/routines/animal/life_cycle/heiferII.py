@@ -290,6 +290,7 @@ class HeiferII(HeiferI):
         self.Ca_requirement = animal_requirements["Ca_requirement"]
         self.P_requirement = animal_requirements["P_requirement"]
         self.DMIest_requirement = animal_requirements["DMIest_requirement"]
+        self.essential_amino_acid_requirement = animal_requirements["essential_amino_acid_requirement"]
 
     def calc_manure_excretion(
         self, methane_model: str, nutrient_amount: Dict[str, float], nutrient_conc: Dict[str, float]
