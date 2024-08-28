@@ -10,7 +10,7 @@ import pandas as pd
 import psutil
 import pytest
 from freezegun import freeze_time
-from mock import mock_open, patch, mock
+from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
 from pytest_mock.plugin import MockerFixture
