@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
 
+import numpy as np
 import pandas as pd
 
 from RUFAS.graph_generator import GraphGenerator
@@ -133,6 +134,11 @@ class OutputManager(object):
                 "report": "report_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
+
+            self.chunkification: bool = False
+            self.saved_pool_chunks_num: int = 0
+            self.saved_pool_chunks_path: Path | None = None
+
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -232,6 +238,28 @@ class OutputManager(object):
         if isinstance(value, dict):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
+
+    def _save_current_variable_pool(self) -> None:
+        """
+        Save the current variable pool into JSON file. Flush the variable pool and reset the pool size.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._save_current_variable_pool.__name__,
+        }
+
+        self.create_directory(self.saved_pool_chunks_path)
+        saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
+        saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
+        self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=True)
+        self.add_log(
+            "save_current_variable_pool",
+            f"Saved the current variable pool to {saved_pool_file_path}",
+            info_map,
+        )
+        self.variables_pool = {}
+        self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
+        self.saved_pool_chunks_num += 1
 
     def _stringify_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
@@ -976,22 +1004,85 @@ class OutputManager(object):
         )
 
         selected_variables: List[str] | None = filter_content.get("variables")
+
+        results = self._parse_filtered_variables(
+            filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion
+        )
+
+        if filter_content.get("expand_data", False):
+            fill_value = filter_content.get("fill_value", np.nan)
+            use_fill_value_in_gaps = filter_content.get("use_fill_value_in_gaps", True)
+            use_fill_value_at_end = filter_content.get("use_fill_value_at_end", True)
+            try:
+                results = Utility.expand_data_temporally(
+                    results,
+                    fill_value=fill_value,
+                    use_fill_value_in_gaps=use_fill_value_in_gaps,
+                    use_fill_value_at_end=use_fill_value_at_end,
+                )
+            except (TypeError, ValueError) as e:
+                error_title = f"Error {e} raised when padding data"
+                error_msg = f"Unable to pad data for variables gathered for {filter_name=}."
+                self.add_error(error_title, error_msg, info_map)
+
         slice_start: int = filter_content.get("slice_start", 0)
         slice_end: int | None = filter_content.get("slice_end")
+        for key in results.keys():
+            if "info_maps" in results[key].keys():
+                results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
+            results[key]["values"] = results[key]["values"][slice_start:slice_end]
 
+        return results
+
+    def _parse_filtered_variables(
+        self,
+        filtered_pool: Dict[str, OutputManager.pool_element_type],
+        selected_variables: List[str] | None,
+        filter_name: str,
+        use_filter_name: bool,
+        filter_by_exclusion: bool,
+    ) -> Dict[str, OutputManager.pool_element_type]:
+        """
+        Unpacks and counts variables that have been filtered out of the Output Manager's variables pool.
+
+        Parameters
+        ----------
+        filtered_pool : Dict[str, OutputManager.pool_element_type]
+            Variables that have been filtered out of the Output Manager's pool.
+        selected_variables : List[str] | None
+            List of key names to select or exclude from variables containing dictionaries.
+        filter_name : str
+            Name of the filter used to collect variables for the filtered pool.
+        use_filter_name : bool
+            Whether to use the filter name when constructing the key name for data pulled from a dictionary.
+        filter_by_exclusion : bool
+            Whether keys in dictionaries should be filtered by exclusion.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]
+            Dictionary containing data from the filtered pool of data, with data from within dictionaries unpacked and
+            separated.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._parse_filtered_variables.__name__,
+            "filter_name": filter_name,
+            "filter_by_exclusion": filter_by_exclusion,
+            "use_filter_name": use_filter_name,
+        }
         results: Dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
         for key in filtered_pool.keys():
-            sliced_info_maps: List[Dict[str, Any]] = (
-                filtered_pool[key]["info_maps"][slice_start:slice_end] if "info_maps" in filtered_pool[key] else []
+            info_maps: List[Dict[str, Any]] = (
+                filtered_pool[key]["info_maps"] if "info_maps" in filtered_pool[key] else []
             )
-            sliced_data: List[Any] = filtered_pool[key]["values"][slice_start:slice_end]
-            is_data_in_dict: bool = all(isinstance(element, dict) for element in sliced_data)
+            data: List[Any] = filtered_pool[key]["values"]
+            is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
-                results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
-                    "values": sliced_data
-                }
+                results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {"values": data}
                 self._variables_usage_counter.update([key])
             elif is_data_in_dict:
                 if not isinstance(selected_variables, list):
@@ -1001,22 +1092,71 @@ class OutputManager(object):
                         f"{is_data_in_dict=}, {selected_variables=}, see Wiki for proper setup details.",
                         info_map,
                     )
-                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(sliced_data)
+                temp_data = Utility.convert_list_of_dicts_to_dict_of_lists(data)
                 filtered_data = Utility.filter_dictionary(temp_data, selected_variables, filter_by_exclusion)
                 for filtered_key, filtered_value in filtered_data.items():
                     combined_key = f"{filter_name}_{counter}.{filtered_key}" if use_filter_name else filtered_key
                     if combined_key in results.keys():
-                        results[combined_key].get("info_maps", []).extend(sliced_info_maps)
+                        results[combined_key].get("info_maps", []).extend(info_maps)
                         results[combined_key]["values"].extend(filtered_value)
                     else:
-                        results[combined_key] = ({"info_maps": sliced_info_maps} if sliced_info_maps else {}) | {
+                        results[combined_key] = ({"info_maps": info_maps} if info_maps else {}) | {
                             "values": filtered_value
                         }
                     self._variables_usage_counter.update([f"{key}.{filtered_key}"])
             counter += 1
         return results
 
-    def save_results(
+    def _sort_saved_chunk_files(self) -> List[Path]:
+        """
+        Get a list of all saved chunks of the output variable pool by retrieving all JSON files under
+        the saved_pool_chunks_path. Then sort the files according to their file name to preserve the order.
+        """
+        list_of_dumped_files: List[Path] = [
+            file for file in self.saved_pool_chunks_path.iterdir() if file.is_file() and file.name.endswith(".json")
+        ]
+        list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
+        return list_of_dumped_files
+
+    def filter_saved_pools(
+        self, filter_content: Dict[str, Any], list_of_dumped_files: List[Path]
+    ) -> Dict[str, OutputManager.pool_element_type]:
+        """
+        Filters saved pools of data by applying specific filter criteria.
+
+        This method iterates over JSON files in the saved pool directory. It then loads each file and applies the
+        filter by calling the `filter_variables_pool()` method. The results are aggregated into a single dictionary,
+        combining entries under the same key by extending lists of info_maps and values.
+
+        Parameters
+        ----------
+        filter_content : (Dict[str, Any])
+            A dictionary specifying the criteria used to filter the variables pools.
+
+        list_of_dumped_files: List[Path]
+            A list containing all chunks of the output variable pool to be filtered.
+
+        Returns
+        -------
+        Dict[str, OutputManager.pool_element_type]:
+            A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
+            under the saved_pool_chunks_path directory.
+        """
+        filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+        for file in list_of_dumped_files:
+            self.load_variables_pool_from_file(file)
+            temp_filtered_pool = self.filter_variables_pool(filter_content)
+            for key, value in temp_filtered_pool.items():
+                if key in filtered_pool.keys():
+                    filtered_pool[key]["info_maps"].extend(value["info_maps"])
+                    filtered_pool[key]["values"].extend(value["values"])
+                else:
+                    filtered_pool[key] = value
+            self.variables_pool = {}
+
+        return filtered_pool
+
+    def save_results(  # noqa: C901
         self,
         filters_dir_path: Path,
         exclude_info_maps: bool,
@@ -1062,6 +1202,8 @@ class OutputManager(object):
         )
         list_of_filter_files = self._list_filter_files_in_dir(filters_dir_path)
         report_generator = ReportGenerator(self.time)
+        if self.chunkification:
+            self._save_current_variable_pool()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = filters_dir_path / filter_file
@@ -1089,7 +1231,11 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = self.filter_variables_pool(filter_content)
+                    filtered_pool = (
+                        self.filter_saved_pools(filter_content, self._sort_saved_chunk_files())
+                        if self.chunkification
+                        else self.filter_variables_pool(filter_content)
+                    )
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 

@@ -1,9 +1,10 @@
-from dataclasses import dataclass, InitVar
+from dataclasses import dataclass, InitVar, field
 from typing import List, Optional
 from math import inf
 from copy import deepcopy
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.manure_pool import ManurePool
 
 
 @dataclass(kw_only=True)
@@ -129,48 +130,6 @@ class SoilData:
         Number of days since phosphorus was applied to the field via fertilizer.
     rain_events_after_fertilizer_application : int, default 0
         Number of rain events that have occurred since phosphorus was applied to the field via fertilizer.
-    machine_manure_dry_mass : float, default 0
-        The dry weight equivalent of manure mass on the field that was applied by machine (kg).
-    machine_manure_applied_mass : float, default 0
-        The dry weight equivalent of the most recent application of manure applied by machine (kg).
-    machine_manure_field_coverage : float, default 0
-        Fraction of the field that is covered by machine-applied manure, between [0, 1] (unitless).
-    machine_manure_moisture_factor : float, default 0
-        Fraction representing the current moisture level of the machine-applied manure on the field, between [0, 0.9]
-        (unitless).
-    machine_water_extractable_inorganic_phosphorus : float, default 0
-        Amount of water extractable inorganic phosphorus on the field that was applied by machine (kg).
-    machine_water_extractable_organic_phosphorus : float, default 0
-        Amount of water extractable organic phosphorus on the field that was applied by machine (kg).
-    machine_stable_inorganic_phosphorus : float, default 0
-        Amount of stable inorganic phosphorus on the field that was applied by machine (kg).
-    machine_stable_organic_phosphorus : float, default 0
-        Amount of stable organic phosphorus on the field that was applied by machine (kg).
-    machine_organic_phosphorus_runoff : float, default 0.0
-        Amount of organic phosphorus from machine-applied manure dissolved in and removed by runoff (kg).
-    machine_inorganic_phosphorus_runoff : float, default 0.0
-        Amount of inorganic phosphorus from machine-applied manure dissolved in and removed by runoff (kg).
-    grazing_manure_dry_mass : float, default 0
-        The dry weight equivalent of manure mass on the field that was applied by grazers (kg).
-    grazing_manure_applied_mass : float, default 0
-        The dry weight equivalent of the most recent application of manure applied by grazers (kg).
-    grazing_manure_field_coverage : float, default 0
-        Fraction of the field that is covered by grazing-applied manure, between [0, 1] (unitless).
-    grazing_manure_moisture_factor : float, default 0
-        Fraction representing the current moisture level of the grazing-applied manure on the field, between [0, 0.9]
-        (unitless).
-    grazing_water_extractable_inorganic_phosphorus : float, default 0
-        Amount of water extractable inorganic phosphorus on the field that was applied by grazing (kg).
-    grazing_water_extractable_organic_phosphorus : float, default 0
-        Amount of water extractable organic phosphorus on the field that was applied by grazing (kg).
-    grazing_stable_inorganic_phosphorus : float, default 0
-        Amount of stable inorganic phosphorus on the field that was applied by grazing (kg).
-    grazing_stable_organic_phosphorus : float, default 0
-        Amount of stable organic phosphorus on the field that was applied by grazing (kg).
-    grazing_organic_phosphorus_runoff : float, default 0.0
-        Amount of organic phosphorus from grazing manure dissolved in and removed by runoff (kg).
-    grazing_inorganic_phosphorus_runoff : float, default 0.0
-        Amount of inorganic phosphorus from grazing manure dissolved in and removed by runoff (kg).
     soil_phosphorus_runoff : float, default 0.0
         Amount of phosphorus removed from the surface soil layer by runoff (kg / ha).
     nitrate_runoff : float, default 0.0
@@ -183,23 +142,18 @@ class SoilData:
         Amount of stable organic nitrogen removed from the soil surface by eroded sediment (kg / ha).
     eroded_active_organic_nitrogen : float, default 0.0
         Amount of active organic nitrogen removed from the soil surface by eroded sediment (kg / ha).
-    plant_surface_residue : float, default 0
-        Plant residue on the surface of the soil (kg/ha).
-    plant_root_residue : float, default 0
-        Plant residue below the surface of the soil (kg/ha).
     plant_residue_lignin_composition : float, default 0.17
         Lignin fraction of plant residue (unitless).
     plant_lignin_nitrogen_ratio : float, default 0
         Plant lignin to nitrogen ratio (unitless).
     plant_residue_metabolic_fraction : float, default 0
         Plant residue fraction that is metabolic (unitless).
-    total_residue : float, default 0
-        Total amount of soil residue ever added to the field (TODO: needed?).
-    crop_root_depth : float, default 0
-        Root depth of the crop harvested (mm).
     crop_yield_nitrogen : float, default 0
         Nitrogen contained in the harvested yield (kg/ha).
-
+    machine_manure : ManurePool
+        A ManurePool instance holding data for machine-applied manure.
+    grazing_manure : ManurePool
+        A ManurePool instance holding data for grazing-applied manure
     """
 
     # ID variables
@@ -222,10 +176,6 @@ class SoilData:
 
     # Track annual phosphorus activity
     annual_runoff_fertilizer_phosphorus: float = 0
-    annual_runoff_machine_manure_inorganic_phosphorus: float = 0
-    annual_runoff_machine_manure_organic_phosphorus: float = 0
-    annual_runoff_grazing_manure_inorganic_phosphorus: float = 0
-    annual_runoff_grazing_manure_organic_phosphorus: float = 0
     annual_soil_phosphorus_runoff: float = 0
 
     # Track annual nitrogen loss from field
@@ -282,28 +232,9 @@ class SoilData:
     days_since_application: int = 0
     rain_events_after_fertilizer_application: int = 0
 
-    # ---- Manure (Phosphorus Cycling)
-    machine_manure_dry_mass: float = 0
-    machine_manure_applied_mass: float = 0
-    machine_manure_field_coverage: float = 0
-    machine_manure_moisture_factor: float = 0
-    machine_water_extractable_inorganic_phosphorus: float = 0
-    machine_water_extractable_organic_phosphorus: float = 0
-    machine_stable_inorganic_phosphorus: float = 0
-    machine_stable_organic_phosphorus: float = 0
-    machine_organic_phosphorus_runoff: float = 0.0
-    machine_inorganic_phosphorus_runoff: float = 0.0
-
-    grazing_manure_dry_mass: float = 0
-    grazing_manure_applied_mass: float = 0
-    grazing_manure_field_coverage: float = 0
-    grazing_manure_moisture_factor: float = 0
-    grazing_water_extractable_inorganic_phosphorus: float = 0
-    grazing_water_extractable_organic_phosphorus: float = 0
-    grazing_stable_inorganic_phosphorus: float = 0
-    grazing_stable_organic_phosphorus: float = 0
-    grazing_organic_phosphorus_runoff: float = 0.0
-    grazing_inorganic_phosphorus_runoff: float = 0.0
+    # ---- Manure pools (Phosphorus Cycling)
+    machine_manure: ManurePool = field(default_factory=ManurePool)
+    grazing_manure: ManurePool = field(default_factory=ManurePool)
 
     soil_phosphorus_runoff: float = 0.0
 
@@ -315,19 +246,18 @@ class SoilData:
     eroded_active_organic_nitrogen: float = 0.0
 
     # ---- Residue partition (Carbon Cycling)
-    plant_surface_residue = 0.0
-    plant_root_residue = 0
     plant_residue_lignin_composition: float = 0.17
     plant_lignin_nitrogen_ratio: float = 0
     plant_residue_metabolic_fraction: float = 0
-    total_residue: float = 0
-    crop_root_depth: float = 0
     crop_yield_nitrogen: float = 0
 
     @property
-    def all_residue(self) -> float:  # TODO: not currently used.
-        """amount of total plant residue, above and below-ground, on the field (kg/ha)"""
-        return self.plant_surface_residue + self.plant_root_residue
+    def total_residue(self) -> float:
+        """
+        Amount of total plant residue, above and below-ground, on the field which is to be transferred to litter pools
+        in the soil profile (kg/ha).
+        """
+        return sum(self.get_vectorized_layer_attribute("plant_residue"))
 
     def __post_init__(self, field_size: float):
         """
@@ -364,7 +294,7 @@ class SoilData:
                     top_depth=0,
                     bottom_depth=20,
                     field_size=field_size,
-                    residue=self.plant_surface_residue,
+                    residue=0.0,
                 ),
                 LayerData(top_depth=20, bottom_depth=50, field_size=field_size),
                 LayerData(top_depth=50, bottom_depth=80, field_size=field_size),
@@ -416,7 +346,7 @@ class SoilData:
         """
         new_top_layer = deepcopy(self.soil_layers[0])
         new_top_layer.bottom_depth = 20
-        new_top_layer.__post_init__(field_size, self.plant_surface_residue)
+        new_top_layer.__post_init__(field_size, 0.0)
         self.soil_layers[0].top_depth = 20
         self.soil_layers[0].__post_init__(field_size, 0)
         self.soil_layers.insert(0, new_top_layer)
@@ -468,11 +398,10 @@ class SoilData:
 
         # Reset phosphorus totals
         self.annual_runoff_fertilizer_phosphorus = 0
-        self.annual_runoff_machine_manure_organic_phosphorus = 0
-        self.annual_runoff_machine_manure_inorganic_phosphorus = 0
-        self.annual_runoff_grazing_manure_organic_phosphorus = 0
-        self.annual_runoff_grazing_manure_inorganic_phosphorus = 0
-
+        self.grazing_manure.annual_runoff_manure_inorganic_phosphorus = 0
+        self.grazing_manure.annual_runoff_manure_organic_phosphorus = 0
+        self.machine_manure.annual_runoff_manure_inorganic_phosphorus = 0
+        self.machine_manure.annual_runoff_manure_organic_phosphorus = 0
         self.annual_soil_phosphorus_runoff = 0
 
         self.annual_runoff_nitrates_total = 0
@@ -560,13 +489,6 @@ class SoilData:
         unclamped_water_factor = self.profile_soil_water_content / (0.85 * self.profile_field_capacity)
         clamped_water_factor = min(1.0, max(0.0, unclamped_water_factor))
         return clamped_water_factor
-
-    # TODO: implement method that validates all the values inside the SoilData object, including
-    #   - soil layers all have top depths above bottom depths, top depth of top layer is 0, none of the layers are
-    #       overlapping, etc.
-    #   - soil evaporation adjusted is always less than or equal to maximum soil evaporation
-    #   - potential evapotranspiration adjusted is always less than or equal to maximum evapotranspiration
-    #   - average slope fraction is always in the range 0 to 1 inclusive (I think)
 
     @property
     def profile_bulk_density(self) -> float:
