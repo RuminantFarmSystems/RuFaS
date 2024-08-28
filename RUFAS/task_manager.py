@@ -149,7 +149,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
         TaskManager.handle_post_processing(
             args={
                 "exclude_info_maps": exclude_info_maps,
@@ -349,21 +349,21 @@ class TaskManager:
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
         }
+        output_manager.run_startup_sequence(
+            LogVerbosity(args["log_verbosity"]),
+            args["exclude_info_maps"],
+            Path(""),
+            False,
+            args["chunkification"],
+            int(args["maximum_memory_usage_percent"] / workers),
+            int(args["maximum_memory_usage"] / workers),
+            args["save_chunk_threshold_call_count"],
+            Path(""),
+            args["output_prefix"],
+            RUFAS_VERSION,
+            task_id,
+        )
         try:
-            output_manager.run_startup_sequence(
-                LogVerbosity(args["log_verbosity"]),
-                args["exclude_info_maps"],
-                Path(""),
-                False,
-                args["chunkification"],
-                args["save_chunk_threshold_call_count"],
-                int(args["maximum_memory_usage"] / workers),
-                int(args["maximum_memory_usage_percent"] / workers),
-                Path(""),
-                args["output_prefix"],
-                RUFAS_VERSION,
-                task_id,
-            )
             input_manager = InputManager(metadata_depth_limit)
             task_type = args.get("task_type")
 

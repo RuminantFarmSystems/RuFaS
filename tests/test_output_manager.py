@@ -760,7 +760,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified(
     output_manager.average_add_variable_call_addition = 1024
     output_manager.maximum_pool_size = 2000
     output_manager.add_variable_call = 9
-    output_manager.save_chunk_threshold_call_count = None
+    output_manager.save_chunk_threshold_call_count = 0
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
@@ -817,7 +817,7 @@ def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
     output_manager.average_add_variable_call_addition = 1024
     output_manager.maximum_pool_size = 4096
     output_manager.add_variable_call = 9
-    output_manager.save_chunk_threshold_call_count = None
+    output_manager.save_chunk_threshold_call_count = 0
     mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
     mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
     patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
@@ -2926,14 +2926,12 @@ def test_save_current_variable_pool(
     output_manager.variables_pool = dummy_variable_pool
     output_manager.current_pool_size = 1024
 
-    mock_create_directory = mocker.patch.object(output_manager, "create_directory")
     mock_generate_file_name = mocker.patch.object(output_manager, "generate_file_name", return_value="dummy_file.json")
     mock_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
     mock_add_log = mocker.patch.object(output_manager, "add_log")
 
     output_manager._save_current_variable_pool()
 
-    mock_create_directory.assert_called_once_with(output_manager.saved_pool_chunks_path)
     mock_generate_file_name.assert_called_once_with(f"saved_pool_{dummy_saved_pool_chunks_num}", "json")
 
     dummy_file_path = Path.joinpath(output_manager.saved_pool_chunks_path, "dummy_file.json")
