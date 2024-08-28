@@ -294,6 +294,10 @@ def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
         "produce_graphics": False,
+        "chunkification": False,
+        "maximum_memory_usage_percent": 1,
+        "maximum_memory_usage": 0,
+        "save_chunk_threshold_call_count": 0
     }
     produce_graphics = False
     result = task_manager.task(args, produce_graphics, 2, 10)
