@@ -249,6 +249,10 @@ def test_task(
         "task_type": task_type,
         "log_verbosity": LogVerbosity.LOGS,
         "exclude_info_maps": False,
+        "chunkification": False,
+        "save_chunk_threshold_call_count": 0,
+        "maximum_memory_usage": 0,
+        "maximum_memory_usage_percent": 0,
         "output_prefix": "test",
         "logs_directory": Path("/fake/logs"),
         "task_id": 1,
@@ -265,7 +269,7 @@ def test_task(
     mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
-    task_manager.task(args, produce_graphics, 10)
+    task_manager.task(args, produce_graphics, 2, 10)
     mock_im_init.assert_called_once_with(10)
 
     if pre_validate:
@@ -290,9 +294,13 @@ def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
         "produce_graphics": False,
+        "chunkification": False,
+        "maximum_memory_usage_percent": 1,
+        "maximum_memory_usage": 0,
+        "save_chunk_threshold_call_count": 0
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 10)
+    result = task_manager.task(args, produce_graphics, 2, 10)
     assert result == "test (1)"
 
 
