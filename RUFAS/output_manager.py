@@ -141,9 +141,9 @@ class OutputManager(object):
             self.saved_pool_chunks_path: Path | None = None
 
             self.available_memory: int = 0
-            self.average_add_variable_call_addition: int | None = None
+            self.average_add_variable_call_addition: int = 0
             self.add_variable_call = 0
-            self.save_chunk_threshold_call_count: int | None = None
+            self.save_chunk_threshold_call_count: int = 0
             self.current_pool_size: int = 0
             self.maximum_pool_size: int = 0
 
