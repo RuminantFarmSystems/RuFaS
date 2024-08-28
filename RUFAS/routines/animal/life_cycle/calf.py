@@ -115,7 +115,7 @@ class Calf(AnimalBase):
             "wean_weight": self.wean_weight,
             "mature_body_weight": self.mature_body_weight,
             "events": str(self.events),
-            "net_merit": self.net_merit
+            "net_merit": self.net_merit,
         }
         return values
 

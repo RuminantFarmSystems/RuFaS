@@ -7,10 +7,10 @@ from RUFAS.util import Utility
 import datetime
 
 base_change_lookup_table = {
-    datetime.date.fromisoformat('2020-04-01'): 231,
-    datetime.date.fromisoformat('2014-12-01'): 184,
-    datetime.date.fromisoformat('2010-01-01'): 132,
-    datetime.date.fromisoformat('2005-01-01'): 0
+    datetime.date.fromisoformat("2020-04-01"): 231,
+    datetime.date.fromisoformat("2014-12-01"): 184,
+    datetime.date.fromisoformat("2010-01-01"): 132,
+    datetime.date.fromisoformat("2005-01-01"): 0,
 }
 
 
@@ -19,13 +19,12 @@ class AnimalGenetics:
         """Get the net merit and top listing semen data from InputManager, save them as class attributes, and perform
         base change and fill the gap for the net merit data."""
         im = InputManager()
-        net_merit_HO: dict[str, list[str | float]] = im.get_data('animal_net_merit')
-        top_listing_semen_HO: dict[str, list[str | float]] = im.get_data('animal_top_listing_semen')
+        net_merit_HO: dict[str, list[str | float]] = im.get_data("animal_net_merit")
+        top_listing_semen_HO: dict[str, list[str | float]] = im.get_data("animal_top_listing_semen")
         self.net_merit: dict[str, dict[str, dict[str, float]]] = {
             "HO": {
-                net_merit_HO["year_month"][i]: {
-                    "average": net_merit_HO["average"][i],
-                    "std": net_merit_HO["std"][i]} for i in range(len(net_merit_HO["year_month"]))
+                net_merit_HO["year_month"][i]: {"average": net_merit_HO["average"][i], "std": net_merit_HO["std"][i]}
+                for i in range(len(net_merit_HO["year_month"]))
             }
         }
         self.net_merit = self.net_merit_base_change(self.net_merit)
@@ -40,7 +39,7 @@ class AnimalGenetics:
 
     @staticmethod
     def net_merit_base_change(
-            original_net_merit: dict[str, dict[str, dict[str, float]]]
+        original_net_merit: dict[str, dict[str, dict[str, float]]]
     ) -> dict[str, dict[str, dict[str, float]]]:
         """
         This function performs the base change for the net merit data.
@@ -75,10 +74,14 @@ class AnimalGenetics:
             adjusted_net_merit[breed] = {}
             for year_month in original_net_merit[breed].keys():
                 adjusted_net_merit[breed][year_month] = {}
-                datetime_year_month = datetime.date.fromisoformat(year_month + '-01')
-                increase = sum([base_change_lookup_table[base_change_time]
-                                for base_change_time in base_change_lookup_table.keys()
-                                if datetime_year_month >= base_change_time])
+                datetime_year_month = datetime.date.fromisoformat(year_month + "-01")
+                increase = sum(
+                    [
+                        base_change_lookup_table[base_change_time]
+                        for base_change_time in base_change_lookup_table.keys()
+                        if datetime_year_month >= base_change_time
+                    ]
+                )
                 original_value = original_net_merit[breed][year_month]["average"] + increase
                 adjusted_value = original_value - total_adjustment_value
                 adjusted_net_merit[breed][year_month]["average"] = adjusted_value
@@ -87,7 +90,7 @@ class AnimalGenetics:
 
     @staticmethod
     def net_merit_fill_gap(
-            original_net_merit: dict[str, dict[str, dict[str, float]]]
+        original_net_merit: dict[str, dict[str, dict[str, float]]]
     ) -> dict[str, dict[str, dict[str, float]]]:
         """
         The input net merit data only has three entries per year, this function fills in the gap in between entries by
@@ -104,12 +107,7 @@ class AnimalGenetics:
             The net merit data after filling the gap in between entries.
         """
         expanded_net_merit: dict[str, dict[str, dict[str, float]]] = {}
-        monthly_increase_lookup = {
-            2005: 140 / 60,
-            2010: 253 / 60,
-            2015: 369 / 60,
-            2020: (538 - 396) / 24
-        }
+        monthly_increase_lookup = {2005: 140 / 60, 2010: 253 / 60, 2015: 369 / 60, 2020: (538 - 396) / 24}
 
         for breed in original_net_merit.keys():
             expanded_net_merit[breed] = {}
@@ -134,9 +132,9 @@ class AnimalGenetics:
                     average_monthly_increase_key = year - (year % 5)
                     average_monthly_increase = monthly_increase_lookup[average_monthly_increase_key]
                     expanded_net_merit[breed][next_year_month] = {
-                        "average":
-                            original_net_merit[breed][year_month]["average"] + num_inc * average_monthly_increase,
-                        "std": original_net_merit[breed][year_month]["std"]
+                        "average": original_net_merit[breed][year_month]["average"]
+                        + num_inc * average_monthly_increase,
+                        "std": original_net_merit[breed][year_month]["std"],
                     }
                     if month < 12:
                         month += 1
@@ -150,9 +148,7 @@ class AnimalGenetics:
 
             updated_keys = list(expanded_net_merit[breed].keys())
             updated_keys.sort()
-            expanded_net_merit[breed] = {
-                k: expanded_net_merit[breed][k] for k in updated_keys
-            }
+            expanded_net_merit[breed] = {k: expanded_net_merit[breed][k] for k in updated_keys}
         return expanded_net_merit
 
     def assign_net_merit_value_to_animals_entering_herd(self, birth_date: str, breed: str) -> float:

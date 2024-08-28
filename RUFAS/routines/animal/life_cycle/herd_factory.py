@@ -214,7 +214,8 @@ class HerdFactory:
                 p_init=0,
                 birth_weight=0,
                 nei_merit=self.genetic_calculator.assign_net_merit_value_to_animals_entering_herd(
-                    time.start_date.strftime("%Y-%m-%d"), self.breed)
+                    time.start_date.strftime("%Y-%m-%d"), self.breed
+                ),
             )
             calf = Calf(args)
             if not (calf.culled or calf.sold):
@@ -252,8 +253,11 @@ class HerdFactory:
 
         animal_data.update(id=self.pre_animal_population.next_id())
         animal_data.update(birth_date=self._backtrack_animal_birth_date(animal_data, time))
-        animal_data.update(net_merit=self.genetic_calculator.assign_net_merit_value_to_animals_entering_herd(
-            animal_data["birth_date"], animal_data["breed"]))
+        animal_data.update(
+            net_merit=self.genetic_calculator.assign_net_merit_value_to_animals_entering_herd(
+                animal_data["birth_date"], animal_data["breed"]
+            )
+        )
         if animal_type == "calf":
             animal_data.update(p_init=0)
 

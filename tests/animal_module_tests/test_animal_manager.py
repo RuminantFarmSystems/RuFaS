@@ -327,7 +327,7 @@ def test_init_pens(
     animal_manager: AnimalManager,
     mock_pen_data: Dict[str, Dict[str, Union[str, float, int]]],
     mock_manure_management_scenarios: Dict[str, List[Dict[str, Union[str, int]]]],
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for function init_pens in file routines/animal/animal_manager.py"""
     # Act

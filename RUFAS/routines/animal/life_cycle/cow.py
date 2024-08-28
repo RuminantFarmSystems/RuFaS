@@ -217,7 +217,7 @@ class Cow(HeiferIII):
             "days_in_milk": self.days_in_milk,
             "parity": self.calves,
             "calving_interval": self.CI,
-            "net_merit": self.net_merit
+            "net_merit": self.net_merit,
         }
 
     def get_replacement_values(self) -> Dict[str, Any]:
@@ -249,7 +249,7 @@ class Cow(HeiferIII):
             "presynch_method": self.presynch_method,
             "tai_method_c": self.tai_method_c,
             "resynch_method": self.resynch_method,
-            "net_merit": self.net_merit
+            "net_merit": self.net_merit,
         }
 
     @property

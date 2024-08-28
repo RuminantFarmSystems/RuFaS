@@ -1483,7 +1483,7 @@ def cow_fixture() -> AnimalBase:
         "semen_type": "conventional",
         "body_weight": 600,
         "pen_history": [],
-        "net_merit": 0.0
+        "net_merit": 0.0,
     }
     AnimalBase.nutrients = {"dummy1": "dummyval1", "dummy2": "dummyval2"}
     AnimalBase.config = {"semen_type": "dummy"}
@@ -3588,7 +3588,7 @@ def mock_cow_args() -> Dict[str, Any]:
         "wood_l": 0,
         "wood_m": 0,
         "wood_n": 0,
-        "net_merit": 0.0
+        "net_merit": 0.0,
     }
     return cow_args
 
