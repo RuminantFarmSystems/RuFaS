@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import MagicMock, Mock
 from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -33,13 +34,13 @@ def test_perform_daily_crop_update(
     mocker.patch.object(CropData, "is_mature", new_callable=mocker.PropertyMock, return_value=is_mature)
 
     # Mock the methods that should be called during the update
-    mocker.patch.object(crop._heat_units, "absorb_heat_units")
-    mocker.patch.object(crop._root_development, "develop_roots")
-    mocker.patch.object(crop._nitrogen_incorporation, "incorporate_nitrogen")
-    mocker.patch.object(crop._phosphorus_incorporation, "incorporate_phosphorus")
-    mocker.patch.object(crop._growth_constraints, "constrain_growth")
-    mocker.patch.object(crop._leaf_area_index, "grow_canopy")
-    mocker.patch.object(crop._biomass_allocation, "allocate_biomass")
+    mock_absorb_heat_units = mocker.patch.object(crop._heat_units, "absorb_heat_units")
+    mock_develop_roots = mocker.patch.object(crop._root_development, "develop_roots")
+    mock_incorporate_nitrogen = mocker.patch.object(crop._nitrogen_incorporation, "incorporate_nitrogen")
+    mock_incorporate_phosphorus = mocker.patch.object(crop._phosphorus_incorporation, "incorporate_phosphorus")
+    mock_constrain_growth = mocker.patch.object(crop._growth_constraints, "constrain_growth")
+    mock_grow_canopy = mocker.patch.object(crop._leaf_area_index, "grow_canopy")
+    mock_allocate_biomass = mocker.patch.object(crop._biomass_allocation, "allocate_biomass")
 
     # Create mock objects for the conditions, field data, and soil data
     mock_conditions = mocker.Mock(spec=CurrentDayConditions)
@@ -51,15 +52,15 @@ def test_perform_daily_crop_update(
 
     # Assertions
     if should_update:
-        crop._heat_units.absorb_heat_units.assert_called_once_with(
+        mock_absorb_heat_units.assert_called_once_with(
             mock_conditions.mean_air_temperature,
             mock_conditions.min_air_temperature,
             mock_conditions.max_air_temperature,
         )
-        crop._root_development.develop_roots.assert_called_once()
-        crop._nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(mock_soil_data)
-        crop._phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(mock_soil_data)
-        crop._growth_constraints.constrain_growth.assert_called_once_with(
+        mock_develop_roots.assert_called_once()
+        mock_incorporate_nitrogen.assert_called_once_with(mock_soil_data)
+        mock_incorporate_phosphorus.assert_called_once_with(mock_soil_data)
+        mock_constrain_growth.assert_called_once_with(
             crop._data.max_transpiration,
             mock_conditions.mean_air_temperature,
             mock_field_data.simulate_water_stress,
@@ -67,16 +68,16 @@ def test_perform_daily_crop_update(
             mock_field_data.simulate_nitrogen_stress,
             mock_field_data.simulate_phosphorus_stress,
         )
-        crop._leaf_area_index.grow_canopy.assert_called_once()
-        crop._biomass_allocation.allocate_biomass.assert_called_once_with(mock_conditions.incoming_light)
+        mock_grow_canopy.assert_called_once()
+        mock_allocate_biomass.assert_called_once_with(mock_conditions.incoming_light)
     else:
-        crop._heat_units.absorb_heat_units.assert_not_called()
-        crop._root_development.develop_roots.assert_not_called()
-        crop._nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
-        crop._phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
-        crop._growth_constraints.constrain_growth.assert_not_called()
-        crop._leaf_area_index.grow_canopy.assert_not_called()
-        crop._biomass_allocation.allocate_biomass.assert_not_called()
+        mock_absorb_heat_units.assert_not_called()
+        mock_develop_roots.assert_not_called()
+        mock_incorporate_nitrogen.assert_not_called()
+        mock_incorporate_phosphorus.assert_not_called()
+        mock_constrain_growth.assert_not_called()
+        mock_grow_canopy.assert_not_called()
+        mock_allocate_biomass.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -92,8 +93,8 @@ def test_cycle_water_for_crops(mocker: MockerFixture, in_growing_season: bool, s
     mocker.patch.object(CropData, "in_growing_season", new_callable=mocker.PropertyMock, return_value=in_growing_season)
     crop = Crop(crop_data)
 
-    mocker.patch.object(crop._water_uptake, "uptake_water")
-    mocker.patch.object(crop._water_dynamics, "cycle_water")
+    mock_uptake_water = mocker.patch.object(crop._water_uptake, "uptake_water")
+    mock_cycle_water = mocker.patch.object(crop._water_dynamics, "cycle_water")
     mock_soil_data = mocker.Mock(spec=SoilData)
 
     if should_update:
@@ -103,11 +104,11 @@ def test_cycle_water_for_crops(mocker: MockerFixture, in_growing_season: bool, s
 
     # Assertions
     if should_update:
-        crop._water_uptake.uptake_water.assert_called_once_with(mock_soil_data)
-        crop._water_dynamics.cycle_water.assert_called_once_with(10.0, 5.0, 20.0)
+        mock_uptake_water.assert_called_once_with(mock_soil_data)
+        mock_cycle_water.assert_called_once_with(10.0, 5.0, 20.0)
     else:
-        crop._water_uptake.uptake_water.assert_not_called()
-        crop._water_dynamics.cycle_water.assert_not_called()
+        mock_uptake_water.assert_not_called()
+        mock_cycle_water.assert_not_called()
         assert crop._data.cumulative_evaporation == 0.0
         assert crop._data.cumulative_transpiration == 0.0
         assert crop._data.cumulative_potential_evapotranspiration == 0.0
@@ -438,7 +439,8 @@ def test_field_proportion_setter(mocker: MockerFixture) -> None:
     ],
 )
 def test_create_crop(
-    crop_reference: str, heat_scheduled: bool, custom_crop_specs: dict, is_supported: bool, should_raise_keyerror: bool
+    crop_reference: str, heat_scheduled: bool, custom_crop_specs: dict[str, Any], is_supported: bool,
+    should_raise_keyerror: bool
 ) -> None:
     """Tests that a new Crop instance is properly created or raises KeyError if crop_reference is invalid."""
     mocked_time = MagicMock(Time)
@@ -534,14 +536,14 @@ def test_make_supported_crop(mocker: MockerFixture) -> None:
     species = "winter_wheat_grain"
     mock_crop_data = Mock(spec=CropData)
 
-    mocker.patch(
+    mock_create_species_data = mocker.patch(
         "RUFAS.routines.field.crop.species_data_factory.CropSpeciesDataFactory.create_species_data",
         return_value=mock_crop_data,
     )
 
     result = Crop.make_supported_crop(species, some_spec="some_value")
 
-    CropSpeciesDataFactory.create_species_data.assert_called_once_with(CropSpecies(species), some_spec="some_value")
+    mock_create_species_data.assert_called_once_with(CropSpecies(species), some_spec="some_value")
     assert isinstance(result, Crop)
     assert result._data == mock_crop_data
 
@@ -554,7 +556,7 @@ def test_make_supported_crop(mocker: MockerFixture) -> None:
         {"minimum_temperature": -10},  # no species name
     ],
 )
-def test_make_custom_crop(config: dict):
+def test_make_custom_crop(config: dict[str, Any]) -> None:
     """Checks that custom crop attributes are set correctly"""
     crop = Crop._make_custom_crop(**config)
     for key, val in config.items():
