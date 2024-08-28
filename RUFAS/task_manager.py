@@ -328,7 +328,9 @@ class TaskManager:
         handler(args, input_manager, output_manager, task_id, produce_graphics)
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None) -> str | None:
+    def task(
+        args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None
+    ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
