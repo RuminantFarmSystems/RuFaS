@@ -20,7 +20,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from typing import Optional
+from typing import Any, Optional
 
 from RUFAS.time import Time
 
@@ -73,8 +73,7 @@ class Crop:
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
-        # Common data object that is updated throughout routines
-        self._data = crop_data or CropData()  # defaults if not given
+        self._data = crop_data or CropData()
 
         # growth process components
         self._growth_constraints = GrowthConstraints(self._data)
@@ -484,7 +483,8 @@ class Crop:
 
     @classmethod
     def create_crop(
-        cls, crop_reference: str, custom_crop_specifications: dict, use_heat_scheduled_harvesting: bool, time: Time
+        cls, crop_reference: str, custom_crop_specifications: dict[str, dict[str, Any]],
+        use_heat_scheduled_harvesting: bool, time: Time
     ) -> Crop:
         """
         Factory method to create a crop instance based on the crop reference.
@@ -493,7 +493,7 @@ class Crop:
         ----------
         crop_reference : str
             The reference for the crop to be planted.
-        custom_crop_specifications : dict
+        custom_crop_specifications : dict[str, dict[str, Any]]
             Dictionary of custom crop specifications, if any.
         use_heat_scheduled_harvesting : bool
             Whether heat-scheduled harvesting should be used.
@@ -509,6 +509,11 @@ class Crop:
         ------
         KeyError
             If the crop reference is for a custom crop that does not exist in the specifications.
+
+        Notes
+        -----
+        This method starts by trying to determine if the crop is of a supported species, if so it passes
+        it to the supported crop creation method. If not, it passes it to the custom crop creation method.
         """
         supported_species = set(item.value for item in CropSpecies)
         if crop_reference in supported_species:
@@ -544,13 +549,13 @@ class Crop:
         self._data.planting_year = time.current_calendar_year
         self._data.planting_day = time.current_julian_day
 
-    def make_crop_from_config_dict(self, config: dict) -> Crop:
+    def make_crop_from_config_dict(self, config: dict[str, Any]) -> Crop:
         """
         Initialize a new crop from a configuration dictionary.
 
         Parameters
         ----------
-        config : dict
+        config : dict[str, Any]
             A dictionary containing specifications for the crop to be initialized.
 
         Details
@@ -576,7 +581,7 @@ class Crop:
         return self._make_custom_crop(**config)
 
     @staticmethod
-    def make_supported_crop(species: str, **specs) -> Crop:
+    def make_supported_crop(species: str, **specs: dict[str, Any]) -> Crop:
         """
         Create a crop instance with attributes determined by the species of the crop.
 
@@ -584,7 +589,7 @@ class Crop:
         ----------
         species : str
             One of the supported species.
-        **specs : optional
+        **specs : dict[str, Any] optional
             An optional set of keyword arguments passed to CropSpeciesDataFactory to customize the crop species.
 
         Details
@@ -603,14 +608,17 @@ class Crop:
         return Crop(crop_data)
 
     @staticmethod
-    def _make_custom_crop(**specs) -> Crop:
+    def _make_custom_crop(**specs: dict[str, Any]) -> Crop:
         """creates a crop instance with customized attributes.
 
-        Args:
-            **specs: an optional set of arguments, passed to CropSpeciesDataFactory that customize the
-              crop species
+        Parameters
+        ----------
+        **specs : dict[str, Any]
+            an optional set of arguments, passed to CropSpeciesDataFactory that customize the crop species.
 
-        Details, this can be used to create a new ('unsupported') crop species/type
+        Details
+        -------
+        This method can be used to create a new ('unsupported') crop species/type.
         """
         crop_data = CropData(**specs)
         return Crop(crop_data)

@@ -49,7 +49,7 @@ class Field:
         List of all planting events that will occur over the run of the simulation in this field.
     harvestings : List[HarvestEvent], default=None
         List of all harvesting events that will occur over the run of the simulation in the field.
-    custom_crop_specifications : Dict[str, Dict], default=None
+    custom_crop_specifications : dict[str, dict[str, Any]], default=None
         Dictionary where keys are crop references and values are dictionaries containing crop specifications.
     tillage_events : List[TillageEvent], default=None
         List of all tillage events that will occur over the run of the simulation in this field.
@@ -74,7 +74,7 @@ class Field:
         Reference to the list of PlantingEvent objects
     harvest_events : List[HarvestEvent]
         Reference to the list of HarvestEvent objects
-    custom_crop_specifications : Dict[str, Dict]
+    custom_crop_specifications : dict[str, dict[str, Any]]
         Reference to the custom crop specifications dictionary.
     fertilizer_applicator : FertilizerApplication(self.soil)
         Provides interface for adding fertilizer to the field
@@ -110,7 +110,7 @@ class Field:
         soil: Optional[Soil] = None,
         plantings: Optional[List[PlantingEvent]] = None,
         harvestings: Optional[List[HarvestEvent]] = None,
-        custom_crop_specifications: Optional[Dict[str, Dict]] = None,
+        custom_crop_specifications: Optional[dict[str, dict[str, Any]]] = None,
         tillage_events: Optional[List[TillageEvent]] = None,
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
@@ -1037,6 +1037,15 @@ class Field:
         KeyError
             If the crop reference is to a custom crop specification, but that specification is not present in the list
             of custom crop specifications.
+
+        Notes
+        -----
+        The crop reference may contain a reference to a supported crop that already has attributes defined for it, or a
+        reference to a custom crop that has user-defined attributes.
+        The harvest method is overwritten for the crop created because that is specified directly by the user, and the
+        crop id is set so that the HarvestEvents will be able to identify the correct crop in the field's list of active
+        crops.
+
         """
         crop = Crop.create_crop(crop_reference, self.custom_crop_specifications, use_heat_scheduled_harvesting, time)
         self.crops.append(crop)
