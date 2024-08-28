@@ -2473,7 +2473,7 @@ def test_recalculate_solids_after_destruction(
     )
     actual_output = ManureTreatmentDailyOutput()
 
-    anaerobic_digester._recalculate_solids_after_destruction(destruction, actual_output)
+    actual_output = anaerobic_digester._recalculate_solids_after_destruction(destruction, actual_output)
 
     assert actual_output.liquid_manure_total_degradable_volatile_solids == expected_degradable_vol_sols
     assert (

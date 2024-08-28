@@ -111,7 +111,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         ) * GasEmissionConstants.AD_CARBON_DIOXIDE_DENSITY
         AD_VS_destruction = total_methane_generation_mass + AD_carbon_dioxide
 
-        self._recalculate_solids_after_destruction(AD_VS_destruction, new_daily_output)
+        new_daily_output = self._recalculate_solids_after_destruction(AD_VS_destruction, new_daily_output)
 
         new_daily_output.daily_final_manure_volume = (
             self._current_manure_treatment_daily_input.liquid_manure_daily_volume
@@ -177,7 +177,7 @@ class AnaerobicDigestion(BaseManureTreatment):
 
     def _recalculate_solids_after_destruction(
         self, volatile_solids_destruction: float, manure_output: ManureTreatmentDailyOutput
-    ) -> None:
+    ) -> ManureTreatmentDailyOutput:
         """
         Adjusts the pools of solids in the manure after volatile solids are destroyed.
 
@@ -188,6 +188,11 @@ class AnaerobicDigestion(BaseManureTreatment):
         manure_output : ManureTreatmentDailyOutput
             ManureTreatmentDailyOutput which will have the solids pools after accounting for volatile solids
             destruction.
+
+        Returns
+        -------
+        ManureTreatmentDailyOutput
+            The manure_output after the destroyed volatile solids have been removed from the volatile solids pools.
 
         """
         info_map = {"class": self.__class__.__name__, "function": self._recalculate_solids_after_destruction.__name__}
@@ -229,6 +234,8 @@ class AnaerobicDigestion(BaseManureTreatment):
         manure_output.liquid_manure_total_solids = (
             self._current_manure_treatment_daily_input.liquid_manure_total_solids - volatile_solids_destruction
         )
+
+        return manure_output
 
     @classmethod
     def _bound_influent_temperature(cls, average_temperature_celsius: float) -> float:
