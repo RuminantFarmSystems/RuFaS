@@ -1192,8 +1192,9 @@ class Field:
             Amount of rain that fell on the current day (mm).
         """
         for crop in self.crops:
-            crop.assess_dormancy(daylength, self.field_data.dormancy_threshold_daylength, rainfall, self.soil.data,
-                                 self.soil)
+            crop.assess_dormancy(
+                daylength, self.field_data.dormancy_threshold_daylength, rainfall, self.soil.data, self.soil
+            )
 
     # </editor-fold>
 

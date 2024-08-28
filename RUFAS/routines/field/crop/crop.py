@@ -487,8 +487,11 @@ class Crop:
 
     @classmethod
     def create_crop(
-        cls, crop_reference: str, custom_crop_specifications: dict[str, dict[str, Any]],
-        use_heat_scheduled_harvesting: bool, time: Time
+        cls,
+        crop_reference: str,
+        custom_crop_specifications: dict[str, dict[str, Any]],
+        use_heat_scheduled_harvesting: bool,
+        time: Time,
     ) -> Crop:
         """
         Factory method to create a crop instance based on the crop reference.

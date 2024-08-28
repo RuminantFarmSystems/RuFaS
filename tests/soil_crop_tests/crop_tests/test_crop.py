@@ -438,8 +438,11 @@ def test_field_proportion_setter(mocker: MockerFixture) -> None:
     ],
 )
 def test_create_crop(
-    crop_reference: str, heat_scheduled: bool, custom_crop_specs: dict[str, Any], is_supported: bool,
-    should_raise_keyerror: bool
+    crop_reference: str,
+    heat_scheduled: bool,
+    custom_crop_specs: dict[str, Any],
+    is_supported: bool,
+    should_raise_keyerror: bool,
 ) -> None:
     """Tests that a new Crop instance is properly created or raises KeyError if crop_reference is invalid."""
     mocked_time = MagicMock(Time)
