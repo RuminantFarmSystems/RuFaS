@@ -134,17 +134,21 @@
         "save_chunk_threshold_call_count": {
           "type": "number",
           "description": "The threshold add variable call count for saving the output variable pool chunk.",
-          "default": 0
+          "default": 0,
+          "minimum": 0
         },
         "maximum_memory_usage": {
           "type": "number",
           "description": "The maximum memory usage in Bytes.",
-          "default": 0
+          "default": 0,
+          "minimum": 0
         },
         "maximum_memory_usage_percent": {
           "type": "number",
           "description": "The maximum percentage of memory use.",
-          "default": 80
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100
         },
         "multi_run_counts": {
           "type": "number",
