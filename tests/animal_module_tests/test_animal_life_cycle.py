@@ -1197,12 +1197,13 @@ def test_handle_new_born(
             "days_born": 0,
             "p_init": p_gest_for_calf,
             "birth_weight": calf_birth_weight,
-            "net_merit": 0.0
+            "net_merit": 0.0,
         }
     )
     if not is_calf_culled and not is_calf_sold:
-        mock_calf.events.add_event.assert_called_once_with(calf_days_born, time.simulation_day,
-                                                           animal_constants.ENTER_HERD)
+        mock_calf.events.add_event.assert_called_once_with(
+            calf_days_born, time.simulation_day, animal_constants.ENTER_HERD
+        )
         assert len(calves_born) == 1
         assert calves_born[0] == mock_calf
     if is_calf_sold:
@@ -1836,7 +1837,7 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
                 "mature_body_weight": 2.0,
                 "birth_weight": 2.0,
                 "p_init": 1,
-                "net_merit": 0.0
+                "net_merit": 0.0,
             }
         ),
         (
@@ -1850,7 +1851,7 @@ def test_update_heiferI(mocker: MockerFixture) -> None:
                 "days_born": 1,
                 "birth_weight": 2,
                 "p_init": 1,
-                "net_merit": 0.0
+                "net_merit": 0.0,
             }
         ),
     ],
