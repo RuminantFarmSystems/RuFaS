@@ -128,7 +128,7 @@
         },
         "chunkification": {
           "type": "bool",
-          "description": "Select this flag if you want to periodically dump the output variable pool.",
+          "description": "Whether to periodically save the output variable pool to a file.",
           "default": false
         },
         "save_chunk_threshold_call_count": {
