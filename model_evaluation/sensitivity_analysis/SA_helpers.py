@@ -110,7 +110,12 @@ def collate_outputs(
 
     for i in range(0, total_num_files):
         file_ID = f"{i+1}".zfill(digits) + "_"
-        file_ID_found = [filename for filename in all_report_filenames if file_ID in filename][-1]
+        try:
+            file_ID_found = [filename for filename in all_report_filenames if file_ID in filename][-1]
+        except:
+            file_ID_backup = f"{1}".zfill(digits) + "_"
+            file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
+            print('used dummy')
         file = pd.read_csv(basedirectory + file_ID_found)
         variable_names: List[str] = []
         if not variable_names:

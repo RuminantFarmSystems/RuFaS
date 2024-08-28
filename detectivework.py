@@ -10,11 +10,10 @@ import time
 import gc
 
 logfilepath = "output/logs/"
-fileprefix = "test-18"
-num_files = 96 + 32
+fileprefix = "fftest_1"
 
 # read the CSV
-input_list = "output/test-18-animal_S256_inputs.csv"
+input_list = f"output/reports/{fileprefix}_inputs.csv"
 input_list_read = pd.read_csv(input_list)
 # add the index for each, 0-X is a columns for run
 df = pd.DataFrame(input_list_read)
@@ -71,7 +70,7 @@ len(initornotlist)
 len(total_time_float_list)
 df.insert(1, "Simulation time", total_time_float_list, True)
 df.insert(2, "Failed simulation", initornotlist, True)
-df.to_csv(f"{fileprefix}_input_input_list_annotated.csv")
+df.to_csv(f"output/{fileprefix}_input_input_list_annotated.csv")
 
 long_simulations = df.loc[df["Simulation time"] > 600]
 normal_simulations = df.loc[df["Simulation time"] <= 600]
@@ -145,7 +144,7 @@ meta = pd.DataFrame(
         "uniquely_long_list": uniquely_long_list,
     }
 )
-meta.to_csv(f"{fileprefix}_input_meta.csv")
+meta.to_csv(f"output/{fileprefix}_input_meta.csv")
 
 # Example lists
 list1 = [1, 2, 3, 4]

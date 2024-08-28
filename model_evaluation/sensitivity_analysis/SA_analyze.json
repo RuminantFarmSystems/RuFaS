@@ -1,10 +1,10 @@
 {
     "analyses": [
         {
-            "input_file": "input/data/tasks/sobol_animal_tasks_v3.json",
+            "input_file": "input/data/tasks/sobol_animal_tasks_v4.json",
             "output_path": "output/reports/",
             "report_name": "report_S30",
-            "only_inputs": true,
+            "only_inputs": false,
             "plot_whole_new": false,
             "inputs_to_collate": [
                 "animal animal_config management_decisions breeding_start_day_h",
