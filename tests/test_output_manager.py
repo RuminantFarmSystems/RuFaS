@@ -3199,7 +3199,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory, f"saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, "saved_pool/20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
     expected_available_memory_gb = expected_available_memory / (1024**3)
@@ -3253,7 +3253,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory, f"saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, "saved_pool/20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
     expected_available_memory_gb = expected_available_memory / (1024**3)
@@ -3307,7 +3307,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory, f"saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, "saved_pool/20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
     expected_available_memory_gb = expected_available_memory / (1024**3)
@@ -3325,6 +3325,8 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
     assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
     assert mock_output_manager.save_chunk_threshold_call_count is None
     assert mock_output_manager.maximum_pool_size == expected_max_pool_size
+
+    mock_output_manager.chunkification = False
     mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
 
     mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]

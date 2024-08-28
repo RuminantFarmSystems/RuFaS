@@ -185,7 +185,6 @@ class OutputManager(object):
             f"{self.available_memory} Bytes.\n"
         )
 
-        self.saved_pool_chunks_num = 0
         if save_chunk_threshold_call_count:
             self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
             log_message += (
