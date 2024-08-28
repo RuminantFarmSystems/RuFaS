@@ -7,20 +7,20 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-om = OutputManager()
-
 
 class Time:
-    def __init__(self):
+    def __init__(self) -> None:
         """
         This object is responsible for creating and tracking time in the simulation.
         """
+        self.om = OutputManager()
         self.im = InputManager()
         self.config_data: Dict[str, str | int | bool] = self.im.get_data("config")
-        self.start_date: datetime = datetime.datetime.strptime(self.config_data["start_date"], "%Y:%j")
-        self.end_date: datetime = datetime.datetime.strptime(self.config_data["end_date"], "%Y:%j")
 
-        self.current_date: datetime = self.start_date
+        self.start_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["start_date"]), "%Y:%j")
+        self.end_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["end_date"]), "%Y:%j")
+
+        self.current_date: datetime.datetime = self.start_date
         self.simulation_length_days: int = (self.end_date - self.start_date).days
         self.simulation_length_years: int = self.end_date.year - self.start_date.year + 1
 
@@ -93,18 +93,20 @@ class Time:
             "function": self.record_time.__name__,
             "prefix": "Time",
         }
-        om.add_variable("day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
-        om.add_variable(
+        self.om.add_variable(
+            "day", self.current_julian_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
+        )
+        self.om.add_variable(
             "year", self.current_simulation_year, dict(info_map, **{"units": MeasurementUnits.SIMULATION_YEAR})
         )
-        om.add_variable(
+        self.om.add_variable(
             "calendar_year", self.current_calendar_year, dict(info_map, **{"units": MeasurementUnits.CALENDAR_YEAR})
         )
-        om.add_variable(
+        self.om.add_variable(
             "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
         )
 
-    def convert_simulation_day_to_date(self, simulation_day: int) -> datetime.date:
+    def convert_simulation_day_to_date(self, simulation_day: int) -> datetime.datetime:
         """
         Convert the simulation day to a date object that is relative to the start date of the simulation.
 
@@ -122,7 +124,7 @@ class Time:
         return actual_date
 
     @staticmethod
-    def convert_year_jday_to_date(year: int, day: int) -> datetime:
+    def convert_year_jday_to_date(year: int, day: int) -> datetime.datetime:
         """
         Converts the year and its day of the year to a datetime object.
 
