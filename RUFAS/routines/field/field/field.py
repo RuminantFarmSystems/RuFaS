@@ -1,12 +1,10 @@
 import math
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.units import MeasurementUnits
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.field.crop.crop import Crop
-from RUFAS.routines.field.crop.species_data_factory import (
-    CropSpecies,
-)
 from RUFAS.routines.field.manager.events import (
     BaseFieldManagementEvent,
     PlantingEvent,
@@ -145,7 +143,7 @@ class Field:
         self.ONLY_NITROGEN_MIX = "100_0_0"
         self.tiller = TillageApplication(self.field_data, self.soil.data)
 
-        self.tillage_events: list[TillageEvent] = tillage_events
+        self.tillage_events: list[TillageEvent] | None = tillage_events
 
         self.manure_applicator = ManureApplication(self.soil.data)
 
@@ -177,7 +175,7 @@ class Field:
 
         self.feed_manager: FeedManager = feed_manager or FeedManager()
 
-    def manage_field(self, time, current_conditions: CurrentDayConditions) -> None:
+    def manage_field(self, time: Time, current_conditions: CurrentDayConditions) -> None:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -1182,7 +1180,7 @@ class Field:
         for crop in self.crops:
             crop.field_proportion = field_coverage_fraction
 
-    def _assess_dormancy(self, daylength: float, rainfall: float) -> None:
+    def _assess_dormancy(self, daylength: float | None, rainfall: float) -> None:
         """
         Transition all crops to dormancy if they are capable of going dormant.
 
@@ -1194,7 +1192,8 @@ class Field:
             Amount of rain that fell on the current day (mm).
         """
         for crop in self.crops:
-            crop.assess_dormancy(daylength, self.field_data.dormancy_threshold_daylength, rainfall, self.soil)
+            crop.assess_dormancy(daylength, self.field_data.dormancy_threshold_daylength, rainfall, self.soil.data,
+                                 self.soil)
 
     # </editor-fold>
 

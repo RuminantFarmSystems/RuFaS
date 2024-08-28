@@ -154,7 +154,7 @@ class Crop:
             self._data.cumulative_potential_evapotranspiration = 0.0
             self._data.cumulative_water_uptake = 0.0
 
-    def handle_water_in_canopy(self, precipitation_reaching_soil: float) -> tuple:
+    def handle_water_in_canopy(self, precipitation_reaching_soil: float) -> tuple[float, float]:
         """
         Handles the water addition to the crop's canopy and calculates excess water.
 
@@ -235,7 +235,7 @@ class Crop:
         self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
 
     @property
-    def name(self) -> str:
+    def name(self) -> str | None:
         return self._data.name
 
     @property
@@ -243,7 +243,7 @@ class Crop:
         return self._data.species
 
     @property
-    def id(self) -> str:
+    def id(self) -> Any | None:
         return self._data.id
 
     @property
@@ -251,12 +251,16 @@ class Crop:
         return self._data.is_alive
 
     @property
-    def max_transpiration(self) -> float:
+    def max_transpiration(self) -> float | None:
         return self._data.max_transpiration
 
     @property
     def field_proportion(self) -> float:
         return self._data.field_proportion
+
+    @field_proportion.setter
+    def field_proportion(self, field_proportion: float) -> None:
+        self._data.field_proportion = field_proportion
 
     @property
     def above_ground_biomass(self) -> float:
@@ -279,7 +283,7 @@ class Crop:
         return self._data.biomass
 
     @property
-    def usable_light(self) -> float:
+    def usable_light(self) -> float | None:
         return self._data.usable_light
 
     @property
@@ -287,11 +291,11 @@ class Crop:
         return self._data.biomass_growth_max
 
     @property
-    def biomass_growth(self) -> float:
+    def biomass_growth(self) -> float | None:
         return self._data.biomass_growth
 
     @property
-    def root_biomass(self) -> float:
+    def root_biomass(self) -> float | None:
         return self._data.root_biomass
 
     @property
@@ -307,15 +311,15 @@ class Crop:
         return self._data.water_stress
 
     @property
-    def temp_stress(self) -> float:
+    def temp_stress(self) -> float | None:
         return self._data.temp_stress
 
     @property
-    def nitrogen_stress(self) -> float:
+    def nitrogen_stress(self) -> float | None:
         return self._data.nitrogen_stress
 
     @property
-    def phosphorus_stress(self) -> float:
+    def phosphorus_stress(self) -> float | None:
         return self._data.phosphorus_stress
 
     @property
@@ -339,43 +343,43 @@ class Crop:
         return self._data.leaf_area_index
 
     @property
-    def canopy_height(self) -> float:
+    def canopy_height(self) -> float | None:
         return self._data.canopy_height
 
     @property
-    def leaf_area_added(self) -> float:
+    def leaf_area_added(self) -> float | None:
         return self._data.leaf_area_added
 
     @property
-    def optimal_leaf_area_change(self) -> float:
+    def optimal_leaf_area_change(self) -> float | None:
         return self._data.optimal_leaf_area_change
 
     @property
-    def potential_nitrogen_uptake(self) -> float:
+    def potential_nitrogen_uptake(self) -> float | None:
         return self._data.potential_nitrogen_uptake
 
     @property
-    def total_phosphorus_uptake(self) -> float:
+    def total_phosphorus_uptake(self) -> float | None:
         return self._data.total_phosphorus_uptake
 
     @property
-    def total_nitrogen_uptake(self) -> float:
+    def total_nitrogen_uptake(self) -> float | None:
         return self._data.total_nitrogen_uptake
 
     @property
-    def optimal_nitrogen_fraction(self) -> float:
+    def optimal_nitrogen_fraction(self) -> float | None:
         return self._data.optimal_nitrogen_fraction
 
     @property
-    def potential_phosphorus_uptake(self) -> float:
+    def potential_phosphorus_uptake(self) -> float | None:
         return self._data.potential_phosphorus_uptake
 
     @property
-    def actual_phosphorus_uptakes(self) -> float:
+    def actual_phosphorus_uptakes(self) -> list[float] | None:
         return self._data.actual_phosphorus_uptakes
 
     @property
-    def actual_nitrogen_uptakes(self) -> float:
+    def actual_nitrogen_uptakes(self) -> list[float] | None:
         return self._data.actual_nitrogen_uptakes
 
     @property
@@ -391,7 +395,7 @@ class Crop:
         return self._data.cumulative_evapotranspiration
 
     @property
-    def water_deficiency(self) -> float:
+    def water_deficiency(self) -> float | None:
         return self._data.water_deficiency
 
     @property
@@ -399,7 +403,7 @@ class Crop:
         return self._data.canopy_water
 
     @property
-    def cut_biomass(self) -> float:
+    def cut_biomass(self) -> float | None:
         return self._data.cut_biomass
 
     @property
@@ -411,11 +415,11 @@ class Crop:
         return self._data.yield_residue
 
     @property
-    def yield_nitrogen(self) -> float:
+    def yield_nitrogen(self) -> float | None:
         return self._data.yield_nitrogen
 
     @property
-    def yield_phosphorus(self) -> float:
+    def yield_phosphorus(self) -> float | None:
         return self._data.yield_phosphorus
 
     @property
@@ -430,16 +434,12 @@ class Crop:
     def use_heat_scheduling(self) -> bool:
         return self._data.use_heat_scheduling
 
-    @field_proportion.setter
-    def field_proportion(self, field_proportion: float) -> None:
-        self._data.field_proportion = field_proportion
-
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Sets the max transpiration for a crop."""
         self._water_dynamics.set_maximum_transpiration(evapotranspirative_demand)
 
     def assess_dormancy(
-        self, daylength: float, dormancy_threshold_daylength: float, rainfall: float, soil: Soil
+        self, daylength: float, dormancy_threshold_daylength: float, rainfall: float, soil_data: SoilData, soil: Soil
     ) -> None:
         """
         Assess and manage dormancy status based on the daylength.
@@ -452,15 +452,17 @@ class Crop:
             The threshold daylength below which the crop should enter dormancy.
         rainfall : float
             Amount of rain that fell on the current day (mm).
-        soil : Soil
+        soil_data : SoilData
             The soil data relevant for dormancy and biomass partitioning.
+        soil : Soil
+            The soil profile.
         """
         if daylength <= dormancy_threshold_daylength:
-            self.enter_dormancy(rainfall, soil)
+            self.enter_dormancy(rainfall, soil_data, soil)
         else:
             self.exit_dormancy()
 
-    def enter_dormancy(self, rainfall: float, soil: Soil) -> None:
+    def enter_dormancy(self, rainfall: float, soil_data: SoilData, soil: Soil) -> None:
         """
         Puts the crop into dormancy and handles biomass partitioning and residue addition.
 
@@ -468,10 +470,12 @@ class Crop:
         ----------
         rainfall : float
             Amount of rain that fell on the current day (mm).
-        soil : Soil
+        soil_data : SoilData
             The soil data relevant for dormancy and biomass partitioning.
+        soil : Soil
+            The soil profile.
         """
-        self._dormancy.enter_dormancy(soil)
+        self._dormancy.enter_dormancy(soil_data)
         self._biomass_allocation.partition_biomass()
         soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
 
@@ -608,13 +612,13 @@ class Crop:
         return Crop(crop_data)
 
     @staticmethod
-    def _make_custom_crop(**specs: dict[str, Any]) -> Crop:
+    def _make_custom_crop(**specs) -> Crop:
         """creates a crop instance with customized attributes.
 
         Parameters
         ----------
-        **specs : dict[str, Any]
-            an optional set of arguments, passed to CropSpeciesDataFactory that customize the crop species.
+        **specs
+            an optional set of arguments, passed to CropData that customizes the crop species.
 
         Details
         -------

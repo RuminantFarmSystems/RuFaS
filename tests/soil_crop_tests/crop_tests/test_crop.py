@@ -271,11 +271,12 @@ def test_assess_dormancy(
     exit_dormancy_mock = mocker.patch.object(crop, "exit_dormancy")
 
     mock_soil = mocker.Mock(spec=Soil)
+    mock_soil_data = mocker.Mock(spec=SoilData)
 
-    crop.assess_dormancy(daylength, dormancy_threshold_daylength, rainfall, mock_soil)
+    crop.assess_dormancy(daylength, dormancy_threshold_daylength, rainfall, mock_soil_data, mock_soil)
 
     if should_enter_dormancy:
-        enter_dormancy_mock.assert_called_once_with(rainfall, mock_soil)
+        enter_dormancy_mock.assert_called_once_with(rainfall, mock_soil_data, mock_soil)
         exit_dormancy_mock.assert_not_called()
     else:
         enter_dormancy_mock.assert_not_called()
@@ -291,6 +292,7 @@ def test_enter_dormancy(mocker: MockerFixture) -> None:
     biomass_allocation_mock = mocker.patch.object(crop._biomass_allocation, "partition_biomass")
 
     mock_soil = mocker.Mock(spec=Soil)
+    mock_soil_data = mocker.Mock(spec=SoilData)
     mock_carbon_cycling = mocker.Mock()
     mock_residue_partition = mocker.Mock()
     mock_soil.carbon_cycling = mock_carbon_cycling
@@ -298,9 +300,9 @@ def test_enter_dormancy(mocker: MockerFixture) -> None:
 
     rainfall = 12.5
 
-    crop.enter_dormancy(rainfall, mock_soil)
+    crop.enter_dormancy(rainfall, mock_soil_data, mock_soil)
 
-    dormancy_mock.assert_called_once_with(mock_soil)
+    dormancy_mock.assert_called_once_with(mock_soil_data)
     biomass_allocation_mock.assert_called_once()
     mock_residue_partition.add_residue_to_pools.assert_called_once_with(rainfall)
 
