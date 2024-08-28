@@ -99,6 +99,7 @@ class Calf(AnimalBase):
         self.wean_weight = args["wean_weight"]
         self.mature_body_weight = args["mature_body_weight"]
         self.events.init_from_string(args["events"])
+        self.net_merit = args["net_merit"]
 
     def get_calf_values(self):
         """
@@ -114,6 +115,7 @@ class Calf(AnimalBase):
             "wean_weight": self.wean_weight,
             "mature_body_weight": self.mature_body_weight,
             "events": str(self.events),
+            "net_merit": self.net_merit,
         }
         return values
 
