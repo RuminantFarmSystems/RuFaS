@@ -16,6 +16,7 @@ from RUFAS.routines.animal.animal_typed_dicts import (
     InitialHerdSummaryTypedDict,
     SoldAnimalTypedDict,
 )
+from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
@@ -28,6 +29,7 @@ from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
     HeiferReproProtocolEnum,
 )
+from RUFAS.time import Time
 from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
@@ -168,6 +170,8 @@ class LifeCycleManager:
         self.replacement_market: List[Cow] = []
         self.animal_population: Optional[AnimalPopulation] = None
 
+        self.genetics_calculator = AnimalGenetics()
+
     def initialize_herd(
         self, herd_data: HerdInfoTypedDict
     ) -> Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
@@ -273,7 +277,7 @@ class LifeCycleManager:
 
     def daily_update(
         self,
-        sim_day: int,
+        time: Time,
         calves: List[Calf],
         heiferIs: List[HeiferI],
         heiferIIs: List[HeiferII],
@@ -298,7 +302,7 @@ class LifeCycleManager:
             heiferIIs: list of HeiferII objects to be updated
             heiferIs: list of HeiferI objects to be updated
             calves: list of Calf objects to be updated
-            sim_day: day number
+            time: current Time object
 
         Returns:
             animals_added: list of animals added from replacement herd
@@ -311,6 +315,7 @@ class LifeCycleManager:
             cows: updated list of cows
 
         """
+        sim_day = time.simulation_day
         animals_removed: List[Cow] = []
         animals_added: List[Cow] = []
         calves_born: List[Calf] = []
@@ -335,7 +340,7 @@ class LifeCycleManager:
             sim_day, heiferIIIs, cows, total_animal_num
         )
 
-        total_animal_num = self._evaluate_and_update_cows(sim_day, cows, calves_born, animals_removed, total_animal_num)
+        total_animal_num = self._evaluate_and_update_cows(time, cows, calves_born, animals_removed, total_animal_num)
         self._check_if_heifers_need_to_be_sold(heiferIIIs, cows, animals_removed, sim_day)
         self._check_if_replacement_heifers_needed(sim_day, heiferIIIs, cows, animals_added)
 
@@ -821,12 +826,15 @@ class LifeCycleManager:
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
             replacement.set_p_purchased()
+            replacement.net_merit = self.genetics_calculator.assign_net_merit_value_to_animals_entering_herd(
+                replacement.birth_date, replacement.breed
+            )
             animals_added.append(replacement)
             self.bought_heifer_num += 1
 
     def _evaluate_and_update_cows(
         self,
-        sim_day: int,
+        time: Time,
         cows: List[Cow],
         calves_born: List[Calf],
         animals_removed: List[Cow],
@@ -837,8 +845,8 @@ class LifeCycleManager:
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        time : Time
+            The current Time object.
         cows : List[Cow]
             The list of cows.
         calves_born : List[Calf]
@@ -853,6 +861,8 @@ class LifeCycleManager:
         int: The newly updated total number of animals in the herd.
 
         """
+        sim_day = time.simulation_day
+
         calving_interval_avail_num = 0
         calving_age_avail_num = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
         calf_to_preg_time_avail_num = {"1": 0, "2": 0, "3": 0, "greater_than_3": 0}
@@ -876,7 +886,7 @@ class LifeCycleManager:
                 self._extract_repro_stats_from_cow(cow)
 
             if new_born:
-                self._handle_new_born(sim_day, cow, calves_born)
+                self._handle_new_born(time, cow, calves_born)
 
         Utility.remove_items_from_list_by_indices(cows, removed_cows_idx)
         return total_animal_num
@@ -1030,7 +1040,11 @@ class LifeCycleManager:
         self.semen_num += cow.semen_num
         self.ai_num += cow.AI_times
 
-    def _handle_new_born(self, sim_day: int, cow: Cow, calves_born: List[Calf]) -> None:
+    def _handle_new_born(self, time: Time, cow: Cow, calves_born: List[Calf]) -> None:
+        sim_day = time.simulation_day
+        net_merit = self.genetics_calculator.assign_net_merit_value_to_newborn_calf(
+            time, AnimalBase.config["breed"], cow.net_merit
+        )
         args = {
             "id": self.animal_population.next_id(),
             "breed": AnimalBase.config["breed"],
@@ -1038,6 +1052,7 @@ class LifeCycleManager:
             "days_born": 0,
             "p_init": cow.p_gest_for_calf,
             "birth_weight": cow.calf_birth_weight,
+            "net_merit": net_merit,
         }
         # at parturition, the sum of P absorbed for gestation rqmts is
         # subtracted from the animal value. the sum of P absorbed for
