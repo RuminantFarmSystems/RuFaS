@@ -112,7 +112,7 @@ class AnimalGenetics:
         for breed in original_net_merit.keys():
             expanded_net_merit[breed] = {}
             years = [int(year_month[:4]) for year_month in original_net_merit[breed].keys()]
-            min_year, max_year = min(years), max(years)
+            max_year = max(years)
             current_keys = list(original_net_merit[breed].keys())
             for year_month in current_keys:
                 expanded_net_merit[breed][year_month] = {
