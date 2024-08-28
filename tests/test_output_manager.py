@@ -3115,8 +3115,9 @@ def test_run_startup_sequence_not_clear_output_directory(
 
 
 def test_run_startup_sequence_chunkification(
-    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable],
-    mocker: MockerFixture
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
     mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
