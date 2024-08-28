@@ -68,6 +68,8 @@ class Utility:
                         current.append([] if next_key_is_digit else {})
                     current = current[key]
                 else:
+                    if key.startswith("numberaskey"):
+                        key = key.replace("numberaskey", "")
                     if isinstance(current, list):
                         current = current[-1]
                     if key not in current:
