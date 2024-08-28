@@ -1,0 +1,49 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "winter_wheat_grain",
+            "planting_years": [2014],
+            "pattern_repeat": 4,
+            "planting_skip": 1,
+            "harvesting_skip": 1,
+            "planting_days": [293],
+            "harvest_years": [2015],
+            "harvest_days": [201],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "2nd",
+            "extracted": true
+
+        },
+{
+            "crop_species": "cereal_rye_silage",
+            "planting_years": [2015],
+            "pattern_repeat": 3,
+            "planting_skip": 1,
+            "harvesting_skip": 1,
+            "planting_days": [202],
+            "harvest_years": [2016],
+            "harvest_days": [100],
+            "harvest_operations": ["kill_only"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        },
+        {
+            "crop_species": "corn_silage",
+            "planting_years": [2014],
+            "pattern_repeat": 4,
+            "planting_skip": 1,
+            "harvesting_skip": 1,
+            "planting_days": [135],
+            "harvest_years": [2014],
+            "harvest_days": [254],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        }
+]
+}
+

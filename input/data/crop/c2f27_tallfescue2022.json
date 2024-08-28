@@ -1,0 +1,19 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "tall_fescue_hay",
+            "planting_years": [2017],
+            "pattern_repeat": 0,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [100],
+            "harvest_years": [2017, 2017, 2017, 2017, 2018, 2018, 2018, 2018, 2018, 2019, 2019, 2019, 2019, 2019, 2020, 2020, 2020, 2020, 2020, 2021, 2021, 2021, 2021, 2021, 2022, 2022, 2022, 2022, 2022 ],
+            "harvest_days": [160, 190, 220, 250, 140, 170, 200, 230, 260, 140, 170, 200, 230, 260, 140, 170, 200, 230, 260, 140, 170, 200, 230, 260, 140, 170, 200, 230, 260],
+            "harvest_operations": ["harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_only","harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+
+        }
+    ]
+}

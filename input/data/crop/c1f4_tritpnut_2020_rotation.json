@@ -1,0 +1,34 @@
+{
+    "crop_schedules": [
+        {
+            "crop_species": "triticale_silage",
+            "planting_years": [2015],
+            "pattern_repeat": 6,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [285],
+            "harvest_years": [2016],
+            "harvest_days": [85],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "2nd",
+            "extracted": true
+
+        },
+        {
+            "crop_species": "alfalfa_silage",
+            "planting_years": [2015],
+            "pattern_repeat": 6,
+            "planting_skip": 0,
+            "harvesting_skip": 0,
+            "planting_days": [93],
+            "harvest_years": [2015],
+            "harvest_days": [278],
+            "harvest_operations": ["harvest_kill"],
+            "harvest_type": "scheduled",
+            "planting_order": "1st",
+            "extracted": true
+        }
+
+    ]
+}

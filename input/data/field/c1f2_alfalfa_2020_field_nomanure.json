@@ -1,0 +1,16 @@
+
+{
+  "soil_specification": "soil",
+  "crop_specification": "Alfalfa 2020 Crop data",
+  "manure_management_specification": "no_manure",
+  "tillage_management_specification": "Alfalfa 2020 Tillage schedule",
+  "fertilizer_management_specification": "Alfalfa 2020 Fertilizer schedule",
+  "field_size": 540,
+  "absolute_latitude": 46.1429,
+  "longitude": 120.0370,
+  "minimum_daylength": 9.0,
+  "seasonal_high_water_table": false,
+  "watering_amount_in_liters": 0.0,
+  "watering_interval": 0,
+  "supplement_manure_nutrient_deficiencies": false
+}

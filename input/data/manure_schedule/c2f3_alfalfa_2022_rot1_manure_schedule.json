@@ -1,0 +1,15 @@
+{
+    "years": [2015, 2016, 2016, 2017, 2018, 2018, 2019],
+    "days": [288, 127, 298, 125, 127, 298, 125],
+    "nitrogen_masses": [3200, 3200, 3200, 3200, 3200, 3200, 3200],
+    "phosphorus_masses": [1524, 1524, 1524, 1524, 1524, 1524, 1524],
+    "potassium_masses": [3352, 3352, 3352, 3352, 3352, 3352, 3352],
+    "coverage_fractions": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+    "application_depths": [ 0.0, 0.0, 0.0, 0.0, 0, 0, 0],
+    "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1, 1, 1],
+    "manure_types": ["liquid", "liquid", "liquid", "liquid", "liquid", "liquid", "liquid"],
+    "pattern_repeat": 1,
+    "pattern_skip": 4
+}
+
+

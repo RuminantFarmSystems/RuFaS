@@ -1,0 +1,20 @@
+{
+    "available_fertilizer_mixes": [
+        {
+            "name": "0_0_60",
+            "N": 0,
+            "P": 0,
+            "K": 0.6
+        }
+    ],
+    "mix_names": ["0_0_60", "0_0_60", "0_0_60", "0_0_60", "0_0_60"],
+    "years": [2011, 2012, 2017, 2018, 2019],
+    "days": [250, 250, 250, 250, 250],
+    "nitrogen_masses": [0, 0, 0, 0, 0],
+    "phosphorus_masses": [0, 0, 0, 0, 0],
+    "potassium_masses": [6095, 6095, 6095, 6095, 6095],
+    "application_depths": [0.0, 0.0, 0.0, 0.0, 0.0],
+    "surface_remainder_fractions": [1.0, 1.0, 1.0, 1.0, 1.0],
+    "pattern_repeat": 1,
+    "pattern_skip": 0
+}
