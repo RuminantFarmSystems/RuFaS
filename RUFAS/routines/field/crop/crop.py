@@ -125,7 +125,7 @@ class Crop:
         self._leaf_area_index.grow_canopy()
         self._biomass_allocation.allocate_biomass(current_conditions.incoming_light)
 
-    def cycle_water_for_crops(
+    def cycle_water_for_crop(
         self, actual_evaporation: float, full_evapotranspirative_demand: float, soil_data: SoilData
     ) -> None:
         """

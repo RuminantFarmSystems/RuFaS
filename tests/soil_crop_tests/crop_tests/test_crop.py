@@ -99,7 +99,7 @@ def test_cycle_water_for_crops(mocker: MockerFixture, in_growing_season: bool, s
     if should_update:
         crop._data.water_uptake = 5.0
 
-    crop.cycle_water_for_crops(10.0, 20.0, mock_soil_data)
+    crop.cycle_water_for_crop(10.0, 20.0, mock_soil_data)
 
     # Assertions
     if should_update:

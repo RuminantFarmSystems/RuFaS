@@ -1343,7 +1343,7 @@ class Field:
         actual_evaporation = full_evapotranspirative_demand - remaining_evapotranspirative_demand
 
         for crop in self.crops:
-            crop.cycle_water_for_crops(actual_evaporation, full_evapotranspirative_demand, self.soil.data)
+            crop.cycle_water_for_crop(actual_evaporation, full_evapotranspirative_demand, self.soil.data)
 
     def _determine_watering_amount(
         self, rainfall: float, manure_water: float, year: int, day: int, irrigation: float
