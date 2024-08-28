@@ -93,9 +93,11 @@ def test_task_manager_start(
     )
     mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
 
-    mock_input_manager = InputManager()
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=workers)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
     mock_task_manager.output_manager = mock_output_manager
 
     mock_task_manager.start(
@@ -147,9 +149,10 @@ def test_task_manager_start(
 def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
     """Unit test for TaskManager.start() with exception raised"""
     mock_task_manager = TaskManager()
-    mock_input_manager = InputManager()
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
     mock_dump_get_data = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     mock_task_manager.output_manager = mock_output_manager
     with pytest.raises(Exception) as exc_info:
         mock_task_manager.start(
@@ -161,7 +164,7 @@ def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager
             True,
             False,
             False,
-            None,
+            10,
         )
     assert "Task Manager's input data is invalid." in str(exc_info.value)
     mock_start_data.assert_called_once_with(Path("/fake/path"))
@@ -178,32 +181,32 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
     )
 
 
-def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> None:
+def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
     """Unit test for TaskManager.set_random_seed() when 0 is passed as random seed."""
-    with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
-        TaskManager.set_random_seed(0, mock_output_manager)
-        mock_randint.assert_called_once_with(0, 2**32 - 1)
-        mock_output_manager.add_log.assert_called_with(
-            "Random seed used",
-            "Seeded libaries with random_seed=4321",
-            {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
-        )
+    mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
+    TaskManager.set_random_seed(0, mock_output_manager)
+    mock_randint.assert_called_once_with(0, 2**32 - 1)
+    mock_output_manager.add_log.assert_called_with(
+        "Random seed used",
+        "Seeded libaries with random_seed=4321",
+        {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
+    )
 
 
 @pytest.mark.parametrize("seed, expected", [(12345, 12345), (0, 4321)])
 def test_set_random_seed_with_parameters(
-    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
+    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
 ) -> None:
     """Unit test for TaskManager.set_random_seed() with specified random seed."""
-    with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
-        TaskManager.set_random_seed(seed, mock_output_manager)
-        if seed == 0:
-            mock_randint.assert_called_once_with(0, 2**32 - 1)
-        mock_output_manager.add_log.assert_called_with(
-            "Random seed used",
-            f"Seeded libaries with random_seed={expected}",
-            {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
-        )
+    mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
+    TaskManager.set_random_seed(seed, mock_output_manager)
+    if seed == 0:
+        mock_randint.assert_called_once_with(0, 2**32 - 1)
+    mock_output_manager.add_log.assert_called_with(
+        "Random seed used",
+        f"Seeded libaries with random_seed={expected}",
+        {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
+    )
 
 
 def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> None:
@@ -242,9 +245,11 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
             "comparison_properties_file_path": "path/to/comparison/properties",
         },
     ]
-    mock_input_manager = InputManager()
-    task_manager.input_manager = mock_input_manager
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=task_data)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    task_manager.input_manager = mock_input_manager
+
     single, multi = task_manager._parse_input_tasks()
     assert len(single) == 1
     assert len(multi) == 1
@@ -281,9 +286,11 @@ def test_handle_post_processing(
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": suppress_logs,
     }
-    mock_input_manager = InputManager()
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_dump_data_logs = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
     task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
     if not suppress_logs:
         mock_dump_data_logs.call_count == 1
@@ -301,8 +308,10 @@ def test_handle_post_processing_load_pool(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager.handle_post_processing() when load_pool_from_file is set to True."""
-    mock_input_manager = InputManager()
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
 
     args = {
@@ -330,8 +339,10 @@ def test_handle_post_processing_save_result(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager.handle_post_processing() when save_result is set to True."""
-    mock_input_manager = InputManager()
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
 
     args = {
@@ -370,12 +381,13 @@ def test_input_data_audit(
         "logs_directory": Path("/fake/output/logs"),
         "suppress_log_files": suppress_logs,
     }
-    mock_input_manager = InputManager()
-    task_manager.input_manager = mock_input_manager
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
     mock_save_metadata_properties = mocker.patch.object(
         mock_input_manager, "save_metadata_properties", return_value=None
     )
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    task_manager.input_manager = mock_input_manager
 
     result = task_manager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
@@ -534,12 +546,11 @@ def test_handle_herd_initialization(
 ) -> None:
     """Unit test for TaskManager.handle_herd_initializaition()"""
     args = {"init_herd": init_herd, "save_animals": save_animals, "save_animals_directory": save_animals_directory}
+    mock_herd_factory = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory")
+    mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
+    mock_initialize_herd = mocker.patch.object(mock_herd_factory, "initialize_herd")
 
-    with patch("RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory") as mock_herd_factory:
-        mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
-        mock_initialize_herd = mocker.patch.object(mock_herd_factory, "initialize_herd")
-
-        task_manager.handle_herd_initializaition(args, mock_output_manager)
+    task_manager.handle_herd_initializaition(args, mock_output_manager)
 
     info_map = {
         "class": TaskManager.__name__,
@@ -562,15 +573,15 @@ def test_single_simulation_run(
     """Unit test for TaskManager.handle_single_simulation_run()"""
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
 
-    args = {}
+    args: dict[str, Any] = {}
 
-    with patch("RUFAS.simulation_engine.SimulationEngine") as mock_simulation_engine:
-        mock_simulation_engine_init = mocker.patch(
-            "RUFAS.task_manager.SimulationEngine", return_value=mock_simulation_engine
-        )
-        mock_simulate = mocker.patch.object(mock_simulation_engine, "simulate")
+    mock_simulation_engine = mocker.patch("RUFAS.simulation_engine.SimulationEngine")
+    mock_simulation_engine_init = mocker.patch(
+        "RUFAS.task_manager.SimulationEngine", return_value=mock_simulation_engine
+    )
+    mock_simulate = mocker.patch.object(mock_simulation_engine, "simulate")
 
-        task_manager.handle_single_simulation_run(args, mock_output_manager)
+    task_manager.handle_single_simulation_run(args, mock_output_manager)
 
     mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
 
@@ -614,7 +625,7 @@ def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
     )
 
 
-def test_herd_init_tasks() -> None:
+def test_herd_init_tasks(mocker: MockerFixture) -> None:
     """Tests that all herd initialization tasks were handled"""
     args = {
         "log_verbosity": "logs",
@@ -633,13 +644,13 @@ def test_herd_init_tasks() -> None:
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
-    with (
-        patch.object(TaskManager, "handle_herd_initializaition", return_value=None) as mock_handle_herd_initializaition,
-        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
-    ):
-        TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
-        mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
-        mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
+    mock_handle_herd_initializaition = mocker.patch.object(
+        TaskManager, "handle_herd_initializaition", return_value=None)
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+
+    TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
+    mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
+    mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
 
 
 def test_expand_end_to_end_testing_args() -> None:
@@ -650,7 +661,7 @@ def test_expand_end_to_end_testing_args() -> None:
 
 
 @pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
-def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) -> None:
+def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool, mocker: MockerFixture) -> None:
     """Tests that all simulation engine run tasks were handled"""
     args = {
         "log_verbosity": "logs",
@@ -667,30 +678,29 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) 
     task_id = 5
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
-    with (
-        patch.object(
+
+    mock_handle_single_simulation_run = mocker.patch.object(
             TaskManager, "handle_single_simulation_run", return_value=None
-        ) as mock_handle_single_simulation_run,
-        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
-        patch.object(Utility, "deep_merge", return_value=None) as mock_deep_merge,
-    ):
-
-        TaskManager._handle_simulation_engine_run_tasks(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
         )
-        if input_patch:
-            mock_deep_merge.assert_called_once_with(mock_input_manager.pool, args["input_patch"])
-        else:
-            mock_deep_merge.assert_not_called()
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+    mock_deep_merge = mocker.patch.object(Utility, "deep_merge", return_value=None)
 
-        mock_handle_single_simulation_run.assert_called_once_with(args, mock_output_manager)
-        mock_handle_post_processing.assert_called_once_with(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True
-        )
+    TaskManager._handle_simulation_engine_run_tasks(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+    )
+    if input_patch:
+        mock_deep_merge.assert_called_once_with(mock_input_manager.pool, args["input_patch"])
+    else:
+        mock_deep_merge.assert_not_called()
+
+    mock_handle_single_simulation_run.assert_called_once_with(args, mock_output_manager)
+    mock_handle_post_processing.assert_called_once_with(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True
+    )
 
 
 @pytest.mark.parametrize("produce_graphics", [True, False])
-def test_postprocessing_tasks(produce_graphics: bool) -> None:
+def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> None:
     """Tests that all postprocessing tasks were handled"""
     args = {
         "log_verbosity": "logs",
@@ -706,17 +716,19 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
     task_id = 5
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
-    with patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing:
-        TaskManager._handle_postprocessing_tasks(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
-        )
-        mock_handle_post_processing.assert_called_once_with(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
-        )
+
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+
+    TaskManager._handle_postprocessing_tasks(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+    )
+    mock_handle_post_processing.assert_called_once_with(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
+    )
 
 
 @pytest.mark.parametrize(
-    "multi_run_args, expected_output",
+    "multi_run_args, expected_output_prefixes, expected_input_patches",
     [
         (
             {
@@ -726,6 +738,8 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
                 "sampler": "fractional_factorial",
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
+                "saltelli_skip": 0,
+                "saltelli_number": 2,
                 "SA_input_variables": [
                     {
                         "variable_name": "animal.herd_information.calf_num",
@@ -748,279 +762,65 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
                 ],
             },
             [
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 1",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 10, "cow_num": 102},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 2",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 10, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 3",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 10, "cow_num": 102},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 4",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 10, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 5",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 6",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 102},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 7",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 2 run 8",
-                    "log_verbosity": "errors",
-                    "sampler": "fractional_factorial",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 102},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
-                        }
-                    },
-                },
+                "Task 2 run 1",
+                "Task 2 run 2",
+                "Task 2 run 3",
+                "Task 2 run 4",
+                "Task 2 run 5",
+                "Task 2 run 6",
+                "Task 2 run 7",
+                "Task 2 run 8",
             ],
+            [
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}}
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
+                    }
+                }
+            ]
         ),
         (
             {
@@ -1054,595 +854,167 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
                 ],
             },
             [
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 01",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 02",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 03",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 04",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 05",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 06",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 07",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 08",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 6, "cow_num": 98},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 09",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 10",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 11",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 12",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 13",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 14",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 15",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
-                {
-                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
-                    "output_prefix": "Task 3 run 16",
-                    "log_verbosity": "errors",
-                    "sampler": "saltelli_sobol",
-                    "SA_load_balancing_start": 0,
-                    "SA_load_balancing_stop": 1,
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
-                    "SA_input_variables": [
-                        {
-                            "variable_name": "animal.herd_information.calf_num",
-                            "lower_bound": 6,
-                            "upper_bound": 10,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.herd_information.cow_num",
-                            "lower_bound": 98,
-                            "upper_bound": 102,
-                            "data_type": "int",
-                        },
-                        {
-                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
-                            "lower_bound": 378,
-                            "upper_bound": 382,
-                            "data_type": "int",
-                        },
-                    ],
-                    "input_patch": {
-                        "animal": {
-                            "herd_information": {"calf_num": 8, "cow_num": 100},
-                            "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                        }
-                    },
-                },
+                "Task 3 run 01",
+                "Task 3 run 02",
+                "Task 3 run 03",
+                "Task 3 run 04",
+                "Task 3 run 05",
+                "Task 3 run 06",
+                "Task 3 run 07",
+                "Task 3 run 08",
+                "Task 3 run 09",
+                "Task 3 run 10",
+                "Task 3 run 11",
+                "Task 3 run 12",
+                "Task 3 run 13",
+                "Task 3 run 14",
+                "Task 3 run 15",
+                "Task 3 run 16",
             ],
+            [
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+            ]
         ),
     ],
 )
 def test_expand_sensitivity_analysis_args(
     multi_run_args: dict[str, Any],
-    expected_output: list[dict[str, Any]],
+    expected_output_prefixes: list[str],
+    expected_input_patches: list[dict[str, dict[str, dict[str, Any]]]],
     mock_output_manager: Generator[Any, Any, Any],
     task_manager: TaskManager,
 ) -> None:
     """Unit test for TaskManager._expand_sensitivity_analysis_args() with fractional_factorial and saltelli_sobol as
     samplers."""
     result = task_manager._expand_sensitivity_analysis_args(multi_run_args)
+
+    expected_output = [{
+                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
+                    "output_prefix": expected_output_prefixes[i],
+                    "log_verbosity": "errors",
+                    "sampler": multi_run_args["sampler"],
+                    "SA_load_balancing_start": 0,
+                    "SA_load_balancing_stop": 1,
+                    "saltelli_skip": 0,
+                    "saltelli_number": 2,
+                    "SA_input_variables": [
+                        {
+                            "variable_name": "animal.herd_information.calf_num",
+                            "lower_bound": 6,
+                            "upper_bound": 10,
+                            "data_type": "int",
+                        },
+                        {
+                            "variable_name": "animal.herd_information.cow_num",
+                            "lower_bound": 98,
+                            "upper_bound": 102,
+                            "data_type": "int",
+                        },
+                        {
+                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                            "lower_bound": 378,
+                            "upper_bound": 382,
+                            "data_type": "int",
+                        },
+                    ],
+                    "input_patch": expected_input_patches[i],
+                } for i in range(len(expected_output_prefixes))]
+
     assert result == expected_output
 
 
@@ -1713,7 +1085,7 @@ def test_expand_sensitivity_analysis_args_invalid_sampler(
     """Unit test for TaskManager._expand_sensitivity_analysis_args() with invalid sampler"""
     task_manager.output_manager = mock_output_manager
 
-    with pytest.raises(Exception) as exception_raised:
+    with pytest.raises(ValueError) as exception_raised:
         task_manager._expand_sensitivity_analysis_args(multi_run_args)
 
     mock_output_manager.add_log.assert_called_once_with(
@@ -1854,13 +1226,13 @@ def test_run_tasks(
     mock_task = mocker.patch.object(task_manager, "task")
     mock_task.return_value = None
 
-    with patch("multiprocessing.Pool") as mock_pool:
-        mock_pool.return_value.imap = lambda func, args: map(func, args)
-        task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
+    mock_pool = mocker.patch("multiprocessing.Pool")
+    mock_pool.return_value.imap = lambda func, args: map(func, args)
+    task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
 
-        task_manager._run_tasks(
-            single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
-        )
+    task_manager._run_tasks(
+        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+    )
 
     mock_task_call_list = [
         call(single_run_task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit)
@@ -1980,13 +1352,14 @@ def test_run_tasks_fail(
 
     mock_om_init = mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
 
-    with patch("multiprocessing.Pool") as mock_pool:
-        mock_pool.return_value.imap = lambda func, args: map(func, args)
-        task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
+    mock_pool = mocker.patch("multiprocessing.Pool")
 
-        task_manager._run_tasks(
-            single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
-        )
+    mock_pool.return_value.imap = lambda func, args: map(func, args)
+    task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
+
+    task_manager._run_tasks(
+        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+    )
 
     mock_om_init.assert_called_once()
     info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
@@ -1996,7 +1369,7 @@ def test_run_tasks_fail(
     )
 
 
-def test_call_handler() -> None:
+def test_call_handler(mocker: MockerFixture) -> None:
     """Tests that wrapper handler function were handled"""
     args = {
         "log_verbosity": "logs",
@@ -2015,22 +1388,23 @@ def test_call_handler() -> None:
     produce_graphics = False
 
     # Call the call_handler method
-    with patch.object(TaskManager, "_handle_postprocessing_tasks", return_value=None) as mock_handle_post_processing:
-        TaskManager.call_handler(
-            mock_handle_post_processing,
-            args=args,
-            input_manager=mock_input_manager,
-            output_manager=mock_output_manager,
-            task_id=task_id,
-            produce_graphics=produce_graphics,
-        )
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "_handle_postprocessing_tasks", return_value=None)
 
-        mock_handle_post_processing.assert_called_once_with(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
-        )
+    TaskManager.call_handler(
+        mock_handle_post_processing,
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        produce_graphics=produce_graphics,
+    )
+
+    mock_handle_post_processing.assert_called_once_with(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+    )
 
 
-def test_input_data_audit_tasks() -> None:
+def test_input_data_audit_tasks(mocker: MockerFixture) -> None:
     """Tests that all input data audit tasks were handled"""
     args = {
         "log_verbosity": LogVerbosity.LOGS,
@@ -2044,15 +1418,17 @@ def test_input_data_audit_tasks() -> None:
         "properties_file_path": Path("more/fake/paths"),
     }
     task_id = 5
-    im = InputManager()
-    om = OutputManager()
+
+    mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=None)
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     produce_graphic = False
 
-    with (
-        patch.object(TaskManager, "handle_input_data_audit", return_value=None) as mock_handle_input_data_audit,
-        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
-    ):
-        TaskManager._handle_input_data_audit_tasks(args, im, om, task_id, produce_graphic)
+    TaskManager._handle_input_data_audit_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
 
-        mock_handle_input_data_audit.assert_called_once_with(args, im, om, False)
-        mock_handle_post_processing.assert_called_once_with(args, im, om, task_id)
+    mock_handle_input_data_audit.assert_called_once_with(args, mock_input_manager, mock_output_manager, False)
+    mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)

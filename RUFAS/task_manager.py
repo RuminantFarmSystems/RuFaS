@@ -268,7 +268,7 @@ class TaskManager:
                     "output_prefix": multi_run_args["output_prefix"],
                 },
             )
-            raise Exception(f"INVALID SAMPLER: The sampler {multi_run_args['sampler']} is not supported")
+            raise ValueError(f"INVALID SAMPLER: The sampler {multi_run_args['sampler']} is not supported")
 
         single_run_args = []
 
