@@ -186,19 +186,7 @@ class Crop:
         return precipitation_reaching_soil, excess_canopy_water
 
     def evaporate_from_canopy(self, evapotranspirative_demand: float) -> float:
-        """
-        Evaporates water from the crop's canopy based on the evapotranspirative demand.
-
-        Parameters
-        ----------
-        evapotranspirative_demand : float
-            The evapotranspirative demand on the field on the current day (mm).
-
-        Returns
-        -------
-        float
-            The amount of water evaporated from the crop's canopy (mm).
-        """
+        """Wrapper for the canopy evaporation routine."""
         amount_evaporated = self._water_dynamics.evaporate_from_canopy(evapotranspirative_demand)
         return amount_evaporated
 
@@ -435,7 +423,7 @@ class Crop:
         return self._data.use_heat_scheduling
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
-        """Sets the max transpiration for a crop."""
+        """Wrapper method for setting the max transpiration for a crop."""
         self._water_dynamics.set_maximum_transpiration(evapotranspirative_demand)
 
     def assess_dormancy(
