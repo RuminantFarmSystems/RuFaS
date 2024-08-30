@@ -4,12 +4,6 @@
 <!-- Use this section to link this pull request to other issues, other pull requests, or mention people. -->
 Issue(s) closed by this pull request: closes #
 
-- [ ] The changelog (`changelog.md`) has been updated.
-      
-How big are the changes in the PR? Would you nominate it for a major version upgrade?
-- [ ] Yes
-- [ ] No
-
 ### What
 <!-- Add more detail about the changes that are being made in the pull request. -->
 
