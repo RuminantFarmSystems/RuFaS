@@ -329,7 +329,9 @@ class Crop:
         crop.set_crop_planting_attributes(crop_reference, use_heat_scheduled_harvesting, time)
         return crop
 
-    def set_crop_planting_attributes(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
+    def set_crop_planting_attributes(
+        self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time
+    ) -> None:
         """
         Initializes the crop's attributes related to planting.
 

@@ -712,8 +712,9 @@ class FieldDataReporter:
                 om.add_variable(
                     "water_stress", crop.data.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
                 )
-                om.add_variable("temp_stress", crop.data.temp_stress, dict(info_map, **{"units":
-                                                                                        MeasurementUnits.UNITLESS}))
+                om.add_variable(
+                    "temp_stress", crop.data.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+                )
                 om.add_variable(
                     "nitrogen_stress",
                     crop.data.nitrogen_stress,
@@ -734,10 +735,12 @@ class FieldDataReporter:
                     crop.data.heat_fraction,
                     dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
                 )
-                om.add_variable("is_growing", crop.data.is_growing, dict(info_map, **{"units":
-                                                                                      MeasurementUnits.UNITLESS}))
-                om.add_variable("is_dormant", crop.data.is_dormant, dict(info_map, **{"units":
-                                                                                      MeasurementUnits.UNITLESS}))
+                om.add_variable(
+                    "is_growing", crop.data.is_growing, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+                )
+                om.add_variable(
+                    "is_dormant", crop.data.is_dormant, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+                )
                 om.add_variable(
                     "leaf_area_index",
                     crop.data.leaf_area_index,
