@@ -726,6 +726,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
     )
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning", "ignore::UserWarning")
 @pytest.mark.parametrize(
     "multi_run_args, expected_output_prefixes, expected_input_patches",
     [
