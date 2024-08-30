@@ -1539,6 +1539,7 @@ class OutputManager(object):
         """
         Dumps all non-data pools into the given path to a directory.
         """
+        self.create_directory(path)
         self.dump_variable_names_and_contexts(path, exclude_info_maps, format_option)
         self.dump_logs(path)
         self.dump_warnings(path)
