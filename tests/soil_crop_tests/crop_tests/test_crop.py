@@ -387,8 +387,8 @@ def test_create_crop(
         assert crop._data.species == expected_crop._data.species
 
 
-def test_initialize_crop(mocker: MockerFixture) -> None:
-    """Test for initialize_crop() in crop.py."""
+def test_set_crop_planting_attributes(mocker: MockerFixture) -> None:
+    """Test for set_crop_planting_attributes() in crop.py."""
     crop_data = CropData()
     crop = Crop(crop_data)
 
@@ -398,7 +398,7 @@ def test_initialize_crop(mocker: MockerFixture) -> None:
 
     crop_reference = "winter_wheat_grain"
     use_heat_scheduled_harvesting = True
-    crop.initialize_crop(crop_reference, use_heat_scheduled_harvesting, mock_time)
+    crop.set_crop_planting_attributes(crop_reference, use_heat_scheduled_harvesting, mock_time)
 
     assert crop._data.use_heat_scheduling == use_heat_scheduled_harvesting
     assert crop._data.id == crop_reference

@@ -326,10 +326,10 @@ class Crop:
                 )
             crop = cls().make_crop_from_config_dict(crop_specifications)
 
-        crop.initialize_crop(crop_reference, use_heat_scheduled_harvesting, time)
+        crop.set_crop_planting_attributes(crop_reference, use_heat_scheduled_harvesting, time)
         return crop
 
-    def initialize_crop(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
+    def set_crop_planting_attributes(self, crop_reference: str, use_heat_scheduled_harvesting: bool, time: Time) -> None:
         """
         Initializes the crop's attributes related to planting.
 
