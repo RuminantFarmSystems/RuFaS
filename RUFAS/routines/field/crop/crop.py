@@ -74,19 +74,22 @@ class Crop:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self._data = crop_data or CropData()
-
-        # growth process components
         self._growth_constraints = GrowthConstraints(self._data)
         self._biomass_allocation = BiomassAllocation(self._data)
-        self._water_dynamics = WaterDynamics(self._data)  # needs soil.evapotranspiration.evapotranspirate() called 1st
+        self._water_dynamics = WaterDynamics(self._data)
         self._water_uptake = WaterUptake(self._data)
         self._nitrogen_incorporation = NitrogenIncorporation(self._data)
         self._phosphorus_incorporation = PhosphorusIncorporation(self._data)
-        self._heat_units = HeatUnits(self._data)  # TODO: rename module and component (e.g., "HeatAccumulation")?
-        self._leaf_area_index = LeafAreaIndex(self._data)  # TODO: rename module and component (e.g., "CanopyGrowth")?
+        self._heat_units = HeatUnits(self._data)
+        self._leaf_area_index = LeafAreaIndex(self._data)
         self._root_development = RootDevelopment(self._data)
         self._crop_management = CropManagement(self._data)
         self._dormancy = Dormancy(self._data)
+
+    @property
+    def data(self) -> CropData:
+        """Provides access to the CropData object."""
+        return self._data
 
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
@@ -161,7 +164,7 @@ class Crop:
         Parameters
         ----------
         precipitation_reaching_soil : float
-            Amount of water available to reach the soil after considering other crops.
+            Amount of water available to reach the soil after considering other crops (mm).
 
         Returns
         -------
@@ -221,206 +224,6 @@ class Crop:
             Instance of the FeedManager that receives harvested crops.
         """
         self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
-
-    @property
-    def name(self) -> str | None:
-        return self._data.name
-
-    @property
-    def species(self) -> CropSpecies:
-        return self._data.species
-
-    @property
-    def id(self) -> Any | None:
-        return self._data.id
-
-    @property
-    def is_alive(self) -> bool:
-        return self._data.is_alive
-
-    @property
-    def max_transpiration(self) -> float | None:
-        return self._data.max_transpiration
-
-    @property
-    def field_proportion(self) -> float:
-        return self._data.field_proportion
-
-    @field_proportion.setter
-    def field_proportion(self, field_proportion: float) -> None:
-        self._data.field_proportion = field_proportion
-
-    @property
-    def above_ground_biomass(self) -> float:
-        return self._data.above_ground_biomass
-
-    @property
-    def planting_day(self) -> int:
-        return self._data.planting_day
-
-    @property
-    def planting_year(self) -> int:
-        return self._data.planting_year
-
-    @property
-    def root_depth(self) -> float:
-        return self._data.root_depth
-
-    @property
-    def biomass(self) -> float:
-        return self._data.biomass
-
-    @property
-    def usable_light(self) -> float | None:
-        return self._data.usable_light
-
-    @property
-    def biomass_growth_max(self) -> float:
-        return self._data.biomass_growth_max
-
-    @property
-    def biomass_growth(self) -> float | None:
-        return self._data.biomass_growth
-
-    @property
-    def root_biomass(self) -> float | None:
-        return self._data.root_biomass
-
-    @property
-    def growth_factor(self) -> float:
-        return self._data.growth_factor
-
-    @property
-    def water_uptake(self) -> float:
-        return self._data.water_uptake
-
-    @property
-    def water_stress(self) -> float:
-        return self._data.water_stress
-
-    @property
-    def temp_stress(self) -> float | None:
-        return self._data.temp_stress
-
-    @property
-    def nitrogen_stress(self) -> float | None:
-        return self._data.nitrogen_stress
-
-    @property
-    def phosphorus_stress(self) -> float | None:
-        return self._data.phosphorus_stress
-
-    @property
-    def accumulated_heat_units(self) -> float:
-        return self._data.accumulated_heat_units
-
-    @property
-    def heat_fraction(self) -> float:
-        return self._data.heat_fraction
-
-    @property
-    def is_growing(self) -> float:
-        return self._data.is_growing
-
-    @property
-    def is_dormant(self) -> float:
-        return self._data.is_dormant
-
-    @property
-    def leaf_area_index(self) -> float:
-        return self._data.leaf_area_index
-
-    @property
-    def canopy_height(self) -> float | None:
-        return self._data.canopy_height
-
-    @property
-    def leaf_area_added(self) -> float | None:
-        return self._data.leaf_area_added
-
-    @property
-    def optimal_leaf_area_change(self) -> float | None:
-        return self._data.optimal_leaf_area_change
-
-    @property
-    def potential_nitrogen_uptake(self) -> float | None:
-        return self._data.potential_nitrogen_uptake
-
-    @property
-    def total_phosphorus_uptake(self) -> float | None:
-        return self._data.total_phosphorus_uptake
-
-    @property
-    def total_nitrogen_uptake(self) -> float | None:
-        return self._data.total_nitrogen_uptake
-
-    @property
-    def optimal_nitrogen_fraction(self) -> float | None:
-        return self._data.optimal_nitrogen_fraction
-
-    @property
-    def potential_phosphorus_uptake(self) -> float | None:
-        return self._data.potential_phosphorus_uptake
-
-    @property
-    def actual_phosphorus_uptakes(self) -> list[float] | None:
-        return self._data.actual_phosphorus_uptakes
-
-    @property
-    def actual_nitrogen_uptakes(self) -> list[float] | None:
-        return self._data.actual_nitrogen_uptakes
-
-    @property
-    def cumulative_evaporation(self) -> float:
-        return self._data.cumulative_evaporation
-
-    @property
-    def cumulative_transpiration(self) -> float:
-        return self._data.cumulative_transpiration
-
-    @property
-    def cumulative_evapotranspiration(self) -> float:
-        return self._data.cumulative_evapotranspiration
-
-    @property
-    def water_deficiency(self) -> float | None:
-        return self._data.water_deficiency
-
-    @property
-    def canopy_water(self) -> float:
-        return self._data.canopy_water
-
-    @property
-    def cut_biomass(self) -> float | None:
-        return self._data.cut_biomass
-
-    @property
-    def wet_yield_collected(self) -> float:
-        return self._data.wet_yield_collected
-
-    @property
-    def yield_residue(self) -> float:
-        return self._data.yield_residue
-
-    @property
-    def yield_nitrogen(self) -> float | None:
-        return self._data.yield_nitrogen
-
-    @property
-    def yield_phosphorus(self) -> float | None:
-        return self._data.yield_phosphorus
-
-    @property
-    def residue_nitrogen(self) -> float:
-        return self._data.residue_nitrogen
-
-    @property
-    def residue_phosphorus(self) -> float:
-        return self._data.residue_phosphorus
-
-    @property
-    def use_heat_scheduling(self) -> bool:
-        return self._data.use_heat_scheduling
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Wrapper method for setting the max transpiration for a crop."""

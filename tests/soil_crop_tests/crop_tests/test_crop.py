@@ -15,6 +15,15 @@ import pytest
 from RUFAS.time import Time
 
 
+def test_data_property() -> None:
+    """Test for Crop data property."""
+    mock_crop_data = Mock(spec=CropData)
+    crop = Crop(mock_crop_data)
+
+    result = crop.data
+    assert result == mock_crop_data
+
+
 @pytest.mark.parametrize(
     "is_mature, is_dormant, should_update",
     [
@@ -314,94 +323,6 @@ def test_exit_dormancy() -> None:
 
     crop.exit_dormancy()
     assert crop._data.is_dormant is False
-
-
-@pytest.mark.parametrize(
-    "property_name, expected_value",
-    [
-        ("name", "Wheat"),
-        ("id", "CROP123"),
-        ("is_alive", True),
-        ("max_transpiration", 10.0),
-        ("field_proportion", 0.5),
-        ("above_ground_biomass", 500.0),
-        ("planting_day", 120),
-        ("planting_year", 2024),
-        ("root_depth", 1.2),
-        ("biomass", 750.0),
-        ("usable_light", 800.0),
-        ("biomass_growth_max", 150.0),
-        ("biomass_growth", 130.0),
-        ("root_biomass", 60.0),
-        ("growth_factor", 0.8),
-        ("water_uptake", 5.0),
-        ("water_stress", 0.2),
-        ("temp_stress", 0.3),
-        ("nitrogen_stress", 0.1),
-        ("phosphorus_stress", 0.4),
-        ("accumulated_heat_units", 1500.0),
-        ("heat_fraction", 0.75),
-        ("is_growing", True),
-        ("is_dormant", False),
-        ("leaf_area_index", 4.0),
-        ("canopy_height", 2.5),
-        ("leaf_area_added", 1.2),
-        ("optimal_leaf_area_change", 1.8),
-        ("potential_nitrogen_uptake", 15.0),
-        ("total_phosphorus_uptake", 8.0),
-        ("total_nitrogen_uptake", 20.0),
-        ("optimal_nitrogen_fraction", 0.85),
-        ("potential_phosphorus_uptake", 5.0),
-        ("actual_phosphorus_uptakes", 4.5),
-        ("actual_nitrogen_uptakes", 18.0),
-        ("cumulative_evaporation", 200.0),
-        ("cumulative_transpiration", 300.0),
-        ("cumulative_evapotranspiration", 500.0),
-        ("water_deficiency", 10.0),
-        ("canopy_water", 50.0),
-        ("cut_biomass", 100.0),
-        ("wet_yield_collected", 400.0),
-        ("yield_residue", 150.0),
-        ("yield_nitrogen", 20.0),
-        ("yield_phosphorus", 10.0),
-        ("residue_nitrogen", 5.0),
-        ("residue_phosphorus", 2.0),
-        ("use_heat_scheduling", True),
-    ],
-)
-def test_crop_properties(mocker: MockerFixture, property_name: str, expected_value: float) -> None:
-    """Test for Crop properties in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
-
-    mock_property = mocker.patch.object(CropData, property_name, new_callable=mocker.PropertyMock)
-    mock_property.return_value = expected_value
-
-    assert getattr(crop, property_name) == expected_value
-
-
-def test_species_property(mocker: MockerFixture) -> None:
-    """Test for species property in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
-
-    mock_species = mocker.Mock(spec=CropSpecies)
-    mocker.patch.object(CropData, "species", new_callable=mocker.PropertyMock, return_value=mock_species)
-
-    assert crop.species == mock_species
-
-
-def test_field_proportion_setter(mocker: MockerFixture) -> None:
-    """Test field_proportion setter in crop.py."""
-    crop_data = CropData()
-    crop = Crop(crop_data)
-
-    field_proportion_mock = mocker.patch.object(CropData, "field_proportion", new_callable=mocker.PropertyMock)
-
-    new_field_proportion = 0.75
-    crop.field_proportion = new_field_proportion
-
-    field_proportion_mock.assert_called_with(new_field_proportion)
 
 
 @pytest.mark.parametrize(
