@@ -14,6 +14,7 @@ jobs:
   format_code:
     runs-on: ubuntu-latest
     outputs:
+      changelog_updated: ${{ steps.record_if_changelog_updated.is_changelog_updated }}
       pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
     steps:
       - name: Checkout repository
@@ -74,6 +75,18 @@ jobs:
             echo "No unauthorized changes detected."
           fi
 
+      - name: Record if changelog has been updated
+        id: record_if_changelog_updated
+        run: |
+          if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
+            echo "changelog.md has been updated."
+            IS_CHANGELOG_UPDATED="true"
+          else
+            echo "Error: changelog.md must be updated for this PR."
+            IS_CHANGELOG_UPDATED="false"
+          fi
+          echo "is_changelog_updated=$IS_CHANGELOG_UPDATED" >> $GITHUB_ENV
+
       - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
         env:
@@ -96,18 +109,6 @@ jobs:
         run: |
           COMMIT_HASH=$(git rev-parse HEAD)
           echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
-
-      - name: Check if changelog has been updated
-        run: |
-          echo "here 1"
-          echo "${OTHER_FILES}"
-          echo "here 2"
-          if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
-            echo "changelog.md has been updated."
-          else
-            echo "Error: changelog.md must be updated for this PR."
-            exit 1
-          fi
 
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
@@ -275,3 +276,14 @@ jobs:
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
+
+      - name: Alert User to Necessary Changelog Updates
+        if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
+        run: |
+          curl \
+              -X POST \
+              $URL \
+              -H "Content-Type: application/json" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              --data "{\"body\": \"The changelog must be updated before this PR can be merged.\"}
+          exit 1
