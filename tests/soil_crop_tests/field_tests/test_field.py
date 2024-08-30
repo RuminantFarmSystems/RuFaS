@@ -583,16 +583,16 @@ def test_plant_crop(
     planted_crop = field.crops[0]
 
     # Adjusted assertion for enum comparison
-    if isinstance(planted_crop.species, CropSpecies):
-        assert planted_crop.species.value == expected_species
+    if isinstance(planted_crop.data.species, CropSpecies):
+        assert planted_crop.data.species.value == expected_species
     else:
-        assert planted_crop.species == expected_species
+        assert planted_crop.data.species == expected_species
 
-    assert planted_crop.use_heat_scheduling == heat_scheduled
-    assert planted_crop.planting_year == year
-    assert planted_crop.planting_day == day
+    assert planted_crop.data.use_heat_scheduling == heat_scheduled
+    assert planted_crop.data.planting_year == year
+    assert planted_crop.data.planting_day == day
 
-    field._record_planting.assert_called_once_with(heat_scheduled, planted_crop.species, year, day)
+    field._record_planting.assert_called_once_with(heat_scheduled, planted_crop.data.species, year, day)
 
 
 @pytest.mark.parametrize(
@@ -767,10 +767,10 @@ def test_harvest_crop(
 ) -> None:
     """Tests that crops are harvested correctly."""
     harvest_crop = Crop()
-    harvest_crop._data.id = crop_reference
+    harvest_crop.data.id = crop_reference
     other_crop_1 = Crop()
     other_crop_2 = Crop()
-    other_crop_1._data.id, other_crop_2._data.id = "not this crop", "not this crop"
+    other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
     field = Field(
         field_data=mock_field_data,
         manure_manager=MagicMock(ManureManager),
@@ -790,7 +790,7 @@ def test_harvest_crop(
         field._harvest_crop(crop_reference, harvest_op, mock_time, mock_conditions)
 
     for crop in field.crops:
-        if crop.id == "not this crop":
+        if crop.data.id == "not this crop":
             crop.manage_crop_harvest.assert_not_called()
         else:
             crop.manage_crop_harvest.assert_called_once_with(

@@ -1050,7 +1050,7 @@ class Field:
 
         self._record_planting(
             use_heat_scheduled_harvesting,
-            crop.species,
+            crop.data.species,
             time.current_calendar_year,
             time.current_julian_day,
         )
@@ -1130,7 +1130,7 @@ class Field:
         that killed off a crop before it could be harvested.
 
         """
-        crops_to_be_harvested = [crop for crop in self.crops if crop.id == crop_reference]
+        crops_to_be_harvested = [crop for crop in self.crops if crop.data.id == crop_reference]
 
         info_map = {
             "class": self.__class__.__name__,
@@ -1166,7 +1166,7 @@ class Field:
         """
         This method removes any crops from the field's list of active crops if they are no longer alive.
         """
-        self.crops = [crop for crop in self.crops if crop.is_alive]
+        self.crops = [crop for crop in self.crops if crop.data.is_alive]
 
     def _reset_crop_field_coverage_fractions(self) -> None:
         """
@@ -1178,7 +1178,7 @@ class Field:
 
         field_coverage_fraction = 1 / number_of_crops_in_field
         for crop in self.crops:
-            crop.field_proportion = field_coverage_fraction
+            crop.data.field_proportion = field_coverage_fraction
 
     def _assess_dormancy(self, daylength: float | None, rainfall: float) -> None:
         """
@@ -1312,8 +1312,8 @@ class Field:
         weights_sum = 0.0
         for crop in self.crops:
             crop.set_maximum_transpiration(remaining_evapotranspirative_demand)
-            field_proportion = crop.field_proportion
-            weighted_transpiration_total += crop.max_transpiration * field_proportion
+            field_proportion = crop.data.field_proportion
+            weighted_transpiration_total += crop.data.max_transpiration * field_proportion
             weights_sum += field_proportion
 
         if weights_sum == 0.0:
@@ -1484,7 +1484,7 @@ class Field:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
         total_above_ground_biomass = 0
         for crop in self.crops:
-            total_above_ground_biomass += crop.above_ground_biomass
+            total_above_ground_biomass += crop.data.above_ground_biomass
         return total_above_ground_biomass
 
     @staticmethod
