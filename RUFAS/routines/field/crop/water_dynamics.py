@@ -41,7 +41,7 @@ class WaterDynamics:
             Evaporation on a given day (mm).
         transpiration : float
             Transpiration on a given day (mm).
-        potential_evapotranspiration:
+        potential_evapotranspiration : float
             Potential evapotranspiration on a given day (mm).
 
         Notes
