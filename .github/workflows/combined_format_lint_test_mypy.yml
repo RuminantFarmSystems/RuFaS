@@ -100,9 +100,9 @@ jobs:
       - name: Check if changelog has been updated
         run: |
           echo "here 1"
-          echo "${ALL_CHANGED_FILES}"
+          echo "${OTHER_FILES}"
           echo "here 2"
-          if echo "${ALL_CHANGED_FILES}" | grep -q "changelog.md"; then
+          if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
             echo "changelog.md has been updated."
           else
             echo "Error: changelog.md must be updated for this PR."
