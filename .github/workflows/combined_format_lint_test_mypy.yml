@@ -277,7 +277,7 @@ jobs:
               --data "{\"body\": \"$COMMIT_MESSAGE\"}"
           fi
 
-      - name: Alert User to Necessary Changelog Updates
+      - name: Notify User of Missing Changelog Updates
         if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
         run: |
           curl \
@@ -285,5 +285,5 @@ jobs:
               $URL \
               -H "Content-Type: application/json" \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              --data "{\"body\": \"The changelog must be updated before this PR can be merged.\"}
+              --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until 'changelog.md' is updated to reflect the changes.\"}
           exit 1
