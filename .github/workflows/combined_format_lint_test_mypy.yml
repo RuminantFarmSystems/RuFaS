@@ -278,7 +278,6 @@ jobs:
           fi
 
       - name: Notify User of Missing Changelog Updates
-        if: ${{ needs.format_code.outputs.changelog_updated == 'false' }}
         run: |
           IS_UPDATED=${{ needs.format_code.outputs.changelog_updated }}
           echo "$IS_UPDATED"
