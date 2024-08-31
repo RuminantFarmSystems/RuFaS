@@ -14,7 +14,7 @@ jobs:
   format_code:
     runs-on: ubuntu-latest
     outputs:
-      changelog_updated: ${{ steps.record_if_changelog_updated.is_changelog_updated }}
+      changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
       pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
     steps:
       - name: Checkout repository
@@ -80,12 +80,11 @@ jobs:
         run: |
           if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
             echo "changelog.md has been updated."
-            IS_CHANGELOG_UPDATED="true"
+            echo "is_changelog_updated=true" >> $GITHUB_OUTPUT
           else
             echo "Error: changelog.md must be updated for this PR."
-            IS_CHANGELOG_UPDATED="false"
+            echo "is_changelog_updated=false" >> $GITHUB_OUTPUT
           fi
-          echo "is_changelog_updated=$IS_CHANGELOG_UPDATED" >> $GITHUB_ENV
 
       - name: Format code with Black and commit changes
         if: ${{ env.FILES != '' && github.ref != 'refs/heads/dev' }}
