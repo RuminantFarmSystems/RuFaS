@@ -14,7 +14,7 @@ jobs:
   format_code:
     runs-on: ubuntu-latest
     outputs:
-      changelog_updated: ${{ steps.record_if_changelog_updated.is_changelog_updated }}
+      changelog_updated: ${{ steps.record_if_changelog_updated.outputs.is_changelog_updated }}
       pushed_commit_sha: ${{ steps.capture_commit_sha.outputs.commit_hash }}
     steps:
       - name: Checkout repository
@@ -279,12 +279,10 @@ jobs:
           fi
 
       - name: Notify User of Missing Changelog Updates
+        if: ${{ needs.format_code.outputs.changelog_updated == 'false'}}
         env:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
-          echo "here"
-          IS_UPDATED=${{ needs.format_code.outputs.changelog_updated }}
-          echo "$IS_UPDATED"
           curl \
               -X POST \
               $URL \
