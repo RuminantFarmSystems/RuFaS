@@ -110,6 +110,7 @@ jobs:
           COMMIT_HASH=$(git rev-parse HEAD)
           echo "commit_hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
 
+
   lint_test_type_check:
     name: Lint, Test, Coverage, and Type Checking
     needs: format_code
