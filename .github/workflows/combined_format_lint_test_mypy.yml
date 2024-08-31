@@ -282,8 +282,9 @@ jobs:
         env:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
-          is_updated=${{ needs.format_code.outputs.changelog_updated }}
-          echo "$is_updated"
+          echo "here"
+          IS_UPDATED=${{ needs.format_code.outputs.changelog_updated }}
+          echo "$IS_UPDATED"
           curl \
               -X POST \
               $URL \
