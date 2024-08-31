@@ -287,5 +287,5 @@ jobs:
               $URL \
               -H "Content-Type: application/json" \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until 'changelog.md' is updated to reflect the changes.\"}
+              --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until 'changelog.md' is updated to reflect the changes.\"}"
           exit 1
