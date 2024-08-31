@@ -280,6 +280,7 @@ jobs:
       - name: Notify User of Missing Changelog Updates
         run: |
           IS_UPDATED=${{ needs.format_code.outputs.changelog_updated }}
+          echo "here"
           echo "$IS_UPDATED"
           curl \
               -X POST \
