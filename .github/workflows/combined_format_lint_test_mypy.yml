@@ -278,6 +278,8 @@ jobs:
           fi
 
       - name: Notify User of Missing Changelog Updates
+        env:
+          URL: ${{ github.event.pull_request.comments_url }}
         run: |
           IS_UPDATED=${{ needs.format_code.outputs.changelog_updated }}
           echo "here"
