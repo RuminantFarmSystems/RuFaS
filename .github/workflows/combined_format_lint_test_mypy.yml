@@ -80,10 +80,10 @@ jobs:
         run: |
           if echo "${OTHER_FILES}" | grep -q "changelog.md"; then
             echo "changelog.md has been updated."
-            echo "changelog_updated=true" >> $GITHUB_OUTPUT
+            echo "is_changelog_updated=true" >> $GITHUB_OUTPUT
           else
             echo "Error: changelog.md must be updated for this PR."
-            echo "changelog_updated=false" >> $GITHUB_OUTPUT
+            echo "is_changelog_updated=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Format code with Black and commit changes
