@@ -21,6 +21,10 @@ PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_010_8
 UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
 
 
+# TODO: remove this default as part of issue #1960
+DEFAULT_BALE_DIAMETER = 1.5
+
+
 class Hay(Storage):
     """
     Represents a Hay storage subclass of Storage.
@@ -57,7 +61,7 @@ class Hay(Storage):
         float
             The diameter of the hay bale (meters).
         """
-        pass
+        return DEFAULT_BALE_DIAMETER
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
