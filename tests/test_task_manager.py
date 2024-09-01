@@ -474,7 +474,6 @@ def test_input_data_audit(
     ],
 )
 def test_task(
-
     mock_output_manager: Generator[Any, Any, Any],
     task_manager: TaskManager,
     mocker: MockerFixture,
