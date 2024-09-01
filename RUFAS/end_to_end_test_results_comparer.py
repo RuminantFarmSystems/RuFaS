@@ -40,7 +40,7 @@ class EndToEndTestResultsComparer:
             om.add_log(
                 f"End-to-end testing for {path_set.domain}",
                 "Collecting and comparing actual and expected results",
-                info_map
+                info_map,
             )
             path_to_actual_results = None
             for path in json_output_path.iterdir():
@@ -88,7 +88,9 @@ class EndToEndTestResultsComparer:
         result_paths: list[dict[str, str]] = im.get_data("end_to_end_testing_result_paths.end_to_end_test_result_paths")
         test_result_paths: list[TestResultPathType] = []
         for path_set in result_paths:
-            test_result_paths.append(TestResultPathType(
-                path_set["domain"], path_set["expected_results_path"], path_set["actual_results_path"]
-            ))
+            test_result_paths.append(
+                TestResultPathType(
+                    path_set["domain"], path_set["expected_results_path"], path_set["actual_results_path"]
+                )
+            )
         return test_result_paths
