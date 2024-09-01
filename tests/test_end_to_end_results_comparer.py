@@ -3,7 +3,7 @@ import pytest
 from pytest_mock import MockerFixture
 from pathlib import Path
 
-from RUFAS.end_to_end_test_results_comparer import EndToEndTestResultsComparer, ResultPathType
+from RUFAS.end_to_end_test_results_comparer import E2ETestResultsComparer, ResultPathType
 
 
 @pytest.mark.parametrize("diff,successful", [({}, True), ({"diff": "diff"}, False)])
@@ -16,7 +16,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     json_dir_path: Path = Path("json_dir")
     mocker.patch("RUFAS.end_to_end_test_results_comparer.OutputManager.__init__", return_value=None)
     results_path = ResultPathType("test_domain", "expected_results", "actual_results")
-    get_result_paths = mocker.patch.object(EndToEndTestResultsComparer, "_get_test_result_paths", return_value=[
+    get_result_paths = mocker.patch.object(E2ETestResultsComparer, "_get_test_result_paths", return_value=[
         results_path
     ])
     mocker.patch(
@@ -34,7 +34,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
     add_error = mocker.patch("RUFAS.end_to_end_test_results_comparer.OutputManager.add_error")
     add_var = mocker.patch("RUFAS.end_to_end_test_results_comparer.OutputManager.add_variable")
 
-    EndToEndTestResultsComparer.compare_actual_and_expected_test_results(json_dir_path)
+    E2ETestResultsComparer.compare_actual_and_expected_test_results(json_dir_path)
 
     get_result_paths.assert_called_once()
     assert mocked_open.call_count == 2
@@ -48,3 +48,19 @@ def test_compare_simulation_outputs_to_expected_outputs(
         assert add_log.call_count == 1
         assert add_error.call_count == 1
         assert add_var.call_count == 2
+
+
+def test_get_test_results_paths(mocker: MockerFixture) -> None:
+    """Tests that paths for gathering end-to-end test results are processed correctly."""
+    get_data = mocker.patch("RUFAS.end_to_end_test_results_comparer.InputManager.get_data", return_value=[
+        {"domain": "one", "expected_results_path": "expected_1", "actual_results_path": "actual_1"},
+        {"domain": "two", "expected_results_path": "expected_2", "actual_results_path": "actual_2"}
+    ])
+    expected = [
+        ResultPathType("one", "expected_1", "actual_1"), ResultPathType("two", "expected_2", "actual_2")
+    ]
+
+    actual = E2ETestResultsComparer._get_test_result_paths()
+
+    assert actual == expected
+    get_data.assert_called_once_with("end_to_end_testing_result_paths.end_to_end_test_result_paths")

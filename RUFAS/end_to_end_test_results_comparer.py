@@ -14,7 +14,7 @@ import re
 ResultPathType = namedtuple("ResultPaths", ["domain", "expected_results_path", "actual_results_path"])
 
 
-class EndToEndTestResultsComparer:
+class E2ETestResultsComparer:
     """
     Contains routines to handle comparing actual and expected results for end-to-end testing of various RuFaS modules.
     """
@@ -32,10 +32,10 @@ class EndToEndTestResultsComparer:
         """
         om = OutputManager()
         info_map: dict[str, Any] = {
-            "class": EndToEndTestResultsComparer.__class__.__name__,
-            "function": EndToEndTestResultsComparer.compare_actual_and_expected_test_results.__name__,
+            "class": E2ETestResultsComparer.__class__.__name__,
+            "function": E2ETestResultsComparer.compare_actual_and_expected_test_results.__name__,
         }
-        test_result_path_sets = EndToEndTestResultsComparer._get_test_result_paths()
+        test_result_path_sets = E2ETestResultsComparer._get_test_result_paths()
 
         for path_set in test_result_path_sets:
             om.add_log(
