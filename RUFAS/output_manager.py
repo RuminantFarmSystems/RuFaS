@@ -1369,7 +1369,7 @@ class OutputManager(object):
         else:
             base_name = f"saved_variables_{filter_file}"
 
-        file_name = self.generate_file_name(base_name, "json", include_millis=False)
+        file_name = self.generate_file_name(base_name, "json")
         file_path = save_path / file_name
         self.dict_to_file_json(filtered_pool, file_path)
 
