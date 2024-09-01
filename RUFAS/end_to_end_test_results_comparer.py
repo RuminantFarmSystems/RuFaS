@@ -11,7 +11,7 @@ import json
 import re
 
 
-TestResultPathType = namedtuple("TestResultPaths", ["domain", "expected_results_path", "actual_results_path"])
+ResultPathType = namedtuple("ResultPaths", ["domain", "expected_results_path", "actual_results_path"])
 
 
 class EndToEndTestResultsComparer:
@@ -36,6 +36,7 @@ class EndToEndTestResultsComparer:
             "function": EndToEndTestResultsComparer.compare_actual_and_expected_test_results.__name__,
         }
         test_result_path_sets = EndToEndTestResultsComparer._get_test_result_paths()
+
         for path_set in test_result_path_sets:
             om.add_log(
                 f"End-to-end testing for {path_set.domain}",
@@ -63,7 +64,7 @@ class EndToEndTestResultsComparer:
 
             diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
-            is_difference_in_results = diff == {}
+            is_difference_in_results: bool = diff == {}
             if is_difference_in_results:
                 om.add_log(
                     f"End-to-end testing succeeded for {path_set.domain}",
@@ -82,14 +83,14 @@ class EndToEndTestResultsComparer:
                 om.add_variable(comparison_type, difference, info_map)
 
     @staticmethod
-    def _get_test_result_paths() -> list[TestResultPathType]:
+    def _get_test_result_paths() -> list[ResultPathType]:
         """Retrieves the paths to test results and associated information from the InputManager."""
         im = InputManager()
         result_paths: list[dict[str, str]] = im.get_data("end_to_end_testing_result_paths.end_to_end_test_result_paths")
-        test_result_paths: list[TestResultPathType] = []
+        test_result_paths: list[ResultPathType] = []
         for path_set in result_paths:
             test_result_paths.append(
-                TestResultPathType(
+                ResultPathType(
                     path_set["domain"], path_set["expected_results_path"], path_set["actual_results_path"]
                 )
             )
