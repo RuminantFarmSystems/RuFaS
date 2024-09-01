@@ -121,6 +121,7 @@ def test_task_manager_start(
         "Task Manager",
         RUFAS_VERSION,
         "TASK MANAGER",
+        False,
     )
 
     info_map = {
@@ -551,6 +552,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         args["output_prefix"],
         RUFAS_VERSION,
         args["task_id"],
+        False,
     )
     mock_im_init.assert_called_once_with(10)
     mock_handler.assert_not_called()
@@ -634,7 +636,7 @@ def test_single_simulation_run(
     """Unit test for TaskManager.handle_single_simulation_run()"""
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
 
-    args: dict[str, Any] = {}
+    args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN}
 
     mock_simulation_engine = mocker.patch("RUFAS.simulation_engine.SimulationEngine")
     mock_simulation_engine_init = mocker.patch(
@@ -713,13 +715,6 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
     mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
-
-
-def test_expand_end_to_end_testing_args() -> None:
-    """Unit test for TaskManager._expand_end_to_end_testing_args()"""
-    task_manager = TaskManager()
-    result = task_manager._expand_end_to_end_testing_args({})
-    assert result == []
 
 
 @pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
