@@ -16,9 +16,9 @@ def test_compare_simulation_outputs_to_expected_outputs(
     json_dir_path: Path = Path("json_dir")
     mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.__init__", return_value=None)
     results_path = ResultPathType("test_domain", "expected_results", "actual_results")
-    get_result_paths = mocker.patch.object(E2ETestResultsComparer, "_get_test_result_paths", return_value=[
-        results_path
-    ])
+    get_result_paths = mocker.patch.object(
+        E2ETestResultsComparer, "_get_test_result_paths", return_value=[results_path]
+    )
     mocker.patch(
         "pathlib.Path.iterdir",
         return_value=[
@@ -52,13 +52,14 @@ def test_compare_simulation_outputs_to_expected_outputs(
 
 def test_get_test_results_paths(mocker: MockerFixture) -> None:
     """Tests that paths for gathering end-to-end test results are processed correctly."""
-    get_data = mocker.patch("RUFAS.e2e_test_results_comparer.InputManager.get_data", return_value=[
-        {"domain": "one", "expected_results_path": "expected_1", "actual_results_path": "actual_1"},
-        {"domain": "two", "expected_results_path": "expected_2", "actual_results_path": "actual_2"}
-    ])
-    expected = [
-        ResultPathType("one", "expected_1", "actual_1"), ResultPathType("two", "expected_2", "actual_2")
-    ]
+    get_data = mocker.patch(
+        "RUFAS.e2e_test_results_comparer.InputManager.get_data",
+        return_value=[
+            {"domain": "one", "expected_results_path": "expected_1", "actual_results_path": "actual_1"},
+            {"domain": "two", "expected_results_path": "expected_2", "actual_results_path": "actual_2"},
+        ],
+    )
+    expected = [ResultPathType("one", "expected_1", "actual_1"), ResultPathType("two", "expected_2", "actual_2")]
 
     actual = E2ETestResultsComparer._get_test_result_paths()
 
