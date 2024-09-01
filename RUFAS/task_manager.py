@@ -9,7 +9,7 @@ from SALib.sample import saltelli as saltelli_sampler
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
-from RUFAS.end_to_end_test_results_comparer import EndToEndTestResultsComparer
+from RUFAS.end_to_end_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -467,7 +467,7 @@ class TaskManager:
         output_manager.flush_pools()
         output_manager.is_first_post_processing = False
 
-        EndToEndTestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
+        E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
             args, input_manager, output_manager, task_id, produce_graphics, save_results=True
