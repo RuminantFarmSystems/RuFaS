@@ -311,7 +311,7 @@ def test_handle_end_to_end_testing(
     post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
     args = {"json_output_directory": "json_path"}
     compare_outputs = mocker.patch(
-        "RUFAS.end_to_end_test_results_comparer.E2ETestResultsComparer.compare_actual_and_expected_test_results"
+        "RUFAS.e2e_test_results_comparer.E2ETestResultsComparer.compare_actual_and_expected_test_results"
     )
     mock_input_manager = mocker.MagicMock()
     add_log = mocker.patch.object(mock_output_manager, "add_log")

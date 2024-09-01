@@ -9,7 +9,7 @@ from SALib.sample import saltelli as saltelli_sampler
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
-from RUFAS.end_to_end_test_results_comparer import E2ETestResultsComparer
+from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory

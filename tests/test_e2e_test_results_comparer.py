@@ -3,7 +3,7 @@ import pytest
 from pytest_mock import MockerFixture
 from pathlib import Path
 
-from RUFAS.end_to_end_test_results_comparer import E2ETestResultsComparer, ResultPathType
+from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer, ResultPathType
 
 
 @pytest.mark.parametrize("diff,successful", [({}, True), ({"diff": "diff"}, False)])
@@ -14,7 +14,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
 ) -> None:
     """Tests _compare_simulation_outputs_to_expected_outputs in TaskManager."""
     json_dir_path: Path = Path("json_dir")
-    mocker.patch("RUFAS.end_to_end_test_results_comparer.OutputManager.__init__", return_value=None)
+    mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.__init__", return_value=None)
     results_path = ResultPathType("test_domain", "expected_results", "actual_results")
     get_result_paths = mocker.patch.object(E2ETestResultsComparer, "_get_test_result_paths", return_value=[
         results_path
@@ -29,10 +29,10 @@ def test_compare_simulation_outputs_to_expected_outputs(
     )
     mocked_open = mocker.patch("builtins.open", mocker.mock_open(read_data="file contents"))
     mocked_load = mocker.patch("json.load", side_effect=[{"a": 1}, {"expected_results": {"a": 1}}])
-    mocked_deepdiff = mocker.patch("RUFAS.end_to_end_test_results_comparer.DeepDiff", return_value=diff)
-    add_log = mocker.patch("RUFAS.end_to_end_test_results_comparer.OutputManager.add_log")
-    add_error = mocker.patch("RUFAS.end_to_end_test_results_comparer.OutputManager.add_error")
-    add_var = mocker.patch("RUFAS.end_to_end_test_results_comparer.OutputManager.add_variable")
+    mocked_deepdiff = mocker.patch("RUFAS.e2e_test_results_comparer.DeepDiff", return_value=diff)
+    add_log = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_log")
+    add_error = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_error")
+    add_var = mocker.patch("RUFAS.e2e_test_results_comparer.OutputManager.add_variable")
 
     E2ETestResultsComparer.compare_actual_and_expected_test_results(json_dir_path)
 
@@ -52,7 +52,7 @@ def test_compare_simulation_outputs_to_expected_outputs(
 
 def test_get_test_results_paths(mocker: MockerFixture) -> None:
     """Tests that paths for gathering end-to-end test results are processed correctly."""
-    get_data = mocker.patch("RUFAS.end_to_end_test_results_comparer.InputManager.get_data", return_value=[
+    get_data = mocker.patch("RUFAS.e2e_test_results_comparer.InputManager.get_data", return_value=[
         {"domain": "one", "expected_results_path": "expected_1", "actual_results_path": "actual_1"},
         {"domain": "two", "expected_results_path": "expected_2", "actual_results_path": "actual_2"}
     ])
