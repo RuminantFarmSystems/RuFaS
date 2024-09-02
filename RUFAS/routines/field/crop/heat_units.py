@@ -29,9 +29,9 @@ class HeatUnits:
 
     def absorb_heat_units(
         self,
-        mean_air_temperature: float = None,
-        min_air_temperature: float = None,
-        max_air_temperature: float = None,
+        mean_air_temperature: float | None = None,
+        min_air_temperature: float | None = None,
+        max_air_temperature: float | None = None,
     ) -> None:
         """
         Main function for absorbing heat units during a day and accumulating them.

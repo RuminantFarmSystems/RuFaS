@@ -887,6 +887,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     # Arrange
     output_manager = OutputManager()
     path = "dummy_path"
+    patch_create_dir = mocker.patch.object(output_manager, "create_directory")
     patch_for_dump_errors = mocker.patch.object(output_manager, "dump_errors")
     patch_for_dump_warnings = mocker.patch.object(output_manager, "dump_warnings")
     patch_for_dump_logs = mocker.patch.object(output_manager, "dump_logs")
@@ -897,6 +898,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     output_manager.dump_all_nondata_pools(path, False, "verbose")
 
     # Assert
+    patch_create_dir.assert_called_once_with(path)
     patch_for_dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
     patch_for_dump_errors.assert_called_once_with(path)
     patch_for_dump_warnings.assert_called_once_with(path)
@@ -907,6 +909,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     output_manager.dump_all_nondata_pools(path, True, "verbose")
 
     # Assert
+    assert patch_create_dir.call_count == 2
     assert patch_for_dump_variable_names_and_contexts.call_count == 2
     assert patch_for_dump_errors.call_count == 2
     assert patch_for_dump_warnings.call_count == 2
