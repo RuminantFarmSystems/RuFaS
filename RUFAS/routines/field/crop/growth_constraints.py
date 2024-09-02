@@ -50,8 +50,8 @@ class GrowthConstraints:
 
     def constrain_growth(
         self,
-        max_transpiration: float,
-        temperature: float,
+        max_transpiration: float | None,
+        temperature: float | None,
         simulate_water_stress: bool,
         simulate_temp_stress: bool,
         simulate_nitrogen_stress: bool,
@@ -62,9 +62,9 @@ class GrowthConstraints:
 
         Parameters
         ----------
-        max_transpiration : float
+        max_transpiration : float | None
             The maximum amount of transpiration possible (in mm) on this day, determined by soil conditions.
-        temperature : float
+        temperature : float | None
             The current air temperature in degrees Celsius.
         simulate_water_stress : bool
             Whether water stress should affect growth of all crops grown in the field.
