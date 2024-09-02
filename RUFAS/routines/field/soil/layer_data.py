@@ -993,7 +993,7 @@ class LayerData:
     @property
     def carbon_residue_amount(self) -> float:
         """
-        Tracks the total amount of carbon residue
+        Tracks the total amount of carbon residue in a soil layer (kg / ha).
 
         """
         return self.metabolic_litter_amount + self.structural_litter_amount
