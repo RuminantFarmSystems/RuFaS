@@ -19,6 +19,7 @@ from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from .ration.amino_acid import EssentialAminoAcidRequirements
 from ...enums import AnimalCombination
 from ...data_structures.pen_manure_data import PenManureData
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 
 om = OutputManager()
 
@@ -392,16 +393,6 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
-    def update_classes_in_pen(self) -> None:
-        """
-        Updates the classes contained within the pen
-        """
-        self.classes_in_pen = set()
-        for animal in list(self.animals_in_pen.values()):
-            life_cycle_stage = type(animal).__name__
-            self.classes_in_pen.add(life_cycle_stage)
-
     def update_animals(self, new_animals: List[Any], animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
@@ -417,7 +408,6 @@ class Pen:
         self.add_new_animals(new_animals)
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
-        self.update_classes_in_pen()
 
     def manure_sums(
         self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
@@ -529,15 +519,14 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if "Cow" in self.classes_in_pen:
+        cows_are_in_pen = self.animal_combination in {AnimalCombination.LAC_COW, AnimalCombination.CLOSE_UP}
+        if cows_are_in_pen:
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     def call_p_rqmts(self):
-        """
-        Calls each animal's method to calculate phosphorus requirements.
-        """
+        """Calls each animal's method to calculate phosphorus requirements."""
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
             DMI = self.ration_nutrient_amount["dm"]
