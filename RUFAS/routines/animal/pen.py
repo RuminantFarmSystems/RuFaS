@@ -524,9 +524,7 @@ class Pen:
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     def call_p_rqmts(self):
-        """
-        Calls each animal's method to calculate phosphorus requirements.
-        """
+        """Calls each animal's method to calculate phosphorus requirements."""
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
             DMI = self.ration_nutrient_amount["dm"]
