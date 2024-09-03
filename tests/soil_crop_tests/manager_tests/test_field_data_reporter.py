@@ -29,8 +29,8 @@ def test_send_daily_variables(
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data=field_data_1, manure_supplier=MagicMock(ManureManager))
-    field_2 = Field(field_data=field_data_2, manure_supplier=MagicMock(ManureManager))
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager))
+    field_2 = Field(field_data=field_data_2, manure_manager=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
@@ -47,9 +47,9 @@ def test_send_daily_variables(
         for index, layer in enumerate(field_2.soil.data.soil_layers):
             layer.percolated_water = percolated_waters[index]
         for index, crop in enumerate(field_1.crops):
-            crop.data.root_depth = root_depths[index]
+            crop._data.root_depth = root_depths[index]
         for index, crop in enumerate(field_2.crops):
-            crop.data.root_depth = root_depths[index]
+            crop._data.root_depth = root_depths[index]
         og.send_daily_variables()
     pool = om.variables_pool
 
@@ -231,8 +231,8 @@ def test_send_annual_variables(
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    field_1 = Field(field_data_1, manure_supplier=MagicMock(ManureManager))
-    field_2 = Field(field_data_2, manure_supplier=MagicMock(ManureManager))
+    field_1 = Field(field_data_1, manure_manager=MagicMock(ManureManager))
+    field_2 = Field(field_data_2, manure_manager=MagicMock(ManureManager))
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
