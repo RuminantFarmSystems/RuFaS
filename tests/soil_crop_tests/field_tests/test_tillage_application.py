@@ -189,8 +189,13 @@ def test_mix_soil_layers(
     ],
 )
 def test_record_tillage(
-    till_depth: float, incorp_frac: float, mix_frac: float, implement: TillageImplement, year: int, day: int,
-    mocker: MockerFixture
+    till_depth: float,
+    incorp_frac: float,
+    mix_frac: float,
+    implement: TillageImplement,
+    year: int,
+    day: int,
+    mocker: MockerFixture,
 ) -> None:
     field_data_1 = FieldData(name="field1", field_size=1.5)
     till_app = TillageApplication(field_data=field_data_1)
@@ -224,10 +229,11 @@ def test_record_tillage(
     }
 
     mock_add = mocker.patch.object(till_app.om, "add_variable")
-    mock_clay = mocker.patch("RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
-                             new_callable=PropertyMock,
-                             return_value=expected_clay_percent,
-                             )
+    mock_clay = mocker.patch(
+        "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
+        new_callable=PropertyMock,
+        return_value=expected_clay_percent,
+    )
 
     till_app._record_tillage(till_depth, incorp_frac, mix_frac, implement, year, day)
 
