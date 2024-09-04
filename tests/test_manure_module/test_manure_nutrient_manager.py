@@ -702,9 +702,7 @@ def test_remove_nutrients_more_than_available(
     manager = ManureNutrientManager()
     if initial_nutrients:
         manager.add_nutrients(initial_nutrients)
-    patch_for_om_add_warning = mocker.patch.object(manager.om,
-                                                   "add_warning"
-                                                   )
+    patch_for_om_add_warning = mocker.patch.object(manager.om, "add_warning")
 
     # Act & Assert
     if isinstance(manure_type, ManureType):
