@@ -80,7 +80,9 @@ class EmissionsEstimator:
             info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
         )
         self.om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
-        self.om.add_variable("actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map)
+        self.om.add_variable(
+            "actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map
+        )
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
