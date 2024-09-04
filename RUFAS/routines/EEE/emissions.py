@@ -35,8 +35,6 @@ SLICE_START = -365
 SLICE_END = -364
 FINAL_DAY_SLICE_START = -1
 
-om = OutputManager()
-
 
 """
 These are constants for calculating the embedded emissions of synthetic nitrogen and phosphorus fertilizer. Their units
@@ -51,6 +49,7 @@ EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR = 1.30
 class EmissionsEstimator:
     def __init__(self) -> None:
         self.im = InputManager()
+        self.om = OutputManager()
 
     def estimate_emissions(self) -> None:
         (
@@ -68,7 +67,7 @@ class EmissionsEstimator:
         info_map = {"class": self.__class__.__name__, "function": self._calculate_purchased_feed_emissions.__name__}
         purchased_feeds = self._gather_ration_feed_totals()
         actual_purchased_feed_totals = self._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
-        om.add_variable(
+        self.om.add_variable(
             "actual_purchased_feed_totals",
             actual_purchased_feed_totals,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
@@ -80,8 +79,8 @@ class EmissionsEstimator:
         emissions_info_map = dict(
             info_map, **{"units": MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_PER_KILOGRAM_DRY_MATTER}
         )
-        om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
-        om.add_variable("actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map)
+        self.om.add_variable("actual_purchased_feed_emissions", actual_purchased_feed_emissions, emissions_info_map)
+        self.om.add_variable("actual_land_use_change_feed_emissions", actual_land_use_change_emissions, emissions_info_map)
 
     def _gather_homegrown_feeds_and_fertilizer_apps(
         self,
@@ -96,7 +95,7 @@ class EmissionsEstimator:
             "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
             "variables": [".*"],
         }
-        yields = om.filter_variables_pool(crop_filter)
+        yields = self.om.filter_variables_pool(crop_filter)
         processed_yields = self._transform_outputs_to_list_of_dicts(yields)
 
         fertilizer_filter = {
@@ -105,7 +104,7 @@ class EmissionsEstimator:
             "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
             "variables": [".*"],
         }
-        fertilizer_apps = om.filter_variables_pool(fertilizer_filter)
+        fertilizer_apps = self.om.filter_variables_pool(fertilizer_filter)
         processed_fert_apps = self._transform_outputs_to_list_of_dicts(fertilizer_apps)
 
         manure_filter = {
@@ -114,7 +113,7 @@ class EmissionsEstimator:
             "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
             "variables": [".*"],
         }
-        manure_apps = om.filter_variables_pool(manure_filter)
+        manure_apps = self.om.filter_variables_pool(manure_filter)
         processed_manure_apps = self._transform_outputs_to_list_of_dicts(manure_apps)
 
         manure_request_filter = {
@@ -123,7 +122,7 @@ class EmissionsEstimator:
             "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
             "variables": [".*"],
         }
-        manure_requests = om.filter_variables_pool(manure_request_filter)
+        manure_requests = self.om.filter_variables_pool(manure_request_filter)
         processed_manure_requests = self._transform_outputs_to_list_of_dicts(manure_requests)
 
         time_filter = {
@@ -134,7 +133,7 @@ class EmissionsEstimator:
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
         }
-        date_variables = om.filter_variables_pool(time_filter)
+        date_variables = self.om.filter_variables_pool(time_filter)
         day_cutoff = date_variables["Time.day"]["values"][0]
         year_cutoff = date_variables["Time.calendar_year"]["values"][0]
         date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff)
@@ -182,7 +181,7 @@ class EmissionsEstimator:
             "variables": [r"^\d+$"],
             "slice_start": SLICE_START,
         }
-        feeds = om.filter_variables_pool(filter)
+        feeds = self.om.filter_variables_pool(filter)
 
         processed_feeds: dict[str, float] = {key: float(sum(feeds[key]["values"])) for key in feeds.keys()}
 
@@ -206,7 +205,7 @@ class EmissionsEstimator:
         missing_data = not all(len(values_list[index]) == len(values_list[0]) for index in range(len(values_list)))
         if missing_data:
             info_map = {"class": self.__class__.__name__, "function": self._transform_outputs_to_list_of_dicts.__name__}
-            om.add_error(
+            self.om.add_error(
                 "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
                 "Ignoring extraneous data.",
                 info_map,
@@ -245,7 +244,7 @@ class EmissionsEstimator:
         for crop_species in homegrown_totals:
             yields = filter(lambda crop: crop["crop"] == crop_species, homegrown_feeds)
             homegrown_totals[crop_species] += sum([crop_yield["total_dry_yield"] for crop_yield in yields])
-        om.add_variable(
+        self.om.add_variable(
             "homegrown_feed_totals",
             homegrown_totals,
             {
@@ -281,7 +280,7 @@ class EmissionsEstimator:
                     "class": self.__class__.__name__,
                     "function": self._calculate_actual_purchased_feed_emissions.__name__,
                 }
-                om.add_warning(
+                self.om.add_warning(
                     "Missing Purchased Feed Emissions",
                     f"Missing data for RuFaS feed {id}, omitting from purchased feed emissions estimation.",
                     info_map,
@@ -294,7 +293,7 @@ class EmissionsEstimator:
                     "class": self.__class__.__name__,
                     "function": self._calculate_actual_purchased_feed_emissions.__name__,
                 }
-                om.add_warning(
+                self.om.add_warning(
                     "Missing Land Use Change Purchased Feed Emissions",
                     f"Missing data for RuFaS feed {id}, omitting from land use change purchased feed emissions "
                     "estimation.",
@@ -407,7 +406,7 @@ class EmissionsEstimator:
                     "manure_nitrogen_requested": crop["manure_nitrogen_requested"],
                     "field_name": crop["field_name"],
                 }
-                om.add_variable(f"homegrown_{crop_type}_emissions", emissions_info, info_map)
+                self.om.add_variable(f"homegrown_{crop_type}_emissions", emissions_info, info_map)
 
     def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, float]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
@@ -424,7 +423,7 @@ class EmissionsEstimator:
                 ],
                 "slice_start": SLICE_START,
             }
-            ammonia_emissions = om.filter_variables_pool(ammonia_filter)
+            ammonia_emissions = self.om.filter_variables_pool(ammonia_filter)
             soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
@@ -435,7 +434,7 @@ class EmissionsEstimator:
                 ],
                 "slice_start": SLICE_START,
             }
-            nitrous_oxide_emissions = om.filter_variables_pool(nitrous_oxide_filter)
+            nitrous_oxide_emissions = self.om.filter_variables_pool(nitrous_oxide_filter)
             soil_data["nitrous_oxide"] = sum(
                 [sum(nitrous_oxide_emissions[key]["values"]) for key in nitrous_oxide_emissions.keys()]
             )
@@ -449,7 +448,7 @@ class EmissionsEstimator:
                 "slice_start": SLICE_START,
                 "slice_end": SLICE_END,
             }
-            starting_carbon_stock = om.filter_variables_pool(starting_carbon_stock_filter)
+            starting_carbon_stock = self.om.filter_variables_pool(starting_carbon_stock_filter)
             total_starting_carbon = sum(
                 [starting_carbon_stock[key]["values"][0] for key in starting_carbon_stock.keys()]
             )
@@ -462,7 +461,7 @@ class EmissionsEstimator:
                 ],
                 "slice_start": FINAL_DAY_SLICE_START,
             }
-            ending_carbon_stock = om.filter_variables_pool(ending_carbon_stock_filter)
+            ending_carbon_stock = self.om.filter_variables_pool(ending_carbon_stock_filter)
             total_ending_carbon = sum([ending_carbon_stock[key]["values"][0] for key in ending_carbon_stock.keys()])
 
             soil_data["carbon_stock_change"] = total_ending_carbon - total_starting_carbon
