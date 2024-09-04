@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, call, patch, PropertyMock
+from unittest.mock import MagicMock, call, PropertyMock
 from typing import List
 
 from pytest_mock import MockerFixture
