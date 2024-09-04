@@ -159,17 +159,6 @@
   ],
   "manure_treatment_configs": [
     {
-      "manure_treatment_type": "slurry storage underfloor",
-      "total_solids_removal_efficiency_for_treatment": 0.0,
-      "volatile_solids_removal_efficiency_for_treatment": 0.0,
-      "nitrogen_removal_efficiency_for_treatment": 0.0,
-      "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": 0.0,
-      "phosphorus_removal_efficiency_for_treatment": 0.0,
-      "potassium_removal_efficiency_for_treatment": 0.0,
-      "storage_time_period": 120,
-      "manure_cover": "cover"
-    },
-    {
       "name": "slurry storage outdoor",
       "manure_treatment_type": "slurry storage outdoor",
       "total_solids_removal_efficiency_for_treatment": 0.00,
