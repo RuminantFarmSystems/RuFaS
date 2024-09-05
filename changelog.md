@@ -16,6 +16,9 @@ A **changelog** is a structured record of changes made to the codebase over time
 ---
 ## Changelog Entries
 
-### v0.9.1
+### Current version
+v0.9.1
+
+### Next Version Updates
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
