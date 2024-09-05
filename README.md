@@ -1,6 +1,6 @@
-[![Flake8](https://img.shields.io/badge/Flake8-passed-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Pytest](https://img.shields.io/badge/Pytest-passed-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Flake8](https://img.shields.io/badge/Flake8-failed-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Pytest](https://img.shields.io/badge/Pytest-failed-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Coverage](https://img.shields.io/badge/Coverage-%25-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 [![Mypy](https://img.shields.io/badge/Mypy-3290%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 
 # Vision
@@ -18,9 +18,6 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 
 ## Past
 N/A
-
-# Changelog
-Find the changelog Google Sheet [here](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit?usp=sharing).
 
 # Priority Definitions for Project Tasks
 
@@ -118,3 +115,5 @@ Remember, flexibility and creativity are your allies in the grand adventure of p
 [2023 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
 
 [2022 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
+
+[Old Change Logs](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit?usp=sharing).
