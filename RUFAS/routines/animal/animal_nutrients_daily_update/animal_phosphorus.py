@@ -36,7 +36,7 @@ class AnimalPhosphorus:
                 0.7 * animal_status.phosphorus_excess_in_diet + animal_status.phosphorus_reserves
             )
         else:
-            animal_status.phosphorus_reserves = 0
+            animal_status.phosphorus_reserves = 0.0
 
         animal_status.total_phosphorus_in_animal = (
             animal_status.total_phosphorus_in_animal
@@ -75,7 +75,7 @@ class AnimalPhosphorus:
         else:
             animal_status.phosphorus_endogenous_loss = 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
 
-    def _calculate_phosphorus_for_growth(animal_status: AnimalPhosphorusStatus) -> None:
+    def _calculate_phosphorus_for_growth(self, animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates phosphorus retained for growth based on animal type.
 
         Notes
@@ -93,9 +93,9 @@ class AnimalPhosphorus:
                 * GeneralConstants.KG_TO_GRAMS
             )
         else:
-            animal_status.phosphorus_for_growth = 0
+            animal_status.phosphorus_for_growth = 0.0
 
-    def _calculate_gestational_phosphorus(animal_status: AnimalPhosphorusStatus) -> None:
+    def _calculate_gestational_phosphorus(self, animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates an animal's gestational phosphorus.
 
         Notes
@@ -110,9 +110,9 @@ class AnimalPhosphorus:
             ) * GeneralConstants.KG_TO_GRAMS
             animal_status.phosphorus_for_gestation_required_for_calf += animal_status.phosphorus_for_gestation
         else:
-            animal_status.phosphorus_for_gestation = 0
+            animal_status.phosphorus_for_gestation = 0.0
 
-    def _calculate_milk_phosphorus(animal_status: AnimalPhosphorusStatus) -> float:
+    def _calculate_milk_phosphorus(self, animal_status: AnimalPhosphorusStatus) -> float:
         """Calculates an animal's milk phosphorus.
 
         Notes
@@ -125,7 +125,7 @@ class AnimalPhosphorus:
             return 0.0
 
     def _calculate_absorbed_phosphorus(
-        animal_status: AnimalPhosphorusStatus, milk_phosphorus: float, urine_production_phosphorus: float
+            self, animal_status: AnimalPhosphorusStatus, milk_phosphorus: float, urine_production_phosphorus: float
     ) -> float:
         """Calculates absorbed phosphorus based on animal type.
 
@@ -158,7 +158,7 @@ class AnimalPhosphorus:
             )
 
     def _calculate_animal_phosphorus_requirement(
-        animal_status: AnimalPhosphorusStatus, absorbed_phosphorus: float
+        self, animal_status: AnimalPhosphorusStatus, absorbed_phosphorus: float
     ) -> None:
         """Calculates an animal's phosphorus requirement by animal type.
 
