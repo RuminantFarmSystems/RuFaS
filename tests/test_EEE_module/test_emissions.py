@@ -54,7 +54,8 @@ def test_estimate_emissions(homegrown_feeds: list[dict[str, Any]],
 
 
 @pytest.mark.parametrize(
-    "homegrown_feeds,purchased_feeds,actual_purchased_feeds",
+    "homegrown_feeds,purchased_feeds,actual_purchased_feeds,actual_purchased_feed_emissions,"
+    "actual_land_use_change_emissions",
     [
         (
             [
@@ -74,6 +75,14 @@ def test_estimate_emissions(homegrown_feeds: list[dict[str, Any]],
             {
                 "feed7": 5.6,
                 "feed8": 7.95
+            },
+            {
+                "emission1": 5.6,
+                "emission2": 7.95
+            },
+            {
+                "emission1": 5.6,
+                "emission2": 7.95
             }
         )
     ]
@@ -81,9 +90,21 @@ def test_estimate_emissions(homegrown_feeds: list[dict[str, Any]],
 def test_calculate_purchased_feed_emissions(homegrown_feeds: list[dict[str, Any]],
                                             purchased_feeds: dict[str, float],
                                             actual_purchased_feeds: dict[str, float],
+                                            actual_purchased_feed_emissions: dict[str, float],
+                                            actual_land_use_change_emissions: dict[str, float],
                                             mocker: MockerFixture) -> None:
     """Tests the calculation of purchased feed emissions."""
     em = EmissionsEstimator()
     mock_add = mocker.patch.object(OutputManager, "add_variable")
     mock_gather_feeds = mocker.patch.object(em, "_gather_ration_feed_totals", return_value=purchased_feeds)
     mock_calc_actual = mocker.patch.object(em, "_calculate_actual_purchased_feeds", return_value=actual_purchased_feeds)
+    mock_calc_actual_emission = mocker.patch.object(em, "_calculate_actual_purchased_feed_emissions",
+                                                    return_value=(actual_purchased_feed_emissions,
+                                                                  actual_land_use_change_emissions))
+
+    em._calculate_purchased_feed_emissions(homegrown_feeds)
+
+    assert mock_add.call_count == 3
+    mock_gather_feeds.assert_called_once()
+    mock_calc_actual.assert_called_once_with(homegrown_feeds, purchased_feeds)
+    mock_calc_actual_emission.assert_called_once_with(actual_purchased_feeds)
