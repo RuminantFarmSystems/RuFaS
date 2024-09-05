@@ -8,40 +8,49 @@ from RUFAS.routines.EEE.emissions import EmissionsEstimator
 
 
 @pytest.mark.parametrize(
-    "homegrown_feeds",
-    [([
-          {"feed_type": "Alfalfa", "quantity_tons": 10.5, "is_organic": True, "harvest_date": "2024-08-15"},
-          {"feed_type": "Corn Silage", "quantity_tons": 25.0, "is_organic": False, "harvest_date": "2024-07-10"}
-      ], [
-          {"field_id": 101, "fertilizer_type": "Nitrogen", "application_rate_kg_per_ha": 50,
-           "application_date": "2024-04-15", "is_organic": False},
-          {"field_id": 102, "fertilizer_type": "Compost", "application_rate_kg_per_ha": 100,
-           "application_date": "2024-05-20", "is_organic": True}
-      ], [
-          {"field_id": 201, "manure_type": "Cow Manure", "application_rate_kg_per_ha": 200,
-           "application_date": "2024-06-10", "method": "Broadcast"},
-          {"field_id": 202, "manure_type": "Pig Manure", "application_rate_kg_per_ha": 180,
-           "application_date": "2024-07-05", "method": "Injection"}
-      ],
-      [
-          {"request_id": 301, "farm_name": "Green Valley Farms", "manure_type": "Cow Manure", "quantity_tons": 50,
-           "requested_date": "2024-08-01", "status": "Pending"},
-          {"request_id": 302, "farm_name": "Sunny Acres", "manure_type": "Calf Manure", "quantity_tons": 30,
-           "requested_date": "2024-08-10", "status": "Fulfilled"}
-      ]
-    )]
+    "homegrown_feeds,fertilizer_applications,manure_applications,manure_requests",
+    [
+        (
+            [
+                {"feed_type": "Alfalfa", "quantity_tons": 10.5, "is_organic": True, "harvest_date": "2024-08-15"},
+                {"feed_type": "Corn Silage", "quantity_tons": 25.0, "is_organic": False, "harvest_date": "2024-07-10"}
+            ], [
+                {"field_id": 101, "fertilizer_type": "Nitrogen", "application_rate_kg_per_ha": 50,
+                 "application_date": "2024-04-15", "is_organic": False},
+                {"field_id": 102, "fertilizer_type": "Compost", "application_rate_kg_per_ha": 100,
+                 "application_date": "2024-05-20", "is_organic": True}
+            ], [
+                {"field_id": 201, "manure_type": "Cow Manure", "application_rate_kg_per_ha": 200,
+                 "application_date": "2024-06-10", "method": "Broadcast"},
+                {"field_id": 202, "manure_type": "Pig Manure", "application_rate_kg_per_ha": 180,
+                 "application_date": "2024-07-05", "method": "Injection"}
+            ],
+            [
+                {"request_id": 301, "farm_name": "Green Valley Farms", "manure_type": "Cow Manure", "quantity_tons": 50,
+                 "requested_date": "2024-08-01", "status": "Pending"},
+                {"request_id": 302, "farm_name": "Sunny Acres", "manure_type": "Calf Manure", "quantity_tons": 30,
+                 "requested_date": "2024-08-10", "status": "Fulfilled"}
+            ]
+        )
+    ]
 )
-def test_estimate_emissions(homegrown_feeds: list[dict[str, Any]], mocker: MockerFixture) -> None:
+def test_estimate_emissions(homegrown_feeds: list[dict[str, Any]],
+                            fertilizer_applications: list[dict[str, Any]],
+                            manure_applications: list[dict[str, Any]],
+                            manure_requests: list[dict[str, Any]],
+                            mocker: MockerFixture) -> None:
     """Tests the estimation routines are called correctly."""
     em = EmissionsEstimator()
-    mock_gather = mocker.patch.object(em, "_gather_homegrown_feeds_and_fertilizer_apps", return_value=homegrown_feeds)
+    mock_gather = mocker.patch.object(em, "_gather_homegrown_feeds_and_fertilizer_apps", return_value=(
+        homegrown_feeds, fertilizer_applications, manure_applications, manure_requests))
     mock_purchase = mocker.patch.object(em, "_calculate_purchased_feed_emissions")
     mock_homegrown = mocker.patch.object(em, "_calculate_homegrown_feed_emissions")
 
     em.estimate_emissions()
     mock_gather.assert_called_once()
-    mock_purchase.assert_called_once_with(1)
-    mock_homegrown.assert_called_once_with(1, 2, 3, 4)
+    mock_purchase.assert_called_once_with(homegrown_feeds)
+    mock_homegrown.assert_called_once_with(homegrown_feeds,
+                                           fertilizer_applications, manure_applications, manure_requests)
 
 
 @pytest.mark.parametrize(
