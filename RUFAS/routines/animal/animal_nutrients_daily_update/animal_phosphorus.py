@@ -13,10 +13,14 @@ class AnimalPhosphorus:
     def perform_daily_phosphorus_update(self, animal_status: AnimalPhosphorusStatus) -> None:
         """Runs the daily phosphorus update for the animal.
 
-        Notes:
-        - Calculation of amount of P in diet greater than animal requirements (A.1G.A.1).
-        - Change in body P reserves (g), must be <= 0 (A.1G.A.2).
-        - Calculate total P in the animal (A.1G.A.3).
+        References
+        ----------
+        RuFaS Phosphorus Animal Module documentation sections A.1G.A.1, A.1G.A.2, A.1G.A.3.
+
+        Notes
+        -----
+        - Change in body P reserves (g), must be <= 0
+
         """
         animal_status.phosphorus_excess_in_diet = max(animal_status.phosphorus_intake
                                                       - animal_status.phosphorus_requirement, 0)
@@ -64,11 +68,9 @@ class AnimalPhosphorus:
     ) -> None:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
-        Notes
-        -----
-        Calculation of the amount of P required for endogenous losses (g).
-        - If animal is a CALF, HEIFER_I, HEIFER_II, or HEIFER_III -> (A.1A-D.E.1).
-        - If animal is a DRY_COW or LAC_COW -> (A.1EF.E.1).
+        References
+        ----------
+        RuFaS Phosphorus Animal Module documentation sections A.1A-D.E.1, A.1EF.E.1.
         """
         if animal_status.animal_type in CALVES_AND_HEIFERS:
             animal_status.phosphorus_endogenous_loss = 0.0008 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
@@ -78,9 +80,9 @@ class AnimalPhosphorus:
     def _calculate_phosphorus_for_growth(self, animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates phosphorus retained for growth based on animal type.
 
-        Notes
-        -----
-        Calculation of the absorbed P retained for growth (g) (A.1A-F.E.3).
+        References
+        ----------
+        RuFaS Phosphorus Animal Module documentation section A.1A-F.E.3.
         """
         if (
             animal_status.animal_type in CALVES_AND_HEIFERS
@@ -98,9 +100,9 @@ class AnimalPhosphorus:
     def _calculate_gestational_phosphorus(self, animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates an animal's gestational phosphorus.
 
-        Notes
-        -----
-        Calculation of absorbed P retained for fetal growth (g) (A.1C-F.E.4).
+        References
+        ----------
+        RuFaS Phosphorus Animal Module documentation section A.1C-F.E.4.
         """
         if animal_status.days_in_preg >= 190:
             exp_1 = (0.05527 - 0.000075 * animal_status.days_in_preg) * animal_status.days_in_preg
@@ -115,9 +117,9 @@ class AnimalPhosphorus:
     def _calculate_milk_phosphorus(self, animal_status: AnimalPhosphorusStatus) -> float:
         """Calculates an animal's milk phosphorus.
 
-        Notes
-        -----
-        Calculation of the amount of P in milk per animal (g) (A.1E.E.5).
+        References
+        ----------
+        RuFaS Phosphorus Animal Module documentation section A.1E.E.5.
         """
         if animal_status.milking:
             return 0.0009 * animal_status.estimated_daily_milk_produced * GeneralConstants.KG_TO_GRAMS
@@ -129,11 +131,9 @@ class AnimalPhosphorus:
     ) -> float:
         """Calculates absorbed phosphorus based on animal type.
 
-        Notes
-        -----
-        Calculation of absorbed P required by the animal (g).
-        - Cows: (A.1EF.E.6).
-        - Calves, HeiferIs, HeiferIIs, HeiferIIIs: (A.1A-F.E.6).
+        References
+        ----------
+        RuFaS Phosphorus Animal Module documentation sections A.1EF.E.6, A.1A-F.E.6.
         """
         if animal_status.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW]:
             return (
@@ -162,12 +162,9 @@ class AnimalPhosphorus:
     ) -> None:
         """Calculates an animal's phosphorus requirement by animal type.
 
-        Notes
-        -----
-        Calculates the requirement of P from the ration (g).
-        - Calves: (A.1A.E.7).
-        - HeiferIs, HeiferIIs, HeiferIIIs: (A.1B-D.E.7).
-        - Cows: (A.1EF.E.7).
+        References
+        ----------
+        RuFaS Phosphorus Animal Module documentation sections A.1A.E.7, A.1B-D.E.7, A.1EF.E.7.
         """
         if animal_status.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW]:
             if animal_status.milking:
