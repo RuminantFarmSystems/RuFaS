@@ -18,7 +18,8 @@ class AnimalPhosphorus:
         - Change in body P reserves (g), must be <= 0 (A.1G.A.2).
         - Calculate total P in the animal (A.1G.A.3).
         """
-        animal_status.phosphorus_excess = max(animal_status.phosphorus_intake - animal_status.phosphorus_requirement, 0)
+        animal_status.phosphorus_excess_in_diet = max(animal_status.phosphorus_intake
+                                                      - animal_status.phosphorus_requirement, 0)
         previous_phosphorus_reserves = animal_status.phosphorus_reserves
 
         if animal_status.phosphorus_intake < animal_status.phosphorus_requirement:
@@ -32,15 +33,15 @@ class AnimalPhosphorus:
             and animal_status.phosphorus_reserves < 0
         ):
             animal_status.phosphorus_reserves = (
-                0.7 * animal_status.phosphorus_excess + animal_status.phosphorus_reserves
+                0.7 * animal_status.phosphorus_excess_in_diet + animal_status.phosphorus_reserves
             )
         else:
             animal_status.phosphorus_reserves = 0
 
-        animal_status.total_phosphorus = (
-            animal_status.total_phosphorus
-            + animal_status.gestational_phosphorus
-            + animal_status.phosphorus_retained_for_growth
+        animal_status.total_phosphorus_in_animal = (
+            animal_status.total_phosphorus_in_animal
+            + animal_status.phosphorus_for_gestation
+            + animal_status.phosphorus_for_growth
             + (animal_status.phosphorus_reserves - previous_phosphorus_reserves)
         )
 
@@ -48,9 +49,9 @@ class AnimalPhosphorus:
         self, animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
     ) -> None:
         """Calculates animal's phosophorus requirements"""
-        self._calculate_endogenous_loss_phosphorus(animal_status, dry_matter_intake)
+        self._calculate_phosphorus_endogenous_loss(animal_status, dry_matter_intake)
         urine_production_phosphorus = 0.000002 * animal_status.body_weight * GeneralConstants.KG_TO_GRAMS
-        self._calculate_phosphorus_retained_for_growth(animal_status)
+        self._calculate_phosphorus_for_growth(animal_status)
         self._calculate_gestational_phosphorus(animal_status)
         milk_phosphorus = self._calculate_milk_phosphorus(animal_status)
         absorbed_phosphorus = self._calculate_absorbed_phosphorus(
@@ -58,7 +59,7 @@ class AnimalPhosphorus:
         )
         self._calculate_animal_phosphorus_requirement(animal_status, absorbed_phosphorus)
 
-    def _calculate_endogenous_loss_phosphorus(
+    def _calculate_phosphorus_endogenous_loss(
         self, animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
     ) -> None:
         """Calculates phosphorus required for endogenous loss based on animal type.
@@ -70,11 +71,11 @@ class AnimalPhosphorus:
         - If animal is a DRY_COW or LAC_COW -> (A.1EF.E.1).
         """
         if animal_status.animal_type in CALVES_AND_HEIFERS:
-            animal_status.endogenous_loss_phosphorus = 0.0008 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
+            animal_status.phosphorus_endogenous_loss = 0.0008 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
         else:
-            animal_status.endogenous_loss_phosphorus = 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
+            animal_status.phosphorus_endogenous_loss = 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
 
-    def _calculate_phosphorus_retained_for_growth(animal_status: AnimalPhosphorusStatus) -> None:
+    def _calculate_phosphorus_for_growth(animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates phosphorus retained for growth based on animal type.
 
         Notes
@@ -85,14 +86,14 @@ class AnimalPhosphorus:
             animal_status.animal_type in CALVES_AND_HEIFERS
             or animal_status.body_weight < animal_status.mature_body_weight
         ):
-            animal_status.phosphorus_retained_for_growth = (
+            animal_status.phosphorus_for_growth = (
                 (0.0012 + 0.004635 * (animal_status.mature_body_weight**0.22) * (animal_status.body_weight ** (-0.22)))
                 * animal_status.daily_growth
                 / 0.96
                 * GeneralConstants.KG_TO_GRAMS
             )
         else:
-            animal_status.phosphorus_retained_for_growth = 0
+            animal_status.phosphorus_for_growth = 0
 
     def _calculate_gestational_phosphorus(animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates an animal's gestational phosphorus.
@@ -104,12 +105,12 @@ class AnimalPhosphorus:
         if animal_status.days_in_preg >= 190:
             exp_1 = (0.05527 - 0.000075 * animal_status.days_in_preg) * animal_status.days_in_preg
             exp_2 = (0.05527 - 0.000075 * (animal_status.days_in_preg - 1)) * (animal_status.days_in_preg - 1)
-            animal_status.gestational_phosphorus = (
+            animal_status.phosphorus_for_gestation = (
                 0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)
             ) * GeneralConstants.KG_TO_GRAMS
-            animal_status.gestational_phosphorus_for_calf += animal_status.gestational_phosphorus
+            animal_status.phosphorus_for_gestation_required_for_calf += animal_status.phosphorus_for_gestation
         else:
-            animal_status.gestational_phosphorus = 0
+            animal_status.phosphorus_for_gestation = 0
 
     def _calculate_milk_phosphorus(animal_status: AnimalPhosphorusStatus) -> float:
         """Calculates an animal's milk phosphorus.
@@ -137,23 +138,23 @@ class AnimalPhosphorus:
         if animal_status.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW]:
             return (
                 urine_production_phosphorus
-                + animal_status.endogenous_loss_phosphorus
-                + animal_status.phosphorus_retained_for_growth
-                + animal_status.gestational_phosphorus
+                + animal_status.phosphorus_endogenous_loss
+                + animal_status.phosphorus_for_growth
+                + animal_status.phosphorus_for_gestation
                 + milk_phosphorus
             )
         elif animal_status.animal_type in [AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
             return (
                 urine_production_phosphorus
-                + animal_status.endogenous_loss_phosphorus
-                + animal_status.phosphorus_retained_for_growth
-                + animal_status.gestational_phosphorus
+                + animal_status.phosphorus_endogenous_loss
+                + animal_status.phosphorus_for_growth
+                + animal_status.phosphorus_for_gestation
             )
         else:
             return (
                 urine_production_phosphorus
-                + animal_status.endogenous_loss_phosphorus
-                + animal_status.phosphorus_retained_for_growth
+                + animal_status.phosphorus_endogenous_loss
+                + animal_status.phosphorus_for_growth
             )
 
     def _calculate_animal_phosphorus_requirement(
