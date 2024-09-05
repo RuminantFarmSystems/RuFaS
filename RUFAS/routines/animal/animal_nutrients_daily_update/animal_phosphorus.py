@@ -22,8 +22,9 @@ class AnimalPhosphorus:
         - Change in body P reserves (g), must be <= 0
 
         """
-        animal_status.phosphorus_excess_in_diet = max(animal_status.phosphorus_intake
-                                                      - animal_status.phosphorus_requirement, 0)
+        animal_status.phosphorus_excess_in_diet = max(
+            animal_status.phosphorus_intake - animal_status.phosphorus_requirement, 0
+        )
         previous_phosphorus_reserves = animal_status.phosphorus_reserves
 
         if animal_status.phosphorus_intake < animal_status.phosphorus_requirement:
@@ -127,7 +128,7 @@ class AnimalPhosphorus:
             return 0.0
 
     def _calculate_absorbed_phosphorus(
-            self, animal_status: AnimalPhosphorusStatus, milk_phosphorus: float, urine_production_phosphorus: float
+        self, animal_status: AnimalPhosphorusStatus, milk_phosphorus: float, urine_production_phosphorus: float
     ) -> float:
         """Calculates absorbed phosphorus based on animal type.
 
