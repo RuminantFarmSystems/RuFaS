@@ -2,7 +2,6 @@ from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
 
-import mock
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.units import MeasurementUnits
