@@ -6,7 +6,7 @@ from ...input_manager import InputManager
 from ...time import Time
 from ...units import MeasurementUnits
 from ...output_manager import OutputManager
-from typing import Any, Tuple, Dict
+from typing import Any, Tuple
 import re
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
@@ -386,8 +386,10 @@ class EmissionsEstimator:
                 ],
                 "slice_start": SLICE_START,
             }
+
             ammonia_emissions = om.filter_variables_pool(ammonia_filter)
             soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
+
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
                 "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year"
@@ -397,6 +399,7 @@ class EmissionsEstimator:
                 ],
                 "slice_start": SLICE_START,
             }
+
             nitrous_oxide_emissions = om.filter_variables_pool(nitrous_oxide_filter)
             soil_data["nitrous_oxide"] = sum(
                 [sum(nitrous_oxide_emissions[key]["values"]) for key in nitrous_oxide_emissions.keys()]
@@ -411,6 +414,7 @@ class EmissionsEstimator:
                 "slice_start": SLICE_START,
                 "slice_end": SLICE_END,
             }
+
             starting_carbon_stock = om.filter_variables_pool(starting_carbon_stock_filter)
             total_starting_carbon = sum(
                 [starting_carbon_stock[key]["values"][0] for key in starting_carbon_stock.keys()]
