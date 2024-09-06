@@ -26,6 +26,7 @@ from unittest.mock import MagicMock, patch, call
 im = InputManager()
 om = OutputManager()
 
+
 @pytest.fixture
 def mock_input_manager(mocker: MockerFixture) -> InputManager:
     """Returns an uninitialized InputManager object"""
