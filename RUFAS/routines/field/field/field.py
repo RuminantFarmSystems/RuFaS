@@ -27,7 +27,7 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.time import Time
 
-om = OutputManager()
+# om = OutputManager()
 
 
 class Field:
@@ -117,6 +117,7 @@ class Field:
         feed_manager: Optional[FeedManager] = None,
     ):
         # field-wide attributes
+        self.om = OutputManager()
         self.field_data = field_data or FieldData()
 
         # soil attributes
@@ -155,7 +156,7 @@ class Field:
         }
 
         if manure_manager is None:
-            om.add_error(
+            self.om.add_error(
                 "field_initialization_error",
                 f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
                 f"initialize.",
@@ -166,7 +167,7 @@ class Field:
         self.manure_manager: ManureManager = manure_manager
 
         if feed_manager is None:
-            om.add_error(
+            self.om.add_error(
                 "field_initialization_error",
                 f"Attempted initialization of Field {self.field_data.name=} with no Feed Manager, initializing a "
                 f"FeedManager to use.",
@@ -272,7 +273,7 @@ class Field:
                 "date": {"year": year, "day": day},
             }
             log_message = "Tried to apply fertilizer with no nitrogen, phosphorus, or potassium requested."
-            om.add_log("fertilizer_application_log", log_message, info_map)
+            self.om.add_log("fertilizer_application_log", log_message, info_map)
             return
 
         invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
@@ -512,7 +513,7 @@ class Field:
             "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("fertilizer_application", value, info_map)
+        self.om.add_variable("fertilizer_application", value, info_map)
 
     def _execute_manure_application(
         self,
@@ -568,7 +569,7 @@ class Field:
         }
         if requested_nitrogen == requested_phosphorus == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
-            om.add_log("manure_application_log", log_message, info_map)
+            self.om.add_log("manure_application_log", log_message, info_map)
             return
 
         nutrient_request = NutrientRequest(
@@ -665,7 +666,7 @@ class Field:
                 f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus "
                 f"deficient by {unmet_phosphorus_demand} kg."
             )
-            om.add_warning(warning_name, warning_message, info_map)
+            self.om.add_warning(warning_name, warning_message, info_map)
             return
 
         if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
@@ -764,7 +765,7 @@ class Field:
             "field_name": self.field_data.name,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable(output_name, value, info_map)
+        self.om.add_variable(output_name, value, info_map)
 
     def _add_manure_water(self, manure_application: NutrientRequestResults, manure_type: ManureType) -> None:
         """
@@ -841,7 +842,7 @@ class Field:
                 f"the soil profile, setting the application depth to be at the bottom of the soil "
                 f"profile."
             )
-        om.add_error(error_name, error_message, info_map)
+        self.om.add_error(error_name, error_message, info_map)
 
     # </editor-fold>
 
@@ -1097,7 +1098,7 @@ class Field:
             "field_size": self.field_data.field_size,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
-        om.add_variable("crop_planting", value, info_map)
+        self.om.add_variable("crop_planting", value, info_map)
 
     def _harvest_crop(
         self,
@@ -1139,13 +1140,13 @@ class Field:
             "date": {"day": time.current_julian_day, "year": time.current_calendar_year},
         }
         if len(crops_to_be_harvested) > 1:
-            om.add_warning(
+            self.om.add_warning(
                 "harvest_warning",
                 "Multiple crops to be harvested by single HarvestEvent.",
                 info_map,
             )
         elif len(crops_to_be_harvested) < 1:
-            om.add_warning(
+            self.om.add_warning(
                 "harvest_warning",
                 "No crop found to be harvested by a HarvestEvent.",
                 info_map,
@@ -1421,7 +1422,7 @@ class Field:
             "suffix": f"field='{self.field_data.name}'",
             "units": MeasurementUnits.MILLIMETERS,
         }
-        om.add_variable("manure_water", manure_water, info_map)
+        self.om.add_variable("manure_water", manure_water, info_map)
 
         self.field_data.manure_water = 0.0
 
@@ -1694,6 +1695,6 @@ class Field:
             "field_size": self.field_data.field_size,
             "units": MeasurementUnits.MILLIMETERS,
         }
-        om.add_variable("field_watering", watering_amount, info_map)
+        self.om.add_variable("field_watering", watering_amount, info_map)
 
     # </editor-fold>
