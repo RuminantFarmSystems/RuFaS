@@ -81,8 +81,6 @@ def test_init(
         assert True
 
 
-
-
 def test_manage_field() -> None:
     """Tests that all subroutines are correctly called by the main routine in field."""
     field = Field(manure_manager=MagicMock(ManureManager))
