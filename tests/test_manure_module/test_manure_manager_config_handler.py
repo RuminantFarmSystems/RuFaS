@@ -493,7 +493,7 @@ def test_get_bedding_config_error(mocker: MockerFixture) -> None:
     manure_manager_config_handler.bedding_configs = {}
     expected_error_message = "Attempted to use a non-existent manure bedding configuration called 'not present'"
 
-    #with pytest.raises(KeyError, match=expected_error_message):
+    # with pytest.raises(KeyError, match=expected_error_message):
     try:
         manure_manager_config_handler.get_bedding_config("not present")
     except KeyError as e:
@@ -640,7 +640,6 @@ def test_get_manure_treatment_config(mocker: MockerFixture) -> None:
     actual = config_handler.get_manure_treatment_config("config")
 
     assert actual == mock_treatment_config
-
 
     with pytest.raises(KeyError, match="Attempted to use a non-existent manure treatment configuration"):
         config_handler.get_manure_treatment_config("not present")
