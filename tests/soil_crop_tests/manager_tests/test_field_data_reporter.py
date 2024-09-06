@@ -1,12 +1,12 @@
 import pytest
 from typing import List
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop import Crop
-from RUFAS.routines.field.manager.field_data_reporter import om
 from RUFAS.routines.manure.manure_manager import ManureManager
 from unittest.mock import patch, PropertyMock, MagicMock
 
@@ -22,6 +22,7 @@ def test_send_daily_variables(
     root_depths: List[float],
 ) -> None:
     """Tests that daily variables were sent correctly through OutputManager"""
+    om = OutputManager()
     field_data_1 = FieldData(name="name 1")
     field_data_2 = FieldData(name="name 2")
     crop_data_1 = CropData(name="crop 1", planting_day=100, planting_year=1993)
@@ -239,6 +240,7 @@ def test_send_annual_variables(
     field_2.crops.append(crop_2)
 
     og = FieldDataReporter([field_1, field_2])
+    om = OutputManager()
     for i in range(3):
         with patch.multiple(
             "RUFAS.routines.field.soil.soil_data.SoilData",
@@ -259,7 +261,6 @@ def test_send_annual_variables(
             for index, layer in enumerate(field_2.soil.data.soil_layers):
                 layer.annual_nitrous_oxide_emissions_total = annual_nitrous_oxide_emissions_total[index]
             og.send_annual_variables()
-    print(om.variables_pool)
     pool = om.variables_pool
     # Testing water and nitrates changes
     assert (
