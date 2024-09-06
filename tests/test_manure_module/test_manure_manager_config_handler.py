@@ -16,6 +16,8 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
 )
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 
+om = OutputManager()
+
 
 def test_process_bedding_configs(mocker: MockerFixture) -> None:
     """Unit test for the _process_bedding_configs() method in manure_manager_config_handler.py."""
@@ -448,7 +450,7 @@ def test_process_manure_treatment_configs_warning(
     mocker.patch.object(ManureTreatmentConfig, "__init__", return_value=None)
     mocker.patch.object(ManureManagerConfigHandler, "__init__", return_value=None)
     config_handler = ManureManagerConfigHandler()
-    add_warning = mocker.patch.object(OutputManager, "add_warning")
+    add_warning = mocker.patch.object(om, "add_warning")
 
     config_handler._process_manure_treatment_configs(treatment_configs)
 
@@ -483,7 +485,7 @@ def test_get_bedding_config(mocker: MockerFixture) -> None:
 
 def test_get_bedding_config_error(mocker: MockerFixture) -> None:
     """Tests that error is properly raised in _get_bedding_config() when a config to get is not there."""
-    add_error = mocker.patch.object(OutputManager, "add_error")
+    add_error = mocker.patch.object(om, "add_error")
     mock_manure_manager_config = mocker.MagicMock()
     mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
@@ -566,7 +568,7 @@ def test_get_manure_handler_config(
 
 def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     """Tests that _get_manure_handler_config() correctly handles errors when missing manure handler types."""
-    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    mock_add_error = mocker.patch.object(om, "add_error")
     expected_title = "Unknown manure handler configuration name"
     expected_message = "Attempted to use a non-existent manure handler configuration called 'not there'"
     expected_info_map = {
@@ -635,7 +637,7 @@ def test_get_manure_treatment_config(mocker: MockerFixture) -> None:
     config_handler = ManureManagerConfigHandler()
     mock_treatment_config = mocker.MagicMock()
     config_handler.manure_treatment_configs = {"config": mock_treatment_config}
-    patch_add_error = mocker.patch.object(OutputManager, "add_error")
+    patch_add_error = mocker.patch.object(om, "add_error")
 
     actual = config_handler.get_manure_treatment_config("config")
 
