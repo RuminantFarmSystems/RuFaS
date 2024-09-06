@@ -643,7 +643,7 @@ def test_get_manure_treatment_config(mocker: MockerFixture) -> None:
 
 
     with pytest.raises(KeyError, match="Attempted to use a non-existent manure treatment configuration"):
-    config_handler.get_manure_treatment_config("not present")
+        config_handler.get_manure_treatment_config("not present")
     patch_add_error.assert_called_once()
 
 
