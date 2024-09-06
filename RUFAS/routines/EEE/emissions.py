@@ -234,10 +234,10 @@ class EmissionsEstimator:
 
         actual_purchased_feed_emissions = {}
         actual_land_use_change_emissions = {}
-        for id, amount_fed in actual_purchased_feeds.items():
+        for feed_id, amount_fed in actual_purchased_feeds.items():
             try:
-                purchased_emissions = amount_fed * purchased_feed_emissions[id]
-                actual_purchased_feed_emissions[id] = purchased_emissions
+                purchased_emissions = amount_fed * purchased_feed_emissions[feed_id]
+                actual_purchased_feed_emissions[feed_id] = purchased_emissions
             except KeyError:
                 info_map = {
                     "class": self.__class__.__name__,
@@ -245,12 +245,12 @@ class EmissionsEstimator:
                 }
                 om.add_warning(
                     "Missing Purchased Feed Emissions",
-                    f"Missing data for RuFaS feed {id}, omitting from purchased feed emissions estimation.",
+                    f"Missing data for RuFaS feed {feed_id}, omitting from purchased feed emissions estimation.",
                     info_map,
                 )
             try:
-                land_use_emissions = amount_fed * land_use_change_emissions[id]
-                actual_land_use_change_emissions[id] = land_use_emissions
+                land_use_emissions = amount_fed * land_use_change_emissions[feed_id]
+                actual_land_use_change_emissions[feed_id] = land_use_emissions
             except KeyError:
                 info_map = {
                     "class": self.__class__.__name__,
@@ -258,7 +258,7 @@ class EmissionsEstimator:
                 }
                 om.add_warning(
                     "Missing Land Use Change Purchased Feed Emissions",
-                    f"Missing data for RuFaS feed {id}, omitting from land use change purchased feed emissions "
+                    f"Missing data for RuFaS feed {feed_id}, omitting from land use change purchased feed emissions "
                     "estimation.",
                     info_map,
                 )
