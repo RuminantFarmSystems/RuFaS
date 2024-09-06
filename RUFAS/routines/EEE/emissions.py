@@ -365,7 +365,7 @@ class EmissionsEstimator:
                 }
                 om.add_variable(f"homegrown_{crop_type}_emissions", emissions_info, info_map)
 
-    def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, dict[str, float]]:
+    def _collect_target_soil_characteristics(self, field_names: list[str]) -> dict[str, dict[str, Any]]:
         """Collects the emissions and soil carbon characteristics used to calculate farm-grown feed emissions."""
         soil_info = {}
         for name in field_names:
