@@ -373,7 +373,7 @@ def test_record_yield(
     dry_mass: float,
     nitrogen: float,
     phosphorus: float,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()

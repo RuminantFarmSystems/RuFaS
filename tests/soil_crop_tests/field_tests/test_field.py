@@ -66,11 +66,7 @@ def mock_field_data() -> FieldData:
     ],
 )
 def test_init(
-    manure_manager: ManureManager,
-    feed_manager: FeedManager,
-    should_fail: bool,
-    error_count: int,
-    mocker: MockerFixture
+    manure_manager: ManureManager, feed_manager: FeedManager, should_fail: bool, error_count: int, mocker: MockerFixture
 ) -> None:
     """Tests that Field initialization fails when passed invalid parameters."""
     add_error = mocker.patch.object(OutputManager, "add_error")
@@ -1353,7 +1349,9 @@ def test_record_fertilizer_application(
         "average_clay_percent": 10.0,
     }
 
-    actual = field.om.variables_pool[f"Field._record_fertilizer_application.fertilizer_application.field='{field_name}'"]
+    actual = field.om.variables_pool[
+        f"Field._record_fertilizer_application.fertilizer_application.field='{field_name}'"
+    ]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
