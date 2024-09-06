@@ -310,7 +310,9 @@ class EmissionsEstimator:
         aggregated_manure_requests = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
         self.manure_aggregation(aggregated_manure_requests, manure_requests)
 
-        grouped_soil_characteristics: dict[str, dict[str, float]] = self._collect_target_soil_characteristics(grouped_feeds.keys())
+        grouped_soil_characteristics: dict[str, dict[str, float]] = self._collect_target_soil_characteristics(
+            grouped_feeds.keys()
+        )
 
         crops_with_emissions: list[Any] = []
         for field in grouped_feeds.keys():
@@ -321,7 +323,7 @@ class EmissionsEstimator:
                 aggregated_manure_apps[field],
                 aggregated_manure_requests[field],
             )
-            .0.extend(crops)
+            (0.0).extend(crops)
 
         info_map = {
             "class": self.__class__.__name__,
@@ -522,8 +524,9 @@ class EmissionsEstimator:
         )
 
     @staticmethod
-    def manure_aggregation(aggregated_manure: dict[str, dict[str, float]],
-                           manure_actions:  list[dict[str, Any]]) -> None:
+    def manure_aggregation(
+        aggregated_manure: dict[str, dict[str, float]], manure_actions: list[dict[str, Any]]
+    ) -> None:
         """Helper methods for _calculate_homegrown_feed_emissions"""
         for app in manure_actions:
             field_name = app["field_name"]
