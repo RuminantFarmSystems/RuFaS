@@ -14,8 +14,6 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
-
 
 class CropManagement:
     """
@@ -41,6 +39,7 @@ class CropManagement:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.om = OutputManager()
 
     # ---- Main Methods ----
     def manage_harvest(
@@ -190,7 +189,7 @@ class CropManagement:
                 f"The variable 'biomass' in CropData has an invalid value: '{self.data.biomass}'. "
             )
 
-            om.add_warning(warning_name, warning_message, info_map)
+            self.om.add_warning(warning_name, warning_message, info_map)
             return None
 
         self.data.biomass -= self.data.cut_biomass
@@ -345,7 +344,7 @@ class CropManagement:
             "field_size": field_size,
             "field_name": field_name,
         }
-        om.add_variable("harvest_yield", value, info_map)
+        self.om.add_variable("harvest_yield", value, info_map)
 
     def _transfer_residue(self, soil_data: SoilData, killed: bool) -> None:
         """
