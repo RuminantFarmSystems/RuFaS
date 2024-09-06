@@ -5,8 +5,6 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.events import FertilizerEvent
 from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
-
 
 @pytest.mark.parametrize(
     "name,mix_names,years,days,nitrogen,phosphorus,potassium,depths,fractions,expected_err_msg",
