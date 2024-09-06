@@ -87,7 +87,7 @@ class EmissionsEstimator:
         time_filter = {
             "name": "Time Filter",
             "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                           "which crop yields and nutrient applications to estimate emissions for.",
+            "which crop yields and nutrient applications to estimate emissions for.",
             "filters": ["Time.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
@@ -380,7 +380,7 @@ class EmissionsEstimator:
             ammonia_filter = {
                 "name": "Soil Ammonia emissions",
                 "description": "Collects the ammonia emissions from all soil layers in the field in the last year of "
-                               "the simulation.",
+                "the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',layer=.*",
                 ],
@@ -391,7 +391,7 @@ class EmissionsEstimator:
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
                 "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year"
-                               " of the simulation.",
+                " of the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"
                 ],
@@ -493,10 +493,9 @@ class EmissionsEstimator:
 
         return feeds_grown
 
-    def filtered_results(self,
-                         filters: dict[str, Any],
-                         date_cutoff: datetime,
-                         occurance_time_name: Tuple[str, str]) -> list[dict[str, Any]]:
+    def filtered_results(
+        self, filters: dict[str, Any], date_cutoff: datetime, occurance_time_name: Tuple[str, str]
+    ) -> list[dict[str, Any]]:
         """
         Helper methods to process the filters for requests/applications.
 
