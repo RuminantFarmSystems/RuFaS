@@ -49,7 +49,6 @@ class ManureManagerConfigHandler:
             manure_manager_config["manure_treatment_configs"]
         )
 
-
     def get_bedding_config(self, bedding_name: str) -> BeddingConfig:
         """Returns the bedding config for the given bedding type name.
 
