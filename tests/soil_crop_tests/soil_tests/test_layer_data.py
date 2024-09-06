@@ -3,6 +3,7 @@ from math import log, exp
 
 import pytest
 from pytest import approx
+from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.crop_and_soil_constants import (
     CUBIC_MILLIMETERS_TO_CUBIC_METERS,
@@ -454,3 +455,14 @@ def test_nutrient_cycling_water_factor(water_content: float, field_capacity: flo
         observed = layer.nutrient_cycling_water_factor
         expected = max(0.05, water_content / field_capacity)
         assert observed == expected
+
+
+@pytest.mark.parametrize("metabolic,structural,expected", [(2, 3, 5), (14.332, 12.445, 26.777), (0, 5.334, 5.334)])
+def test_carbon_residue_amount(metabolic: float, structural: float, expected: float, mocker: MockerFixture) -> None:
+    """Test that the carbon_residue_amount adds carbon residue correctly."""
+    layer = LayerData(top_depth=15, bottom_depth=40, field_size=1.8)
+    mocker.patch.object(layer, "metabolic_litter_amount", metabolic)
+    mocker.patch.object(layer, "structural_litter_amount", structural)
+
+    observed = layer.carbon_residue_amount
+    assert observed == expected
