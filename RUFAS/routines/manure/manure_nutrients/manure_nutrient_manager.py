@@ -11,12 +11,11 @@ from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
     NutrientRequestResults,
 )
 
-om = OutputManager()
-
 
 class ManureNutrientManager:
     def __init__(self) -> None:
         """Initialize the manure nutrient manager."""
+        self.om = OutputManager()
 
         self._nutrients_by_manure_type = {
             ManureType.LIQUID: ManureNutrients(manure_type=ManureType.LIQUID),
@@ -288,7 +287,7 @@ class ManureNutrientManager:
             requested_amount = getattr(results, attr)
             available_amount = getattr(current_nutrients, attr)
             if requested_amount > available_amount:
-                om.add_warning(
+                self.om.add_warning(
                     "Remove more nutrients than available",
                     f"Requested {attr} ({requested_amount}) is more than available ({available_amount})",
                     info_map,
