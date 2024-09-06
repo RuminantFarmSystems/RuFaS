@@ -356,7 +356,7 @@ class EmissionsEstimator:
                 grouped_soil_characteristics[field],
                 aggregated_manure_apps[field],
                 aggregated_manure_requests[field],
-                fertilizer_applications
+                fertilizer_applications,
             )
             crops_with_emissions.extend(crops)
 
@@ -469,7 +469,7 @@ class EmissionsEstimator:
         field_emissions: dict[str, float],
         manure_applications: dict[str, float],
         manure_requests: dict[str, float],
-        fertilizer_applications_data: list[dict[str, Any]]
+        fertilizer_applications_data: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops.
@@ -493,7 +493,7 @@ class EmissionsEstimator:
         if total_dry_mass_per_ha_grown == 0.0:
             return feeds_grown
 
-        sorted_crops = sorted(feeds_grown, key=lambda crop: (crop['planting_year'], crop['planting_day']))
+        sorted_crops = sorted(feeds_grown, key=lambda crop: (crop["planting_year"], crop["planting_day"]))
         for crop in sorted_crops:
             fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
             crop["nitrous_oxide_emissions"] = (
@@ -516,40 +516,41 @@ class EmissionsEstimator:
                 applied = True
             else:
                 for i, crop in enumerate(sorted_crops):
-                    crop_harvest_date = self._get_date(crop['harvest_year'], crop['harvest_day'])
+                    crop_harvest_date = self._get_date(crop["harvest_year"], crop["harvest_day"])
                     if i + 1 < len(sorted_crops):
                         next_crop = sorted_crops[i + 1]
-                        next_crop_planting_date = self._get_date(next_crop['planting_year'],
-                                                                 next_crop['planting_day'])
+                        next_crop_planting_date = self._get_date(next_crop["planting_year"], next_crop["planting_day"])
                         if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
-                            next_crop["nitrogen_fertilizer_used"] += fertilizer_application['nitrogen']
+                            next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
                             next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
-                                fertilizer_application["nitrogen"]
-                                * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
+                                fertilizer_application["nitrogen"] * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
                             )
-                            next_crop["phosphorus_fertilizer_used"] += fertilizer_application['phosphorus']
+                            next_crop["phosphorus_fertilizer_used"] += fertilizer_application["phosphorus"]
                             next_crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
-                                fertilizer_application["phosphorus"]
-                                * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+                                fertilizer_application["phosphorus"] * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
                             )
-                            next_crop["potassium_fertilizer_used"] += fertilizer_application['potassium']
+                            next_crop["potassium_fertilizer_used"] += fertilizer_application["potassium"]
                             next_crop["potassium_fertilizer_embedded_CO2_emissions"] = (
-                                fertilizer_application["potassium"]
-                                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
+                                fertilizer_application["potassium"] * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
                             )
                             applied = True
                             break
             if not applied:
-                om.add_warning("Fertilizer application not associated with any crops.",
-                               f"Fertilizer applied on {fertilizer_application_date} did not align with any crop "
-                               "planting and harvesting dates.",
-                               info_map={"class": self.__class__.__name__,
-                                         "function": self._calculate_emissions_by_field.__name__})
+                om.add_warning(
+                    "Fertilizer application not associated with any crops.",
+                    f"Fertilizer applied on {fertilizer_application_date} did not align with any crop "
+                    "planting and harvesting dates.",
+                    info_map={
+                        "class": self.__class__.__name__,
+                        "function": self._calculate_emissions_by_field.__name__,
+                    },
+                )
 
         return sorted_crops
 
-    def _partition_applied_crop_fertilizer_emissions(self, fertilizer_application: dict[str, float],
-                                                     applied_crops: list[dict[str, Any]]) -> None:
+    def _partition_applied_crop_fertilizer_emissions(
+        self, fertilizer_application: dict[str, float], applied_crops: list[dict[str, Any]]
+    ) -> None:
         """Partitions synthetic emissions from fertilizer applications to crop(s) whose planting and harvesting dates
         encompass the fertilizer application date.
 
@@ -562,27 +563,22 @@ class EmissionsEstimator:
         """
         for crop in applied_crops:
             split_factor = 1 / len(applied_crops)
-            crop["nitrogen_fertilizer_used"] += fertilizer_application['nitrogen'] * split_factor
+            crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"] * split_factor
             crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
-                fertilizer_application["nitrogen"]
-                * split_factor
-                * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
+                fertilizer_application["nitrogen"] * split_factor * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
             )
-            crop["phosphorus_fertilizer_used"] += fertilizer_application['phosphorus'] * split_factor
+            crop["phosphorus_fertilizer_used"] += fertilizer_application["phosphorus"] * split_factor
             crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
-                fertilizer_application["phosphorus"]
-                * split_factor
-                * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+                fertilizer_application["phosphorus"] * split_factor * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
             )
-            crop["potassium_fertilizer_used"] += fertilizer_application['potassium'] * split_factor
+            crop["potassium_fertilizer_used"] += fertilizer_application["potassium"] * split_factor
             crop["potassium_fertilizer_embedded_CO2_emissions"] = (
-                fertilizer_application["potassium"]
-                * split_factor
-                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
+                fertilizer_application["potassium"] * split_factor * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
             )
 
-    def _extract_applied_crops(self, sorted_crops: list[dict[str, Any]], fertilizer_application_date: date
-                               ) -> list[dict[str, Any]]:
+    def _extract_applied_crops(
+        self, sorted_crops: list[dict[str, Any]], fertilizer_application_date: date
+    ) -> list[dict[str, Any]]:
         """Extracts a list of crops that had fertilizer applied to them between their planting and harvesting dates.
 
         Parameters
@@ -600,8 +596,8 @@ class EmissionsEstimator:
         applied_crops = []
 
         for crop in sorted_crops:
-            crop_planting_date = self._get_date(crop['planting_year'], crop['planting_day'])
-            crop_harvest_date = self._get_date(crop['harvest_year'], crop['harvest_day'])
+            crop_planting_date = self._get_date(crop["planting_year"], crop["planting_day"])
+            crop_harvest_date = self._get_date(crop["harvest_year"], crop["harvest_day"])
 
             if crop_planting_date <= fertilizer_application_date <= crop_harvest_date:
                 applied_crops.append(crop)
