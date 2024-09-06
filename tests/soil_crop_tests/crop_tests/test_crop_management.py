@@ -18,8 +18,6 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
-om = OutputManager()
-
 
 @pytest.fixture
 def mock_time() -> Time:
@@ -375,6 +373,7 @@ def test_record_yield(
     dry_mass: float,
     nitrogen: float,
     phosphorus: float,
+    mocker: MockerFixture
 ) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
@@ -430,15 +429,14 @@ def test_record_yield(
         "field_size": field_size,
         "field_name": field_name,
     }
+    add_variable = mocker.patch.object(OutputManager, "add_variable")
+    crop_manager._record_yield(field_name, field_size, year, day)
 
-    with patch.object(om, "add_variable") as add_variable:
-        crop_manager._record_yield(field_name, field_size, year, day)
-
-        add_variable.assert_called_once_with(
-            "harvest_yield",
-            expected_value,
-            expected_info_map,
-        )
+    add_variable.assert_called_once_with(
+        "harvest_yield",
+        expected_value,
+        expected_info_map,
+    )
 
 
 @pytest.mark.parametrize(

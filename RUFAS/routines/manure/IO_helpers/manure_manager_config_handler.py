@@ -24,8 +24,6 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
 
-om = OutputManager()
-
 
 class ManureManagerConfigHandler:
     """A class that manages the custom manure manager configs."""
@@ -39,6 +37,7 @@ class ManureManagerConfigHandler:
             The manure manager config dictionary that contains all the manure manager config information.
 
         """
+
         self.bedding_configs = self._process_bedding_configs(manure_manager_config["bedding_configs"])
         self.manure_handler_configs = self._process_manure_handler_configs(
             manure_manager_config["manure_handler_configs"]
@@ -49,6 +48,7 @@ class ManureManagerConfigHandler:
         self.manure_treatment_configs = self._process_manure_treatment_configs(
             manure_manager_config["manure_treatment_configs"]
         )
+
 
     def get_bedding_config(self, bedding_name: str) -> BeddingConfig:
         """Returns the bedding config for the given bedding type name.
@@ -67,6 +67,7 @@ class ManureManagerConfigHandler:
         try:
             return self.bedding_configs[bedding_name]
         except KeyError:
+            om = OutputManager()
             info_map = {"class": self.__class__.__name__, "function": self.get_bedding_config.__name__}
             error_title = "Unknown manure bedding configuration name"
             error_message = f"Attempted to use a non-existent manure bedding configuration called '{bedding_name}'"
@@ -95,6 +96,7 @@ class ManureManagerConfigHandler:
         try:
             return self.manure_handler_configs[manure_handler_type_name]
         except KeyError:
+            om = OutputManager()
             info_map = {
                 "class": self.__class__.__name__,
                 "function": self.get_manure_handler_config.__name__,
@@ -132,6 +134,7 @@ class ManureManagerConfigHandler:
         try:
             return self.manure_separator_configs[manure_separator_name]
         except KeyError:
+            om = OutputManager()
             info_map = {"class": self.__class__.__name__, "function": self.get_manure_separator_config.__name__}
             error_title = "Unknown manure separator configuration name"
             error_message = (
@@ -163,6 +166,7 @@ class ManureManagerConfigHandler:
         try:
             return self.manure_treatment_configs[manure_treatment_type_name]
         except KeyError:
+            om = OutputManager()
             info_map = {"class": self.__class__.__name__, "function": self.get_manure_treatment_config.__name__}
             error_title = "Unknown manure treatment configuration name"
             error_message = (
@@ -189,6 +193,7 @@ class ManureManagerConfigHandler:
         """
         info_map = {"class": cls.__class__.__name__, "function": cls._process_bedding_configs.__name__}
         available_bedding_configs: Dict[str, BeddingConfig] = {}
+        om = OutputManager()
         for config in bedding_configs:
             bedding_name = config.pop("name")
             if bedding_name in available_bedding_configs:
@@ -223,7 +228,7 @@ class ManureManagerConfigHandler:
             If there are multiple configurations for one configuration name.
 
         """
-
+        om = OutputManager()
         info_map = {
             "class": cls.__name__,
             "function": cls._process_manure_handler_configs.__name__,
@@ -266,6 +271,7 @@ class ManureManagerConfigHandler:
             If there are multiple configurations for one configuration name.
 
         """
+        om = OutputManager()
         info_map = {"class": cls.__name__, "function": cls._process_manure_separator_configs.__name__}
 
         available_manure_separator_configs: Dict[str, ManureSeparatorConfig | None] = {}
@@ -310,6 +316,7 @@ class ManureManagerConfigHandler:
         the user specified one of the digestion-lagoon combinations to be used.
 
         """
+        om = OutputManager()
         info_map = {"class": cls.__name__, "function": cls._process_manure_treatment_configs.__name__}
         available_manure_treatment_configs: dict[
             str, ManureTreatmentConfig | tuple[ManureTreatmentConfig, ManureTreatmentConfig]
