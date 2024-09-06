@@ -20,9 +20,6 @@ When decision-making is difficult and doubtful, we use these as our North Star t
 ## Past
 N/A
 
-# Changelog
-Find the changelog Google Sheet [here](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit?usp=sharing).
-
 # Priority Definitions for Project Tasks
 
 ## Individual Task Priorities
@@ -119,3 +116,5 @@ Remember, flexibility and creativity are your allies in the grand adventure of p
 [2023 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1PcxDMAKYupDahtYiIpTKMMTjL4rbGa5ntiKf5ZuHHvU/edit?usp=sharing)
 
 [2022 Fixathon End tasks](https://docs.google.com/spreadsheets/d/1SnY3c4vBXrD9ybHoswJW28FrkG4DWx4fyvotIXA85BM/edit?usp=sharing)
+
+[Old Change Logs](https://docs.google.com/spreadsheets/d/1U-3igxdstHTFb6k5dVcE5-x9IL0r6q18eUiwwytKZyA/edit?usp=sharing).
