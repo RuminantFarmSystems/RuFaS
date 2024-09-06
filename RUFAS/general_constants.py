@@ -27,6 +27,14 @@ class GeneralConstants:
         PERCENTAGE_TO_FRACTION: The conversion factor from a percentage to a fraction.
         FRACTION_TO_PERCENTAGE: The conversion factor from a fraction to a percentage.
 
+        EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR:
+         Constants for calculating the embedded emissions of synthetic nitrogen. Reference IPCC 2021.
+        EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR:
+         Constants for calculating the embedded emissions of synthetic PHOSPHORUS. Reference GWP 100.
+        EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR:
+         Constants for calculating the embedded emissions of synthetic POTASSIUM. Reference BASF's Eco-efficiency
+         analysis tool.
+
     """
 
     # Length-related
@@ -73,6 +81,11 @@ class GeneralConstants:
     # Area related
     HECTARES_TO_SQUARE_CENTIMETERS = 100_000_000
     HECTARES_TO_SQUARE_MILLIMETERS = 10_000_000_000
+
+    # Emission related
+    EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR = 5.32
+    EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR = 3.07
+    EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR = 1.30
 
     CONSTANTS_TO_UNITS = {
         "MM_TO_M": MeasurementUnits.METERS_PER_MILLIMETER,
