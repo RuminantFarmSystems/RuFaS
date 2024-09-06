@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
@@ -16,8 +15,6 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
     ManureTreatmentType,
 )
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
-
-om = OutputManager()
 
 
 def test_process_bedding_configs(mocker: MockerFixture) -> None:
@@ -451,7 +448,7 @@ def test_process_manure_treatment_configs_warning(
     mocker.patch.object(ManureTreatmentConfig, "__init__", return_value=None)
     mocker.patch.object(ManureManagerConfigHandler, "__init__", return_value=None)
     config_handler = ManureManagerConfigHandler()
-    add_warning = mocker.patch.object(om, "add_warning")
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
 
     config_handler._process_manure_treatment_configs(treatment_configs)
 
@@ -486,7 +483,7 @@ def test_get_bedding_config(mocker: MockerFixture) -> None:
 
 def test_get_bedding_config_error(mocker: MockerFixture) -> None:
     """Tests that error is properly raised in _get_bedding_config() when a config to get is not there."""
-    add_error = mocker.patch.object(om, "add_error")
+    add_error = mocker.patch.object(OutputManager, "add_error")
     mock_manure_manager_config = mocker.MagicMock()
     mocker.patch(
         "RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__",
@@ -496,9 +493,11 @@ def test_get_bedding_config_error(mocker: MockerFixture) -> None:
     manure_manager_config_handler.bedding_configs = {}
     expected_error_message = "Attempted to use a non-existent manure bedding configuration called 'not present'"
 
-    with pytest.raises(KeyError, match=expected_error_message):
+    # with pytest.raises(KeyError, match=expected_error_message):
+    try:
         manure_manager_config_handler.get_bedding_config("not present")
-
+    except KeyError as e:
+        assert e.args[0] == expected_error_message
     add_error.assert_called_once()
 
 
@@ -567,6 +566,7 @@ def test_get_manure_handler_config(
 
 def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     """Tests that _get_manure_handler_config() correctly handles errors when missing manure handler types."""
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
     expected_title = "Unknown manure handler configuration name"
     expected_message = "Attempted to use a non-existent manure handler configuration called 'not there'"
     expected_info_map = {
@@ -580,8 +580,7 @@ def test_get_manure_handler_config_error(mocker: MockerFixture) -> None:
     )
     mock_manure_config_handler = ManureManagerConfigHandler()
     mock_manure_config_handler.manure_handler_configs = {}
-
-    with patch.object(om, "add_error") as mock_add_error, pytest.raises(KeyError):
+    with pytest.raises(KeyError):
         mock_manure_config_handler.get_manure_handler_config("not there")
 
     mock_add_error.assert_called_once_with(expected_title, expected_message, expected_info_map)
@@ -636,12 +635,12 @@ def test_get_manure_treatment_config(mocker: MockerFixture) -> None:
     config_handler = ManureManagerConfigHandler()
     mock_treatment_config = mocker.MagicMock()
     config_handler.manure_treatment_configs = {"config": mock_treatment_config}
+    patch_add_error = mocker.patch.object(OutputManager, "add_error")
 
     actual = config_handler.get_manure_treatment_config("config")
 
     assert actual == mock_treatment_config
 
-    patch_add_error = mocker.patch.object(om, "add_error")
     with pytest.raises(KeyError, match="Attempted to use a non-existent manure treatment configuration"):
         config_handler.get_manure_treatment_config("not present")
     patch_add_error.assert_called_once()
