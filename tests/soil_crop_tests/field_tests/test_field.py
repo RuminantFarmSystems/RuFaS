@@ -72,12 +72,15 @@ def test_init(
     add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(ValueError, match="Manure supplier cannot be None."):
-            Field(manure_manager=manure_manager, feed_manager=feed_manager)
+            field = Field(manure_manager=manure_manager, feed_manager=feed_manager)
+            add_error = mocker.patch.object(field.om, "add_error")
+            assert add_error.call_count == error_count
+
     else:
         Field(manure_manager=manure_manager, feed_manager=feed_manager)
         assert True
 
-    assert add_error.call_count == error_count
+
 
 
 def test_manage_field() -> None:
