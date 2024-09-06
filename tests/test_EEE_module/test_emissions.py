@@ -131,3 +131,13 @@ def test_calculate_purchased_feed_emissions(
     mock_gather_feeds.assert_called_once()
     mock_calc_actual.assert_called_once_with(homegrown_feeds, purchased_feeds)
     mock_calc_actual_emission.assert_called_once_with(actual_purchased_feeds)
+#
+# @pytest.mark.parametrize("filter_result,",
+#                          ({
+#                              "key1": {"values": ["value1", "value2", "value3"], "info_maps": [{"key": "val"}]},
+#                              "key2": {"values": ["value4", "value5", "value6"], "info_maps": [{"key": "val"}]},
+#                              "key3": {"values": ["value7", "value8", "value9"], "info_maps": [{"key": "val"}]},
+#                          }))
+# def test_gather_homegrown_feeds_and_fertilizer_apps(filter_result: dict[str, dict[str, list]],
+#                                                     mocker: MockerFixture) -> None:
+#     """Test that the yields were applied correctly."""
