@@ -9,8 +9,6 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
-
 
 @pytest.fixture
 def mock_weather_input() -> dict:
