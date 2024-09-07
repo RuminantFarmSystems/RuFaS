@@ -27,8 +27,6 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.time import Time
 
-# om = OutputManager()
-
 
 class Field:
     """
