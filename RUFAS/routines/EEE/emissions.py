@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from ..field.crop.crop_enum import CropSpecies
 from ...input_manager import InputManager
 from ...time import Time
@@ -353,6 +353,7 @@ class EmissionsEstimator:
         crops_with_emissions = []
         for field in grouped_feeds.keys():
             crops = self._calculate_emissions_by_field(
+                field,
                 grouped_feeds[field],
                 grouped_soil_characteristics[field],
                 aggregated_manure_apps[field],
@@ -466,6 +467,7 @@ class EmissionsEstimator:
 
     def _calculate_emissions_by_field(
         self,
+        field_name: str,
         feeds_grown: list[dict[str, Any]],
         field_emissions: dict[str, float],
         manure_applications: dict[str, float],
@@ -507,8 +509,10 @@ class EmissionsEstimator:
             crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
             crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
 
-        for fertilizer_application in fertilizer_applications_data:
-            fertilizer_application_date = self._get_date(fertilizer_application["year"], fertilizer_application["day"])
+        filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
+        for fertilizer_application in filtered_fertilizers:
+            fertilizer_application_date = Time.convert_year_jday_to_date(fertilizer_application["year"],
+                                                                         fertilizer_application["day"])
             applied_crops = self._extract_applied_crops(sorted_crops, fertilizer_application_date)
             applied = False
 
@@ -517,10 +521,11 @@ class EmissionsEstimator:
                 applied = True
             else:
                 for i, crop in enumerate(sorted_crops):
-                    crop_harvest_date = self._get_date(crop["harvest_year"], crop["harvest_day"])
+                    crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
                     if i + 1 < len(sorted_crops):
                         next_crop = sorted_crops[i + 1]
-                        next_crop_planting_date = self._get_date(next_crop["planting_year"], next_crop["planting_day"])
+                        next_crop_planting_date = Time.convert_year_jday_to_date(next_crop["planting_year"],
+                                                                                 next_crop["planting_day"])
                         if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
                             next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
                             next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
@@ -597,14 +602,9 @@ class EmissionsEstimator:
         applied_crops = []
 
         for crop in sorted_crops:
-            crop_planting_date = self._get_date(crop["planting_year"], crop["planting_day"])
-            crop_harvest_date = self._get_date(crop["harvest_year"], crop["harvest_day"])
+            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"])
+            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
 
             if crop_planting_date <= fertilizer_application_date <= crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops
-
-    @staticmethod
-    def _get_date(year: int, day: int) -> date:
-        """Helper function to convert year and day to a date object."""
-        return date(year, 1, 1) + timedelta(days=day - 1)
