@@ -23,4 +23,5 @@ v0.9.1
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
 - [1948](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [Soil and Crop] Utilize a residue tracker property method in the layer data pool that sums structural and metabolic litter.
+- [1973](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [OutputManager] Avoid global variable usage of output manager [2/2].
 - [1944](https://github.com/RuminantFarmSystems/MASM/pull/1944) - [minor change] [Documentation] Updates the Sphinx GitHub Action so that it can be triggered manually on specific branches and modifies it to not remove any .rst files.
