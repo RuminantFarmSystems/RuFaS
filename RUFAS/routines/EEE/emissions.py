@@ -92,7 +92,7 @@ class EmissionsEstimator:
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
         }
-        date_variables = om.filter_variables_pool(time_filter)
+        date_variables = self.om.filter_variables_pool(time_filter)
         day_cutoff = date_variables["Time.day"]["values"][0]
         year_cutoff = date_variables["Time.calendar_year"]["values"][0]
         date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff)
