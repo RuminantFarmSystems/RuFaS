@@ -177,8 +177,8 @@ class SoilErosion:
             }
             om.add_warning(
                 "Silt and clay fractions are 0",
-                f"Both silt and clay fractions are 0 which will lead to unreliable predictions of erosion and soil"
-                f" emissions",
+                "Both silt and clay fractions are 0 which will lead to unreliable predictions of erosion and soil"
+                " emissions",
                 info_map,
             )
             return 1

@@ -56,9 +56,9 @@ def test_determine_clay_silt_ratio_factor_zero(mocker: MockerFixture) -> None:
     info_map = {"class": "SoilErosion", "function": "_determine_clay_silt_ratio_factor"}
     mock_add.assert_called_once_with(
         "Silt and clay fractions are 0",
-        f"Both silt and clay fractions are 0 which will lead to unreliable predictions "
-        f"of erosion and soil"
-        f" emissions",
+        "Both silt and clay fractions are 0 which will lead to unreliable predictions "
+        "of erosion and soil"
+        " emissions",
         info_map,
     )
 
