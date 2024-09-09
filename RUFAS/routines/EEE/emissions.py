@@ -511,8 +511,9 @@ class EmissionsEstimator:
 
         filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
         for fertilizer_application in filtered_fertilizers:
-            fertilizer_application_date = Time.convert_year_jday_to_date(fertilizer_application["year"],
-                                                                         fertilizer_application["day"])
+            fertilizer_application_date = Time.convert_year_jday_to_date(
+                fertilizer_application["year"], fertilizer_application["day"]
+            )
             applied_crops = self._extract_applied_crops(sorted_crops, fertilizer_application_date)
             applied = False
 
@@ -524,8 +525,9 @@ class EmissionsEstimator:
                     crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
                     if i + 1 < len(sorted_crops):
                         next_crop = sorted_crops[i + 1]
-                        next_crop_planting_date = Time.convert_year_jday_to_date(next_crop["planting_year"],
-                                                                                 next_crop["planting_day"])
+                        next_crop_planting_date = Time.convert_year_jday_to_date(
+                            next_crop["planting_year"], next_crop["planting_day"]
+                        )
                         if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
                             next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
                             next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
