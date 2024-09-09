@@ -59,7 +59,6 @@ def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) 
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)
     )
     add_warning = mocker.patch.object(om, "add_warning")
-
     field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
 
     assert len(field_manager.fields) == len(field_blob_names)
