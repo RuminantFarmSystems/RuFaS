@@ -68,9 +68,7 @@ class AnimalPhosphorus:
         )
 
     @staticmethod
-    def _calculate_phosphorus_requirements(
-        animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
-    ) -> None:
+    def _calculate_phosphorus_requirements(animal_status: AnimalPhosphorusStatus, dry_matter_intake: float) -> None:
         """Calculates animal's phosophorus requirements"""
         AnimalPhosphorus._calculate_phosphorus_endogenous_loss(animal_status, dry_matter_intake)
         urine_production_phosphorus = 0.000002 * animal_status.body_weight * GeneralConstants.KG_TO_GRAMS
@@ -83,9 +81,7 @@ class AnimalPhosphorus:
         AnimalPhosphorus._calculate_animal_phosphorus_requirement(animal_status, absorbed_phosphorus)
 
     @staticmethod
-    def _calculate_phosphorus_endogenous_loss(
-        animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
-    ) -> None:
+    def _calculate_phosphorus_endogenous_loss(animal_status: AnimalPhosphorusStatus, dry_matter_intake: float) -> None:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
         References
