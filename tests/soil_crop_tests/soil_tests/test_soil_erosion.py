@@ -52,7 +52,7 @@ def test_determine_clay_silt_ratio_factor(silt: float, clay: float) -> None:
 
 def test_determine_clay_silt_ratio_factor_zero(mocker: MockerFixture) -> None:
     """Tests the case when silt and clay are zero."""
-    mock_add = mocker.patch.object(OutputManager, "add_warning")
+    mock_add = mocker.patch.object(om, "add_warning")
     observed = SoilErosion._determine_clay_silt_ratio_factor(0, 0)
     assert observed == 1
     info_map = {"class": "SoilErosion", "function": "_determine_clay_silt_ratio_factor"}
