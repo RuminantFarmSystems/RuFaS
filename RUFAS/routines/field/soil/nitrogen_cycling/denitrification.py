@@ -3,6 +3,7 @@ from math import exp, pi, atan, e
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 class Denitrification:
@@ -32,9 +33,14 @@ class Denitrification:
     def __init__(self, soil_data: Optional[SoilData] = None, field_size: Optional[float] = None):
         self.data = soil_data or SoilData(field_size=field_size)
 
-    def denitrify(self) -> None:
+    def denitrify(self, field_size: float) -> None:
         """
         Conducts the daily denitrification operations.
+
+        Parameters
+        ----------
+        field_size : float
+            Size of the field (ha).
 
         References
         ----------
@@ -63,7 +69,14 @@ class Denitrification:
                 layer.soil_overall_carbon_fraction,
             )
 
-            nitrate_denitrification_partitioning_effect = self._calculate_nitrate_effect(layer.nitrate_content)
+            nitrate_concentration_mg_per_kg = LayerData.determine_soil_nutrient_concentration(
+                layer.nitrate_content, layer.bulk_density, layer.layer_thickness, field_size
+            )
+
+            # Milligrams per kilogram is equivalent to micrograms per gram
+            nitrate_denitrification_partitioning_effect = self._calculate_nitrate_effect(
+                nitrate_concentration_mg_per_kg
+            )
             carbon_denitrification_partitioning_effect = self._calculate_carbon_effect(layer.carbon_emissions)
             moisture_denitrification_partitioning_effect = self._calculate_moisture_effect(
                 layer.water_filled_pore_space
@@ -140,7 +153,7 @@ class Denitrification:
         Parameters
         ----------
         nitrate_content : float
-            Amount of nitrates (kg / ha).
+            Amount of nitrates (ug N / g soil).
 
         Returns
         -------
@@ -158,8 +171,7 @@ class Denitrification:
            denitrification." Global biogeochemical cycles 10.3 (1996): 401-412.
 
         """
-        nitrate_content_grams = nitrate_content * GeneralConstants.KG_TO_GRAMS
-        fractional_term = atan(pi * 0.01 * (nitrate_content_grams - 190)) / pi
+        fractional_term = atan(pi * 0.01 * (nitrate_content - 190)) / pi
 
         return (1.0 - (0.5 + fractional_term)) * 25
 
