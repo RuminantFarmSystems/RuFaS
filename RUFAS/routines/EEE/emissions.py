@@ -520,14 +520,14 @@ class EmissionsEstimator:
 
     @staticmethod
     def calculate_crop_emissions_and_fertilizer_usage(
-        crop,
-        field_emissions,
-        fertilizer_applications,
-        manure_applications,
-        manure_requests,
-        total_dry_mass_per_ha_grown,
-        field_size,
-    ):
+        crop: dict[str, Any],
+        field_emissions: dict[str, float],
+        fertilizer_applications: dict[str, float],
+        manure_applications: dict[str, float],
+        manure_requests: dict[str, float],
+        total_dry_mass_per_ha_grown: int,
+        field_size: float,
+    ) -> None:
         """Helper method to deal with crop emissions and fertilizer related process."""
         fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
         crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
