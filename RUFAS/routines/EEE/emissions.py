@@ -497,7 +497,7 @@ class EmissionsEstimator:
         -------
         list[dict[str, Any]]
             Filtered result of the retrieved data.
-        
+
         """
         filtered_pools = self.om.filter_variables_pool(filters)
         processed_data = self._transform_outputs_to_list_of_dicts(filtered_pools)
