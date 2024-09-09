@@ -486,11 +486,11 @@ class EmissionsEstimator:
 
         Parameters
         ----------
-        filters: dict[str, Any]
+        filters : dict[str, Any]
             A filter to collect the desired data from OutputManager.
-        date_cutoff: datetime
+        date_cutoff : datetime
             Date that indicates the cutoff of occurrence.
-        occurance_time_name: Tuple[str, str]
+        occurance_time_name : Tuple[str, str]
             How the key is named for the year and day from the data retrieved from OM.
 
         Returns
