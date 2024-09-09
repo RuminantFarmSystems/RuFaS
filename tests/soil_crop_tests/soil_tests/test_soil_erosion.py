@@ -2,7 +2,10 @@ import pytest
 from math import exp, log, atan, sin
 from unittest.mock import MagicMock, patch
 
+from pytest_mock import MockerFixture
+
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.soil_erosion import SoilErosion
 
@@ -45,18 +48,20 @@ def test_determine_clay_silt_ratio_factor(silt: float, clay: float) -> None:
     assert observe == expect
 
 
-@pytest.mark.parametrize(
-    "silt,clay",
-    [
-        (0, 0),
-    ],
-)
-def test_error_clay_silt_ratio_factor(silt: float, clay: float) -> None:
-    """Tests that _determine_clay_silt_ratio_factor() in soil_erosion.py correctly raises an error when invalid input is
-    given
-    """
-    with pytest.raises(Exception):
-        SoilErosion._determine_clay_silt_ratio_factor(silt, clay)
+def test_determine_clay_silt_ratio_factor_zero(mocker: MockerFixture) -> None:
+    """Tests the case when silt and clay are zero."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_warning")
+    observed = SoilErosion._determine_clay_silt_ratio_factor(0, 0)
+    assert observed == 1
+    info_map = {"class": "SoilErosion", "function": "_determine_clay_silt_ratio_factor"}
+    mock_add.assert_called_once_with(
+        "Silt and clay fractions are 0",
+        "Both silt and clay fractions are 0 which will lead to unreliable predictions "
+        "of erosion and soil"
+        " emissions",
+        info_map,
+    )
 
 
 @pytest.mark.parametrize(
