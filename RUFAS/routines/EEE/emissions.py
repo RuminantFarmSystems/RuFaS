@@ -87,7 +87,7 @@ class EmissionsEstimator:
         time_filter = {
             "name": "Time Filter",
             "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-            "which crop yields and nutrient applications to estimate emissions for.",
+                           "which crop yields and nutrient applications to estimate emissions for.",
             "filters": ["Time.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
@@ -376,7 +376,7 @@ class EmissionsEstimator:
             ammonia_filter = {
                 "name": "Soil Ammonia emissions",
                 "description": "Collects the ammonia emissions from all soil layers in the field in the last year of "
-                "the simulation.",
+                               "the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',layer=.*",
                 ],
@@ -389,7 +389,7 @@ class EmissionsEstimator:
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
                 "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year"
-                " of the simulation.",
+                               " of the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"
                 ],
@@ -462,34 +462,9 @@ class EmissionsEstimator:
             return feeds_grown
 
         for crop in feeds_grown:
-            fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
-            crop["nitrous_oxide_emissions"] = (
-                field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
-            )
-            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
-            crop["carbon_stock_change"] = (
-                field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown * field_size
-            )
-            crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
-            crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
-                fertilizer_applications["nitrogen"]
-                * fraction_of_total_mass_grown
-                * GeneralConstants.EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
-            )
-            crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
-            crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
-                fertilizer_applications["phosphorus"]
-                * fraction_of_total_mass_grown
-                * GeneralConstants.EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
-            )
-            crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
-            crop["potassium_fertilizer_embedded_CO2_emissions"] = (
-                fertilizer_applications["potassium"]
-                * fraction_of_total_mass_grown
-                * GeneralConstants.EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
-            )
-            crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
-            crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
+            self.calculate_crop_emissions_and_fertilizer_usage(crop, field_emissions, fertilizer_applications,
+                                                               manure_applications, manure_requests,
+                                                               total_dry_mass_per_ha_grown, field_size)
 
         return feeds_grown
 
@@ -532,3 +507,37 @@ class EmissionsEstimator:
             field_name = app["field_name"]
             aggregated_manure[field_name]["nitrogen"] += app["nitrogen"]
             aggregated_manure[field_name]["phosphorus"] += app["phosphorus"]
+
+    @staticmethod
+    def calculate_crop_emissions_and_fertilizer_usage(crop, field_emissions, fertilizer_applications,
+                                                      manure_applications,
+                                                      manure_requests, total_dry_mass_per_ha_grown, field_size):
+        """Helper method to deal with crop emissions and fertilizer related process."""
+        fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
+        crop["nitrous_oxide_emissions"] = (
+            field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
+        )
+        crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
+        crop["carbon_stock_change"] = (
+            field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown * field_size
+        )
+        crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
+        crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
+            fertilizer_applications["nitrogen"]
+            * fraction_of_total_mass_grown
+            * GeneralConstants.EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
+        )
+        crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
+        crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
+            fertilizer_applications["phosphorus"]
+            * fraction_of_total_mass_grown
+            * GeneralConstants.EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+        )
+        crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
+        crop["potassium_fertilizer_embedded_CO2_emissions"] = (
+            fertilizer_applications["potassium"]
+            * fraction_of_total_mass_grown
+            * GeneralConstants.EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
+        )
+        crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
+        crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
