@@ -9,8 +9,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.soil_erosion import SoilErosion
 
-om = OutputManager()
-
 
 # --- Static method tests ---
 @pytest.mark.parametrize(
@@ -52,6 +50,7 @@ def test_determine_clay_silt_ratio_factor(silt: float, clay: float) -> None:
 
 def test_determine_clay_silt_ratio_factor_zero(mocker: MockerFixture) -> None:
     """Tests the case when silt and clay are zero."""
+    om = OutputManager()
     mock_add = mocker.patch.object(om, "add_warning")
     observed = SoilErosion._determine_clay_silt_ratio_factor(0, 0)
     assert observed == 1
