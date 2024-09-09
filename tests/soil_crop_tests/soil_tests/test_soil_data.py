@@ -482,7 +482,7 @@ def test_zero_silt_clay_warning(mocker: MockerFixture) -> None:
             clay_fraction=0
         )
     ]
-    data = SoilData(soil_layers=soil_layers, field_size=0.95)
+    data = SoilData(soil_layers=soil_layers, field_size=0.95) # noqa: F841
     info_map = {"class": "SoilData", "function": "__post_init__"}
     mock_add.assert_called_once_with(
         'Silt and clay fractions in the soil are 0, which will lead to unreliable '
