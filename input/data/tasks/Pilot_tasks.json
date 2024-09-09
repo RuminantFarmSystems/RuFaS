@@ -1,0 +1,46 @@
+{
+  "parallel_workers": 6,
+  "tasks": [
+
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "output_prefix": "c1f1",
+      "metadata_file_path": "input/metadata/c1f1_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0,
+      "multi_run_counts": 4
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "output_prefix": "c1f2",
+      "metadata_file_path": "input/metadata/c1f2_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0,
+      "multi_run_counts": 4
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "output_prefix": "c1f3",
+      "metadata_file_path": "input/metadata/c1f3_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0,
+      "multi_run_counts": 4
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "output_prefix": "c1f4",
+      "metadata_file_path": "input/metadata/c1f4_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0,
+      "multi_run_counts": 4
+    },
+    {
+      "task_type": "SIMULATION_MULTI_RUN",
+      "output_prefix": "c1f5",
+      "metadata_file_path": "input/metadata/c1f5_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0,
+      "multi_run_counts": 4
+    }
+  ]
+}

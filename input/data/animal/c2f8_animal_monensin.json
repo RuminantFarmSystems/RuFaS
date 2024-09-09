@@ -7,7 +7,13 @@
     "cow_num": 2796,
     "replace_num": 13980,
     "herd_num": 2796,
-    "breed": "HO"
+    "breed": "HO",
+    "parity_fractions": {
+      "1": 0.302,
+      "2": 0.238,
+      "3": 0.459
+    },
+    "annual_milk_yield": 40997364
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
@@ -147,6 +153,7 @@
   "pasture_concentrate": 0,
   "methane_model": "Mutian",
   "ration": {
+    "phosphorus_requirement_buffer": 0,
     "user_input": true,
     "formulation_interval": 30
   },

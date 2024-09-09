@@ -7,7 +7,13 @@
 		"cow_num":8000,
 		"replace_num":40000,
 		"herd_num":8000,
-		"breed": "JE"
+		"breed": "JE",
+		"parity_fractions": {
+      "1": 0.372,
+      "2": 0.250,
+      "3": 0.372
+    },
+    "annual_milk_yield": 63747125
   },
   "herd_initialization": {
     "initial_animal_num": 10000,
@@ -92,14 +98,6 @@
 				"avg_estrus_cycle_after_pgf": 5,
 				"std_estrus_cycle_after_pgf": 2
 			},
-			"milking": {
-				"wood_l": [[10.59, 16.14, 15.97], [10.59, 16.14, 15.97]],
-				"wood_m": [[0.245, 0.237, 0.265], [0.245, 0.237, 0.265]],
-				"wood_n": [[0.0024, 0.0036, 0.0040], [0.0024, 0.0036, 0.0040]],
-				"wood_l_std": [[0.28, 0.54, 0.51], [0.39, 0.49, 0.47]],
-				"wood_m_std": [[0.0046, 0.0064, 0.0060], [0.0076, 0.0071, 0.0069]],
-				"wood_n_std": [[3.77e-5, 5.82e-5, 5.54e-5], [6.60e-5, 6.69e-5, 6.53e-5]]
-			},
 			"culling": {
 				"parity_death_prob": [0.022, 0.023, 0.08, 0.08],
 				"parity_cull_prob": [0.022, 0.023, 0.08, 0.08],
@@ -147,6 +145,7 @@
 	"pasture_concentrate": 0,
 	"methane_model": "Mutian",
 	"ration": {
+		"phosphorus_requirement_buffer": 0,
 		"user_input": true,
 		"formulation_interval": 30
 	},
