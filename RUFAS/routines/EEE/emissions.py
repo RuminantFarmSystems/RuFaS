@@ -537,7 +537,7 @@ class EmissionsEstimator:
                             applied = True
                             break
             if not applied:
-                om.add_warning(
+                self.om.add_warning(
                     "Fertilizer application not associated with any crops.",
                     f"Fertilizer applied on {fertilizer_application_date} did not align with any crop "
                     "planting and harvesting dates.",
