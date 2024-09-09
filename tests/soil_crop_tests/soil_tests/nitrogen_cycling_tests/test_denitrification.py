@@ -43,7 +43,7 @@ def test_calculate_denitrification_amount(
 
 @pytest.mark.parametrize(
     "nitrates,expected",
-    [(0.0, 23.679093), (0.05, 23.220937), (0.1, 22.294784), (0.2, 10.077695), (0.3, 2.241527), (0.5, 0.814252)],
+    [(0.0, 23.679093), (50.0, 23.220937), (100.0, 22.294784), (200.0, 10.077695), (300.0, 2.241527), (500.0, 0.814252)],
 )
 def test_calculate_nitrate_effect(denitrifier: Denitrification, nitrates: float, expected: float) -> None:
     """Tests that the nitrate effect is correctly calculated."""
@@ -121,6 +121,7 @@ def test_denitrify(mocker: MockerFixture) -> None:
     """
     mocker.patch.object(LayerData, "nutrient_cycling_water_factor", new_callable=PropertyMock, return_value=0.91)
     mocker.patch.object(LayerData, "nutrient_cycling_temp_factor", new_callable=PropertyMock, return_value=0.89)
+    nutrient_concentration = mocker.patch.object(LayerData, "determine_soil_nutrient_concentration", return_value=100.0)
     data = SoilData(field_size=1.8)
     incorp = Denitrification(data)
     incorp.data.set_vectorized_layer_attribute("nitrate_content", [35] * 4)
@@ -136,10 +137,11 @@ def test_denitrify(mocker: MockerFixture) -> None:
     partition_factor = mocker.patch.object(incorp, "_calculate_partitioning_factor")
     calc_nitrous_oxide = mocker.patch.object(incorp, "_calculate_nitrous_oxide_emissions", return_value=10.0)
 
-    incorp.denitrify()
+    incorp.denitrify(field_size=2.1)
 
     nitrification_amount_calls = [call(35, 1.5, 0.89, 0.65)] * 3
     calc_denit.assert_has_calls(nitrification_amount_calls)
+    assert nutrient_concentration.call_count == 3
     assert nitrate.call_count == 3
     assert carbon.call_count == 3
     assert moisture.call_count == 3
