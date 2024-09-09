@@ -139,12 +139,12 @@ def test_mineralize_and_decompose_nitrogen(temp: float, fresh_nitrogen: float, d
     if temp > 0:
         nutrient_ratio_calls = [
             call(
-                incorp.data.soil_layers[0].total_soil_carbon_amount,
+                incorp.data.soil_layers[0].carbon_residue_amount,
                 incorp.data.soil_layers[0].fresh_organic_nitrogen_content,
                 incorp.data.soil_layers[0].nitrate_content,
             ),
             call(
-                incorp.data.soil_layers[0].total_soil_carbon_amount,
+                incorp.data.soil_layers[0].carbon_residue_amount,
                 incorp.data.soil_layers[0].fresh_organic_phosphorus_content,
                 incorp.data.soil_layers[0].labile_inorganic_phosphorus_content,
             ),
