@@ -10,8 +10,25 @@ HEIFERS_AND_COWS = [AnimalType.DRY_COW, AnimalType.LAC_COW, AnimalType.HEIFER_II
 
 class AnimalPhosphorus:
 
-    def perform_daily_phosphorus_update(self, animal_status: AnimalPhosphorusStatus) -> None:
-        """Runs the daily phosphorus update for the animal.
+    @staticmethod
+    def perform_daily_phosphorus_update(animal_status: AnimalPhosphorusStatus, animal) -> None:
+        """Manages animal's daily phosphorus update."""
+        animal_status.get_phosphorus_data(animal)
+        dry_matter_intake = AnimalPhosphorus._get_dry_matter_intake()
+        AnimalPhosphorus._calculate_phosphorus_requirements(animal_status, dry_matter_intake)
+        AnimalPhosphorus._calculate_total_animal_phosphorus(animal_status)
+        animal_status._update_animal(animal)
+
+    @staticmethod
+    def _get_dry_matter_intake() -> float:
+        """Get ration data for animal dry matter intake."""
+        # Not sure where ration will be or how it will be tied to a particular animal (currently done by pen)
+        # But assuming it's not an attribute of the animal, we will need this info from ration.
+        return 0.0
+
+    @staticmethod
+    def _calculate_total_animal_phosphorus(animal_status: AnimalPhosphorusStatus) -> None:
+        """Calculates the total phosphorus for the animal.
 
         References
         ----------
@@ -50,22 +67,24 @@ class AnimalPhosphorus:
             + (animal_status.phosphorus_reserves - previous_phosphorus_reserves)
         )
 
-    def calculate_phosphorus_requirements(
-        self, animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
+    @staticmethod
+    def _calculate_phosphorus_requirements(
+        animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
     ) -> None:
         """Calculates animal's phosophorus requirements"""
-        self._calculate_phosphorus_endogenous_loss(animal_status, dry_matter_intake)
+        AnimalPhosphorus._calculate_phosphorus_endogenous_loss(animal_status, dry_matter_intake)
         urine_production_phosphorus = 0.000002 * animal_status.body_weight * GeneralConstants.KG_TO_GRAMS
-        self._calculate_phosphorus_for_growth(animal_status)
-        self._calculate_gestational_phosphorus(animal_status)
-        milk_phosphorus = self._calculate_milk_phosphorus(animal_status)
-        absorbed_phosphorus = self._calculate_absorbed_phosphorus(
+        AnimalPhosphorus._calculate_phosphorus_for_growth(animal_status)
+        AnimalPhosphorus._calculate_gestational_phosphorus(animal_status)
+        milk_phosphorus = AnimalPhosphorus._calculate_milk_phosphorus(animal_status)
+        absorbed_phosphorus = AnimalPhosphorus._calculate_absorbed_phosphorus(
             animal_status, milk_phosphorus, urine_production_phosphorus
         )
-        self._calculate_animal_phosphorus_requirement(animal_status, absorbed_phosphorus)
+        AnimalPhosphorus._calculate_animal_phosphorus_requirement(animal_status, absorbed_phosphorus)
 
+    @staticmethod
     def _calculate_phosphorus_endogenous_loss(
-        self, animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
+        animal_status: AnimalPhosphorusStatus, dry_matter_intake: float
     ) -> None:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
@@ -73,12 +92,13 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A-D.E.1, A.1EF.E.1.
         """
-        if animal_status.animal_type in CALVES_AND_HEIFERS:
+        if AnimalPhosphorus._is_calf_or_heifer(animal_status.animal_type):
             animal_status.phosphorus_endogenous_loss = 0.0008 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
         else:
             animal_status.phosphorus_endogenous_loss = 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
 
-    def _calculate_phosphorus_for_growth(self, animal_status: AnimalPhosphorusStatus) -> None:
+    @staticmethod
+    def _calculate_phosphorus_for_growth(animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates phosphorus retained for growth based on animal type.
 
         References
@@ -86,7 +106,7 @@ class AnimalPhosphorus:
         RuFaS Phosphorus Animal Module documentation section A.1A-F.E.3.
         """
         if (
-            animal_status.animal_type in CALVES_AND_HEIFERS
+            AnimalPhosphorus._is_calf_or_heifer(animal_status.animal_type)
             or animal_status.body_weight < animal_status.mature_body_weight
         ):
             animal_status.phosphorus_for_growth = (
@@ -98,7 +118,8 @@ class AnimalPhosphorus:
         else:
             animal_status.phosphorus_for_growth = 0.0
 
-    def _calculate_gestational_phosphorus(self, animal_status: AnimalPhosphorusStatus) -> None:
+    @staticmethod
+    def _calculate_gestational_phosphorus(animal_status: AnimalPhosphorusStatus) -> None:
         """Calculates an animal's gestational phosphorus.
 
         References
@@ -115,7 +136,8 @@ class AnimalPhosphorus:
         else:
             animal_status.phosphorus_for_gestation = 0.0
 
-    def _calculate_milk_phosphorus(self, animal_status: AnimalPhosphorusStatus) -> float:
+    @staticmethod
+    def _calculate_milk_phosphorus(animal_status: AnimalPhosphorusStatus) -> float:
         """Calculates an animal's milk phosphorus.
 
         References
@@ -127,8 +149,9 @@ class AnimalPhosphorus:
         else:
             return 0.0
 
+    @staticmethod
     def _calculate_absorbed_phosphorus(
-        self, animal_status: AnimalPhosphorusStatus, milk_phosphorus: float, urine_production_phosphorus: float
+        animal_status: AnimalPhosphorusStatus, milk_phosphorus: float, urine_production_phosphorus: float
     ) -> float:
         """Calculates absorbed phosphorus based on animal type.
 
@@ -158,8 +181,9 @@ class AnimalPhosphorus:
                 + animal_status.phosphorus_for_growth
             )
 
+    @staticmethod
     def _calculate_animal_phosphorus_requirement(
-        self, animal_status: AnimalPhosphorusStatus, absorbed_phosphorus: float
+        animal_status: AnimalPhosphorusStatus, absorbed_phosphorus: float
     ) -> None:
         """Calculates an animal's phosphorus requirement by animal type.
 
@@ -178,3 +202,7 @@ class AnimalPhosphorus:
             animal_status.phosphorus_requirement = absorbed_phosphorus / 0.90
         else:
             animal_status.phosphorus_requirement = absorbed_phosphorus / 0.664
+
+    @staticmethod
+    def _is_calf_or_heifer(animal_type: AnimalType) -> bool:
+        return animal_type in CALVES_AND_HEIFERS
