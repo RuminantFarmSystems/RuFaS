@@ -2,10 +2,6 @@ from typing import List, Any
 
 from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import FertilizerEvent
-from RUFAS.output_manager import OutputManager
-
-
-om = OutputManager()
 
 
 class FertilizerSchedule(Schedule):
