@@ -1,0 +1,72 @@
+{"crop_schedules":
+  [
+  {
+    "crop_species": "alfalfa_hay",
+    "harvest_days": [
+      179, 135, 179, 135, 179
+    ],
+    "harvest_years": [
+      2010,
+      2011, 2011,
+      2012, 2012
+    ],
+    "harvest_operations": [
+      "harvest_only", "harvest_only", "harvest_only", "harvest_only", "harvest_kill"
+    ],
+    "harvest_type": "optimal",
+    "planting_days": [
+      89
+    ],
+    "planting_years": [
+      2010
+    ],
+    "pattern_repeat": 0,
+    "planting_skip": 0,
+    "harvesting_skip": 0
+  },
+  {
+    "crop_species": "corn_grain",
+    "harvest_days": [
+      298
+    ],
+    "harvest_years": [
+      2013, 2014, 2015
+    ],
+    "harvest_operations": [
+      "harvest_kill"
+    ],
+    "harvest_type": "scheduled",
+    "planting_days": [
+      127
+    ],
+    "planting_years": [
+      2013, 2014, 2015
+    ],
+    "pattern_repeat": 0,
+    "planting_skip": 0,
+    "harvesting_skip": 0
+  },
+      {
+    "crop_species": "triticale_silage",
+    "harvest_days": [
+      120
+    ],
+    "harvest_years": [
+      2014, 2015
+    ],
+    "harvest_operations": [
+      "kill_only"
+    ],
+    "harvest_type": "scheduled",
+    "planting_days": [
+      300
+    ],
+    "planting_years": [
+      2013, 2014
+    ],
+    "pattern_repeat": 0,
+    "planting_skip": 0,
+    "harvesting_skip": 0
+  }
+]
+}
