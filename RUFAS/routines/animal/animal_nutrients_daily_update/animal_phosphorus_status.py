@@ -6,6 +6,7 @@ from RUFAS.routines.animal.general_properties import GeneralProperties
 @dataclass
 class AnimalPhosphorusStatus:
     """Dataclass representing the phosphorus status of the animal."""
+
     animal_type: AnimalType
     body_weight: float
     mature_body_weight: float
