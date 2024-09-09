@@ -9,6 +9,8 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.soil_erosion import SoilErosion
 
+om = OutputManager()
+
 
 # --- Static method tests ---
 @pytest.mark.parametrize(
@@ -44,7 +46,7 @@ def test_determine_clay_silt_ratio_factor(silt: float, clay: float) -> None:
     """Tests _determine_clay_silt_ratio_factor() in soil_erosion.py"""
     observe = SoilErosion._determine_clay_silt_ratio_factor(silt, clay)
     expect = silt / (clay + silt)
-    expect = expect**0.3
+    expect = expect ** 0.3
     assert observe == expect
 
 
@@ -61,20 +63,6 @@ def test_determine_clay_silt_ratio_factor_zero(mocker: MockerFixture) -> None:
         " emissions",
         info_map,
     )
-
-
-@pytest.mark.parametrize(
-    "silt,clay",
-    [
-        (0, 0),
-    ],
-)
-def test_error_clay_silt_ratio_factor(silt: float, clay: float) -> None:
-    """Tests that _determine_clay_silt_ratio_factor() in soil_erosion.py correctly raises an error when invalid input is
-    given
-    """
-    with pytest.raises(Exception):
-        SoilErosion._determine_clay_silt_ratio_factor(silt, clay)
 
 
 @pytest.mark.parametrize(
@@ -303,7 +291,7 @@ def test_determine_rainfall_intensity(
 )
 def test_determine_time_of_concentration(slope: float, manning: float, average_slope: float) -> None:
     """Tests that the time of concentration is determined correctly."""
-    expected = ((slope**0.6) * (manning**0.6)) / (18 * (average_slope**0.3))
+    expected = ((slope ** 0.6) * (manning ** 0.6)) / (18 * (average_slope ** 0.3))
     actual = SoilErosion._determine_time_of_concentration(slope, manning, average_slope)
     assert actual == expected
 
