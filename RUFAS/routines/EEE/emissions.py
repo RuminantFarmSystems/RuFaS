@@ -481,11 +481,11 @@ class EmissionsEstimator:
 
         for crop in feeds_grown:
             fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
-            crop["nitrous_oxide_emissions"] = field_emissions[
-                                                  "nitrous_oxide"] * fraction_of_total_mass_grown * field_size
+            crop["nitrous_oxide_emissions"] =\
+                (field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size)
             crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
-            crop["carbon_stock_change"] = (field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown *
-                                           field_size)
+            crop["carbon_stock_change"] =\
+                (field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown * field_size)
             crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
             crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
                 fertilizer_applications["nitrogen"]
