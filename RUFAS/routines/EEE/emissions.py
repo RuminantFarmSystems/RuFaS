@@ -6,7 +6,7 @@ from ...input_manager import InputManager
 from ...time import Time
 from ...units import MeasurementUnits
 from ...output_manager import OutputManager
-from typing import Any, Tuple
+from typing import Any
 import re
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
