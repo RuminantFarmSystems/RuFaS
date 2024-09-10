@@ -17,6 +17,7 @@ class GeneralProperties:
     days_born: int
     days_in_preg: int
     events: AnimalEvents
+    estimated_daily_milk_produced: float
     future_cull_date: int
     future_death_date: int
     gender: Enum
