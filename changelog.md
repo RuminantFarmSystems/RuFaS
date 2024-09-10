@@ -25,3 +25,4 @@ v0.9.1
 - [1948](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [Soil and Crop] Utilize a residue tracker property method in the layer data pool that sums structural and metabolic litter.
 - [1973](https://github.com/RuminantFarmSystems/MASM/pull/1973) - [minor change] [OutputManager] Avoid global variable usage of output manager [2/2].
 - [1870](https://github.com/RuminantFarmSystems/MASM/pull/1870) - [minor change] [Soil and Crop] Partition denitrified nitrates between nitrous oxide emissions and dinitrogen emissions, instead of having all denitrified nitrates leave the soil as nitrous oxide.
+- [1974](https://github.com/RuminantFarmSystems/MASM/pull/1974/) - [minor change] [Animal] Establishes the AnimalPhosphorusStatus calculator class and the AnimalPhosphorus class to perform the daily phosphorus update for each animal for eventual incorporation into the newly refreshed Animal module.
