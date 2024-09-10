@@ -366,6 +366,7 @@ class EmissionsEstimator:
                 aggregated_manure_apps[field],
                 aggregated_manure_requests[field],
             )
+            print("a")
             crops_with_emissions.extend(crops)
 
         info_map = {
