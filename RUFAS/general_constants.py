@@ -8,6 +8,8 @@ class GeneralConstants:
         MM_TO_M: The conversion factor from millimeters to meters.
         CM_TO_MM: The conversion factor from centimeters to millimeters.
         MM_TO_CM: The conversion factor from millimeters to centimeters.
+        M_TO_KM: The conversion factor from meters to kilometers.
+        KM_TO_M: The conversion factor from kilometers to meters.
 
         GRAMS_TO_KG: The conversion factor from grams to kilograms.
         LITERS_TO_CUBIC_METERS: The conversion factor from liters to cubic meters.
