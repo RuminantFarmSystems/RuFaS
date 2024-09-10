@@ -322,10 +322,10 @@ class EmissionsEstimator:
         fields_with_manure_apps = {app["field_name"] for app in manure_applications}
         all_fields = list(fields_with_manure_apps | fields_with_crops)
         aggregated_manure_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
-        self.manure_aggregation(aggregated_manure_apps, manure_applications)
+        self.aggregate_manure_operations(aggregated_manure_apps, manure_applications)
 
         aggregated_manure_requests = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
-        self.manure_aggregation(aggregated_manure_requests, manure_requests)
+        self.aggregate_manure_operations(aggregated_manure_requests, manure_requests)
 
         grouped_soil_characteristics: dict[str, float] = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
@@ -541,11 +541,21 @@ class EmissionsEstimator:
         )
 
     @staticmethod
-    def manure_aggregation(
-        aggregated_manure: dict[str, dict[str, float]], manure_actions: list[dict[str, Any]]
+    def aggregate_manure_operations(
+        aggregated_manure: dict[str, dict[str, float]], manure_operations: list[dict[str, Any]]
     ) -> None:
-        """Helper methods for _calculate_homegrown_feed_emissions"""
-        for app in manure_actions:
+        """
+        Helper methods for _calculate_homegrown_feed_emissions.
+
+        Parameters
+        ----------
+        aggregated_manure: dict[str, dict[str, float]]
+            Data for tracking the amount of aggregated manure.
+        manure_operations: list[dict[str, Any]]
+            The manure operations that will aggregate manure.
+
+        """
+        for app in manure_operations:
             field_name = app["field_name"]
             aggregated_manure[field_name]["nitrogen"] += app["nitrogen"]
             aggregated_manure[field_name]["phosphorus"] += app["phosphorus"]
