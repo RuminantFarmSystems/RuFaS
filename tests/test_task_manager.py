@@ -121,6 +121,7 @@ def test_task_manager_start(
         "Task Manager",
         RUFAS_VERSION,
         "TASK MANAGER",
+        False,
     )
 
     info_map = {
@@ -302,6 +303,27 @@ def test_handle_post_processing(
         mock_output_manager.dump_all_nondata_pools.assert_not_called()
 
 
+def test_handle_end_to_end_testing(
+    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture
+) -> None:
+    """Test that end-to-end testing is executed correctly."""
+    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
+    post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    args = {"json_output_directory": "json_path"}
+    compare_outputs = mocker.patch(
+        "RUFAS.e2e_test_results_comparer.E2ETestResultsComparer.compare_actual_and_expected_test_results"
+    )
+    mock_input_manager = mocker.MagicMock()
+    add_log = mocker.patch.object(mock_output_manager, "add_log")
+
+    task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", False)
+
+    sim_engine_run_tasks.assert_called_once_with(args, mock_input_manager, mock_output_manager, "test_task", False)
+    compare_outputs.assert_called_once_with(args["json_output_directory"])
+    assert add_log.call_count == 2
+    assert post_processing.call_count == 1
+
+
 def test_handle_post_processing_load_pool(
     task_manager: TaskManager,
     mock_output_manager: Generator[Any, Any, Any],
@@ -410,6 +432,7 @@ def test_input_data_audit(
         [TaskType.HERD_INITIALIZATION, False],
         [TaskType.SIMULATION_SINGLE_RUN, False],
         [TaskType.POST_PROCESSING, False],
+        [TaskType.END_TO_END_TESTING, False],
     ],
 )
 def test_task(
@@ -490,6 +513,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         args["output_prefix"],
         RUFAS_VERSION,
         args["task_id"],
+        False,
     )
     mock_im_init.assert_called_once_with(10)
     mock_handler.assert_not_called()
@@ -573,7 +597,7 @@ def test_single_simulation_run(
     """Unit test for TaskManager.handle_single_simulation_run()"""
     mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
 
-    args: dict[str, Any] = {}
+    args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN}
 
     mock_simulation_engine = mocker.patch("RUFAS.simulation_engine.SimulationEngine")
     mock_simulation_engine_init = mocker.patch(
@@ -652,13 +676,6 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
     mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
-
-
-def test_expand_end_to_end_testing_args() -> None:
-    """Unit test for TaskManager._expand_end_to_end_testing_args()"""
-    task_manager = TaskManager()
-    result = task_manager._expand_end_to_end_testing_args({})
-    assert result == []
 
 
 @pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
