@@ -12,12 +12,14 @@ HEIFERS_AND_COWS = [AnimalType.DRY_COW, AnimalType.LAC_COW, AnimalType.HEIFER_II
 class AnimalPhosphorus:
 
     @staticmethod
-    def perform_daily_phosphorus_update(animal_status: AnimalPhosphorusStatus, general_properties: GeneralProperties
-                                        ) -> AnimalPhosphorusStatus:
+    def perform_daily_phosphorus_update(
+        animal_status: AnimalPhosphorusStatus, general_properties: GeneralProperties
+    ) -> AnimalPhosphorusStatus:
         """Manages animal's daily phosphorus update."""
         dry_matter_intake = AnimalPhosphorus._get_dry_matter_intake()
-        phosphorus_status = AnimalPhosphorus._calculate_phosphorus_requirements(general_properties, animal_status,
-                                                                                dry_matter_intake)
+        phosphorus_status = AnimalPhosphorus._calculate_phosphorus_requirements(
+            general_properties, animal_status, dry_matter_intake
+        )
         phosphorus_status = AnimalPhosphorus._calculate_total_animal_phosphorus(phosphorus_status)
 
         return phosphorus_status
@@ -71,34 +73,33 @@ class AnimalPhosphorus:
         return phosphorus_status
 
     @staticmethod
-    def _calculate_phosphorus_requirements(general_properties: GeneralProperties,
-                                           phosphorus_status: AnimalPhosphorusStatus,
-                                           dry_matter_intake: float
-                                           ) -> AnimalPhosphorusStatus:
+    def _calculate_phosphorus_requirements(
+        general_properties: GeneralProperties, phosphorus_status: AnimalPhosphorusStatus, dry_matter_intake: float
+    ) -> AnimalPhosphorusStatus:
         """Calculates animal's phosophorus requirements"""
-        phosphorus_status.phosphorus_endogenous_loss = \
-            AnimalPhosphorus._calculate_phosphorus_endogenous_loss(general_properties, phosphorus_status,
-                                                                   dry_matter_intake)
+        phosphorus_status.phosphorus_endogenous_loss = AnimalPhosphorus._calculate_phosphorus_endogenous_loss(
+            general_properties, phosphorus_status, dry_matter_intake
+        )
         urine_production_phosphorus = 0.000002 * general_properties.body_weight * GeneralConstants.KG_TO_GRAMS
         phosphorus_status.phosphorus_for_growth = AnimalPhosphorus._calculate_phosphorus_for_growth(general_properties)
-        phosphorus_status.phosphorus_for_gestation = \
-            AnimalPhosphorus._calculate_gestational_phosphorus(general_properties)
+        phosphorus_status.phosphorus_for_gestation = AnimalPhosphorus._calculate_gestational_phosphorus(
+            general_properties
+        )
         phosphorus_status.phosphorus_for_gestation_required_for_calf += phosphorus_status.phosphorus_for_gestation
         milk_phosphorus = AnimalPhosphorus._calculate_milk_phosphorus(general_properties)
         absorbed_phosphorus = AnimalPhosphorus._calculate_absorbed_phosphorus(
             general_properties, phosphorus_status, milk_phosphorus, urine_production_phosphorus
         )
-        phosphorus_status.phosphorus_requirement = \
-            AnimalPhosphorus._calculate_animal_phosphorus_requirement(general_properties, phosphorus_status,
-                                                                      absorbed_phosphorus)
+        phosphorus_status.phosphorus_requirement = AnimalPhosphorus._calculate_animal_phosphorus_requirement(
+            general_properties, phosphorus_status, absorbed_phosphorus
+        )
 
         return phosphorus_status
 
     @staticmethod
-    def _calculate_phosphorus_endogenous_loss(general_properties: GeneralProperties,
-                                              phosphorus_status: AnimalPhosphorusStatus,
-                                              dry_matter_intake: float
-                                              ) -> float:
+    def _calculate_phosphorus_endogenous_loss(
+        general_properties: GeneralProperties, phosphorus_status: AnimalPhosphorusStatus, dry_matter_intake: float
+    ) -> float:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
         References
@@ -111,8 +112,7 @@ class AnimalPhosphorus:
             return 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
 
     @staticmethod
-    def _calculate_phosphorus_for_growth(general_properties: GeneralProperties
-                                         ) -> float:
+    def _calculate_phosphorus_for_growth(general_properties: GeneralProperties) -> float:
         """Calculates phosphorus retained for growth based on animal type.
 
         References
@@ -124,8 +124,12 @@ class AnimalPhosphorus:
             or general_properties.body_weight < general_properties.mature_body_weight
         ):
             return (
-                (0.0012 + 0.004635 * (general_properties.mature_body_weight**0.22)
-                 * (general_properties.body_weight ** (-0.22)))
+                (
+                    0.0012
+                    + 0.004635
+                    * (general_properties.mature_body_weight**0.22)
+                    * (general_properties.body_weight ** (-0.22))
+                )
                 * general_properties.daily_growth
                 / 0.96
                 * GeneralConstants.KG_TO_GRAMS
@@ -134,8 +138,7 @@ class AnimalPhosphorus:
             return 0.0
 
     @staticmethod
-    def _calculate_gestational_phosphorus(general_properties: GeneralProperties
-                                          ) -> float:
+    def _calculate_gestational_phosphorus(general_properties: GeneralProperties) -> float:
         """Calculates an animal's gestational phosphorus.
 
         References
@@ -145,15 +148,12 @@ class AnimalPhosphorus:
         if general_properties.days_in_preg >= 190:
             exp_1 = (0.05527 - 0.000075 * general_properties.days_in_preg) * general_properties.days_in_preg
             exp_2 = (0.05527 - 0.000075 * (general_properties.days_in_preg - 1)) * (general_properties.days_in_preg - 1)
-            return (
-                0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)
-            ) * GeneralConstants.KG_TO_GRAMS
+            return (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * GeneralConstants.KG_TO_GRAMS
         else:
             return 0.0
 
     @staticmethod
-    def _calculate_milk_phosphorus(general_properties: GeneralProperties
-                                   ) -> float:
+    def _calculate_milk_phosphorus(general_properties: GeneralProperties) -> float:
         """Calculates an animal's milk phosphorus.
 
         References
@@ -170,7 +170,7 @@ class AnimalPhosphorus:
         general_properties: GeneralProperties,
         phosphorus_status: AnimalPhosphorusStatus,
         milk_phosphorus: float,
-        urine_production_phosphorus: float
+        urine_production_phosphorus: float,
     ) -> float:
         """Calculates absorbed phosphorus based on animal type.
 
