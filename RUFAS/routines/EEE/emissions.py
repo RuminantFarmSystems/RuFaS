@@ -322,16 +322,10 @@ class EmissionsEstimator:
         fields_with_manure_apps = {app["field_name"] for app in manure_applications}
         all_fields = list(fields_with_manure_apps | fields_with_crops)
         aggregated_manure_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
-        for app in manure_applications:
-            field_name = app["field_name"]
-            aggregated_manure_apps[field_name]["nitrogen"] += app["nitrogen"]
-            aggregated_manure_apps[field_name]["phosphorus"] += app["phosphorus"]
+        self.manure_aggregation(aggregated_manure_apps, manure_applications)
 
         aggregated_manure_requests = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
-        for request in manure_requests:
-            field_name = request["field_name"]
-            aggregated_manure_requests[field_name]["nitrogen"] += app["nitrogen"]
-            aggregated_manure_requests[field_name]["phosphorus"] += app["phosphorus"]
+        self.manure_aggregation(aggregated_manure_requests, manure_requests)
 
         grouped_soil_characteristics: dict[str, float] = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
@@ -486,15 +480,32 @@ class EmissionsEstimator:
             return feeds_grown
 
         for crop in feeds_grown:
-            self.calculate_crop_emissions_and_fertilizer_usage(
-                crop,
-                field_emissions,
-                fertilizer_applications,
-                manure_applications,
-                manure_requests,
-                total_dry_mass_per_ha_grown,
-                field_size,
+            fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
+            crop["nitrous_oxide_emissions"] = field_emissions[
+                                                  "nitrous_oxide"] * fraction_of_total_mass_grown * field_size
+            crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
+            crop["carbon_stock_change"] = (field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown *
+                                           field_size)
+            crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
+            crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
+                fertilizer_applications["nitrogen"]
+                * fraction_of_total_mass_grown
+                * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
             )
+            crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
+            crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
+                fertilizer_applications["phosphorus"]
+                * fraction_of_total_mass_grown
+                * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+            )
+            crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
+            crop["potassium_fertilizer_embedded_CO2_emissions"] = (
+                fertilizer_applications["potassium"]
+                * fraction_of_total_mass_grown
+                * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
+            )
+            crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
+            crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
 
         return feeds_grown
 
@@ -530,41 +541,11 @@ class EmissionsEstimator:
         )
 
     @staticmethod
-    def calculate_crop_emissions_and_fertilizer_usage(
-        crop: dict[str, Any],
-        field_emissions: dict[str, float],
-        fertilizer_applications: dict[str, float],
-        manure_applications: dict[str, float],
-        manure_requests: dict[str, float],
-        total_dry_mass_per_ha_grown: int,
-        field_size: float,
+    def manure_aggregation(
+        aggregated_manure: dict[str, dict[str, float]], manure_actions: list[dict[str, Any]]
     ) -> None:
-        """
-        Helper method responsible for assigning emissions, fertilizer used, and other sustainability metrics to a
-        particular crop based on how much of it was grown.
-
-        """
-        fraction_of_total_mass_grown = crop["dry_yield"] / total_dry_mass_per_ha_grown
-        crop["nitrous_oxide_emissions"] = field_emissions["nitrous_oxide"] * fraction_of_total_mass_grown * field_size
-        crop["ammonia_emissions"] = field_emissions["ammonia"] * fraction_of_total_mass_grown * field_size
-        crop["carbon_stock_change"] = field_emissions["carbon_stock_change"] * fraction_of_total_mass_grown * field_size
-        crop["nitrogen_fertilizer_used"] = fertilizer_applications["nitrogen"] * fraction_of_total_mass_grown
-        crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
-            fertilizer_applications["nitrogen"]
-            * fraction_of_total_mass_grown
-            * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
-        )
-        crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
-        crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
-            fertilizer_applications["phosphorus"]
-            * fraction_of_total_mass_grown
-            * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
-        )
-        crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
-        crop["potassium_fertilizer_embedded_CO2_emissions"] = (
-            fertilizer_applications["potassium"]
-            * fraction_of_total_mass_grown
-            * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
-        )
-        crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
-        crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
+        """Helper methods for _calculate_homegrown_feed_emissions"""
+        for app in manure_actions:
+            field_name = app["field_name"]
+            aggregated_manure[field_name]["nitrogen"] += app["nitrogen"]
+            aggregated_manure[field_name]["phosphorus"] += app["phosphorus"]
