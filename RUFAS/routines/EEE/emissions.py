@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from ..field.crop.crop_enum import CropSpecies
-from ...general_constants import GeneralConstants
 from ...input_manager import InputManager
 from ...time import Time
 from ...units import MeasurementUnits
@@ -37,6 +36,16 @@ CROP_SPECIES_TO_PURCHASED_FEED_ID = {
 SLICE_START = -365
 SLICE_END = -364
 FINAL_DAY_SLICE_START = -1
+
+
+"""
+These are constants for calculating the embedded emissions of synthetic nitrogen and phosphorus fertilizer. Their units
+are in kg CO2e / kg N and kg CO2e / kg P, respectively. The nitrogen and phosphorus constants reference IPCC 2021, GWP
+100, the potassium constant references BASF's Eco-efficiency analysis tool.
+"""
+EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR: float = 5.32
+EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR: float = 3.07
+EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR: float = 1.30
 
 
 class EmissionsEstimator:
@@ -543,19 +552,19 @@ class EmissionsEstimator:
         crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
             fertilizer_applications["nitrogen"]
             * fraction_of_total_mass_grown
-            * GeneralConstants.EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
+            * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
         )
         crop["phosphorus_fertilizer_used"] = fertilizer_applications["phosphorus"] * fraction_of_total_mass_grown
         crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
             fertilizer_applications["phosphorus"]
             * fraction_of_total_mass_grown
-            * GeneralConstants.EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
+            * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
         )
         crop["potassium_fertilizer_used"] = fertilizer_applications["potassium"] * fraction_of_total_mass_grown
         crop["potassium_fertilizer_embedded_CO2_emissions"] = (
             fertilizer_applications["potassium"]
             * fraction_of_total_mass_grown
-            * GeneralConstants.EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
+            * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
         )
         crop["manure_nitrogen_used"] = manure_applications["nitrogen"] * fraction_of_total_mass_grown
         crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
