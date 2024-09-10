@@ -125,16 +125,12 @@ class EmissionsEstimator:
                 "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
                 "variables": [".*"],
                 "date_fields": ("year", "day"),
-            }
+            },
         ]
 
         results = []
         for filter_def in filters:
-            filtered_data = self.filter_results(
-                filter_def,
-                date_cutoff,
-                *filter_def["date_fields"]
-            )
+            filtered_data = self.filter_results(filter_def, date_cutoff, *filter_def["date_fields"])
             if filter_def["name"] == "Homegrown Feeds":
                 for crop in filtered_data:
                     crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
