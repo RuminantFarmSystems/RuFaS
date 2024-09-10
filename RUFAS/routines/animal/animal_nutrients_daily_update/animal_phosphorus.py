@@ -71,7 +71,7 @@ class AnimalPhosphorus:
         return phosphorus_status
 
     @staticmethod
-    def _calculate_phosphorus_requirements(general_properties: GeneralProperties, 
+    def _calculate_phosphorus_requirements(general_properties: GeneralProperties,
                                            phosphorus_status: AnimalPhosphorusStatus,
                                            dry_matter_intake: float
                                            ) -> AnimalPhosphorusStatus:
