@@ -521,8 +521,9 @@ class EmissionsEstimator:
                 self._partition_applied_crop_fertilizer_emissions(fertilizer_application, applied_crops)
                 applied = True
             else:
-                applied = self._apply_fertilizer_to_next_crop(fertilizer_application, sorted_crops,
-                                                              fertilizer_application_date)
+                applied = self._apply_fertilizer_to_next_crop(
+                    fertilizer_application, sorted_crops, fertilizer_application_date
+                )
             if not applied:
                 self.om.add_warning(
                     "Fertilizer application not associated with any crops.",
