@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Union
+from typing import Dict, List
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.animal import Animal
@@ -60,7 +60,7 @@ class AnimalGroupingScenario(Enum):
 
         Parameters
         ----------
-        calf : Calf
+        calf : Animal
             The calf to get the animal subtype of.
 
         Returns
@@ -78,7 +78,7 @@ class AnimalGroupingScenario(Enum):
 
         Parameters
         ----------
-        heiferI : HeiferI
+        heiferI : Animal
             The heiferI to get the animal subtype of.
 
         Returns
@@ -96,7 +96,7 @@ class AnimalGroupingScenario(Enum):
 
         Parameters
         ----------
-        heiferII : HeiferII
+        heiferII : Animal
             The heiferII to get the animal subtype of.
 
         Returns
@@ -114,7 +114,7 @@ class AnimalGroupingScenario(Enum):
 
         Parameters
         ----------
-        heiferIII : HeiferIII
+        heiferIII : Animal
             The heiferIII to get the animal subtype of.
 
         Returns
@@ -132,7 +132,7 @@ class AnimalGroupingScenario(Enum):
 
         Parameters
         ----------
-        cow : Cow
+        cow : Animal
             The cow to get the animal subtype of.
 
         Returns
@@ -158,7 +158,7 @@ class AnimalGroupingScenario(Enum):
 
         Parameters
         ----------
-        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+        animal : Animal
             The animal to get the animal type of.
 
         Returns
@@ -176,7 +176,7 @@ class AnimalGroupingScenario(Enum):
 
         Parameters
         ----------
-        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+        animal : Animal
             The animal to find the animal combination for.
 
         Returns
