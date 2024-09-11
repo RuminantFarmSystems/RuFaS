@@ -8,8 +8,8 @@ from .baleage import Baleage
 from .grain import Grain, Dry, HighMoisture
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .silage import Silage, Bag, Bunker, Pile
-from ...time import Time
-from ...weather import Weather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 # Defines the compatilibty between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
