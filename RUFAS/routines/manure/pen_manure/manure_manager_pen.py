@@ -4,6 +4,7 @@ from typing import Set
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from ....enums import AnimalCombination
 from ....data_structures.pen_manure_data import PenManureData
+from RUFAS.routines.animal.animal_types import AnimalType
 
 
 class ManureManagerPen:
@@ -22,8 +23,6 @@ class ManureManagerPen:
         The number of animals in this pen.
     num_lactating_cows : int
         The number of lactating cows in this pen.
-    classes_in_pen : Set[str]
-        Set of unique animal classes in this pen.
     animal_combination : AnimalCombination
         An AnimalCombination enum that describes the current animal makeup in this pen.
     housing_type : str
@@ -61,7 +60,6 @@ class ManureManagerPen:
         """
         self.id: int = pen["id"]
         self.num_animals: int = pen["num_animals"]
-        self.classes_in_pen: Set[str] = pen["classes_in_pen"]
         self.animal_combination: AnimalCombination = pen["animal_combination"]
 
         self.housing_type: str = pen["housing_type"]
@@ -130,6 +128,6 @@ class ManureManagerPen:
 
         exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
 
-        if "LacCow" in self.classes_in_pen:
+        if AnimalCombination.LAC_COW in self.animal_combination:
             return exposed_manure_surface_area.has_lac_cows * self.num_stalls
         return exposed_manure_surface_area.no_lac_cows * self.num_stalls

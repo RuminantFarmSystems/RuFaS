@@ -799,7 +799,6 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen) -> None:
     """Tests get_manure_data in Pen."""
     pen.id = 1
     pen.animals_in_pen = {"1": 1, "2": 2, "3": 3}
-    pen.classes_in_pen = {"heiferIs", "heiferIIs"}
     pen.animal_combination = AnimalCombination.GROWING
     pen.housing_type = "barn"
     pen.pen_type = "freestall"
@@ -816,7 +815,6 @@ def test_get_manure_data(mocker: MockerFixture, pen: Pen) -> None:
     expected = PenManureData(
         id=1,
         num_animals=3,
-        classes_in_pen={"heiferIs", "heiferIIs"},
         animal_combination=AnimalCombination.GROWING,
         housing_type="barn",
         pen_type="freestall",

@@ -19,7 +19,6 @@ from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from .ration.amino_acid import EssentialAminoAcidRequirements
 from ...enums import AnimalCombination
 from ...data_structures.pen_manure_data import PenManureData
-from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 
 om = OutputManager()
 
@@ -85,9 +84,6 @@ class Pen:
 
     animals_in_pen : dictionary
         A dictionary of all animals in this pen that maps animal id to animal object.
-
-    classes_in_pen : set
-        The set (no repeats) of all the classes to which the animals in the pen belong.
 
     avg_DBW : float
         The average daily change in (delta) body weight of the animals in the pen.
@@ -223,8 +219,6 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = {}
-
-        self.classes_in_pen = set()
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -931,7 +925,6 @@ class Pen:
         return PenManureData(
             id=self.id,
             num_animals=len(self.animals_in_pen),
-            classes_in_pen=self.classes_in_pen,
             animal_combination=self.animal_combination,
             housing_type=self.housing_type,
             pen_type=self.pen_type,
