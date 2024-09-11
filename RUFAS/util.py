@@ -586,6 +586,9 @@ class Utility:
 
     @staticmethod
     def flatten_dictionary(input_dictionary: dict[str, Any], parent_key='', separator='.') -> dict[str, Any]:
+        """
+        Flatten a nested dictionary to a single level of depth by joining the keys with "."
+        """
         items = []
         for key, value in input_dictionary.items():
             new_key = parent_key + separator + key if parent_key else key
@@ -600,6 +603,9 @@ class Utility:
 
     @staticmethod
     def combine_saved_input_csv(saved_csv_path: Path) -> None:
+        """
+        Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.
+        """
         result_df = pd.DataFrame(columns=["property_group", "variable_name"])
         saved_csv_list = [file for file in os.listdir(saved_csv_path) if file.endswith(".csv")]
         for csv_file in saved_csv_list:

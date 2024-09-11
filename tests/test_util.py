@@ -693,11 +693,13 @@ def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: flo
     ]
 )
 def test_flatten_dictionary(input_dictionary: dict[str, Any], expected_output: dict[str, Any]) -> None:
+    """Tests the flatten_dictionary() in Utility"""
     actual_output = Utility.flatten_dictionary(input_dictionary)
     assert actual_output == expected_output
 
 
 def test_combine_saved_input_csv(mocker: MockerFixture) -> None:
+    """Tests the combine_saved_input_csv() in Utility"""
     mock_read_csv = mocker.patch("pandas.read_csv", return_value=pd.DataFrame())
     mock_merge_df = mocker.patch("pandas.DataFrame.merge", return_value=pd.DataFrame())
     mock_to_csv = mocker.patch("pandas.DataFrame.to_csv")

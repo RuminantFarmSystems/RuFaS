@@ -2471,6 +2471,16 @@ class InputManager:
             raise
 
     def export_pool_to_csv(self, output_prefix: str, output_path: Path) -> None:
+        """
+        Flatten the interested input data and export the variables with their values into a CSV.
+
+        Parameters
+        ----------
+        output_prefix: str
+            The output prefix for the current task.
+        output_path: Path
+            The folder to save the output CSV.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.export_pool_to_csv.__name__,
