@@ -152,10 +152,12 @@ class TaskManager:
                 "variable_name_style": "verbose",
                 "logs_directory": logs_directory,
                 "suppress_log_files": suppress_log_files,
+                "input_data_csv_export_path": Path(self.input_manager.get_data("tasks.input_data_csv_export_path"))
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
             task_id="TASK_MANAGER",
+            export_input_data_to_csv=self.input_manager.get_data("tasks.export_input_data_to_csv")
         )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -185,6 +187,9 @@ class TaskManager:
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
+            input_task["export_input_data_to_csv"] = self.input_manager.get_data("tasks.export_input_data_to_csv")
+            input_task["input_data_csv_export_path"] = Path(self.input_manager.get_data(
+                "tasks.input_data_csv_export_path"))
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
@@ -461,6 +466,9 @@ class TaskManager:
             )
             input_manager.save_metadata_properties(args["logs_directory"])
 
+        if args["export_input_data_to_csv"]:
+            input_manager.export_pool_to_csv(args["output_prefix"], args["input_data_csv_export_path"])
+
         return is_data_valid
 
     @staticmethod
@@ -472,6 +480,7 @@ class TaskManager:
         produce_graphics: bool = False,
         save_results: bool = False,
         load_pool_from_file: bool = False,
+        export_input_data_to_csv: bool = False
     ) -> None:
         """
         Handles post-processing tasks based on specified arguments.
@@ -492,7 +501,8 @@ class TaskManager:
             Whether to save results after processing.
         load_pool_from_file : bool
             Whether to load data pool from file.
-
+        export_input_data_to_csv: bool
+            Whether to export the input data to a CSV file.
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -500,6 +510,9 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
+
+        if export_input_data_to_csv:
+            Utility.combine_saved_input_csv(args["input_data_csv_export_path"])
 
         if load_pool_from_file:
             output_manager.flush_pools()

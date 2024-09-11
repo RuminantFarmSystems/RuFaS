@@ -1,9 +1,12 @@
 import datetime
+import os
 import re
 import shutil
 import numpy as np
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Tuple, Optional
+
+import pandas as pd
 
 from .general_constants import GeneralConstants
 
@@ -580,3 +583,28 @@ class Utility:
     def generate_random_number(mean: float, std_dev: float) -> float:
         """Generates a normally distributed random number using the provided mean and standard deviation."""
         return np.random.normal(mean, std_dev)
+
+    @staticmethod
+    def flatten_dictionary(input_dictionary: dict[str, Any], parent_key='', separator='.') -> dict[str, Any]:
+        items = []
+        for key, value in input_dictionary.items():
+            new_key = parent_key + separator + key if parent_key else key
+            if isinstance(value, dict):
+                items.extend(Utility.flatten_dictionary(value, new_key, separator=separator).items())
+            elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
+                for i in range(len(value)):
+                    items.extend(Utility.flatten_dictionary(value[i], new_key + f"_{i}", separator=separator).items())
+            else:
+                items.append((new_key, value))
+        return dict(items)
+
+    @staticmethod
+    def combine_saved_input_csv(saved_csv_path: Path) -> None:
+        result_df = pd.DataFrame(columns=["property_group", "variable_name"])
+        saved_csv_list = [file for file in os.listdir(saved_csv_path) if file.endswith(".csv")]
+        for csv_file in saved_csv_list:
+            csv_file_path = saved_csv_path / csv_file
+            current_df = pd.read_csv(csv_file_path)
+            result_df = current_df.merge(result_df, how="outer", on=["property_group", "variable_name"])
+        output_csv_path = saved_csv_path / "saved_input_data.csv"
+        result_df.to_csv(output_csv_path)
