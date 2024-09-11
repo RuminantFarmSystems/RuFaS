@@ -38,6 +38,7 @@ class E2ETestResultsComparer:
         test_result_path_sets = E2ETestResultsComparer._get_test_result_paths()
 
         for path_set in test_result_path_sets:
+            info_map["domain"] = path_set.domain
             om.add_log(
                 f"End-to-end testing for {path_set.domain}",
                 "Collecting and comparing actual and expected results",
@@ -45,14 +46,14 @@ class E2ETestResultsComparer:
             )
             path_to_actual_results = None
             for path in json_output_path.iterdir():
-                is_a_match = re.match(f"{str(json_output_path)}/{path_set.actual_results_path}.*", str(path))
+                is_a_match = re.match(f"{json_output_path}/{path_set.actual_results_path}.*", str(path))
                 if is_a_match:
                     path_to_actual_results = path
                     break
             else:
                 om.add_error(
-                    "End-to-end testing failed.",
-                    f"Could not find actual end-to-end testing results for {path_set.domain}",
+                    f"End-to-end testing failed for {path_set.domain}.",
+                    "Could not find actual end-to-end testing results",
                     info_map,
                 )
                 continue
