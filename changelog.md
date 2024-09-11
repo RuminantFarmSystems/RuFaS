@@ -27,3 +27,4 @@ v0.9.1
 - [1973](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [OutputManager] Avoid global variable usage of output manager [2/2].
 - [1870](https://github.com/RuminantFarmSystems/MASM/pull/1870) - [minor change] [Soil and Crop] Partition denitrified nitrates between nitrous oxide emissions and dinitrogen emissions, instead of having all denitrified nitrates leave the soil as nitrous oxide.
 - [1974](https://github.com/RuminantFarmSystems/MASM/pull/1974/) - [minor change] [Animal] Establishes the AnimalPhosphorusStatus calculator class and the AnimalPhosphorus class to perform the daily phosphorus update for each animal for eventual incorporation into the newly refreshed Animal module.
+- [1986](https://github.com/RuminantFarmSystems/MASM/pull/1986/) - [minor change] [Animal] Creates the biophysical folder, and necessary files with empty class and folders for the redesigned animal module.
