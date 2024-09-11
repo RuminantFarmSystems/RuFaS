@@ -24,8 +24,9 @@ v0.9.1
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
 - [1948](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [Soil and Crop] Utilize a residue tracker property method in the layer data pool that sums structural and metabolic litter.
 - [1980](https://github.com/RuminantFarmSystems/MASM/pull/1980) - [minor change] [Soil and Crop] Set return value and add warning when silt and clay are zero.
-- [1973](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [OutputManager] Avoid global variable usage of output manager [2/2].
+- [1973](https://github.com/RuminantFarmSystems/MASM/pull/1973) - [minor change] [OutputManager] Avoid global variable usage of output manager [2/2].
 - [1870](https://github.com/RuminantFarmSystems/MASM/pull/1870) - [minor change] [Soil and Crop] Partition denitrified nitrates between nitrous oxide emissions and dinitrogen emissions, instead of having all denitrified nitrates leave the soil as nitrous oxide.
 - [1974](https://github.com/RuminantFarmSystems/MASM/pull/1974/) - [minor change] [Animal] Establishes the AnimalPhosphorusStatus calculator class and the AnimalPhosphorus class to perform the daily phosphorus update for each animal for eventual incorporation into the newly refreshed Animal module.
 - [1944](https://github.com/RuminantFarmSystems/MASM/pull/1944) - [minor change] [GitHub Actions] Updates the Sphinx GitHub Action so that it can be triggered manually on specific branches and modifies it to not remove any .rst files.
 - [1986](https://github.com/RuminantFarmSystems/MASM/pull/1986/) - [minor change] [Animal] Creates the biophysical folder, and necessary files with empty class and folders for the redesigned animal module.
+- [1983](https://github.com/RuminantFarmSystems/MASM/pull/1983) - [minor change] [Github] Caches dependencies between Github Action jobs within the same run to speed up jobs.
