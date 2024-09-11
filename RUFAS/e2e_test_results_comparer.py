@@ -64,20 +64,21 @@ class E2ETestResultsComparer:
 
             diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
-            is_difference_in_results:bool= False if diff == {} else True
+            is_difference_in_results: bool = False if (diff == {}) else True
             if is_difference_in_results:
-                om.add_log(
-                    f"End-to-end testing succeeded for {path_set.domain}",
-                    "No differences found between actual and expected end-to-end testing results.",
-                    info_map,
-                )
-            else:
                 om.add_error(
                     f"End-to-end testing failed for {path_set.domain}",
                     "Identified differences between actual and expected results.",
                     info_map,
                 )
-            diff.update({"end_to_end_testing_passing": is_difference_in_results})
+            else:
+                om.add_log(
+                    f"End-to-end testing succeeded for {path_set.domain}",
+                    "No differences found between actual and expected end-to-end testing results.",
+                    info_map,
+                )
+            end_to_end_testing_passing: bool = not is_difference_in_results
+            diff.update({"end_to_end_testing_passing": end_to_end_testing_passing})
             info_map.update({"units": MeasurementUnits.UNITLESS, "prefix": path_set.domain})
             for comparison_type, difference in diff.items():
                 om.add_variable(comparison_type, difference, info_map)
