@@ -217,9 +217,7 @@ class HerdFactory:
 
         return self.pre_animal_population
 
-    def _init_animal_from_data(
-        self, animal_type: str, animal_data: Dict[str, Any]
-    ) -> Animal:
+    def _init_animal_from_data(self, animal_type: str, animal_data: Dict[str, Any]) -> Animal:
         """Function to initialize an animal object from input data"""
         ANIMAL_CLASSES: Dict[str, Type] = {
             "calf": Animal,
@@ -312,13 +310,9 @@ class HerdFactory:
             order_by_random=True,
         )
 
-    def _random_sample_with_replacement_by_type(
-        self, animal_type: str
-    ) -> List[Animal]:
+    def _random_sample_with_replacement_by_type(self, animal_type: str) -> List[Animal]:
         """Function to randomly sample a specific animal type with replacement"""
-        PRE_ANIMAL_DATA: Dict[
-            str, List[Animal]
-        ] = {
+        PRE_ANIMAL_DATA: Dict[str, List[Animal]] = {
             "calf": self.pre_animal_population.calves,
             "heiferI": self.pre_animal_population.heiferIs,
             "heiferII": self.pre_animal_population.heiferIIs,

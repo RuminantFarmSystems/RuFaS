@@ -727,11 +727,7 @@ class AnimalRequirements:
 
         if Animal.config["ration"]["phosphorus_requirement_buffer"] > 0:
             phosphorus_requirement = phosphorus_requirement * (
-                1
-                + (
-                    Animal.config["ration"]["phosphorus_requirement_buffer"]
-                    * GeneralConstants.PERCENTAGE_TO_FRACTION
-                )
+                1 + (Animal.config["ration"]["phosphorus_requirement_buffer"] * GeneralConstants.PERCENTAGE_TO_FRACTION)
             )
         # Requirements summary dictionary
         return {
