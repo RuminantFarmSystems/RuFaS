@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 from ..field.crop.crop_enum import CropSpecies
 from ...input_manager import InputManager
 from ...time import Time
