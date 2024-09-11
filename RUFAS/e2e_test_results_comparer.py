@@ -51,8 +51,8 @@ class E2ETestResultsComparer:
                     break
             else:
                 om.add_error(
-                    f"Could not find actual end-to-end testing results for {path_set.domain}",
                     "End-to-end testing failed.",
+                    f"Could not find actual end-to-end testing results for {path_set.domain}",
                     info_map,
                 )
                 continue
@@ -64,7 +64,7 @@ class E2ETestResultsComparer:
 
             diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
 
-            is_difference_in_results: bool = diff == {}
+            is_difference_in_results:bool= False if diff == {} else True
             if is_difference_in_results:
                 om.add_log(
                     f"End-to-end testing succeeded for {path_set.domain}",
@@ -73,7 +73,7 @@ class E2ETestResultsComparer:
                 )
             else:
                 om.add_error(
-                    f"Failed end-to-end testing for {path_set.domain}",
+                    f"End-to-end testing failed for {path_set.domain}",
                     "Identified differences between actual and expected results.",
                     info_map,
                 )
