@@ -1,7 +1,11 @@
 import datetime
 import re
+from pathlib import Path
 from typing import Any, Dict, List
+
+import pandas as pd
 import pytest
+from mock.mock import call
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 import math
@@ -666,3 +670,47 @@ def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: flo
 
     assert actual == 10.0
     random.assert_called_once_with(mean, std_dev)
+
+
+@pytest.mark.parametrize(
+    "input_dictionary, expected_output",
+    [
+        ({"a": 1,"b": {"c": 2,"d": 3}}, {"a": 1, "b.c": 2, "b.d": 3}),
+        ({"x": {"y": {"z": 4}}}, {"x.y.z": 4}),
+        ({"name": "John", "contacts": [
+            {"type": "email", "value": "john@example.com"},
+            {"type": "phone", "value": "123-456-7890"}]
+          },
+         {"name": "John", "contacts_0.type": "email", "contacts_0.value": "john@example.com",
+          "contacts_1.type": "phone", "contacts_1.value": "123-456-7890"}),
+        ({"user": {"id": 1, "name": "Alice", "attributes": {"age": 30, "languages": ["English", "Spanish"]}}},
+         {"user.id": 1, "user.name": "Alice", "user.attributes.age": 30, "user.attributes.languages":
+             ["English", "Spanish"]}),
+        ({}, {}),
+        ({"empty_dict": {}, "empty_list": [],
+          "valid_key": "value"}, {"empty_dict": {}, "empty_list": [], "valid_key": "value"}),
+        ({"items": [{}]}, {})
+    ]
+)
+def test_flatten_dictionary(input_dictionary: dict[str, Any], expected_output: dict[str, Any]) -> None:
+    actual_output = Utility.flatten_dictionary(input_dictionary)
+    assert actual_output == expected_output
+
+
+def test_combine_saved_input_csv(mocker: MockerFixture) -> None:
+    mock_read_csv = mocker.patch("pandas.read_csv", return_value=pd.DataFrame())
+    mock_merge_df = mocker.patch("pandas.DataFrame.merge", return_value=pd.DataFrame())
+    mock_to_csv = mocker.patch("pandas.DataFrame.to_csv")
+
+    mock_list_dir = mocker.patch("os.listdir", return_value=["a.csv", "b.csv", "c"])
+
+    saved_csv_path = Path("dummy/path")
+
+    Utility.combine_saved_input_csv(saved_csv_path)
+
+    mock_list_dir.assert_called_once_with(saved_csv_path)
+    mock_read_csv.assert_has_calls([
+        call(saved_csv_path / "a.csv"), call(saved_csv_path / "b.csv")
+    ])
+    assert mock_merge_df.call_count == 2
+    mock_to_csv.assert_called_once_with(saved_csv_path / "saved_input_data.csv")

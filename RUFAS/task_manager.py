@@ -172,6 +172,8 @@ class TaskManager:
         parsed_single_run_args: List[Dict[str, Any]] = []
         parsed_multi_run_args: List[Dict[str, Any]] = []
         tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
+        export_input_data_to_csv = self.input_manager.get_data("tasks.export_input_data_to_csv")
+        input_data_csv_export_path = Path(self.input_manager.get_data("tasks.input_data_csv_export_path"))
         for input_task in tasks_from_input:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             input_task["input_patch"] = None
@@ -187,9 +189,8 @@ class TaskManager:
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
-            input_task["export_input_data_to_csv"] = self.input_manager.get_data("tasks.export_input_data_to_csv")
-            input_task["input_data_csv_export_path"] = Path(self.input_manager.get_data(
-                "tasks.input_data_csv_export_path"))
+            input_task["export_input_data_to_csv"] = export_input_data_to_csv
+            input_task["input_data_csv_export_path"] = input_data_csv_export_path
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
