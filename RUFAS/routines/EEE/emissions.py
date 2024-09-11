@@ -563,7 +563,7 @@ class EmissionsEstimator:
         self,
         fertilizer_application: dict[str, Any],
         sorted_crops: list[dict[str, Any]],
-        fertilizer_application_date: datetime.date,
+        fertilizer_application_date: date,
     ) -> bool:
         """
         Applies fertilizer to the next available crop after harvest and before the next planting.
