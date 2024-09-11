@@ -546,15 +546,15 @@ class EmissionsEstimator:
         for crop in applied_crops:
             split_factor = 1 / len(applied_crops)
             crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"] * split_factor
-            crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
+            crop["nitrogen_fertilizer_embedded_CO2_emissions"] += (
                 fertilizer_application["nitrogen"] * split_factor * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
             )
             crop["phosphorus_fertilizer_used"] += fertilizer_application["phosphorus"] * split_factor
-            crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
+            crop["phosphorus_fertilizer_embedded_CO2_emissions"] += (
                 fertilizer_application["phosphorus"] * split_factor * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
             )
             crop["potassium_fertilizer_used"] += fertilizer_application["potassium"] * split_factor
-            crop["potassium_fertilizer_embedded_CO2_emissions"] = (
+            crop["potassium_fertilizer_embedded_CO2_emissions"] += (
                 fertilizer_application["potassium"] * split_factor * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
             )
 
@@ -568,24 +568,25 @@ class EmissionsEstimator:
         Applies fertilizer to the next available crop after harvest and before the next planting.
         Returns True if fertilizer was applied, False otherwise.
         """
-        for i, crop in enumerate(sorted_crops):
+        for index, crop in enumerate(sorted_crops):
             crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
-            if i + 1 < len(sorted_crops):
-                next_crop = sorted_crops[i + 1]
+            next_crop_exists = index + 1 < len(sorted_crops)
+            if next_crop_exists:
+                next_crop = sorted_crops[index + 1]
                 next_crop_planting_date = Time.convert_year_jday_to_date(
                     next_crop["planting_year"], next_crop["planting_day"]
                 )
                 if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
                     next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
-                    next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] = (
+                    next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] += (
                         fertilizer_application["nitrogen"] * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
                     )
                     next_crop["phosphorus_fertilizer_used"] += fertilizer_application["phosphorus"]
-                    next_crop["phosphorus_fertilizer_embedded_CO2_emissions"] = (
+                    next_crop["phosphorus_fertilizer_embedded_CO2_emissions"] += (
                         fertilizer_application["phosphorus"] * EMBEDDED_PHOSPHORUS_FERTILIZER_EMISSIONS_FACTOR
                     )
                     next_crop["potassium_fertilizer_used"] += fertilizer_application["potassium"]
-                    next_crop["potassium_fertilizer_embedded_CO2_emissions"] = (
+                    next_crop["potassium_fertilizer_embedded_CO2_emissions"] += (
                         fertilizer_application["potassium"] * EMBEDDED_POTASSIUM_FERTILIZER_EMISSIONS_FACTOR
                     )
                     return True
@@ -605,7 +606,7 @@ class EmissionsEstimator:
 
         Returns
         -------
-        list
+        list[dict[str, Any]]
             A list of the crops whose planting and harvesting dates encompass the fertilizer application date.
         """
         applied_crops = []
@@ -614,6 +615,6 @@ class EmissionsEstimator:
             crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"])
             crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
 
-            if crop_planting_date <= fertilizer_application_date <= crop_harvest_date:
+            if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops
