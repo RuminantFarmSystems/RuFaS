@@ -93,7 +93,7 @@ class EmissionsEstimator:
         time_filter = {
             "name": "Time Filter",
             "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                           "which crop yields and nutrient applications to estimate emissions for.",
+            "which crop yields and nutrient applications to estimate emissions for.",
             "filters": ["Time.(day|calendar_year)"],
             "slice_start": SLICE_START,
             "slice_end": SLICE_END,
@@ -104,38 +104,34 @@ class EmissionsEstimator:
         date_cutoff = Time.convert_year_jday_to_date(year_cutoff, day_cutoff)
 
         filters: dict[str, dict[str, Any]] = {
-            "homegrown feeds filter":
-                {
-                    "name": "Homegrown Feeds",
-                    "description": "Collects all crop harvests that occurred in the simulation.",
-                    "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-                    "variables": [".*"],
-                    "date_fields": ("harvest_year", "harvest_day"),
-                },
-            "fertilizer applications filter":
-                {
-                    "name": "Fertilizer Applications",
-                    "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
-                    "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
-                    "variables": [".*"],
-                    "date_fields": ("year", "day"),
-                },
-            "manure applications filter":
-                {
-                    "name": "Manure Applications",
-                    "description": "Collects all manure applications that occurred in the simulation.",
-                    "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
-                    "variables": [".*"],
-                    "date_fields": ("year", "day"),
-                },
-            "manure requests filter":
-                {
-                    "name": "Manure Requests",
-                    "description": "Collects all manure requests that occurred in the simulation.",
-                    "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
-                    "variables": [".*"],
-                    "date_fields": ("year", "day"),
-                },
+            "homegrown feeds filter": {
+                "name": "Homegrown Feeds",
+                "description": "Collects all crop harvests that occurred in the simulation.",
+                "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
+                "variables": [".*"],
+                "date_fields": ("harvest_year", "harvest_day"),
+            },
+            "fertilizer applications filter": {
+                "name": "Fertilizer Applications",
+                "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
+                "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
+                "variables": [".*"],
+                "date_fields": ("year", "day"),
+            },
+            "manure applications filter": {
+                "name": "Manure Applications",
+                "description": "Collects all manure applications that occurred in the simulation.",
+                "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
+                "variables": [".*"],
+                "date_fields": ("year", "day"),
+            },
+            "manure requests filter": {
+                "name": "Manure Requests",
+                "description": "Collects all manure requests that occurred in the simulation.",
+                "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
+                "variables": [".*"],
+                "date_fields": ("year", "day"),
+            },
         }
 
         results = {}
@@ -312,17 +308,15 @@ class EmissionsEstimator:
         fields_with_crops = set(grouped_feeds.keys())
         fields_with_fertilizer_apps = {app["field_name"] for app in fertilizer_applications}
         all_fields = list(fields_with_fertilizer_apps | fields_with_crops)
-        aggregated_fertilizer_apps = self._aggregate_data(fertilizer_applications, all_fields, ["nitrogen",
-                                                                                                "phosphorus",
-                                                                                                "potassium"])
+        aggregated_fertilizer_apps = self._aggregate_data(
+            fertilizer_applications, all_fields, ["nitrogen", "phosphorus", "potassium"]
+        )
 
         fields_with_manure_apps = {app["field_name"] for app in manure_applications}
         all_fields = list(fields_with_manure_apps | fields_with_crops)
-        aggregated_manure_apps = self._aggregate_data(manure_applications, all_fields, ["nitrogen",
-                                                                                        "phosphorus"])
+        aggregated_manure_apps = self._aggregate_data(manure_applications, all_fields, ["nitrogen", "phosphorus"])
 
-        aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen",
-                                                                                        "phosphorus"])
+        aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen", "phosphorus"])
 
         grouped_soil_characteristics: dict[str, float] = self._collect_target_soil_characteristics(grouped_feeds.keys())
 
@@ -388,7 +382,7 @@ class EmissionsEstimator:
             ammonia_filter = {
                 "name": "Soil Ammonia emissions",
                 "description": "Collects the ammonia emissions from all soil layers in the field in the last year of "
-                               "the simulation.",
+                "the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',layer=.*",
                 ],
@@ -402,7 +396,7 @@ class EmissionsEstimator:
             nitrous_oxide_filter = {
                 "name": "Soil Nitrous Oxide emissions",
                 "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year"
-                               " of the simulation.",
+                " of the simulation.",
                 "filters": [
                     f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"
                 ],
@@ -540,10 +534,9 @@ class EmissionsEstimator:
             )
         )
 
-    def _aggregate_data(self,
-                        operations: list[dict[str, Any]],
-                        all_fields: list[str],
-                        nutrients: list[str]) -> dict[str, dict[str, float]]:
+    def _aggregate_data(
+        self, operations: list[dict[str, Any]], all_fields: list[str], nutrients: list[str]
+    ) -> dict[str, dict[str, float]]:
         """
         Aggregate nutrient data for different types of applications (fertilizer, manure, etc.).
 
