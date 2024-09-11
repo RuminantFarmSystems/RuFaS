@@ -1,4 +1,4 @@
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import ReproStateEnum
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import ReproStateEnum
 
 
 class ReproStateManager:

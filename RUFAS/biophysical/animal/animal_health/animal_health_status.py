@@ -1,5 +1,5 @@
 from typing import Optional
-from RUFAS.routines.animal.animal_health.outcomes import DiseaseOutcomes
+from RUFAS.biophysical.animal.animal_health.outcomes import DiseaseOutcomes
 
 
 class AnimalHealthStatus:

@@ -9,11 +9,11 @@ from scipy.optimize import OptimizeResult, minimize
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
-from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.ration.user_defined_ration import (
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AvailableFeedsTypedDict
+from RUFAS.biophysical.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.biophysical.animal.ration.ration_config import RationConfig
+from RUFAS.biophysical.animal.ration.user_defined_ration import (
     UserDefinedRationManager as UserDefinedRationManager,
 )
 

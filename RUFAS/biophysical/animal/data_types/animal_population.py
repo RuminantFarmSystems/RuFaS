@@ -2,11 +2,7 @@ from dataclasses import dataclass
 from random import shuffle
 from typing import List, Dict
 
-from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.biophysical.animal.animal import Animal
 
 
 @dataclass(kw_only=True)
@@ -35,12 +31,12 @@ class AnimalPopulation:
 
     """
 
-    calves: List[Calf]
-    heiferIs: List[HeiferI]
-    heiferIIs: List[HeiferII]
-    heiferIIIs: List[HeiferIII]
-    cows: List[Cow]
-    replacement: List[Cow]
+    calves: List[Animal]
+    heiferIs: List[Animal]
+    heiferIIs: List[Animal]
+    heiferIIIs: List[Animal]
+    cows: List[Animal]
+    replacement: List[Animal]
 
     current_animal_id: int = 0
     order_by_random: bool = True
@@ -76,7 +72,7 @@ class AnimalPopulation:
         self.current_animal_id += 1
         return self.current_animal_id
 
-    def get_calves(self) -> List[Calf]:
+    def get_calves(self) -> List[Animal]:
         """
         Retrieve a list of Calf instances.
 
@@ -89,7 +85,7 @@ class AnimalPopulation:
             shuffle(self.calves)
         return self.calves
 
-    def get_heiferIs(self) -> List[HeiferI]:
+    def get_heiferIs(self) -> List[Animal]:
         """
         Retrieve a list of HeiferI instances.
 
@@ -103,7 +99,7 @@ class AnimalPopulation:
 
         return self.heiferIs
 
-    def get_heiferIIs(self) -> List[HeiferII]:
+    def get_heiferIIs(self) -> List[Animal]:
         """
         Retrieve a list of HeiferII instances.
 
@@ -117,7 +113,7 @@ class AnimalPopulation:
 
         return self.heiferIIs
 
-    def get_heiferIIIs(self) -> List[HeiferIII]:
+    def get_heiferIIIs(self) -> List[Animal]:
         """
         Retrieve a list of HeiferIII instances.
 
@@ -130,7 +126,7 @@ class AnimalPopulation:
             shuffle(self.heiferIIIs)
         return self.heiferIIIs
 
-    def get_cows(self) -> List[Cow]:
+    def get_cows(self) -> List[Animal]:
         """
         Retrieve a list of Cow instances.
 
@@ -143,7 +139,7 @@ class AnimalPopulation:
             shuffle(self.cows)
         return self.cows
 
-    def get_replacement_cows(self) -> List[Cow]:
+    def get_replacement_cows(self) -> List[Animal]:
         """
         Retrieve a list of replacement Cow instances.
 

@@ -1,4 +1,4 @@
-from RUFAS.routines.animal.animal_health.animal_health_status import AnimalHealthStatus
+from RUFAS.biophysical.animal.animal_health.animal_health_status import AnimalHealthStatus
 from RUFAS.time import Time
 from abc import ABC, abstractmethod
 

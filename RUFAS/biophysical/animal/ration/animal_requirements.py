@@ -5,10 +5,10 @@ import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_types import AnimalType
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
-from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 
 om = OutputManager()
 
@@ -560,7 +560,7 @@ class AnimalRequirements:
             thryptophan=0.0,
             valine=0.0,
         )
-        if AnimalBase.config["nutrient_standard"] == "NRC":
+        if Animal.config["nutrient_standard"] == "NRC":
             (
                 net_energy_maintenance,
                 conceptus_weight,
@@ -632,7 +632,7 @@ class AnimalRequirements:
                 dry_matter_intake_estimate,
             )
 
-        elif AnimalBase.config["nutrient_standard"] == "NASEM":
+        elif Animal.config["nutrient_standard"] == "NASEM":
             net_energy_lactation = self.calculate_NASEM_energy_lactation_requirements(
                 animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
             )
@@ -720,16 +720,16 @@ class AnimalRequirements:
             )
         else:
             nutrient_standard_error = f"Nutrient Standard \
-                {AnimalBase.config['nutrient_standard']} \
+                {Animal.config['nutrient_standard']} \
                 not supported"
             info_map = {"function": self.calc_rqmts}
             om.add_error("nutrient_standard_error", nutrient_standard_error, info_map)
 
-        if AnimalBase.config["ration"]["phosphorus_requirement_buffer"] > 0:
+        if Animal.config["ration"]["phosphorus_requirement_buffer"] > 0:
             phosphorus_requirement = phosphorus_requirement * (
                 1
                 + (
-                    AnimalBase.config["ration"]["phosphorus_requirement_buffer"]
+                    Animal.config["ration"]["phosphorus_requirement_buffer"]
                     * GeneralConstants.PERCENTAGE_TO_FRACTION
                 )
             )
@@ -1973,7 +1973,7 @@ class AnimalRequirements:
 
         """
         distance_km = distance * GeneralConstants.M_TO_KM
-        nutrient_standard = AnimalBase.config["nutrient_standard"]
+        nutrient_standard = Animal.config["nutrient_standard"]
         if nutrient_standard == "NRC":
             # Activity requirements
             # ---------------------
