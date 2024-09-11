@@ -165,10 +165,10 @@ class OutputManager(object):
     @property
     def _filter_prefixes(self) -> dict[str, str]:
         """Returns the appropriate set of acceptable filter prefixes."""
-        if not self.is_end_to_end_testing_run:
-            return self.__supported_filter_types_prefixes
-        else:
+        if self.is_end_to_end_testing_run:
             return self.__end_to_end_testing_filter_prefixes
+        else:
+            return self.__supported_filter_types_prefixes
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
