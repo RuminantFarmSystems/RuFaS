@@ -589,7 +589,7 @@ class Utility:
         items = []
         for key, value in input_dictionary.items():
             new_key = parent_key + separator + key if parent_key else key
-            if isinstance(value, dict):
+            if isinstance(value, dict) and value:
                 items.extend(Utility.flatten_dictionary(value, new_key, separator=separator).items())
             elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], dict):
                 for i in range(len(value)):
