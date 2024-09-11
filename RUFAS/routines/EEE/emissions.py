@@ -312,25 +312,15 @@ class EmissionsEstimator:
         fields_with_crops = set(grouped_feeds.keys())
         fields_with_fertilizer_apps = {app["field_name"] for app in fertilizer_applications}
         all_fields = list(fields_with_fertilizer_apps | fields_with_crops)
-        # aggregated_fertilizer_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0, "potassium": 0.0} for key in all_fields}
-        # for app in fertilizer_applications:
-        #     field_name = app["field_name"]
-        #     aggregated_fertilizer_apps[field_name]["nitrogen"] += app["nitrogen"]
-        #     aggregated_fertilizer_apps[field_name]["phosphorus"] += app["phosphorus"]
-        #     aggregated_fertilizer_apps[field_name]["potassium"] += app["potassium"]
         aggregated_fertilizer_apps = self._aggregate_data(fertilizer_applications, all_fields, ["nitrogen",
                                                                                                 "phosphorus",
                                                                                                 "potassium"])
 
         fields_with_manure_apps = {app["field_name"] for app in manure_applications}
         all_fields = list(fields_with_manure_apps | fields_with_crops)
-        # aggregated_manure_apps = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
-        # aggregated_manure_apps = self._aggregate_manure_operations(aggregated_manure_apps, manure_applications)
         aggregated_manure_apps = self._aggregate_data(manure_applications, all_fields, ["nitrogen",
                                                                                         "phosphorus"])
 
-        # aggregated_manure_requests = {key: {"nitrogen": 0.0, "phosphorus": 0.0} for key in all_fields}
-        # aggregated_manure_requests = self._aggregate_manure_operations(aggregated_manure_requests, manure_requests)
         aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen",
                                                                                         "phosphorus"])
 
@@ -394,49 +384,6 @@ class EmissionsEstimator:
         soil_info = {}
         for name in field_names:
             sanitized_name = re.escape(name)
-            # filters: dict[str, dict[str, Any]] = {
-            #     "ammonia":
-            #         {
-            #             "name": "Soil Ammonia emissions",
-            #             "description": "Collects the ammonia emissions from all soil layers in the field in the last "
-            #                            "year of the simulation.",
-            #             "filters": [
-            #                 f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',"
-            #                 f"layer=.*",
-            #             ],
-            #             "slice_start": SLICE_START,
-            #         },
-            #     "nitrous_oxide":
-            #         {
-            #             "name": "Soil Nitrous Oxide emissions",
-            #             "description": "Collects the nitrous oxide emissions from all soil layers in the field in the "
-            #                            "last year of the simulation.",
-            #             "filters": [
-            #                 f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',"
-            #                 f"layer=.*"
-            #             ],
-            #             "slice_start": SLICE_START,
-            #         },
-            #     "starting_carbon_stock_filter":
-            #         {
-            #             "name": "Starting soil profile carbon stock",
-            #             "description": "Collects the soil carbon stock level 365 days before the simulation ended.",
-            #             "filters": [
-            #                 f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
-            #             ],
-            #             "slice_start": SLICE_START,
-            #             "slice_end": SLICE_END,
-            #         },
-            #     "ending_carbon_stock_filter":
-            #         {
-            #             "name": "Ending soil profile carbon stock",
-            #             "description": "Collects the soil carbon stock level on the last day of the simulation.",
-            #             "filters": [
-            #                 f"FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='{sanitized_name}'"
-            #             ],
-            #             "slice_start": FINAL_DAY_SLICE_START,
-            #         }
-            # }
             soil_data = {}
             ammonia_filter = {
                 "name": "Soil Ammonia emissions",
