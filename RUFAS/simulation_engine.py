@@ -18,6 +18,13 @@ from RUFAS.weather import Weather
 from .routines.EEE.EEE_manager import EEEManager
 
 
+"""
+Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
+TODO: remove this constant after Animal and Feed Storage modules are connected - #1878
+"""
+FEED_DEGRADATION_INTERVAL_LENGTH = 15
+
+
 class SimulationEngine:
     """
     The SimulationEngine class is responsible for orchestrating the entire simulation
@@ -117,7 +124,7 @@ class SimulationEngine:
 
         # TODO: remove this code after Animal and Feed Storage modules are connected - #1878
         if self.is_end_to_end_test_run:
-            process_degradations_today = self.time.current_julian_day % 15 == 0
+            process_degradations_today = self.time.current_julian_day % FEED_DEGRADATION_INTERVAL_LENGTH == 0
             if process_degradations_today:
                 self.feed_manager.process_degradations(self.weather, self.time)
 
