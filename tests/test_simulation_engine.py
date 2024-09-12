@@ -21,11 +21,12 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.simulation_engine.Time", return_value=mock_time)
 
     # Act
-    simulation_engine = SimulationEngine()
+    simulation_engine = SimulationEngine(is_end_to_end_test_run=False)
 
     # Assert
     mock_initialize_simulation.assert_called_once()
     assert simulation_engine.time == mock_time
+    assert simulation_engine.is_end_to_end_test_run is False
 
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
@@ -160,7 +161,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
 
     mock_weather = mocker.MagicMock()
     patch_for_weather = mocker.patch("RUFAS.simulation_engine.Weather", return_value=mock_weather)
-    simulation_engine.set_is_end_to_end_test_run(False)
+    simulation_engine.is_end_to_end_test_run = False
 
     mock_time = mocker.MagicMock()
     simulation_engine.time = mock_time
