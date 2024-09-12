@@ -21,11 +21,12 @@ def test_simulation_engine_init(mocker: MockerFixture) -> None:
     mocker.patch("RUFAS.simulation_engine.Time", return_value=mock_time)
 
     # Act
-    simulation_engine = SimulationEngine()
+    simulation_engine = SimulationEngine(is_end_to_end_test_run=False)
 
     # Assert
     mock_initialize_simulation.assert_called_once()
     assert simulation_engine.time == mock_time
+    assert simulation_engine.is_end_to_end_test_run is False
 
 
 @pytest.mark.parametrize("start_time, end_time", [(100, 200), (300, 400)])
@@ -88,7 +89,8 @@ def test_simulate(mocker: MockerFixture, start_time: int, end_time: int) -> None
     mock_estimate_emissions.assert_called_once()
 
 
-def test_daily_simulation(mocker: MockerFixture) -> None:
+@pytest.mark.parametrize("is_end_to_end_test_run", [True, False])
+def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -> None:
     """
     Unit test for function _daily_simulation in file RUFAS/simulation_engine.py
     """
@@ -97,6 +99,7 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
     mocker.patch.object(SimulationEngine, "__init__", return_value=None)
     simulation_engine = SimulationEngine()
     simulation_engine.day_counter = 100
+    simulation_engine.is_end_to_end_test_run = is_end_to_end_test_run
     simulation_engine.feed = mocker.MagicMock()
     simulation_engine.animal_manager = mocker.MagicMock()
     simulation_engine.animal_manager.simulation_day = expected_animal_manager_sim_day = 10
@@ -104,6 +107,8 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
     simulation_engine.field_manager = mocker.MagicMock()
     simulation_engine.weather = mocker.MagicMock()
     simulation_engine.time = mocker.MagicMock()
+    simulation_engine.time.current_julian_day = 15
+    simulation_engine.feed_manager = mocker.MagicMock()
     simulation_engine.animal_manager.all_pens = mocker.MagicMock()
     mock_pen_manure_data = [mocker.MagicMock(autospec=PenManureData)]
     mocker.patch.object(simulation_engine.animal_manager, "collect_pen_manure_data", return_value=mock_pen_manure_data)
@@ -115,6 +120,12 @@ def test_daily_simulation(mocker: MockerFixture) -> None:
     simulation_engine._daily_simulation()
 
     # Assert
+    if is_end_to_end_test_run:
+        simulation_engine.feed_manager.process_degradations.assert_called_once_with(
+            simulation_engine.weather, simulation_engine.time
+        )
+    else:
+        simulation_engine.feed_manager.assert_not_called()
     simulation_engine.animal_manager.daily_updates.assert_called_once_with(
         simulation_engine.feed,
         simulation_engine.weather,
@@ -150,6 +161,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
 
     mock_weather = mocker.MagicMock()
     patch_for_weather = mocker.patch("RUFAS.simulation_engine.Weather", return_value=mock_weather)
+    simulation_engine.is_end_to_end_test_run = False
 
     mock_time = mocker.MagicMock()
     simulation_engine.time = mock_time
@@ -197,6 +209,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     )
     patch_for_field_manager.assert_called_once_with(manure_manager=mock_manure_manager, feed_manager=mock_feed_manager)
     patch_for_feed_manager.assert_called_once()
+    mock_feed_manager.setup_stored_feeds.assert_not_called()
 
 
 @pytest.mark.parametrize(

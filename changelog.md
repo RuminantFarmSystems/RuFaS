@@ -30,3 +30,4 @@ v0.9.1
 - [1944](https://github.com/RuminantFarmSystems/MASM/pull/1944) - [minor change] [GitHub Actions] Updates the Sphinx GitHub Action so that it can be triggered manually on specific branches and modifies it to not remove any .rst files.
 - [1986](https://github.com/RuminantFarmSystems/MASM/pull/1986/) - [minor change] [Animal] Creates the biophysical folder, and necessary files with empty class and folders for the redesigned animal module.
 - [1979](https://github.com/RuminantFarmSystems/MASM/pull/1979) - [minor change] [EEE] Updates synthetic fertilizer emissions to be partitioned by crop schedule instead of by dry yield.
+- [1784](https://github.com/RuminantFarmSystems/MASM/pull/1784) - [minor change] [Task Manager][Feed Storage] Adds end-to-end testing routine for the Feed Storage module which can be extended to test other parts of RuFaS.
