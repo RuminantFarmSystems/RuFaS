@@ -5,7 +5,7 @@ from ...input_manager import InputManager
 from ...time import Time
 from ...units import MeasurementUnits
 from ...output_manager import OutputManager
-from typing import Any
+from typing import Any, Literal
 import re
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
@@ -54,12 +54,12 @@ class EmissionsEstimator:
 
     def estimate_emissions(self) -> None:
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
-        self._calculate_purchased_feed_emissions(fertilizer_apps["homegrown feeds filter result"])
+        self._calculate_purchased_feed_emissions(fertilizer_apps["Homegrown Feeds"])
         self._calculate_homegrown_feed_emissions(
-            fertilizer_apps["homegrown feeds filter result"],
-            fertilizer_apps["fertilizer applications filter result"],
-            fertilizer_apps["manure applications filter result"],
-            fertilizer_apps["manure requests filter result"],
+            fertilizer_apps["Homegrown Feeds"],
+            fertilizer_apps["Fertilizer Applications"],
+            fertilizer_apps["Manure Applications"],
+            fertilizer_apps["Manure Requests"],
         )
 
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
@@ -126,20 +126,21 @@ class EmissionsEstimator:
                 "date_fields": ("year", "day"),
             },
             "manure requests filter": {
-                "name": "Manure Applications",
-                "descriptions": "Collects all manure applications that occurred in the simulation.",
+                "name": "Manure Requests",
+                "description": "Collects all manure requests that occurred in the simulation.",
                 "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
                 "variables": [".*"],
                 "date_fields": ("year", "day"),
             },
         }
+
         results = {}
         for operation_filter_key in filters:
             operation_filter = filters[operation_filter_key]
             filtered_data = self._filter_results(operation_filter, date_cutoff, *operation_filter["date_fields"])
-            results[f"{operation_filter_key} result"] = filtered_data
+            results[operation_filter["name"]] = filtered_data
 
-        for crop in results["homegrown feeds filter result"]:
+        for crop in results["Homegrown Feeds"]:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
         return results
@@ -373,36 +374,31 @@ class EmissionsEstimator:
         soil_info = {}
         for name in field_names:
             sanitized_name = re.escape(name)
-            soil_data = {}
-            ammonia_filter = {
-                "name": "Soil Ammonia emissions",
-                "description": "Collects the ammonia emissions from all soil layers in the field in the last year of "
-                "the simulation.",
-                "filters": [
-                    f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}',layer=.*",
-                ],
-                "slice_start": SLICE_START,
+            filters: dict[str, dict[str, Any]] = {
+                "ammonia":
+                    {
+                        "name": "Soil Ammonia emissions",
+                        "description": "Collects the ammonia emissions from all soil layers in the field in the last "
+                                       "year of the simulation.",
+                        "filters": [
+                            f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}'"
+                            f",layer=.*",
+                        ],
+                        "slice_start": SLICE_START,
+                    },
+                "nitrous_oxide":
+                    {
+                        "name": "Soil Nitrous Oxide emissions",
+                        "description": "Collects the nitrous oxide emissions from all soil layers in the field in the "
+                                       "last year of the simulation.",
+                        "filters": [
+                            f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',"
+                            f"layer=.*"
+                        ],
+                        "slice_start": SLICE_START,
+                    }
             }
-
-            ammonia_emissions = self.om.filter_variables_pool(ammonia_filter)
-
-            soil_data["ammonia"] = sum([sum(ammonia_emissions[key]["values"]) for key in ammonia_emissions.keys()])
-
-            nitrous_oxide_filter = {
-                "name": "Soil Nitrous Oxide emissions",
-                "description": "Collects the nitrous oxide emissions from all soil layers in the field in the last year"
-                " of the simulation.",
-                "filters": [
-                    f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',layer=.*"
-                ],
-                "slice_start": SLICE_START,
-            }
-
-            nitrous_oxide_emissions = self.om.filter_variables_pool(nitrous_oxide_filter)
-
-            soil_data["nitrous_oxide"] = sum(
-                [sum(nitrous_oxide_emissions[key]["values"]) for key in nitrous_oxide_emissions.keys()]
-            )
+            soil_data = self._soil_data_update(filters)
 
             starting_carbon_stock_filter = {
                 "name": "Starting soil profile carbon stock",
@@ -656,3 +652,25 @@ class EmissionsEstimator:
             if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops
+
+    def _soil_data_update(self, filters: dict[str, dict[str, Any]]) -> dict[str, int | Literal[0]]:
+        """
+        This method will update the soil data update according to data extracted using the filters.
+
+        Parameters
+        ----------
+        filters: dict[str, dict[str, Any]]
+            A dictionary of filters to retrieve data from the OM.
+
+        Return
+        ------
+        dict[str, int | Literal[0]]
+            The updated soil data.
+
+        """
+        soil_data = {}
+        for key in filters.keys():
+            emissions = self.om.filter_variables_pool(filters[key])
+            soil_data[key] = sum([sum(emissions[key]["values"]) for key in emissions.keys()])
+
+        return soil_data
