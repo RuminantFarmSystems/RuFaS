@@ -432,12 +432,15 @@ class TaskManager:
         }
         TaskManager.handle_herd_initializaition(args, output_manager)
 
-        output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-        simulator = SimulationEngine()
-
-        # TODO: Remove this if statement and setter call when Animal and Feed Storage modules are completed - #1878.
+        # TODO: Remove this if statement and argument to SimulationEngine init when Animal and Feed Storage modules are
+        # completed - #1878.
         if args["task_type"] == TaskType.END_TO_END_TESTING:
-            simulator.set_is_end_to_end_test_run(True)
+            is_end_to_end_test_run = True
+        else:
+            is_end_to_end_test_run = False
+
+        output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
+        simulator = SimulationEngine(is_end_to_end_test_run=is_end_to_end_test_run)
 
         simulator.simulate()
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)

@@ -31,6 +31,12 @@ class SimulationEngine:
     process for RuFaS. It manages the simulation's lifecycle, advancing time, executing daily
     and annual routines, and logging simulation progress.
 
+    Parameters
+    ----------
+    is_end_to_end_test_run : bool
+        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        Indicates if a simulation is being run for end-to-end testing.
+
     Attributes
     ----------
     weather : Weather
@@ -48,8 +54,8 @@ class SimulationEngine:
         The FieldManager object that manages all fields in the simulation.
     is_end_to_end_test_run : bool
         TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
-        Indicates if a simulation is being run for end-to-end testing. Defaults to False, is set to True if end-to-end
-        testing inputs are found in the Input Manager.
+        Indicates if a simulation is being run for end-to-end testing. Set to True if end-to-end testing inputs are
+        found in the Input Manager.
 
     Methods
     -------
@@ -57,7 +63,7 @@ class SimulationEngine:
         Execute the simulation process.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, is_end_to_end_test_run: bool) -> None:
         """
         Initializes the simulation engine.
         """
@@ -66,7 +72,7 @@ class SimulationEngine:
         self.time = Time()
 
         # TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
-        self.is_end_to_end_test_run = False
+        self.is_end_to_end_test_run = is_end_to_end_test_run
 
         self._initialize_simulation()
 
@@ -106,11 +112,6 @@ class SimulationEngine:
         total_simulation_time = t_end_sim - t_start_sim
         total_simulation_time_log = f"Total simulation time is: {total_simulation_time}"
         self.om.add_log("total_simulation_time", total_simulation_time_log, info_map)
-
-    # TODO: remove this setter when Animal and Feed Storage modules are connected - #1878
-    def set_is_end_to_end_test_run(self, is_end_to_end_test_run: bool) -> None:
-        """Setter for the is_end_to_end_test_run attribute of SimulationEngine."""
-        self.is_end_to_end_test_run = is_end_to_end_test_run
 
     def _run_simulation_main_loop(self) -> None:
         """
