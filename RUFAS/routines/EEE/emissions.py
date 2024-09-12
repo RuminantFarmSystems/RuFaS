@@ -375,28 +375,26 @@ class EmissionsEstimator:
         for name in field_names:
             sanitized_name = re.escape(name)
             filters: dict[str, dict[str, Any]] = {
-                "ammonia":
-                    {
-                        "name": "Soil Ammonia emissions",
-                        "description": "Collects the ammonia emissions from all soil layers in the field in the last "
-                                       "year of the simulation.",
-                        "filters": [
-                            f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}'"
-                            f",layer=.*",
-                        ],
-                        "slice_start": SLICE_START,
-                    },
-                "nitrous_oxide":
-                    {
-                        "name": "Soil Nitrous Oxide emissions",
-                        "description": "Collects the nitrous oxide emissions from all soil layers in the field in the "
-                                       "last year of the simulation.",
-                        "filters": [
-                            f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',"
-                            f"layer=.*"
-                        ],
-                        "slice_start": SLICE_START,
-                    }
+                "ammonia": {
+                    "name": "Soil Ammonia emissions",
+                    "description": "Collects the ammonia emissions from all soil layers in the field in the last "
+                    "year of the simulation.",
+                    "filters": [
+                        f"FieldDataReporter.send_daily_variables.ammonia_emissions.field='{sanitized_name}'"
+                        f",layer=.*",
+                    ],
+                    "slice_start": SLICE_START,
+                },
+                "nitrous_oxide": {
+                    "name": "Soil Nitrous Oxide emissions",
+                    "description": "Collects the nitrous oxide emissions from all soil layers in the field in the "
+                    "last year of the simulation.",
+                    "filters": [
+                        f"FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field='{sanitized_name}',"
+                        f"layer=.*"
+                    ],
+                    "slice_start": SLICE_START,
+                },
             }
             soil_data = self._soil_data_update(filters)
 
