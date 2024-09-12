@@ -54,12 +54,12 @@ class EmissionsEstimator:
 
     def estimate_emissions(self) -> None:
         fertilizer_apps = self._gather_homegrown_feeds_and_fertilizer_apps()
-        self._calculate_purchased_feed_emissions(fertilizer_apps["Homegrown Feeds"])
+        self._calculate_purchased_feed_emissions(fertilizer_apps["homegrown feeds filter result"])
         self._calculate_homegrown_feed_emissions(
-            fertilizer_apps["Homegrown Feeds"],
-            fertilizer_apps["Fertilizer Applications"],
-            fertilizer_apps["Manure Applications"],
-            fertilizer_apps["Manure Requests"],
+            fertilizer_apps["homegrown feeds filter result"],
+            fertilizer_apps["fertilizer applications filter result"],
+            fertilizer_apps["manure applications filter result"],
+            fertilizer_apps["manure requests filter result"],
         )
 
     def _calculate_purchased_feed_emissions(self, homegrown_feeds: list[dict[str, Any]]) -> None:
@@ -126,21 +126,20 @@ class EmissionsEstimator:
                 "date_fields": ("year", "day"),
             },
             "manure requests filter": {
-                "name": "Manure Requests",
-                "description": "Collects all manure requests that occurred in the simulation.",
+                "name": "Manure Applications",
+                "descriptions": "Collects all manure applications that occurred in the simulation.",
                 "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
                 "variables": [".*"],
                 "date_fields": ("year", "day"),
             },
         }
-
         results = {}
         for operation_filter_key in filters:
             operation_filter = filters[operation_filter_key]
             filtered_data = self._filter_results(operation_filter, date_cutoff, *operation_filter["date_fields"])
-            results[operation_filter["name"]] = filtered_data
+            results[f"{operation_filter_key} result"] = filtered_data
 
-        for crop in results["Homegrown Feeds"]:
+        for crop in results["homegrown feeds filter result"]:
             crop["total_dry_yield"] = crop["dry_yield"] * crop["field_size"]
 
         return results
