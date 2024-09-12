@@ -1001,8 +1001,9 @@ class AnimalManager:
         """
         for animal in animal_type_list:
             current_pen_id = self.animal_to_pen_id_map[animal.id]
-            animal.update_pen_history(current_pen_id, self.simulation_day,
-                                      self.all_pens[current_pen_id].animal_combination)
+            animal.update_pen_history(
+                current_pen_id, self.simulation_day, self.all_pens[current_pen_id].animal_combination
+            )
 
     def collect_pen_manure_data(self) -> list[PenManureData]:
         """Returns the manure information from all pens in PenManureData."""
