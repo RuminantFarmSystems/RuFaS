@@ -532,7 +532,7 @@ class EmissionsEstimator:
             )
 
     def _filter_results(
-        self, filters: dict[str, Any], date_cutoff: datetime, year_key: str, day_key: str
+        self, filters: dict[str, Any], date_cutoff: date, year_key: str, day_key: str
     ) -> list[dict[str, Any]]:
         """
         This method help with filtering data based on the timeframe provided.
