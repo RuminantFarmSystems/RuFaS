@@ -432,7 +432,7 @@ class TaskManager:
         }
         TaskManager.handle_herd_initializaition(args, output_manager)
 
-        # TODO: Remove this if statement and argument to SimulationEngine init when Animal and Feed Storage modules are
+        # TODO: Remove this if-else block and argument to SimulationEngine init when Animal and Feed Storage modules are
         # completed - #1878.
         if args["task_type"] == TaskType.END_TO_END_TESTING:
             is_end_to_end_test_run = True
