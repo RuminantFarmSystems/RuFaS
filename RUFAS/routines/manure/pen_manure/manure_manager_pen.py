@@ -128,6 +128,6 @@ class ManureManagerPen:
 
         exposed_manure_surface_area = exposed_manure_surface_area_by_pen_type[self.pen_type]
 
-        if AnimalCombination.LAC_COW in self.animal_combination:
+        if AnimalCombination.LAC_COW == self.animal_combination:
             return exposed_manure_surface_area.has_lac_cows * self.num_stalls
         return exposed_manure_surface_area.no_lac_cows * self.num_stalls
