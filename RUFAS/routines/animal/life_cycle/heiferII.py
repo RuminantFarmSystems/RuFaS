@@ -393,14 +393,14 @@ class HeiferII(HeiferI):
 
         self.days_born += 1
 
-        if self.body_weight < self.mature_body_weight:
+        if self.body_weight < 0.82*self.mature_body_weight:
             # Heifer can only grow to a maximum weight of mature_body_weight
             self.daily_growth = self.get_bw_change()
 
             self.body_weight += self.daily_growth
 
         else:
-            self.body_weight = self.mature_body_weight
+            self.body_weight = 0.82*self.mature_body_weight
             self.events.add_event(self.days_born, sim_day, const.MATURE_BODY_WEIGHT_REGULAR)
 
         if self.repro_program != HeiferII.get_user_defined_repro_protocol():

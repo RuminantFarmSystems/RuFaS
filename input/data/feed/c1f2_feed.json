@@ -1,8 +1,8 @@
 {
   "calf_feeds": [202, 216],
   "growing_feeds": [31, 91, 108, 230, 239, 231, 232, 248, 251],
-  "close_up_feeds": [91, 108, 167],
-  "lac_cow_feeds": [22, 31, 46, 51, 91, 108, 110, 119, 167, 230, 239, 231, 232, 248, 251],
+  "close_up_feeds": [91, 108, 167,301],
+  "lac_cow_feeds": [22, 31, 46, 51, 91, 108, 110, 119, 167, 230, 239, 231, 232, 248, 251, 301],
   "purchased_feeds": [
     {
       "purchased_feed":22,
@@ -70,6 +70,10 @@
     },
     {
       "purchased_feed": 110,
+      "purchased_feed_cost": 0.01
+    },
+    {
+      "purchased_feed": 301,
       "purchased_feed_cost": 0.01
     }
   ],

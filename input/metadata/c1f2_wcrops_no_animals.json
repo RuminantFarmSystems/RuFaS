@@ -3,7 +3,7 @@
     "config": {
       "title": "Config Data",
       "description": "Configuration file for general simulation parameters.",
-      "path": "input/data/config/c1f2_config.json",
+      "path": "input/data/config/c1f2_config_no_animals.json",
       "type": "json",
       "properties": "config_properties"
     },

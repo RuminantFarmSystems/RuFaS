@@ -251,7 +251,7 @@ class ManurePool:
             The temperature factor on the current day (unitless).
 
         """
-        if self.manure_dry_mass > 0 and self.manure_field_coverage > 0:
+        if self.manure_applied_mass > 0 and self.manure_field_coverage > 0:
             change_in_machine_manure_moisture = self._determine_moisture_change(
                 rainfall,
                 self.manure_moisture_factor,

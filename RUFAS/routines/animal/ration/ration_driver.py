@@ -144,7 +144,7 @@ class RationManager:
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen
         elif pen.ration != {}:
-            return pen.ration, ration_vals
+            return pen.ration_per_animal, ration_vals
         else:
             om.add_error(
                 "No previous ration available",
