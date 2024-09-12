@@ -574,11 +574,9 @@ class EmissionsEstimator:
         operations : list[dict[str, Any]]
             A list of application dictionaries. Each dictionary contains the field name and nutrient amounts.
             Example: {"field_name": "Field1", "nitrogen": 50.0, "phosphorus": 20.0}
-
         all_fields : list[str]
             A list of field names to aggregate data for, usually combining fields with crops and fields with
             applications.
-
         nutrients : list[str]
             A list of nutrient keys to aggregate (e.g., ["nitrogen", "phosphorus", "potassium"]).
 
