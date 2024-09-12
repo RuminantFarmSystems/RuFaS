@@ -2787,7 +2787,6 @@ def test_filter_saved_pools(
 
 def test_run_startup_sequence_clear_output_directory(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
@@ -2805,6 +2804,7 @@ def test_run_startup_sequence_clear_output_directory(
     dummy_output_prefix: str = "dummy_prefix"
     dummy_version_number: str = "0.0"
     dummy_task_id: str = "dummy_task"
+    is_e2e_run: bool = True
 
     mock_output_manager.run_startup_sequence(
         dummy_verbosity,
@@ -2815,6 +2815,7 @@ def test_run_startup_sequence_clear_output_directory(
         dummy_output_prefix,
         dummy_version_number,
         dummy_task_id,
+        is_e2e_run,
     )
 
     mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
@@ -2824,11 +2825,11 @@ def test_run_startup_sequence_clear_output_directory(
     mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
     mock_create_directory.assert_called_once_with(dummy_output_directory)
     mock_clear_output_dir.assert_called_once_with(dummy_variables_file_path, dummy_output_directory)
+    assert mock_output_manager.is_end_to_end_testing_run == is_e2e_run
 
 
 def test_run_startup_sequence_not_clear_output_directory(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
@@ -2846,6 +2847,7 @@ def test_run_startup_sequence_not_clear_output_directory(
     dummy_output_prefix: str = "dummy_prefix"
     dummy_version_number: str = "0.0"
     dummy_task_id: str = "dummy_task"
+    is_e2e_run: bool = False
 
     mock_output_manager.run_startup_sequence(
         dummy_verbosity,
@@ -2856,6 +2858,7 @@ def test_run_startup_sequence_not_clear_output_directory(
         dummy_output_prefix,
         dummy_version_number,
         dummy_task_id,
+        False,
     )
 
     mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
@@ -2865,3 +2868,4 @@ def test_run_startup_sequence_not_clear_output_directory(
     mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
     mock_create_directory.assert_called_once_with(dummy_output_directory)
     mock_clear_output_dir.assert_not_called()
+    assert mock_output_manager.is_end_to_end_testing_run == is_e2e_run
