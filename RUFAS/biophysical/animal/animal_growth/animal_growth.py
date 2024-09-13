@@ -1,0 +1,2 @@
+class AnimalGrowth:
+    pass
