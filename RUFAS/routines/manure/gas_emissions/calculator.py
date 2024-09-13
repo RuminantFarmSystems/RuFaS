@@ -1341,5 +1341,5 @@ class GasEmissionsCalculator:
         float
             The empirical nitrogen loss from nitrous oxide emission (kg :math:`N_2O`-N/day).
         """
-
+        print("dummy line")
         return emission_factor_kg_nitrous_oxide_N_per_kg_manure_N * manure_nitrogen_kg_N_per_day
