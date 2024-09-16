@@ -14,13 +14,13 @@ class CurrentDayConditions:
 
     Attributes
     ----------
-    incoming_light: float, optional, default=None
+    incoming_light: float, default=None
         Incoming light radiation energy (MJ/m^2).
-    min_air_temperature: float, optional, default=None
+    min_air_temperature: float, default=None
         Minimum air temperature for the day (C).
-    mean_air_temperature: float, optional, default=None
+    mean_air_temperature: float, default=None
         Average air temperature for the day (C).
-    max_air_temperature: float, optional, default=None
+    max_air_temperature: float, default=None
         Maximum air temperature for the day (C).
     daylength: float, optional, default=None
         Length of time from sunup to sundown on the day (hours).
@@ -42,10 +42,10 @@ class CurrentDayConditions:
 
     """
 
-    incoming_light: Optional[float] = None
-    min_air_temperature: Optional[float] = None
-    mean_air_temperature: Optional[float] = None
-    max_air_temperature: Optional[float] = None
+    incoming_light: float = None
+    min_air_temperature: float = None
+    mean_air_temperature: float = None
+    max_air_temperature: float = None
     daylength: Optional[float] = None
     annual_mean_air_temperature: Optional[float] = None
     snowfall: float = 0.0
