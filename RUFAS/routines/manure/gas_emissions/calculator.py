@@ -1345,7 +1345,7 @@ class GasEmissionsCalculator:
         return emission_factor_kg_nitrous_oxide_N_per_kg_manure_N * manure_nitrogen_kg_N_per_day
 
     @staticmethod
-    def adjust_air_temperature(air_temperature: float) -> float:
+    def determine_barn_air_temperature(air_temperature: float) -> float:
         """Adjusts the air temperature to be more reflective of the range found inside a barn.
 
         Parameters

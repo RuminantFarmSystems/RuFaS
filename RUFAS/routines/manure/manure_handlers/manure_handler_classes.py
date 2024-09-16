@@ -135,7 +135,7 @@ class BaseManureHandler:
         housing_ammonia_emission = 0.0
 
         air_temperature = self._get_current_day_average_temperature_in_celsius()
-        barn_temperature = GasEmissionsCalculator.adjust_air_temperature(air_temperature)
+        barn_temperature = GasEmissionsCalculator.determine_barn_air_temperature(air_temperature)
 
         if pen.pen_type in ["freestall", "tiestall"]:
             housing_methane_emission = GasEmissionsCalculator.calculate_housing_methane_emission(
