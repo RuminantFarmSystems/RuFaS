@@ -910,3 +910,17 @@ def test_nitrogen_loss_in_open_lots_from_ammonia_emission(
             GasEmissionsCalculator.nitrogen_loss_in_open_lots_from_ammonia_emission(daily_nitrogen_input)
             == expected_output
         )
+
+
+@pytest.mark.parametrize(
+    "input_temp, expected_output",
+    [
+        (0.0, 5.0),           # Below the minimum threshold
+        (5.0, 5.0),           # At the lower boundary
+        (10.0, 10.0),         # Within the range
+        (30.0, 30.0),         # At the upper boundary
+        (35.0, 30.0),         # Above the maximum threshold
+    ]
+)
+def test_adjust_air_temperature(input_temp: float, expected_output: float):
+    assert GasEmissionsCalculator.adjust_air_temperature(input_temp) == expected_output
