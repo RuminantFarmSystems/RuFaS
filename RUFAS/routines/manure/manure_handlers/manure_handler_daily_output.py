@@ -184,7 +184,7 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_daily_volume: float = field(init=False)
     liquid_manure_daily_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
 
-    air_temperature: float = 0.0
+    air_temperature: float | None = 0.0
     air_temperature_unit: MeasurementUnits = MeasurementUnits.DEGREES_CELSIUS
 
     barn_temperature: float = 0.0

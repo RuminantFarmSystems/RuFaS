@@ -92,7 +92,7 @@ class BaseManureHandler:
         self.config = manure_handler_config
         self.milking_parlor = MilkingParlor()
 
-    def _get_current_day_average_temperature_in_celsius(self) -> float:
+    def _get_current_day_average_temperature_in_celsius(self) -> float | None:
         """Gets the average temperature of the day, in Celsius.
 
         Returns
