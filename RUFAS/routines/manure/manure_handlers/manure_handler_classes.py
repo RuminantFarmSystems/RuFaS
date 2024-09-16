@@ -92,7 +92,7 @@ class BaseManureHandler:
         self.config = manure_handler_config
         self.milking_parlor = MilkingParlor()
 
-    def _get_current_day_average_temperature_in_celsius(self) -> float:
+    def _get_current_day_average_temperature_in_celsius(self) -> float | None:
         """Gets the average temperature of the day, in Celsius.
 
         Returns
@@ -134,23 +134,26 @@ class BaseManureHandler:
         housing_carbon_dioxide_emission = 0.0
         housing_ammonia_emission = 0.0
 
+        air_temperature = self._get_current_day_average_temperature_in_celsius()
+        barn_temperature = GasEmissionsCalculator.adjust_air_temperature(air_temperature)
+
         if pen.pen_type in ["freestall", "tiestall"]:
-            housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
+            housing_methane_emission = GasEmissionsCalculator.calculate_housing_methane_emission(
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
-                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+                barn_temperature=barn_temperature,
             )
 
-            housing_carbon_dioxide_emission = GasEmissionsCalculator.housing_carbon_dioxide_emission(
+            housing_carbon_dioxide_emission = GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission(
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
-                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+                barn_temperature=barn_temperature,
             )
 
-            housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
+            housing_ammonia_emission = GasEmissionsCalculator.calculate_housing_ammonia_emission(
                 num_animals=pen.num_animals,
-                barn_area=pen.exposed_manure_surface_area_from_pen_type,  # m^2/animal
-                urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,  # kg
-                urine=pen.manure.urine,  # kg
-                temp=self._get_current_day_average_temperature_in_celsius(),
+                barn_area=pen.exposed_manure_surface_area_from_pen_type,
+                urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,
+                urine=pen.manure.urine,
+                barn_temperature=barn_temperature
             )
 
         if bedding:
@@ -189,7 +192,8 @@ class BaseManureHandler:
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)
             ),
-            tempC=self._get_current_day_average_temperature_in_celsius(),
+            air_temperature=air_temperature,
+            barn_temperature=barn_temperature,
             num_animals=pen.num_animals,
         )
 
