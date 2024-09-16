@@ -374,9 +374,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
 
     current_barn_temp = 30.0
     patch_for_adjust_air_temp = mocker.patch(
-        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
-        "adjust_air_temperature",
-        return_value=current_barn_temp
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator." "adjust_air_temperature",
+        return_value=current_barn_temp,
     )
 
     # Act
@@ -531,9 +530,8 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
     )
     current_barn_temp = 30.0
     patch_for_adjust_air_temp = mocker.patch(
-        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
-        "adjust_air_temperature",
-        return_value=current_barn_temp
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator." "adjust_air_temperature",
+        return_value=current_barn_temp,
     )
 
     manure_handler_daily_output = mock_manure_handler.daily_update(pen=mock_pen, bedding=None, sim_day=sim_day)

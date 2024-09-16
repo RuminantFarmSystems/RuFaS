@@ -153,7 +153,7 @@ class BaseManureHandler:
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
                 urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,
                 urine=pen.manure.urine,
-                barn_temperature=barn_temperature
+                barn_temperature=barn_temperature,
             )
 
         if bedding:

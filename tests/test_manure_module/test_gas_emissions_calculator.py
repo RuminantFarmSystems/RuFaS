@@ -595,7 +595,9 @@ def test_housing_ammonia_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.calculate_housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
+            GasEmissionsCalculator.calculate_housing_ammonia_emission(
+                num_animals, barn_area, urine_tan, urine, temp, pH, hsc
+            )
     else:
         actual = GasEmissionsCalculator.calculate_housing_ammonia_emission(
             num_animals, barn_area, urine_tan, urine, temp, pH, hsc
@@ -915,12 +917,12 @@ def test_nitrogen_loss_in_open_lots_from_ammonia_emission(
 @pytest.mark.parametrize(
     "input_temp, expected_output",
     [
-        (0.0, 5.0),           # Below the minimum threshold
-        (5.0, 5.0),           # At the lower boundary
-        (10.0, 10.0),         # Within the range
-        (30.0, 30.0),         # At the upper boundary
-        (35.0, 30.0),         # Above the maximum threshold
-    ]
+        (0.0, 5.0),  # Below the minimum threshold
+        (5.0, 5.0),  # At the lower boundary
+        (10.0, 10.0),  # Within the range
+        (30.0, 30.0),  # At the upper boundary
+        (35.0, 30.0),  # Above the maximum threshold
+    ],
 )
 def test_adjust_air_temperature(input_temp: float, expected_output: float):
     assert GasEmissionsCalculator.adjust_air_temperature(input_temp) == expected_output
