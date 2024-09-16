@@ -8,7 +8,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 import json
-import re
 
 
 ResultPathType = namedtuple("ResultPaths", ["domain", "expected_results_path", "actual_results_path"])
@@ -46,8 +45,8 @@ class E2ETestResultsComparer:
             )
             path_to_actual_results = None
             for path in json_output_path.iterdir():
-                escaped_path = re.escape(str(json_output_path / path_set.actual_results_path))
-                is_a_match = re.match(f"{escaped_path}.*", str(path))
+                actual_results_base_path = Path(path_set.actual_results_path)
+                is_a_match = path.name.startswith(actual_results_base_path.name)
                 if is_a_match:
                     path_to_actual_results = path
                     break
