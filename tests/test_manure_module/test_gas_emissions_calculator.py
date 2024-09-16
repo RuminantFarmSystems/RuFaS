@@ -342,9 +342,9 @@ def test_housing_carbon_dioxide_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_carbon_dioxide_emission(barn_area, barn_temp)
+            GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission(barn_area, barn_temp)
     else:
-        actual = GasEmissionsCalculator.housing_carbon_dioxide_emission(barn_area, barn_temp)
+        actual = GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission(barn_area, barn_temp)
         assert actual == pytest.approx(expected)
 
 
@@ -510,9 +510,9 @@ def test_housing_methane_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_methane_emission(barn_area, barn_temp)
+            GasEmissionsCalculator.calculate_housing_methane_emission(barn_area, barn_temp)
     else:
-        actual = GasEmissionsCalculator.housing_methane_emission(barn_area, barn_temp)
+        actual = GasEmissionsCalculator.calculate_housing_methane_emission(barn_area, barn_temp)
         assert actual == pytest.approx(expected)
 
 
@@ -595,9 +595,9 @@ def test_housing_ammonia_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
+            GasEmissionsCalculator.calculate_housing_ammonia_emission(num_animals, barn_area, urine_tan, urine, temp, pH, hsc)
     else:
-        actual = GasEmissionsCalculator.housing_ammonia_emission(
+        actual = GasEmissionsCalculator.calculate_housing_ammonia_emission(
             num_animals, barn_area, urine_tan, urine, temp, pH, hsc
         )
         assert actual == pytest.approx(expected)

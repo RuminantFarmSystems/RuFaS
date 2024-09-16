@@ -134,25 +134,26 @@ class BaseManureHandler:
         housing_carbon_dioxide_emission = 0.0
         housing_ammonia_emission = 0.0
 
+        air_temperature = self._get_current_day_average_temperature_in_celsius()
+        barn_temperature = GasEmissionsCalculator.adjust_air_temperature(air_temperature)
+
         if pen.pen_type in ["freestall", "tiestall"]:
-            air_temp = self._get_current_day_average_temperature_in_celsius()
-            barn_temp = self._adjust_air_temperature(air_temp)
-            housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
+            housing_methane_emission = GasEmissionsCalculator.calculate_housing_methane_emission(
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
-                barn_temp=barn_temp,
+                barn_temperature=barn_temperature,
             )
 
-            housing_carbon_dioxide_emission = GasEmissionsCalculator.housing_carbon_dioxide_emission(
+            housing_carbon_dioxide_emission = GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission(
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
-                barn_temp=barn_temp,
+                barn_temperature=barn_temperature,
             )
 
-            housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
+            housing_ammonia_emission = GasEmissionsCalculator.calculate_housing_ammonia_emission(
                 num_animals=pen.num_animals,
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
                 urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,
                 urine=pen.manure.urine,
-                temp=barn_temp
+                barn_temperature=barn_temperature
             )
 
         if bedding:
@@ -191,7 +192,8 @@ class BaseManureHandler:
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)
             ),
-            tempC=self._get_current_day_average_temperature_in_celsius(),
+            air_temperature=air_temperature,
+            barn_temperature=barn_temperature,
             num_animals=pen.num_animals,
         )
 
@@ -215,27 +217,6 @@ class BaseManureHandler:
         )
 
         return cleaning_water_volume
-
-    @staticmethod
-    def _adjust_air_temperature(air_temp: float) -> float:
-        """Adjusts the air temperature to be more reflective of the range found inside a barn.
-
-        Parameters
-        ----------
-        air_temp : float
-            The air temperature.
-
-        Returns
-        -------
-        float
-            The barn temperature.
-        """
-        if air_temp < 5:
-            return 5
-        elif 5 <= air_temp <= 30:
-            return air_temp
-        else:
-            return 30
 
 
 class FlushSystem(BaseManureHandler):

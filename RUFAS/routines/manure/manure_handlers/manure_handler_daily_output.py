@@ -103,10 +103,14 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         Same as total_daily_manure_volume. Used for satisfying the LiquidManurePortionProtocol.
     liquid_manure_daily_volume_unit: MeasurementUnits
         Unit for liquid_manure_daily_volume
-    tempC: float
+    air_temp: float
         Temperature of the current day, C.
-    tempC_unit: MeasurementUnits
-        Unit for tempC
+    air_temp_unit: MeasurementUnits
+        Unit for air_temp.
+    barn_temp: float
+        Temperature in the barn, C.
+    barn_temp_unit: MeasurementUnits
+        Unit for barn_temp.
     num_animals: int
         Number of animals in the pen each day.
     num_animals_unit: MeasurementUnits
@@ -180,8 +184,11 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     liquid_manure_daily_volume: float = field(init=False)
     liquid_manure_daily_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
 
-    tempC: float = 0.0
-    tempC_unit: MeasurementUnits = MeasurementUnits.DEGREES_CELSIUS
+    air_temperature: float = 0.0
+    air_temperature_unit: MeasurementUnits = MeasurementUnits.DEGREES_CELSIUS
+
+    barn_temperature: float = 0.0
+    barn_temperature_unit: MeasurementUnits = MeasurementUnits.DEGREES_CELSIUS
 
     num_animals: int = -1
     num_animals_unit: MeasurementUnits = MeasurementUnits.UNITLESS
