@@ -53,7 +53,7 @@ class CurrentDayConditions:
     irrigation: float = 0.0
     precipitation: float = 0.0
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Sets precipitation as snow_fall or rainfall depending on mean air temperature"""
         is_freezing = self.mean_air_temperature < 0.0
         if is_freezing:
