@@ -46,7 +46,8 @@ class E2ETestResultsComparer:
             )
             path_to_actual_results = None
             for path in json_output_path.iterdir():
-                is_a_match = re.match(f"{json_output_path}/{path_set.actual_results_path}.*", str(path))
+                escaped_path = re.escape(str(json_output_path / path_set.actual_results_path))
+                is_a_match = re.match(f"{escaped_path}.*", str(path))
                 if is_a_match:
                     path_to_actual_results = path
                     break
