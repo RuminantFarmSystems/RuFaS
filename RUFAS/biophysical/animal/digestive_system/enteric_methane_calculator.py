@@ -1,5 +1,6 @@
 import math
 
+from RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator import MethaneMitigationCalculator
 from RUFAS.general_constants import GeneralConstants
 
 
@@ -88,7 +89,11 @@ class EntericMethaneCalculator:
             The daily enteric emissions for cows (g/day).
 
         """
-        methane_emission = 0.0
+        dry_matter_intake = nutrient_amounts["dm"]
+        NDF_concentration = nutrient_concentrations["NDF"]
+        EE_concentration = nutrient_concentrations["EE"]
+        starch_concentration = nutrient_concentrations["starch"]
+
         if is_lactating:
             methane_emission = EntericMethaneCalculator._lactating_cow_manure(body_weight,
                                                                               milk_fat,
@@ -102,6 +107,25 @@ class EntericMethaneCalculator:
                                                                         nutrient_amounts,
                                                                         nutrient_concentrations)
 
+        if methane_mitigation_method:
+            methane_yield = 0.0
+            methane_yield_reduction = 0.0
+            if dry_matter_intake != 0:
+                methane_yield = methane_emission / dry_matter_intake
+                methane_yield_reduction = MethaneMitigationCalculator.methane_mitigation(
+                    NDF_concentration,
+                    EE_concentration,
+                    starch_concentration,
+                    methane_mitigation_method,
+                    methane_mitigation_additive_amount,
+                )
+
+            methane_emission = (
+                methane_yield * (1 + methane_yield_reduction / GeneralConstants.FRACTION_TO_PERCENTAGE) *
+                dry_matter_intake
+            )
+
+        return methane_emission
 
     @staticmethod
     def _lactating_cow_manure(body_weight: float, milk_fat: float, metabolizable_energy_intake: float,
@@ -195,11 +219,9 @@ class EntericMethaneCalculator:
             methane_emission = (
                                    45.98
                                    - 45.98
-                                   * math.exp(
-                                   -((
-                                             -0.0011 * starch_concentration / ADF_concentration) + 0.0045) * metabolizable_energy_intake * 4.184
-                               )
-                               ) / 0.05565
+                                   * math.exp(-((
+                                                        -0.0011 * starch_concentration / ADF_concentration) + 0.0045) *
+                                              metabolizable_energy_intake * 4.184)) / 0.05565
         else:
             # Default: IPCC Tier 2
             gross_energy_concentration = (
@@ -208,4 +230,3 @@ class EntericMethaneCalculator:
             methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565  # [A.3B.C.3]
 
         return methane_emission
-
