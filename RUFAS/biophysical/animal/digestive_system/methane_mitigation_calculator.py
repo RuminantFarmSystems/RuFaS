@@ -47,4 +47,3 @@ class MethaneMitigationCalculator:
             methane_yield_reduction = 0.0
 
         return methane_yield_reduction
-
