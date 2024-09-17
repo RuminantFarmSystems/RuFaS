@@ -1,5 +1,4 @@
 from typing import TypedDict
-from datetime import date
 
 
 class MilkProductionRecord(TypedDict):
@@ -8,17 +7,17 @@ class MilkProductionRecord(TypedDict):
 
     Attributes
     ----------
-    record_date : date
-        Date of this milk production record.
+    simulation_day : int
+        Simulation day of milk production was recorded on.
     days_in_milk : int
         Number of days of the animal into milking.
     milk_production : float
         Amount of milk produced by the animal (kg).
     days_born : int
-        Age of the animal in days.
+        Age of the animal (days).
 
     """
-    record_date: date
+    simulation_day: int
     days_in_milk: int
     milk_production: float
     days_born: int
