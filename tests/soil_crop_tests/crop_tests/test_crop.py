@@ -51,10 +51,11 @@ def test_perform_daily_crop_update(
     mock_allocate_biomass = mocker.patch.object(crop._biomass_allocation, "allocate_biomass")
 
     # Create mock objects for the conditions, field data, and soil data
-    mock_conditions = mocker.Mock(spec=CurrentDayConditions(min_air_temperature=-1,
-                                                            max_air_temperature=1,
-                                                            mean_air_temperature=2,
-                                                            incoming_light=12))
+    mock_conditions = mocker.Mock(
+        spec=CurrentDayConditions(
+            min_air_temperature=-1, max_air_temperature=1, mean_air_temperature=2, incoming_light=12
+        )
+    )
     mock_field_data = mocker.Mock(spec=FieldData)
     mock_soil_data = mocker.Mock(spec=SoilData)
 
