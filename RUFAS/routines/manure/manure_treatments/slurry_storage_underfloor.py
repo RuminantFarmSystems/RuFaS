@@ -71,7 +71,7 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
 
         """
         air_temperature = self._get_current_day_average_temperature_celsius()
-        barn_temperature = GasEmissionsCalculator.determine_barn_air_temeprature(air_temperature)
+        barn_temperature = GasEmissionsCalculator.determine_barn_air_temperature(air_temperature)
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(

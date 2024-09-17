@@ -688,7 +688,7 @@ def test_arrhenius_exponent(
         ),
     ],
 )
-def test_methane_emission_from_slurry_storage(
+def test_calculate_methane_emission_from_slurry_storage(
     mocker: MockerFixture,
     total_volatile_solids: float,
     temp: float | None,
@@ -696,7 +696,7 @@ def test_methane_emission_from_slurry_storage(
     error_message: str | None,
 ) -> None:
     """
-    Unit test for methane_emission_from_slurry_storage() method in calculator.py.
+    Unit test for calculate_methane_emission_from_slurry_storage() method in calculator.py.
 
     This test verifies that the method correctly calculates the methane emission from manure storage
     given the total volatile solids and temperature. It also checks that the method raises an exception for
@@ -804,7 +804,7 @@ def test_methane_emission_from_slurry_storage(
         ),
     ],
 )
-def test_storage_ammonia_emission(
+def test_calculate_storage_ammonia_emission(
     num_animals: int,
     storage_area: float,
     manure_tan: float,
@@ -816,7 +816,7 @@ def test_storage_ammonia_emission(
     error_message: str | None,
 ) -> None:
     """
-    Unit test for storage_ammonia_emission() method in calculator.py.
+    Unit test for calculate_storage_ammonia_emission() method in calculator.py.
 
     This test verifies that the method correctly calculates the ammonia storage emissions
     given the number of animals, the storage area, manure total ammoniacal nitrogen, manure volume,
@@ -826,7 +826,7 @@ def test_storage_ammonia_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.storage_ammonia_emission(
+            GasEmissionsCalculator.calculate_storage_ammonia_emission(
                 num_animals,
                 manure_tan,
                 manure_volume,
@@ -836,7 +836,7 @@ def test_storage_ammonia_emission(
                 pH,
             )
     else:
-        actual = GasEmissionsCalculator.storage_ammonia_emission(
+        actual = GasEmissionsCalculator.calculate_storage_ammonia_emission(
             num_animals,
             manure_tan,
             manure_volume,
