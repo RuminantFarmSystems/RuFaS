@@ -20,11 +20,13 @@ def mock_om() -> OutputManager:
     [
         (
             SoilData(previous_day_snow_temperature=-3.5, snow_lag_factor=1.0, field_size=10),
-            CurrentDayConditions(mean_air_temperature=-3),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=-9, mean_air_temperature=-3,
+                                 max_air_temperature=6),
         ),
         (
             SoilData(previous_day_snow_temperature=-5, snow_lag_factor=1.0, field_size=10),
-            CurrentDayConditions(mean_air_temperature=-10),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=-9, mean_air_temperature=-10,
+                                 max_air_temperature=6),
         ),
     ],
 )
@@ -54,7 +56,8 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
                 snow_melt_base_temperature=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-3, max_air_temperature=-1),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=-3, mean_air_temperature=-3,
+                                 max_air_temperature=-1),
             15,
         ),
         (
@@ -65,7 +68,8 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
                 snow_melt_base_temperature=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=3, max_air_temperature=5),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=3,
+                                 max_air_temperature=5),
             25,
         ),
         (
@@ -76,7 +80,8 @@ def test_calc_snow_temp(soil_data: SoilData, current_day_conditions: CurrentDayC
                 snow_melt_base_temperature=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=3, max_air_temperature=5),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=3,
+                                 max_air_temperature=5),
             25,
         ),
     ],
@@ -161,7 +166,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=0.0),
             15,
         ),
         (
@@ -176,7 +182,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=1.0),
             25,
         ),
         (
@@ -191,7 +198,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=0.0),
             15,
         ),
         (
@@ -206,7 +214,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=0.0),
             15,
         ),
         (
@@ -221,7 +230,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=1.0),
             15,
         ),
         (
@@ -236,7 +246,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=1.0),
             15,
         ),
         (
@@ -251,7 +262,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=0.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=0.0),
             15,
         ),
         (
@@ -266,7 +278,8 @@ def test_melt_factor(soil_data: SoilData, day: int):
                 snow_coverage_fraction=1.0,
                 field_size=10,
             ),
-            CurrentDayConditions(mean_air_temperature=-5, max_air_temperature=-1, snowfall=1.0),
+            CurrentDayConditions(incoming_light=11.3, min_air_temperature=3, mean_air_temperature=-5,
+                                 max_air_temperature=-1, snowfall=1.0),
             15,
         ),
     ],
