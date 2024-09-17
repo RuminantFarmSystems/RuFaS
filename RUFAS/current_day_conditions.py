@@ -22,10 +22,10 @@ class CurrentDayConditions:
         Average air temperature for the day (C).
     max_air_temperature: float
         Maximum air temperature for the day (C).
-    annual_mean_air_temperature: float
-        Average annual air temperature for the year (C).
     daylength: float, optional, default=None
         Length of time from sunup to sundown on the day (hours).
+    annual_mean_air_temperature: float, optional, default=None
+        Average annual air temperature for the year (C).
     snowfall: float, default=0.0
         Amount of snow that falls on the day (mm).
     rainfall: float, default=0.0
@@ -46,8 +46,8 @@ class CurrentDayConditions:
     min_air_temperature: float
     mean_air_temperature: float
     max_air_temperature: float
-    annual_mean_air_temperature: float
     daylength: Optional[float] = None
+    annual_mean_air_temperature: Optional[float] = None
     snowfall: float = 0.0
     rainfall: float = 0.0
     irrigation: float = 0.0
