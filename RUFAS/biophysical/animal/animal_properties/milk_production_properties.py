@@ -35,12 +35,13 @@ class MilkProductionProperties:
         History of a cow's milk production.
 
     """
+
     true_protein_content: float  # Old var name: milk_protein_kg
     fat_content: float  # Old name: milk_fat_kg
     milk_production_reduction: float
     latest_305_day_milk_production: float  # Old var name: latest_milk_production_305days
     crude_protein_percent: float  # Old var name: CP_milk
-    true_protein_percent : float  # Old var name: mPrt
+    true_protein_percent: float  # Old var name: mPrt
     fat_percent: float
     lactose_percent: float  # Old var name: lactose
     wood_l: float

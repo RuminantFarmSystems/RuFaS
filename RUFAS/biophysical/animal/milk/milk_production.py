@@ -58,7 +58,10 @@ class MilkProduction:
 
         general_properties.days_in_milk += 1
         general_properties.estimated_daily_milk_produced = MilkProduction.calculate_daily_milk_production(
-            general_properties.days_in_milk, milking_properties.wood_l, milking_properties.wood_m, milking_properties.wood_n
+            general_properties.days_in_milk,
+            milking_properties.wood_l,
+            milking_properties.wood_m,
+            milking_properties.wood_n,
         )
         general_properties.estimated_daily_milk_produced = MilkProduction._adjust_milk_production(
             general_properties.estimated_daily_milk_produced, milking_properties.milk_production_reduction
@@ -148,7 +151,7 @@ class MilkProduction:
                 simulation_day=time.simulation_day,
                 days_in_milk=general_properties.days_in_milk,
                 milk_production=general_properties.estimated_daily_milk_produced,
-                days_born=general_properties.days_born
+                days_born=general_properties.days_born,
             )
         )
         return milking_properties

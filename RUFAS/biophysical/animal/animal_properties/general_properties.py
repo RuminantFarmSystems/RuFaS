@@ -19,8 +19,9 @@ class GeneralProperties:
     estimated_daily_milk_produced : float
         Milk production of the animal on a single day (kg).
     milking
-    
+
     """
+
     animal_type: AnimalType
     birth_date: str
     birth_weight: float
