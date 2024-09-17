@@ -9,10 +9,10 @@ class MilkProductionProperties:
 
     Attributes
     ----------
-    days_in_milk : int
-        Number of days the cow has been milking for in the current lactation.
-    milk_produced : float
-        Milk production of the cow on a single day (kg).
+    true_protein_content : float
+        Amount of true protein in the milk produced (kg).
+    fat_content : float
+        Amount of fat in the milk produced (kg).
     milk_production_reduction : float
         Amount of milk daily production is reduced by (kg). TODO: previously this value would be negative, I think we should switch to it being positive.
     latest_305_day_milk_production : float
@@ -25,8 +25,6 @@ class MilkProductionProperties:
         Percentage of cow's milk that is fat by weight. TODO: double check the "by weight" part.
     lactose_percent : float
         Percentage of cow's milk that is lactose by weight. TODO: double check the "by weight" part.
-    lactation_model : str, default "wood"
-        Model which will be used to predict milk production (unitless).
     wood_l : float
         Wood's "l" lactation curve parameter (unitless).
     wood_m : float
@@ -37,15 +35,14 @@ class MilkProductionProperties:
         History of a cow's milk production.
 
     """
-    days_in_milk: int
-    milk_produced: float  # Old var name: estimated_daily_milk_produced.
+    true_protein_content: float  # Old var name: milk_protein_kg
+    fat_content: float  # Old name: milk_fat_kg
     milk_production_reduction: float
     latest_305_day_milk_production: float  # Old var name: latest_milk_production_305days
     crude_protein_percent: float  # Old var name: CP_milk
     true_protein_percent : float  # Old var name: mPrt
     fat_percent: float
     lactose_percent: float  # Old var name: lactose
-    lactation_model: str = "wood"  # Old var name: lactation_cuve TODO: should verify if we only want support for Wood's model, or make it an Enum?
     wood_l: float
     wood_m: float
     wood_n: float
