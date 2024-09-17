@@ -713,16 +713,16 @@ def test_methane_emission_from_slurry_storage(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
                 total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
     else:
         if temp is None:
-            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            actual = GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
                 total_degradable_volatile_solids, total_non_degradable_volatile_solids
             )
         else:
-            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            actual = GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
                 total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
         assert actual == approx(expected, rel=1e-6)
