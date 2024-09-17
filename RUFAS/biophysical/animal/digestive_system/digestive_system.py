@@ -1,3 +1,2 @@
 class DigestiveSystem:
-    d
     pass
