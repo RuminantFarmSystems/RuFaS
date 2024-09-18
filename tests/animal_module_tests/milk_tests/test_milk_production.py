@@ -1,6 +1,29 @@
 import pytest
+from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
+from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
+from RUFAS.time import Time
+
+
+@pytest.fixture
+def milking_properties(mocker: MockerFixture) -> MilkProductionProperties:
+    mocker.patch.object(MilkProductionProperties, "__init__", return_value=None)
+    return MilkProductionProperties()
+
+
+@pytest.fixture
+def general_properties(mocker: MockerFixture) -> GeneralProperties:
+    mocker.patch.object(GeneralProperties, "__init__", return_value=None)
+    return GeneralProperties()
+
+
+@pytest.fixture
+def time(mocker: MockerFixture) -> Time:
+    mocker.patch.object(Time, "__init__", return_value=None)
+    return Time()
 
 
 @pytest.mark.parametrize(
@@ -21,11 +44,51 @@ def test_get_milk_yield_values_wood_curve(
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize(
-    "milk,reduction,variance,expected", [(30.0, 4.0, 2.0, 28.0), (28.0, 0.0, -1.0, 27.0)]
-)
+@pytest.mark.parametrize("milk,reduction,variance,expected", [(30.0, 4.0, 2.0, 28.0), (28.0, 0.0, -1.0, 27.0)])
 def test_adjust_milk_production(milk: float, reduction: float, variance: float, expected: float) -> None:
     """Test that milk production is varied correctly."""
     actual = MilkProduction._adjust_milk_production(milk, variance, reduction)
 
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "sim_day,milk_days,milk_produced,age,expected",
+    [
+        (
+            100,
+            30,
+            25.0,
+            300,
+            MilkProductionRecord(simulation_day=100, days_in_milk=30, milk_production=25.0, days_born=300),
+        ),
+        (
+            1000,
+            300,
+            20.0,
+            800,
+            MilkProductionRecord(simulation_day=1000, days_in_milk=300, milk_production=20.0, days_born=800),
+        ),
+    ],
+)
+def test_update_milking_history(
+    mocker: MockerFixture,
+    milking_properties: MilkProductionProperties,
+    general_properties: GeneralProperties,
+    time: Time,
+    sim_day: int,
+    milk_days: int,
+    milk_produced: float,
+    age: int,
+    expected: MilkProductionRecord,
+) -> None:
+    """Tests that the milking history of a cow is updated correctly."""
+    milking_properties.milk_production_history = []
+    general_properties.days_in_milk = milk_days
+    general_properties.estimated_daily_milk_produced = milk_produced
+    general_properties.days_born = age
+    mocker.patch("RUFAS.time.Time.simulation_day", new_callable=mocker.PropertyMock, return_value=sim_day)
+
+    milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
+
+    assert milking_properties.milk_production_history[-1] == expected
