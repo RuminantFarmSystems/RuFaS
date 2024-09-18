@@ -15,10 +15,10 @@ class Time:
         """
         self.om = OutputManager()
         self.im = InputManager()
-        self.config_data: Dict[str, str | int | bool] = self.im.get_data("config")
+        config_data: Dict[str, str | int | bool] = self.im.get_data("config")
 
-        self.start_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["start_date"]), "%Y:%j")
-        self.end_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["end_date"]), "%Y:%j")
+        self.start_date: datetime.datetime = datetime.datetime.strptime(str(config_data["start_date"]), "%Y:%j")
+        self.end_date: datetime.datetime = datetime.datetime.strptime(str(config_data["end_date"]), "%Y:%j")
 
         self.current_date: datetime.datetime = self.start_date
         self.simulation_length_days: int = (self.end_date - self.start_date).days
