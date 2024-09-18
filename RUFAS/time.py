@@ -9,18 +9,21 @@ from RUFAS.util import Utility
 
 
 class Time:
-    def __init__(self) -> None:
+    def __init__(self, start_date: datetime = None, end_date: datetime = None, current_date: datetime = None) -> None:
         """
         This object is responsible for creating and tracking time in the simulation.
         """
         self.om = OutputManager()
         self.im = InputManager()
-        config_data: Dict[str, str | int | bool] = self.im.get_data("config")
 
-        self.start_date: datetime = datetime.strptime(str(config_data["start_date"]), "%Y:%j")
-        self.end_date: datetime = datetime.strptime(str(config_data["end_date"]), "%Y:%j")
+        config_data: Dict[str, str | int | bool] = {}
+        if not start_date or not end_date:
+            config_data = self.im.get_data("config")
 
-        self.current_date: datetime = self.start_date
+        self.start_date: datetime = start_date or datetime.strptime(str(config_data["start_date"]), "%Y:%j")
+        self.end_date: datetime = end_date or datetime.strptime(str(config_data["end_date"]), "%Y:%j")
+
+        self.current_date: datetime = current_date or self.start_date
         self.simulation_length_days: int = (self.end_date - self.start_date).days
         self.simulation_length_years: int = self.end_date.year - self.start_date.year + 1
 
