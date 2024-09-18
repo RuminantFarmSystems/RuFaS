@@ -26,6 +26,17 @@ def time(mocker: MockerFixture) -> Time:
     return Time()
 
 
+def test_perform_daily_milking_update_not_milking(
+    mocker: MockerFixture, milking_properties: MilkProductionProperties, general_properties: GeneralProperties, time: Time
+) -> None:
+    """Tests that daily milking update is performed correctly when cow is not milking."""
+    mocker.patch.object(general_properties, "milking", new_callable=mocker.PropertyMock, return_value=False)
+
+    actual_milk, actual_general = MilkProduction.perform_daily_milking_update(milking_properties, general_properties, time)
+
+    assert True
+
+
 @pytest.mark.parametrize(
     "day,l_param,m_param,n_param,expected",
     [
