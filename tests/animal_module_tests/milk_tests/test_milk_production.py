@@ -70,7 +70,7 @@ def test_perform_daily_milking_update_dry_off(
         days_born=LAC_COW["days_born"],
     )
 
-    milking_properties, general_properties = MilkProduction.calculate_daily_milk_production(
+    milking_properties, general_properties = MilkProduction.perform_daily_milking_update(
         milking_properties, general_properties, time
     )
 
@@ -148,7 +148,7 @@ def test_update_milking_history(
     general_properties.days_in_milk = milk_days
     general_properties.estimated_daily_milk_produced = milk_produced
     general_properties.days_born = age
-    mocker.patch.object(Time, new_callable=mocker.PropertyMock, return_value=sim_day)
+    mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=sim_day)
 
     milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
 
