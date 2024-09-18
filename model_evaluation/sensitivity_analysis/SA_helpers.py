@@ -116,6 +116,8 @@ def collate_outputs(
             file_ID_backup = f"{1}".zfill(digits) + "_"
             file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
             print('used dummy')
+            print(i/total_num_files)
+            print(i)
         file = pd.read_csv(basedirectory + file_ID_found)
         variable_names: List[str] = []
         if not variable_names:

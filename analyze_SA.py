@@ -20,15 +20,19 @@ for analysis in config_json["analyses"]:  # noqa
     only_inputs = analysis["only_inputs"]
     plot_whole_new = analysis["plot_whole_new"]
 
-    inputs_to_collate = analysis["inputs_to_collate"]
     plot_inputs = analysis["plot_inputs"]
-    outputs_to_collate = analysis["outputs_to_collate"]
     plot_outputs = analysis["plot_outputs"]
 
     with open(input_file) as json_file:
         input_config = json.load(json_file)
 
     task_to_analyze: Dict[str, Any] = input_config["tasks"][0]
+
+    if analysis["inputs_to_collate_override"]:
+        inputs_to_collate = analysis["inputs_to_collate"]
+    else:
+        inputs_to_collate = [(variable['variable_name']).replace('.', ' ') for variable in task_to_analyze['SA_input_variables']]
+
     output_prefix = task_to_analyze["output_prefix"]
     sampler = task_to_analyze["sampler"]
 
@@ -62,7 +66,7 @@ for analysis in config_json["analyses"]:  # noqa
         writer = csv.writer(f)
         writer.writerows(new_whole_output)
 
-    if inputs_to_collate or outputs_to_collate:
+    if inputs_to_collate:
         new_whole_output_pd = pd.DataFrame(new_whole_output)
         column_names = new_whole_output_pd.iloc[0]
         row_names = new_whole_output_pd[0]
@@ -149,6 +153,12 @@ for analysis in config_json["analyses"]:  # noqa
             #ENDTRY
         except:
             print(f'analysis of {input} failed')
+
+    if analysis["outputs_to_collate_override"]:
+        outputs_to_collate = analysis["outputs_to_collate"]
+    else:
+        outputs_to_collate = output_pd.index.tolist()
+
     # here for a single output, we sort and explore all the inputs
     for output in outputs_to_collate:
         try:

@@ -3,13 +3,13 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "animal_S256",
+        "output_prefix": "animal_S128",
         "log_verbosity": "errors",
         "sampler": "sobol",
-        "saltelli_number": 256,
+        "saltelli_number": 128,
         "saltelli_skip": 2048,
-        "SA_load_balancing_start": 0.5,
-        "SA_load_balancing_stop": 0.6,
+        "SA_load_balancing_start": 0.3,
+        "SA_load_balancing_stop": 0.4,
         "random_seed": 42,
         "SA_input_variables": [
           {
