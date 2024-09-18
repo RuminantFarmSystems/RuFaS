@@ -126,7 +126,9 @@ class MilkProduction:
 
     @staticmethod
     @njit
-    def _adjust_milk_production(milk_production: float, milk_production_variance: float, milk_production_reduction: float) -> float:
+    def _adjust_milk_production(
+        milk_production: float, milk_production_variance: float, milk_production_reduction: float
+    ) -> float:
         """
         Randomly adjusts the milk production on a specific day.
 
