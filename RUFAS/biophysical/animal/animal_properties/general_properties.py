@@ -41,7 +41,6 @@ class GeneralProperties:
     id: int
     is_pregnant: bool
     mature_body_weight: float
-    milking: bool
     nutrients: list[str]
     ration_formulation = {"objective": 0.00}
     sold: bool
