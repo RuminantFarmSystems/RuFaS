@@ -22,14 +22,18 @@ v0.9.1
 ### Next Version Updates
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
-- [1948](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [Soil and Crop] Utilize a residue tracker property method in the layer data pool that sums structural an
+- [1977](https://github.com/RuminantFarmSystems/MASM/pull/1977) - [minor change] [EEE] Improve emission.py codebase and clarity.
+- [1948](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [Soil and Crop] Utilize a residue tracker property method in the layer data pool that sums structural and metabolic litter.
 - [1980](https://github.com/RuminantFarmSystems/MASM/pull/1980) - [minor change] [Soil and Crop] Set return value and add warning when silt and clay are zero.
 - [1973](https://github.com/RuminantFarmSystems/MASM/pull/1973) - [minor change] [OutputManager] Avoid global variable usage of output manager [2/2].
 - [1870](https://github.com/RuminantFarmSystems/MASM/pull/1870) - [minor change] [Soil and Crop] Partition denitrified nitrates between nitrous oxide emissions and dinitrogen emissions,
-- [1974](https://github.com/RuminantFarmSystems/MASM/pull/1974/) - [minor change] [Animal] Establishes the AnimalPhosphorusStatus calculator class and the AnimalPhosphorus class to perform the daily phosphorus update for each animal for eventual incorporation into the newly refreshed Animal module.
+- [1974](https://github.com/RuminantFarmSystems/MASM/pull/1974) - [minor change] [Animal] Establishes the AnimalPhosphorusStatus calculator class and the AnimalPhosphorus class to perform the daily phosphorus update for each animal for eventual incorporation into the newly refreshed Animal module.
 - [1944](https://github.com/RuminantFarmSystems/MASM/pull/1944) - [minor change] [GitHub Actions] Updates the Sphinx GitHub Action so that it can be triggered manually on specific branches and modifies it to not remove any .rst files.
-- [1986](https://github.com/RuminantFarmSystems/MASM/pull/1986/) - [minor change] [Animal] Creates the biophysical folder, and necessary files with empty class and folders for the redesigned animal module.
+- [1986](https://github.com/RuminantFarmSystems/MASM/pull/1986) - [minor change] [Animal] Creates the biophysical folder, and necessary files with empty class and folders for the redesigned animal module.
 - [1979](https://github.com/RuminantFarmSystems/MASM/pull/1979) - [minor change] [EEE] Updates synthetic fertilizer emissions to be partitioned by crop schedule instead of by dry yield.
 - [1784](https://github.com/RuminantFarmSystems/MASM/pull/1784) - [minor change] [Task Manager][Feed Storage] Adds end-to-end testing routine for the Feed Storage module which can be extended to test other parts of RuFaS.
 - [1998](https://github.com/RuminantFarmSystems/MASM/pull/1998) - [minor change] [GitHub Actions] Adds if statement to make sure there is a PR to comment on before attempting to post a comment.
+- [2000](https://github.com/RuminantFarmSystems/MASM/pull/2000) - [minor change] [CurrentWeatherConditions] Removed optional type hints.
+- [1989](https://github.com/RuminantFarmSystems/MASM/pull/1989) - [minor change] [Animal] Method formulate_ration now correctly returns pen.ration_per_animal instead of pen.ration.
+- [2001](https://github.com/RuminantFarmSystems/MASM/pull/2001) - [minor change] [E2E Testing] Changes E2ETestResultsComparer so that it constructs file paths properly on Windows machines.
 - [2002](https://github.com/RuminantFarmSystems/MASM/pull/2002) - [minor change] [Manure] Adds conversion of air temperature to barn temperature for use in calculations of emissions associated with Manure Handlers.
