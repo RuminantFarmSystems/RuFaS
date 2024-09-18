@@ -7,6 +7,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.time import Time
 
+
 @pytest.fixture
 def mock_config() -> Dict[str, Any]:
     config = {
@@ -14,6 +15,7 @@ def mock_config() -> Dict[str, Any]:
         "end_date": "2000:1",
     }
     return config
+
 
 def test_time_initialization() -> None:
     """Tests that Time instances are created correctly."""
