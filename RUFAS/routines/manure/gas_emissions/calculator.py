@@ -1351,12 +1351,12 @@ class GasEmissionsCalculator:
         Parameters
         ----------
         air_temperature : float
-            The air temperature.
+            The air temperature (°C).
 
         Returns
         -------
         float
-            The barn temperature.
+            The barn temperature (°C).
         """
         if air_temperature < 5:
             return 5.0
