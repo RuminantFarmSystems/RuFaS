@@ -291,20 +291,13 @@ class BaseManureTreatment(ABC):
         """
         return 0.0
 
-    def _calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+    def _get_nitrous_oxide_emissions_factor(
         self,
         manure_treatment_type: ManureTreatmentType,
-        manure_cover: str,
-        manure_nitrogen_kg_N_per_day: float,
+        manure_cover: str
     ) -> float:
         """
-        Calculate the empirical nitrogen loss from nitrous oxide emission.
-
-        Notes
-        -----
-        This method is used to calculate the empirical nitrogen loss from nitrous oxide emission for the
-        following manure treatments: slurry storage underfloor, slurry storage outdoor, anaerobic lagoon,
-        anaerobic digestion.
+        Get the correct nitrous oxide emissions factor based on manure treatment type and cover.
 
         Parameters
         ----------
@@ -312,23 +305,17 @@ class BaseManureTreatment(ABC):
             The type of manure treatment.
         manure_cover : str
             The type of cover for the manure. Options are: cover, crust, no cover, and N/A.
-        manure_nitrogen_kg_N_per_day
-            The amount of manure nitrogen entering the manure treatment and storage system (kg N/day).
 
         Returns
         -------
         float
-            The empirical nitrogen loss from nitrous oxide emission (kg N/day).
+            Nitrous oxide emission factor (kg Nitrous Oxide N/kg manure N) for different manure treatment and storage
+            systems.
         """
 
-        return GasEmissionsCalculator.empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=(
-                GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
-                    manure_treatment_type
-                ][manure_cover]
-            ),
-            manure_nitrogen_kg_N_per_day=manure_nitrogen_kg_N_per_day,
-        )
+        return GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
+            manure_treatment_type
+        ][manure_cover]
 
     def _get_current_day_average_temperature_celsius(self) -> float:
         """Returns the average temperature of the current day in Celsius.
