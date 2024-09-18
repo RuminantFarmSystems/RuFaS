@@ -6,11 +6,13 @@ from RUFAS.general_constants import GeneralConstants
 
 class ManureExcretionCalculator:
     @staticmethod
-    def calf_manure(body_weight: float,
-                    fecal_phosphorus: float,
-                    urine_phosphorus_required: float,
-                    nutrient_amount: dict[str, float],
-                    nutrient_conc: dict[str, float]) -> Tuple[float, AnimalManureExcretions]:
+    def calf_manure(
+        body_weight: float,
+        fecal_phosphorus: float,
+        urine_phosphorus_required: float,
+        nutrient_amount: dict[str, float],
+        nutrient_conc: dict[str, float],
+    ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a calf with information from the ration formulation.
 
@@ -103,7 +105,7 @@ class ManureExcretionCalculator:
             non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=0
+            potassium=0,
         )
 
         return total_phosphorus_excreted, manure_excretion_values
@@ -186,21 +188,21 @@ class ManureExcretionCalculator:
 
         # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
         manure_nitrogen = (
-                              15.1
-                              + 0.83
-                              * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-                              * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-                              / GeneralConstants.FRACTION_TO_PERCENTAGE
-                          ) * GeneralConstants.GRAMS_TO_KG
+            15.1
+            + 0.83
+            * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
+            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            / GeneralConstants.FRACTION_TO_PERCENTAGE
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Nitrogen excretion in feces, kg [A.3B.B.2]
         fecal_nitrogen = (
-                             0.345
-                             + 0.317
-                             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-                             * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-                             / GeneralConstants.FRACTION_TO_PERCENTAGE
-                         ) * GeneralConstants.GRAMS_TO_KG
+            0.345
+            + 0.317
+            * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
+            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            / GeneralConstants.FRACTION_TO_PERCENTAGE
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Nitrogen excretion in urine, kg [A.3B.B.3]
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
@@ -251,7 +253,7 @@ class ManureExcretionCalculator:
             non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=potassium
+            potassium=potassium,
         )
 
         return total_phosphorus_excreted, manure_excretion_values
