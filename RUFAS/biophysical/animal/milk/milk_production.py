@@ -45,7 +45,6 @@ class MilkProduction:
 
         is_dry_off_day = general_properties.days_in_preg == general_properties.dry_off_day_of_pregnancy
         if is_dry_off_day:
-            milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
             general_properties.events.add_event(general_properties.days_born, time.simulation_day, DRY)
             general_properties.days_in_milk = 0
             general_properties.estimated_daily_milk_produced = 0.0
@@ -56,6 +55,7 @@ class MilkProduction:
             milking_properties.true_protein_percent = 0.0
             milking_properties.fat_percent = 0.0
             milking_properties.lactose_percent = 0.0
+            milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
             return milking_properties, general_properties
 
         general_properties.days_in_milk += 1
