@@ -65,8 +65,14 @@ class MilkProduction:
             milking_properties.wood_m,
             milking_properties.wood_n,
         )
+
+        milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        )
         general_properties.estimated_daily_milk_produced = MilkProduction._adjust_milk_production(
-            general_properties.estimated_daily_milk_produced, milking_properties.milk_production_reduction
+            general_properties.estimated_daily_milk_produced,
+            milk_production_variance,
+            milking_properties.milk_production_reduction,
         )
 
         milking_properties.true_protein_content = (
@@ -120,7 +126,7 @@ class MilkProduction:
 
     @staticmethod
     @njit
-    def _adjust_milk_production(milk_production: float, milk_production_reduction: float) -> float:
+    def _adjust_milk_production(milk_production: float, milk_production_variance: float, milk_production_reduction: float) -> float:
         """
         Randomly adjusts the milk production on a specific day.
 
@@ -128,6 +134,10 @@ class MilkProduction:
         ----------
         milk_production : float
             Unvaried milk production (kg).
+        variance : float
+            How much the actual milk production varied from the estimated amount (kg).
+        milk_production_reduction : float
+            How much milk production was reduced by other attributes of the animals physiology (kg).
 
         Returns
         -------
@@ -135,9 +145,6 @@ class MilkProduction:
             Milk production that has been varied by a random amount (kg).
 
         """
-        milk_production_variance = Utility.generate_random_number(
-            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
-        )
         milk_production += milk_production_variance - milk_production_reduction
         return milk_production
 
