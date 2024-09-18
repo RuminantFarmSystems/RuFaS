@@ -1320,7 +1320,7 @@ class GasEmissionsCalculator:
         )
 
     @staticmethod
-    def empirical_nitrogen_loss_from_nitrous_oxide_emission(
+    def calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
         emission_factor_kg_nitrous_oxide_N_per_kg_manure_N: float,
         manure_nitrogen_kg_N_per_day: float,
     ) -> float:
