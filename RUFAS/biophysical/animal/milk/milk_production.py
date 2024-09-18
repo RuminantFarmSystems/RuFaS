@@ -49,6 +49,8 @@ class MilkProduction:
             general_properties.events.add_event(general_properties.days_born, time.simulation_day, DRY)
             general_properties.days_in_milk = 0
             general_properties.estimated_daily_milk_produced = 0.0
+            milking_properties.true_protein_content = 0.0
+            milking_properties.fat_content = 0.0
             milking_properties.latest_305_day_milk_production = 0.0
             milking_properties.crude_protein_percent = 0.0
             milking_properties.true_protein_percent = 0.0
