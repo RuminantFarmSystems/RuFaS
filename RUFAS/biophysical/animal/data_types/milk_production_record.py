@@ -8,7 +8,7 @@ class MilkProductionRecord(TypedDict):
     Attributes
     ----------
     simulation_day : int
-        Simulation day of milk production was recorded on.
+        Simulation day that milk production was recorded on.
     days_in_milk : int
         Number of days of the animal into milking.
     milk_production : float
