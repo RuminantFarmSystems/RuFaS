@@ -117,10 +117,7 @@ def test_perform_daily_milking_update(
     mocker.patch.object(MilkProduction, "_adjust_milk_production", return_value=milk_produced)
     mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=500)
     expected_record = MilkProductionRecord(
-        simulation_day=500,
-        days_in_milk=expected_days_in_milk,
-        milk_production=40.0,
-        days_born=LAC_COW["days_born"]
+        simulation_day=500, days_in_milk=expected_days_in_milk, milk_production=40.0, days_born=LAC_COW["days_born"]
     )
 
     milking_properties, general_properties = MilkProduction.perform_daily_milking_update(
