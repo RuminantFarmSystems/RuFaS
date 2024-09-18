@@ -160,17 +160,9 @@ class ManureExcretionCalculator:
         dry_matter_intake = nutrient_amounts["dm"]
         CP_concentration = nutrient_concentrations["CP"]
         potassium_concentration = nutrient_concentrations["potassium"]
-        ASH_concentration = nutrient_concentrations["ash"]
-        NDF_concentration = nutrient_concentrations["NDF"]
-        EE_concentration = nutrient_concentrations["EE"]
+
         # Soluble residue
         # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
-        soluble_residue = (
-            (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration)
-            - NDF_concentration
-            - CP_concentration
-            - EE_concentration
-        )
 
         # Total urine, kg [A.3B.A.1]
         urine = 9.0
