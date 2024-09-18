@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from ..general_property_values import LAC_COW
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
@@ -15,9 +16,8 @@ def milking_properties(mocker: MockerFixture) -> MilkProductionProperties:
 
 
 @pytest.fixture
-def general_properties(mocker: MockerFixture) -> GeneralProperties:
-    mocker.patch.object(GeneralProperties, "__init__", return_value=None)
-    return GeneralProperties()
+def general_properties() -> GeneralProperties:
+    return GeneralProperties(**LAC_COW)
 
 
 @pytest.fixture
@@ -27,14 +27,29 @@ def time(mocker: MockerFixture) -> Time:
 
 
 def test_perform_daily_milking_update_not_milking(
-    mocker: MockerFixture, milking_properties: MilkProductionProperties, general_properties: GeneralProperties, time: Time
+    mocker: MockerFixture,
+    milking_properties: MilkProductionProperties,
+    general_properties: GeneralProperties,
+    time: Time,
 ) -> None:
     """Tests that daily milking update is performed correctly when cow is not milking."""
-    mocker.patch.object(general_properties, "milking", new_callable=mocker.PropertyMock, return_value=False)
+    general_properties.days_in_milk = 0
+    general_properties.estimated_daily_milk_produced = 0.0
+    mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=100)
+    expected_record = MilkProductionRecord(
+        simulation_day=100,
+        days_in_milk=0,
+        milk_production=0.0,
+        days_born=LAC_COW["days_born"],
+    )
+    milking_properties.milk_production_history = []
 
-    actual_milk, actual_general = MilkProduction.perform_daily_milking_update(milking_properties, general_properties, time)
+    milking_properties, actual_general = MilkProduction.perform_daily_milking_update(
+        milking_properties, general_properties, time
+    )
 
-    assert True
+    assert actual_general == general_properties
+    assert milking_properties.milk_production_history[-1] == expected_record
 
 
 @pytest.mark.parametrize(
