@@ -147,7 +147,7 @@ class MilkProduction:
             Milk production that has been varied by a random amount (kg).
 
         """
-        milk_production += milk_production_variance - milk_production_reduction
+        milk_production += milk_production_variance + milk_production_reduction
         return milk_production
 
     @staticmethod

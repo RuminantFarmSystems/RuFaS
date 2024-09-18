@@ -14,7 +14,7 @@ class MilkProductionProperties:
     fat_content : float
         Amount of fat in the milk produced (kg).
     milk_production_reduction : float
-        Amount of milk daily production is reduced by (kg). TODO: previously this value would be negative, I think we should switch to it being positive.
+        Amount of milk daily production is reduced by (kg).
     latest_305_day_milk_production : float
         Sum of milk production over the last 305 days of the cow's lactation (kg).
     crude_protein_percent : float

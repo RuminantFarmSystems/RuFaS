@@ -156,7 +156,7 @@ def test_get_milk_yield_values_wood_curve(
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("milk,reduction,variance,expected", [(30.0, 4.0, 2.0, 28.0), (28.0, 0.0, -1.0, 27.0)])
+@pytest.mark.parametrize("milk,reduction,variance,expected", [(30.0, -4.0, 2.0, 28.0), (28.0, 0.0, -1.0, 27.0)])
 def test_adjust_milk_production(milk: float, reduction: float, variance: float, expected: float) -> None:
     """Test that milk production is varied correctly."""
     actual = MilkProduction._adjust_milk_production(milk, variance, reduction)
