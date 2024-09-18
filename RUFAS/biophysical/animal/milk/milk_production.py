@@ -90,9 +90,7 @@ class MilkProduction:
 
     @staticmethod
     @njit
-    def calculate_daily_milk_production(
-        day_of_milk: int, l_param: float, m_param: float, n_param: float
-    ) -> float:
+    def calculate_daily_milk_production(day_of_milk: int, l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
