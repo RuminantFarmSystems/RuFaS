@@ -71,7 +71,7 @@ class ManureExcretionCalculator:
         # Total ammoniacal N in manure, kg
         manure_total_ammoniacal_nitrogen = urine_nitrogen
 
-        phosphorus_excretion_values = _calculate_phosphorus_excretion_values(
+        phosphorus_excretion_values = ManureExcretionCalculator._calculate_phosphorus_excretion_values(
             daily_milk_production=0,
             total_manure_excreted=total_manure_excreted,
             fecal_phosphorus=fecal_phosphorus,
@@ -108,70 +108,79 @@ class ManureExcretionCalculator:
 
         return total_phosphorus_excreted, manure_excretion_values
 
+    @staticmethod
+    def heifer_manure(body_weight: float,
+                      fecal_phosphorus: float,
+                      urine_phosphorus_required: float,
+                      methane_model: str,
+                      nutrient_amount: dict[str, float],
+                      nutrient_conc: dict[str, float],
+                      ) -> Tuple[float, AnimalManureExcretions]:
 
-def _calculate_phosphorus_excretion_values(
-    daily_milk_production: float,
-    total_manure_excreted: float,
-    fecal_phosphorus: float,
-    urine_phosphorus_required: float,
-) -> Tuple[float, float, float, float, float]:
-    """Calculates a set of phosphorus excretion values produced by a given animal.
+    @staticmethod
+    def _calculate_phosphorus_excretion_values(
+        daily_milk_production: float,
+        total_manure_excreted: float,
+        fecal_phosphorus: float,
+        urine_phosphorus_required: float,
+    ) -> Tuple[float, float, float, float, float]:
+        """Calculates a set of phosphorus excretion values produced by a given animal.
 
-    Parameters
-    ----------
-    daily_milk_production : float
-        Amount of daily milk produced by the animal, kg.
-        This parameter should be set to 0 if this function is called for a non-cow animal.
-    total_manure_excreted : float
-        Amount of manure excreted by the animal, kg.
-    fecal_phosphorus : float
-        Amount of fecal phosphorus excreted by the animal, g.
-    urine_phosphorus_required : float
-        Amount of phosphorus required for urine production, g.
+        Parameters
+        ----------
+        daily_milk_production : float
+            Amount of daily milk produced by the animal, kg.
+            This parameter should be set to 0 if this function is called for a non-cow animal.
+        total_manure_excreted : float
+            Amount of manure excreted by the animal, kg.
+        fecal_phosphorus : float
+            Amount of fecal phosphorus excreted by the animal, g.
+        urine_phosphorus_required : float
+            Amount of phosphorus required for urine production, g.
 
-    Returns
-    -------
-    float
-        Total amount of phosphorus excreted by the animal, g.
-    float
-        Fraction of extractable inorganic phosphorus, unitless.
-    float
-        Fraction of water extractable organic phosphorus, unitless.
-    float
-        Amount of manure phosphorus excreted, g.
-    float
-        Fraction of phosphorus in the manure, unitless.
+        Returns
+        -------
+        float
+            Total amount of phosphorus excreted by the animal, g.
+        float
+            Fraction of extractable inorganic phosphorus, unitless.
+        float
+            Fraction of water extractable organic phosphorus, unitless.
+        float
+            Amount of manure phosphorus excreted, g.
+        float
+            Fraction of phosphorus in the manure, unitless.
 
-    """
-    # P fraction of manure (A.3.A.1)
-    if total_manure_excreted > 0:
-        manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
-            total_manure_excreted * GeneralConstants.KG_TO_GRAMS
+        """
+        # P fraction of manure (A.3.A.1)
+        if total_manure_excreted > 0:
+            manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
+                total_manure_excreted * GeneralConstants.KG_TO_GRAMS
+            )
+        else:
+            manure_phosphorus_fraction = 0.0
+
+        # Water extractable Inorganic P (WIP) fraction - fraction of manure
+        # compromised of inorganic water extractable P [A.3.A.2]
+        inorganic_phosphorus_fraction = 0.50 * manure_phosphorus_fraction
+
+        # Water extractable Organic P (WOP) fraction - fraction of maure
+        # comprised of organic water extractable P [A.3.A.3]
+        organic_phosphorus_fraction = 0.05 * manure_phosphorus_fraction
+
+        # amount of P in milk per animal (g) [A.3E.B.1]
+        phosphorus_in_milk = 0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
+
+        # manure P excretion for manure module input (g) [A.3.B.2]
+        manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
+
+        # amount of P excreted by an animal (g) [A.3.B.3]
+        total_phosphorus_excreted = phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
+
+        return (
+            total_phosphorus_excreted,
+            inorganic_phosphorus_fraction,
+            organic_phosphorus_fraction,
+            manure_phosphorus_excreted,
+            manure_phosphorus_fraction,
         )
-    else:
-        manure_phosphorus_fraction = 0.0
-
-    # Water extractable Inorganic P (WIP) fraction - fraction of manure
-    # compromised of inorganic water extractable P [A.3.A.2]
-    inorganic_phosphorus_fraction = 0.50 * manure_phosphorus_fraction
-
-    # Water extractable Organic P (WOP) fraction - fraction of maure
-    # comprised of organic water extractable P [A.3.A.3]
-    organic_phosphorus_fraction = 0.05 * manure_phosphorus_fraction
-
-    # amount of P in milk per animal (g) [A.3E.B.1]
-    phosphorus_in_milk = 0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
-
-    # manure P excretion for manure module input (g) [A.3.B.2]
-    manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
-
-    # amount of P excreted by an animal (g) [A.3.B.3]
-    total_phosphorus_excreted = phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
-
-    return (
-        total_phosphorus_excreted,
-        inorganic_phosphorus_fraction,
-        organic_phosphorus_fraction,
-        manure_phosphorus_excreted,
-        manure_phosphorus_fraction,
-    )
