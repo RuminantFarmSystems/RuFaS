@@ -291,9 +291,7 @@ class BaseManureTreatment(ABC):
         return 0.0
 
     def _get_nitrous_oxide_emissions_factor(
-        self,
-        manure_treatment_type: ManureTreatmentType,
-        manure_cover: str
+        self, manure_treatment_type: ManureTreatmentType, manure_cover: str
     ) -> float:
         """
         Get the correct nitrous oxide emissions factor based on manure treatment type and cover.

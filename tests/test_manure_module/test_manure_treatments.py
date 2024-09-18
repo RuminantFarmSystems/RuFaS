@@ -1619,9 +1619,7 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     emissions_factor = 0.005
 
     patch_for_get_nitrous_oxide_emissions_factor = mocker.patch.object(
-        anaerobic_lagoon,
-        "_get_nitrous_oxide_emissions_factor",
-        return_value=emissions_factor
+        anaerobic_lagoon, "_get_nitrous_oxide_emissions_factor", return_value=emissions_factor
     )
 
     # Act
@@ -2220,9 +2218,7 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
     emissions_factor = 0.005
 
     patch_for_get_nitrous_oxide_emissions_factor = mocker.patch.object(
-        anaerobic_digestion,
-        "_get_nitrous_oxide_emissions_factor",
-        return_value=emissions_factor
+        anaerobic_digestion, "_get_nitrous_oxide_emissions_factor", return_value=emissions_factor
     )
 
     # Act
