@@ -1,3 +1,4 @@
+from .milk_production import MilkProduction
 from RUFAS.input_manager import InputManager
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
@@ -215,36 +216,6 @@ class LactationCurve:
 
         return {"l": l_param, "m": m_param, "n": n_param}
 
-    def get_milk_yield_values_wood_curve(
-        self, day_of_milk: int, l_param: float, m_param: float, n_param: float
-    ) -> float:
-        """
-        Calculates the milk yield on the given day using Wood's lactation curve.
-
-        Parameters
-        ----------
-        day_of_milk : int
-            Days into milk of the cow.
-        l_param: float
-            Wood's lactation curve parameter l.
-        m_param: float
-            Wood's lactation curve parameter m.
-        n_param: float
-            Wood's lactation curve parameter n.
-
-        Returns
-        -------
-        numpy.float64
-            Milk yield on the provided day (kg).
-
-        References
-        ----------
-        Li, M., et al. "Investigating the effect of temporal, geographic, and management factors on US Holstein
-        lactation curve parameters." Journal of Dairy Science 105.9 (2022): 7525-7538.
-
-        """
-        return float(l_param * np.power(day_of_milk, m_param) * np.exp(-1 * n_param * day_of_milk))
-
     def calc_305_day_milk_yield(self, l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the total milk yield from day 1 to day 305 of the lactation.
@@ -265,7 +236,7 @@ class LactationCurve:
 
         """
 
-        result, _ = quad(self.get_milk_yield_values_wood_curve, 1, 305, args=(l_param, m_param, n_param))
+        result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
         return float(result)
 
     def get_wood_parameters(self, parity: int) -> dict[str, float]:
