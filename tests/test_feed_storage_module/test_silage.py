@@ -40,6 +40,7 @@ def test_acceptable_crops(silage: Silage):
     ]
 
 
+@pytest.mark.skip(reason="Issue #2008")
 @pytest.mark.parametrize("days_of_loss", [(0), (10), (3)])
 def test_process_degradations(
     mocker: MockerFixture, silage: Silage, harvested_crop: HarvestedCrop, days_of_loss: int

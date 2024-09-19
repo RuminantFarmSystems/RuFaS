@@ -135,8 +135,7 @@ class Storage:
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
                     exceeds the storage capacity ({self.capacity})"
             )
-        storage_crop = copy.deepcopy(crop)
-        self.stored.append(storage_crop)
+        self.stored.append(crop)
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
