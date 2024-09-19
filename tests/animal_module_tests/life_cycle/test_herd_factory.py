@@ -9,6 +9,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
 from RUFAS.time import Time
 from RUFAS.routines import Feed
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
@@ -72,15 +73,10 @@ def test_init(
         "RUFAS.routines.animal.life_cycle.animal_population.AnimalPopulation.__init__",
         return_value=None,
     )
-    mock_animal_genetics_init = mocker.patch(
-        "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.__init__",
-        return_value=None,
-    )
     HerdFactory()
 
     assert mock_input_manager.get_data.call_count == 4
     assert mock_animal_population_init.call_count == 2
-    assert mock_animal_genetics_init.call_count == 1
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
@@ -1736,6 +1732,8 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_animal_base_set_nutrient_list = mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list"
     )
+    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics,
+                                                                          "initialize_class_variables")
 
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = True
@@ -1757,6 +1755,8 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_animal_base_set_config.assert_called_once()
     mock_animal_base_set_lactation_curve_parameters.assert_called_once()
     mock_animal_base_set_nutrient_list.assert_called_once_with("NASEM")
+
+    mock_animal_genetics_initialize_class_variables.assert_called_once()
 
     mock_herd_factory._generate_animals.assert_called_once()
     mock_herd_factory._initialize_herd_from_data.assert_not_called()
@@ -1810,6 +1810,9 @@ def test_initialize_herd_init_herd_true_save_animals_false(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.setup_lactation_curve_parameters"
     )
 
+    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics,
+                                                                          "initialize_class_variables")
+
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = False
     mock_herd_factory.save_animals_path = Path("dummy_path")
@@ -1825,6 +1828,8 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     mock_animal_base_set_config.assert_called_once()
     mock_animal_base_set_nutrient_list.assert_called_once_with("NASEM")
     mock_animal_base_set_lactation_curve_parameters.assert_called_once()
+
+    mock_animal_genetics_initialize_class_variables.assert_called_once()
 
     mock_herd_factory._generate_animals.assert_called_once()
     mock_herd_factory._initialize_herd_from_data.assert_not_called()
@@ -1874,6 +1879,9 @@ def test_initialize_herd_init_herd_false(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.setup_lactation_curve_parameters"
     )
 
+    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics,
+                                                                          "initialize_class_variables")
+
     mock_herd_factory.init_herd = False
     mock_herd_factory.save_animals = False
     mock_herd_factory.save_animals_path = Path("dummy_path")
@@ -1889,6 +1897,8 @@ def test_initialize_herd_init_herd_false(
     mock_animal_base_set_config.assert_called_once()
     mock_animal_base_set_nutrient_list.assert_called_once_with("NASEM")
     mock_animal_base_set_lactation_curve_parameters.assert_called_once()
+
+    mock_animal_genetics_initialize_class_variables.assert_called_once()
 
     mock_herd_factory._generate_animals.assert_not_called()
     mock_herd_factory._initialize_herd_from_data.assert_called_once()

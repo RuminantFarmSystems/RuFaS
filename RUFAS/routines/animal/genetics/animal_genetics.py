@@ -6,7 +6,15 @@ from RUFAS.util import Utility
 
 import datetime
 
-base_change_lookup_table = {
+"""
+The base change time and value in the net merit value.
+
+References
+----------
+CDCB website
+
+"""
+BASE_CHANGE_LOOKUP_TABLE = {
     datetime.date.fromisoformat("2020-04-01"): 231,
     datetime.date.fromisoformat("2014-12-01"): 184,
     datetime.date.fromisoformat("2010-01-01"): 132,
@@ -15,7 +23,27 @@ base_change_lookup_table = {
 
 
 class AnimalGenetics:
+    """
+    The Net Merit lookup table.
+    {
+        breed: {
+            "year_month": {
+                "average": float,
+                "std: float
+            }
+        }
+    }
+    """
     net_merit: dict[str, dict[str, dict[str, float]]] = {}
+
+    """
+        The Top Listing Semen lookup table.
+        {
+            breed: {
+                "year_month": float
+            }
+        }
+        """
     top_semen: dict[str, dict[str, float]] = {}
 
     @classmethod
@@ -51,12 +79,12 @@ class AnimalGenetics:
         Parameters
         ----------
         original_net_merit: dict[str, dict[str, dict[str, float]]]
-            The original net merit data.
+            The original net merit data, $USD.
 
         Returns
         -------
         dict[str, dict[str, dict[str, float]]]
-            The net merit data after base change.
+            The net merit data after base change, $USD.
 
         Notes
         -----
@@ -73,7 +101,7 @@ class AnimalGenetics:
         https://uscdcb.com/wp-content/uploads/2020/02/Norman-et-al-Genetic-Base-Change-April-2020-FINAL_new.pdf
         """
         adjusted_net_merit: dict[str, dict[str, dict[str, float]]] = {}
-        total_adjustment_value = sum([base_change_lookup_table[i] for i in base_change_lookup_table.keys()])
+        total_adjustment_value = sum([BASE_CHANGE_LOOKUP_TABLE[i] for i in BASE_CHANGE_LOOKUP_TABLE.keys()])
         for breed in original_net_merit.keys():
             adjusted_net_merit[breed] = {}
             for year_month in original_net_merit[breed].keys():
@@ -81,8 +109,8 @@ class AnimalGenetics:
                 datetime_year_month = datetime.date.fromisoformat(year_month + "-01")
                 increase = sum(
                     [
-                        base_change_lookup_table[base_change_time]
-                        for base_change_time in base_change_lookup_table.keys()
+                        BASE_CHANGE_LOOKUP_TABLE[base_change_time]
+                        for base_change_time in BASE_CHANGE_LOOKUP_TABLE.keys()
                         if datetime_year_month >= base_change_time
                     ]
                 )
@@ -103,12 +131,12 @@ class AnimalGenetics:
         Parameters
         ----------
         original_net_merit: dict[str, dict[str, dict[str, float]]]
-            The original net merit data.
+            The original net merit data, $USD.
 
         Returns
         -------
         dict[str, dict[str, dict[str, float]]]
-            The net merit data after filling the gap in between entries.
+            The net merit data after filling the gap in between entries, $USD.
         """
         expanded_net_merit: dict[str, dict[str, dict[str, float]]] = {}
         monthly_increase_lookup = {2005: 132 / 60, 2010: 184 / 60, 2015: 231 / 60, 2020: (360.731239 - 36.931108) / 48}
@@ -171,7 +199,7 @@ class AnimalGenetics:
         Returns
         -------
         float
-            The net merit value of the animal
+            The net merit value of the animal, $USD.
 
         Notes
         -----
@@ -192,6 +220,8 @@ class AnimalGenetics:
         ----------
         time: Time
             The Time instance that contains the birthdate of the newborn calf.
+            This function will be called on the day of birth for the newborn calf; therefore, the current date will be
+            the birthdate of the calf.
         breed: str
             The breed of the newborn calf.
         dam_net_merit_value: float
@@ -200,7 +230,7 @@ class AnimalGenetics:
         Returns
         -------
         float
-            The net merit value of the newborn calf.
+            The net merit value of the newborn calf, $USD.
 
         Notes
         -----
