@@ -16,71 +16,71 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
     ---------
     pen_id: int
         ID of the pen that this output is associated with.
-    pen_id_unit: MeasurementUnits
+    pen_id_unit: MeasurementUnits.UNITLESS
         Unit for pen_id
     simulation_day: int
         Number of days into the simulation.
-    simulation_day_unit: MeasurementUnits
+    simulation_day_unit: MeasurementUnits.SIMULATION_DAY
         Unit for simulation_day
     manure_urea: float
         Urea concentration in manure, g/L.
-    manure_urea_unit: MeasurementUnits
+    manure_urea_unit: MeasurementUnits.GRAMS_PER_LITER
         Unit for manure_urea
     liquid_manure_total_ammoniacal_nitrogen: float
         Total ammoniacal nitrogen, kg.
-    liquid_manure_total_ammoniacal_nitrogen_unit: MeasurementUnits
+    liquid_manure_total_ammoniacal_nitrogen_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_total_ammoniacal_nitrogen
     liquid_manure_nitrogen: float
         Amount of nitrogen in manure, kg.
-    liquid_manure_nitrogen_unit: MeasurementUnits
+    liquid_manure_nitrogen_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_nitrogen
     liquid_manure_total_solids: float
         Total amount of solids from the manure, kg.
-    liquid_manure_total_solids_unit: MeasurementUnits
+    liquid_manure_total_solids_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_total_solids
     liquid_manure_total_degradable_volatile_solids: float
         Amount of degradable volatile solids, kg.
-    liquid_manure_total_degradable_volatile_solids_unit: MeasurementUnits
+    liquid_manure_total_degradable_volatile_solids_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_total_degradable_volatile_solids
     liquid_manure_total_non_degradable_volatile_solids: float
         Amount of non-degradable volatile solids, kg.
-    liquid_manure_total_non_degradable_volatile_solids_unit: MeasurementUnits
+    liquid_manure_total_non_degradable_volatile_solids_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_total_non_degradable_volatile_solids
     liquid_manure_total_volatile_solids: float
         Total amount of volatile solids, kg.
-    liquid_manure_total_volatile_solids_unit: MeasurementUnits
+    liquid_manure_total_volatile_solids_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_total_volatile_solids
     liquid_manure_phosphorus: float
         Amount of phosphorus excreted in manure, kg.
-    liquid_manure_phosphorus_unit: MeasurementUnits
+    liquid_manure_phosphorus_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_phosphorus
     liquid_manure_potassium: float
         Amount of potassium in manure, kg.
-    liquid_manure_potassium_unit: MeasurementUnits
+    liquid_manure_potassium_unit: MeasurementUnits.KILOGRAMS
         Unit for liquid_manure_potassium
     housing_methane: float
         Methane emissions from ..., kg.  # TODO: Fill in.
-    housing_methane_unit: MeasurementUnits
+    housing_methane_unit: MeasurementUnits.KILOGRAMS
         Unit for housing_methane
     housing_carbon_dioxide: float
         Carbon dioxide emissions from ..., kg.  # TODO: Fill in.
-    housing_carbon_dioxide_unit: MeasurementUnits
+    housing_carbon_dioxide_unit: MeasurementUnits.KILOGRAMS
         Unit for housing_carbon_dioxide
     housing_ammonia: float
         Ammonia emissions from ..., kg.  # TODO: Fill in.
-    housing_ammonia_unit: MeasurementUnits
+    housing_ammonia_unit: MeasurementUnits.KILOGRAMS
         Unit for housing_ammonia
     manure_volume: float
         Amount of raw manure, m^3.
-    manure_volume_unit: MeasurementUnits
+    manure_volume_unit: MeasurementUnits.KILOGRAMS
         Unit for manure_volume
     cleaning_water_volume: float
         Volume of cleaning water used in main barn, m^3.
-    cleaning_water_volume_unit: MeasurementUnits
+    cleaning_water_volume_unit: MeasurementUnits.CUBIC_METERS
         Unit for cleaning_water_volume
     total_bedding_volume: float
         Total amount of bedding needed for all the animals in pen, m^3.
-    total_bedding_volume_unit: MeasurementUnits
+    total_bedding_volume_unit: MeasurementUnits.CUBIC_METERS
         Unit for total_bedding_volume
     total_bedding_mass : float, default 0.0
         Total amount of bedding needed for all the animals in pen, kg.
@@ -93,27 +93,27 @@ class ManureHandlerDailyOutput(LiquidManurePortionProtocol):
         Unit for organic_bedding_added_to_manure.
     total_water_volume_in_milking_parlor: float
         Total volume of water used for lactating cows in the milking center, m^3.
-    total_water_volume_in_milking_parlor_unit: MeasurementUnits
+    total_water_volume_in_milking_parlor_unit: MeasurementUnits.CUBIC_METERS
         Unit for total_water_volume_in_milking_parlor
     total_daily_manure_volume: float
         Total amount of manure, bedding, and water combined, m^3.
-    total_daily_manure_volume_unit: MeasurementUnits
+    total_daily_manure_volume_unit: MeasurementUnits.CUBIC_METERS
         Unit for total_daily_manure_volume
     liquid_manure_daily_volume: float
         Same as total_daily_manure_volume. Used for satisfying the LiquidManurePortionProtocol.
-    liquid_manure_daily_volume_unit: MeasurementUnits
+    liquid_manure_daily_volume_unit: MeasurementUnits.CUBIC_METERS
         Unit for liquid_manure_daily_volume
     air_temp: float
         Temperature of the current day, C.
-    air_temp_unit: MeasurementUnits
+    air_temp_unit: MeasurementUnits.DEGREES_CELSIUS
         Unit for air_temp.
     barn_temp: float
         Temperature in the barn, C.
-    barn_temp_unit: MeasurementUnits
+    barn_temp_unit: MeasurementUnits.DEGREES_CELSIUS
         Unit for barn_temp.
     num_animals: int
         Number of animals in the pen each day.
-    num_animals_unit: MeasurementUnits
+    num_animals_unit: MeasurementUnits.UNITLESS
         Unit for num_animals
     """
 
