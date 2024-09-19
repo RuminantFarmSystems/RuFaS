@@ -190,21 +190,21 @@ class ManureExcretionCalculator:
 
         # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
         manure_nitrogen = (
-                              15.1
-                              + 0.83
-                              * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-                              * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-                              / GeneralConstants.FRACTION_TO_PERCENTAGE
-                          ) * GeneralConstants.GRAMS_TO_KG
+            15.1
+            + 0.83
+            * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
+            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            / GeneralConstants.FRACTION_TO_PERCENTAGE
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Nitrogen excretion in feces, kg [A.3B.B.2]
         fecal_nitrogen = (
-                             0.345
-                             + 0.317
-                             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-                             * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-                             / GeneralConstants.FRACTION_TO_PERCENTAGE
-                         ) * GeneralConstants.GRAMS_TO_KG
+            0.345
+            + 0.317
+            * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
+            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            / GeneralConstants.FRACTION_TO_PERCENTAGE
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Nitrogen excretion in urine, kg [A.3B.B.3]
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
@@ -261,17 +261,19 @@ class ManureExcretionCalculator:
         return total_phosphorus_excreted, manure_excretion_values
 
     @staticmethod
-    def cow_manure(is_lactating: bool,
-                   body_weight: float,
-                   days_in_milk: int,
-                   milk_protein: float,
-                   daily_milk_production: float,
-                   fecal_phosphorus: float,
-                   urine_phosphorus_required: float,
-                   milk_fat: float,
-                   metabolizable_energy_intake: float,
-                   nutrient_amount: dict[str, float],
-                   nutrient_concentration: dict[str, float]) -> Tuple[float, AnimalManureExcretions]:
+    def cow_manure(
+        is_lactating: bool,
+        body_weight: float,
+        days_in_milk: int,
+        milk_protein: float,
+        daily_milk_production: float,
+        fecal_phosphorus: float,
+        urine_phosphorus_required: float,
+        milk_fat: float,
+        metabolizable_energy_intake: float,
+        nutrient_amount: dict[str, float],
+        nutrient_concentration: dict[str, float],
+    ) -> Tuple[float, AnimalManureExcretions]:
         """
 
         Parameters
@@ -293,22 +295,35 @@ class ManureExcretionCalculator:
 
         """
         if is_lactating:
-            return ManureExcretionCalculator._lactating_cow_manure(days_in_milk, milk_protein, daily_milk_production,
-                                                                   fecal_phosphorus, urine_phosphorus_required,
-                                                                   nutrient_amount, nutrient_concentration)
+            return ManureExcretionCalculator._lactating_cow_manure(
+                days_in_milk,
+                milk_protein,
+                daily_milk_production,
+                fecal_phosphorus,
+                urine_phosphorus_required,
+                nutrient_amount,
+                nutrient_concentration,
+            )
         else:
-            return ManureExcretionCalculator._dry_cow_manure(body_weight, daily_milk_production, fecal_phosphorus,
-                                                             urine_phosphorus_required, nutrient_amount,
-                                                             nutrient_concentration)
+            return ManureExcretionCalculator._dry_cow_manure(
+                body_weight,
+                daily_milk_production,
+                fecal_phosphorus,
+                urine_phosphorus_required,
+                nutrient_amount,
+                nutrient_concentration,
+            )
 
     @staticmethod
-    def _lactating_cow_manure(days_in_milk: int,
-                              milk_protein: float,
-                              daily_milk_production: float,
-                              fecal_phosphorus: float,
-                              urine_phosphorus_required: float,
-                              nutrient_amounts: dict[str, float],
-                              nutrient_concentrations: dict[str, float]) -> Tuple[float, AnimalManureExcretions]:
+    def _lactating_cow_manure(
+        days_in_milk: int,
+        milk_protein: float,
+        daily_milk_production: float,
+        fecal_phosphorus: float,
+        urine_phosphorus_required: float,
+        nutrient_amounts: dict[str, float],
+        nutrient_concentrations: dict[str, float],
+    ) -> Tuple[float, AnimalManureExcretions]:
         """Calculates the manure excretion values for a cow with information from the ration formulation.
 
         Parameters
@@ -380,12 +395,12 @@ class ManureExcretionCalculator:
 
         # Total manure nitrogen, kg [A.3E.B.1]
         manure_nitrogen = (
-                              20.3
-                              + 0.654
-                              * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-                              * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-                              / GeneralConstants.FRACTION_TO_PERCENTAGE
-                          ) * GeneralConstants.GRAMS_TO_KG
+            20.3
+            + 0.654
+            * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
+            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            / GeneralConstants.FRACTION_TO_PERCENTAGE
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Fecal nitrogen, kg [A.3B.B.2]
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
@@ -454,18 +469,20 @@ class ManureExcretionCalculator:
             non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=potassium
+            potassium=potassium,
         )
 
         return total_phosphorus_excreted, manure_excretion_values
 
     @staticmethod
-    def _dry_cow_manure(body_weight: float,
-                        daily_milk_production: float,
-                        fecal_phosphorus: float,
-                        urine_phosphorus_required: float,
-                        nutrient_amounts: dict[str, float],
-                        nutrient_concentrations: dict[str, float]) -> Tuple[float, AnimalManureExcretions]:
+    def _dry_cow_manure(
+        body_weight: float,
+        daily_milk_production: float,
+        fecal_phosphorus: float,
+        urine_phosphorus_required: float,
+        nutrient_amounts: dict[str, float],
+        nutrient_concentrations: dict[str, float],
+    ) -> Tuple[float, AnimalManureExcretions]:
         """Calculates the manure excretion values for a non-lactating cow with information from the ration formulation.
 
         Parameters
@@ -554,21 +571,21 @@ class ManureExcretionCalculator:
 
         # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
         manure_nitrogen = (
-                              15.1
-                              + 0.83
-                              * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-                              * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-                              / GeneralConstants.FRACTION_TO_PERCENTAGE
-                          ) * GeneralConstants.GRAMS_TO_KG
+            15.1
+            + 0.83
+            * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
+            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            / GeneralConstants.FRACTION_TO_PERCENTAGE
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Nitrogen excretion in feces, kg [A.3B.B.2]
         fecal_nitrogen = (
-                             0.345
-                             + 0.317
-                             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-                             * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-                             / GeneralConstants.FRACTION_TO_PERCENTAGE
-                         ) * GeneralConstants.GRAMS_TO_KG
+            0.345
+            + 0.317
+            * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
+            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            / GeneralConstants.FRACTION_TO_PERCENTAGE
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Nitrogen excretion in urine, kg [A.3B.B.3]
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
@@ -619,7 +636,7 @@ class ManureExcretionCalculator:
             non_water_organic_phosphorus_fraction=0.0,
             phosphorus=manure_phosphorus_excreted,
             phosphorus_fraction=manure_phosphorus_fraction,
-            potassium=potassium
+            potassium=potassium,
         )
 
         return total_phosphorus_excreted, manure_excretion_values
