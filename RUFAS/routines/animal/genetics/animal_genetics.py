@@ -34,6 +34,7 @@ class AnimalGenetics:
         }
     }
     """
+
     net_merit: dict[str, dict[str, dict[str, float]]] = {}
 
     """

@@ -1152,10 +1152,11 @@ def test_handle_new_born(
     mock_animal_population.next_id.return_value = calf_id = 100
     life_cycle_manager.animal_population = mock_animal_population
 
-    mock_assign_net_merit_value_to_newborn_calf = mocker.patch.object(AnimalGenetics,
-                                                                      "assign_net_merit_value_to_newborn_calf",
-                                                                      return_value=0.0,
-                                                                      )
+    mock_assign_net_merit_value_to_newborn_calf = mocker.patch.object(
+        AnimalGenetics,
+        "assign_net_merit_value_to_newborn_calf",
+        return_value=0.0,
+    )
 
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.p_animal = p_animal = 1.0

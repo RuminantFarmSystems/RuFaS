@@ -1732,8 +1732,7 @@ def test_initialize_herd_init_herd_true_save_animals_true(
     mock_animal_base_set_nutrient_list = mocker.patch(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.set_nutrient_list"
     )
-    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics,
-                                                                          "initialize_class_variables")
+    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics, "initialize_class_variables")
 
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = True
@@ -1810,8 +1809,7 @@ def test_initialize_herd_init_herd_true_save_animals_false(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.setup_lactation_curve_parameters"
     )
 
-    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics,
-                                                                          "initialize_class_variables")
+    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics, "initialize_class_variables")
 
     mock_herd_factory.init_herd = True
     mock_herd_factory.save_animals = False
@@ -1879,8 +1877,7 @@ def test_initialize_herd_init_herd_false(
         "RUFAS.routines.animal.life_cycle.animal_base.AnimalBase.setup_lactation_curve_parameters"
     )
 
-    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics,
-                                                                          "initialize_class_variables")
+    mock_animal_genetics_initialize_class_variables = mocker.patch.object(AnimalGenetics, "initialize_class_variables")
 
     mock_herd_factory.init_herd = False
     mock_herd_factory.save_animals = False
