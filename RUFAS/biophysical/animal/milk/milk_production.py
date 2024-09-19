@@ -96,13 +96,13 @@ class MilkProduction:
 
     @staticmethod
     @njit
-    def calculate_daily_milk_production(day_of_milk: int, l_param: float, m_param: float, n_param: float) -> float:
+    def calculate_daily_milk_production(days_in_milk: int, l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
         Parameters
         ----------
-        day_of_milk : int
+        days_in_milk : int
             Days into milk of the cow.
         l_param: float
             Wood's lactation curve parameter l.
@@ -122,7 +122,7 @@ class MilkProduction:
         lactation curve parameters." Journal of Dairy Science 105.9 (2022): 7525-7538.
 
         """
-        return l_param * np.power(day_of_milk, m_param) * np.exp(-1 * n_param * day_of_milk)
+        return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
 
     @staticmethod
     @njit
@@ -136,7 +136,7 @@ class MilkProduction:
         ----------
         milk_production : float
             Unvaried milk production (kg).
-        variance : float
+        milk_production_variance : float
             How much the actual milk production varied from the estimated amount (kg).
         milk_production_reduction : float
             How much milk production was reduced by other attributes of the animals physiology (kg).
