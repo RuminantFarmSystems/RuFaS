@@ -26,7 +26,7 @@ class AnimalGrowth:
             general_properties: GeneralProperties,
             animal_growth_properties: AnimalGrowthProperties,
             reproduction_properties: ReproductionProperties,
-            time: Time) -> tuple[AnimalGrowthProperties,ReproductionProperties, GeneralProperties]:
+            time: Time) -> tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]:
         if general_properties.animal_type == AnimalType.CALF:
             animal_growth_properties.daily_growth = AnimalGrowth.calculate_calf_body_weight_change(
                 general_properties.birth_weight)
@@ -119,14 +119,15 @@ class AnimalGrowth:
         return target_average_daily_gain_pregnant_heifer + conceptus_growth, reproduction_properties
 
     @staticmethod
-    def calculate_cow_body_weight_change(
+    def calculate_cow_body_weight_change(       # noqa
             animal_growth_properties: AnimalGrowthProperties,
             reproduction_properties: ReproductionProperties,
             days_in_preg: int,
             mature_body_weight: float,
             body_weight: float,
-            days_in_milk: int
-    ) -> tuple[float, AnimalGrowthProperties, ReproductionProperties]:  # noqa
+            days_in_milk: int,
+            dry_off_day_of_pregnancy: int
+    ) -> tuple[float, AnimalGrowthProperties, ReproductionProperties]:
         # on the calving day
         if days_in_preg == reproduction_properties.gestation_length:
             conceptus_growth = -reproduction_properties.conceptus_weight
@@ -165,17 +166,17 @@ class AnimalGrowth:
                 bodyweight_tissue = -20 / 65 * math.exp(1 - days_in_milk / 65) + 20 / (
                     65**2
                 ) * days_in_milk * math.exp(1 - days_in_milk / 65)
-                if days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
+                if days_in_preg == dry_off_day_of_pregnancy - 1:
                     animal_growth_properties.tissue_changed = 20 * days_in_milk / 65 * math.exp(1 - days_in_milk / 65)
             else:  # parity > 1
                 bodyweight_tissue = -40 / 70 * math.exp(1 - days_in_milk / 70) + 40 / (
                     70**2
                 ) * days_in_milk * math.exp(1 - days_in_milk / 70)
-                if days_in_preg == AnimalBase.config["days_in_preg_when_dry"] - 1:
+                if days_in_preg == dry_off_day_of_pregnancy - 1:
                     animal_growth_properties.tissue_changed = 40 * days_in_milk / 70 * math.exp(1 - days_in_milk / 70)
         else:  # dry period
             bodyweight_tissue = animal_growth_properties.tissue_changed / (
-                reproduction_properties.gestation_length - AnimalBase.config["days_in_preg_when_dry"]
+                reproduction_properties.gestation_length - dry_off_day_of_pregnancy
             )
 
         return target_adg_cow + conceptus_growth + bodyweight_tissue, animal_growth_properties, reproduction_properties
