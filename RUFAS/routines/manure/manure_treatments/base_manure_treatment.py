@@ -273,6 +273,27 @@ class BaseManureTreatment(ABC):
         """
         pass
 
+    @staticmethod
+    def _determine_storage_temperature(air_temperature: float) -> float:
+        """Determines the temperature of the manure storage for outdoor storages.
+
+        Parameters
+        ----------
+        air_temperature : float
+            The current day's ambient air temperature.
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage.
+        """
+        if air_temperature <= 0.0:
+            return 0.0
+        elif 0.0 < air_temperature < 35.0:
+            return air_temperature
+        else:
+            return 35.0
+
     def calc_methane_emission(self, *args, **kwargs) -> float:
         """Calculates the methane emission of the manure treatment.
 

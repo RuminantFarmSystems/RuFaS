@@ -70,15 +70,16 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             (kg :math:`CH_4`/day).
 
         """
-        temperature_celsius = self._get_current_day_average_temperature_celsius()
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        barn_temperature = GasEmissionsCalculator.determine_barn_air_temperature(air_temperature)
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = (
-            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
                 accumulated_liquid_manure_total_degradable_volatile_solids=(
                     accumulated_liquid_manure_total_degradable_volatile_solids),
                 accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                     accumulated_liquid_manure_total_non_degradable_volatile_solids),
-                temp=temperature_celsius,
+                storage_temperature=barn_temperature,
             )
         )
         # fmt: on
@@ -105,12 +106,14 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             in the treatment system after the ammonia emission is calculated, kg.
 
         """
-        ammonia_loss = GasEmissionsCalculator.storage_ammonia_emission(
+        air_temperature = self._get_current_day_average_temperature_celsius()
+        barn_temperature = GasEmissionsCalculator.determine_barn_air_temperature(air_temperature)
+        ammonia_loss = GasEmissionsCalculator.calculate_storage_ammonia_emission(
             num_animals=num_animals,
             manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
             manure_volume=accumulated_manure_volume,
             manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
-            temp=self._get_current_day_average_temperature_celsius(),
+            storage_temperature=barn_temperature,
         )
 
         return ammonia_loss
