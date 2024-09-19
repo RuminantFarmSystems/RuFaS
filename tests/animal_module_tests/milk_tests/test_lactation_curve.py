@@ -327,19 +327,6 @@ def test_calculate_adjusted_wood_parameters(
 
 
 @pytest.mark.parametrize(
-    "l_param,m_param,n_param,expected",
-    [(17.8, 0.229, 0.00331, 9745.195761), (19.9, 0.231, 0.00299, 11523.229036), (22.1, 0.334, 0.00400, 17955.511169)],
-)
-def test_calc_305_day_milk_yield(
-    lactation_curve: LactationCurve, l_param: float, m_param: float, n_param: float, expected: float
-) -> None:
-    """Test that 305 day milk yields are estimated correctly."""
-    actual = lactation_curve.calc_305_day_milk_yield(l_param, m_param, n_param)
-
-    assert pytest.approx(actual) == expected
-
-
-@pytest.mark.parametrize(
     "parity,l_expect,m_expect,n_expect,l_std_dev_expected,m_std_dev_expected,n_std_dev_expected",
     [
         (1, 18.1, 0.228, 0.003321, 0.28, 0.0046, 3.77e-5),

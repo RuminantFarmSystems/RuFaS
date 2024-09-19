@@ -82,18 +82,18 @@ class LactationCurve:
     _parity_to_parameter_mapping = {}
     _parity_to_std_dev_mapping = {}
 
-    def __init__(self, time: Time) -> None:
+    @classmethod
+    def __init__(cls, time: Time) -> None:
         im = InputManager()
-        self.om = OutputManager()
 
         lactation_inputs: dict[str, Any] = im.get_data("lactation")
         all_year_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["year"]
-        year_adjustments = self._get_year_adjustments(all_year_adjustments, time)
+        year_adjustments = cls._get_year_adjustments(all_year_adjustments, time)
 
         fips_code: int = im.get_data("config.FIPS_county_code")
         all_region_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"]["region"]
         region_mapping: dict[str, str] = lactation_inputs["state_to_region_mapping"]
-        region_adjustments = self._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
+        region_adjustments = cls._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
         animal_inputs: dict[str, Any] = im.get_data("animal")
         animal_milking_frequency: float = animal_inputs["animal_config"]["management_decisions"][
@@ -102,7 +102,7 @@ class LactationCurve:
         all_milking_frequency_adjustments: dict[str, dict[str, float]] = lactation_inputs["adjustments"][
             "milking_frequency"
         ]
-        milking_frequency_adjustments = self._get_milking_frequency_adjustments(
+        milking_frequency_adjustments = cls._get_milking_frequency_adjustments(
             all_milking_frequency_adjustments, animal_milking_frequency
         )
 
@@ -112,56 +112,56 @@ class LactationCurve:
         base_wood_parameter_m: float = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
         base_wood_parameter_n: float = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
 
-        parity_1_parameters = self._calculate_adjusted_wood_parameters(
+        parity_1_parameters = cls._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["1"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
-        parity_2_parameters = self._calculate_adjusted_wood_parameters(
+        parity_2_parameters = cls._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["2"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
-        parity_3_parameters = self._calculate_adjusted_wood_parameters(
+        parity_3_parameters = cls._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["3"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
 
-        self.parity_to_parameter_mapping = {
+        cls._parity_to_parameter_mapping = {
             1: parity_1_parameters, 2: parity_2_parameters, 3: parity_3_parameters
         }
 
-        self.parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
+        cls._parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
             1: lactation_inputs["parameter_standard_deviations"]["1"],
             2: lactation_inputs["parameter_standard_deviations"]["2"],
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        info_map = {"class": self.__class__.__name__, "function": "__init__"},
+        info_map = {"class": cls.__class__.__name__, "function": "__init__"},
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
-            self.om.add_log(
+            cls._om.add_log(
                 "Projected annual milk yield provided to simulation",
                 "Using the annual milk yield input to fit lactation curve parameters.",
                 info_map,
             )
-            self._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
+            cls._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
         else:
-            self.om.add_log(
+            cls._om.add_log(
                 "Annual milk yield not provided to simulation",
                 "Lactation curve parameters will not be fit to the target milk production.",
                 info_map,
             )
 
         info_map["units"] = MeasurementUnits.UNITLESS
-        for parity, params in self.parity_to_parameter_mapping.items():
+        for parity, params in cls._parity_to_parameter_mapping.items():
             base_var_name = f"parity_{parity}_lactation_curve_parameter_"
             for param, value in params.items():
-                self.om.add_variable(f"{base_var_name}_{param}", value, info_map)
+                cls._om.add_variable(f"{base_var_name}_{param}", value, info_map)
 
     @classmethod
     def _get_year_adjustments(
@@ -207,7 +207,7 @@ class LactationCurve:
 
     @classmethod
     def _calculate_adjusted_wood_parameters(
-        self, l_param: float, m_param: float, n_param: float, adjustments: list[dict[str, float]]
+        cls, l_param: float, m_param: float, n_param: float, adjustments: list[dict[str, float]]
     ) -> dict[str, float]:
         """
         Computes Wood's Lactation Curve parameters adjusted for different factors.
