@@ -899,9 +899,7 @@ def test_slurry_storage_calc_methane_emission(
     )
     current_storage_temp = temperature_celsius
     patch_for_determine_storage_temp = mocker.patch.object(
-        slurry_storage,
-        "_determine_storage_temperature",
-        return_value=current_storage_temp
+        slurry_storage, "_determine_storage_temperature", return_value=current_storage_temp
     )
     expected_methane_loss = (2.0, 1.98)
     patch_for_calc_methane_emission_from_slurry_storage = mocker.patch(
@@ -990,9 +988,7 @@ def test_slurry_storage_calc_ammonia_emission(
     )
     current_storage_temp = temperature_celsius
     patch_for_determine_storage_temp = mocker.patch.object(
-        slurry_storage,
-        "_determine_storage_temperature",
-        return_value=current_storage_temp
+        slurry_storage, "_determine_storage_temperature", return_value=current_storage_temp
     )
     expected_ammonia_loss = 2.0
     patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch.object(
@@ -1539,9 +1535,7 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
     current_storage_temp = mock_temp_value
     patch_for_determine_storage_temp = mocker.patch.object(
-        anaerobic_lagoon,
-        "_determine_storage_temperature",
-        return_value=current_storage_temp
+        anaerobic_lagoon, "_determine_storage_temperature", return_value=current_storage_temp
     )
 
     # Act
@@ -1606,9 +1600,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
     )
     current_storage_temp = mock_temp_value
     patch_for_determine_storage_temp = mocker.patch.object(
-        anaerobic_lagoon,
-        "_determine_storage_temperature",
-        return_value=current_storage_temp
+        anaerobic_lagoon, "_determine_storage_temperature", return_value=current_storage_temp
     )
 
     # Act
