@@ -15,7 +15,30 @@ import numpy as np
 class MilkProduction:
     """
     Handles updating the milk-production related animal attributes.
+
+    Attributes
+    ----------
+    FAT_PERCENT : float
+        Class constant which stores the user-defined fat percentage of milk (by weight).
+    TRUE_PROTEIN_PERCENT : float
+        Class constant which stores the user-defined true protein percentage of milk (by weight).
+
+    Notes
+    -----
+    The class constants for fat and true protein percentages in milk are intented to be stores. The actual fat and true
+    protein percentages of an individual animal will be stored in the MilkProductionProperties instance associated with
+    that animal.
+
     """
+
+    FAT_PERCENT = None
+    TRUE_PROTEIN_PERCENT = None
+
+    @classmethod
+    def set_milk_quality(cls, fat_percent: float, true_protein_percent: float) -> None:
+        """Sets user-defined milk qualities."""
+        cls.FAT_PERCENT = fat_percent,
+        cls.TRUE_PROTEIN_PERCENT = true_protein_percent
 
     @staticmethod
     def perform_daily_milking_update(
