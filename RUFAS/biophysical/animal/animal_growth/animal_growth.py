@@ -1,4 +1,5 @@
 import math
+from typing import Any
 
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
@@ -19,9 +20,9 @@ class AnimalGrowth:
     @classmethod
     def initialize_class_variables(cls) -> None:
         im = InputManager()
-        animal_config = im.get_data("animal.animal_config.farm_level.calf.wean_day")
-        cls.wean_day = animal_config["farm_level"]["calf.wean_day"]
-        cls.target_heifer_pregnant_day = animal_config["farm_level"]["bodyweight"]["target_heifer_preg_day"]
+        animal_config: dict[str, dict[str, Any]] = im.get_data("animal.animal_config.farm_level")
+        cls.wean_day: int = animal_config["calf"]["wean_day"]
+        cls.target_heifer_pregnant_day: int = animal_config["bodyweight"]["target_heifer_preg_day"]
 
     @staticmethod
     def daily_routines(
