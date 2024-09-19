@@ -1368,10 +1368,4 @@ class GasEmissionsCalculator:
         reported in Bucklin et al. (FL, upper limit; https://doi.org/10.13031/2013.28851).
         The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
         """
-        return np.clip(air_temperature, 5, 30)
-        if air_temperature < 5:
-            return 5.0
-        elif 5 <= air_temperature <= 30:
-            return air_temperature
-        else:
-            return 30.0
+        return float(np.clip(air_temperature, 5.0, 30.0))
