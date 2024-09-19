@@ -1737,7 +1737,7 @@ def setup_dummy_animal_manager_with_pens(
 
         dummy_pen = setup_dummy_pen(pen_dict["pen_id"], pen_dict["num_stalls"], animal_list)
 
-        dummy_pen.ration = pen_dict["ration"]
+        dummy_pen.ration_per_animal = pen_dict["ration_per_animal"]
 
         for animal in animal_list:
             dummy_pen.animals_in_pen[animal.id] = animal

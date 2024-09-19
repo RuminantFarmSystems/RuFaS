@@ -5227,6 +5227,13 @@
           "minimum": 0.01,
           "default": 9.5
         },
+        "pH": {
+          "type": "number",
+          "description": "pH of the soil layer.",
+          "default": 7.0,
+          "minimum": 0.0,
+          "maximum": 14.0
+        },
         "initial_temperature": {
           "type": "number",
           "description": "Temperature of the layer at the beginning of the simulation.\nUnits: degrees Celsius.",
@@ -5654,6 +5661,182 @@
           "type": "string",
           "default": ""
         }
+      }
+    }
+  },
+  "end_to_end_test_result_path_properties": {
+    "end_to_end_test_result_paths": {
+      "type": "array",
+      "description": "List of paths to results used to execute end-to-end testing, as well as the domain that they are in.",
+      "properties": {
+        "type": "object",
+        "domain": {
+          "type": "string",
+          "description": "Indicates which domain of RuFaS is being tested with the associated paths."
+        },
+        "expected_results_path": {
+          "type": "string",
+          "description": "Path to the file with the expected results for the specified domain."
+        },
+        "actual_results_path": {
+          "type": "string",
+          "description": "Path to the file with the actual results for the specified domain."
+        }
+      }
+    }
+  },
+  "end_to_end_testing_input_properties": {
+    "reusable_values": {
+      "type": "object",
+      "fresh_mass": {
+        "type": "number"
+      },
+      "dry_matter_digestibility": {
+        "type": "number"
+      }
+    },
+    "hay_values": {
+      "type": "object",
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
+      }
+    },
+    "baleage_values": {
+      "type": "object",
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
+      }
+    },
+    "grain_values": {
+      "type": "object",
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
+      }
+    },
+    "silage_values": {
+      "type": "object",
+      "category": {
+        "type": "string"
+      },
+      "crop_type": {
+        "type": "string"
+      },
+      "dry_matter_percentage": {
+        "type": "number"
+      },
+      "lignin": {
+        "type": "number"
+      },
+      "crude_protein_percent": {
+        "type": "number"
+      },
+      "non_protein_nitrogen": {
+        "type": "number"
+      },
+      "starch": {
+        "type": "number"
+      },
+      "adf": {
+        "type": "number"
+      },
+      "ndf": {
+        "type": "number"
+      },
+      "sugar": {
+        "type": "number"
+      },
+      "ash": {
+        "type": "number"
       }
     }
   }
