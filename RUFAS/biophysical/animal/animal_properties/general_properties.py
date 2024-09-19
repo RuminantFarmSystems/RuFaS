@@ -16,6 +16,7 @@ class GeneralProperties:
     daily_growth: float
     days_born: int
     days_in_preg: int
+    days_in_milk: int
     events: AnimalEvents
     estimated_daily_milk_produced: float
     future_cull_date: int
