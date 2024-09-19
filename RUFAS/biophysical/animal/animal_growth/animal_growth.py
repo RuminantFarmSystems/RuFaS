@@ -23,10 +23,11 @@ class AnimalGrowth:
 
     @staticmethod
     def daily_routines(
-            general_properties: GeneralProperties,
-            animal_growth_properties: AnimalGrowthProperties,
-            reproduction_properties: ReproductionProperties,
-            time: Time) -> tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]:
+        general_properties: GeneralProperties,
+        animal_growth_properties: AnimalGrowthProperties,
+        reproduction_properties: ReproductionProperties,
+        time: Time,
+    ) -> tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]:
         if general_properties.animal_type == AnimalType.CALF:
             animal_growth_properties.daily_growth = AnimalGrowth.calculate_calf_body_weight_change(
                 general_properties.birth_weight
@@ -131,14 +132,14 @@ class AnimalGrowth:
         return target_average_daily_gain_pregnant_heifer + conceptus_growth, reproduction_properties
 
     @staticmethod
-    def calculate_cow_body_weight_change(       # noqa
-            animal_growth_properties: AnimalGrowthProperties,
-            reproduction_properties: ReproductionProperties,
-            days_in_preg: int,
-            mature_body_weight: float,
-            body_weight: float,
-            days_in_milk: int,
-            dry_off_day_of_pregnancy: int
+    def calculate_cow_body_weight_change(  # noqa
+        animal_growth_properties: AnimalGrowthProperties,
+        reproduction_properties: ReproductionProperties,
+        days_in_preg: int,
+        mature_body_weight: float,
+        body_weight: float,
+        days_in_milk: int,
+        dry_off_day_of_pregnancy: int,
     ) -> tuple[float, AnimalGrowthProperties, ReproductionProperties]:
         # on the calving day
         if days_in_preg == reproduction_properties.gestation_length:
