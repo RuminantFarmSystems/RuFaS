@@ -41,7 +41,6 @@ from RUFAS.time import Time
 
 @fixture
 def life_cycle_manager(mocker: MockerFixture) -> LifeCycleManager:
-    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalGenetics")
     life_cycle_manager = LifeCycleManager(data=mocker.MagicMock(autospec=AnimalConfigTypedDict))
     life_cycle_manager.om = OutputManager()
     return life_cycle_manager
@@ -817,6 +816,8 @@ def test_check_if_heifers_need_to_be_sold(mocker: MockerFixture, life_cycle_mana
 def test_check_if_replacement_heifers_needed(mocker: MockerFixture, life_cycle_manager: LifeCycleManager) -> None:
     """Unit test for function _check_if_replacement_heifers_needed in file life_cycle.py"""
 
+    mocker.patch.object(AnimalGenetics, "assign_net_merit_value_to_animals_entering_herd")
+
     # Case 1: len(cows) + len(heiferIIIs) + bought_heifer_num < herd_num * 1.01 AND sim_day > 1
     # Arrange
     sim_day = 100
@@ -1151,9 +1152,10 @@ def test_handle_new_born(
     mock_animal_population.next_id.return_value = calf_id = 100
     life_cycle_manager.animal_population = mock_animal_population
 
-    mock_genetics = mocker.MagicMock(autospec=AnimalGenetics)
-    mock_genetics.assign_net_merit_value_to_newborn_calf.return_value = 0.0
-    life_cycle_manager.genetics_calculator = mock_genetics
+    mock_assign_net_merit_value_to_newborn_calf = mocker.patch.object(AnimalGenetics,
+                                                                      "assign_net_merit_value_to_newborn_calf",
+                                                                      return_value=0.0,
+                                                                      )
 
     mock_cow = mocker.MagicMock(autospec=Cow)
     mock_cow.p_animal = p_animal = 1.0
@@ -1185,7 +1187,7 @@ def test_handle_new_born(
     life_cycle_manager._handle_new_born(time, mock_cow, calves_born)
 
     # Assert
-    mock_genetics.assign_net_merit_value_to_newborn_calf.assert_called_once_with(time, "HO", mock_cow.net_merit)
+    mock_assign_net_merit_value_to_newborn_calf.assert_called_once_with(time, "HO", mock_cow.net_merit)
     assert mock_cow.p_animal == expected_cow_p_animal
     assert mock_cow.p_gest_for_calf == approx(0.0)
     assert mock_cow.calf_birth_weight == approx(0.0)

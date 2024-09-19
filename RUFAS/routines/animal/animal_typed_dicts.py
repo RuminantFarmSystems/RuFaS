@@ -48,7 +48,8 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
     pen_history: NotRequired[List]
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
-    nei_merit: NotRequired[float]
+    net_merit: NotRequired[float]
+    """The net merit value that represents the genetic value of the animal, USD."""
 
 
 class CalfValuesTypedDict(TypedDict):
