@@ -93,8 +93,6 @@ class HerdFactory:
             current_animal_id=0,
         )
 
-        self.genetic_calculator = AnimalGenetics()
-
     def _calves_update(self) -> None:
         """Calves update for generating herd simulation"""
         remaining_calves: List[Calf] = []
@@ -197,7 +195,7 @@ class HerdFactory:
 
                 calf = Calf(args)
                 if not (calf.culled or calf.sold):
-                    calf.net_merit = self.genetic_calculator.assign_net_merit_value_to_newborn_calf(
+                    calf.net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
                         time, calf.breed, cow.net_merit
                     )
                     self.pre_animal_population.calves.append(calf)
@@ -213,7 +211,7 @@ class HerdFactory:
                 days_born=0,
                 p_init=0,
                 birth_weight=0,
-                nei_merit=self.genetic_calculator.assign_net_merit_value_to_animals_entering_herd(
+                nei_merit=AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
                     time.start_date.strftime("%Y-%m-%d"), self.breed
                 ),
             )
@@ -254,7 +252,7 @@ class HerdFactory:
         animal_data.update(id=self.pre_animal_population.next_id())
         animal_data.update(birth_date=self._backtrack_animal_birth_date(animal_data, time))
         animal_data.update(
-            net_merit=self.genetic_calculator.assign_net_merit_value_to_animals_entering_herd(
+            net_merit=AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
                 animal_data["birth_date"], animal_data["breed"]
             )
         )
@@ -393,6 +391,8 @@ class HerdFactory:
 
         time = Time()
         AnimalBase.setup_lactation_curve_parameters(time)
+
+        AnimalGenetics.initialize_class_variables()
 
         if self.init_herd:
             self.pre_animal_population = self._generate_animals(time)

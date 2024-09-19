@@ -15,22 +15,26 @@ base_change_lookup_table = {
 
 
 class AnimalGenetics:
-    def __init__(self) -> None:
-        """Get the net merit and top listing semen data from InputManager, save them as class attributes, and perform
-        base change and fill the gap for the net merit data."""
+    net_merit: dict[str, dict[str, dict[str, float]]] = {}
+    top_semen: dict[str, dict[str, float]] = {}
+
+    @classmethod
+    def initialize_class_variables(cls) -> None:
+        """This method initializes the class variables for net_merit and top_semen."""
         im = InputManager()
         net_merit_HO: dict[str, list[str | float]] = im.get_data("animal_net_merit")
         top_listing_semen_HO: dict[str, list[str | float]] = im.get_data("animal_top_listing_semen")
-        self.net_merit: dict[str, dict[str, dict[str, float]]] = {
+
+        cls.net_merit = {
             "HO": {
                 net_merit_HO["year_month"][i]: {"average": net_merit_HO["average"][i], "std": net_merit_HO["std"][i]}
                 for i in range(len(net_merit_HO["year_month"]))
             }
         }
-        self.net_merit = self.net_merit_base_change(self.net_merit)
-        self.net_merit = self.net_merit_fill_gap(self.net_merit)
+        cls.net_merit = cls.net_merit_base_change(cls.net_merit)
+        cls.net_merit = cls.net_merit_fill_gap(cls.net_merit)
 
-        self.top_semen: dict[str, dict[str, float]] = {
+        cls.top_semen = {
             "HO": {
                 top_listing_semen_HO["year_month"][i]: top_listing_semen_HO["estimated_PTA"][i]
                 for i in range(len(top_listing_semen_HO["year_month"]))
@@ -107,7 +111,7 @@ class AnimalGenetics:
             The net merit data after filling the gap in between entries.
         """
         expanded_net_merit: dict[str, dict[str, dict[str, float]]] = {}
-        monthly_increase_lookup = {2005: 140 / 60, 2010: 253 / 60, 2015: 369 / 60, 2020: (538 - 396) / 24}
+        monthly_increase_lookup = {2005: 132 / 60, 2010: 184 / 60, 2015: 231 / 60, 2020: (360.731239 - 36.931108) / 48}
 
         for breed in original_net_merit.keys():
             expanded_net_merit[breed] = {}
@@ -151,7 +155,8 @@ class AnimalGenetics:
             expanded_net_merit[breed] = {k: expanded_net_merit[breed][k] for k in updated_keys}
         return expanded_net_merit
 
-    def assign_net_merit_value_to_animals_entering_herd(self, birth_date: str, breed: str) -> float:
+    @staticmethod
+    def assign_net_merit_value_to_animals_entering_herd(birth_date: str, breed: str) -> float:
         """
         This function calculates the net merit value for animals entering the herd, either during initialization or
         for animals bought during the simulation.
@@ -174,11 +179,12 @@ class AnimalGenetics:
         of the net merit value, then generates a random value from the distribution as the net merit value.
         """
         birth_year_month = birth_date[:7]
-        average = self.net_merit[breed][birth_year_month]["average"]
-        std = self.net_merit[breed][birth_year_month]["std"]
+        average = AnimalGenetics.net_merit[breed][birth_year_month]["average"]
+        std = AnimalGenetics.net_merit[breed][birth_year_month]["std"]
         return Utility.generate_random_number(average, std)
 
-    def assign_net_merit_value_to_newborn_calf(self, time: Time, breed: str, dam_net_merit_value: float) -> float:
+    @staticmethod
+    def assign_net_merit_value_to_newborn_calf(time: Time, breed: str, dam_net_merit_value: float) -> float:
         """
         This function calculates the net merit value for the newborn calves.
 
@@ -205,7 +211,7 @@ class AnimalGenetics:
         population variance.
         """
         birth_year_month = str(time.current_calendar_year) + "-" + str(time.current_month).zfill(2)
-        semen_PTA: float = self.top_semen[breed][birth_year_month]
+        semen_PTA: float = AnimalGenetics.top_semen[breed][birth_year_month]
         average_net_merit = semen_PTA + dam_net_merit_value
-        variance = ((self.net_merit[breed][birth_year_month]["std"]) ** 2) / 2
+        variance = ((AnimalGenetics.net_merit[breed][birth_year_month]["std"]) ** 2) / 2
         return Utility.generate_random_number(average_net_merit, np.sqrt(variance))

@@ -170,8 +170,6 @@ class LifeCycleManager:
         self.replacement_market: List[Cow] = []
         self.animal_population: Optional[AnimalPopulation] = None
 
-        self.genetics_calculator = AnimalGenetics()
-
     def initialize_herd(
         self, herd_data: HerdInfoTypedDict
     ) -> Tuple[List[Calf], List[HeiferI], List[HeiferII], List[HeiferIII], List[Cow]]:
@@ -826,7 +824,7 @@ class LifeCycleManager:
             replacement = self.replacement_market.pop(0)
             replacement.events.add_event(replacement.days_born, sim_day, animal_constants.ENTER_HERD)
             replacement.set_p_purchased()
-            replacement.net_merit = self.genetics_calculator.assign_net_merit_value_to_animals_entering_herd(
+            replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
                 replacement.birth_date, replacement.breed
             )
             animals_added.append(replacement)
@@ -1042,7 +1040,7 @@ class LifeCycleManager:
 
     def _handle_new_born(self, time: Time, cow: Cow, calves_born: List[Calf]) -> None:
         sim_day = time.simulation_day
-        net_merit = self.genetics_calculator.assign_net_merit_value_to_newborn_calf(
+        net_merit = AnimalGenetics.assign_net_merit_value_to_newborn_calf(
             time, AnimalBase.config["breed"], cow.net_merit
         )
         args = {
