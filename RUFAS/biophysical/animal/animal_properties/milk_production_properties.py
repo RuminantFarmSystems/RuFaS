@@ -18,13 +18,13 @@ class MilkProductionProperties:
     latest_305_day_milk_production : float
         Sum of milk production over the last 305 days of the cow's lactation (kg).
     crude_protein_percent : float
-        Percentage of cow's milk that is crude protein by weight. TODO: double check the "by weight" part.
+        Percentage of cow's milk that is crude protein by weight.
     true_protein_percent : float
         Percentage of cow's milk that is true protein. TODO: how do true protein and crude protein need to be compared in order to make sure they're valid.
     fat_percent : float
-        Percentage of cow's milk that is fat by weight. TODO: double check the "by weight" part.
+        Percentage of cow's milk that is fat by weight.
     lactose_percent : float
-        Percentage of cow's milk that is lactose by weight. TODO: double check the "by weight" part.
+        Percentage of cow's milk that is lactose by weight.
     wood_l : float
         Wood's "l" lactation curve parameter (unitless).
     wood_m : float
