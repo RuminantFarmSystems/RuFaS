@@ -287,7 +287,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
             manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
             manure_volume=accumulated_manure_volume,
             manure_density=ManureConstants.SLURRY_MANURE_DENSITY,
-            storage_temperature=storage_temperature
+            storage_temperature=storage_temperature,
         )
 
         return ammonia_loss
