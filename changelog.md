@@ -40,5 +40,6 @@ v0.9.1
 - [2000](https://github.com/RuminantFarmSystems/MASM/pull/2000) - [minor change] [CurrentWeatherConditions] Removed optional type hints.
 - [1989](https://github.com/RuminantFarmSystems/MASM/pull/1989) - [minor change] [Animal] Method formulate_ration now correctly returns pen.ration_per_animal instead of pen.ration.
 - [2001](https://github.com/RuminantFarmSystems/MASM/pull/2001) - [minor change] [E2E Testing] Changes E2ETestResultsComparer so that it constructs file paths properly on Windows machines.
+- [2010](https://github.com/RuminantFarmSystems/MASM/pull/2010) - [minor change] Updates liquid manure nitrogen input source used to calculate N2O emissions for manure storages.
 - [2002](https://github.com/RuminantFarmSystems/MASM/pull/2002) - [minor change] [Manure] Adds a method to determine the ambient inside barn temperature based on the outdoor air temperature for use in calculations of emissions associated with Manure Handlers.
 - [2009](https://github.com/RuminantFarmSystems/MASM/pull/2009) - [minor change] [Time][Feed Storage] Modifies the init of Time so that a time object can be created without needing config from IM. This in turn allows us to avoid deep copies used for time management.
