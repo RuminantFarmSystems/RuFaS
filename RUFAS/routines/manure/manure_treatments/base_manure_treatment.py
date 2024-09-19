@@ -6,6 +6,8 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
+import numpy as np
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
@@ -274,7 +276,7 @@ class BaseManureTreatment(ABC):
         pass
 
     @staticmethod
-    def _determine_storage_temperature(air_temperature: float) -> float:
+    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
         """Determines the temperature of the manure storage for outdoor storages.
 
         Parameters
@@ -287,12 +289,7 @@ class BaseManureTreatment(ABC):
         float
             The estimated temperature of the manure storage.
         """
-        if air_temperature <= 0.0:
-            return 0.0
-        elif 0.0 < air_temperature < 35.0:
-            return air_temperature
-        else:
-            return 35.0
+        return float(np.clip(air_temperature, 0.0, 35.0))
 
     def calc_methane_emission(self, *args, **kwargs) -> float:
         """Calculates the methane emission of the manure treatment.

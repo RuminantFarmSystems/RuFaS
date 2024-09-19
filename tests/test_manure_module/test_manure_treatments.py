@@ -898,8 +898,8 @@ def test_slurry_storage_calc_methane_emission(
         return_value=current_barn_temp,
     )
     current_storage_temp = temperature_celsius
-    patch_for_determine_storage_temp = mocker.patch.object(
-        slurry_storage, "_determine_storage_temperature", return_value=current_storage_temp
+    patch_for_determine_outdoor_storage_temperature = mocker.patch.object(
+        slurry_storage, "_determine_outdoor_storage_temperature", return_value=current_storage_temp
     )
     expected_methane_loss = (2.0, 1.98)
     patch_for_calc_methane_emission_from_slurry_storage = mocker.patch(
@@ -930,9 +930,9 @@ def test_slurry_storage_calc_methane_emission(
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     if slurry_storage_class is SlurryStorageUnderfloor:
         patch_for_determine_barn_air_temperature.assert_called_once()
-        patch_for_determine_storage_temp.assert_not_called()
+        patch_for_determine_outdoor_storage_temperature.assert_not_called()
     else:
-        patch_for_determine_storage_temp.assert_called_once()
+        patch_for_determine_outdoor_storage_temperature.assert_called_once()
         patch_for_determine_barn_air_temperature.assert_not_called()
     if slurry_storage_class is SlurryStorageUnderfloor:
         patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
@@ -987,8 +987,8 @@ def test_slurry_storage_calc_ammonia_emission(
         return_value=current_barn_temp,
     )
     current_storage_temp = temperature_celsius
-    patch_for_determine_storage_temp = mocker.patch.object(
-        slurry_storage, "_determine_storage_temperature", return_value=current_storage_temp
+    patch_for_determine_outdoor_storage_temperature = mocker.patch.object(
+        slurry_storage, "_determine_outdoor_storage_temperature", return_value=current_storage_temp
     )
     expected_ammonia_loss = 2.0
     patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch.object(
@@ -1010,9 +1010,9 @@ def test_slurry_storage_calc_ammonia_emission(
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
     if slurry_storage_class is SlurryStorageUnderfloor:
         patch_for_determine_barn_air_temperature.assert_called_once()
-        patch_for_determine_storage_temp.assert_not_called()
+        patch_for_determine_outdoor_storage_temperature.assert_not_called()
     else:
-        patch_for_determine_storage_temp.assert_called_once()
+        patch_for_determine_outdoor_storage_temperature.assert_called_once()
         patch_for_determine_barn_air_temperature.assert_not_called()
 
     if slurry_storage_class is SlurryStorageOutdoor:
@@ -1534,8 +1534,8 @@ def test_anaerobic_lagoon_update_methane_emission(
         return_value=mock_temp_value,
     )
     current_storage_temp = mock_temp_value
-    patch_for_determine_storage_temp = mocker.patch.object(
-        anaerobic_lagoon, "_determine_storage_temperature", return_value=current_storage_temp
+    patch_for_determine_outdoor_storage_temperature = mocker.patch.object(
+        anaerobic_lagoon, "_determine_outdoor_storage_temperature", return_value=current_storage_temp
     )
 
     # Act
@@ -1554,7 +1554,7 @@ def test_anaerobic_lagoon_update_methane_emission(
     )
     # fmt: on
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
-    patch_for_determine_storage_temp.assert_called_once()
+    patch_for_determine_outdoor_storage_temperature.assert_called_once()
     assert actual_methane_emission == expected_methane_emission
 
 
@@ -1599,8 +1599,8 @@ def test_anaerobic_lagoon_update_ammonia_emission(
         return_value=mock_temp_value,
     )
     current_storage_temp = mock_temp_value
-    patch_for_determine_storage_temp = mocker.patch.object(
-        anaerobic_lagoon, "_determine_storage_temperature", return_value=current_storage_temp
+    patch_for_determine_outdoor_storage_temperature = mocker.patch.object(
+        anaerobic_lagoon, "_determine_outdoor_storage_temperature", return_value=current_storage_temp
     )
 
     # Act
@@ -1614,7 +1614,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
         manure_density=ManureConstants.LIQUID_MANURE_DENSITY,
         storage_temperature=current_storage_temp,
     )
-    patch_for_determine_storage_temp.assert_called_once()
+    patch_for_determine_outdoor_storage_temperature.assert_called_once()
     assert mock_daily_output.storage_ammonia == mock_storage_ammonia_emission_value
 
 

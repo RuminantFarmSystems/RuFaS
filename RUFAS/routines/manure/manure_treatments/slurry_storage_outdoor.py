@@ -241,7 +241,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         air_temperature = self._get_current_day_average_temperature_celsius()
-        storage_temperature = self._determine_storage_temperature(air_temperature)
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
         # fmt: off
         methane_loss, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
@@ -281,7 +281,7 @@ class SlurryStorageOutdoor(BaseManureTreatment):
 
         """
         air_temperature = self._get_current_day_average_temperature_celsius()
-        storage_temperature = self._determine_storage_temperature(air_temperature)
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
         ammonia_loss = GasEmissionsCalculator.calculate_storage_ammonia_emission(
             num_animals=num_animals,
             manure_total_ammoniacal_nitrogen=accumulated_manure_total_ammoniacal_nitrogen,
