@@ -22,6 +22,7 @@ jobs:
         with:
           persist-credentials: true
           fetch-depth: 1
+          ref: ${{ github.base_ref }}
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -36,7 +37,7 @@ jobs:
       - name: Get all added or modified files
         run: |
           BASE_BRANCH=${{ github.base_ref }} || "dev"
-          git fetch origin $BASE_BRANCH
+          git diff --name-only $BASE_BRANCH
           if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
             echo "Fallback to dev branch because $BASE_BRANCH does not exist."
             BASE_BRANCH="dev"
@@ -91,7 +92,7 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref || github.ref }}
         run: |
-          black ${{ env.FILES }}
+          black $(git diff --name-only $BASE_BRANCH | grep '\.py$')
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add -A
