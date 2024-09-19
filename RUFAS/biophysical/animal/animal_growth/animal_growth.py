@@ -23,48 +23,56 @@ class AnimalGrowth:
 
     @staticmethod
     def daily_routines(
-            general_properties: GeneralProperties,
-            animal_growth_properties: AnimalGrowthProperties,
-            reproduction_properties: ReproductionProperties,
-            time: Time) -> tuple[AnimalGrowthProperties,ReproductionProperties, GeneralProperties]:
+        general_properties: GeneralProperties,
+        animal_growth_properties: AnimalGrowthProperties,
+        reproduction_properties: ReproductionProperties,
+        time: Time,
+    ) -> tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]:
         if general_properties.animal_type == AnimalType.CALF:
             animal_growth_properties.daily_growth = AnimalGrowth.calculate_calf_body_weight_change(
-                general_properties.birth_weight)
+                general_properties.birth_weight
+            )
             general_properties.body_weight += animal_growth_properties.daily_growth
 
         elif general_properties.animal_type == AnimalType.HEIFER_I or (
             general_properties.animal_type == AnimalType.HEIFER_II and not general_properties.is_pregnant
         ):
             animal_growth_properties.daily_growth = AnimalGrowth.calculate_non_pregnant_heifer_body_weight_change(
-                general_properties.days_born, general_properties.mature_body_weight, general_properties.body_weight)
+                general_properties.days_born, general_properties.mature_body_weight, general_properties.body_weight
+            )
             general_properties.body_weight += animal_growth_properties.daily_growth
 
-        elif (general_properties.animal_type == AnimalType.HEIFER_II and general_properties.is_pregnant) or \
-                general_properties.animal_type == AnimalType.HEIFER_III:
+        elif (
+            general_properties.animal_type == AnimalType.HEIFER_II and general_properties.is_pregnant
+        ) or general_properties.animal_type == AnimalType.HEIFER_III:
             if general_properties.body_weight < general_properties.mature_body_weight:
-                (
-                    animal_growth_properties.daily_growth,
-                    reproduction_properties
-                ) = AnimalGrowth.calculate_pregnant_heifer_body_weight_change(reproduction_properties,
-                                                                              general_properties.days_in_preg,
-                                                                              general_properties.mature_body_weight,
-                                                                              general_properties.body_weight)
+                (animal_growth_properties.daily_growth, reproduction_properties) = (
+                    AnimalGrowth.calculate_pregnant_heifer_body_weight_change(
+                        reproduction_properties,
+                        general_properties.days_in_preg,
+                        general_properties.mature_body_weight,
+                        general_properties.body_weight,
+                    )
+                )
                 general_properties.body_weight += animal_growth_properties.daily_growth
             else:
                 general_properties.body_weight = general_properties.mature_body_weight
-                general_properties.events.add_event(general_properties.days_born,
-                                                    time.simulation_day,
-                                                    animal_constants.MATURE_BODY_WEIGHT_REGULAR)
+                general_properties.events.add_event(
+                    general_properties.days_born, time.simulation_day, animal_constants.MATURE_BODY_WEIGHT_REGULAR
+                )
 
-        elif general_properties.animal_type == AnimalType.DRY_COW or \
-                general_properties.animal_type == AnimalType.LAC_COW:
-            (
-                animal_growth_properties.daily_growth,
-                animal_growth_properties,
-                reproduction_properties
-            ) = AnimalGrowth.calculate_cow_body_weight_change(
-                animal_growth_properties, reproduction_properties, general_properties.days_in_preg,
-                general_properties.mature_body_weight, general_properties.body_weight, general_properties.days_in_milk
+        elif (
+            general_properties.animal_type == AnimalType.DRY_COW or general_properties.animal_type == AnimalType.LAC_COW
+        ):
+            (animal_growth_properties.daily_growth, animal_growth_properties, reproduction_properties) = (
+                AnimalGrowth.calculate_cow_body_weight_change(
+                    animal_growth_properties,
+                    reproduction_properties,
+                    general_properties.days_in_preg,
+                    general_properties.mature_body_weight,
+                    general_properties.body_weight,
+                    general_properties.days_in_milk,
+                )
             )
             general_properties.body_weight += animal_growth_properties.daily_growth
 
@@ -76,7 +84,8 @@ class AnimalGrowth:
 
     @staticmethod
     def calculate_non_pregnant_heifer_body_weight_change(
-            days_born: int, mature_body_weight: float, body_weight: float) -> float:
+        days_born: int, mature_body_weight: float, body_weight: float
+    ) -> float:
         divisor = abs(AnimalGrowth.target_heifer_pregnant_day - days_born)
         if divisor == 0:
             divisor = 1
@@ -87,8 +96,11 @@ class AnimalGrowth:
 
     @staticmethod
     def calculate_pregnant_heifer_body_weight_change(
-            reproduction_properties: ReproductionProperties, days_in_preg: int, mature_body_weight: float,
-            body_weight: float) -> tuple[float, ReproductionProperties]:
+        reproduction_properties: ReproductionProperties,
+        days_in_preg: int,
+        mature_body_weight: float,
+        body_weight: float,
+    ) -> tuple[float, ReproductionProperties]:
         """
         Calculates the body weight change for a heifer, depending on if she
         is pregnant or not.
@@ -108,10 +120,11 @@ class AnimalGrowth:
             conceptus_growth = -reproduction_properties.conceptus_weight
             reproduction_properties.conceptus_weight = 0
         elif days_in_preg > 50:
-            conceptus_total_weight = (0.0148 * reproduction_properties.gestation_length - 2.408) * \
-                                     reproduction_properties.calf_birth_weight
+            conceptus_total_weight = (
+                0.0148 * reproduction_properties.gestation_length - 2.408
+            ) * reproduction_properties.calf_birth_weight
             conceptus_param = conceptus_total_weight ** (1 / 3) / (reproduction_properties.gestation_length - 50)
-            conceptus_growth = 3 * conceptus_param ** 3 * (days_in_preg - 50) ** 2
+            conceptus_growth = 3 * conceptus_param**3 * (days_in_preg - 50) ** 2
             reproduction_properties.conceptus_weight += conceptus_growth
         else:
             conceptus_growth = 0
@@ -120,12 +133,12 @@ class AnimalGrowth:
 
     @staticmethod
     def calculate_cow_body_weight_change(
-            animal_growth_properties: AnimalGrowthProperties,
-            reproduction_properties: ReproductionProperties,
-            days_in_preg: int,
-            mature_body_weight: float,
-            body_weight: float,
-            days_in_milk: int
+        animal_growth_properties: AnimalGrowthProperties,
+        reproduction_properties: ReproductionProperties,
+        days_in_preg: int,
+        mature_body_weight: float,
+        body_weight: float,
+        days_in_milk: int,
     ) -> tuple[float, AnimalGrowthProperties, ReproductionProperties]:  # noqa
         # on the calving day
         if days_in_preg == reproduction_properties.gestation_length:
@@ -134,8 +147,9 @@ class AnimalGrowth:
             animal_growth_properties.tissue_changed = 0
         # conceptus weight change during pregnancy
         elif days_in_preg > 50:
-            conceptus_total_weight = (0.0148 * reproduction_properties.gestation_length - 2.408) * \
-                                     reproduction_properties.calf_birth_weight
+            conceptus_total_weight = (
+                0.0148 * reproduction_properties.gestation_length - 2.408
+            ) * reproduction_properties.calf_birth_weight
             conceptus_param = conceptus_total_weight ** (1 / 3) / (reproduction_properties.gestation_length - 50)
             conceptus_growth = 3 * conceptus_param**3 * (days_in_preg - 50) ** 2
             reproduction_properties.conceptus_weight += conceptus_growth
