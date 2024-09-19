@@ -1,6 +1,8 @@
 import math
 from typing import Tuple
 
+import numpy as np
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
@@ -1346,21 +1348,24 @@ class GasEmissionsCalculator:
 
     @staticmethod
     def determine_barn_air_temperature(air_temperature: float) -> float:
-        """Adjusts the air temperature to be more reflective of the range found inside a barn.
+        """Determines the ambient inside barn temperature based on the outdoor air temperature.
 
         Parameters
         ----------
         air_temperature : float
-            The air temperature.
+            The air temperature (°C).
 
         Returns
         -------
         float
-            The barn temperature.
+            The barn temperature (°C).
+
+        References
+        ----------
+        Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
+        This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
+        These bounds were suggested by manure SMEs and are supported by barn temperature ranges
+        reported in Bucklin et al. (FL, upper limit; https://doi.org/10.13031/2013.28851).
+        The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
         """
-        if air_temperature < 5:
-            return 5.0
-        elif 5 <= air_temperature <= 30:
-            return air_temperature
-        else:
-            return 30.0
+        return float(np.clip(air_temperature, 5.0, 30.0))

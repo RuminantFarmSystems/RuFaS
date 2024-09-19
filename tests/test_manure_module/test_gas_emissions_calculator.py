@@ -924,5 +924,5 @@ def test_nitrogen_loss_in_open_lots_from_ammonia_emission(
         (35.0, 30.0),  # Above the maximum threshold
     ],
 )
-def test_determine_barn_air_temperature(input_temp: float, expected_output: float):
+def test_determine_barn_air_temperature(input_temp: float, expected_output: float) -> None:
     assert GasEmissionsCalculator.determine_barn_air_temperature(input_temp) == expected_output
