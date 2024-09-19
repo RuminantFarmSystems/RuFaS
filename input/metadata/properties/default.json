@@ -865,9 +865,8 @@
           "pattern": "^(HO|JE)$"
         },
         "birth_date": {
-          "type": "number",
-          "description": "Birth date.",
-          "minimum": 0
+          "type": "string",
+          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -897,6 +896,11 @@
         "events": {
           "type": "string",
           "default": ""
+        },
+        "net_merit": {
+          "type": "number",
+          "description": "The net merit value.",
+          "default": 0.0
         }
       }
     },
@@ -916,9 +920,8 @@
           "pattern": "^(HO|JE)$"
         },
         "birth_date": {
-          "type": "number",
-          "description": "Birth date.",
-          "minimum": 0
+          "type": "string",
+          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -947,6 +950,11 @@
         },
         "events": {
           "type": "string"
+        },
+        "net_merit": {
+          "type": "number",
+          "description": "The net merit value.",
+          "default": 0.0
         }
       }
     },
@@ -966,9 +974,8 @@
           "pattern": "^(HO|JE)$"
         },
         "birth_date": {
-          "type": "number",
-          "description": "Birth date.",
-          "minimum": 0
+          "type": "string",
+          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1073,6 +1080,11 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
+        },
+        "net_merit": {
+          "type": "number",
+          "description": "The net merit value.",
+          "default": 0.0
         }
       }
     },
@@ -1092,9 +1104,8 @@
           "pattern": "^(HO|JE)$"
         },
         "birth_date": {
-          "type": "number",
-          "description": "Birth date.",
-          "minimum": 0
+          "type": "string",
+          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1199,6 +1210,11 @@
           "type": "number",
           "description": "Calf Birth weight.",
           "minimum": 0
+        },
+        "net_merit": {
+          "type": "number",
+          "description": "The net merit value.",
+          "default": 0.0
         }
       }
     },
@@ -1218,9 +1234,8 @@
           "pattern": "^(HO|JE)$"
         },
         "birth_date": {
-          "type": "number",
-          "description": "Birth date.",
-          "minimum": 0
+          "type": "string",
+          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1355,6 +1370,11 @@
           "type": "number",
           "description": "Calving Interval",
           "minimum": 0
+        },
+        "net_merit": {
+          "type": "number",
+          "description": "The net merit value.",
+          "default": 0.0
         }
       }
     },
@@ -1374,9 +1394,8 @@
           "pattern": "^(HO|JE)$"
         },
         "birth_date": {
-          "type": "number",
-          "description": "Birth date.",
-          "minimum": 0
+          "type": "string",
+          "description": "Birth date."
         },
         "days_born": {
           "type": "number",
@@ -1496,7 +1515,57 @@
           "type": "string",
           "description": "Cow ReSynch Protocol.",
           "pattern": "^(TAIafterPD|TAIbeforePD|PGFatPD)$"
+        },
+        "net_merit": {
+          "type": "number",
+          "description": "The net merit value.",
+          "default": 0.0
         }
+      }
+    }
+  },
+  "animal_net_merit_properties": {
+    "year_month": {
+      "type": "array",
+      "description": "The birth year and month of the animal.",
+      "properties": {
+        "type": "string",
+        "description": "The birth year and month of the animal."
+      }
+    },
+    "average": {
+      "type": "array",
+      "description": "The average net-merit values of the animal.",
+      "properties": {
+        "type": "number",
+        "description": "The average net-merit values of the animal born on the given birth year and month."
+      }
+    },
+    "std": {
+      "type": "array",
+      "description": "The standard deviation of the net-merit values of the animal.",
+      "properties": {
+        "type": "number",
+        "description": "The standard deviation of the net-merit values of the animal born on the given birth year and month.",
+        "minimum": 0
+      }
+    }
+  },
+  "animal_top_listing_semen_properties": {
+    "year_month": {
+      "type": "array",
+      "description": "The birth year and month of the baby calf.",
+      "properties": {
+        "type": "string",
+        "description": "The birth year and month of the baby calf."
+      }
+    },
+    "estimated_PTA": {
+      "type": "array",
+      "description": "The estimated PTA value for the top listing semen.",
+      "properties": {
+        "type": "number",
+        "description": "The estimated PTA value for the top listing semen."
       }
     }
   },
