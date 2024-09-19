@@ -1,6 +1,8 @@
 import math
 from typing import Tuple
 
+import numpy as np
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
     GasEmissionConstants,
@@ -203,7 +205,7 @@ class GasEmissionsCalculator:
             return -math.tanh(hours + 3.5) / 3.5
 
     @classmethod
-    def housing_methane_emission(cls, barn_area: float, barn_temp: float) -> float:
+    def calculate_housing_methane_emission(cls, barn_area: float, barn_temperature: float) -> float:
         """
         Calculate housing methane emissions from manure handlers.
 
@@ -227,7 +229,7 @@ class GasEmissionsCalculator:
         ----------
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
-        barn_temp : float
+        barn_temperature : float
             Current barn temperature (:math:`^{\\circ}C`).
 
         Returns
@@ -244,10 +246,10 @@ class GasEmissionsCalculator:
         if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        return max(0.0, 0.13 * barn_temp) * barn_area / 1000
+        return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def housing_carbon_dioxide_emission(cls, barn_area: float, barn_temp: float) -> float:
+    def calculate_housing_carbon_dioxide_emission(cls, barn_area: float, barn_temperature: float) -> float:
         """
         Calculate carbon dioxide housing emission.
 
@@ -271,7 +273,7 @@ class GasEmissionsCalculator:
         ----------
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
-        barn_temp : float
+        barn_temperature : float
             Current barn temperature (:math:`^{\\circ}C`).
 
         Returns
@@ -288,16 +290,16 @@ class GasEmissionsCalculator:
         if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        return max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
+        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def housing_ammonia_emission(
+    def calculate_housing_ammonia_emission(
         cls,
         num_animals: int,
         barn_area: float,
         urine_total_ammoniacal_nitrogen: float,
         urine: float,
-        temp: float,
+        barn_temperature: float,
         pH: float = GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
         housing_specific_constant: float = GasEmissionConstants.HOUSING_HSC,
     ) -> float:
@@ -397,7 +399,7 @@ class GasEmissionsCalculator:
             Total ammoniacal nitrogen in manure (kg).
         urine : float
             Amount of manure produced by animals in the barn (kg).
-        temp : float
+        barn_temperature : float
             Current barn temperature (:math:`^{\\circ}C`).
         pH : float, optional
             pH value for housing ammonia emission (unitless). Default is set to 7.7. This value is listed as
@@ -437,8 +439,8 @@ class GasEmissionsCalculator:
         total_ammoniacal_nitrogen = urine_total_ammoniacal_nitrogen / total_barn_area
         manure_density = ManureConstants.SLURRY_MANURE_DENSITY  # kg/m^3
         seconds_per_day = GeneralConstants.SECONDS_PER_DAY
-        temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
-        ammonia_resistance = cls._ammonia_resistance(temp, housing_specific_constant)
+        temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(barn_temperature)
+        ammonia_resistance = cls._ammonia_resistance(barn_temperature, housing_specific_constant)
         manure_per_area = urine / total_barn_area  # kg/m^2
         equilibrium_coefficient = cls._equilibrium_coefficient(temperature_kelvin, pH)
         ammonia_loss = (total_ammoniacal_nitrogen * seconds_per_day * manure_density) / (
@@ -1343,3 +1345,33 @@ class GasEmissionsCalculator:
         """
 
         return emission_factor_kg_nitrous_oxide_N_per_kg_manure_N * manure_nitrogen_kg_N_per_day
+
+    @staticmethod
+    def determine_barn_air_temperature(air_temperature: float) -> float:
+        """Determines the ambient inside barn temperature based on the outdoor air temperature.
+
+        Parameters
+        ----------
+        air_temperature : float
+            The air temperature (°C).
+
+        Returns
+        -------
+        float
+            The barn temperature (°C).
+
+        References
+        ----------
+        Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
+        This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
+        These bounds were suggested by manure SMEs and are supported by barn temperature ranges
+        reported in Bucklin et al. (FL, upper limit; https://doi.org/10.13031/2013.28851).
+        The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
+        """
+        return np.clip(air_temperature, 5, 30)
+        if air_temperature < 5:
+            return 5.0
+        elif 5 <= air_temperature <= 30:
+            return air_temperature
+        else:
+            return 30.0
