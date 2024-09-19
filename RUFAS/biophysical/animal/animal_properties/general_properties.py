@@ -16,6 +16,8 @@ class GeneralProperties:
     daily_growth: float
     days_born: int
     days_in_preg: int
+    days_in_milk: int
+    dry_off_day_of_pregnancy: int  # Old name: days_in_preg_when_dry, used to be in AnimalBase.config
     events: AnimalEvents
     estimated_daily_milk_produced: float
     future_cull_date: int
