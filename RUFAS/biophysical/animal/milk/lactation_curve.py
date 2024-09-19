@@ -1,7 +1,7 @@
-from .milk_production import MilkProduction
 from RUFAS.input_manager import InputManager
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 import numpy as np
@@ -107,19 +107,19 @@ class LactationCurve:
         base_wood_parameter_m: float = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
         base_wood_parameter_n: float = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
 
-        self.parity_1_parameters = self._calculate_adjusted_wood_parameters(
+        parity_1_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["1"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
-        self.parity_2_parameters = self._calculate_adjusted_wood_parameters(
+        parity_2_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
             [parity_adjustments["2"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
-        self.parity_3_parameters = self._calculate_adjusted_wood_parameters(
+        parity_3_parameters = self._calculate_adjusted_wood_parameters(
             base_wood_parameter_l,
             base_wood_parameter_m,
             base_wood_parameter_n,
@@ -127,9 +127,7 @@ class LactationCurve:
         )
 
         self.parity_to_parameter_mapping = {
-            1: self.parity_1_parameters,
-            2: self.parity_2_parameters,
-            3: self.parity_3_parameters,
+            1: parity_1_parameters, 2: parity_2_parameters, 3: parity_3_parameters
         }
 
         self.parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
@@ -138,14 +136,27 @@ class LactationCurve:
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
+        info_map = {"class": self.__class__.__name__, "function": "__init__"},
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             self.om.add_log(
                 "Projected annual milk yield provided to simulation",
                 "Using the annual milk yield input to fit lactation curve parameters.",
-                {"class": self.__class__.__name__, "function": "__init__"},
+                info_map,
             )
             self._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
+        else:
+            self.om.add_log(
+                "Annual milk yield not provided to simulation",
+                "Lactation curve parameters will not be fit to the target milk production.",
+                info_map,
+            )
+
+        info_map["units"] = MeasurementUnits.UNITLESS
+        for parity, params in self.parity_to_parameter_mapping.items():
+            base_var_name = f"parity_{parity}_lactation_curve_parameter_"
+            for param, value in params.items():
+                self.om.add_variable(f"{base_var_name}_{param}", value, info_map)
 
     def _get_year_adjustments(
         self, year_adjustment_values: dict[str, dict[str, float]], time: Time
