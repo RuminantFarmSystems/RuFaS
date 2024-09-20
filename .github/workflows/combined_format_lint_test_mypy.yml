@@ -36,13 +36,9 @@ jobs:
 
       - name: Get all added or modified files
         run: |
+          git checkout ${{ github.head_ref }}
           BASE_BRANCH=${{ github.base_ref }} || "dev"
-          git diff --name-only $BASE_BRANCH
-          if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
-            echo "Fallback to dev branch because $BASE_BRANCH does not exist."
-            BASE_BRANCH="dev"
-            git fetch origin $BASE_BRANCH
-          fi
+          git fetch origin $BASE_BRANCH --depth=1
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
           echo "All Changed Files: $ALL_CHANGED_FILES"
 
