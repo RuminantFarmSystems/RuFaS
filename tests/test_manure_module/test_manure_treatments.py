@@ -1596,9 +1596,9 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     mocker.patch.object(anaerobic_lagoon, "_update_methane_emission", return_value=(100.0, 99.0))
     anaerobic_lagoon._current_manure_treatment_daily_input = mocker.MagicMock()
 
-    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission = mocker.patch.object(
-        anaerobic_lagoon,
-        "_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission",
+    patch_for_calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission = mocker.patch(
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator"
+        ".calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission"
     )
     precipitation_volume = 100.0
     patch_for_precipitation_volume_property = mocker.patch(
@@ -1616,11 +1616,17 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     expected_final_volume = 100
     expected_precipitation_volume_increase = 100
 
+    emissions_factor = 0.005
+
+    patch_for_get_nitrous_oxide_emissions_factor = mocker.patch.object(
+        anaerobic_lagoon, "_get_nitrous_oxide_emissions_factor", return_value=emissions_factor
+    )
+
     # Act
     daily_output = anaerobic_lagoon._daily_update_helper()
 
     # Assert
-    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission.assert_called_once()
+    patch_for_calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission.assert_called_once()
     assert daily_output.daily_final_manure_volume == expected_final_volume
     anaerobic_lagoon._update_ammonia_emission.assert_called_once_with(daily_output)
     anaerobic_lagoon._update_methane_emission.assert_called_once_with(anaerobic_lagoon._accumulated_output)
@@ -1630,6 +1636,7 @@ def test_anaerobic_lagoon_daily_update_helper(mocker: MockFixture) -> None:
     assert anaerobic_lagoon._accumulated_precipitation_volume == expected_precipitation_volume_increase
     assert patch_for_precipitation_volume_property.call_count == 1
     assert isinstance(daily_output, ManureTreatmentDailyOutput)
+    patch_for_get_nitrous_oxide_emissions_factor.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -2203,9 +2210,15 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
         return_value=complete_daily_output,
     )
     patch_for_accumulate_daily_output = mocker.patch.object(anaerobic_digestion, "_adjust_accumulated_output")
-    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission = mocker.patch.object(
-        anaerobic_digestion,
-        "_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission",
+    patch_for_calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission = mocker.patch(
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator"
+        ".calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission"
+    )
+
+    emissions_factor = 0.005
+
+    patch_for_get_nitrous_oxide_emissions_factor = mocker.patch.object(
+        anaerobic_digestion, "_get_nitrous_oxide_emissions_factor", return_value=emissions_factor
     )
 
     # Act
@@ -2215,7 +2228,8 @@ def test_daily_update_helper(mocker: MockFixture) -> None:
     patch_for_initialize_daily_output_during_update.assert_called_once_with(current_manure_treatment_daily_input)
     patch_for_calc_anaerobic_digestion_daily_output.assert_called_once_with(initial_daily_output)
     patch_for_accumulate_daily_output.assert_called_once_with(complete_daily_output)
-    patch_for_calc_empirical_nitrogen_loss_from_nitrous_oxide_emission.assert_called_once()
+    patch_for_calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission.assert_called_once()
+    patch_for_get_nitrous_oxide_emissions_factor.assert_called_once()
     assert actual_daily_output == complete_daily_output
 
 
