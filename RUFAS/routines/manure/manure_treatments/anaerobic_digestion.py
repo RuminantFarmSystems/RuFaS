@@ -265,9 +265,7 @@ class AnaerobicDigestion(BaseManureTreatment):
         # TODO: Name the constants if you can - Issue #1120
         return 0.68298 + 0.025662 * average_temperature_celsius + 0.01306 * moisture_content * 100
 
-    def _adjust_accumulated_output(
-        self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    ) -> None:
+    def _adjust_accumulated_output(self, manure_treatment_daily_output: ManureTreatmentDailyOutput) -> None:
         """Override method of BaseManureTreatment class _adjust_accumulated_output() to accommodate for
         wanting to never empty the manure pit for AnaerobicDigestion"""
         self._accumulated_output += manure_treatment_daily_output
