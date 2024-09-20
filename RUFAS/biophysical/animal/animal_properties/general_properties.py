@@ -11,11 +11,12 @@ class GeneralProperties:
     birth_date: str
     birth_weight: float
     body_weight: float
-    breed: Enum
+    breed: "Breed"
     culled: bool
-    daily_growth: float
     days_born: int
     days_in_preg: int
+    days_in_milk: int
+    dry_off_day_of_pregnancy: int  # Old name: days_in_preg_when_dry, used to be in AnimalBase.config
     events: AnimalEvents
     estimated_daily_milk_produced: float
     future_cull_date: int
@@ -32,3 +33,13 @@ class GeneralProperties:
     sold: bool
     sold_at_day: int
     wean_weight: float
+
+
+class Breed(Enum):
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Gender(Enum):
+    MALE = "male"
+    FEMALE = "female"
