@@ -142,6 +142,7 @@ class OutputManager(object):
             self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
                 "json": "e2e_json_",
                 "comparison": "e2e_comparison_",
+                "csv": "csv_",
             }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
 
