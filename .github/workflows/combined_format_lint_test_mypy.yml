@@ -51,12 +51,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
+      
       - name: Check for Unauthorized Changes
         run: |
           paths_to_protect=(
@@ -80,6 +75,11 @@ jobs:
           else
             echo "No unauthorized changes detected."
           fi
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Record if changelog has been updated
         id: record_if_changelog_updated
