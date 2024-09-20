@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from numba import njit
+
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
@@ -11,8 +13,8 @@ class ManureExcretionCalculator:
         body_weight: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amount: dict[str, float],
-        nutrient_conc: dict[str, float],
+        nutrient_amounts: dict[str, float],
+        nutrient_concentrations: dict[str, float],
     ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a calf with information from the ration formulation.
@@ -25,9 +27,9 @@ class ManureExcretionCalculator:
             Amount of fecal phosphorus excreted by the current animal, g.
         urine_phosphorus_required : float
             Amount of phosphorus required for urine production, g.
-        nutrient_amount : Dict[str, float]
+        nutrient_amounts : Dict[str, float]
             Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
-        nutrient_conc : Dict[str, float]
+        nutrient_concentrations : Dict[str, float]
             Concentration of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
@@ -38,9 +40,6 @@ class ManureExcretionCalculator:
             A dictionary that contains the manure excretion values as specified
                 in the AnimalManureExcretions class definition.
         """
-
-        nutrient_amounts = nutrient_amount
-        nutrient_concentrations = nutrient_conc
         dry_matter_intake = nutrient_amounts["dm"]
         CP_concentration = nutrient_concentrations["CP"]
 
@@ -269,8 +268,6 @@ class ManureExcretionCalculator:
         daily_milk_production: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        milk_fat: float,
-        metabolizable_energy_intake: float,
         nutrient_amount: dict[str, float],
         nutrient_concentration: dict[str, float],
     ) -> Tuple[float, AnimalManureExcretions]:
@@ -285,8 +282,6 @@ class ManureExcretionCalculator:
         daily_milk_production
         fecal_phosphorus
         urine_phosphorus_required
-        milk_fat
-        metabolizable_energy_intake
         nutrient_amount
         nutrient_concentration
 
