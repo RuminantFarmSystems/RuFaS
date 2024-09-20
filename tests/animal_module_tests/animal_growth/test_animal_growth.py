@@ -14,19 +14,37 @@ from RUFAS.time import Time
 @pytest.fixture
 def mock_general_properties() -> GeneralProperties:
     return GeneralProperties(
-        animal_type=AnimalType.CALF, birth_date="", birth_weight=0, body_weight=0, breed=Breed.HO, culled=False,
-        days_born=0, days_in_preg=0, days_in_milk=0, dry_off_day_of_pregnancy=0, events=AnimalEvents(),
-        estimated_daily_milk_produced=0, future_cull_date=0, future_death_date=0, gender=Gender.FEMALE, id=0,
-        is_dry=False, is_lactating=False, is_pregnant=False, mature_body_weight=0, milking=True, nutrients=[],
-        sold=False, sold_at_day=0, wean_weight=0
+        animal_type=AnimalType.CALF,
+        birth_date="",
+        birth_weight=0,
+        body_weight=0,
+        breed=Breed.HO,
+        culled=False,
+        days_born=0,
+        days_in_preg=0,
+        days_in_milk=0,
+        dry_off_day_of_pregnancy=0,
+        events=AnimalEvents(),
+        estimated_daily_milk_produced=0,
+        future_cull_date=0,
+        future_death_date=0,
+        gender=Gender.FEMALE,
+        id=0,
+        is_dry=False,
+        is_lactating=False,
+        is_pregnant=False,
+        mature_body_weight=0,
+        milking=True,
+        nutrients=[],
+        sold=False,
+        sold_at_day=0,
+        wean_weight=0,
     )
 
 
 @pytest.fixture
 def mock_animal_growth_properties() -> AnimalGrowthProperties:
-    return AnimalGrowthProperties(
-        daily_growth=0, conceptus_weight=0, DBW=0, tissue_changed=0
-    )
+    return AnimalGrowthProperties(daily_growth=0, conceptus_weight=0, DBW=0, tissue_changed=0)
 
 
 @pytest.fixture
