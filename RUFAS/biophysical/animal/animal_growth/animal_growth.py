@@ -157,22 +157,12 @@ class AnimalGrowth:
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float, float]:
-        updated_conceptus_weight = reproduction_properties.conceptus_weight
-        updated_tissue_change = animal_growth_properties.tissue_changed
+        updated_tissue_change = 0 if general_properties.days_in_preg == reproduction_properties.gestation_length \
+            else animal_growth_properties.tissue_changed
 
-        if general_properties.days_in_preg == reproduction_properties.gestation_length:
-            conceptus_growth = -reproduction_properties.conceptus_weight
-            updated_conceptus_weight = 0
-            updated_tissue_change = 0
-        elif general_properties.days_in_preg > 50:
-            conceptus_total_weight = (
-                0.0148 * reproduction_properties.gestation_length - 2.408
-            ) * reproduction_properties.calf_birth_weight
-            conceptus_param = conceptus_total_weight ** (1 / 3) / (reproduction_properties.gestation_length - 50)
-            conceptus_growth = 3 * conceptus_param**3 * (general_properties.days_in_preg - 50) ** 2
-            updated_conceptus_weight += conceptus_growth
-        else:
-            conceptus_growth = 0
+        conceptus_growth, updated_conceptus_weight = AnimalGrowth._calculate_pregnant_heifer_conceptus_growth(
+            reproduction_properties, general_properties
+        )
 
         return conceptus_growth, updated_conceptus_weight, updated_tissue_change
 
