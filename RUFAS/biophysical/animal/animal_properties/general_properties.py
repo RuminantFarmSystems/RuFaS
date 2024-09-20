@@ -11,9 +11,8 @@ class GeneralProperties:
     birth_date: str
     birth_weight: float
     body_weight: float
-    breed: Enum
+    breed: "Breed"
     culled: bool
-    daily_growth: float
     days_born: int
     days_in_preg: int
     days_in_milk: int
@@ -34,3 +33,13 @@ class GeneralProperties:
     sold: bool
     sold_at_day: int
     wean_weight: float
+
+
+class Breed(Enum):
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Gender(Enum):
+    MALE = "male"
+    FEMALE = "female"

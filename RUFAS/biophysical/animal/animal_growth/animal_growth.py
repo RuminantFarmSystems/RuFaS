@@ -21,8 +21,8 @@ class AnimalGrowth:
     def initialize_class_variables(cls) -> None:
         im = InputManager()
         animal_config: dict[str, dict[str, Any]] = im.get_data("animal.animal_config.farm_level")
-        cls.wean_day: int = animal_config["calf"]["wean_day"]
-        cls.target_heifer_pregnant_day: int = animal_config["bodyweight"]["target_heifer_preg_day"]
+        cls.wean_day = animal_config["calf"]["wean_day"]
+        cls.target_heifer_pregnant_day = animal_config["bodyweight"]["target_heifer_preg_day"]
 
     @staticmethod
     def daily_routines(

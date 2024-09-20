@@ -3,26 +3,37 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_growth.animal_growth import AnimalGrowth
 from RUFAS.biophysical.animal.animal_properties.animal_growth_properties import AnimalGrowthProperties
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Gender
 from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 
 
 @pytest.fixture
-def mock_general_properties(mocker: MockerFixture) -> GeneralProperties:
-    return mocker.MagicMock(auto_spec=GeneralProperties)
+def mock_general_properties() -> GeneralProperties:
+    return GeneralProperties(
+        animal_type=AnimalType.CALF, birth_date="", birth_weight=0, body_weight=0, breed=Breed.HO, culled=False,
+        days_born=0, days_in_preg=0, days_in_milk=0, dry_off_day_of_pregnancy=0, events=AnimalEvents(),
+        estimated_daily_milk_produced=0, future_cull_date=0, future_death_date=0, gender=Gender.FEMALE, id=0,
+        is_dry=False, is_lactating=False, is_pregnant=False, mature_body_weight=0, milking=True, nutrients=[],
+        sold=False, sold_at_day=0, wean_weight=0
+    )
 
 
 @pytest.fixture
-def mock_animal_growth_properties(mocker: MockerFixture) -> AnimalGrowthProperties:
-    return mocker.MagicMock(auto_spec=AnimalGrowthProperties)
+def mock_animal_growth_properties() -> AnimalGrowthProperties:
+    return AnimalGrowthProperties(
+        daily_growth=0, conceptus_weight=0, DBW=0, tissue_changed=0
+    )
 
 
 @pytest.fixture
-def mock_reproduction_properties(mocker: MockerFixture) -> ReproductionProperties:
-    return mocker.MagicMock(auto_spec=ReproductionProperties)
+def mock_reproduction_properties() -> ReproductionProperties:
+    return ReproductionProperties(
+        gestation_length=0, conceptus_weight=0, calf_birth_weight=0, calves=0, calving_interval=0
+    )
 
 
 @pytest.mark.parametrize("wean_day, target_heifer_preg_day", [(10, 100), (60, 399)])
