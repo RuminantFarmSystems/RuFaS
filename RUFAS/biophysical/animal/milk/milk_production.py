@@ -5,7 +5,6 @@ from ..animal_module_constants import AnimalModuleConstants
 from ..animal_properties.general_properties import GeneralProperties
 from ..animal_properties.milk_production_properties import MilkProductionProperties
 from ..data_types.milk_production_record import MilkProductionRecord
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.util import Utility
 
@@ -71,8 +70,10 @@ class MilkProduction:
             general_properties.events.add_event(general_properties.days_born, time.simulation_day, DRY)
             general_properties.days_in_milk = 0
             general_properties.daily_milk_produced = 0.0
+            milking_properties.crude_protein_content = 0.0
             milking_properties.true_protein_content = 0.0
             milking_properties.fat_content = 0.0
+            milking_properties.lactose_content = 0.0
             milking_properties.milk_production_last_305_days = 0.0
             milking_properties.crude_protein_percent = 0.0
             milking_properties.true_protein_percent = 0.0
@@ -98,15 +99,17 @@ class MilkProduction:
             milking_properties.milk_production_reduction,
         )
 
-        milking_properties.true_protein_content = (
-            general_properties.daily_milk_produced
-            * milking_properties.true_protein_percent
-            * GeneralConstants.PERCENTAGE_TO_FRACTION
+        milking_properties.crude_protein_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.crude_protein_content
         )
-        milking_properties.fat_content = (
-            general_properties.daily_milk_produced
-            * milking_properties.fat_percent
-            * GeneralConstants.PERCENTAGE_TO_FRACTION
+        milking_properties.true_protein_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.true_protein_percent
+        )
+        milking_properties.fat_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.fat_percent
+        )
+        milking_properties.lactose_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.lactose_percent
         )
 
         milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
@@ -172,6 +175,27 @@ class MilkProduction:
         """
         milk_production += milk_production_variance + milk_production_reduction
         return milk_production
+
+    @staticmethod
+    @njit
+    def _calculate_nutrient_content(milk: float, nutrient_percentage: float) -> float:
+        """
+        Calculates the amount of a given nutrient in milk.
+
+        Parameters
+        ----------
+        milk : float
+            Amount of milk produced (kg).
+        nutrient_percentage : float
+            Percentage of nutrient in the milk.
+
+        Returns
+        -------
+        float
+            Amount of nutrient contained in the milk (kg).
+
+        """
+        return milk * nutrient_percentage * 0.01
 
     @staticmethod
     def _update_milking_history(

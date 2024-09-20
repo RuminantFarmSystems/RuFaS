@@ -9,10 +9,14 @@ class MilkProductionProperties:
 
     Attributes
     ----------
+    crude_protein_content : float
+        Amount of crude/total protein in the milk produced (kg).
     true_protein_content : float
         Amount of true protein in the milk produced (kg).
     fat_content : float
         Amount of fat in the milk produced (kg).
+    lactose_content : float
+        Amount of lactose in the milk produced (kg).
     milk_production_reduction : float
         Amount of milk daily production is reduced by (kg).
     milk_production_last_305_days : float
@@ -37,8 +41,10 @@ class MilkProductionProperties:
 
     """
 
+    crude_protein_content: float
     true_protein_content: float  # Old var name: milk_protein_kg
     fat_content: float  # Old name: milk_fat_kg
+    lactose_content: float
     milk_production_reduction: float
     milk_production_last_305_days: float  # Old var name: latest_milk_production_305days
     crude_protein_percent: float  # Old var name: CP_milk

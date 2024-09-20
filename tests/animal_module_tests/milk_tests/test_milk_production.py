@@ -13,8 +13,10 @@ from RUFAS.time import Time
 @pytest.fixture
 def milking_properties() -> MilkProductionProperties:
     return MilkProductionProperties(
+        crude_protein_content=1.7,
         true_protein_content=1.5,
         fat_content=2.0,
+        lactose_content=3.0,
         milk_production_reduction=0.3,
         milk_production_last_305_days=0.0,
         crude_protein_percent=3.2,
@@ -86,8 +88,10 @@ def test_perform_daily_milking_update_dry_off(
     add_event.assert_called_once_with(general_properties.days_born, 100, DRY)
     assert general_properties.days_in_milk == 0
     assert general_properties.daily_milk_produced == 0.0
+    assert milking_properties.crude_protein_content == 0.0
     assert milking_properties.true_protein_content == 0.0
     assert milking_properties.fat_content == 0.0
+    assert milking_properties.lactose_content == 0.0
     assert milking_properties.milk_production_last_305_days == 0.0
     assert milking_properties.crude_protein_percent == 0.0
     assert milking_properties.true_protein_percent == 0.0
@@ -154,6 +158,14 @@ def test_get_milk_yield_values_wood_curve(
 def test_adjust_milk_production(milk: float, reduction: float, variance: float, expected: float) -> None:
     """Test that milk production is varied correctly."""
     actual = MilkProduction._adjust_milk_production(milk, variance, reduction)
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize("milk,nutrient,expected", [(30.0, 5.0, 1.5), (25.0, 0.0, 0.0), (20.0, 100.0, 20.0)])
+def test_calculate_nutrient_content(milk: float, nutrient: float, expected: float) -> None:
+    """Test that nutrient content of milk is calculated correctly."""
+    actual = MilkProduction._calculate_nutrient_content(milk, nutrient)
 
     assert actual == expected
 
