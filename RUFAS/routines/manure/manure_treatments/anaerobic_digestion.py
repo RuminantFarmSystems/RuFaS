@@ -267,7 +267,7 @@ class AnaerobicDigestion(BaseManureTreatment):
 
     def _adjust_accumulated_output(
         self, manure_treatment_daily_output: ManureTreatmentDailyOutput
-    ) -> ManureTreatmentDailyOutput:
+    ) -> None:
         """Override method of BaseManureTreatment class _adjust_accumulated_output() to accommodate for
         wanting to never empty the manure pit for AnaerobicDigestion"""
         self._accumulated_output += manure_treatment_daily_output

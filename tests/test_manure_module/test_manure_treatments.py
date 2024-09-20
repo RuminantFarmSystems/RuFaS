@@ -2,9 +2,8 @@ import dataclasses
 import math
 from typing import Any, Type, Tuple
 
-from mock import MagicMock
+from unittest.mock import MagicMock, PropertyMock, call
 import pytest
-from mock.mock import PropertyMock, call
 from pytest import approx
 from pytest_mock import MockFixture, MockerFixture
 
@@ -15,6 +14,7 @@ from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
     AnaerobicDigestion,
 )
@@ -48,9 +48,12 @@ from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import (
 from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import (
     SlurryStorageUnderfloor,
 )
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
     LiquidManurePortionProtocol,
 )
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 # Test ManureTreatmentDailyOutput
@@ -1002,7 +1005,8 @@ def test_slurry_storage_outdoor_init(mocker: MockFixture) -> None:
     mock_manure_treatment_config = mocker.MagicMock()
     mock_manure_treatment_config.freeboard_input = freeboard_input = 130.0
 
-    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def mock_base_manure_treatment(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+                                   ) -> None:
         self.weather = weather
         self.time = time
         self.config = manure_treatment_config
@@ -1374,7 +1378,8 @@ def test_slurry_storage_outdoor_pit_volume(mocker: MockFixture) -> None:
         (MagicMock(num_animals=None), None, 0),
     ],
 )
-def test_slurry_storage_outdoor_precipitation_volume(mocker, current_pen, num_animals, expected_volume):
+def test_slurry_storage_outdoor_precipitation_volume(mocker: MockerFixture, current_pen: ManureManagerPen | None,
+                                                     num_animals: int | None, expected_volume: float) -> None:
     """Unit test for precipitation_volume() in slurry_storage_outdoor.py, with different pen and animal scenarios."""
     # Arrange
     slurry_storage_outdoor = SlurryStorageOutdoor(
@@ -1728,7 +1733,8 @@ def test_sludge_accumulation_volume_property(mocker: MockFixture) -> None:
 @pytest.mark.parametrize(
     "daily_output, expected_flushing_volume", [(MagicMock(cleaning_water_volume=10.0), 10.0), (None, 0.0)]
 )
-def test_flushing_volume_property(mocker: MockFixture, daily_output, expected_flushing_volume: float) -> None:
+def test_flushing_volume_property(mocker: MockFixture, daily_output: ManureHandlerDailyOutput,
+                                  expected_flushing_volume: float) -> None:
     """Unit test for flushing_volume property in anaerobic_lagoon.py."""
     # Arrange
     anaerobic_lagoon = AnaerobicLagoon(
@@ -2510,7 +2516,8 @@ def test_anaerobic_digestion_and_lagoon_init(mocker: MockFixture) -> None:
     mock_time = mocker.MagicMock()
     mock_manure_treatment_config = (mocker.MagicMock(), mocker.MagicMock())
 
-    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def mock_base_manure_treatment(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+                                   ) -> None:
         self.weather = weather
         self.time = time
         self.config = manure_treatment_config
@@ -2671,7 +2678,8 @@ def test_compost_bedded_pack_barn_init(mocker: MockFixture) -> None:
     mock_time = mocker.MagicMock()
     mock_manure_treatment_config = mocker.MagicMock()
 
-    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def mock_base_manure_treatment(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+                                   ) -> None:
         self.weather = weather
         self.time = time
         self.config = manure_treatment_config
@@ -2925,7 +2933,8 @@ def test_open_lots_init(mocker: MockFixture) -> None:
     mock_time = mocker.MagicMock()
     mock_manure_treatment_config = mocker.MagicMock()
 
-    def mock_base_manure_treatment(self, weather, time, manure_treatment_config: ManureTreatmentConfig) -> None:
+    def mock_base_manure_treatment(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig
+                                   ) -> None:
         self.weather = weather
         self.time = time
         self.config = manure_treatment_config
