@@ -16,9 +16,9 @@ class GeneralProperties:
         Number of days the animal has been milking for in its current lactation.
     dry_off_day_of_pregnancy : int
         Number of days into pregnancy when a lactating cow stops milking.
-    estimated_daily_milk_produced : float
+    daily_milk_produced : float
         Milk production of the animal on a single day (kg).
-    milking
+    is_milking
 
     """
 
@@ -34,7 +34,7 @@ class GeneralProperties:
     events: AnimalEvents
     days_in_milk: int
     dry_off_day_of_pregnancy: int  # Old name: days_in_preg_when_dry, used to be in AnimalBase.config
-    estimated_daily_milk_produced: float
+    daily_milk_produced: float  # Old name: estimated_daily_milk_produced
     future_cull_date: int
     future_death_date: int
     gender: Enum
@@ -48,6 +48,6 @@ class GeneralProperties:
     wean_weight: float
 
     @property
-    def milking(self) -> bool:
-        """True if the cow is currently lactating, else False."""
+    def is_milking(self) -> bool:  # Old name: milking
+        """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0

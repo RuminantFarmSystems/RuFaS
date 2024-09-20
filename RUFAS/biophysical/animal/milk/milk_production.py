@@ -62,7 +62,7 @@ class MilkProduction:
             Milking and general properties of the animal after milk production-related updates for the current day.
 
         """
-        if not general_properties.milking:
+        if not general_properties.is_milking:
             milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
             return milking_properties, general_properties
 
@@ -70,7 +70,7 @@ class MilkProduction:
         if is_dry_off_day:
             general_properties.events.add_event(general_properties.days_born, time.simulation_day, DRY)
             general_properties.days_in_milk = 0
-            general_properties.estimated_daily_milk_produced = 0.0
+            general_properties.daily_milk_produced = 0.0
             milking_properties.true_protein_content = 0.0
             milking_properties.fat_content = 0.0
             milking_properties.milk_production_last_305_days = 0.0
@@ -82,7 +82,7 @@ class MilkProduction:
             return milking_properties, general_properties
 
         general_properties.days_in_milk += 1
-        general_properties.estimated_daily_milk_produced = MilkProduction.calculate_daily_milk_production(
+        general_properties.daily_milk_produced = MilkProduction.calculate_daily_milk_production(
             general_properties.days_in_milk,
             milking_properties.wood_l,
             milking_properties.wood_m,
@@ -92,19 +92,19 @@ class MilkProduction:
         milk_production_variance = Utility.generate_random_number(
             AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
         )
-        general_properties.estimated_daily_milk_produced = MilkProduction._adjust_milk_production(
-            general_properties.estimated_daily_milk_produced,
+        general_properties.daily_milk_produced = MilkProduction._adjust_milk_production(
+            general_properties.daily_milk_produced,
             milk_production_variance,
             milking_properties.milk_production_reduction,
         )
 
         milking_properties.true_protein_content = (
-            general_properties.estimated_daily_milk_produced
+            general_properties.daily_milk_produced
             * milking_properties.true_protein_percent
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         )
         milking_properties.fat_content = (
-            general_properties.estimated_daily_milk_produced
+            general_properties.daily_milk_produced
             * milking_properties.fat_percent
             * GeneralConstants.PERCENTAGE_TO_FRACTION
         )
@@ -182,7 +182,7 @@ class MilkProduction:
             MilkProductionRecord(
                 simulation_day=time.simulation_day,
                 days_in_milk=general_properties.days_in_milk,
-                milk_production=general_properties.estimated_daily_milk_produced,
+                milk_production=general_properties.daily_milk_produced,
                 days_born=general_properties.days_born,
             )
         )

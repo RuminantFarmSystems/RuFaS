@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from ..general_property_values import LAC_COW
+from ..general_property_values import LAC_COW_PROPERTIES
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
@@ -30,7 +30,7 @@ def milking_properties() -> MilkProductionProperties:
 
 @pytest.fixture
 def general_properties() -> GeneralProperties:
-    return GeneralProperties(**LAC_COW)
+    return GeneralProperties(**LAC_COW_PROPERTIES)
 
 
 @pytest.fixture
@@ -47,10 +47,10 @@ def test_perform_daily_milking_update_not_milking(
 ) -> None:
     """Tests that daily milking update is performed correctly when cow is not milking."""
     general_properties.days_in_milk = 0
-    general_properties.estimated_daily_milk_produced = 0.0
+    general_properties.daily_milk_produced = 0.0
     mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=100)
     expected_record = MilkProductionRecord(
-        simulation_day=100, days_in_milk=0, milk_production=0.0, days_born=LAC_COW["days_born"]
+        simulation_day=100, days_in_milk=0, milk_production=0.0, days_born=LAC_COW_PROPERTIES["days_born"]
     )
     milking_properties.milk_production_history = []
 
@@ -76,7 +76,7 @@ def test_perform_daily_milking_update_dry_off(
         simulation_day=100,
         days_in_milk=0,
         milk_production=0.0,
-        days_born=LAC_COW["days_born"],
+        days_born=LAC_COW_PROPERTIES["days_born"],
     )
 
     milking_properties, general_properties = MilkProduction.perform_daily_milking_update(
@@ -85,7 +85,7 @@ def test_perform_daily_milking_update_dry_off(
 
     add_event.assert_called_once_with(general_properties.days_born, 100, DRY)
     assert general_properties.days_in_milk == 0
-    assert general_properties.estimated_daily_milk_produced == 0.0
+    assert general_properties.daily_milk_produced == 0.0
     assert milking_properties.true_protein_content == 0.0
     assert milking_properties.fat_content == 0.0
     assert milking_properties.milk_production_last_305_days == 0.0
@@ -117,7 +117,7 @@ def test_perform_daily_milking_update(
     mocker.patch.object(MilkProduction, "_adjust_milk_production", return_value=milk_produced)
     mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=500)
     expected_record = MilkProductionRecord(
-        simulation_day=500, days_in_milk=expected_days_in_milk, milk_production=40.0, days_born=LAC_COW["days_born"]
+        simulation_day=500, days_in_milk=expected_days_in_milk, milk_production=40.0, days_born=LAC_COW_PROPERTIES["days_born"]
     )
 
     milking_properties, general_properties = MilkProduction.perform_daily_milking_update(
@@ -125,7 +125,7 @@ def test_perform_daily_milking_update(
     )
 
     assert general_properties.days_in_milk == expected_days_in_milk
-    assert general_properties.estimated_daily_milk_produced == milk_produced
+    assert general_properties.daily_milk_produced == milk_produced
     assert milking_properties.true_protein_content == 1.2
     assert pytest.approx(milking_properties.fat_content) == 1.4
     assert milking_properties.milk_production_history[-1] == expected_record
@@ -191,7 +191,7 @@ def test_update_milking_history(
     """Tests that the milking history of a cow is updated correctly."""
     milking_properties.milk_production_history = []
     general_properties.days_in_milk = milk_days
-    general_properties.estimated_daily_milk_produced = milk_produced
+    general_properties.daily_milk_produced = milk_produced
     general_properties.days_born = age
     mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=sim_day)
 
