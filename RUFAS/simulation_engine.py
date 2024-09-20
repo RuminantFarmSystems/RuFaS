@@ -22,7 +22,7 @@ from .routines.EEE.EEE_manager import EEEManager
 Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
 TODO: remove this constant after Animal and Feed Storage modules are connected - #1878
 """
-FEED_DEGRADATION_INTERVAL_LENGTH = 15
+FEED_DEGRADATION_INTERVAL_LENGTH = 1
 
 
 class SimulationEngine:
@@ -127,6 +127,7 @@ class SimulationEngine:
         if self.is_end_to_end_test_run:
             process_degradations_today = self.time.current_julian_day % FEED_DEGRADATION_INTERVAL_LENGTH == 0
             if process_degradations_today:
+                print(self.time.simulation_day)
                 self.feed_manager.process_degradations(self.weather, self.time)
 
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
@@ -211,4 +212,3 @@ class SimulationEngine:
         if self.is_end_to_end_test_run:
             end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
             self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)
-            self.feed_manager.process_degradations(self.weather, self.time)
