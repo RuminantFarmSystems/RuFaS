@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -282,12 +282,10 @@ jobs:
         env:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
-          if [ -n "$URL" ]; then
-            curl \
-                -X POST \
-                $URL \
-                -H "Content-Type: application/json" \
-                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
-            exit 1
-          fi
+          curl \
+              -X POST \
+              $URL \
+              -H "Content-Type: application/json" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
+          exit 1
