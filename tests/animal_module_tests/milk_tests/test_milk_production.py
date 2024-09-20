@@ -16,7 +16,7 @@ def milking_properties() -> MilkProductionProperties:
         true_protein_content=1.5,
         fat_content=2.0,
         milk_production_reduction=0.3,
-        latest_305_day_milk_production=0.0,
+        milk_production_last_305_days=0.0,
         crude_protein_percent=3.2,
         true_protein_percent=3.0,
         fat_percent=3.5,
@@ -88,7 +88,7 @@ def test_perform_daily_milking_update_dry_off(
     assert general_properties.estimated_daily_milk_produced == 0.0
     assert milking_properties.true_protein_content == 0.0
     assert milking_properties.fat_content == 0.0
-    assert milking_properties.latest_305_day_milk_production == 0.0
+    assert milking_properties.milk_production_last_305_days == 0.0
     assert milking_properties.crude_protein_percent == 0.0
     assert milking_properties.true_protein_percent == 0.0
     assert milking_properties.fat_percent == 0.0
@@ -129,7 +129,7 @@ def test_perform_daily_milking_update(
     assert milking_properties.true_protein_content == 1.2
     assert pytest.approx(milking_properties.fat_content) == 1.4
     assert milking_properties.milk_production_history[-1] == expected_record
-    assert milking_properties.latest_305_day_milk_production == expected_305_day_production
+    assert milking_properties.milk_production_last_305_days == expected_305_day_production
 
 
 @pytest.mark.parametrize(
