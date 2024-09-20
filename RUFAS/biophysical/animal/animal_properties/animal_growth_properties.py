@@ -3,4 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class AnimalGrowthProperties:
-    pass
+    daily_growth: float
+    conceptus_weight: float
+    DBW: float
+    tissue_changed: float
