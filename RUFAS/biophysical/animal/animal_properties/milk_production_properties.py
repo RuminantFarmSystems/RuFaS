@@ -20,7 +20,7 @@ class MilkProductionProperties:
     crude_protein_percent : float
         Percentage of cow's milk that is crude protein by weight.
     true_protein_percent : float
-        Percentage of cow's milk that is true protein. TODO: how do true protein and crude protein need to be compared in order to make sure they're valid.
+        Percentage of cow's milk that is true protein by weight.
     fat_percent : float
         Percentage of cow's milk that is fat by weight.
     lactose_percent : float
