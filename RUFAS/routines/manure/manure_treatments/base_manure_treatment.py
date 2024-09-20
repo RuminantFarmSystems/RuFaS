@@ -282,12 +282,12 @@ class BaseManureTreatment(ABC):
         Parameters
         ----------
         air_temperature : float
-            The current day's ambient air temperature.
+            The current day's ambient air temperature (°C).
 
         Returns
         -------
         float
-            The estimated temperature of the manure storage.
+            The estimated temperature of the manure storage (°C).
         """
         return float(np.clip(air_temperature, 0.0, 35.0))
 
