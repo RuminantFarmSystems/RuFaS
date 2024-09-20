@@ -37,7 +37,7 @@ class MilkProduction:
     @classmethod
     def set_milk_quality(cls, fat_percent: float, true_protein_percent: float) -> None:
         """Sets user-defined milk qualities."""
-        cls.FAT_PERCENT = fat_percent,
+        cls.FAT_PERCENT = (fat_percent,)
         cls.TRUE_PROTEIN_PERCENT = true_protein_percent
 
     @staticmethod
