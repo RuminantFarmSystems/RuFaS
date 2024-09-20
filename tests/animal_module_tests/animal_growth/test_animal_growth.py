@@ -70,11 +70,6 @@ def test_initialize_class_variables(wean_day: int, target_heifer_preg_day: int, 
     mock_get_data.assert_called_once_with("animal.animal_config.farm_level")
 
 
-# body_weight: float, target_adg_calf: float, days_born: int, mature_body_weight:float,
-#                         days_in_preg: int, gestation_length: int, conceptus_weight: float, calf_birth_weight: float,
-#                         calves: int, days_in_milk: int, calving_interval: float
-
-
 @pytest.mark.parametrize(
     "animal_type, body_weight, mature_body_weight, is_pregnant",
     [
