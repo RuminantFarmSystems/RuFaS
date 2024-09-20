@@ -287,16 +287,22 @@ def test_calculate_cow_body_weight_change(
 
 @pytest.mark.parametrize(
     "conceptus_weight, days_in_preg, gestation_length, calf_birth_weight, expected_conceptus_growth,"
-    "expected_conceptus_weight", [
+    "expected_conceptus_weight",
+    [
         (12.5, 30, 60, 18.8, 0, 12.5),
         (23.8, 50, 50, 13.6, -23.8, 0),
-        (33.3, 80, 276, 43.9, 0.01721806061, 33.3172180606)
-    ]
+        (33.3, 80, 276, 43.9, 0.01721806061, 33.3172180606),
+    ],
 )
 def test_calculate_pregnant_heifer_conceptus_growth(
-        conceptus_weight: float, days_in_preg: int, gestation_length: int, calf_birth_weight: float,
-        expected_conceptus_growth: float, expected_conceptus_weight: float,
-        mock_reproduction_properties: ReproductionProperties, mock_general_properties: GeneralProperties
+    conceptus_weight: float,
+    days_in_preg: int,
+    gestation_length: int,
+    calf_birth_weight: float,
+    expected_conceptus_growth: float,
+    expected_conceptus_weight: float,
+    mock_reproduction_properties: ReproductionProperties,
+    mock_general_properties: GeneralProperties,
 ) -> None:
     mock_reproduction_properties.conceptus_weight = conceptus_weight
     mock_reproduction_properties.gestation_length = gestation_length
@@ -304,7 +310,8 @@ def test_calculate_pregnant_heifer_conceptus_growth(
     mock_general_properties.days_in_preg = days_in_preg
 
     actual_conceptus_growth, actual_conceptus_weight = AnimalGrowth._calculate_pregnant_heifer_conceptus_growth(
-        mock_reproduction_properties, mock_general_properties)
+        mock_reproduction_properties, mock_general_properties
+    )
 
     assert pytest.approx(actual_conceptus_growth) == expected_conceptus_growth
     assert pytest.approx(actual_conceptus_weight) == expected_conceptus_weight
@@ -312,31 +319,36 @@ def test_calculate_pregnant_heifer_conceptus_growth(
 
 @pytest.mark.parametrize(
     "days_in_preg, gestation_length, tissue_changed,"
-    "expected_conceptus_growth, expected_conceptus_weight, expected_tissue_change", [
-        (30, 60, 12.5, 18.8, 0, 12.5),
-        (50, 50, 12.5, 13.6, -23.8, 0),
-        (80, 276, 23.3, 43.9, 0.01721806061, 23.3)
-    ]
+    "expected_conceptus_growth, expected_conceptus_weight, expected_tissue_change",
+    [(30, 60, 12.5, 18.8, 0, 12.5), (50, 50, 12.5, 13.6, -23.8, 0), (80, 276, 23.3, 43.9, 0.01721806061, 23.3)],
 )
 def test_calculate_cow_conceptus_growth(
-        days_in_preg: int, gestation_length: int, tissue_changed: float,
-        expected_conceptus_growth: float, expected_conceptus_weight: float, expected_tissue_change: float,
-        mock_reproduction_properties: ReproductionProperties, mock_general_properties: GeneralProperties,
-        mock_animal_growth_properties: AnimalGrowthProperties, mocker: MockerFixture
+    days_in_preg: int,
+    gestation_length: int,
+    tissue_changed: float,
+    expected_conceptus_growth: float,
+    expected_conceptus_weight: float,
+    expected_tissue_change: float,
+    mock_reproduction_properties: ReproductionProperties,
+    mock_general_properties: GeneralProperties,
+    mock_animal_growth_properties: AnimalGrowthProperties,
+    mocker: MockerFixture,
 ) -> None:
-    mocker.patch.object(AnimalGrowth, "_calculate_pregnant_heifer_conceptus_growth",
-                        return_value=(expected_conceptus_growth, expected_conceptus_weight))
+    mocker.patch.object(
+        AnimalGrowth,
+        "_calculate_pregnant_heifer_conceptus_growth",
+        return_value=(expected_conceptus_growth, expected_conceptus_weight),
+    )
 
     mock_reproduction_properties.gestation_length = gestation_length
     mock_general_properties.days_in_preg = days_in_preg
     mock_animal_growth_properties.tissue_changed = tissue_changed
 
-    (
-        actual_conceptus_growth,
-        actual_conceptus_weight,
-        actual_tissue_change
-    ) = AnimalGrowth._calculate_cow_conceptus_growth(
-        mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties)
+    (actual_conceptus_growth, actual_conceptus_weight, actual_tissue_change) = (
+        AnimalGrowth._calculate_cow_conceptus_growth(
+            mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
+        )
+    )
 
     assert pytest.approx(actual_conceptus_growth) == expected_conceptus_growth
     assert pytest.approx(actual_conceptus_weight) == expected_conceptus_weight
@@ -344,18 +356,24 @@ def test_calculate_cow_conceptus_growth(
 
 
 @pytest.mark.parametrize(
-    "days_in_preg, gestation_length, mature_body_weight, body_weight, expected", [
+    "days_in_preg, gestation_length, mature_body_weight, body_weight, expected",
+    [
         (135, 276, 740.1, 543.21, 0.4335114893617016),
         (276, 276, 740.1, 665.43, -56.20607999999993),
         (288, 276, 740.1, 654.32, 3.79504),
         (135, 276, 540.1, 543.21, -0.6830842553191498),
         (276, 276, 540.1, 665.43, -213.64607999999998),
         (288, 276, 540.1, 654.32, 16.915040000000005),
-    ]
+    ],
 )
 def test_calculate_pregnant_heifer_target_daily_growth(
-        days_in_preg: int, gestation_length: int, mature_body_weight: float, body_weight: float, expected: float,
-        mock_reproduction_properties: ReproductionProperties, mock_general_properties: GeneralProperties
+    days_in_preg: int,
+    gestation_length: int,
+    mature_body_weight: float,
+    body_weight: float,
+    expected: float,
+    mock_reproduction_properties: ReproductionProperties,
+    mock_general_properties: GeneralProperties,
 ) -> None:
     mock_reproduction_properties.gestation_length = gestation_length
     mock_general_properties.days_in_preg = days_in_preg
@@ -370,18 +388,25 @@ def test_calculate_pregnant_heifer_target_daily_growth(
 
 
 @pytest.mark.parametrize(
-    "calves, days_in_preg, mature_body_weight, calving_interval, body_weight, gestation_length, expected", [
+    "calves, days_in_preg, mature_body_weight, calving_interval, body_weight, gestation_length, expected",
+    [
         (1, 0, 700, 365, 600, 280, 0.18410958904),
         (1, 50, 700, 365, 600, 280, 0.190476190476),
         (2, 0, 700, 365, 600, 280, 0.147287671232),
         (2, 50, 700, 365, 600, 280, 0.4329004329),
         (0, 100, 700, 365, 600, 280, 0),
-    ]
+    ],
 )
 def test_calculate_cow_target_daily_growth(
-        calves: int, days_in_preg: int, mature_body_weight: float, calving_interval: float, body_weight: float,
-        gestation_length: int, expected: float, mock_reproduction_properties: ReproductionProperties,
-        mock_general_properties: GeneralProperties
+    calves: int,
+    days_in_preg: int,
+    mature_body_weight: float,
+    calving_interval: float,
+    body_weight: float,
+    gestation_length: int,
+    expected: float,
+    mock_reproduction_properties: ReproductionProperties,
+    mock_general_properties: GeneralProperties,
 ) -> None:
     mock_reproduction_properties.calves = calves
     mock_reproduction_properties.gestation_length = gestation_length
@@ -390,9 +415,7 @@ def test_calculate_cow_target_daily_growth(
     mock_general_properties.mature_body_weight = mature_body_weight
     mock_general_properties.body_weight = body_weight
 
-    actual = AnimalGrowth._calculate_cow_target_daily_growth(
-        mock_reproduction_properties, mock_general_properties
-    )
+    actual = AnimalGrowth._calculate_cow_target_daily_growth(mock_reproduction_properties, mock_general_properties)
 
     assert pytest.approx(actual) == expected
 
@@ -406,13 +429,20 @@ def test_calculate_cow_target_daily_growth(
         (2, 30, 100, 250, 5, 280, -0.578218759978826, 5),
         (2, 50, 249, 250, 5, 280, -0.2172591342771183, 38.020348498495714),
         (1, 0, 100, 250, 5, 280, 0.16666666666666666, 5),
-    ]
+    ],
 )
 def test_calculate_cow_body_weight_tissue_change(
-        calves: int, days_in_milk: int, days_in_preg: int, dry_off_day_of_pregnancy: int, tissue_changed: float,
-        gestation_length: int, expected_body_weight_tissue: float, expected_updated_tissue_changed: float,
-        mock_animal_growth_properties: AnimalGrowthProperties, mock_reproduction_properties: ReproductionProperties,
-        mock_general_properties: GeneralProperties
+    calves: int,
+    days_in_milk: int,
+    days_in_preg: int,
+    dry_off_day_of_pregnancy: int,
+    tissue_changed: float,
+    gestation_length: int,
+    expected_body_weight_tissue: float,
+    expected_updated_tissue_changed: float,
+    mock_animal_growth_properties: AnimalGrowthProperties,
+    mock_reproduction_properties: ReproductionProperties,
+    mock_general_properties: GeneralProperties,
 ) -> None:
     mock_reproduction_properties.calves = calves
     mock_reproduction_properties.gestation_length = gestation_length
@@ -427,4 +457,3 @@ def test_calculate_cow_body_weight_tissue_change(
 
     assert pytest.approx(actual_body_weight_tissue) == expected_body_weight_tissue
     assert pytest.approx(actual_updated_tissue_changed) == expected_updated_tissue_changed
-

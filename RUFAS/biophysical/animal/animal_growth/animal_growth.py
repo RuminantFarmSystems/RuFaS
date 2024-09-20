@@ -157,8 +157,11 @@ class AnimalGrowth:
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float, float]:
-        updated_tissue_change = 0 if general_properties.days_in_preg == reproduction_properties.gestation_length \
+        updated_tissue_change = (
+            0
+            if general_properties.days_in_preg == reproduction_properties.gestation_length
             else animal_growth_properties.tissue_changed
+        )
 
         conceptus_growth, updated_conceptus_weight = AnimalGrowth._calculate_pregnant_heifer_conceptus_growth(
             reproduction_properties, general_properties
