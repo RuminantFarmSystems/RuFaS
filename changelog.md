@@ -25,6 +25,7 @@ v0.9.2
 
 ### Next Version Updates
 
+trivial change
 
 ### v0.9.2
 
