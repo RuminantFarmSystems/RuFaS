@@ -23,21 +23,25 @@ jobs:
           persist-credentials: true
           fetch-depth: 1
 
-      - name: Ensure correct branch
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
         run: |
-          CURRENT_BRANCH="${{ github.head_ref }}"
-          if [ -z "$CURRENT_BRANCH" ]; then
-            echo "No head ref found. Defaulting to dev branch."
-            git checkout dev
-          else
-            git checkout $CURRENT_BRANCH
-          fi
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Get all added or modified files
         run: |
           BASE_BRANCH=${{ github.base_ref }} || "dev"
-          git fetch origin $BASE_BRANCH --depth=1
-
+          git diff --name-only $BASE_BRANCH
+          if ! git rev-parse --verify --quiet origin/$BASE_BRANCH; then
+            echo "Fallback to dev branch because $BASE_BRANCH does not exist."
+            BASE_BRANCH="dev"
+            git fetch origin $BASE_BRANCH
+          fi
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
           echo "All Changed Files: $ALL_CHANGED_FILES"
 
@@ -47,11 +51,6 @@ jobs:
           OTHER_FILES=$(echo "$ALL_CHANGED_FILES" | grep -v '\.py$' | tr '\n' ' ')
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-      
       - name: Check for Unauthorized Changes
         run: |
           paths_to_protect=(
@@ -75,11 +74,6 @@ jobs:
           else
             echo "No unauthorized changes detected."
           fi
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Record if changelog has been updated
         id: record_if_changelog_updated
@@ -288,12 +282,10 @@ jobs:
         env:
           URL: ${{ github.event.pull_request.comments_url }}
         run: |
-          if [ -n "$URL" ]; then
-            curl \
-                -X POST \
-                $URL \
-                -H "Content-Type: application/json" \
-                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
-            exit 1
-          fi
+          curl \
+              -X POST \
+              $URL \
+              -H "Content-Type: application/json" \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              --data "{\"body\": \"🚨 Please update the changelog. This PR cannot be merged until \`changelog.md\` is updated to reflect the changes.\"}"
+          exit 1
