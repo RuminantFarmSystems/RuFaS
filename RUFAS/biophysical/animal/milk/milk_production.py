@@ -11,6 +11,9 @@ from RUFAS.util import Utility
 import numpy as np
 
 
+PERCENTAGE_TO_FRACTION = 0.01
+
+
 class MilkProduction:
     """
     Handles updating the milk-production related animal attributes.
@@ -36,7 +39,7 @@ class MilkProduction:
     @classmethod
     def set_milk_quality(cls, fat_percent: float, true_protein_percent: float) -> None:
         """Sets user-defined milk qualities."""
-        cls.FAT_PERCENT = (fat_percent,)
+        cls.FAT_PERCENT = fat_percent
         cls.TRUE_PROTEIN_PERCENT = true_protein_percent
 
     @staticmethod
@@ -195,7 +198,7 @@ class MilkProduction:
             Amount of nutrient contained in the milk (kg).
 
         """
-        return milk * nutrient_percentage * 0.01
+        return milk * nutrient_percentage * PERCENTAGE_TO_FRACTION
 
     @staticmethod
     def _update_milking_history(
