@@ -212,4 +212,3 @@ class SimulationEngine:
         if self.is_end_to_end_test_run:
             end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
             self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)
-            self.feed_manager.process_degradations(self.weather, self.time)
