@@ -21,7 +21,7 @@ class GeneralProperties:
     estimated_daily_milk_produced: float
     future_cull_date: int
     future_death_date: int
-    gender: Enum
+    gender: "Gender"
     id: int
     is_dry: bool
     is_lactating: bool
