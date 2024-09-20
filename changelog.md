@@ -23,7 +23,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 
 v0.9.2
 
-### Next Version Updates
+### Next Version Updatesgit status
 
 trivial change
 
