@@ -2,7 +2,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 
 
-LAC_COW = {
+LAC_COW_PROPERTIES = {
     "animal_type": AnimalType.LAC_COW,
     "birth_date": "2020-01-01",
     "birth_weight": 40.0,
@@ -15,7 +15,7 @@ LAC_COW = {
     "events": AnimalEvents(),
     "days_in_milk": 150,
     "dry_off_day_of_pregnancy": 180,
-    "estimated_daily_milk_produced": 30.0,
+    "daily_milk_produced": 30.0,
     "future_cull_date": 1000,
     "future_death_date": 1100,
     "gender": None,
