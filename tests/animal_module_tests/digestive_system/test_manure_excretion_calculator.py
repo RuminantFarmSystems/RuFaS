@@ -174,3 +174,88 @@ def test_heifer_manure(body_weight: float,
                                                       urine_phosphorus_required=urine_phosphorus_required)
 
     assert observed == expected
+
+
+@pytest.mark.parametrize(
+    "body_weight,days_in_milk,milk_protein,daily_milk_production,fecal_phosphorus,"
+    "urine_phosphorus_required,nutrient_amounts,nutrient_concentrations",
+    [
+        (43.2,
+         6,
+         225.3,
+         21.4,
+         14.3,
+         92.4,
+         {"a": 56.2},
+         {"b": 58.3})
+    ]
+)
+def test_cow_manure_lactating(body_weight: float,
+                              days_in_milk: int,
+                              milk_protein: float,
+                              daily_milk_production: float,
+                              fecal_phosphorus: float,
+                              urine_phosphorus_required: float,
+                              nutrient_amounts: dict[str, float],
+                              nutrient_concentrations: dict[str, float],
+                              mocker: MockerFixture) -> None:
+    mock_lactating_cow_manure = mocker.patch.object(ManureExcretionCalculator, "_lactating_cow_manure")
+    ManureExcretionCalculator.cow_manure(True,
+                                         body_weight,
+                                         days_in_milk,
+                                         milk_protein,
+                                         daily_milk_production,
+                                         fecal_phosphorus,
+                                         urine_phosphorus_required,
+                                         nutrient_amounts,
+                                         nutrient_concentrations
+                                         )
+    mock_lactating_cow_manure.assert_called_once_with(days_in_milk,
+                                                      milk_protein,
+                                                      daily_milk_production,
+                                                      fecal_phosphorus,
+                                                      urine_phosphorus_required,
+                                                      nutrient_amounts,
+                                                      nutrient_concentrations)
+
+
+@pytest.mark.parametrize(
+    "body_weight,days_in_milk,milk_protein,daily_milk_production,fecal_phosphorus,"
+    "urine_phosphorus_required,nutrient_amounts,nutrient_concentrations",
+    [
+        (43.2,
+         6,
+         225.3,
+         21.4,
+         14.3,
+         92.4,
+         {"a": 56.2},
+         {"b": 58.3})
+    ]
+)
+def test_cow_manure_dry(body_weight: float,
+                        days_in_milk: int,
+                        milk_protein: float,
+                        daily_milk_production: float,
+                        fecal_phosphorus: float,
+                        urine_phosphorus_required: float,
+                        nutrient_amounts: dict[str, float],
+                        nutrient_concentrations: dict[str, float],
+                        mocker: MockerFixture) -> None:
+    mock_lactating_cow_manure = mocker.patch.object(ManureExcretionCalculator, "_dry_cow_manure")
+    ManureExcretionCalculator.cow_manure(False,
+                                         body_weight,
+                                         days_in_milk,
+                                         milk_protein,
+                                         daily_milk_production,
+                                         fecal_phosphorus,
+                                         urine_phosphorus_required,
+                                         nutrient_amounts,
+                                         nutrient_concentrations
+                                         )
+    mock_lactating_cow_manure.assert_called_once_with(body_weight,
+                                                      daily_milk_production,
+                                                      fecal_phosphorus,
+                                                      urine_phosphorus_required,
+                                                      nutrient_amounts,
+                                                      nutrient_concentrations)

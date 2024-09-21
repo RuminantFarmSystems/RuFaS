@@ -266,8 +266,8 @@ class ManureExcretionCalculator:
         daily_milk_production: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amount: dict[str, float],
-        nutrient_concentration: dict[str, float],
+        nutrient_amounts: dict[str, float],
+        nutrient_concentrations: dict[str, float],
     ) -> Tuple[float, AnimalManureExcretions]:
         """
 
@@ -280,8 +280,8 @@ class ManureExcretionCalculator:
         daily_milk_production
         fecal_phosphorus
         urine_phosphorus_required
-        nutrient_amount
-        nutrient_concentration
+        nutrient_amounts
+        nutrient_concentrations
 
         Returns
         -------
@@ -294,8 +294,8 @@ class ManureExcretionCalculator:
                 daily_milk_production,
                 fecal_phosphorus,
                 urine_phosphorus_required,
-                nutrient_amount,
-                nutrient_concentration,
+                nutrient_amounts,
+                nutrient_concentrations,
             )
         else:
             return ManureExcretionCalculator._dry_cow_manure(
@@ -303,8 +303,8 @@ class ManureExcretionCalculator:
                 daily_milk_production,
                 fecal_phosphorus,
                 urine_phosphorus_required,
-                nutrient_amount,
-                nutrient_concentration,
+                nutrient_amounts,
+                nutrient_concentrations,
             )
 
     @staticmethod
