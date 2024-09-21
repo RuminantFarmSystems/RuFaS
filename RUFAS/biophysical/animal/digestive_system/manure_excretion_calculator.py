@@ -1,6 +1,4 @@
-from typing import Tuple
-
-from numba import njit
+from typing import Tuple, Dict
 
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
@@ -13,8 +11,8 @@ class ManureExcretionCalculator:
         body_weight: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
-        nutrient_amounts: dict[str, float],
-        nutrient_concentrations: dict[str, float],
+        nutrient_amounts: Dict[str, float],
+        nutrient_concentrations: Dict[str, float],
     ) -> Tuple[float, AnimalManureExcretions]:
         """
         Calculates the manure excretion values for a calf with information from the ration formulation.

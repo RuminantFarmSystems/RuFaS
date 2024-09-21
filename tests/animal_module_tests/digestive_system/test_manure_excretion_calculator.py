@@ -1,5 +1,4 @@
 import pytest
-from numba import njit
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
@@ -12,7 +11,7 @@ from RUFAS.general_constants import GeneralConstants
     "inorganic_phosphorus_fraction,total_phosphorus_excreted,organic_phosphorus_fraction,manure_phosphorus_excreted,"
     "manure_phosphorus_fraction",
     [
-        (40,
+        (500000,
          36.5,
          22.8,
          {"dm": 24.3},
@@ -63,7 +62,7 @@ def test_calf_manure(body_weight: float,
                     total_solids=total_solids,
                     degradable_volatile_solids=degradable_volatile_solids,
                     non_degradable_volatile_solids=non_degradable_volatile_solids,
-                    inorganic_phosphorus_fraction=total_phosphorus_excreted,
+                    inorganic_phosphorus_fraction=inorganic_phosphorus_fraction,
                     organic_phosphorus_fraction=organic_phosphorus_fraction,
                     non_water_inorganic_phosphorus_fraction=0.0,
                     non_water_organic_phosphorus_fraction=0.0,
@@ -76,6 +75,22 @@ def test_calf_manure(body_weight: float,
                                                      nutrient_amounts,
                                                      nutrient_concentrations)
 
-    mock_phosphorus_excretion.assert_called_once_with(0, total_manure_excreted, fecal_phosphorus,
-                                                      urine_phosphorus_required)
+    mock_phosphorus_excretion.assert_called_once_with(daily_milk_production=0,
+                                                      total_manure_excreted=total_manure_excreted,
+                                                      fecal_phosphorus=fecal_phosphorus,
+                                                      urine_phosphorus_required=urine_phosphorus_required)
+
     assert observed == expected
+
+def test_heifer_manure(
+    body_weight: float,
+                     fecal_phosphorus: float,
+                     urine_phosphorus_required: float,
+                     nutrient_amounts: dict[str, float],
+                     nutrient_concentrations: dict[str, float],
+                     inorganic_phosphorus_fraction: float,
+                     total_phosphorus_excreted: float,
+                     organic_phosphorus_fraction: float,
+                     manure_phosphorus_excreted: float,
+                     manure_phosphorus_fraction: float,
+                     mocker: MockerFixture) -> None:
