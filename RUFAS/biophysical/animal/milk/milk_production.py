@@ -5,13 +5,11 @@ from ..animal_module_constants import AnimalModuleConstants
 from ..animal_properties.general_properties import GeneralProperties
 from ..animal_properties.milk_production_properties import MilkProductionProperties
 from ..data_types.milk_production_record import MilkProductionRecord
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.util import Utility
 
 import numpy as np
-
-
-PERCENTAGE_TO_FRACTION = 0.01
 
 
 class MilkProduction:
@@ -92,15 +90,7 @@ class MilkProduction:
             milking_properties.wood_m,
             milking_properties.wood_n,
         )
-
-        milk_production_variance = Utility.generate_random_number(
-            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
-        )
-        general_properties.daily_milk_produced = MilkProduction._adjust_milk_production(
-            general_properties.daily_milk_produced,
-            milk_production_variance,
-            milking_properties.milk_production_reduction,
-        )
+        general_properties = MilkProduction._adjust_milk_production(milking_properties, general_properties)\
 
         milking_properties.crude_protein_content = MilkProduction._calculate_nutrient_content(
             general_properties.daily_milk_produced, milking_properties.crude_protein_content
@@ -154,33 +144,34 @@ class MilkProduction:
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
 
     @staticmethod
-    @njit
     def _adjust_milk_production(
-        milk_production: float, milk_production_variance: float, milk_production_reduction: float
-    ) -> float:
+        milking_properties: MilkProductionProperties, general_properties: GeneralProperties
+    ) -> GeneralProperties:
         """
         Randomly adjusts the milk production on a specific day.
 
         Parameters
         ----------
-        milk_production : float
-            Unvaried milk production (kg).
-        milk_production_variance : float
-            How much the actual milk production varied from the estimated amount (kg).
-        milk_production_reduction : float
-            How much milk production was reduced by other attributes of the animals physiology (kg).
+        milking_properties : MilkProductionProperties
+            Animal properties only used to determine milk production.
+        general_properties : GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
 
         Returns
         -------
-        float
-            Milk production that has been varied by a random amount (kg).
+        general_properties : GeneralProperties
+            Animal properties with the daily_milk_produced attribute updated.
 
         """
-        milk_production += milk_production_variance + milk_production_reduction
-        return milk_production
+        milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        )
+        general_properties.daily_milk_produced += (
+            milk_production_variance + milking_properties.milk_production_reduction
+        )
+        return general_properties
 
     @staticmethod
-    @njit
     def _calculate_nutrient_content(milk: float, nutrient_percentage: float) -> float:
         """
         Calculates the amount of a given nutrient in milk.
@@ -198,7 +189,7 @@ class MilkProduction:
             Amount of nutrient contained in the milk (kg).
 
         """
-        return milk * nutrient_percentage * PERCENTAGE_TO_FRACTION
+        return milk * nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
     @staticmethod
     def _update_milking_history(
