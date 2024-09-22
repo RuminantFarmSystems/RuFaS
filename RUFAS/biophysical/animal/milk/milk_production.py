@@ -90,8 +90,7 @@ class MilkProduction:
             milking_properties.wood_m,
             milking_properties.wood_n,
         )
-        general_properties = MilkProduction._adjust_milk_production(milking_properties, general_properties)\
-
+        general_properties = MilkProduction._adjust_milk_production(milking_properties, general_properties)
         milking_properties.crude_protein_content = MilkProduction._calculate_nutrient_content(
             general_properties.daily_milk_produced, milking_properties.crude_protein_content
         )
