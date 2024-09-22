@@ -8,6 +8,7 @@ from RUFAS.biophysical.animal.animal_properties.milk_production_properties impor
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.time import Time
+from RUFAS.util import Utility
 
 
 @pytest.fixture
@@ -117,8 +118,10 @@ def test_perform_daily_milking_update(
     milking_properties.milk_production_history = [
         MilkProductionRecord(simulation_day=1, days_in_milk=100, milk_production=1.0, days_born=500) for _ in range(305)
     ]
-    milk_produced = 40.0
-    mocker.patch.object(MilkProduction, "_adjust_milk_production", return_value=milk_produced)
+    milking_properties.milk_production_reduction = -6.0
+    expected_milk_produced = 40.0
+    mocker.patch.object(MilkProduction, "calculate_daily_milk_production", return_value=45.0)
+    mocker.patch.object(Utility, "generate_random_number", return_value=1.0)
     mocker.patch.object(Time, "simulation_day", new_callable=mocker.PropertyMock, return_value=500)
     expected_record = MilkProductionRecord(
         simulation_day=500,
@@ -132,7 +135,7 @@ def test_perform_daily_milking_update(
     )
 
     assert general_properties.days_in_milk == expected_days_in_milk
-    assert general_properties.daily_milk_produced == milk_produced
+    assert general_properties.daily_milk_produced == expected_milk_produced
     assert milking_properties.true_protein_content == 1.2
     assert pytest.approx(milking_properties.fat_content) == 1.4
     assert milking_properties.milk_production_history[-1] == expected_record
@@ -158,11 +161,23 @@ def test_get_milk_yield_values_wood_curve(
 
 
 @pytest.mark.parametrize("milk,reduction,variance,expected", [(30.0, -4.0, 2.0, 28.0), (28.0, 0.0, -1.0, 27.0)])
-def test_adjust_milk_production(milk: float, reduction: float, variance: float, expected: float) -> None:
+def test_adjust_milk_production(
+    mocker: MockerFixture,
+    milking_properties: MilkProductionProperties,
+    general_properties: GeneralProperties,
+    milk: float,
+    reduction: float,
+    variance: float,
+    expected: float,
+) -> None:
     """Test that milk production is varied correctly."""
-    actual = MilkProduction._adjust_milk_production(milk, variance, reduction)
+    milking_properties.milk_production_reduction = reduction
+    general_properties.daily_milk_produced = milk
+    mocker.patch.object(Utility, "generate_random_number", return_value=variance)
 
-    assert actual == expected
+    actual = MilkProduction._adjust_milk_production(milking_properties, general_properties)
+
+    assert actual.daily_milk_produced == expected
 
 
 @pytest.mark.parametrize("milk,nutrient,expected", [(30.0, 5.0, 1.5), (25.0, 0.0, 0.0), (20.0, 100.0, 20.0)])
