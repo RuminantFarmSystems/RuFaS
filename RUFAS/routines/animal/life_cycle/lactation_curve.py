@@ -137,21 +137,14 @@ class LactationCurve:
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        info_map = ({"class": self.__class__.__name__, "function": "__init__"},)
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             self.om.add_log(
                 "Projected annual milk yield provided to simulation",
                 "Using the annual milk yield input to fit lactation curve parameters.",
-                info_map,
+                {"class": self.__class__.__name__, "function": "__init__"},
             )
             self._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
-        else:
-            self.om.add_log(
-                "Annual milk yield not provided to simulation",
-                "Lactation curve parameters will not be fit to the target milk production.",
-                info_map,
-            )
 
     def _get_year_adjustments(
         self, year_adjustment_values: dict[str, dict[str, float]], time: Time
