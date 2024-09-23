@@ -6,7 +6,6 @@ from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 import numpy as np
-from scipy.integrate import quad
 from typing import Any
 
 """
@@ -83,7 +82,7 @@ class LactationCurve:
     _parity_to_std_dev_mapping = {}
 
     @classmethod
-    def __init__(cls, time: Time) -> None:
+    def set_lactation_parameters(cls, time: Time) -> None:
         im = InputManager()
 
         lactation_inputs: dict[str, Any] = im.get_data("lactation")
@@ -141,7 +140,7 @@ class LactationCurve:
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        info_map = {"class": cls.__class__.__name__, "function": "__init__"},
+        info_map = {"class": cls.__class__.__name__, "function": "__init__"}
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             cls._om.add_log(
