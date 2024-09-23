@@ -8,11 +8,11 @@ from typing import Any
 import datetime
 
 
-@pytest.fixture
-def lactation_curve(mocker: MockerFixture) -> LactationCurve:
-    mocker.patch.object(LactationCurve, "__init__", return_value=None)
-    mock_time = mocker.MagicMock()
-    return LactationCurve(mock_time)
+# @pytest.fixture
+# def lactation_curve(mocker: MockerFixture) -> LactationCurve:
+#     mocker.patch.object(LactationCurve, "__init__", return_value=None)
+#     mock_time = mocker.MagicMock()
+#     return LactationCurve(mock_time)
 
 
 @pytest.fixture
@@ -157,7 +157,7 @@ def lactation_inputs() -> dict[str, Any]:
 
 
 @pytest.mark.parametrize("annual_milk_yield,expect_fitting", [(10_000_000, True), (None, False)])
-def test_init(
+def test_set_lactation_curve(
     mocker: MockerFixture,
     animal_inputs: dict[str, Any],
     lactation_inputs: dict[str, Any],
@@ -187,26 +187,27 @@ def test_init(
     )
     adjust_lactation_curve = mocker.patch.object(LactationCurve, "_adjust_lactation_curve_to_milk_yield")
 
-    lactation_curve = LactationCurve(mock_time)
+    LactationCurve.set_lactation_parameters(mock_time)
 
     assert get_data.call_count == 3
     year_adjustments.assert_called_once()
     region_adjustments.assert_called_once()
     milking_freq.assert_called_once()
     assert adjust_wood_params.call_count == 3
-    assert lactation_curve.parity_to_parameter_mapping[1] == lactation_curve.parity_1_parameters
-    assert lactation_curve.parity_to_parameter_mapping[2] == lactation_curve.parity_2_parameters
-    assert lactation_curve.parity_to_parameter_mapping[3] == lactation_curve.parity_3_parameters
-    assert lactation_curve.parity_to_std_dev_mapping == {
+    assert LactationCurve._parity_to_parameter_mapping == {
+        1: {"l": 17.0, "m": 0.240, "n": 0.003376},
+        2: {"l": 21.0, "m": 0.247, "n": 0.003376},
+        3: {"l": 20.0, "m": 0.245, "n": 0.003376},
+    }
+    assert LactationCurve._parity_to_std_dev_mapping == {
         1: {"parameter_l_std_dev": 0.28, "parameter_m_std_dev": 0.0046, "parameter_n_std_dev": 3.77e-5},
         2: {"parameter_l_std_dev": 0.54, "parameter_m_std_dev": 0.0064, "parameter_n_std_dev": 5.82e-5},
         3: {"parameter_l_std_dev": 0.51, "parameter_m_std_dev": 0.0060, "parameter_n_std_dev": 5.54e-5},
     }
+    add_log.assert_called_once()
     if expect_fitting:
-        add_log.assert_called_once()
         adjust_lactation_curve.assert_called_once()
     else:
-        add_log.assert_not_called()
         adjust_lactation_curve.assert_not_called()
 
 
