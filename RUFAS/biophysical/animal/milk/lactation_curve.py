@@ -72,8 +72,8 @@ class LactationCurve:
     """
 
     _om = OutputManager()
-    _parity_to_parameter_mapping = {}
-    _parity_to_std_dev_mapping = {}
+    _parity_to_parameter_mapping: dict[int, dict[str, float]] = {}
+    _parity_to_std_dev_mapping: dict[int, dict[str, float]] = {}
 
     @classmethod
     def set_lactation_parameters(cls, time: Time) -> None:
@@ -105,23 +105,21 @@ class LactationCurve:
         base_wood_parameter_m: float = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
         base_wood_parameter_n: float = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
 
-        cls._parity_to_parameter_mapping: dict[int, dict[str, float]] = {}
         for parity, adjustments in parity_adjustments.items():
-            parity = int(parity)
-            cls._parity_to_parameter_mapping[parity] = cls._calculate_adjusted_wood_parameters(
+            cls._parity_to_parameter_mapping[int(parity)] = cls._calculate_adjusted_wood_parameters(
                 base_wood_parameter_l,
                 base_wood_parameter_m,
                 base_wood_parameter_n,
                 [adjustments, year_adjustments, region_adjustments, milking_frequency_adjustments],
             )
 
-        cls._parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
+        cls._parity_to_std_dev_mapping = {
             1: lactation_inputs["parameter_standard_deviations"]["1"],
             2: lactation_inputs["parameter_standard_deviations"]["2"],
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        info_map = {"class": cls.__class__.__name__, "function": "__init__"}
+        info_map: dict[str, Any] = {"class": cls.__class__.__name__, "function": "__init__"}
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             cls._om.add_log(
@@ -138,8 +136,8 @@ class LactationCurve:
             )
 
         info_map["units"] = MeasurementUnits.UNITLESS
-        for parity, params in cls._parity_to_parameter_mapping.items():
-            base_var_name = f"parity_{parity}_lactation_curve_parameter_"
+        for animal_parity, params in cls._parity_to_parameter_mapping.items():
+            base_var_name = f"parity_{animal_parity}_lactation_curve_parameter_"
             for param, value in params.items():
                 cls._om.add_variable(f"{base_var_name}_{param}", value, info_map)
 
