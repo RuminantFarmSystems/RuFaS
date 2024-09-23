@@ -38,7 +38,7 @@ class MilkProduction:
     @classmethod
     def set_milk_quality(cls, fat_percent: float, true_protein_percent: float) -> None:
         """Sets user-defined milk qualities."""
-        cls.FAT_PERCENT = fat_percent,
+        cls.FAT_PERCENT = fat_percent
         cls.TRUE_PROTEIN_PERCENT = true_protein_percent
 
     @staticmethod
@@ -63,7 +63,7 @@ class MilkProduction:
             Milking and general properties of the animal after milk production-related updates for the current day.
 
         """
-        if not general_properties.milking:
+        if not general_properties.is_milking:
             milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
             return milking_properties, general_properties
 
@@ -71,10 +71,12 @@ class MilkProduction:
         if is_dry_off_day:
             general_properties.events.add_event(general_properties.days_born, time.simulation_day, DRY)
             general_properties.days_in_milk = 0
-            general_properties.estimated_daily_milk_produced = 0.0
+            general_properties.daily_milk_produced = 0.0
+            milking_properties.crude_protein_content = 0.0
             milking_properties.true_protein_content = 0.0
             milking_properties.fat_content = 0.0
-            milking_properties.latest_305_day_milk_production = 0.0
+            milking_properties.lactose_content = 0.0
+            milking_properties.milk_production_last_305_days = 0.0
             milking_properties.crude_protein_percent = 0.0
             milking_properties.true_protein_percent = 0.0
             milking_properties.fat_percent = 0.0
@@ -83,38 +85,31 @@ class MilkProduction:
             return milking_properties, general_properties
 
         general_properties.days_in_milk += 1
-        general_properties.estimated_daily_milk_produced = MilkProduction.calculate_daily_milk_production(
+        general_properties.daily_milk_produced = MilkProduction.calculate_daily_milk_production(
             general_properties.days_in_milk,
             milking_properties.wood_l,
             milking_properties.wood_m,
             milking_properties.wood_n,
         )
-
-        milk_production_variance = Utility.generate_random_number(
-            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        general_properties = MilkProduction._adjust_milk_production(milking_properties, general_properties)
+        milking_properties.crude_protein_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.crude_protein_content
         )
-        general_properties.estimated_daily_milk_produced = MilkProduction._adjust_milk_production(
-            general_properties.estimated_daily_milk_produced,
-            milk_production_variance,
-            milking_properties.milk_production_reduction,
+        milking_properties.true_protein_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.true_protein_percent
         )
-
-        milking_properties.true_protein_content = (
-            general_properties.estimated_daily_milk_produced
-            * milking_properties.true_protein_percent
-            * GeneralConstants.PERCENTAGE_TO_FRACTION
+        milking_properties.fat_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.fat_percent
         )
-        milking_properties.fat_content = (
-            general_properties.estimated_daily_milk_produced
-            * milking_properties.fat_percent
-            * GeneralConstants.PERCENTAGE_TO_FRACTION
+        milking_properties.lactose_content = MilkProduction._calculate_nutrient_content(
+            general_properties.daily_milk_produced, milking_properties.lactose_percent
         )
 
         milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
 
         if general_properties.days_in_milk == 305:
             milk_history = [record["milk_production"] for record in milking_properties.milk_production_history[-305:]]
-            milking_properties.latest_305_day_milk_production = np.sum(milk_history)
+            milking_properties.milk_production_last_305_days = np.sum(milk_history)
 
         return milking_properties, general_properties
 
@@ -173,30 +168,52 @@ class MilkProduction:
         return float(result)
 
     @staticmethod
-    @njit
     def _adjust_milk_production(
-        milk_production: float, milk_production_variance: float, milk_production_reduction: float
-    ) -> float:
+        milking_properties: MilkProductionProperties, general_properties: GeneralProperties
+    ) -> GeneralProperties:
         """
         Randomly adjusts the milk production on a specific day.
 
         Parameters
         ----------
-        milk_production : float
-            Unvaried milk production (kg).
-        milk_production_variance : float
-            How much the actual milk production varied from the estimated amount (kg).
-        milk_production_reduction : float
-            How much milk production was reduced by other attributes of the animals physiology (kg).
+        milking_properties : MilkProductionProperties
+            Animal properties only used to determine milk production.
+        general_properties : GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        general_properties : GeneralProperties
+            Animal properties with the daily_milk_produced attribute updated.
+
+        """
+        milk_production_variance = Utility.generate_random_number(
+            AnimalModuleConstants.DAILY_MILK_VARIATION_MEAN, AnimalModuleConstants.DAILY_MILK_VARIATION_STD_DEV
+        )
+        general_properties.daily_milk_produced += (
+            milk_production_variance + milking_properties.milk_production_reduction
+        )
+        return general_properties
+
+    @staticmethod
+    def _calculate_nutrient_content(milk: float, nutrient_percentage: float) -> float:
+        """
+        Calculates the amount of a given nutrient in milk.
+
+        Parameters
+        ----------
+        milk : float
+            Amount of milk produced (kg).
+        nutrient_percentage : float
+            Percentage of nutrient in the milk.
 
         Returns
         -------
         float
-            Milk production that has been varied by a random amount (kg).
+            Amount of nutrient contained in the milk (kg).
 
         """
-        milk_production += milk_production_variance + milk_production_reduction
-        return milk_production
+        return milk * nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
     @staticmethod
     def _update_milking_history(
@@ -207,7 +224,7 @@ class MilkProduction:
             MilkProductionRecord(
                 simulation_day=time.simulation_day,
                 days_in_milk=general_properties.days_in_milk,
-                milk_production=general_properties.estimated_daily_milk_produced,
+                milk_production=general_properties.daily_milk_produced,
                 days_born=general_properties.days_born,
             )
         )
