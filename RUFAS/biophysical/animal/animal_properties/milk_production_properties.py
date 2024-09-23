@@ -19,7 +19,7 @@ class MilkProductionProperties:
         Amount of lactose in the milk produced (kg).
     milk_production_reduction : float
         Amount of milk daily production is reduced by (kg).
-    current_lact_305_day_milk_produced : float
+    current_lactation_305_day_milk_produced : float
         Sum of milk production over the first 305 days of the animal's current lactation (kg). This value is reset to 0
         when a lactation ends, and is not reset until the 305th day of the next lactation is reached.
     crude_protein_percent : float
@@ -46,7 +46,7 @@ class MilkProductionProperties:
     fat_content: float
     lactose_content: float
     milk_production_reduction: float
-    current_lact_305_day_milk_produced: float
+    current_lactation_305_day_milk_produced: float
     crude_protein_percent: float
     true_protein_percent: float
     fat_percent: float
