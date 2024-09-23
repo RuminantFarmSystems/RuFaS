@@ -137,7 +137,7 @@ class LactationCurve:
             3: lactation_inputs["parameter_standard_deviations"]["3"],
         }
 
-        info_map = {"class": self.__class__.__name__, "function": "__init__"},
+        info_map = ({"class": self.__class__.__name__, "function": "__init__"},)
         annual_milk_yield: float = animal_inputs["herd_information"]["annual_milk_yield"]
         if annual_milk_yield is not None:
             self.om.add_log(

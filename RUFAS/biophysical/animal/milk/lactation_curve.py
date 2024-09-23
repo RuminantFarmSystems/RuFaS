@@ -124,9 +124,7 @@ class LactationCurve:
             [parity_adjustments["3"], year_adjustments, region_adjustments, milking_frequency_adjustments],
         )
 
-        cls._parity_to_parameter_mapping = {
-            1: parity_1_parameters, 2: parity_2_parameters, 3: parity_3_parameters
-        }
+        cls._parity_to_parameter_mapping = {1: parity_1_parameters, 2: parity_2_parameters, 3: parity_3_parameters}
 
         cls._parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
             1: lactation_inputs["parameter_standard_deviations"]["1"],
@@ -157,9 +155,7 @@ class LactationCurve:
                 cls._om.add_variable(f"{base_var_name}_{param}", value, info_map)
 
     @classmethod
-    def _get_year_adjustments(
-        cls, year_adjustment_values: dict[str, dict[str, float]], time: Time
-    ) -> dict[str, float]:
+    def _get_year_adjustments(cls, year_adjustment_values: dict[str, dict[str, float]], time: Time) -> dict[str, float]:
         """Retrieves the appropriate adjustment values based on the end year of the simulation."""
         end_year = time.end_date.year
 

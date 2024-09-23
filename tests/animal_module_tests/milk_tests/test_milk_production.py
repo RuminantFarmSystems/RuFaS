@@ -164,9 +164,7 @@ def test_get_milk_yield_values_wood_curve(
     "l_param,m_param,n_param,expected",
     [(17.8, 0.229, 0.00331, 9745.195761), (19.9, 0.231, 0.00299, 11523.229036), (22.1, 0.334, 0.00400, 17955.511169)],
 )
-def test_calc_305_day_milk_yield(
-    l_param: float, m_param: float, n_param: float, expected: float
-) -> None:
+def test_calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float, expected: float) -> None:
     """Test that 305 day milk yields are estimated correctly."""
     actual = MilkProduction.calc_305_day_milk_yield(l_param, m_param, n_param)
 

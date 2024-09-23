@@ -268,9 +268,7 @@ def test_get_region_adjustments(lactation_inputs: dict[str, Any], fips_code: int
     ],
 )
 def test_get_milking_frequency_adjustments(
-    lactation_inputs: dict[str, Any],
-    milking_frequency: float,
-    expected: dict[str, float]
+    lactation_inputs: dict[str, Any], milking_frequency: float, expected: dict[str, float]
 ) -> None:
     """Test that the milking frequency adjustments are retrieved appropriately."""
     milking_frequency_adjustments = lactation_inputs["adjustments"]["milking_frequency"]
@@ -361,24 +359,20 @@ def test_get_wood_parameters(
 
 
 def test_adjust_lactation_curve_to_milk_yield(
-    mocker: MockerFixture,
-    animal_inputs: dict[str, Any],
-    lactation_inputs: dict[str, Any]
+    mocker: MockerFixture, animal_inputs: dict[str, Any], lactation_inputs: dict[str, Any]
 ) -> None:
     """Test that Wood's parameters are correctly adjusted based on a farm's total milk yield."""
     LactationCurve._parity_to_parameter_mapping = {
         1: {"l": 17.0, "m": 0.247, "n": 0.003376},
         2: {"l": 17.0, "m": 0.247, "n": 0.003376},
-        3: {"l": 17.0, "m": 0.247, "n": 0.003376}
+        3: {"l": 17.0, "m": 0.247, "n": 0.003376},
     }
     estimate_305d_yield = mocker.patch.object(
         LactationCurve,
         "_estimate_305_day_milk_yield_by_parity",
         return_value={"parity_1": 10_000.0, "parity_2": 11_000.0, "parity_3": 10_500.0},
     )
-    fit_l_param = mocker.patch.object(
-        LactationCurve, "_fit_wood_l_param_to_milk_yield", side_effect=[19.2, 20.0, 19.5]
-    )
+    fit_l_param = mocker.patch.object(LactationCurve, "_fit_wood_l_param_to_milk_yield", side_effect=[19.2, 20.0, 19.5])
 
     LactationCurve._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
 
