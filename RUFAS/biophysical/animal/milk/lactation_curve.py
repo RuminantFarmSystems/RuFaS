@@ -112,7 +112,7 @@ class LactationCurve:
                 base_wood_parameter_l,
                 base_wood_parameter_m,
                 base_wood_parameter_n,
-                [adjustments, year_adjustments, region_adjustments, milking_frequency_adjustments]
+                [adjustments, year_adjustments, region_adjustments, milking_frequency_adjustments],
             )
 
         cls._parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
