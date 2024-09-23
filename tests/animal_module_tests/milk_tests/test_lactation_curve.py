@@ -326,7 +326,6 @@ def test_calculate_adjusted_wood_parameters(
 )
 def test_get_wood_parameters(
     mocker: MockerFixture,
-    lactation_curve: LactationCurve,
     parity: int,
     l_expect: float,
     m_expect: float,
@@ -337,20 +336,17 @@ def test_get_wood_parameters(
 ) -> None:
     """Test that Wood's parameters are retrieved correctly from LactationCurve."""
     gen_rand = mocker.patch.object(Utility, "generate_random_number", side_effect=[20.22, 0.311, 0.003122])
-    lactation_curve.parity_1_parameters = {"l": 18.1, "m": 0.228, "n": 0.003321}
-    lactation_curve.parity_2_parameters = {"l": 22.1, "m": 0.247, "n": 0.003376}
-    lactation_curve.parity_3_parameters = {"l": 22.0, "m": 0.231, "n": 0.003351}
-    lactation_curve.parity_to_parameter_mapping = {
-        1: lactation_curve.parity_1_parameters,
-        2: lactation_curve.parity_2_parameters,
-        3: lactation_curve.parity_3_parameters,
+    LactationCurve._parity_to_parameter_mapping = {
+        1: {"l": 18.1, "m": 0.228, "n": 0.003321},
+        2: {"l": 22.1, "m": 0.247, "n": 0.003376},
+        3: {"l": 22.0, "m": 0.231, "n": 0.003351},
     }
     parity_1_std_dev = {"parameter_l_std_dev": 0.28, "parameter_m_std_dev": 0.0046, "parameter_n_std_dev": 3.77e-5}
     parity_2_std_dev = {"parameter_l_std_dev": 0.54, "parameter_m_std_dev": 0.0064, "parameter_n_std_dev": 5.82e-5}
     parity_3_std_dev = {"parameter_l_std_dev": 0.51, "parameter_m_std_dev": 0.0060, "parameter_n_std_dev": 5.54e-5}
-    lactation_curve.parity_to_std_dev_mapping = {1: parity_1_std_dev, 2: parity_2_std_dev, 3: parity_3_std_dev}
+    LactationCurve._parity_to_std_dev_mapping = {1: parity_1_std_dev, 2: parity_2_std_dev, 3: parity_3_std_dev}
 
-    actual = lactation_curve.get_wood_parameters(parity)
+    actual = LactationCurve.get_wood_parameters(parity)
 
     assert actual["l"] == 20.22
     assert actual["m"] == 0.311
