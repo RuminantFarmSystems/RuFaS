@@ -362,30 +362,31 @@ def test_get_wood_parameters(
 
 def test_adjust_lactation_curve_to_milk_yield(
     mocker: MockerFixture,
-    lactation_curve: LactationCurve,
     animal_inputs: dict[str, Any],
-    lactation_inputs: dict[str, Any],
+    lactation_inputs: dict[str, Any]
 ) -> None:
     """Test that Wood's parameters are correctly adjusted based on a farm's total milk yield."""
-    lactation_curve.parity_1_parameters = {"l": 17.0, "m": 0.247, "n": 0.003376}
-    lactation_curve.parity_2_parameters = {"l": 17.0, "m": 0.247, "n": 0.003376}
-    lactation_curve.parity_3_parameters = {"l": 17.0, "m": 0.247, "n": 0.003376}
+    LactationCurve._parity_to_parameter_mapping = {
+        1: {"l": 17.0, "m": 0.247, "n": 0.003376},
+        2: {"l": 17.0, "m": 0.247, "n": 0.003376},
+        3: {"l": 17.0, "m": 0.247, "n": 0.003376}
+    }
     estimate_305d_yield = mocker.patch.object(
-        lactation_curve,
+        LactationCurve,
         "_estimate_305_day_milk_yield_by_parity",
         return_value={"parity_1": 10_000.0, "parity_2": 11_000.0, "parity_3": 10_500.0},
     )
     fit_l_param = mocker.patch.object(
-        lactation_curve, "_fit_wood_l_param_to_milk_yield", side_effect=[19.2, 20.0, 19.5]
+        LactationCurve, "_fit_wood_l_param_to_milk_yield", side_effect=[19.2, 20.0, 19.5]
     )
 
-    lactation_curve._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
+    LactationCurve._adjust_lactation_curve_to_milk_yield(animal_inputs, lactation_inputs)
 
     estimate_305d_yield.assert_called_once()
     assert fit_l_param.call_count == 3
-    assert lactation_curve.parity_1_parameters["l"] == 19.2
-    assert lactation_curve.parity_2_parameters["l"] == 20.0
-    assert lactation_curve.parity_3_parameters["l"] == 19.5
+    assert LactationCurve._parity_to_parameter_mapping[1]["l"] == 19.2
+    assert LactationCurve._parity_to_parameter_mapping[2]["l"] == 20.0
+    assert LactationCurve._parity_to_parameter_mapping[3]["l"] == 19.5
 
 
 @pytest.mark.parametrize(
@@ -418,7 +419,7 @@ def test_estimate_305_day_milk_yield_by_parity(
     om = OutputManager()
     add_error = mocker.patch.object(om, "add_error")
     add_warning = mocker.patch.object(om, "add_warning")
-    lactation_curve.om = om
+    lactation_curve._om = om
 
     actual = lactation_curve._estimate_305_day_milk_yield_by_parity(
         annual_yield, milking_cows, p1_frac, p2_frac, p3_frac, p2_adjust, p3_adjust
