@@ -8,13 +8,6 @@ from typing import Any
 import datetime
 
 
-# @pytest.fixture
-# def lactation_curve(mocker: MockerFixture) -> LactationCurve:
-#     mocker.patch.object(LactationCurve, "__init__", return_value=None)
-#     mock_time = mocker.MagicMock()
-#     return LactationCurve(mock_time)
-
-
 @pytest.fixture
 def animal_inputs() -> dict[str, Any]:
     return {
@@ -225,7 +218,6 @@ def test_set_lactation_curve(
 def test_get_year_adjustments(
     mocker: MockerFixture,
     lactation_inputs: dict[str, Any],
-    lactation_curve: LactationCurve,
     expected: dict[str, float],
     year: int,
     bounded: bool,
@@ -234,10 +226,10 @@ def test_get_year_adjustments(
     mock_time = mocker.MagicMock()
     mock_time.end_date = datetime.datetime(year, 6, 1)
     year_adjustments = lactation_inputs["adjustments"]["year"]
-    lactation_curve.om = mocker.MagicMock()
-    add_warning = mocker.patch.object(lactation_curve.om, "add_warning")
+    LactationCurve._om = mocker.MagicMock()
+    add_warning = mocker.patch.object(LactationCurve._om, "add_warning")
 
-    actual = lactation_curve._get_year_adjustments(year_adjustments, mock_time)
+    actual = LactationCurve._get_year_adjustments(year_adjustments, mock_time)
 
     if not bounded:
         add_warning.assert_called_once()
@@ -255,14 +247,12 @@ def test_get_year_adjustments(
         (35000, {"l": -0.96, "m": 3.13, "n": 1.50}),
     ],
 )
-def test_get_region_adjustments(
-    lactation_inputs: dict[str, Any], lactation_curve: LactationCurve, fips_code: int, expected: dict[str, float]
-) -> None:
+def test_get_region_adjustments(lactation_inputs: dict[str, Any], fips_code: int, expected: dict[str, float]) -> None:
     """Test that the region adjustments are retrieved appropriately."""
     all_region_adjustments = lactation_inputs["adjustments"]["region"]
     region_mapping = lactation_inputs["state_to_region_mapping"]
 
-    actual = lactation_curve._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
+    actual = LactationCurve._get_region_adjustments(all_region_adjustments, region_mapping, fips_code)
 
     assert actual == expected
 
@@ -279,14 +269,13 @@ def test_get_region_adjustments(
 )
 def test_get_milking_frequency_adjustments(
     lactation_inputs: dict[str, Any],
-    lactation_curve: LactationCurve,
     milking_frequency: float,
-    expected: dict[str, float],
+    expected: dict[str, float]
 ) -> None:
     """Test that the milking frequency adjustments are retrieved appropriately."""
     milking_frequency_adjustments = lactation_inputs["adjustments"]["milking_frequency"]
 
-    actual = lactation_curve._get_milking_frequency_adjustments(milking_frequency_adjustments, milking_frequency)
+    actual = LactationCurve._get_milking_frequency_adjustments(milking_frequency_adjustments, milking_frequency)
 
     assert actual == expected
 
@@ -315,7 +304,6 @@ def test_get_milking_frequency_adjustments(
     ],
 )
 def test_calculate_adjusted_wood_parameters(
-    lactation_curve: LactationCurve,
     l_param: float,
     m_param: float,
     n_param: float,
@@ -323,7 +311,8 @@ def test_calculate_adjusted_wood_parameters(
     expected: dict[str, float],
 ) -> None:
     """Test that the Wood's parameters are adjusted correctly."""
-    actual = lactation_curve._calculate_adjusted_wood_parameters(l_param, m_param, n_param, adjustments)
+    actual = LactationCurve._calculate_adjusted_wood_parameters(l_param, m_param, n_param, adjustments)
+
     assert pytest.approx(actual) == expected
 
 
