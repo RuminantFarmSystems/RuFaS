@@ -317,7 +317,7 @@ class ManureExcretionCalculator:
         nutrient_amounts: dict[str, float],
         nutrient_concentrations: dict[str, float],
     ) -> Tuple[float, AnimalManureExcretions]:
-        """Calculates the manure excretion values for a cow with information from the ration formulation.
+        """Calculates the manure excretion values for a lactating cow with information from the ration formulation.
 
         Parameters
         ----------
