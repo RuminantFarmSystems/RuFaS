@@ -5,7 +5,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.util import Utility
 from typing import Any
-import datetime
+from datetime import date
 
 
 @pytest.fixture
@@ -231,7 +231,7 @@ def test_get_year_adjustments(
 ) -> None:
     """Test that year adjustments are retrieved appropriately."""
     mock_time = mocker.MagicMock()
-    mock_time.end_date = datetime.datetime(year, 6, 1)
+    mock_time.end_date = date(year, 6, 1)
     year_adjustments = lactation_inputs["adjustments"]["year"]
     lactation_curve.om = mocker.MagicMock()
     add_warning = mocker.patch.object(lactation_curve.om, "add_warning")
