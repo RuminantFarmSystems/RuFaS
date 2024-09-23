@@ -66,7 +66,7 @@ class RationManager:
         Returns
         -------
         Dict[str, float]
-            Formulated ration.
+            Formulated ration for a single animal.
         Dict[str, float]
             Summary of ration content.
         """
@@ -80,10 +80,10 @@ class RationManager:
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
         if udrm.use_user_defined_ration:
-            ration, ration_vals = cls.get_user_defined_ration(
+            ration_per_animal, ration_vals = cls.get_user_defined_ration(
                 req, pen, available_feeds, animal_grouping_scenario, sim_day
             )
-            return ration, ration_vals
+            return ration_per_animal, ration_vals
 
         previous_ration = None
         if hasattr(pen, "ration_per_animal"):
@@ -139,12 +139,12 @@ class RationManager:
                     )
 
         if solution is not None and solution.success:
-            ration = cls.make_ration_from_solution(available_feeds, solution)
-            return ration, ration_vals
+            ration_per_animal = cls.make_ration_from_solution(available_feeds, solution)
+            return ration_per_animal, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen
-        elif pen.ration != {}:
-            return pen.ration, ration_vals
+        elif previous_ration != {}:
+            return previous_ration, ration_vals
         else:
             om.add_error(
                 "No previous ration available",
