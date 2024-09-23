@@ -1,3 +1,5 @@
+import math
+
 import pytest
 from pytest_mock import MockerFixture
 
@@ -144,7 +146,7 @@ def test_cow_manure_dry_with_mitigation(body_weight: float,
     starch_concentration = nutrient_concentrations["starch"]
 
     mock_dry_cow_manure = mocker.patch.object(EntericMethaneCalculator, "_dry_cow_manure",
-                                                    return_value=25)
+                                              return_value=25)
 
     methane_yield = 25 / dry_matter_intake
     mock_methane_mitigation = mocker.patch.object(MethaneMitigationCalculator,
@@ -177,3 +179,109 @@ def test_cow_manure_dry_with_mitigation(body_weight: float,
                                                     starch_concentration,
                                                     methane_mitigation_method,
                                                     methane_mitigation_additive_amount)
+
+
+@pytest.mark.parametrize(
+    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations",
+    [
+        (59.67, 6.31, 5.25, {"dm": 42.32},
+         {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2})
+    ]
+)
+def test_lactating_cow_manure_mutian(body_weight: float,
+                                     milk_fat: float,
+                                     metabolizable_energy_intake: float,
+                                     nutrient_amounts: dict[str, float],
+                                     nutrient_concentrations: dict[str, float]) -> None:
+    """Test the daily enteric emissions for lactating cows with Mutian method."""
+    dry_matter_intake = nutrient_amounts["dm"]
+    NDF_concentration = nutrient_concentrations["NDF"]
+    expected = (
+        -126 + 11.3 * dry_matter_intake + 2.30 * NDF_concentration + 28.8 * milk_fat + 0.148 * body_weight
+    )
+    observed = EntericMethaneCalculator._lactating_cow_manure(body_weight,
+                                                              milk_fat,
+                                                              metabolizable_energy_intake,
+                                                              nutrient_amounts,
+                                                              nutrient_concentrations,
+                                                              "Mutian")
+    assert expected == observed
+
+
+@pytest.mark.parametrize(
+    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations",
+    [
+        (59.67, 6.31, 5.25, {"dm": 42.32},
+         {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2})
+    ]
+)
+def test_lactating_cow_manure_mills(body_weight: float,
+                                    milk_fat: float,
+                                    metabolizable_energy_intake: float,
+                                    nutrient_amounts: dict[str, float],
+                                    nutrient_concentrations: dict[str, float]) -> None:
+    """Test the daily enteric emissions for lactating cows with Mills method."""
+    ADF_concentration = nutrient_concentrations["ADF"]
+    starch_concentration = nutrient_concentrations["starch"]
+    expected = 45.98 * (1 - math.exp(
+        -(-0.0011 * starch_concentration / ADF_concentration + 0.0045) * metabolizable_energy_intake * 4.184)) / 0.05565
+    observed = EntericMethaneCalculator._lactating_cow_manure(body_weight,
+                                                              milk_fat,
+                                                              metabolizable_energy_intake,
+                                                              nutrient_amounts,
+                                                              nutrient_concentrations,
+                                                              "Mills")
+    assert expected == observed
+
+
+@pytest.mark.parametrize(
+    "body_weight,milk_fat,metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations",
+    [
+        (59.67, 6.31, 5.25, {"dm": 42.32},
+         {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2})
+    ]
+)
+def test_lactating_cow_manure_IPCC(body_weight: float,
+                                   milk_fat: float,
+                                   metabolizable_energy_intake: float,
+                                   nutrient_amounts: dict[str, float],
+                                   nutrient_concentrations: dict[str, float]) -> None:
+    """Test the daily enteric emissions for lactating cows with IPCC method."""
+    dry_matter_intake = nutrient_amounts["dm"]
+    ASH_concentration = nutrient_concentrations["ash"]
+    CP_concentration = nutrient_concentrations["CP"]
+    NDF_concentration = nutrient_concentrations["NDF"]
+    EE_concentration = nutrient_concentrations["EE"]
+    soluble_residue = (
+        100
+        - ASH_concentration
+        - NDF_concentration
+        - CP_concentration
+        - EE_concentration
+    )
+    gross_energy_concentration = (
+        0.263 * CP_concentration
+        + 0.522 * EE_concentration
+        + 0.198 * NDF_concentration
+        + 0.160 * soluble_residue
+    )
+    expected = 0.065 * gross_energy_concentration * dry_matter_intake / 0.05565
+    observed = EntericMethaneCalculator._lactating_cow_manure(body_weight,
+                                                              milk_fat,
+                                                              metabolizable_energy_intake,
+                                                              nutrient_amounts,
+                                                              nutrient_concentrations,
+                                                              "IPCC")
+    assert expected == observed
+
+
+def test_lactating_cow_manure_other() -> None:
+    """Test the daily enteric emissions for lactating cows with no specific method."""
+    observed = EntericMethaneCalculator._lactating_cow_manure(59.67,
+                                                              6.31,
+                                                              5.25,
+                                                              {"dm": 42.32},
+                                                              {"ash": 39.14, "ADF": 39.54,
+                                                               "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
+                                                              "test")
+    assert observed == 0
