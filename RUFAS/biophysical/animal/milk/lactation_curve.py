@@ -105,28 +105,15 @@ class LactationCurve:
         base_wood_parameter_m: float = lactation_inputs["parameter_mean_values"]["parameter_m_mean"]
         base_wood_parameter_n: float = lactation_inputs["parameter_mean_values"]["parameter_n_mean"]
 
-        parity_1_parameters = cls._calculate_adjusted_wood_parameters(
-            base_wood_parameter_l,
-            base_wood_parameter_m,
-            base_wood_parameter_n,
-            [parity_adjustments["1"], year_adjustments, region_adjustments, milking_frequency_adjustments],
-        )
-        parity_2_parameters = cls._calculate_adjusted_wood_parameters(
-            base_wood_parameter_l,
-            base_wood_parameter_m,
-            base_wood_parameter_n,
-            [parity_adjustments["2"], year_adjustments, region_adjustments, milking_frequency_adjustments],
-        )
-        parity_3_parameters = cls._calculate_adjusted_wood_parameters(
-            base_wood_parameter_l,
-            base_wood_parameter_m,
-            base_wood_parameter_n,
-            [parity_adjustments["3"], year_adjustments, region_adjustments, milking_frequency_adjustments],
-        )
-
-        cls._parity_to_parameter_mapping = {
-            1: parity_1_parameters, 2: parity_2_parameters, 3: parity_3_parameters
-        }
+        cls._parity_to_parameter_mapping: dict[int, dict[str, float]] = {}
+        for parity, adjustments in parity_adjustments.items():
+            parity = int(parity)
+            cls._parity_to_parameter_mapping[parity] = cls._calculate_adjusted_wood_parameters(
+                base_wood_parameter_l,
+                base_wood_parameter_m,
+                base_wood_parameter_n,
+                [adjustments, year_adjustments, region_adjustments, milking_frequency_adjustments]
+            )
 
         cls._parity_to_std_dev_mapping: dict[int, dict[str, float]] = {
             1: lactation_inputs["parameter_standard_deviations"]["1"],
