@@ -42,15 +42,15 @@ class MilkProductionProperties:
     """
 
     crude_protein_content: float
-    true_protein_content: float  # Old var name: milk_protein_kg
-    fat_content: float  # Old name: milk_fat_kg
+    true_protein_content: float
+    fat_content: float
     lactose_content: float
     milk_production_reduction: float
-    milk_production_last_305_days: float  # Old var name: latest_milk_production_305days
-    crude_protein_percent: float  # Old var name: CP_milk
-    true_protein_percent: float  # Old var name: mPrt
+    milk_production_last_305_days: float
+    crude_protein_percent: float
+    true_protein_percent: float
     fat_percent: float
-    lactose_percent: float  # Old var name: lactose
+    lactose_percent: float
     wood_l: float
     wood_m: float
     wood_n: float
