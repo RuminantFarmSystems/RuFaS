@@ -1,4 +1,4 @@
-from .milk_production import MilkProduction
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.input_manager import InputManager
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
