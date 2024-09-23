@@ -401,7 +401,6 @@ def test_adjust_lactation_curve_to_milk_yield(
 )
 def test_estimate_305_day_milk_yield_by_parity(
     mocker: MockerFixture,
-    lactation_curve: LactationCurve,
     annual_yield: float,
     milking_cows: int,
     p1_frac: float,
@@ -419,9 +418,9 @@ def test_estimate_305_day_milk_yield_by_parity(
     om = OutputManager()
     add_error = mocker.patch.object(om, "add_error")
     add_warning = mocker.patch.object(om, "add_warning")
-    lactation_curve._om = om
+    LactationCurve._om = om
 
-    actual = lactation_curve._estimate_305_day_milk_yield_by_parity(
+    actual = LactationCurve._estimate_305_day_milk_yield_by_parity(
         annual_yield, milking_cows, p1_frac, p2_frac, p3_frac, p2_adjust, p3_adjust
     )
 
@@ -450,10 +449,8 @@ def test_estimate_305_day_milk_yield_by_parity(
         (8.0, 18000.0, 27.99),
     ],
 )
-def test_fit_wood_l_param_to_milk_yield(
-    lactation_curve: LactationCurve, l_param: float, milk_yield: float, expected: float
-) -> None:
+def test_fit_wood_l_param_to_milk_yield(l_param: float, milk_yield: float, expected: float) -> None:
     """Test that Wood's l parameter is correctly fitted to a 305 day milk yield."""
-    actual = lactation_curve._fit_wood_l_param_to_milk_yield(l_param, 0.247, 0.003376, milk_yield)
+    actual = LactationCurve._fit_wood_l_param_to_milk_yield(l_param, 0.247, 0.003376, milk_yield)
 
     assert pytest.approx(actual) == expected
