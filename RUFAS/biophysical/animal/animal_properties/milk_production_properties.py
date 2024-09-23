@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from ..data_types.milk_production_record import MilkProductionRecord
+from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 
 
 @dataclass

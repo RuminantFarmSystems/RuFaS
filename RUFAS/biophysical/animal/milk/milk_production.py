@@ -1,10 +1,10 @@
 from numba import njit
 
-from ..animal_constants import DRY
-from ..animal_module_constants import AnimalModuleConstants
-from ..animal_properties.general_properties import GeneralProperties
-from ..animal_properties.milk_production_properties import MilkProductionProperties
-from ..data_types.milk_production_record import MilkProductionRecord
+from RUFAS.biophysical.animal.animal_constants import DRY
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
+from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.util import Utility
