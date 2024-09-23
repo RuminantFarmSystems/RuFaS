@@ -108,7 +108,7 @@ class MilkProduction:
 
         if general_properties.days_in_milk == 305:
             milk_history = [record["milk_production"] for record in milking_properties.milk_production_history[-305:]]
-            milking_properties.milk_production_last_305_days = np.sum(milk_history)
+            milking_properties.current_lactation_305_day_milk_produced = np.sum(milk_history)
 
         return milking_properties, general_properties
 
