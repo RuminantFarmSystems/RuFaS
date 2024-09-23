@@ -20,7 +20,7 @@ class EntericMethaneCalculator:
         """
         methane_emission = 0.0
         if methane_model:
-            methane_emission = (0.013 * (body_weight ** 0.75) * 4.184) / 0.05565
+            methane_emission = (0.013 * (body_weight**0.75) * 4.184) / 0.05565
 
         return methane_emission
 
@@ -125,7 +125,7 @@ class EntericMethaneCalculator:
                     EE_concentration,
                     starch_concentration,
                     methane_mitigation_method,
-                    methane_mitigation_additive_amount
+                    methane_mitigation_additive_amount,
                 )
 
             methane_emission = (
@@ -238,14 +238,14 @@ class EntericMethaneCalculator:
         if methane_model == "Mills":
             # Methane model = 'Mills' [A.3E.C.2]
             methane_emission = (
-                                   45.98
-                                   - 45.98
-                                   * math.exp(
-                                   -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
-                                   * metabolizable_energy_intake
-                                   * 4.184
-                               )
-                               ) / 0.05565
+                45.98
+                - 45.98
+                * math.exp(
+                    -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
+                    * metabolizable_energy_intake
+                    * 4.184
+                )
+            ) / 0.05565
         else:
             # Default: IPCC Tier 2
             gross_energy_concentration = (
