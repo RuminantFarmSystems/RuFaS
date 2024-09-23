@@ -42,6 +42,14 @@ def time(mocker: MockerFixture) -> Time:
     return Time()
 
 
+def test_set_milk_quality() -> None:
+    """Tests that milk quality class attributes are set correctly."""
+    MilkProduction.set_milk_quality(1.0, 2.0)
+
+    assert MilkProduction.FAT_PERCENT == 1.0
+    assert MilkProduction.TRUE_PROTEIN_PERCENT == 2.0
+
+
 def test_perform_daily_milking_update_not_milking(
     mocker: MockerFixture,
     milking_properties: MilkProductionProperties,

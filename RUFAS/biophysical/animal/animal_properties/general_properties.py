@@ -33,8 +33,8 @@ class GeneralProperties:
     days_in_preg: int
     events: AnimalEvents
     days_in_milk: int
-    dry_off_day_of_pregnancy: int  # Old name: days_in_preg_when_dry, used to be in AnimalBase.config
-    daily_milk_produced: float  # Old name: estimated_daily_milk_produced
+    dry_off_day_of_pregnancy: int
+    daily_milk_produced: float
     future_cull_date: int
     future_death_date: int
     gender: Enum
@@ -48,6 +48,6 @@ class GeneralProperties:
     wean_weight: float
 
     @property
-    def is_milking(self) -> bool:  # Old name: milking
+    def is_milking(self) -> bool:
         """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0
