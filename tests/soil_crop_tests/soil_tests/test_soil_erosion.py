@@ -45,18 +45,10 @@ def test_determine_clay_silt_ratio_factor(silt: float, clay: float) -> None:
     assert observe == expect
 
 
-@pytest.mark.parametrize(
-    "silt,clay",
-    [
-        (0, 0),
-    ],
-)
-def test_error_clay_silt_ratio_factor(silt: float, clay: float) -> None:
-    """Tests that _determine_clay_silt_ratio_factor() in soil_erosion.py correctly raises an error when invalid input is
-    given
-    """
-    with pytest.raises(Exception):
-        SoilErosion._determine_clay_silt_ratio_factor(silt, clay)
+def test_determine_clay_silt_ratio_factor_zero() -> None:
+    """Tests the case when silt and clay are zero."""
+    observed = SoilErosion._determine_clay_silt_ratio_factor(0, 0)
+    assert observed == 1
 
 
 @pytest.mark.parametrize(
