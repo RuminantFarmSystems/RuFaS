@@ -285,3 +285,69 @@ def test_lactating_cow_manure_other() -> None:
                                                                "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
                                                               "test")
     assert observed == 0
+
+
+@pytest.mark.parametrize(
+    "metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations",
+    [
+        (5.25, {"dm": 42.32},
+         {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2})
+    ]
+)
+def test_dry_cow_manure_mills(metabolizable_energy_intake: float,
+                              nutrient_amounts: dict[str, float],
+                              nutrient_concentrations: dict[str, float]) -> None:
+    """Test the daily enteric emissions for dry cows with Mills method."""
+    ADF_concentration = nutrient_concentrations["ADF"]
+    starch_concentration = nutrient_concentrations["starch"]
+    expected = (
+                   45.98
+                   - 45.98
+                   * math.exp(
+                   -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
+                   * metabolizable_energy_intake
+                   * 4.184
+               )
+               ) / 0.05565
+    observed = EntericMethaneCalculator._dry_cow_manure("Mills",
+                                                        metabolizable_energy_intake,
+                                                        nutrient_amounts,
+                                                        nutrient_concentrations)
+    assert expected == observed
+
+
+@pytest.mark.parametrize(
+    "metabolizable_energy_intake,nutrient_amounts,nutrient_concentrations",
+    [
+        (5.25, {"dm": 42.32},
+         {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2})
+    ]
+)
+def test_dry_cow_manure_mills(metabolizable_energy_intake: float,
+                              nutrient_amounts: dict[str, float],
+                              nutrient_concentrations: dict[str, float]) -> None:
+    """Test the daily enteric emissions for dry cows with Mills method."""
+    dry_matter_intake = nutrient_amounts["dm"]
+    ASH_concentration = nutrient_concentrations["ash"]
+    ADF_concentration = nutrient_concentrations["ADF"]
+    CP_concentration = nutrient_concentrations["CP"]
+    NDF_concentration = nutrient_concentrations["NDF"]
+    EE_concentration = nutrient_concentrations["EE"]
+    starch_concentration = nutrient_concentrations["starch"]
+    soluble_residue = (
+        (100 - ASH_concentration)
+        - NDF_concentration
+        - CP_concentration
+        - EE_concentration
+    )
+    expected = (0.065 * (
+                0.263 * CP_concentration
+                + 0.522 * EE_concentration
+                + 0.198 * NDF_concentration
+                + 0.160 * soluble_residue
+            ) * dry_matter_intake) / 0.05565
+    observed = EntericMethaneCalculator._dry_cow_manure("other",
+                                                        metabolizable_energy_intake,
+                                                        nutrient_amounts,
+                                                        nutrient_concentrations)
+    assert expected == observed
