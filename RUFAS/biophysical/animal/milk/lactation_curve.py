@@ -62,17 +62,11 @@ class LactationCurve:
 
     Attributes
     ----------
-    om : OutputManager
+    _om : OutputManager
         The OutputManager for this module to use.
-    parity_1_parameters : dict[str, float]
-        Contains the adjusted l, m, and n parameters for parity 1 cows.
-    parity_2_parameters : dict[str, float]
-        Contains the adjusted l, m, and n parameters for parity 2 cows.
-    parity_3_parameters : dict[str, float]
-        Contains the adjusted l, m, and n parameters for parity 3+ cows.
-    parity_to_parameter_mapping : dict[int, dict[str, float]]
+    _parity_to_parameter_mapping : dict[int, dict[str, float]]
         Maps the parity (1, 2, and 3+) to the associated sets of l, m and n parameters.
-    parity_to_std_dev_mapping : dict[int, dict[str, float]]
+    _parity_to_std_dev_mapping : dict[int, dict[str, float]]
         Maps parities (1, 2, and 3+) to the standard devations of Wood's l, m, and n parameters.
 
     """
