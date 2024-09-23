@@ -160,8 +160,8 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation section A.1E.E.5.
         """
-        if general_properties.is_milking:
-            return 0.0009 * general_properties.daily_milk_produced * GeneralConstants.KG_TO_GRAMS
+        if general_properties.milking:
+            return 0.0009 * general_properties.estimated_daily_milk_produced * GeneralConstants.KG_TO_GRAMS
         else:
             return 0.0
 
@@ -210,7 +210,7 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A.E.7, A.1B-D.E.7, A.1EF.E.7.
         """
-        if general_properties.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW] and general_properties.is_milking:
+        if general_properties.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW] and general_properties.milking:
             return absorbed_phosphorus / (
                 1.86696
                 - 5.01238 * phosphorus_status.ration_phosphorus_concentration
