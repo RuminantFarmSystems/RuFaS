@@ -11,6 +11,7 @@ from mock.mock import call
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
+from RUFAS.util import Utility
 
 
 @pytest.fixture
@@ -61,7 +62,6 @@ def input_manager_original_method_states(
         "get_data_keys_by_properties": mock_input_manager.get_data_keys_by_properties,
         "flush_pool": mock_input_manager.flush_pool,
         "_metadata_properties_exist": mock_input_manager._metadata_properties_exist,
-        "_set_nested_value": mock_input_manager._set_nested_value,
         "_add_variable_to_pool": mock_input_manager._add_variable_to_pool,
         "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
         "add_tabular_variable_to_pool": mock_input_manager.add_tabular_variable_to_pool,
@@ -314,8 +314,8 @@ def test_populate_pool_valid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: True)
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(input_manager, "om")
+    mocker.patch.object(input_manager.om, "add_log")
 
     # Act
     result = input_manager._populate_pool(eager_termination=True)
@@ -344,8 +344,8 @@ def test_populate_pool_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(input_manager, "om")
+    mocker.patch.object(input_manager.om, "add_log")
     elements_counter = ElementsCounter()
     elements_counter.increment(ElementState.INVALID)
     mocker.patch.object(input_manager, "elements_counter", elements_counter)
@@ -375,8 +375,8 @@ def test_populate_pool_partial_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=[True, False, True, False])
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(input_manager, "om")
+    mocker.patch.object(input_manager.om, "add_log")
 
     # Act
     result = input_manager._populate_pool(eager_termination=False)
@@ -410,8 +410,8 @@ def test_populate_pool_eager_termination(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(input_manager, "_validate_input_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(input_manager, "om")
+    mocker.patch.object(input_manager.om, "add_log")
 
     # Act
     result = input_manager._populate_pool(eager_termination=True)
@@ -483,7 +483,7 @@ def test_bool_type_validator(
     unused_bool_input = False
     patch_extract = mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=input_data_value)
     patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
 
     # Act
     result = input_manager._bool_type_validator(
@@ -539,17 +539,17 @@ def test_number_type_validator(
     dummy_counter = mocker.MagicMock(autospec=ElementsCounter)
     patch_extract = mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=dummy_value)
     patch_path_to_str = mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy_name")
+    add_warning = mocker.patch.object(input_manager.om, "add_warning")
 
-    with patch("RUFAS.input_manager.om.add_warning") as add_warning:
-        result = input_manager._number_type_validator(
-            dummy_var_path,
-            dummy_variable_properties,
-            dummy_input_data,
-            unused_bool_input,
-            dummy_properties_key,
-            dummy_counter,
-            unused_bool_input,
-        )
+    result = input_manager._number_type_validator(
+        dummy_var_path,
+        dummy_variable_properties,
+        dummy_input_data,
+        unused_bool_input,
+        dummy_properties_key,
+        dummy_counter,
+        unused_bool_input,
+    )
 
     patch_extract.assert_called_once_with(
         dummy_input_data, dummy_var_path, dummy_variable_properties, unused_bool_input
@@ -597,7 +597,7 @@ def test_string_type_validator(
     patch_path_to_str = mocker.patch.object(
         mock_input_manager, "_convert_variable_path_to_str", return_value="dummy_name"
     )
-    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    add_warning = mocker.patch.object(mock_input_manager.om, "add_warning")
 
     result = mock_input_manager._string_type_validator(
         var_path,
@@ -1438,7 +1438,7 @@ def test_get_data_returns_none(
     # Arrange
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_get_data)
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
 
     # Act
     result = input_manager.get_data(dummy_data_path)
@@ -1721,14 +1721,14 @@ def test_get_metadata_raises_exception(
 
 
 def test_get_data_by_properties_no_data(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable], mocker: MockerFixture
 ) -> None:
     """Tests that error is handled properly when get_metadata() raises KeyError."""
     mock_input_manager.get_metadata = MagicMock(side_effect=KeyError)
 
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        actual = mock_input_manager.get_data_keys_by_properties("dummy_property")
+    add_error = mocker.patch.object(mock_input_manager.om, "add_error")
+
+    actual = mock_input_manager.get_data_keys_by_properties("dummy_property")
 
     assert add_error.call_count == 1
     assert actual == []
@@ -1991,8 +1991,8 @@ def test_add_variable_to_pool_valid(
     patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", wraps=input_manager._prepare_data)
 
     expected_add_warning_count = 1 if starting_im_pool else 0
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
+    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
 
     # Act
     result = input_manager._add_variable_to_pool(
@@ -2122,8 +2122,8 @@ def test_add_variable_to_pool_invalid(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=False)
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
+    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
     mock_elements_counter = mocker.MagicMock()
     mock_elements_counter.invalid_elements = 1
     mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
@@ -2258,8 +2258,8 @@ def test_add_variable_to_pool_eager_termination(
     mock_elements_counter = mocker.MagicMock()
     mock_elements_counter.invalid_elements = 1
     mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
+    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
 
     # Act
     with pytest.raises(ValueError):
@@ -2733,30 +2733,6 @@ def test_log_missing_data_runtime_key_error(
     assert mock_add_warning.call_count == 0
 
 
-@pytest.mark.parametrize(
-    "nested_dict, element_hierarchy, value, expected_result",
-    [
-        ({}, ["a"], 1, {"a": 1}),
-        ({"a": 1}, ["a"], 2, {"a": 2}),
-        ({"a": {"b": 1}}, ["a", "c"], 2, {"a": {"b": 1, "c": 2}}),
-        ({"a": {"b": {"c": 1}}}, ["a", "b", "d"], 2, {"a": {"b": {"c": 1, "d": 2}}}),
-        ({"a": {"b": {"c": 1}}}, ["a", "b", "d", "e"], 2, {"a": {"b": {"c": 1, "d": {"e": 2}}}}),
-    ],
-)
-def test_set_nested_value(
-    nested_dict: Dict[str, Any],
-    element_hierarchy: List[str],
-    value: Any,
-    expected_result: Dict[str, Any],
-    mock_input_manager: InputManager,
-) -> None:
-    actual_result = mock_input_manager._set_nested_value(
-        nested_dict=nested_dict, element_hierarchy=element_hierarchy, value=value
-    )
-
-    assert actual_result == expected_result
-
-
 @pytest.fixture
 def mock_metadata_for_add_variable_to_pool_nested() -> Dict[str, Dict[str, Any]]:
     return {
@@ -3145,9 +3121,9 @@ def test_add_variable_to_pool_nested(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool_nested)
     mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_add_variable_to_pool_nested)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
-    mocker.patch("RUFAS.input_manager.om.add_log")
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_error")
+    mocker.patch.object(input_manager.om, "add_log")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
+    mocker.patch.object(input_manager.om, "add_error")
 
     if (not is_modifiable_during_runtime) and eager_termination:
         with pytest.raises(PermissionError):
@@ -3188,13 +3164,14 @@ def test_dump_get_data_logs(
     }
     mock_dir_path = Path("dummy_path")
     mock_generated_file_name = "dummy_file_name.json"
-    patch_for_generate_file_name = mocker.patch(
-        "RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name
+    patch_for_generate_file_name = mocker.patch.object(
+        mock_input_manager.om, "generate_file_name", return_value=mock_generated_file_name
     )
     patch_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
 
-    with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
-        mock_input_manager.dump_get_data_logs(path=mock_dir_path)
+    mock_dict_to_file_json = mocker.patch.object(mock_input_manager.om, "dict_to_file_json")
+
+    mock_input_manager.dump_get_data_logs(path=mock_dir_path)
 
     patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
     patch_create_dir.assert_called_once_with(mock_dir_path)
@@ -3387,7 +3364,7 @@ def test_object_type_validator(
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=patch_validate_return)
-    mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+    mocker.patch.object(input_manager.om, "add_warning", return_value=None)
     mock_elements_counter = mocker.MagicMock()
 
     # Act
@@ -3421,7 +3398,7 @@ def test_object_type_validator_key_removal(
     mocker.patch.object(input_manager, "_extract_input_data_by_key_list", return_value=data)
     mocker.patch.object(input_manager, "_validate_input_by_type", return_value=True)
     mocker.patch.object(input_manager, "_convert_variable_path_to_str", return_value="dummy path")
-    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+    add_warning = mocker.patch.object(input_manager.om, "add_warning", return_value=None)
     mock_elements_counter = mocker.MagicMock()
     variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
     violation_msg = "Violates properties defined in metadata properties section 'properties blob'."
@@ -3506,7 +3483,7 @@ def test_validate_array_container_properties(
 
     # Arrange
     input_manager = InputManager()
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
 
     # Act
     result = input_manager._validate_array_container_properties(
@@ -3836,8 +3813,8 @@ def test_save_metadata_properties_errors(
     mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
     mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
-    mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=generated_filename)
-    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mocker.patch.object(mock_input_manager.om, "generate_file_name", return_value=generated_filename)
+    mock_add_error = mocker.patch.object(mock_input_manager.om, "add_error")
 
     with pytest.raises(exception) as exc_info:
         mock_input_manager.save_metadata_properties(output_dir)
@@ -4814,7 +4791,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
 
 
 @pytest.mark.parametrize(
-    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties",
+    "variable_name,input_data,properties_blob_key," "expected_data,expected_metadata_properties,is_nested",
     [
         (
             "example_property",
@@ -4825,6 +4802,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
                 "example_property": {"description": "An example property", "type": "string"},
                 "object_property": {"nested_property": {"description": "An example property", "type": "string"}},
             },
+            False,
         ),
         (
             "example_property.object_property.nested_property",
@@ -4832,6 +4810,7 @@ def mock_metadata_prepare_data() -> dict[Any, Any]:
             "example_blob_key",
             {"object_property": {"nested_property": {"nested_key": "nested_value"}}},
             {"type": "string", "description": "An example property"},
+            True,
         ),
     ],
 )
@@ -4843,13 +4822,18 @@ def test_prepare_data(
     expected_data: dict[Any, Any],
     expected_metadata_properties: dict[str, Any],
     mocker: MockerFixture,
+    is_nested: bool,
 ) -> None:
     """Unit test for prepare_data to ensure data were extracted correctly"""
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_prepare_data)
+    mock_flat_to_nested = mocker.patch.object(
+        Utility, "flatten_keys_to_nested_structure", wraps=Utility.flatten_keys_to_nested_structure
+    )
 
     data, metadata_properties = input_manager._prepare_data(variable_name, input_data, properties_blob_key)
-
+    if is_nested:
+        mock_flat_to_nested.assert_called_once()
     assert data == expected_data
     assert metadata_properties == expected_metadata_properties
 

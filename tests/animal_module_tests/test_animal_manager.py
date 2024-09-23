@@ -275,7 +275,10 @@ def mock_im_pool() -> Dict[str, Dict[str, Any]]:
 
 
 @pytest.fixture
-def animal_manager(input_manager: InputManager, mock_im_pool: Dict[str, Dict[str, Any]]) -> AnimalManager:
+def animal_manager(
+    input_manager: InputManager, mock_im_pool: Dict[str, Dict[str, Any]], mocker: MockerFixture
+) -> AnimalManager:
+    mocker.patch.object(AnimalBase, "setup_lactation_curve_parameters")
     init_pens_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_pens")
     init_animals_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_animals")
     init_nutrient_rqmts_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_nutrient_rqmts")
@@ -1732,7 +1735,7 @@ def setup_dummy_animal_manager_with_pens(
 
         dummy_pen = setup_dummy_pen(pen_dict["pen_id"], pen_dict["num_stalls"], animal_list)
 
-        dummy_pen.ration = pen_dict["ration"]
+        dummy_pen.ration_per_animal = pen_dict["ration_per_animal"]
 
         for animal in animal_list:
             dummy_pen.animals_in_pen[animal.id] = animal

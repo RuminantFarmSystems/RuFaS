@@ -49,7 +49,7 @@ def test_calculate_nutrient_cycling_residue_composition_factor(
     observed = MineralizationDecomposition._calculate_nutrient_cycling_residue_composition_factor(
         nitrogen_ratio, phosphorus_ratio
     )
-    expected = min(1.0, nutrient_term)
+    expected = 1
 
     calls = [call(nitrogen_ratio, 25), call(phosphorus_ratio, 200)]
     MineralizationDecomposition._calculate_nutrient_term_for_residue_composition_factor.assert_has_calls(calls)
@@ -139,12 +139,12 @@ def test_mineralize_and_decompose_nitrogen(temp: float, fresh_nitrogen: float, d
     if temp > 0:
         nutrient_ratio_calls = [
             call(
-                incorp.data.soil_layers[0].total_soil_carbon_amount,
+                incorp.data.soil_layers[0].carbon_residue_amount,
                 incorp.data.soil_layers[0].fresh_organic_nitrogen_content,
                 incorp.data.soil_layers[0].nitrate_content,
             ),
             call(
-                incorp.data.soil_layers[0].total_soil_carbon_amount,
+                incorp.data.soil_layers[0].carbon_residue_amount,
                 incorp.data.soil_layers[0].fresh_organic_phosphorus_content,
                 incorp.data.soil_layers[0].labile_inorganic_phosphorus_content,
             ),

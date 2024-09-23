@@ -71,3 +71,14 @@ class ManureConstants:
     """
     The fraction of total solids in Liquid manure. Temporary placeholder until upstream solids tracking is fixed.
     """
+
+    METHANE_DESTRUCTION_EFFICIENCY = 81
+    """
+    The percentage of methane destroyed in systems using a cap and flare
+    """
+
+    AD_TAN_INCREASE_FACTOR = 1.60
+    """
+    The factor by which manure total ammoniacal nitrogen content is increased by the anaerobic digestion process
+    (unitless).
+    """

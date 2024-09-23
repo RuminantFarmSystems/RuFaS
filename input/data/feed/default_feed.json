@@ -8,28 +8,28 @@
         44,
         51,
         110,
-        167, 
+        167,
         176,
         231,
         234
     ],
     "close_up_feeds": [
-        2, 
+        2,
         44,
         51,
-        100, 
+        100,
         110,
-        167, 
+        167,
         231,
         234
     ],
     "lac_cow_feeds": [
-        2, 
+        2,
         44,
         51,
-        94, 
+        94,
         110,
-        167, 
+        167,
         231,
         234
     ],
@@ -53,7 +53,7 @@
         {
             "purchased_feed": 100,
             "purchased_feed_cost": 0.1
-        }, 
+        },
         {
             "purchased_feed": 110,
             "purchased_feed_cost": 0.1
@@ -76,7 +76,7 @@
         },
         {
             "purchased_feed": 231,
-            "purchased_feed_cost": 0.1 
+            "purchased_feed_cost": 0.1
         },
         {
             "purchased_feed": 234,
@@ -148,7 +148,7 @@
             },
             {
                 "feed_type": 231,
-                "ration_percentage": 1.5 
+                "ration_percentage": 1.5
             },
             {
                 "feed_type": 234,
@@ -162,7 +162,7 @@
             },
             {
                 "feed_type": 44,
-                "ration_percentage": 4.1 
+                "ration_percentage": 4.1
             },
             {
                 "feed_type": 51,
@@ -182,7 +182,7 @@
             },
             {
                 "feed_type": 231,
-                "ration_percentage": 1.1 
+                "ration_percentage": 1.1
             },
             {
                 "feed_type": 234,
@@ -208,7 +208,7 @@
             },
             {
                 "feed_type": 110,
-                "ration_percentage": 13.7 
+                "ration_percentage": 13.7
             },
             {
                 "feed_type": 167,
@@ -216,7 +216,7 @@
             },
             {
                 "feed_type": 231,
-                "ration_percentage": 1.8 
+                "ration_percentage": 1.8
             },
             {
                 "feed_type": 234,

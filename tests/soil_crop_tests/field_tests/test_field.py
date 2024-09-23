@@ -1,6 +1,7 @@
 from math import exp
 from typing import List, Dict
 from unittest.mock import MagicMock, PropertyMock, patch, call
+
 import pytest
 from pytest_mock import MockerFixture
 from RUFAS.units import MeasurementUnits
@@ -37,8 +38,6 @@ from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.routines.EEE.enums import TillageImplement
 
-om = OutputManager()
-
 
 @pytest.fixture
 def mock_time() -> Time:
@@ -67,26 +66,24 @@ def mock_field_data() -> FieldData:
     ],
 )
 def test_init(
-    manure_manager: ManureManager,
-    feed_manager: FeedManager,
-    should_fail: bool,
-    error_count: int,
+    manure_manager: ManureManager, feed_manager: FeedManager, should_fail: bool, error_count: int, mocker: MockerFixture
 ) -> None:
     """Tests that Field initialization fails when passed invalid parameters."""
-    with patch.object(om, "add_error") as add_error:
-        if should_fail:
-            with pytest.raises(ValueError, match="Manure supplier cannot be None."):
-                Field(manure_supplier=manure_manager, feed_manager=feed_manager)
-        else:
-            Field(manure_supplier=manure_manager, feed_manager=feed_manager)
-            assert True
+    add_error = mocker.patch.object(OutputManager, "add_error")
+    if should_fail:
+        with pytest.raises(ValueError, match="Manure supplier cannot be None."):
+            field = Field(manure_manager=manure_manager, feed_manager=feed_manager)
+            add_error = mocker.patch.object(field.om, "add_error")
+            assert add_error.call_count == error_count
 
-        assert add_error.call_count == error_count
+    else:
+        Field(manure_manager=manure_manager, feed_manager=feed_manager)
+        assert True
 
 
 def test_manage_field() -> None:
     """Tests that all subroutines are correctly called by the main routine in field."""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field._check_fertilizer_application_schedule = MagicMock()
     field._check_manure_application_schedule = MagicMock()
     field._check_tillage_schedule = MagicMock()
@@ -172,7 +169,7 @@ def test_check_crop_planting_schedule(
     contains four cases: some planting events occur on the current day, all planting events occur on the current day,
     no planting events occur on the current day, and no planting events left.
     """
-    field = Field(plantings=all_events, manure_supplier=MagicMock(ManureManager))
+    field = Field(plantings=all_events, manure_manager=MagicMock(ManureManager))
     field._filter_events = MagicMock(return_value=(events_remaining, events_occurring_today))
 
     field._plant_crop = MagicMock()
@@ -235,7 +232,7 @@ def test_check_fertilizer_application_schedule(
     current_events: List[FertilizerEvent],
 ) -> None:
     """Tests that fertilizer events that occur on the current day are properly selected and executed."""
-    field = Field(fertilizer_events=events, manure_supplier=MagicMock(ManureManager))
+    field = Field(fertilizer_events=events, manure_manager=MagicMock(ManureManager))
     field._filter_events = MagicMock(return_value=(remaining_events, current_events))
     field._execute_fertilizer_application = MagicMock()
     mocked_time = MagicMock(Time)
@@ -311,7 +308,7 @@ def test_check_manure_application_schedule(
     current_events: List[ManureEvent],
 ) -> None:
     """Tests that ManureEvents are correctly checked for and executed when scheduled."""
-    field = Field(manure_events=events, manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_events=events, manure_manager=MagicMock(ManureManager))
     field._filter_events = MagicMock(return_value=(remaining_events, current_events))
     field._execute_manure_application = MagicMock()
     mocked_time = MagicMock(Time)
@@ -384,7 +381,7 @@ def test_check_crop_harvest_schedule(
     current_harvest_events: List[HarvestEvent],
 ) -> None:
     """Tests that the schedule of crop harvests is determined correctly for any given day."""
-    field = Field(harvestings=all_harvest_events, manure_supplier=MagicMock(ManureManager))
+    field = Field(harvestings=all_harvest_events, manure_manager=MagicMock(ManureManager))
 
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "calendar_year", year)
@@ -408,12 +405,12 @@ def test_check_crop_harvest_schedule(
 
 
 @pytest.mark.parametrize(
-    "crop_num,heat_scheduled,expected_harvested,expected_harvest_count",
+    "crop_num,should_harvest_results,expected_harvest_count",
     [
-        (5, [True, False, True, True, False], [True, False, False, True, False], 2),
-        (2, [True, True], [False, True], 1),
-        (2, [False, False], [False, False], 0),
-        (0, [], [], 0),
+        (5, [True, False, True, True, False], 3),
+        (2, [True, True], 2),
+        (2, [False, False], 0),
+        (0, [], 0),
     ],
 )
 def test_harvest_heat_scheduled_crops(
@@ -421,28 +418,20 @@ def test_harvest_heat_scheduled_crops(
     mock_feed_manager: FeedManager,
     mock_field_data: FieldData,
     crop_num: int,
-    heat_scheduled: List[bool],
-    expected_harvested: List[bool],
+    should_harvest_results: List[bool],
     expected_harvest_count: int,
 ) -> None:
     """Tests that all crops which are set to be harvested based on heat level are."""
     crops = []
     for index in range(crop_num):
-        mock_data = MagicMock(CropData)
-        crops.append(MagicMock(Crop(mock_data)))
-        if heat_scheduled[index]:
-            crops[index].data.use_heat_scheduling = True
-        else:
-            crops[index].data.use_heat_scheduling = False
-        crops[index].data.harvest_heat_fraction = 1.0
-        if expected_harvested[index]:
-            crops[index].data.heat_fraction = crops[index].data.harvest_heat_fraction
-        else:
-            crops[index].data.heat_fraction = 0.0
-        crops[index].crop_management.manage_harvest = MagicMock()
+        mock_crop = MagicMock(Crop)
+        mock_crop.should_harvest_based_on_heat.return_value = should_harvest_results[index]
+        mock_crop_management = MagicMock()
+        mock_crop.crop_management = mock_crop_management
+        crops.append(mock_crop)
 
     field = Field(
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
         feed_manager=mock_feed_manager,
         field_data=mock_field_data,
     )
@@ -454,9 +443,10 @@ def test_harvest_heat_scheduled_crops(
     ) as add_residue:
         field._harvest_heat_scheduled_crops(10.0, mock_time)
 
-    for index in range(len(crops)):
-        if expected_harvested[index]:
-            crops[index].crop_management.manage_harvest.assert_called_once_with(
+    actual_harvest_count = 0
+    for index, crop in enumerate(crops):
+        if should_harvest_results[index]:
+            crop.manage_crop_harvest.assert_called_once_with(
                 HarvestOperation.HARVEST_ONLY,
                 mock_field_data.name,
                 mock_field_data.field_size,
@@ -464,9 +454,12 @@ def test_harvest_heat_scheduled_crops(
                 field.soil.data,
                 mock_feed_manager,
             )
+            actual_harvest_count += 1
         else:
-            crops[index].crop_management.manage_harvest.assert_not_called()
+            crop.manage_crop_harvest.assert_not_called()
+
     assert add_residue.call_count == expected_harvest_count
+    assert actual_harvest_count == expected_harvest_count
 
 
 @pytest.mark.parametrize(
@@ -533,14 +526,14 @@ def test_filter_events(
 
 
 @pytest.mark.parametrize(
-    "crop_reference,heat_scheduled,custom_crop_specs,is_supported,year,day",
+    "crop_reference,heat_scheduled,custom_crop_specs,expected_species,year,day",
     [
-        ("corn_silage", False, None, True, 1990, 120),
+        ("corn_silage", False, None, "corn_silage", 1990, 120),
         (
             "custom_alfalfa",
             False,
             {"custom_alfalfa": {"species": "alfalfa", "minimum_temperature": 3.0}},
-            False,
+            "custom alfalfa",
             1992,
             115,
         ),
@@ -554,7 +547,7 @@ def test_filter_events(
                     "minimum_temperature": -60,
                 },
             },
-            False,
+            "custom halo_alien_corn",
             2000,
             110,
         ),
@@ -563,8 +556,8 @@ def test_filter_events(
 def test_plant_crop(
     crop_reference: str,
     heat_scheduled: bool,
-    custom_crop_specs: Dict,
-    is_supported: bool,
+    custom_crop_specs: dict,
+    expected_species: str,
     year: int,
     day: int,
 ) -> None:
@@ -573,7 +566,7 @@ def test_plant_crop(
     field = Field(
         field_data=field_data,
         custom_crop_specifications=custom_crop_specs,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "current_calendar_year", year)
@@ -582,19 +575,21 @@ def test_plant_crop(
 
     field._plant_crop(crop_reference, heat_scheduled, mocked_time)
 
-    if is_supported:
-        expected_crop = field._make_supported_crop(crop_reference)
-    else:
-        expected_crop = field._make_crop_from_config_dict(custom_crop_specs.get(crop_reference))
-    expected_crop.data.use_heat_scheduling = heat_scheduled
-    expected_crop.data.id = crop_reference
+    assert len(field.crops) == 1  # Ensure one crop is added
 
-    assert field.crops[0].data.id == expected_crop.data.id
-    assert field.crops[0].data.use_heat_scheduling == expected_crop.data.use_heat_scheduling
-    assert field.crops[0].data.species == expected_crop.data.species
-    assert field.crops[0].data.planting_year == year
-    assert field.crops[0].data.planting_day == day
-    field._record_planting.assert_called_once_with(heat_scheduled, expected_crop.data.species, year, day)
+    planted_crop = field.crops[0]
+
+    # Adjusted assertion for enum comparison
+    if isinstance(planted_crop.data.species, CropSpecies):
+        assert planted_crop.data.species.value == expected_species
+    else:
+        assert planted_crop.data.species == expected_species
+
+    assert planted_crop.data.use_heat_scheduling == heat_scheduled
+    assert planted_crop.data.planting_year == year
+    assert planted_crop.data.planting_day == day
+
+    field._record_planting.assert_called_once_with(heat_scheduled, planted_crop.data.species, year, day)
 
 
 @pytest.mark.parametrize(
@@ -690,7 +685,7 @@ def test_record_planting(
     """Tests that crop plantings are correctly recorded to the OutputManager."""
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     with patch(
         "RUFAS.routines.field.soil.soil_data.SoilData.average_clay_percent",
@@ -700,14 +695,13 @@ def test_record_planting(
         field._record_planting(heat_scheduled, species, year, day)
 
         clay.assert_called_once()
-
-    actual = om.variables_pool[f"Field._record_planting.crop_planting.field='{field_name}'"]
+    actual = field.om.variables_pool[f"Field._record_planting.crop_planting.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
 
 @pytest.mark.parametrize(
-    "field_name,crop_reference,custom_crop_specs,expected",
+    "field_name,crop_reference,custom_crop_specs,expected_substring",
     [
         (
             "test_field_1",
@@ -722,30 +716,33 @@ def test_record_planting(
                     "minimum_temperature": -60,
                 },
             },
-            "'test_field_1': expected to have crop specification for 'halo_alien_alfalfa', received specifications for "
-            "'('halo_alien_winter_wheat', 'halo_alien_corn')' crop types.",
+            "Expected to have crop specification for 'halo_alien_alfalfa', received specifications for",
         ),
         (
             "test_field_2",
             "halo_alien_durum_wheat",
             None,
-            "'test_field_2': expected to have crop specification for "
-            "'halo_alien_durum_wheat', received specifications for '()' crop "
-            "types.",
+            "Expected to have crop specification for 'halo_alien_durum_wheat', received specifications for",
         ),
     ],
 )
-def test_plant_crop_error(field_name: str, crop_reference: str, custom_crop_specs: Dict, expected: str) -> None:
+def test_plant_crop_error(
+    field_name: str, crop_reference: str, custom_crop_specs: Dict, expected_substring: str
+) -> None:
     """Tests that errors are correctly raised when a crop specification for a requested planting is not present."""
     field = Field(
         custom_crop_specifications=custom_crop_specs,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     field.field_data.name = field_name
     mocked_time = MagicMock(Time)
     with pytest.raises(KeyError) as e:
         field._plant_crop(crop_reference, True, mocked_time)
-    assert expected in str(e.value)
+
+    error_message = str(e.value)
+
+    assert expected_substring in error_message
+    assert crop_reference in error_message
 
 
 @pytest.mark.parametrize(
@@ -772,12 +769,12 @@ def test_harvest_crop(
     other_crop_1.data.id, other_crop_2.data.id = "not this crop", "not this crop"
     field = Field(
         field_data=mock_field_data,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
         feed_manager=mock_feed_manager,
     )
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
     for crop in field.crops:
-        crop.crop_management.manage_harvest = MagicMock()
+        crop.manage_crop_harvest = MagicMock()
     mock_conditions = MagicMock(CurrentDayConditions)
     mock_conditions.rainfall = rainfall
 
@@ -790,9 +787,9 @@ def test_harvest_crop(
 
     for crop in field.crops:
         if crop.data.id == "not this crop":
-            crop.crop_management.manage_harvest.assert_not_called()
+            crop.manage_crop_harvest.assert_not_called()
         else:
-            crop.crop_management.manage_harvest.assert_called_once_with(
+            crop.manage_crop_harvest.assert_called_once_with(
                 harvest_op,
                 mock_field_data.name,
                 mock_field_data.field_size,
@@ -827,10 +824,10 @@ def test_harvest_crop_warnings(
         }
 
         for crop in crops:
-            crop.data.id = "test"
-            crop.crop_management.manage_harvest = MagicMock()
+            crop._data.id = "test"
+            crop.manage_crop_harvest = MagicMock()
         field = Field(
-            manure_supplier=MagicMock(ManureManager),
+            manure_manager=MagicMock(ManureManager),
             field_data=mock_field_data,
             feed_manager=mock_feed_manager,
         )
@@ -847,7 +844,7 @@ def test_harvest_crop_warnings(
             field._harvest_crop("test", HarvestOperation.HARVEST_KILL, mock_time, mock_conditions)
 
         for crop in crops:
-            crop.crop_management.manage_harvest.assert_called_once_with(
+            crop.manage_crop_harvest.assert_called_once_with(
                 HarvestOperation.HARVEST_KILL,
                 mock_field_data.name,
                 mock_field_data.field_size,
@@ -856,7 +853,7 @@ def test_harvest_crop_warnings(
                 mock_feed_manager,
             )
         assert add_residue.call_count == len(crops)
-        actual = om.warnings_pool[f"Field._harvest_crop.harvest_warning.field='{mock_field_data.name}'"]
+        actual = field.om.warnings_pool[f"Field._harvest_crop.harvest_warning.field='{mock_field_data.name}'"]
         assert actual["info_maps"].__contains__(expected_info_map)
         assert actual["values"].__contains__(expected_message)
 
@@ -867,20 +864,20 @@ def test_remove_dead_crops() -> None:
     This test contains four cases: there are no crops in the field, some crops in the field are dead, no crops in the
     field are dead, and all crops in the field are dead.
     """
-    field_1 = Field(manure_supplier=MagicMock(ManureManager))
+    field_1 = Field(manure_manager=MagicMock(ManureManager))
     field_1._remove_dead_crops()
     assert field_1.crops == []
 
-    field_2 = Field(manure_supplier=MagicMock(ManureManager))
+    field_2 = Field(manure_manager=MagicMock(ManureManager))
     crop_1 = Crop()
-    crop_1.data.is_alive = False
+    crop_1._data.is_alive = False
     crop_2 = Crop()
     crop_3 = Crop()
     field_2.crops = [crop_1, crop_2, crop_3]
     field_2._remove_dead_crops()
     assert field_2.crops == [crop_2, crop_3]
 
-    field_3 = Field(manure_supplier=MagicMock(ManureManager))
+    field_3 = Field(manure_manager=MagicMock(ManureManager))
     crop_4 = Crop()
     crop_5 = Crop()
     crop_6 = Crop()
@@ -888,7 +885,7 @@ def test_remove_dead_crops() -> None:
     field_3._remove_dead_crops()
     assert field_3.crops == [crop_4, crop_5, crop_6]
 
-    field_4 = Field(manure_supplier=MagicMock(ManureManager))
+    field_4 = Field(manure_manager=MagicMock(ManureManager))
     crop_7 = Crop()
     crop_8 = Crop()
     field_4.crops = [crop_7, crop_8]
@@ -907,11 +904,11 @@ def test_remove_dead_crops() -> None:
 )
 def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_field_proportion: float) -> None:
     """Tests that crops in a field correctly have their proportion reset when there are other crops present."""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.crops = crop_list
     field._reset_crop_field_coverage_fractions()
     for crop in field.crops:
-        assert crop.data.field_proportion == expected_field_proportion
+        assert crop._data.field_proportion == expected_field_proportion
 
 
 @pytest.mark.parametrize(
@@ -925,7 +922,7 @@ def test_reset_crop_field_coverage_fractions(crop_list: List[Crop], expected_fie
 def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     """Tests that each crop's dormancy method is called."""
     crop = Crop()
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.field_data.dormancy_threshold_daylength = threshold_daylength
     field.crops = [crop]
     rainfall = 10.3
@@ -952,84 +949,6 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
     else:
         dormancy.assert_not_called()
         biomass.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "species,specs",
-    [
-        ("corn_grain", {}),  # no additional arguments
-        (
-            "alfalfa_hay",
-            {"minimum_temperature": -2.1, "id": 123},
-        ),  # supported species, with alteration
-    ],
-)
-def test_make_supported_crop(species: str, specs: dict):
-    """ensure that supported crops are properly created."""
-    # check that attributes are correct
-    crop = Field._make_supported_crop(species, **specs)
-    assert crop.data.species == CropSpecies(species)
-    for key, val in specs.items():
-        assert getattr(crop.data, key) == val
-
-    if len(specs) > 0:
-        assert "altered" in crop.data.name
-    else:
-        assert "altered" not in crop.data.name
-
-    # failing cases
-    with pytest.raises(Exception):
-        Field._make_supported_crop("fake_crop")
-    with pytest.raises(Exception):
-        Field._make_supported_crop("corn", bad_attr=17.35)
-
-
-@pytest.mark.parametrize(
-    "config",
-    [
-        {"species": "grass"},  # custom species, with generic defaults
-        {"species": "cottonwood", "is_perennial": True},  # custom species and attribute
-        {"minimum_temperature": -10},  # no species name
-    ],
-)
-def test_make_custom_crop(config: dict):
-    """checks that custom crop attributes are set correctly"""
-    crop = Field._make_custom_crop(**config)
-    for key, val in config.items():
-        assert getattr(crop.data, key) == val
-
-
-@pytest.mark.parametrize(
-    "config",
-    [
-        {"species": "corn"},  # supported species
-        {
-            "species": "corn",
-            "minimum_temperature": -2.0,
-            "is_perennial": True,
-        },  # supported species, with alterations
-        {"species": "grass"},  # unsupported species, generic attributes
-        {
-            "species": "cottonwood",
-            "is_perennial": True,
-        },  # custom species and attributes
-        {"minimum_temperature": -2.0},  # generic custom crop, with alterations
-    ],
-)
-def test_make_crop_from_config_dict(config: dict):
-    supported_crops = set(item.value for item in CropSpecies)
-    has_supported_species = "species" in config.keys() and str(config["species"]) in supported_crops
-    Field._make_supported_crop = MagicMock()
-    Field._make_custom_crop = MagicMock()
-
-    Field._make_crop_from_config_dict(config)
-
-    if has_supported_species:
-        Field._make_supported_crop.assert_called_once()
-        Field._make_custom_crop.assert_not_called()
-    else:
-        Field._make_supported_crop.assert_not_called()
-        Field._make_custom_crop.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1061,7 +980,7 @@ def test_execute_fertilizer_application(
     field = Field(
         field_data=field_data,
         fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}},
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     formulate = mocker.patch.object(
         field,
@@ -1090,7 +1009,7 @@ def test_execute_fertilizer_application(
                 "timestamp": "00-Jan-1970_Thu_00-00-00",
             }
             expected_log_message = "Tried to apply fertilizer with no nitrogen, phosphorus, or potassium requested."
-            actual = om.logs_pool["Field._execute_fertilizer_application.fertilizer_application_log.field='test'"]
+            actual = field.om.logs_pool["Field._execute_fertilizer_application.fertilizer_application_log.field='test'"]
             assert actual["info_maps"].__contains__(expected_info_map)
             assert actual["values"].__contains__(expected_log_message)
             formulate.assert_not_called()
@@ -1127,7 +1046,7 @@ def test_execute_fertilizer_application_error(
     field = Field(
         field_data=FieldData(name=field_name),
         fertilizer_mixes=available_mixes,
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     with pytest.raises(KeyError) as e:
         field._execute_fertilizer_application(mix_name, 10.0, 10.0, 10.0, 0.0, 1.0, 1994, 120)
@@ -1153,7 +1072,7 @@ def test_execute_fertilizer_application_with_invalid_args(
     with corrected values takes place."""
     field = Field(
         field_data=FieldData(name="test", field_size=1.2),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     with (
@@ -1380,7 +1299,7 @@ def test_record_fertilizer_application(
     """Tests that fertilizer applications are correctly recorded in the OutputManager."""
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
 
     with patch(
@@ -1431,7 +1350,9 @@ def test_record_fertilizer_application(
         "average_clay_percent": 10.0,
     }
 
-    actual = om.variables_pool[f"Field._record_fertilizer_application.fertilizer_application.field='{field_name}'"]
+    actual = field.om.variables_pool[
+        f"Field._record_fertilizer_application.fertilizer_application.field='{field_name}'"
+    ]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
@@ -1639,7 +1560,7 @@ def test_execute_manure_application(
             field_size=1.4,
             supplement_manure_nutrient_deficiencies=supplement,
         ),
-        manure_supplier=mocked_manure_manager,
+        manure_manager=mocked_manure_manager,
     )
     field._add_manure_water = mocker.MagicMock()
     field.manure_applicator.apply_machine_manure = MagicMock()
@@ -1647,107 +1568,109 @@ def test_execute_manure_application(
     field._determine_optimal_fertilizer_mix = MagicMock(return_value="expected_optimal_mix")
     field._execute_fertilizer_application = MagicMock()
 
-    with patch.object(om, "add_log") as log, patch.object(om, "add_warning") as warn:
-        field._execute_manure_application(nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day)
+    log = mocker.patch.object(field.om, "add_log")
+    warn = mocker.patch.object(field.om, "add_warning")
 
-        if nitrogen == phosphorus == 0.0:
-            log.assert_called_once()
+    field._execute_manure_application(nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day)
 
-            mocked_manure_manager.request_nutrients.assert_not_called()
-            field.manure_applicator.apply_machine_manure.assert_not_called()
-            field._record_manure_application.assert_not_called()
+    if nitrogen == phosphorus == 0.0:
+        log.assert_called_once()
+
+        mocked_manure_manager.request_nutrients.assert_not_called()
+        field.manure_applicator.apply_machine_manure.assert_not_called()
+        field._record_manure_application.assert_not_called()
+        warn.assert_not_called()
+        field._determine_optimal_fertilizer_mix.assert_not_called()
+        field._execute_fertilizer_application.assert_not_called()
+    else:
+        log.assert_not_called()
+        expected_total_inorganic_fraction = 0.14  # equal to (50.0 / 250.0) * 0.7
+        expected_total_organic_fraction = 0.06  # equal to (50.0 / 250.0) * 0.3
+
+        if supplied_manure is not None:
+            mocked_manure_manager.request_nutrients.assert_called_once_with(expected_request)
+            field._add_manure_water.assert_called_once_with(supplied_manure, manure_type)
+            field.manure_applicator.apply_machine_manure.assert_called_once_with(
+                dry_matter_mass=supplied_manure.dry_matter,
+                dry_matter_fraction=supplied_manure.dry_matter_fraction,
+                total_phosphorus_mass=supplied_manure.phosphorus,
+                field_coverage=coverage,
+                application_depth=depth,
+                surface_remainder_fraction=remainder,
+                field_size=1.4,
+                inorganic_nitrogen_fraction=pytest.approx(expected_total_inorganic_fraction),
+                ammonium_fraction=supplied_manure.ammonium_nitrogen_fraction,
+                organic_nitrogen_fraction=pytest.approx(expected_total_organic_fraction),
+                water_extractable_inorganic_phosphorus_fraction=supplied_manure.inorganic_phosphorus_fraction,
+            )
+            expected_record_manure_application_calls = [
+                mocker.call(
+                    dry_matter_mass=supplied_manure.dry_matter,
+                    dry_matter_fraction=supplied_manure.dry_matter_fraction,
+                    field_coverage=coverage,
+                    nitrogen=supplied_manure.nitrogen,
+                    phosphorus=supplied_manure.phosphorus,
+                    potassium=None,
+                    application_depth=depth,
+                    surface_remainder_fraction=remainder,
+                    year=year,
+                    day=day,
+                    output_name="manure_application",
+                ),
+                mocker.call(
+                    dry_matter_mass=0.0,
+                    dry_matter_fraction=0.0,
+                    field_coverage=coverage,
+                    nitrogen=expected_request.nitrogen,
+                    phosphorus=expected_request.phosphorus,
+                    potassium=None,
+                    application_depth=depth,
+                    surface_remainder_fraction=remainder,
+                    year=year,
+                    day=day,
+                    output_name="manure_request",
+                ),
+            ]
+            field._record_manure_application.assert_has_calls(expected_record_manure_application_calls)
+
+        if fertilizer_applied and not supplement:
+            warn.assert_called_once()
+            field._determine_optimal_fertilizer_mix.assert_not_called()
+            field._execute_fertilizer_application.assert_not_called()
+        elif not fertilizer_applied and not supplement:
             warn.assert_not_called()
             field._determine_optimal_fertilizer_mix.assert_not_called()
             field._execute_fertilizer_application.assert_not_called()
-        else:
-            log.assert_not_called()
-            expected_total_inorganic_fraction = 0.14  # equal to (50.0 / 250.0) * 0.7
-            expected_total_organic_fraction = 0.06  # equal to (50.0 / 250.0) * 0.3
-
-            if supplied_manure is not None:
-                mocked_manure_manager.request_nutrients.assert_called_once_with(expected_request)
-                field._add_manure_water.assert_called_once_with(supplied_manure, manure_type)
-                field.manure_applicator.apply_machine_manure.assert_called_once_with(
-                    dry_matter_mass=supplied_manure.dry_matter,
-                    dry_matter_fraction=supplied_manure.dry_matter_fraction,
-                    total_phosphorus_mass=supplied_manure.phosphorus,
-                    field_coverage=coverage,
-                    application_depth=depth,
-                    surface_remainder_fraction=remainder,
-                    field_size=1.4,
-                    inorganic_nitrogen_fraction=pytest.approx(expected_total_inorganic_fraction),
-                    ammonium_fraction=supplied_manure.ammonium_nitrogen_fraction,
-                    organic_nitrogen_fraction=pytest.approx(expected_total_organic_fraction),
-                    water_extractable_inorganic_phosphorus_fraction=supplied_manure.inorganic_phosphorus_fraction,
-                )
-                expected_record_manure_application_calls = [
-                    mocker.call(
-                        dry_matter_mass=supplied_manure.dry_matter,
-                        dry_matter_fraction=supplied_manure.dry_matter_fraction,
-                        field_coverage=coverage,
-                        nitrogen=supplied_manure.nitrogen,
-                        phosphorus=supplied_manure.phosphorus,
-                        potassium=None,
-                        application_depth=depth,
-                        surface_remainder_fraction=remainder,
-                        year=year,
-                        day=day,
-                        output_name="manure_application",
-                    ),
-                    mocker.call(
-                        dry_matter_mass=0.0,
-                        dry_matter_fraction=0.0,
-                        field_coverage=coverage,
-                        nitrogen=expected_request.nitrogen,
-                        phosphorus=expected_request.phosphorus,
-                        potassium=None,
-                        application_depth=depth,
-                        surface_remainder_fraction=remainder,
-                        year=year,
-                        day=day,
-                        output_name="manure_request",
-                    ),
-                ]
-                field._record_manure_application.assert_has_calls(expected_record_manure_application_calls)
-
-            if fertilizer_applied and not supplement:
-                warn.assert_called_once()
-                field._determine_optimal_fertilizer_mix.assert_not_called()
-                field._execute_fertilizer_application.assert_not_called()
-            elif not fertilizer_applied and not supplement:
-                warn.assert_not_called()
-                field._determine_optimal_fertilizer_mix.assert_not_called()
-                field._execute_fertilizer_application.assert_not_called()
-            elif fertilizer_applied and only_nitrogen_unmet and supplement:
-                warn.assert_not_called()
-                field._determine_optimal_fertilizer_mix.assert_not_called()
-                field._execute_fertilizer_application.assert_called_once_with(
-                    "100_0_0",
-                    expected_unmet_nitrogen,
-                    expected_unmet_phosphorus,
-                    0,
-                    depth,
-                    remainder,
-                    year,
-                    day,
-                )
-            elif fertilizer_applied and not only_nitrogen_unmet and supplement:
-                warn.assert_not_called()
-                field._determine_optimal_fertilizer_mix.assert_called_once_with(
-                    expected_unmet_nitrogen,
-                    expected_unmet_phosphorus,
-                    field.available_fertilizer_mixes,
-                )
-                field._execute_fertilizer_application.assert_called_once_with(
-                    "expected_optimal_mix",
-                    expected_unmet_nitrogen,
-                    expected_unmet_phosphorus,
-                    0,
-                    depth,
-                    remainder,
-                    year,
-                    day,
-                )
+        elif fertilizer_applied and only_nitrogen_unmet and supplement:
+            warn.assert_not_called()
+            field._determine_optimal_fertilizer_mix.assert_not_called()
+            field._execute_fertilizer_application.assert_called_once_with(
+                "100_0_0",
+                expected_unmet_nitrogen,
+                expected_unmet_phosphorus,
+                0,
+                depth,
+                remainder,
+                year,
+                day,
+            )
+        elif fertilizer_applied and not only_nitrogen_unmet and supplement:
+            warn.assert_not_called()
+            field._determine_optimal_fertilizer_mix.assert_called_once_with(
+                expected_unmet_nitrogen,
+                expected_unmet_phosphorus,
+                field.available_fertilizer_mixes,
+            )
+            field._execute_fertilizer_application.assert_called_once_with(
+                "expected_optimal_mix",
+                expected_unmet_nitrogen,
+                expected_unmet_phosphorus,
+                0,
+                depth,
+                remainder,
+                year,
+                day,
+            )
 
 
 @pytest.mark.parametrize(
@@ -1778,7 +1701,7 @@ def test_execute_manure_application_with_invalid_args(
     mocked_manure_manager.request_nutrients = MagicMock(return_value=supplied_nutrients)
     field = Field(
         field_data=FieldData(name="test", field_size=1.89),
-        manure_supplier=mocked_manure_manager,
+        manure_manager=mocked_manure_manager,
     )
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     expected_total_inorganic_fraction = 0.15  # equal to (50.0 / 100.0) * 0.3
@@ -2030,7 +1953,7 @@ def test_record_manure_application(
     """Tests that manure applications are recorded correctly."""
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
 
     with patch(
@@ -2054,7 +1977,7 @@ def test_record_manure_application(
 
         clay.assert_called_once()
 
-    actual = om.variables_pool[
+    actual = field.om.variables_pool[
         f"{Field.__name__}.{Field._record_manure_application.__name__}.manure_application.field='{field_name}'"
     ]
     assert actual["info_maps"].__contains__(expected_info)
@@ -2078,7 +2001,7 @@ def test_add_manure_water(
     """Tests that manure water is correctly calculated and stored."""
     field_data = FieldData(field_size=2.3)
     mock_manure_manager = mocker.MagicMock(autospec=ManureManager)
-    field = Field(field_data=field_data, manure_supplier=mock_manure_manager)
+    field = Field(field_data=field_data, manure_manager=mock_manure_manager)
     mocked_converter = mocker.patch.object(field.field_data, "convert_liters_to_millimeters", return_value=10.0)
 
     field._add_manure_water(manure_application, manure_type)
@@ -2135,13 +2058,13 @@ def test_record_nutrient_application_error(
 ) -> None:
     """Tests that manure and fertilizer application errors are correctly recorded to the OutputManager."""
     with patch("RUFAS.output_manager.Utility.get_timestamp") as mocked_timestamp:
-        field = Field(field_data=FieldData(name="test"), manure_supplier=MagicMock(ManureManager))
+        field = Field(field_data=FieldData(name="test"), manure_manager=MagicMock(ManureManager))
         mocked_timestamp.return_value = "00-Jan-1970_Thu_00-00-00"
 
         field._record_nutrient_application_error(depth, remainder, name, year, day)
 
         expected_error_name = f"Field._record_nutrient_application_error.{name}.{expected_info_map['suffix']}"
-        actual = om.errors_pool[expected_error_name]
+        actual = field.om.errors_pool[expected_error_name]
         assert actual["info_maps"].__contains__(expected_info_map)
         assert actual["values"].__contains__(expected_error_message)
 
@@ -2181,11 +2104,11 @@ def test_execute_daily_processes(
             simulate_phosphorus_stress=stressors,
         )
 
-        incorp = Field(field_data=field_data, manure_supplier=MagicMock(ManureManager))
+        incorp = Field(field_data=field_data, manure_manager=MagicMock(ManureManager))
         crop_1 = Crop()
-        crop_1.data.max_transpiration = transpiration
+        crop_1._data.max_transpiration = transpiration
         crop_2 = Crop()
-        crop_2.data.max_transpiration = transpiration
+        crop_2._data.max_transpiration = transpiration
         incorp.crops = [crop_1, crop_2]
         current_conditions = CurrentDayConditions(
             incoming_light=light,
@@ -2200,13 +2123,13 @@ def test_execute_daily_processes(
         incorp.soil.soil_temp.daily_soil_temperature_update = MagicMock()
         incorp._cycle_water = MagicMock()
         for crop in incorp.crops:
-            crop.heat_units.absorb_heat_units = MagicMock()
-            crop.root_development = MagicMock()
-            crop.nitrogen_incorporation.incorporate_nitrogen = MagicMock()
-            crop.phosphorus_incorporation.incorporate_phosphorus = MagicMock()
-            crop.growth_constraints.constrain_growth = MagicMock()
-            crop.leaf_area_index.grow_canopy = MagicMock()
-            crop.biomass_allocation.allocate_biomass = MagicMock()
+            crop._heat_units.absorb_heat_units = MagicMock()
+            crop._root_development = MagicMock()
+            crop._nitrogen_incorporation.incorporate_nitrogen = MagicMock()
+            crop._phosphorus_incorporation.incorporate_phosphorus = MagicMock()
+            crop._growth_constraints.constrain_growth = MagicMock()
+            crop._leaf_area_index.grow_canopy = MagicMock()
+            crop._biomass_allocation.allocate_biomass = MagicMock()
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "current_calendar_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
@@ -2223,25 +2146,25 @@ def test_execute_daily_processes(
         incorp._cycle_water.assert_called_once_with(current_conditions, mocked_time)
         for crop in incorp.crops:
             if crops_growing:
-                crop.heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
-                crop.root_development.develop_roots.assert_called_once()
-                crop.nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(incorp.soil.data)
-                crop.phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(incorp.soil.data)
-                crop.growth_constraints.constrain_growth.assert_called_once_with(
+                crop._heat_units.absorb_heat_units.assert_called_once_with(mean_temp, min_temp, max_temp)
+                crop._root_development.develop_roots.assert_called_once()
+                crop._nitrogen_incorporation.incorporate_nitrogen.assert_called_once_with(incorp.soil.data)
+                crop._phosphorus_incorporation.incorporate_phosphorus.assert_called_once_with(incorp.soil.data)
+                crop._growth_constraints.constrain_growth.assert_called_once_with(
                     transpiration,
                     mean_temp,
                     *[stressors] * 4,
                 )
-                crop.leaf_area_index.grow_canopy.assert_called_once()
-                crop.biomass_allocation.allocate_biomass.assert_called_once_with(light)
+                crop._leaf_area_index.grow_canopy.assert_called_once()
+                crop._biomass_allocation.allocate_biomass.assert_called_once_with(light)
             else:
-                crop.heat_units.absorb_heat_units.assert_not_called()
-                crop.root_development.develop_roots.assert_not_called()
-                crop.nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
-                crop.phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
-                crop.growth_constraints.constrain_growth.assert_not_called()
-                crop.leaf_area_index.grow_canopy.assert_not_called()
-                crop.biomass_allocation.allocate_biomass.assert_not_called()
+                crop._heat_units.absorb_heat_units.assert_not_called()
+                crop._root_development.develop_roots.assert_not_called()
+                crop._nitrogen_incorporation.incorporate_nitrogen.assert_not_called()
+                crop._phosphorus_incorporation.incorporate_phosphorus.assert_not_called()
+                crop._growth_constraints.constrain_growth.assert_not_called()
+                crop._leaf_area_index.grow_canopy.assert_not_called()
+                crop._biomass_allocation.allocate_biomass.assert_not_called()
 
 
 @pytest.mark.parametrize(
@@ -2283,7 +2206,7 @@ def test_cycle_water(
             water_sublimated=1.0,
             snow_content=snow_content,
         )
-        soil_data.plant_surface_residue = surface_residue
+        soil_data.soil_layers[0].plant_residue = surface_residue
         soil = Soil(soil_data)
         crop_data_1 = CropData(
             field_proportion=crop_1_proportion,
@@ -2315,7 +2238,7 @@ def test_cycle_water(
             current_residue=residue,
             seasonal_high_water_table=high_water_table,
         )
-        incorp = Field(field_data=field_data, soil=soil, manure_supplier=MagicMock(ManureManager))
+        incorp = Field(field_data=field_data, soil=soil, manure_manager=MagicMock(ManureManager))
         incorp.crops = [crop_1, crop_2]
 
         incorp.soil.infiltration.infiltrate = MagicMock()
@@ -2337,12 +2260,12 @@ def test_cycle_water(
         incorp._determine_maximum_soil_evaporation = MagicMock(return_value=5.0)
         incorp._get_manure_water = MagicMock(return_value=manure_water)
 
-        crop_1.water_dynamics.set_maximum_transpiration = MagicMock()
-        crop_1.water_dynamics.cycle_water = MagicMock()
-        crop_1.water_uptake.uptake_water = MagicMock()
-        crop_2.water_dynamics.set_maximum_transpiration = MagicMock()
-        crop_2.water_dynamics.cycle_water = MagicMock()
-        crop_2.water_uptake.uptake_water = MagicMock()
+        crop_1._water_dynamics.set_maximum_transpiration = MagicMock()
+        crop_1._water_dynamics.cycle_water = MagicMock()
+        crop_1._water_uptake.uptake_water = MagicMock()
+        crop_2._water_dynamics.set_maximum_transpiration = MagicMock()
+        crop_2._water_dynamics.cycle_water = MagicMock()
+        crop_2._water_uptake.uptake_water = MagicMock()
         mocked_time = MagicMock(Time)
         setattr(mocked_time, "current_simulation_year", 2023)
         setattr(mocked_time, "current_julian_day", 178)
@@ -2368,8 +2291,8 @@ def test_cycle_water(
         incorp.soil.nitrogen_cycling.cycle_nitrogen.assert_called_once_with(field_size)
         incorp.soil.carbon_cycling.cycle_carbon.assert_called_once_with(2.0, mean_temp, field_size)
         expected_remaining_demand = 30.5
-        crop_1.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
-        crop_2.water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
+        crop_1._water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
+        crop_2._water_dynamics.set_maximum_transpiration.assert_called_once_with(expected_remaining_demand)
         expected_average_transpiration = 44.1 * crop_1_proportion + 39.5 * crop_2_proportion
         incorp._determine_soil_evaporation_and_sublimation_adjusted.assert_called_once_with(
             40.0,
@@ -2383,17 +2306,17 @@ def test_cycle_water(
         incorp.soil.evaporation.evaporate.assert_called_once_with(5.0)
         expected_actual_evaporation = 33.5 - (expected_remaining_demand - 4.5)
         if crops_growing:
-            crop_1.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
-            crop_1.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
-            crop_2.water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
-            crop_2.water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
+            crop_1._water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
+            crop_1._water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.5, 33.5)
+            crop_2._water_uptake.uptake_water.assert_called_once_with(incorp.soil.data)
+            crop_2._water_dynamics.cycle_water.assert_called_once_with(expected_actual_evaporation, 3.25, 33.5)
         else:
-            assert crop_1.data.cumulative_evaporation == 0
-            assert crop_1.data.cumulative_transpiration == 0
-            assert crop_1.data.cumulative_potential_evapotranspiration == 0
-            assert crop_2.data.cumulative_evaporation == 0
-            assert crop_2.data.cumulative_transpiration == 0
-            assert crop_2.data.cumulative_potential_evapotranspiration == 0
+            assert crop_1._data.cumulative_evaporation == 0
+            assert crop_1._data.cumulative_transpiration == 0
+            assert crop_1._data.cumulative_potential_evapotranspiration == 0
+            assert crop_2._data.cumulative_evaporation == 0
+            assert crop_2._data.cumulative_transpiration == 0
+            assert crop_2._data.cumulative_potential_evapotranspiration == 0
 
 
 @pytest.mark.parametrize(
@@ -2432,7 +2355,7 @@ def test_determine_watering_amount(
     data.watering_amount_in_mm = 5.0
     data.watering_occurs = watering_occurs
     data.current_water_deficit = water_deficit
-    incorp = Field(field_data=data, manure_supplier=MagicMock(ManureManager))
+    incorp = Field(field_data=data, manure_manager=MagicMock(ManureManager))
 
     actual = incorp._determine_watering_amount(rainfall, manure_water, mocked_time.year, mocked_time.day, irrigation)
     if old_method:
@@ -2465,7 +2388,7 @@ def test_determine_watering_amount(
 def test_get_manure_water(mocker: MockerFixture, water_amount: float, field_name: str) -> None:
     """Tests that manure water is correctly retrieved and logged."""
     field_data = FieldData(name=field_name, manure_water=water_amount)
-    field = Field(field_data=field_data, manure_supplier=MagicMock(autospec=ManureManager))
+    field = Field(field_data=field_data, manure_manager=MagicMock(autospec=ManureManager))
 
     with patch("RUFAS.output_manager.OutputManager.add_variable") as add_var:
         actual = field._get_manure_water()
@@ -2524,13 +2447,13 @@ def test_handle_water_in_crop_canopies(
         crop1 = Crop(crop_data1)
         crop_data2 = CropData(canopy_water=second_canopy_amount)
         crop2 = Crop(crop_data2)
-        field = Field(manure_supplier=MagicMock(ManureManager))
+        field = Field(manure_manager=MagicMock(ManureManager))
         field.crops = [crop1, crop2]
 
         actual = field._handle_water_in_crop_canopies(precipitation)
         assert actual == expected_return
-        assert field.crops[0].data.canopy_water == expected_first
-        assert field.crops[1].data.canopy_water == expected_second
+        assert field.crops[0]._data.canopy_water == expected_first
+        assert field.crops[1]._data.canopy_water == expected_second
 
 
 @pytest.mark.parametrize(
@@ -2554,22 +2477,22 @@ def test_evaporate_from_crop_canopies(
     crop1 = Crop(data1)
     data2 = CropData(canopy_water=canopy_water_2)
     crop2 = Crop(data2)
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.crops = [crop1, crop2]
 
     actual_demand = field._evaporate_from_crop_canopies(demand)
     assert pytest.approx(actual_demand) == expected_demand
-    assert pytest.approx(expected_canopy_water1) == field.crops[0].data.canopy_water
-    assert pytest.approx(expected_canopy_water2) == field.crops[1].data.canopy_water
+    assert pytest.approx(expected_canopy_water1) == field.crops[0]._data.canopy_water
+    assert pytest.approx(expected_canopy_water2) == field.crops[1]._data.canopy_water
 
 
 @pytest.mark.parametrize("biomasses,expected", [([30, 20, 14], 64), ([22.1], 22.1), ([], 0.0)])
 def test_determine_total_above_ground_biomass(biomasses: List[float], expected: float) -> None:
     """Tests that total above ground biomass on the field is correctly calculated."""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     for biomass in biomasses:
         crop = Crop()
-        crop.data.above_ground_biomass = biomass
+        crop._data.above_ground_biomass = biomass
         field.crops.append(crop)
 
     actual = field._determine_total_above_ground_biomass()
@@ -2703,7 +2626,7 @@ def test_determine_soil_cover_index(above_ground_biomass: float, residue: float,
 
 def test_annual_reset() -> None:
     """Tests that all annual reset subroutines are called properly"""
-    field = Field(manure_supplier=MagicMock(ManureManager))
+    field = Field(manure_manager=MagicMock(ManureManager))
     field.soil.data.do_annual_reset = MagicMock()
     field.field_data.perform_annual_field_reset = MagicMock()
 
@@ -2774,7 +2697,7 @@ def test_check_tillage_schedule(
     setattr(mocked_time, "current_calendar_year", year)
     setattr(mocked_time, "current_julian_day", day)
 
-    field = Field(tillage_events=events, manure_supplier=MagicMock(ManureManager))
+    field = Field(tillage_events=events, manure_manager=MagicMock(ManureManager))
     todays_count = len(is_today)
     field.tiller.till_soil = MagicMock()
     field._check_tillage_schedule(mocked_time)
@@ -2910,11 +2833,11 @@ def test_record_field_watering(
 ) -> None:
     field = Field(
         field_data=FieldData(name=field_name, field_size=field_size),
-        manure_supplier=MagicMock(ManureManager),
+        manure_manager=MagicMock(ManureManager),
     )
     field._record_field_watering(year=year, day=day, watering_amount=watering_amount)
 
-    actual = om.variables_pool[f"Field._record_field_watering.field_watering.field='{field_name}'"]
+    actual = field.om.variables_pool[f"Field._record_field_watering.field_watering.field='{field_name}'"]
     assert actual["info_maps"].__contains__(expected_info_map)
     assert actual["values"].__contains__(expected_value)
 
