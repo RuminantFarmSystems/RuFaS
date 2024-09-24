@@ -37,6 +37,7 @@ class ManureExcretionCalculator:
         AnimalManureExcretions
             A dictionary that contains the manure excretion values as specified
                 in the AnimalManureExcretions class definition.
+
         """
         dry_matter_intake = nutrient_amounts["dm"]
         CP_concentration = nutrient_concentrations["CP"]
@@ -270,21 +271,51 @@ class ManureExcretionCalculator:
         nutrient_concentrations: dict[str, float],
     ) -> Tuple[float, AnimalManureExcretions]:
         """
+        Calculates the manure excretion values for a cow with information from the ration formulation.
 
         Parameters
         ----------
-        is_lactating
-        body_weight
-        days_in_milk
-        milk_protein
-        daily_milk_production
-        fecal_phosphorus
-        urine_phosphorus_required
-        nutrient_amounts
-        nutrient_concentrations
+        is_lactating: bool
+            Indicates cow's lactating status.
+        body_weight: float
+            Body weight of the current animal (kg).
+        days_in_milk: int
+            Days in milk.
+        milk_protein: float
+            Milk protein (from animal input), % of milk.
+        daily_milk_production: float
+            Daily milk production of the current cow (kg).
+        fecal_phosphorus: float
+            Amount of fecal phosphorus excreted by the current cow (g).
+        urine_phosphorus_required: float
+            Amount of phosphorus required for urine production (g).
+        nutrient_amounts: Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_concentrations: Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
+        float
+        Total amount of phosphorus excreted by the given animal (g).
+
+        AnimalManureExcretions
+            A dictionary that contains the manure excretion values as specified
+                in the AnimalManureExcretions class definition.
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+        }
 
         """
         if is_lactating:
@@ -317,7 +348,8 @@ class ManureExcretionCalculator:
         nutrient_amounts: dict[str, float],
         nutrient_concentrations: dict[str, float],
     ) -> Tuple[float, AnimalManureExcretions]:
-        """Calculates the manure excretion values for a lactating cow with information from the ration formulation.
+        """
+        Calculates the manure excretion values for a lactating cow with information from the ration formulation.
 
         Parameters
         ----------
@@ -357,6 +389,7 @@ class ManureExcretionCalculator:
             "potassium": "percent of DM",
             "N": "percent of DM",
         }
+
         """
         dry_matter_intake = nutrient_amounts["dm"]
         ASH_diet_content = nutrient_amounts["ash"]
@@ -514,6 +547,7 @@ class ManureExcretionCalculator:
             "potassium": "percent of DM",
             "N": "percent of DM",
         }
+
         """
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
