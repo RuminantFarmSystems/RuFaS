@@ -25,7 +25,7 @@ v0.9.2
 
 ### Next Version Updates
 
-- [2005](https://github.com/RuminantFarmSystems/MASM/pull/2005) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
+- [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
 
 ### v0.9.2
 

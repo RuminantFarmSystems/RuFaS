@@ -1,10 +1,10 @@
 from numba import njit
 
-from ..animal_constants import DRY
-from ..animal_module_constants import AnimalModuleConstants
-from ..animal_properties.general_properties import GeneralProperties
-from ..animal_properties.milk_production_properties import MilkProductionProperties
-from ..data_types.milk_production_record import MilkProductionRecord
+from RUFAS.biophysical.animal.animal_constants import DRY
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
+from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.util import Utility
@@ -76,7 +76,7 @@ class MilkProduction:
             milking_properties.true_protein_content = 0.0
             milking_properties.fat_content = 0.0
             milking_properties.lactose_content = 0.0
-            milking_properties.milk_production_last_305_days = 0.0
+            milking_properties.current_lactation_305_day_milk_produced = 0.0
             milking_properties.crude_protein_percent = 0.0
             milking_properties.true_protein_percent = 0.0
             milking_properties.fat_percent = 0.0
@@ -109,7 +109,7 @@ class MilkProduction:
 
         if general_properties.days_in_milk == 305:
             milk_history = [record["milk_production"] for record in milking_properties.milk_production_history[-305:]]
-            milking_properties.milk_production_last_305_days = np.sum(milk_history)
+            milking_properties.current_lactation_305_day_milk_produced = np.sum(milk_history)
 
         return milking_properties, general_properties
 
