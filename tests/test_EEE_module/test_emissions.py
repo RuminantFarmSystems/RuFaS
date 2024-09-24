@@ -131,6 +131,8 @@ def test_calculate_purchased_feed_emissions(
     mock_gather_feeds.assert_called_once()
     mock_calc_actual.assert_called_once_with(homegrown_feeds, purchased_feeds)
     mock_calc_actual_emission.assert_called_once_with(actual_purchased_feeds)
+
+
 #
 # @pytest.mark.parametrize("filter_result,",
 #                          ({
