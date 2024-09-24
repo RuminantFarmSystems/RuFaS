@@ -26,6 +26,7 @@ v0.9.2
 ### Next Version Updates
 
 - [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
+- [2017](https://github.com/RuminantFarmSystems/MASM/pull/2017) - [minor change] [Animal] Deduplicates references to lactation parameters in the `LactationParameter` submodule and reorganizes structure to be consistent with other animal submodules.
 
 ### v0.9.2
 
