@@ -300,7 +300,7 @@ def test_dry_cow_manure_mills(
 def test_dry_cow_manure_others(
     metabolizable_energy_intake: float, nutrient_amounts: dict[str, float], nutrient_concentrations: dict[str, float]
 ) -> None:
-    """Test the daily enteric emissions for dry cows with Mills method."""
+    """Test the daily enteric emissions for dry cows with other method."""
     dry_matter_intake = nutrient_amounts["dm"]
     ASH_concentration = nutrient_concentrations["ash"]
     CP_concentration = nutrient_concentrations["CP"]

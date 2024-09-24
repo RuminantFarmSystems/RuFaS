@@ -8,14 +8,19 @@ class EntericMethaneCalculator:
     @staticmethod
     def calf_methane(methane_model: str | None, body_weight: float) -> float:
         """
+        Calculates the amount of methane emission for calf.
 
         Parameters
         ----------
-        methane_model
-        body_weight
+        methane_model: str
+            Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
+        body_weight: float
+            Body weight of the current animal, kg.
 
         Returns
         -------
+        float
+            The amount of methane emission for calf (g/day).
 
         """
         methane_emission = 0.0
@@ -29,15 +34,21 @@ class EntericMethaneCalculator:
         methane_model: str | None, dry_matter_intake: float, nutrient_concentrations: dict[str, float]
     ) -> float:
         """
+        Calculates the amount of methane emission for heifer.
 
         Parameters
         ----------
-        methane_model
-        dry_matter_intake
-        nutrient_concentrations
+        methane_model: str
+            Methane model used for methane emission calculations, including Boadi, IPCC.
+        dry_matter_intake: float
+            Amount of dry matter intake (kg).
+        nutrient_concentrations: dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
+        float
+            Amount of methane emission for heifer (g/day).
 
         """
         methane_emission = 0.0
@@ -80,20 +91,44 @@ class EntericMethaneCalculator:
 
         Parameters
         ----------
-        body_weight
-        methane_model
-        is_lactating
-        milk_fat
-        metabolizable_energy_intake
-        nutrient_amounts
-        nutrient_concentrations
-        methane_mitigation_method
-        methane_mitigation_additive_amount
+        body_weight: float
+            Body weight of the current cow (kg).
+        methane_model: str
+            Methane model used for methane emission calculations, including "Mutian", "Mills", "IPCC".
+        is_lactating: bool
+            Indicator of cow's lactating status.
+        milk_fat: float
+            Milk fat (from animal input), % of milk.
+        metabolizable_energy_intake: float
+            Metabolizable energy intake, Mcal/kg dry matter.
+        nutrient_amounts: Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_concentrations: Dict[str, float]
+             Concentrations of nutrients in pen ration, calculated per animal, percentages.
+        methane_mitigation_method: str
+            The name of the methane mitigation feed additives. The accepted names are
+                '3-NOP', 'Monensin', 'Essential Oils', and 'Seaweed'.
+        methane_mitigation_additive_amount: float
+            The dosage of the feed additive, mg/kg DMI.
 
         Returns
         -------
         float
             The daily enteric emissions for cows (g/day).
+
+            Notes
+            -----
+            nutrient_amount_units = {
+                "dm": "kg/animal",
+                "CP": "percent of DM",
+                "ADF": "percent of DM",
+                "NDF": "percent of DM",
+                "lignin": "percent of DM",
+                "ash": "percent of DM",
+                "phosphorus": "percent of DM",
+                "potassium": "percent of DM",
+                "N": "percent of DM",
+            }
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
@@ -150,16 +185,35 @@ class EntericMethaneCalculator:
 
         Parameters
         ----------
-        body_weight
-        milk_fat
-        metabolizable_energy_intake
-        nutrient_amounts
-        nutrient_concentrations
+        body_weight: float
+            Body weight of the current cow (kg).
+        milk_fat: float
+            Milk fat (from animal input), % of milk.
+        metabolizable_energy_intake: float
+            Metabolizable energy intake, Mcal/kg dry matter.
+        nutrient_amounts: Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_concentrations: Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
         float
             The daily enteric emissions for lactating cows (g/day).
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+        }
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
@@ -211,15 +265,33 @@ class EntericMethaneCalculator:
 
         Parameters
         ----------
-        methane_model
-        metabolizable_energy_intake
-        nutrient_amounts
-        nutrient_concentration
+        methane_model: str
+            Methane model used for methane emission calculations, including Mills, IPCC.
+        metabolizable_energy_intake: float
+            Metabolizable energy intake, Mcal/kg dry matter.
+        nutrient_amounts: Dict[str, float]
+            Amounts of nutrients in pen ration, calculated per animal, see Notes section for units.
+        nutrient_concentrations: Dict[str, float]
+            Concentrations of nutrients in pen ration, calculated per animal, percentages.
 
         Returns
         -------
         float
             The daily enteric emissions for dry cows (g/day).
+
+        Notes
+        -----
+        nutrient_amount_units = {
+            "dm": "kg/animal",
+            "CP": "percent of DM",
+            "ADF": "percent of DM",
+            "NDF": "percent of DM",
+            "lignin": "percent of DM",
+            "ash": "percent of DM",
+            "phosphorus": "percent of DM",
+            "potassium": "percent of DM",
+            "N": "percent of DM",
+        }
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
