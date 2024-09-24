@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from ..general_property_values import LAC_COW_PROPERTIES
+from tests.animal_module_tests.general_property_values import LAC_COW_PROPERTIES
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
@@ -19,7 +19,7 @@ def milking_properties() -> MilkProductionProperties:
         fat_content=2.0,
         lactose_content=3.0,
         milk_production_reduction=0.3,
-        milk_production_last_305_days=0.0,
+        current_lactation_305_day_milk_produced=0.0,
         crude_protein_percent=3.2,
         true_protein_percent=3.0,
         fat_percent=3.5,
@@ -101,7 +101,7 @@ def test_perform_daily_milking_update_dry_off(
     assert milking_properties.true_protein_content == 0.0
     assert milking_properties.fat_content == 0.0
     assert milking_properties.lactose_content == 0.0
-    assert milking_properties.milk_production_last_305_days == 0.0
+    assert milking_properties.current_lactation_305_day_milk_produced == 0.0
     assert milking_properties.crude_protein_percent == 0.0
     assert milking_properties.true_protein_percent == 0.0
     assert milking_properties.fat_percent == 0.0
@@ -147,7 +147,7 @@ def test_perform_daily_milking_update(
     assert milking_properties.true_protein_content == 1.2
     assert pytest.approx(milking_properties.fat_content) == 1.4
     assert milking_properties.milk_production_history[-1] == expected_record
-    assert milking_properties.milk_production_last_305_days == expected_305_day_production
+    assert milking_properties.current_lactation_305_day_milk_produced == expected_305_day_production
 
 
 @pytest.mark.parametrize(
