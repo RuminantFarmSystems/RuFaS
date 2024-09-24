@@ -39,8 +39,6 @@ class AnimalManureExcretions(TypedDict):
         Fraction of phosphorus in manure (unitless).
     potassium: float
         Amount of potassium in manure (g).
-    enteric_methane_g: float
-        Amount of methane emissions (g/day).
 
     """
 
@@ -60,4 +58,3 @@ class AnimalManureExcretions(TypedDict):
     phosphorus: float
     phosphorus_fraction: float
     potassium: float
-    enteric_methane_g: float
