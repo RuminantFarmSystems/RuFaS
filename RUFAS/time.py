@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 from typing import Dict
 
 from RUFAS.general_constants import GeneralConstants
@@ -9,18 +9,21 @@ from RUFAS.util import Utility
 
 
 class Time:
-    def __init__(self) -> None:
+    def __init__(self, start_date: datetime = None, end_date: datetime = None, current_date: datetime = None) -> None:
         """
         This object is responsible for creating and tracking time in the simulation.
         """
         self.om = OutputManager()
         self.im = InputManager()
-        self.config_data: Dict[str, str | int | bool] = self.im.get_data("config")
 
-        self.start_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["start_date"]), "%Y:%j")
-        self.end_date: datetime.datetime = datetime.datetime.strptime(str(self.config_data["end_date"]), "%Y:%j")
+        config_data: Dict[str, str | int | bool] = {}
+        if not start_date or not end_date:
+            config_data = self.im.get_data("config")
 
-        self.current_date: datetime.datetime = self.start_date
+        self.start_date: datetime = start_date or datetime.strptime(str(config_data["start_date"]), "%Y:%j")
+        self.end_date: datetime = end_date or datetime.strptime(str(config_data["end_date"]), "%Y:%j")
+
+        self.current_date: datetime = current_date or self.start_date
         self.simulation_length_days: int = (self.end_date - self.start_date).days
         self.simulation_length_years: int = self.end_date.year - self.start_date.year + 1
 
@@ -28,7 +31,7 @@ class Time:
         """
         Advances the time in the simulation by 1 day.
         """
-        self.current_date += datetime.timedelta(days=1)
+        self.current_date += timedelta(days=1)
 
     @property
     def year_start_day(self) -> int:
@@ -106,7 +109,7 @@ class Time:
             "simulation_day", self.simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
         )
 
-    def convert_simulation_day_to_date(self, simulation_day: int) -> datetime.datetime:
+    def convert_simulation_day_to_date(self, simulation_day: int) -> datetime:
         """
         Convert the simulation day to a date object that is relative to the start date of the simulation.
 
@@ -117,14 +120,14 @@ class Time:
 
         Returns
         -------
-        datetime.date
+        date
             The date object that corresponds to the simulation day.
         """
-        actual_date = self.start_date + datetime.timedelta(days=simulation_day - 1)
+        actual_date = self.start_date + timedelta(days=simulation_day - 1)
         return actual_date
 
     @staticmethod
-    def convert_year_jday_to_date(year: int, day: int) -> datetime.datetime:
+    def convert_year_jday_to_date(year: int, day: int) -> datetime:
         """
         Converts the year and its day of the year to a datetime object.
 
@@ -141,8 +144,8 @@ class Time:
             The datetime object from the provided inputs.
 
         """
-        first_day_of_year = datetime.datetime(year, 1, 1)
-        return first_day_of_year + datetime.timedelta(days=day - 1)
+        first_day_of_year = datetime(year, 1, 1)
+        return first_day_of_year + timedelta(days=day - 1)
 
     def __str__(self) -> str:
         return (
