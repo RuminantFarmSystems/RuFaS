@@ -159,11 +159,12 @@ class BaseManureHandler:
         if bedding:
             total_bedding_mass = bedding.calc_total_bedding_mass(pen.num_animals)
             total_organic_bedding_mass_added = bedding.calc_organic_bedding_mass_added_to_manure(total_bedding_mass)
+            organic_bedding_dry_solids = total_organic_bedding_mass_added * bedding.bedding_dry_matter_content
         else:
             total_bedding_mass = 0.0
-            total_organic_bedding_mass_added = 0.0
+            organic_bedding_dry_solids = 0.0
 
-        non_degradable_volatile_solids = pen.manure.non_degradable_volatile_solids + total_organic_bedding_mass_added
+        non_degradable_volatile_solids = pen.manure.non_degradable_volatile_solids + organic_bedding_dry_solids
 
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
@@ -188,7 +189,7 @@ class BaseManureHandler:
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals) if bedding is not None else 0.0,
             total_bedding_mass=total_bedding_mass,
-            organic_bedding_added_to_manure=total_organic_bedding_mass_added,
+            organic_bedding_added_to_manure=organic_bedding_dry_solids,
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)
             ),
