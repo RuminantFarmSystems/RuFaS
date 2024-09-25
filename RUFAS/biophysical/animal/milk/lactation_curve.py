@@ -5,7 +5,7 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
-import numpy as np
+from scipy.optimize import OptimizeResult, OptimizeWarning, minimize
 from typing import Any
 
 """
@@ -379,15 +379,11 @@ class LactationCurve:
             Wood's l parameter adjusted to best fit the given milk yield.
 
         """
-        smallest_diff = float("inf")
-        l_param_best_fit = l_param
+        def objective(l_param_varied: float) -> float:
+            return abs(MilkProduction.calc_305_day_milk_yield(l_param_varied, m_param, n_param) - milk_yield)
 
-        for l_param_error in np.arange(LOWER_BOUND, UPPER_BOUND, STEP_SIZE):
-            l_param_varied = max(0.0, l_param + l_param_error)
-            varied_305_day_milk_yield = MilkProduction.calc_305_day_milk_yield(l_param_varied, m_param, n_param)
-            milk_yield_difference = abs(varied_305_day_milk_yield - milk_yield)
-            if milk_yield_difference < smallest_diff:
-                smallest_diff = milk_yield_difference
-                l_param_best_fit = l_param_varied
+        bounds = [(max(l_param + LOWER_BOUND, 0.0), l_param + UPPER_BOUND)]
+        minimized_result: OptimizeResult = minimize(objective, x0=l_param, bounds=bounds)
+        l_param_best_fit = minimized_result.x[0]
 
         return l_param_best_fit

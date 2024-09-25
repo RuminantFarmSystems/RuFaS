@@ -442,7 +442,7 @@ def test_estimate_305_day_milk_yield_by_parity(
         (16.4, 12393.8032489, 21.0),
         (19.5, 10033.0788205, 17.0),
         (23.0, 900.0, 3.0),
-        (8.0, 18000.0, 27.99),
+        (8.0, 18000.0, 28.00),
     ],
 )
 def test_fit_wood_l_param_to_milk_yield(l_param: float, milk_yield: float, expected: float) -> None:
