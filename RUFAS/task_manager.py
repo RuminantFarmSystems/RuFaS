@@ -9,6 +9,7 @@ from SALib.sample import saltelli as saltelli_sampler
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
+from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -16,7 +17,7 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-RUFAS_VERSION = "0.9"
+RUFAS_VERSION = "0.9.2"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
@@ -46,7 +47,7 @@ class TaskType(Enum):
 
     def is_multi_run(self) -> bool:
         """Checks if the task type involves multiple runs."""
-        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS, TaskType.END_TO_END_TESTING]
+        return self in [TaskType.SIMULATION_MULTI_RUN, TaskType.SENSITIVITY_ANALYSIS]
 
 
 class TaskManager:
@@ -102,6 +103,7 @@ class TaskManager:
             "Task Manager",
             RUFAS_VERSION,
             "TASK MANAGER",
+            False,
         )
         info_map = {
             "class": TaskManager.__name__,
@@ -209,7 +211,6 @@ class TaskManager:
         task_type_to_expander_map = {
             TaskType.SIMULATION_MULTI_RUN: self._expand_simulation_multi_run_args,
             TaskType.SENSITIVITY_ANALYSIS: self._expand_sensitivity_analysis_args,
-            TaskType.END_TO_END_TESTING: self._expand_end_to_end_testing_args,
         }
         for multi_run_arg in multi_run_args:
             task_type = multi_run_arg["task_type"]
@@ -290,10 +291,6 @@ class TaskManager:
 
         return single_run_args
 
-    def _expand_end_to_end_testing_args(self, multi_run_args: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Placeholder for expanding end-to-end testing multi-run tasks."""
-        return []
-
     def _run_tasks(
         self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
     ) -> None:
@@ -343,8 +340,11 @@ class TaskManager:
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
+            TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
         }
         try:
+            task_type = args.get("task_type")
+            is_end_to_end_test = True if task_type is TaskType.END_TO_END_TESTING else False
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
@@ -354,9 +354,9 @@ class TaskManager:
                 args["output_prefix"],
                 RUFAS_VERSION,
                 task_id,
+                is_end_to_end_test,
             )
             input_manager = InputManager(metadata_depth_limit)
-            task_type = args.get("task_type")
 
             handler = validation_and_comparison_handlers.get(task_type)
             if handler:
@@ -432,10 +432,49 @@ class TaskManager:
         }
         TaskManager.handle_herd_initializaition(args, output_manager)
 
+        # TODO: Remove this if-else block and argument to SimulationEngine init when Animal and Feed Storage modules are
+        # completed - #1878.
+        if args["task_type"] == TaskType.END_TO_END_TESTING:
+            is_end_to_end_test_run = True
+        else:
+            is_end_to_end_test_run = False
+
         output_manager.add_log("Starting the simulation", "Starting the simulation", info_map)
-        simulator = SimulationEngine()
+        simulator = SimulationEngine(is_end_to_end_test_run=is_end_to_end_test_run)
+
         simulator.simulate()
         output_manager.add_log("Simulation completed", "Simulation completed", info_map)
+
+    @staticmethod
+    def _handle_end_to_end_testing(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: str,
+        produce_graphics: bool,
+    ) -> None:
+        """Runs end-to-end testing routine."""
+        info_map = {
+            "class": TaskManager.__name__,
+            "function": TaskManager._handle_end_to_end_testing.__name__,
+            "task_id": task_id,
+            "produce_graphics": produce_graphics,
+        }
+
+        output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
+
+        TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
+
+        output_manager.add_log("End-to-end testing", "Completed simulation for end-to-end testing", info_map)
+
+        output_manager.flush_pools()
+        output_manager.is_first_post_processing = False
+
+        E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
+
+        TaskManager.handle_post_processing(
+            args, input_manager, output_manager, task_id, produce_graphics, save_results=True
+        )
 
     @staticmethod
     def handle_input_data_audit(
