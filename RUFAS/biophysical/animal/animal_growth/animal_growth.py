@@ -109,10 +109,14 @@ class AnimalGrowth:
             general_properties.body_weight += animal_growth_properties.daily_growth
         else:
             om = OutputManager()
-            om.add_error("Unexpected Animal Type",
-                         f"{general_properties.animal_type} is not a valid animal type.",
-                         {"class": AnimalGrowth.__class__.__name__,
-                          "function": AnimalGrowth.evaluate_body_weight_change.__name__})
+            om.add_error(
+                "Unexpected Animal Type",
+                f"{general_properties.animal_type} is not a valid animal type.",
+                {
+                    "class": AnimalGrowth.__class__.__name__,
+                    "function": AnimalGrowth.evaluate_body_weight_change.__name__,
+                },
+            )
 
         return animal_growth_properties, reproduction_properties, general_properties
 
