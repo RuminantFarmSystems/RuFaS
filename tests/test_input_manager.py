@@ -5021,3 +5021,76 @@ def test_add_to_pool(
     input_manager._add_to_pool(variable_name, validated_data)
     mock_add_warning.assert_called_once()
     assert input_manager.pool["module1"] == {"test": "random"}
+
+
+def test_export_pool_to_csv(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Tests export_pool_to_csv() function in InputManager."""
+    mock_pool = {
+        "a": {"A": 1},
+        "b": {"B": 2},
+        "c": {"C": 3},
+        "d": {"D": [1, 2, 3]},
+        "animal_population": {}
+    }
+    mock_input_manager.csv_report_generation_list = ["a", "c", "d", "animal_population"]
+    mock_input_manager.pool = mock_pool
+
+    output_dir = Path("/fake/directory")
+
+    mock_flatten_dictionary = mocker.patch.object(Utility, "flatten_dictionary", side_effect=[
+        {"A": 1}, {"C": 3}, {"D": [1, 2, 3]}
+    ])
+
+    mock_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    mock_to_csv = mocker.patch("pandas.DataFrame.to_csv")
+
+    mock_input_manager.export_pool_to_csv("dummy_prefix", output_dir)
+
+    mock_flatten_dictionary.assert_has_calls([
+        call({"A": 1}), call({"C": 3}), call({"D": [1, 2, 3]})
+    ], any_order=True)
+    mock_create_dir.assert_called_once_with(output_dir)
+    mock_to_csv.assert_called_once_with(output_dir / "dummy_prefix.csv", index=False)
+    mock_add_log.assert_called_once_with("Save input data CSV success.", f"Successfully saved to {output_dir}.",
+                                         {"class": mock_input_manager.__class__.__name__,
+                                          "function": mock_input_manager.export_pool_to_csv.__name__,})
+
+@pytest.mark.parametrize(
+    "exception, error_message",
+    [(FileNotFoundError, "No such file or directory"), (PermissionError, "Permission denied"),
+     (OSError, "OS error")],
+)
+def test_export_pool_to_csv_errors(
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+    exception: Type[FileNotFoundError | PermissionError | OSError],
+    error_message: str,
+) -> None:
+    """Tests all the possible errors in export_pool_to_csv() function of InputManager."""
+    mock_pool = {
+        "a": {"A": 1},
+        "b": {"B": 2},
+        "c": {"C": 3},
+        "d": {"D": [1, 2, 3]},
+        "animal_population": {}
+    }
+    mock_input_manager.csv_report_generation_list = ["a", "c", "d"]
+    mock_input_manager.pool = mock_pool
+
+    output_dir = Path("/fake/directory")
+
+    mocker.patch.object(Utility, "flatten_dictionary")
+    mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
+    mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
+    mock_add_error = mocker.patch.object(mock_input_manager.om, "add_error")
+
+    with pytest.raises(exception) as exc_info:
+        mock_input_manager.export_pool_to_csv("dummy_prefix", output_dir)
+
+    assert str(exc_info.value) == error_message
+
+    mock_add_error.assert_called_once_with(
+        "Save CSV failure.", f"Unable to save to {output_dir} because of {error_message}.", ANY
+    )

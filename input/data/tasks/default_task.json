@@ -1,10 +1,20 @@
 {
   "parallel_workers": 4,
+  "export_input_data_to_csv": true,
+  "input_data_csv_export_path": "output/saved_input_data/",
+  "input_data_csv_import_path": "output/saved_input_data/saved_input_data.csv",
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
       "metadata_file_path": "input/metadata/default_metadata.json",
       "output_prefix": "default",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/default_metadata.json",
+      "output_prefix": "task_2",
       "log_verbosity": "errors",
       "random_seed": 42
     }
