@@ -55,11 +55,6 @@ class LactationCurve:
     """
     Manages Wood's lactation curve parameters l, m, and n as they are used by the rest of the Animal module.
 
-    Parameters
-    ----------
-    time : Time
-        Time instance that manages time in the simulation.
-
     Attributes
     ----------
     _om : OutputManager
@@ -77,6 +72,16 @@ class LactationCurve:
 
     @classmethod
     def set_lactation_parameters(cls, time: Time) -> None:
+        """
+        Calculates Wood's lactation curve parameters, adjusted based on the location, production, and management
+        practices of the farm being simulated.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance that manages time in the simulation.
+
+        """
         im = InputManager()
 
         lactation_inputs: dict[str, Any] = im.get_data("lactation")
