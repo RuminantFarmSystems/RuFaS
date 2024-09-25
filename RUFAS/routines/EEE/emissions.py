@@ -442,6 +442,7 @@ class EmissionsEstimator:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops.
         """
+        # skip
         field_size = feeds_grown[0]["field_size"]
         total_dry_mass_per_ha_grown = sum([crop["dry_yield"] for crop in feeds_grown])
 
