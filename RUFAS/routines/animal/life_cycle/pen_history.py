@@ -17,7 +17,7 @@ class PenHistory(TypedDict):
         The end date of the pen's usage.
     pen : int
         The id of the pen that the animal is in.
-    animal_combination : list[str]
+    animal_combination : AnimalCombination
         Represents the valid animal type combinations in the pen.
     """
 
