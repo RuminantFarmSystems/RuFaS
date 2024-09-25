@@ -54,11 +54,13 @@ class GeneralProperties:
 
 class Breed(Enum):
     """Enum indicating the breed of the animal."""
+
     HO = "Holstein"
     JE = "Jersey"
 
 
 class Gender(Enum):
     """Enum indicating the gender of the animal."""
+
     MALE = "male"
     FEMALE = "female"

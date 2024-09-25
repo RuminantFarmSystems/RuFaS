@@ -24,6 +24,7 @@ class AnimalGrowth:
     target_heifer_pregnant_day: int
         Class constant that indicates the user-defined target pregnant day for heifers.
     """
+
     wean_day: int
     target_heifer_pregnant_day: int
 
