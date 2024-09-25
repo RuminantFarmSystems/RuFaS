@@ -5,7 +5,7 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
-from scipy.optimize import OptimizeResult, OptimizeWarning, minimize
+from scipy.optimize import minimize
 from typing import Any
 
 """
@@ -383,7 +383,7 @@ class LactationCurve:
             return abs(MilkProduction.calc_305_day_milk_yield(l_param_varied, m_param, n_param) - milk_yield)
 
         bounds = [(max(l_param + LOWER_BOUND, 0.0), l_param + UPPER_BOUND)]
-        minimized_result: OptimizeResult = minimize(objective, x0=l_param, bounds=bounds)
+        minimized_result = minimize(objective, x0=l_param, bounds=bounds)
         l_param_best_fit = minimized_result.x[0]
 
         return l_param_best_fit
