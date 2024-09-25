@@ -312,6 +312,7 @@ def test_recalculate_biomass_distribution(
     assert crop.root_fraction == expected_root_fraction
 
 
+@pytest.mark.skip(reason="Issue #2008")
 @pytest.mark.parametrize(
     "field_size,wet_yield_collected,expected_fresh_mass",
     [

@@ -17,7 +17,7 @@ from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
-RUFAS_VERSION = "0.9"
+RUFAS_VERSION = "0.9.2"
 
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0

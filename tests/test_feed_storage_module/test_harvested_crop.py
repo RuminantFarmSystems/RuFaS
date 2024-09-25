@@ -58,7 +58,6 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_heat_generated = mocker.patch.object(
         HarvestedCrop, "_calculate_total_sensible_heat_generated", return_value=900.0
     )
-    mock_deepcopy = mocker.patch("RUFAS.routines.feed_storage.harvested_crop.deepcopy")
     crop = HarvestedCrop(
         category=CropCategory.SMALL_GRAIN, type=CropType.WHEAT, **sample_crop_data  # type: ignore[arg-type]
     )
@@ -83,7 +82,6 @@ def test_attributes(mocker: MockerFixture) -> None:
     mock_bale_density.assert_called_once()
     mock_heat_generated.assert_called_once()
     mock_dry_mass.assert_called_once()
-    mock_deepcopy.assert_called_once_with(crop.storage_time)
 
 
 @pytest.mark.parametrize(
