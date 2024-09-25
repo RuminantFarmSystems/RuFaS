@@ -379,6 +379,7 @@ class LactationCurve:
             Wood's l parameter adjusted to best fit the given milk yield.
 
         """
+
         def objective(l_param_varied: float) -> float:
             return abs(MilkProduction.calc_305_day_milk_yield(l_param_varied, m_param, n_param) - milk_yield)
 
