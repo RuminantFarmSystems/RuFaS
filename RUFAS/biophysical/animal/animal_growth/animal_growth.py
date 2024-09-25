@@ -29,7 +29,7 @@ class AnimalGrowth:
     target_heifer_pregnant_day: int
 
     @classmethod
-    def initialize_class_variables(cls) -> None:
+    def initialize_animal_growth_variables(cls) -> None:
         """
         This function retrieves the user input data from the InputManager and initializes the class constants.
         """
@@ -56,7 +56,6 @@ class AnimalGrowth:
             Animal properties that are related to body weight growth.
         reproduction_properties: ReproductionProperties
             Animal properties that are related to animal reproduction.
-        general_properties : GeneralProperties
         time : Time
             Time instance containing the current time of the simulation.
 
@@ -140,9 +139,7 @@ class AnimalGrowth:
         float
             The daily body weight growth for non-pregnant heifers (kg).
         """
-        divisor = abs(AnimalGrowth.target_heifer_pregnant_day - general_properties.days_born)
-        if divisor == 0:
-            divisor = 1
+        divisor = max(1, abs(AnimalGrowth.target_heifer_pregnant_day - general_properties.days_born))
         return max(
             (0.55 * 0.96 * general_properties.mature_body_weight - 0.96 * general_properties.body_weight) / divisor,
             AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE,
@@ -285,7 +282,7 @@ class AnimalGrowth:
             tissue changed (kg).
         """
         updated_tissue_change = (
-            0
+            0.0
             if general_properties.days_in_preg == reproduction_properties.gestation_length
             else animal_growth_properties.tissue_changed
         )
@@ -315,9 +312,7 @@ class AnimalGrowth:
         float
             The daily growth rate for pregnant heifers (kg).
         """
-        divisor = reproduction_properties.gestation_length - general_properties.days_in_preg
-        if divisor == 0:
-            divisor = 1
+        divisor = max(1, abs(reproduction_properties.gestation_length - general_properties.days_in_preg))
         return (0.82 * 0.96 * general_properties.mature_body_weight - 0.96 * general_properties.body_weight) / divisor
 
     @staticmethod
@@ -388,7 +383,7 @@ class AnimalGrowth:
             The body weight tissue growth for cows (kg), and the updated tissue changed (kg).
         """
         updated_tissue_changed = animal_growth_properties.tissue_changed
-        if not general_properties.days_in_milk == 0:
+        if general_properties.is_milking:
             if reproduction_properties.calves == 1:
                 body_weight_tissue = -20 / 65 * math.exp(1 - general_properties.days_in_milk / 65) + 20 / (
                     65**2
