@@ -164,14 +164,14 @@ class EmissionsEstimator:
         return processed_feeds
 
     def _transform_outputs_to_list_of_dicts(
-        self, data: dict[str, OutputManager.pool_element_type]
+        self, data: dict[str, Any]
     ) -> list[dict[str, Any]]:
         """
         Transforms dictionary of lists collected from the Output Manager into list of dictionaries.
 
         Examples
         --------
-        >>> a = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}]}
+        >>> a = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}}
         >>> _transform_outputs_to_list_of_dicts(a)
         [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}]
 
