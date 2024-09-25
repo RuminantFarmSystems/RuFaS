@@ -9,7 +9,7 @@ from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.routines.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.time import Time
-from ....enums import AnimalCombination
+from RUFAS.enums import AnimalCombination
 
 
 class AnimalBase:
