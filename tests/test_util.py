@@ -1,7 +1,12 @@
 import datetime
 import re
+from pathlib import Path
 from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
 import pytest
+from mock.mock import call
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 import math
@@ -666,3 +671,152 @@ def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: flo
 
     assert actual == 10.0
     random.assert_called_once_with(mean, std_dev)
+
+
+@pytest.mark.parametrize(
+    "input_dictionary, expected_output",
+    [
+        ({"a": 1, "b": {"c": 2,"d": 3}}, {"a": 1, "b.c": 2, "b.d": 3}),
+        ({"x": {"y": {"z": 4}}}, {"x.y.z": 4}),
+        ({"name": "John", "contacts": [
+            {"type": "email", "value": "john@example.com"},
+            {"type": "phone", "value": "123-456-7890"}]
+          },
+         {"name": "John", "contacts_0.type": "email", "contacts_0.value": "john@example.com",
+          "contacts_1.type": "phone", "contacts_1.value": "123-456-7890"}),
+        ({"user": {"id": 1, "name": "Alice", "attributes": {"age": 30, "languages": ["English", "Spanish"]}}},
+         {"user.id": 1, "user.name": "Alice", "user.attributes.age": 30, "user.attributes.languages":
+             ["English", "Spanish"]}),
+        ({}, {}),
+        ({"empty_dict": {}, "empty_list": [],
+          "valid_key": "value"}, {"empty_dict": {}, "empty_list": [], "valid_key": "value"}),
+        ({"items": [{}]}, {})
+    ]
+)
+def test_flatten_dictionary(input_dictionary: dict[str, Any], expected_output: dict[str, Any]) -> None:
+    """Tests the flatten_dictionary() in Utility"""
+    actual_output = Utility.flatten_dictionary(input_dictionary)
+    assert actual_output == expected_output
+
+
+@pytest.mark.parametrize(
+    "saved_csv_contents, saved_csv_files, import_previous_csv_content, expected_result", [
+        (
+            [
+                pd.DataFrame({
+                    "property_group": ["group1", "group1"],
+                    "variable_name": ["var1", "var2"],
+                    "value": [1, 2],
+                })
+            ],
+            ["file1.csv"],
+            None,
+            pd.DataFrame({
+                "property_group": ["group1", "group1"],
+                "variable_name": ["var1", "var2"],
+                "value": [1, 2],
+            })
+        ),
+        (
+            [
+                pd.DataFrame({
+                    "property_group": ["group1", "group1"],
+                    "variable_name": ["var1", "var2"],
+                    "value": [1, 2],
+                })
+            ],
+            ["file1.csv"],
+            pd.DataFrame({
+                "property_group": ["group1", "group3"],
+                "variable_name": ["var1", "var4"],
+                "value": [100, 400],
+            }),
+            pd.DataFrame({
+                "property_group": ["group1", "group1", "group3"],
+                "variable_name": ["var1", "var2", "var4"],
+                "value_1": [100, np.nan, 400],
+                "value_2": [1, 2, np.nan],
+            })
+        ),
+        (
+            [
+                pd.DataFrame({
+                    "property_group": ["group1", "group1"],
+                    "variable_name": ["var1", "var2"],
+                    "value": [1, 2],
+                }),
+                pd.DataFrame({
+                    "property_group": ["group1", "group2"],
+                    "variable_name": ["var1", "var3"],
+                    "value": [10, 30],
+                }),
+            ],
+            ["file1.csv", "file2.csv"],
+            None,
+            pd.DataFrame({
+                "property_group": ["group1", "group1", "group2"],
+                "variable_name": ["var1", "var2", "var3"],
+                "value_1": [1, 2, np.nan],
+                "value_2": [10, np.nan, 30],
+            })
+        ),
+        (
+            [
+                pd.DataFrame({
+                    "property_group": ["group1", "group1"],
+                    "variable_name": ["var1", "var2"],
+                    "value": [1, 2],
+                }),
+                pd.DataFrame({
+                    "property_group": ["group1", "group2"],
+                    "variable_name": ["var1", "var3"],
+                    "value": [10, 30],
+                }),
+            ],
+            ["file1.csv", "file2.csv"],
+            pd.DataFrame({
+                "property_group": ["group1", "group1", "group3"],
+                "variable_name": ["var1", "var2", "var4"],
+                "value_1": [100, np.nan, 400],
+                "value_2": [1, 2, np.nan],
+            }),
+            pd.DataFrame({
+                "property_group": ["group1", "group1", "group2"],
+                "variable_name": ["var1", "var2", "var3"],
+                "value_1": [1, 2, np.nan],
+                "value_2": [10, np.nan, 30],
+                "value_3": [1, 2, np.nan],
+                "value_4": [10, np.nan, 30],
+            })
+        ),
+    ]
+)
+def test_combine(
+        saved_csv_contents: list[pd.DataFrame],
+        saved_csv_files: list[str],
+        import_previous_csv_content: pd.DataFrame,
+        expected_result: pd.DataFrame,
+        mocker: MockerFixture
+) -> None:
+    read_csv_return = saved_csv_contents.copy()
+    if import_previous_csv_content is not None:
+        read_csv_return = [import_previous_csv_content] + read_csv_return
+    mock_read_csv = mocker.patch("pandas.read_csv", side_effect=read_csv_return)
+
+    mock_to_csv = mocker.patch("pandas.DataFrame.to_csv")
+
+    mock_list_dir = mocker.patch("os.listdir", return_value=saved_csv_files)
+    mock_rmtree = mocker.patch("shutil.rmtree")
+
+    saved_csv_working_folder = Path("dummy/working/folder")
+    output_csv_path = Path("dummy/output/folder")
+    import_csv_path = Path("dummy/import/folder") if import_previous_csv_content is not None else Path("")
+
+    Utility.combine_saved_input_csv(saved_csv_working_folder, output_csv_path, import_csv_path)
+
+    assert mock_read_csv.call_count == len(read_csv_return)
+
+    mock_to_csv.assert_called_once()
+    mock_list_dir.assert_called_once_with(saved_csv_working_folder)
+
+    mock_rmtree.assert_called_once_with(saved_csv_working_folder)
