@@ -45,10 +45,13 @@ jobs:
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
           echo "All Changed Files: $ALL_CHANGED_FILES"
 
-          FILES=$(echo "$ALL_CHANGED_FILES" | grep '\.py$' | tr '\n' ' ')
+          MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
+          echo "Modified Files Only (excluding deleted): $MODIFIED_FILES_ONLY"
+
+          FILES=$(echo "$MODIFIED_FILES_ONLY" | grep '\.py$' | tr '\n' ' ')
           echo "FILES=$FILES" >> $GITHUB_ENV
 
-          OTHER_FILES=$(echo "$ALL_CHANGED_FILES" | grep -v '\.py$' | tr '\n' ' ')
+          OTHER_FILES=$(echo "$MODIFIED_FILES_ONLY" | grep -v '\.py$' | tr '\n' ' ')
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
@@ -61,7 +64,7 @@ jobs:
           
           # Check if any of the protected paths have been changed
           for path in "${paths_to_protect[@]}"; do
-            if echo "${FILES} ${OTHER_FILES}" | grep -q "$path"; then
+            if echo "${ALL_CHANGED_FILES}" | grep -q "$path"; then
               unauthorized_changes=true
               unauthorized_paths+="$path, "
             fi
