@@ -30,7 +30,6 @@ def mock_general_properties() -> GeneralProperties:
         future_death_date=0,
         gender=Gender.FEMALE,
         id=0,
-        is_pregnant=False,
         mature_body_weight=0,
         nutrients=[],
         sold=False,
@@ -41,7 +40,7 @@ def mock_general_properties() -> GeneralProperties:
 
 @pytest.fixture
 def mock_animal_growth_properties() -> AnimalGrowthProperties:
-    return AnimalGrowthProperties(daily_growth=0, conceptus_weight=0, DBW=0, tissue_changed=0)
+    return AnimalGrowthProperties(daily_growth=0, tissue_changed=0)
 
 
 @pytest.fixture
@@ -52,7 +51,7 @@ def mock_reproduction_properties() -> ReproductionProperties:
 
 
 @pytest.mark.parametrize("wean_day, target_heifer_preg_day", [(10, 100), (60, 399)])
-def test_initialize_class_variables(wean_day: int, target_heifer_preg_day: int, mocker: MockerFixture) -> None:
+def test_initialize_animal_growth_variables(wean_day: int, target_heifer_preg_day: int, mocker: MockerFixture) -> None:
     im = InputManager()
     mock_get_data = mocker.patch.object(
         im,
@@ -60,10 +59,10 @@ def test_initialize_class_variables(wean_day: int, target_heifer_preg_day: int, 
         return_value={"calf": {"wean_day": wean_day}, "bodyweight": {"target_heifer_preg_day": target_heifer_preg_day}},
     )
 
-    AnimalGrowth.initialize_class_variables()
+    AnimalGrowth.initialize_animal_growth_variables()
 
-    assert AnimalGrowth.wean_day == wean_day
-    assert AnimalGrowth.target_heifer_pregnant_day == target_heifer_preg_day
+    assert AnimalGrowth.WEAN_DAY == wean_day
+    assert AnimalGrowth.TARGET_HEIFER_PREGNANT_DAY == target_heifer_preg_day
     mock_get_data.assert_called_once_with("animal.animal_config.farm_level")
 
 
@@ -101,7 +100,7 @@ def test_daily_routines(
     mock_general_properties.animal_type = animal_type
     mock_general_properties.body_weight = body_weight
     mock_general_properties.mature_body_weight = mature_body_weight
-    mock_general_properties.is_pregnant = is_pregnant
+    mock_general_properties.days_in_preg = 1 if is_pregnant else 0
 
     mock_reproduction_properties.conceptus_weight = 68
     mock_animal_growth_properties.tissue_changed = 88
@@ -127,7 +126,7 @@ def test_daily_routines(
     )
 
     (result_animal_growth_properties, result_reproduction_properties, result_general_properties) = (
-        AnimalGrowth.daily_routines(
+        AnimalGrowth.evaluate_body_weight_change(
             mock_general_properties, mock_animal_growth_properties, mock_reproduction_properties, mock_time
         )
     )
@@ -190,7 +189,7 @@ def test_daily_routines(
 def test_calculate_calf_body_weight_change(
     birth_weight: float, wean_day: int, mock_general_properties: GeneralProperties
 ) -> None:
-    AnimalGrowth.wean_day = wean_day
+    AnimalGrowth.WEAN_DAY = wean_day
     mock_general_properties.birth_weight = birth_weight
 
     result = AnimalGrowth.calculate_calf_body_weight_change(mock_general_properties)
@@ -215,7 +214,7 @@ def test_calculate_non_pregnant_heifer_body_weight_change(
     expected: float,
     mock_general_properties: GeneralProperties,
 ) -> None:
-    AnimalGrowth.target_heifer_pregnant_day = target_heifer_pregnant_day
+    AnimalGrowth.TARGET_HEIFER_PREGNANT_DAY = target_heifer_pregnant_day
 
     mock_general_properties.days_born = days_born
     mock_general_properties.body_weight = body_weight
@@ -381,10 +380,10 @@ def test_calculate_cow_conceptus_growth(
     [
         (135, 276, 740.1, 543.21, 0.4335114893617016),
         (276, 276, 740.1, 665.43, -56.20607999999993),
-        (288, 276, 740.1, 654.32, 3.79504),
+        (288, 276, 740.1, 654.32, -3.79504),
         (135, 276, 540.1, 543.21, -0.6830842553191498),
         (276, 276, 540.1, 665.43, -213.64607999999998),
-        (288, 276, 540.1, 654.32, 16.915040000000005),
+        (288, 276, 540.1, 654.32, -16.915040000000005),
     ],
 )
 def test_calculate_pregnant_heifer_target_daily_growth(

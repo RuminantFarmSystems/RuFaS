@@ -20,7 +20,6 @@ LAC_COW_PROPERTIES = {
     "future_death_date": 1100,
     "gender": Gender.FEMALE,
     "id": 1,
-    "is_pregnant": True,
     "mature_body_weight": 700.0,
     "nutrients": ["protein", "fat"],
     "sold": False,
