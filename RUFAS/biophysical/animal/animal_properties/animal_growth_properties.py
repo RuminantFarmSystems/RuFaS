@@ -9,12 +9,10 @@ class AnimalGrowthProperties:
     Attributes
     ----------
     daily_growth: float
-    conceptus_weight: float
-    DBW: float
+        The body weight of the animal (kg).
     tissue_changed: float
+        Body weight change due to tissue mobilization (kg).
     """
 
     daily_growth: float
-    conceptus_weight: float
-    DBW: float
     tissue_changed: float
