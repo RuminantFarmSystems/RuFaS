@@ -9,7 +9,7 @@ from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.routines.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.time import Time
-from ....enums import AnimalCombination
+from RUFAS.enums import AnimalCombination
 
 
 class AnimalBase:
@@ -204,7 +204,8 @@ class AnimalBase:
         last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
             self.pen_history.append(
-                PenHistory(start_date=curr_day, end_date=curr_day, pen=curr_pen, animal_combination=animal_combination))
+                PenHistory(start_date=curr_day, end_date=curr_day, pen=curr_pen, animal_combination=animal_combination)
+            )
 
         else:  # last_pen == curr_pen
             self.pen_history[-1]["end_date"] = curr_day

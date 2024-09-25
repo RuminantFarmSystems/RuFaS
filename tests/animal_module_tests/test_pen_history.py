@@ -12,7 +12,9 @@ from RUFAS.enums import AnimalCombination
         (100, 200, 3, AnimalCombination.LAC_COW),
     ],
 )
-def test_pen_history_initialization(start_date: int, end_date: int, pen: int, animal_combination: AnimalCombination) -> None:
+def test_pen_history_initialization(
+    start_date: int, end_date: int, pen: int, animal_combination: AnimalCombination
+) -> None:
     """
     Unit test for the initialization of the PenHistory object in pen_history.py.
 
