@@ -103,7 +103,7 @@ class Composting(BaseManureTreatment):
             Configuration settings for manure treatment.
         """
         super().__init__(weather, time, manure_treatment_config)
-        self.composting_type: CompostingType = CompostingType.get_type(self.config.composting_type)
+        self.composting_type: CompostingType = CompostingType(self.config.composting_type)
 
     def _daily_update_helper(self) -> ManureTreatmentDailyOutput:
         daily_input = self._current_manure_treatment_daily_input
