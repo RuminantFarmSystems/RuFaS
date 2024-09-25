@@ -26,18 +26,17 @@ class GeneralProperties:
     birth_date: str
     birth_weight: float
     body_weight: float
-    breed: Enum
+    breed: "Breed"
     culled: bool
-    daily_growth: float
     days_born: int
     days_in_preg: int
-    events: AnimalEvents
     days_in_milk: int
     dry_off_day_of_pregnancy: int
+    events: AnimalEvents
     daily_milk_produced: float
     future_cull_date: int
     future_death_date: int
-    gender: Enum
+    gender: "Gender"
     id: int
     is_pregnant: bool
     mature_body_weight: float
@@ -51,3 +50,17 @@ class GeneralProperties:
     def is_milking(self) -> bool:
         """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0
+
+
+class Breed(Enum):
+    """Enum indicating the breed of the animal."""
+
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Gender(Enum):
+    """Enum indicating the gender of the animal."""
+
+    MALE = "male"
+    FEMALE = "female"
