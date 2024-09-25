@@ -585,7 +585,7 @@ class Utility:
         return np.random.normal(mean, std_dev)
 
     @staticmethod
-    def flatten_dictionary(input_dictionary: dict[str, Any], parent_key='', separator='.') -> dict[str, Any]:
+    def flatten_dictionary(input_dictionary: dict[str, Any], parent_key="", separator=".") -> dict[str, Any]:
         """
         Flatten a nested dictionary to a single level of depth by joining the keys with "."
         """
@@ -602,8 +602,9 @@ class Utility:
         return dict(items)
 
     @staticmethod
-    def combine_saved_input_csv(saved_csv_working_folder: Path, output_csv_path: Path,
-                                import_csv_path: Path | None) -> None:
+    def combine_saved_input_csv(
+        saved_csv_working_folder: Path, output_csv_path: Path, import_csv_path: Path | None
+    ) -> None:
         """
         Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.
         """
@@ -620,16 +621,18 @@ class Utility:
 
             data_prefix = [col for col in list(current_df.columns) if col not in ["property_group", "variable_name"]][0]
 
-            if data_prefix in list(result_df.columns) or \
-                    any(data_prefix in prefix for prefix in list(result_df.columns)):
+            if data_prefix in list(result_df.columns) or any(
+                data_prefix in prefix for prefix in list(result_df.columns)
+            ):
                 same_prefix_columns: list[str] = [prefix for prefix in list(result_df.columns) if data_prefix in prefix]
                 if len(same_prefix_columns) == 1:
                     result_df.rename(columns={same_prefix_columns[0]: same_prefix_columns[0] + "_1"}, inplace=True)
                     current_df.rename(columns={data_prefix: data_prefix + "_2"}, inplace=True)
                 else:
                     suffix_numbers = [column_name.split(f"{data_prefix}_")[1] for column_name in same_prefix_columns]
-                    current_df.rename(columns={data_prefix: f"{data_prefix}_{int(max(suffix_numbers))+1}"},
-                                      inplace=True)
+                    current_df.rename(
+                        columns={data_prefix: f"{data_prefix}_{int(max(suffix_numbers))+1}"}, inplace=True
+                    )
             result_df = current_df.merge(result_df, how="outer", on=["property_group", "variable_name"])
         output_csv_path = output_csv_path / "saved_input_data.csv"
         result_df.to_csv(output_csv_path, index=False)

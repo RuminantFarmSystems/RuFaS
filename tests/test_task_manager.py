@@ -95,11 +95,16 @@ def test_task_manager_start(
 
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
-    mock_get_data = mocker.patch.object(mock_input_manager, "get_data",
-                                        return_value={"parallel_workers": workers, "input_data_csv_export_path": "",
-                                                      "input_data_csv_import_path": "",
-                                                      "export_input_data_to_csv": False}
-)
+    mock_get_data = mocker.patch.object(
+        mock_input_manager,
+        "get_data",
+        return_value={
+            "parallel_workers": workers,
+            "input_data_csv_export_path": "",
+            "input_data_csv_import_path": "",
+            "export_input_data_to_csv": False,
+        },
+    )
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     mock_task_manager.output_manager = mock_output_manager
 
@@ -252,7 +257,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
                 "properties_file_path": "path/to/properties",
                 "comparison_properties_file_path": "path/to/comparison/properties",
             },
-        ]
+        ],
     }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=task_data)
@@ -336,14 +341,17 @@ def test_handle_post_processing_export_input_tocsv(
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
         "input_data_csv_export_path": Path("/fake/saved_input"),
-        "input_data_csv_import_path": Path("/fake/saved_input")
+        "input_data_csv_import_path": Path("/fake/saved_input"),
     }
-    task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1",
-                                        export_input_data_to_csv=True)
+    task_manager.handle_post_processing(
+        args, mock_input_manager, mock_output_manager, "1/1", export_input_data_to_csv=True
+    )
 
-    Utility.combine_saved_input_csv.assert_called_once_with(TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
-                                                            args["input_data_csv_export_path"],
-                                                            args["input_data_csv_import_path"])
+    Utility.combine_saved_input_csv.assert_called_once_with(
+        TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
+        args["input_data_csv_export_path"],
+        args["input_data_csv_import_path"],
+    )
 
 
 def test_handle_end_to_end_testing(
@@ -435,11 +443,15 @@ def test_handle_post_processing_save_result(
     )
 
 
-@pytest.mark.parametrize("suppress_logs, export_input_data_to_csv",
-                         [(True, True), (False, True), (True, False), (False, False)])
+@pytest.mark.parametrize(
+    "suppress_logs, export_input_data_to_csv", [(True, True), (False, True), (True, False), (False, False)]
+)
 def test_input_data_audit(
-    suppress_logs: bool, export_input_data_to_csv: bool,
-    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture
+    suppress_logs: bool,
+    export_input_data_to_csv: bool,
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
+    mocker: MockerFixture,
 ) -> None:
     """Unit test for TaskManager.handle_input_data_audit()"""
     args = {
@@ -448,16 +460,14 @@ def test_input_data_audit(
         "logs_directory": Path("/fake/output/logs"),
         "suppress_log_files": suppress_logs,
         "export_input_data_to_csv": export_input_data_to_csv,
-        "input_data_csv_export_path": Path("/fake/output/saved_input")
+        "input_data_csv_export_path": Path("/fake/output/saved_input"),
     }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
     mock_save_metadata_properties = mocker.patch.object(
         mock_input_manager, "save_metadata_properties", return_value=None
     )
-    mocve_export_pool_to_csv = mocker.patch.object(
-        mock_input_manager, "export_pool_to_csv", return_value=None
-    )
+    mocve_export_pool_to_csv = mocker.patch.object(mock_input_manager, "export_pool_to_csv", return_value=None)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     task_manager.input_manager = mock_input_manager
 
@@ -474,7 +484,9 @@ def test_input_data_audit(
         mock_save_metadata_properties.assert_not_called()
 
     if export_input_data_to_csv:
-        mocve_export_pool_to_csv.assert_called_once_with(args["output_prefix"], TaskManager.INPUT_DATA_CSV_WORKING_FOLDER)
+        mocve_export_pool_to_csv.assert_called_once_with(
+            args["output_prefix"], TaskManager.INPUT_DATA_CSV_WORKING_FOLDER
+        )
     else:
         mocve_export_pool_to_csv.assert_not_called()
 

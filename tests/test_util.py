@@ -676,22 +676,40 @@ def test_generate_random_number(mocker: MockerFixture, mean: float, std_dev: flo
 @pytest.mark.parametrize(
     "input_dictionary, expected_output",
     [
-        ({"a": 1, "b": {"c": 2,"d": 3}}, {"a": 1, "b.c": 2, "b.d": 3}),
+        ({"a": 1, "b": {"c": 2, "d": 3}}, {"a": 1, "b.c": 2, "b.d": 3}),
         ({"x": {"y": {"z": 4}}}, {"x.y.z": 4}),
-        ({"name": "John", "contacts": [
-            {"type": "email", "value": "john@example.com"},
-            {"type": "phone", "value": "123-456-7890"}]
-          },
-         {"name": "John", "contacts_0.type": "email", "contacts_0.value": "john@example.com",
-          "contacts_1.type": "phone", "contacts_1.value": "123-456-7890"}),
-        ({"user": {"id": 1, "name": "Alice", "attributes": {"age": 30, "languages": ["English", "Spanish"]}}},
-         {"user.id": 1, "user.name": "Alice", "user.attributes.age": 30, "user.attributes.languages":
-             ["English", "Spanish"]}),
+        (
+            {
+                "name": "John",
+                "contacts": [
+                    {"type": "email", "value": "john@example.com"},
+                    {"type": "phone", "value": "123-456-7890"},
+                ],
+            },
+            {
+                "name": "John",
+                "contacts_0.type": "email",
+                "contacts_0.value": "john@example.com",
+                "contacts_1.type": "phone",
+                "contacts_1.value": "123-456-7890",
+            },
+        ),
+        (
+            {"user": {"id": 1, "name": "Alice", "attributes": {"age": 30, "languages": ["English", "Spanish"]}}},
+            {
+                "user.id": 1,
+                "user.name": "Alice",
+                "user.attributes.age": 30,
+                "user.attributes.languages": ["English", "Spanish"],
+            },
+        ),
         ({}, {}),
-        ({"empty_dict": {}, "empty_list": [],
-          "valid_key": "value"}, {"empty_dict": {}, "empty_list": [], "valid_key": "value"}),
-        ({"items": [{}]}, {})
-    ]
+        (
+            {"empty_dict": {}, "empty_list": [], "valid_key": "value"},
+            {"empty_dict": {}, "empty_list": [], "valid_key": "value"},
+        ),
+        ({"items": [{}]}, {}),
+    ],
 )
 def test_flatten_dictionary(input_dictionary: dict[str, Any], expected_output: dict[str, Any]) -> None:
     """Tests the flatten_dictionary() in Utility"""
@@ -700,103 +718,128 @@ def test_flatten_dictionary(input_dictionary: dict[str, Any], expected_output: d
 
 
 @pytest.mark.parametrize(
-    "saved_csv_contents, saved_csv_files, import_previous_csv_content, expected_result", [
+    "saved_csv_contents, saved_csv_files, import_previous_csv_content, expected_result",
+    [
         (
             [
-                pd.DataFrame({
-                    "property_group": ["group1", "group1"],
-                    "variable_name": ["var1", "var2"],
-                    "value": [1, 2],
-                })
+                pd.DataFrame(
+                    {
+                        "property_group": ["group1", "group1"],
+                        "variable_name": ["var1", "var2"],
+                        "value": [1, 2],
+                    }
+                )
             ],
             ["file1.csv"],
             None,
-            pd.DataFrame({
-                "property_group": ["group1", "group1"],
-                "variable_name": ["var1", "var2"],
-                "value": [1, 2],
-            })
-        ),
-        (
-            [
-                pd.DataFrame({
+            pd.DataFrame(
+                {
                     "property_group": ["group1", "group1"],
                     "variable_name": ["var1", "var2"],
                     "value": [1, 2],
-                })
+                }
+            ),
+        ),
+        (
+            [
+                pd.DataFrame(
+                    {
+                        "property_group": ["group1", "group1"],
+                        "variable_name": ["var1", "var2"],
+                        "value": [1, 2],
+                    }
+                )
             ],
             ["file1.csv"],
-            pd.DataFrame({
-                "property_group": ["group1", "group3"],
-                "variable_name": ["var1", "var4"],
-                "value": [100, 400],
-            }),
-            pd.DataFrame({
-                "property_group": ["group1", "group1", "group3"],
-                "variable_name": ["var1", "var2", "var4"],
-                "value_1": [100, np.nan, 400],
-                "value_2": [1, 2, np.nan],
-            })
+            pd.DataFrame(
+                {
+                    "property_group": ["group1", "group3"],
+                    "variable_name": ["var1", "var4"],
+                    "value": [100, 400],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "property_group": ["group1", "group1", "group3"],
+                    "variable_name": ["var1", "var2", "var4"],
+                    "value_1": [100, np.nan, 400],
+                    "value_2": [1, 2, np.nan],
+                }
+            ),
         ),
         (
             [
-                pd.DataFrame({
-                    "property_group": ["group1", "group1"],
-                    "variable_name": ["var1", "var2"],
-                    "value": [1, 2],
-                }),
-                pd.DataFrame({
-                    "property_group": ["group1", "group2"],
-                    "variable_name": ["var1", "var3"],
-                    "value": [10, 30],
-                }),
+                pd.DataFrame(
+                    {
+                        "property_group": ["group1", "group1"],
+                        "variable_name": ["var1", "var2"],
+                        "value": [1, 2],
+                    }
+                ),
+                pd.DataFrame(
+                    {
+                        "property_group": ["group1", "group2"],
+                        "variable_name": ["var1", "var3"],
+                        "value": [10, 30],
+                    }
+                ),
             ],
             ["file1.csv", "file2.csv"],
             None,
-            pd.DataFrame({
-                "property_group": ["group1", "group1", "group2"],
-                "variable_name": ["var1", "var2", "var3"],
-                "value_1": [1, 2, np.nan],
-                "value_2": [10, np.nan, 30],
-            })
+            pd.DataFrame(
+                {
+                    "property_group": ["group1", "group1", "group2"],
+                    "variable_name": ["var1", "var2", "var3"],
+                    "value_1": [1, 2, np.nan],
+                    "value_2": [10, np.nan, 30],
+                }
+            ),
         ),
         (
             [
-                pd.DataFrame({
-                    "property_group": ["group1", "group1"],
-                    "variable_name": ["var1", "var2"],
-                    "value": [1, 2],
-                }),
-                pd.DataFrame({
-                    "property_group": ["group1", "group2"],
-                    "variable_name": ["var1", "var3"],
-                    "value": [10, 30],
-                }),
+                pd.DataFrame(
+                    {
+                        "property_group": ["group1", "group1"],
+                        "variable_name": ["var1", "var2"],
+                        "value": [1, 2],
+                    }
+                ),
+                pd.DataFrame(
+                    {
+                        "property_group": ["group1", "group2"],
+                        "variable_name": ["var1", "var3"],
+                        "value": [10, 30],
+                    }
+                ),
             ],
             ["file1.csv", "file2.csv"],
-            pd.DataFrame({
-                "property_group": ["group1", "group1", "group3"],
-                "variable_name": ["var1", "var2", "var4"],
-                "value_1": [100, np.nan, 400],
-                "value_2": [1, 2, np.nan],
-            }),
-            pd.DataFrame({
-                "property_group": ["group1", "group1", "group2"],
-                "variable_name": ["var1", "var2", "var3"],
-                "value_1": [1, 2, np.nan],
-                "value_2": [10, np.nan, 30],
-                "value_3": [1, 2, np.nan],
-                "value_4": [10, np.nan, 30],
-            })
+            pd.DataFrame(
+                {
+                    "property_group": ["group1", "group1", "group3"],
+                    "variable_name": ["var1", "var2", "var4"],
+                    "value_1": [100, np.nan, 400],
+                    "value_2": [1, 2, np.nan],
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "property_group": ["group1", "group1", "group2"],
+                    "variable_name": ["var1", "var2", "var3"],
+                    "value_1": [1, 2, np.nan],
+                    "value_2": [10, np.nan, 30],
+                    "value_3": [1, 2, np.nan],
+                    "value_4": [10, np.nan, 30],
+                }
+            ),
         ),
-    ]
+    ],
 )
 def test_combine(
-        saved_csv_contents: list[pd.DataFrame],
-        saved_csv_files: list[str],
-        import_previous_csv_content: pd.DataFrame,
-        expected_result: pd.DataFrame,
-        mocker: MockerFixture
+    saved_csv_contents: list[pd.DataFrame],
+    saved_csv_files: list[str],
+    import_previous_csv_content: pd.DataFrame,
+    expected_result: pd.DataFrame,
+    mocker: MockerFixture,
 ) -> None:
     read_csv_return = saved_csv_contents.copy()
     if import_previous_csv_content is not None:

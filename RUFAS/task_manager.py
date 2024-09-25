@@ -52,6 +52,7 @@ class TaskType(Enum):
 
 class TaskManager:
     """Manager class for handling tasks related to simulations and analyses."""
+
     INPUT_DATA_CSV_WORKING_FOLDER = Path("output/saved_pool_working_folder/")
 
     def __init__(self) -> None:
@@ -162,7 +163,7 @@ class TaskManager:
             input_manager=self.input_manager,
             output_manager=self.output_manager,
             task_id="TASK_MANAGER",
-            export_input_data_to_csv=task_config.get("export_input_data_to_csv")
+            export_input_data_to_csv=task_config.get("export_input_data_to_csv"),
         )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -526,7 +527,7 @@ class TaskManager:
         produce_graphics: bool = False,
         save_results: bool = False,
         load_pool_from_file: bool = False,
-        export_input_data_to_csv: bool = False
+        export_input_data_to_csv: bool = False,
     ) -> None:
         """
         Handles post-processing tasks based on specified arguments.
@@ -558,9 +559,11 @@ class TaskManager:
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
         if export_input_data_to_csv:
-            Utility.combine_saved_input_csv(TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
-                                            args["input_data_csv_export_path"],
-                                            args["input_data_csv_import_path"])
+            Utility.combine_saved_input_csv(
+                TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
+                args["input_data_csv_export_path"],
+                args["input_data_csv_import_path"],
+            )
 
         if load_pool_from_file:
             output_manager.flush_pools()
