@@ -1,3 +1,4 @@
+from RUFAS.biophysical.animal.animal_properties.general_properties import Breed, Gender
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 
@@ -7,9 +8,8 @@ LAC_COW_PROPERTIES = {
     "birth_date": "2020-01-01",
     "birth_weight": 40.0,
     "body_weight": 600.0,
-    "breed": None,
+    "breed": Breed.HO,
     "culled": False,
-    "daily_growth": 0.9,
     "days_born": 900,
     "days_in_preg": 100,
     "events": AnimalEvents(),
@@ -18,7 +18,7 @@ LAC_COW_PROPERTIES = {
     "daily_milk_produced": 30.0,
     "future_cull_date": 1000,
     "future_death_date": 1100,
-    "gender": None,
+    "gender": Gender.FEMALE,
     "id": 1,
     "is_pregnant": True,
     "mature_body_weight": 700.0,
