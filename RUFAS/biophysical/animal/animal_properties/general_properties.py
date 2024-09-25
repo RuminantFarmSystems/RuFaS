@@ -38,7 +38,6 @@ class GeneralProperties:
     future_death_date: int
     gender: "Gender"
     id: int
-    is_pregnant: bool
     mature_body_weight: float
     nutrients: list[str]
     ration_formulation = {"objective": 0.00}
@@ -50,6 +49,11 @@ class GeneralProperties:
     def is_milking(self) -> bool:
         """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0
+
+    @property
+    def is_pregnant(self) -> bool:
+        """True if the animal is currently pregnant, else False."""
+        return self.days_in_preg > 0
 
 
 class Breed(Enum):

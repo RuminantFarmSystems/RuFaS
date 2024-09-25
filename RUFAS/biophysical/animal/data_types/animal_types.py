@@ -28,3 +28,8 @@ class AnimalType(Enum):
     HEIFER_III = "HeiferIII"
     DRY_COW = "DryCow"
     LAC_COW = "LacCow"
+
+    @property
+    def is_cow(self) -> bool:
+        """True if the animal is a cow, False otherwise"""
+        return self in (AnimalType.DRY_COW, AnimalType.LAC_COW)
