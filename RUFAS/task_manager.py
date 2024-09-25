@@ -176,10 +176,11 @@ class TaskManager:
         """
         parsed_single_run_args: List[Dict[str, Any]] = []
         parsed_multi_run_args: List[Dict[str, Any]] = []
-        tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
-        export_input_data_to_csv = self.input_manager.get_data("tasks.export_input_data_to_csv")
-        input_data_csv_export_path = Path(self.input_manager.get_data("tasks.input_data_csv_export_path"))
-        input_data_csv_import_path = Path(self.input_manager.get_data("tasks.input_data_csv_import_path"))
+        task_config: Dict[str, Any] = self.input_manager.get_data("tasks")
+        tasks_from_input: List[Dict[str, Any]] = task_config.get("tasks")
+        export_input_data_to_csv = task_config.get("export_input_data_to_csv")
+        input_data_csv_export_path = Path(task_config.get("input_data_csv_export_path"))
+        input_data_csv_import_path = Path(task_config.get("input_data_csv_import_path"))
         for input_task in tasks_from_input:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             input_task["input_patch"] = None

@@ -95,9 +95,12 @@ def test_task_manager_start(
 
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
-    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", side_effect=[workers, "", False])
+    mock_get_data = mocker.patch.object(mock_input_manager, "get_data",
+                                        return_value={"parallel_workers": workers, "input_data_csv_export_path": "",
+                                                      "input_data_csv_import_path": "",
+                                                      "export_input_data_to_csv": False}
+)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
-
     mock_task_manager.output_manager = mock_output_manager
 
     mock_task_manager.start(
@@ -138,9 +141,7 @@ def test_task_manager_start(
     mock_output_manager.add_log.assert_has_calls(expected_add_log_calls)
 
     mock_start_data.assert_called_once_with(Path("metadata/path"))
-    mock_get_data.assert_has_calls([
-        call("tasks.parallel_workers"), call("tasks.input_data_csv_export_path"), call("tasks.export_input_data_to_csv")
-    ])
+    mock_get_data.assert_called_once_with("tasks")
 
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
@@ -214,42 +215,47 @@ def test_set_random_seed_with_parameters(
 
 def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> None:
     """Unit test for TaskManager._parse_input_tasks()"""
-    task_data = [
-        {
-            "task_type": "Herd Initialization",
-            "metadata_file_path": "/path/to/herd",
-            "output_directory": "/output",
-            "filters_directory": "/output/filters",
-            "csv_output_directory": "/output/CSV",
-            "json_output_directory": "/output/JSON",
-            "report_directory": "/output/reports",
-            "graphics_directory": "/output/graphics",
-            "output_pool_path": "/output",
-            "save_animals_directory": "/output/herd",
-            "logs_directory": "/output/logs",
-            "suppress_log_files": True,
-            "properties_file_path": "path/to/properties",
-            "comparison_properties_file_path": "path/to/comparison/properties",
-        },
-        {
-            "task_type": "SIMULATION_MULTI_RUN",
-            "metadata_file_path": "/path/to/sim",
-            "output_directory": "/output",
-            "filters_directory": "/output/filters",
-            "csv_output_directory": "/output/CSV",
-            "json_output_directory": "/output/JSON",
-            "report_directory": "/output/reports",
-            "graphics_directory": "/output/graphics",
-            "output_pool_path": "/output",
-            "save_animals_directory": "/output/herd",
-            "logs_directory": "/output/logs",
-            "suppress_log_files": False,
-            "properties_file_path": "path/to/properties",
-            "comparison_properties_file_path": "path/to/comparison/properties",
-        },
-    ]
+    task_data = {
+        "export_input_data_to_csv": False,
+        "input_data_csv_export_path": "",
+        "input_data_csv_import_path": "",
+        "tasks": [
+            {
+                "task_type": "Herd Initialization",
+                "metadata_file_path": "/path/to/herd",
+                "output_directory": "/output",
+                "filters_directory": "/output/filters",
+                "csv_output_directory": "/output/CSV",
+                "json_output_directory": "/output/JSON",
+                "report_directory": "/output/reports",
+                "graphics_directory": "/output/graphics",
+                "output_pool_path": "/output",
+                "save_animals_directory": "/output/herd",
+                "logs_directory": "/output/logs",
+                "suppress_log_files": True,
+                "properties_file_path": "path/to/properties",
+                "comparison_properties_file_path": "path/to/comparison/properties",
+            },
+            {
+                "task_type": "SIMULATION_MULTI_RUN",
+                "metadata_file_path": "/path/to/sim",
+                "output_directory": "/output",
+                "filters_directory": "/output/filters",
+                "csv_output_directory": "/output/CSV",
+                "json_output_directory": "/output/JSON",
+                "report_directory": "/output/reports",
+                "graphics_directory": "/output/graphics",
+                "output_pool_path": "/output",
+                "save_animals_directory": "/output/herd",
+                "logs_directory": "/output/logs",
+                "suppress_log_files": False,
+                "properties_file_path": "path/to/properties",
+                "comparison_properties_file_path": "path/to/comparison/properties",
+            },
+        ]
+    }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
-    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", side_effect=[task_data, False, ""])
+    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=task_data)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     task_manager.input_manager = mock_input_manager
 
@@ -258,9 +264,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
     assert len(multi) == 1
     assert single[0]["task_type"] == TaskType.HERD_INITIALIZATION
     assert multi[0]["task_type"] == TaskType.SIMULATION_MULTI_RUN
-    mock_get_data.assert_has_calls([
-        call("tasks.tasks"), call("tasks.export_input_data_to_csv"), call("tasks.input_data_csv_export_path")
-    ])
+    mock_get_data.assert_called_once_with("tasks")
 
 
 def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
@@ -331,12 +335,15 @@ def test_handle_post_processing_export_input_tocsv(
         "output_pool_path": Path("/fake/pool"),
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
-        "input_data_csv_export_path": Path("/fake/saved_input")
+        "input_data_csv_export_path": Path("/fake/saved_input"),
+        "input_data_csv_import_path": Path("/fake/saved_input")
     }
     task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1",
                                         export_input_data_to_csv=True)
 
-    Utility.combine_saved_input_csv.assert_called_once_with(args["input_data_csv_export_path"])
+    Utility.combine_saved_input_csv.assert_called_once_with(TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
+                                                            args["input_data_csv_export_path"],
+                                                            args["input_data_csv_import_path"])
 
 
 def test_handle_end_to_end_testing(
@@ -467,7 +474,7 @@ def test_input_data_audit(
         mock_save_metadata_properties.assert_not_called()
 
     if export_input_data_to_csv:
-        mocve_export_pool_to_csv.assert_called_once_with(args["output_prefix"], args["input_data_csv_export_path"])
+        mocve_export_pool_to_csv.assert_called_once_with(args["output_prefix"], TaskManager.INPUT_DATA_CSV_WORKING_FOLDER)
     else:
         mocve_export_pool_to_csv.assert_not_called()
 
