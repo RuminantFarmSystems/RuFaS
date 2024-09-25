@@ -14,11 +14,24 @@ from RUFAS.biophysical.animal.animal_properties.animal_growth_properties import 
 
 
 class AnimalGrowth:
+    """
+    Handles updating the body weight growth related animal attributes.
+
+    Attributes
+    ----------
+    wean_day: int
+        Class constant that indicates the user-defined wean day for calves.
+    target_heifer_pregnant_day: int
+        Class constant that indicates the user-defined target pregnant day for heifers.
+    """
     wean_day: int
     target_heifer_pregnant_day: int
 
     @classmethod
     def initialize_class_variables(cls) -> None:
+        """
+        This function retrieves the user input data from the InputManager and initializes the class constants.
+        """
         im = InputManager()
         animal_config: dict[str, dict[str, Any]] = im.get_data("animal.animal_config.farm_level")
         cls.wean_day = animal_config["calf"]["wean_day"]
@@ -31,6 +44,27 @@ class AnimalGrowth:
         reproduction_properties: ReproductionProperties,
         time: Time,
     ) -> tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]:
+        """
+        Handles an animal's daily growth updates.
+
+        Parameters
+        ----------
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+        animal_growth_properties: AnimalGrowthProperties
+            Animal properties that are related to body weight growth.
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties : GeneralProperties
+        time : Time
+            Time instance containing the current time of the simulation.
+
+        Returns
+        -------
+        tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]
+            The updated animal growth properties, reproduction properties, and the general properties of the animal
+            after the growth-related routines for the current day.
+        """
         if general_properties.animal_type == AnimalType.CALF:
             animal_growth_properties.daily_growth = AnimalGrowth.calculate_calf_body_weight_change(general_properties)
             general_properties.body_weight += animal_growth_properties.daily_growth
@@ -75,10 +109,36 @@ class AnimalGrowth:
 
     @staticmethod
     def calculate_calf_body_weight_change(general_properties: GeneralProperties) -> float:
+        """
+        Calculates the body weight change for calves.
+
+        Parameters
+        ----------
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        float
+            The daily body weight growth for calves (kg).
+        """
         return general_properties.birth_weight / AnimalGrowth.wean_day
 
     @staticmethod
     def calculate_non_pregnant_heifer_body_weight_change(general_properties: GeneralProperties) -> float:
+        """
+        Calculates the body weight change for non-pregnant heifers.
+
+        Parameters
+        ----------
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        float
+            The daily body weight growth for non-pregnant heifers (kg).
+        """
         divisor = abs(AnimalGrowth.target_heifer_pregnant_day - general_properties.days_born)
         if divisor == 0:
             divisor = 1
@@ -92,6 +152,21 @@ class AnimalGrowth:
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float]:
+        """
+        Calculates the body weight change for pregnant heifers.
+
+        Parameters
+        ----------
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        tuple[float, float]
+            The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+        """
         target_average_daily_growth_pregnant_heifer = AnimalGrowth._calculate_pregnant_heifer_target_daily_growth(
             reproduction_properties, general_properties
         )
@@ -111,6 +186,24 @@ class AnimalGrowth:
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float, float]:
+        """
+        Calculates the body weight change for cows.
+
+        Parameters
+        ----------
+        animal_growth_properties: AnimalGrowthProperties
+            Animal properties that are related to body weight growth.
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        tuple[float, float, float]
+            The daily body weight growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
+            tissue changed (kg).
+        """
         (conceptus_growth, reproduction_properties.conceptus_weight, animal_growth_properties.tissue_changed) = (
             AnimalGrowth._calculate_cow_conceptus_growth(
                 animal_growth_properties, reproduction_properties, general_properties
@@ -135,6 +228,21 @@ class AnimalGrowth:
     def _calculate_pregnant_heifer_conceptus_growth(
         reproduction_properties: ReproductionProperties, general_properties: GeneralProperties
     ) -> tuple[float, float]:
+        """
+        Calculates the conceptus growth for pregnant heifers.
+
+        Parameters
+        ----------
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        tuple[float, float]
+            The conceptus growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+        """
         updated_conceptus_weight = reproduction_properties.conceptus_weight
         if general_properties.days_in_preg == reproduction_properties.gestation_length:
             conceptus_growth = -reproduction_properties.conceptus_weight
@@ -157,6 +265,24 @@ class AnimalGrowth:
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float, float]:
+        """
+        Calculates the conceptus growth for cows.
+
+        Parameters
+        ----------
+        animal_growth_properties: AnimalGrowthProperties
+            Animal properties that are related to body weight growth.
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        tuple[float, float, float]
+            The conceptus growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
+            tissue changed (kg).
+        """
         updated_tissue_change = (
             0
             if general_properties.days_in_preg == reproduction_properties.gestation_length
@@ -173,6 +299,21 @@ class AnimalGrowth:
     def _calculate_pregnant_heifer_target_daily_growth(
         reproduction_properties: ReproductionProperties, general_properties: GeneralProperties
     ) -> float:
+        """
+        Calculates the target daily growth for pregnant heifers.
+
+        Parameters
+        ----------
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        float
+            The daily growth rate for pregnant heifers (kg).
+        """
         divisor = reproduction_properties.gestation_length - general_properties.days_in_preg
         if divisor == 0:
             divisor = 1
@@ -182,6 +323,21 @@ class AnimalGrowth:
     def _calculate_cow_target_daily_growth(
         reproduction_properties: ReproductionProperties, general_properties: GeneralProperties
     ) -> float:
+        """
+        Calculates the target daily growth for cows.
+
+        Parameters
+        ----------
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        float
+            The daily growth rate for cows (kg).
+        """
         if reproduction_properties.calves == 1:
             if general_properties.days_in_preg < 1:
                 target_adg_cow = (
@@ -213,6 +369,23 @@ class AnimalGrowth:
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float]:
+        """
+        Calculates the body weight tissue growth for cows.
+
+        Parameters
+        ----------
+        animal_growth_properties: AnimalGrowthProperties
+            Animal properties that are related to body weight growth.
+        reproduction_properties: ReproductionProperties
+            Animal properties that are related to animal reproduction.
+        general_properties: GeneralProperties
+            Animal properties that are general or are used to determine many animal outcomes.
+
+        Returns
+        -------
+        tuple[float, float]
+            The body weight tissue growth for cows (kg), and the updated tissue changed (kg).
+        """
         updated_tissue_changed = animal_growth_properties.tissue_changed
         if not general_properties.days_in_milk == 0:
             if reproduction_properties.calves == 1:
