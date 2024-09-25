@@ -59,7 +59,6 @@ def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) 
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)
     )
     add_warning = mocker.patch.object(om, "add_warning")
-
     field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
 
     assert len(field_manager.fields) == len(field_blob_names)
@@ -1303,6 +1302,7 @@ def test_crop_schedule_setup(
                 "field_capacity_water_concentration": 0.29,
                 "saturation_point_water_concentration": 0.58,
                 "saturated_hydraulic_conductivity": 9.17,
+                "pH": 9.9,
                 "initial_temperature": 15.77575,
                 "bulk_density": 1.34,
                 "organic_carbon_fraction": 0.012,
@@ -1329,6 +1329,7 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.29,
                 saturation_point_water_concentration=0.58,
                 saturated_hydraulic_conductivity=9.17,
+                pH=9.9,
                 clay_fraction=0.2195,
                 temperature=15.77575,
                 bulk_density=1.34,
@@ -1358,6 +1359,7 @@ def test_crop_schedule_setup(
                 "field_capacity_water_concentration": 0.306,
                 "saturation_point_water_concentration": 0.5,
                 "saturated_hydraulic_conductivity": 9.17,
+                "pH": 6.5,
                 "initial_temperature": 14.50797297,
                 "bulk_density": 1.42,
                 "organic_carbon_fraction": 0.012,
@@ -1384,6 +1386,7 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.306,
                 saturation_point_water_concentration=0.5,
                 saturated_hydraulic_conductivity=9.17,
+                pH=6.5,
                 clay_fraction=0.2727,
                 temperature=14.50797297,
                 bulk_density=1.42,

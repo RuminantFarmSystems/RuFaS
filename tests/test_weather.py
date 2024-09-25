@@ -9,8 +9,6 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
-
 
 @pytest.fixture
 def mock_weather_input() -> dict:
@@ -90,6 +88,7 @@ def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]
 def mock_current_day_conditions() -> CurrentDayConditions:
     """Fixture for CurrentDayConditions object."""
     mock_current_weather = MagicMock(CurrentDayConditions)
+    mock_current_weather.incoming_light = 12.0
     mock_current_weather.precipitation = 5.0
     mock_current_weather.rainfall = 5.0
     mock_current_weather.snowfall = 0.0
