@@ -352,12 +352,6 @@
             "vertical_aggregation": "sum",
             "slice_start": -365
         },
-      {     "name": "DMI by feed",
-            "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_total_across_pens"],
-            "variables": ["^[0-9]+$"],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
         {
             "name": "Total herd DMI, kg",
             "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
@@ -603,10 +597,20 @@
             {
                 "name": "Total storage methane, kg",
                 "filters": [
-                    "^ManureTreatmentDailyOutput_Pen_.*storage_methane"
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_methane$",
+                    "^AnaerobicDigestion_ManureTreatmentDailyOutput_.*methane_leakage_mass"
                 ],
                 "vertical_aggregation": "sum",
                 "horizontal_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
+            {
+                "name": "Storage ammonia by pen, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_ammonia"
+                ],
+                "vertical_aggregation": "sum",
                 "horizontal_first": false,
                 "slice_start": -365
             },
@@ -636,6 +640,15 @@
                 ],
                 "horizontal_aggregation": "sum"
             },
+          {
+                "name": "Manure nitrous oxide (storage) by pen, kg",
+                "filters": [
+                    "^ManureTreatmentDailyOutput_Pen_.*storage_nitrous_oxide.*"
+                ],
+                "vertical_aggregation": "sum",
+                "horizontal_first": false,
+                "slice_start": -365
+            },
             {
                 "name": "Total manure nitrous oxide (storage), kg",
                 "filters": [
@@ -656,34 +669,6 @@
                 "horizontal_first": false,
                 "slice_start": -365
             },
-            {
-                "name": "Byproducts fed, kg DM",
-                "filters": [
-                    "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"
-                ],
-                "variables": ["byproducts_total"],
-                "vertical_aggregation": "sum",
-                "slice_start": -365
-            },
-            {
-                "name": "Byproducts fed, % of DM",
-                "cross_references": [
-                    "Byproducts fed, kg DM_byproducts_total_ver_agg",
-                    "Total herd DMI, kg_dry_matter_intake_total_ver_agg"
-                ],
-                "horizontal_aggregation": "division",
-                "horizontal_order":[
-                    "Byproducts fed, kg DM_byproducts_total_ver_agg",
-                    "Total herd DMI, kg_dry_matter_intake_total_ver_agg"
-                ]
-            }, 
-
-
-
-
-
-
-
 
 
 
@@ -1146,32 +1131,33 @@
                 "days per year"
             ]
         },
-        {
-            "name": "Total herd feed CO2, kg",
+       {
+            "name": "Total Feed emissions-including LUC",
             "filters": [
-                "AnimalModuleReporter.report_daily_feed_emissions.*"
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
             "slice_start": -365
         },
-
-        {
-            "name": "Herd feed CO2 per FPCM, kg/kg",
+      {
+            "name": "Herd feed CO2 per FPCM - including LUC",
             "cross_references": [
-                "Total herd feed CO2, kg_feed_emissions_total_ver_agg",
+                "Total Feed emissions-including LUC_ver_hor_agg",
                 "Herd FPCM, kg_hor_agg"
             ],
             "horizontal_aggregation": "division",
             "horizontal_order": [
-                "Total herd feed CO2, kg_feed_emissions_total_ver_agg",
+                "Total Feed emissions-including LUC_ver_hor_agg",
                 "Herd FPCM, kg_hor_agg"
-            ]
+            ],"display_units": true
         },
+
         {
             "name": "adjusted whole herd feed CO2, kg",
             "cross_references": [
-                "Total herd feed CO2, kg_feed_emissions_total_ver_agg",
+                "Total Feed emissions-including LUC_ver_hor_agg",
                 "milk allocation factor_hor_agg"
             ],
             "horizontal_aggregation": "product"
@@ -1184,8 +1170,6 @@
             ],
             "horizontal_aggregation": "division"
         },
-
-
         {
             "name": "DMI by feed",
             "filters": [
@@ -1204,20 +1188,26 @@
             "vertical_aggregation": "sum",
             "slice_start": -365
         },
- 
+ {
+      "name": "Total Feed LUC emissions",
+      "filters": [
+        "AnimalModuleReporter.report_daily_feed_emissions.land_use_change_feed_emissions_.*"
+      ],
+      "variables": ["^[0-9]+$"],
+      "vertical_aggregation": "sum",
+      "horizontal_aggregation":"sum",
+      "slice_start": -365
+        },
         {
-            "name": "Fertilizer",
-            "filters": [
-                "Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"
+            "name": "Total Feed emissions-excluding LUC",
+            "cross_references": [
+                "Total Feed emissions-including LUC_ver_hor_agg",
+                "Total Feed LUC emissions_ver_hor_agg"
             ],
-            "variables": [
-                "mass",
-                "nitrogen",
-                "phosphorus",
-                "application_depth",
-                "surface_remainder_fraction",
-                "day",
-                "year"
+            "horizontal_aggregation": "subtraction",
+            "horizontal_order": [
+                "Total Feed emissions-including LUC_ver_hor_agg",
+                "Total Feed LUC emissions_ver_hor_agg"
             ]
         },
       {
@@ -1225,198 +1215,9 @@
       "filters": [
         "AnimalModuleReporter.report_daily_feed_emissions.land_use_change_feed_emissions_.*"
       ],
-      "variables": [".*"],
+      "variables": ["^[0-9]+$"],
       "vertical_aggregation": "sum",
       "slice_start": -365
-        },
-        {
-            "name": "Tillage",
-            "filters": [
-                "TillageApplication._record_tillage\\.tillage_record\\.field='.*'"
-            ],
-            "variables": [
-                "tillage_depth",
-                "incorporation_fraction",
-                "mixing_fraction",
-                "implement",
-                "day",
-                "year"
-            ]
-        },
-        {
-            "name": "Manure",
-            "filters": [
-                "Field._record_manure_application\\.manure_application\\.field='.*'"
-            ],
-            "variables": [
-                "dry_matter_mass",
-                "dry_matter_fraction",
-                "field_coverage",
-                "surface_remainder_fraction",
-                "application_depth",
-                "nitrogen",
-                "phosphorus",
-                "day",
-                "year"
-            ]
-        },
-        {
-            "name": "Yield",
-            "filters": [
-                "CropManagement._record_yield.harvest_yield.field='*'"
-            ],
-            "variables": [
-                "crop",
-                "wet_yield",
-                "dry_yield",
-                "nitrogen",
-                "phosphorus",
-                "harvest_index",
-                "planting_date",
-                "harvest_date",
-                "residue_nitrogen",
-                "yield_residue"
-            ]
-        },
-        {
-            "name": "Total eroded sediment",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.eroded_sediment.field.*"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "Phosphorus Runoff",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.soil_phosphorus_runoff.field.*"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "Fertilizer P Runoff",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.runoff_fertilizer_phosphorus.field='.*'"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "Nitrate Percolate",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.percolated_nitrates.field='.*',layer='3'"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "Soil CO2 emissions",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.profile_carbon_emissions.field.*"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "Soil N2O emissions",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.nitrous_oxide_emissions.field=.*,layer=.*"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "Soil NH3 emissions",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.ammonia_emissions.field=.*,layer=.*"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "profile_carbon_total-1",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field=.*"
-            ],
-            "slice_start": -1
-        },
-        {
-            "name": "profile_carbon_total-365",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field=.*"
-            ],
-            "slice_start": -365,
-            "slice_end": -364
-        },
-        {
-            "name": "Phosphorus Runoff prior year",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.soil_phosphorus_runoff.field.*"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -730,
-            "slice_end": -365
-        },
-        {
-            "name": "Fertilizer P Runoff Previous Year",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.runoff_fertilizer_phosphorus.field='.*'"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -730,
-            "slice_end": -365
-        },
-        {
-            "name": "Nitrate Percolate prior year",
-            "filters": [
-                "FieldDataReporter.send_daily_variables.percolated_nitrates.field='.*',layer='3'"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -730,
-            "slice_end": -365
-        },
-        {
-            "name": "N Fertilizer kg, annual total",
-            "filters": [
-                "Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"
-            ],
-            "variables": [
-                "nitrogen"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "N Fertilizer Emissions",
-            "cross_references": [
-                "N Fertilizer kg, annual total_nitrogen_ver_agg"
-            ],
-            "constants": {
-                "Upstream N emissions": 3.11
-            },
-            "horizontal_aggregation": "product"
-        },
-        {
-            "name": "P Fertilizer kg, annual total",
-            "filters": [
-                "Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"
-            ],
-            "variables": [
-                "phosphorus"
-            ],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
-        {
-            "name": "P Fertilizer Emissions",
-            "cross_references": [
-                "P Fertilizer kg, annual total_phosphorus_ver_agg"
-            ],
-            "constants": {
-                "Upstream N emissions": 1.84
-            },
-            "horizontal_aggregation": "product"
         }
     ]
 }
