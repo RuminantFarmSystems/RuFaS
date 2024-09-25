@@ -29,6 +29,7 @@ from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import (
     CompostBeddedPackBarn,
 )
 from RUFAS.routines.manure.manure_treatments.composting import Composting
+from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
     ManureTreatmentConfig,
 )
@@ -508,6 +509,9 @@ def test_initialize_private_attributes_during_update(
 ) -> None:
     # Arrange
     mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    if manure_treatment_class == Composting:
+        mock_treatment_config.composting_type = "intensive windrow"
+
     manure_treatment = manure_treatment_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
@@ -536,6 +540,8 @@ def test_initialize_private_attributes_during_update(
     assert manure_treatment._manure_handler_daily_output == manure_handler_daily_output
     assert manure_treatment._current_manure_treatment_daily_input == manure_treatment_daily_input
     assert manure_treatment._manure_separator == manure_separator
+    if manure_treatment_class == Composting:
+        assert manure_treatment.composting_type == CompostingType.INTENSIVE_WINDROW
 
 
 @pytest.mark.parametrize(
@@ -1777,6 +1783,8 @@ def test_adjust_accumulated_output_empty_manure_pit(
 
     """
     mock_treatment_config = mocker.MagicMock(autospec=ManureTreatmentConfig)
+    if manure_treatment_class == Composting:
+        mock_treatment_config.composting_type = "intensive windrow"
     manure_treatment = manure_treatment_class(
         weather=mocker.MagicMock(),
         time=mocker.MagicMock(),
@@ -1798,6 +1806,8 @@ def test_adjust_accumulated_output_empty_manure_pit(
 
     # Assert after
     assert manure_treatment._accumulated_output == expected_accumulated_output
+    if manure_treatment_class == Composting:
+        assert manure_treatment.composting_type == CompostingType.INTENSIVE_WINDROW
 
 
 def test_volume_needed_property(mocker: MockFixture) -> None:
@@ -3285,6 +3295,7 @@ def test_composting_calc_methane_emission(mocker: MockFixture) -> None:
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_total_volatile_solids = 5
@@ -3412,6 +3423,7 @@ def test_composting_calculate_max_microbial_decomposition_rate(
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_total_volatile_solids = 5
@@ -3443,6 +3455,7 @@ def test_composting_calculate_slow_microbial_decomposition_rate(
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_total_volatile_solids = 5
@@ -3478,6 +3491,7 @@ def test_composting_calculate_carbon_decomposition_rate(mocker: MockFixture) -> 
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
     manure_treatment_config_mock.last_compost_turning_or_addition = 1
 
     daily_input_mock = mocker.MagicMock()
@@ -3524,6 +3538,7 @@ def test_calculate_anaerobic_coefficient(mocker: MockFixture) -> None:
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
 
@@ -3560,6 +3575,7 @@ def test_composting_calculate_carbon_decomposition(mocker: MockFixture) -> None:
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
 
@@ -3689,6 +3705,7 @@ def test_composting_calculate_total_Nitrogen_mass(mocker: MockFixture) -> None:
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
@@ -3724,6 +3741,7 @@ def test_composting_calculate_organic_Nitrogen_mass(mocker: MockFixture) -> None
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
@@ -3750,6 +3768,7 @@ def test_composting_calculate_inorganic_Nitrogen_mass(mocker: MockFixture) -> No
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
@@ -3776,6 +3795,7 @@ def test_composting_calculate_ammoniacal_nitrogen_mass(mocker: MockFixture) -> N
     time_mock = mocker.MagicMock()
 
     manure_treatment_config_mock = mocker.MagicMock()
+    manure_treatment_config_mock.composting_type = "intensive windrow"
 
     daily_input_mock = mocker.MagicMock()
     daily_input_mock.liquid_manure_nitrogen = 10
