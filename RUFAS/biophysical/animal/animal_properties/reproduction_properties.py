@@ -14,6 +14,7 @@ class ReproductionProperties:
     calves: int
     calving_interval: float
     """
+
     gestation_length: int
     conceptus_weight: float
     calf_birth_weight: float
