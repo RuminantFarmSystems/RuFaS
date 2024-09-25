@@ -82,8 +82,12 @@ def test_estimate_emissions(
     mock_gather = mocker.patch.object(
         em,
         "_gather_homegrown_feeds_and_fertilizer_apps",
-        return_value={"Homegrown Feeds": homegrown_feeds, "Fertilizer Applications": fertilizer_applications,
-                      "Manure Applications": manure_applications, "Manure Requests": manure_requests}
+        return_value={
+            "Homegrown Feeds": homegrown_feeds,
+            "Fertilizer Applications": fertilizer_applications,
+            "Manure Applications": manure_applications,
+            "Manure Requests": manure_requests,
+        },
     )
     mock_purchase = mocker.patch.object(em, "_calculate_purchased_feed_emissions")
     mock_homegrown = mocker.patch.object(em, "_calculate_homegrown_feed_emissions")
@@ -138,72 +142,83 @@ def test_calculate_purchased_feed_emissions(
 
 def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture):
     em = EmissionsEstimator()
-    mock_filter_variable = mocker.patch.object(em.om, "filter_variables_pool",
-                                               return_value={"Time.day": {"values": [20]},
-                                                             "Time.calendar_year": {"values": [2014]}
-                                                             })
-    mock_convert_time = mocker.patch.object(Time, "convert_year_jday_to_date",
-                                            return_value=datetime(2014, 1, 20))
-    mock_filter_results = mocker.patch.object(em, "_filter_results", return_value=[{"dry_yield": 4,
-                                                                                    "field_size": 2}])
+    mock_filter_variable = mocker.patch.object(
+        em.om,
+        "filter_variables_pool",
+        return_value={"Time.day": {"values": [20]}, "Time.calendar_year": {"values": [2014]}},
+    )
+    mock_convert_time = mocker.patch.object(Time, "convert_year_jday_to_date", return_value=datetime(2014, 1, 20))
+    mock_filter_results = mocker.patch.object(em, "_filter_results", return_value=[{"dry_yield": 4, "field_size": 2}])
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                       "which crop yields and nutrient applications to estimate emissions for.",
+        "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
     }
 
-    expected = {'Homegrown Feeds': [{'dry_yield': 4, 'field_size': 2, 'total_dry_yield': 8}],
-                'Fertilizer Applications': [{'dry_yield': 4, 'field_size': 2, 'total_dry_yield': 8}],
-                'Manure Applications': [{'dry_yield': 4, 'field_size': 2, 'total_dry_yield': 8}],
-                'Manure Requests': [{'dry_yield': 4, 'field_size': 2, 'total_dry_yield': 8}]}
+    expected = {
+        "Homegrown Feeds": [{"dry_yield": 4, "field_size": 2, "total_dry_yield": 8}],
+        "Fertilizer Applications": [{"dry_yield": 4, "field_size": 2, "total_dry_yield": 8}],
+        "Manure Applications": [{"dry_yield": 4, "field_size": 2, "total_dry_yield": 8}],
+        "Manure Requests": [{"dry_yield": 4, "field_size": 2, "total_dry_yield": 8}],
+    }
     observed = em._gather_homegrown_feeds_and_fertilizer_apps()
 
     assert observed == expected
     mock_convert_time.assert_called_once_with(2014, 20)
     mock_filter_variable.assert_called_once_with(time_filter)
     assert mock_filter_results.call_count == 4
-    mock_filter_results.assert_has_calls([
-        mocker.call(
-            {
-                "name": "Homegrown Feeds",
-                "description": "Collects all crop harvests that occurred in the simulation.",
-                "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("harvest_year", "harvest_day"),
-            },
-            datetime(2014, 1, 20),
-            "harvest_year", "harvest_day"),
-        mocker.call(
-            {
-                "name": "Fertilizer Applications",
-                "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
-                "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("year", "day"),
-            },
-            datetime(2014, 1, 20),
-            "year", "day"),
-        mocker.call(
-            {
-                "name": "Manure Applications",
-                "description": "Collects all manure applications that occurred in the simulation.",
-                "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("year", "day"),
-            },
-            datetime(2014, 1, 20),
-            "year", "day"),
-        mocker.call(
-            {
-                "name": "Manure Requests",
-                "description": "Collects all manure requests that occurred in the simulation.",
-                "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
-                "variables": [".*"],
-                "date_fields": ("year", "day"),
-            },
-            datetime(2014, 1, 20),
-            "year", "day")
-    ])
+    mock_filter_results.assert_has_calls(
+        [
+            mocker.call(
+                {
+                    "name": "Homegrown Feeds",
+                    "description": "Collects all crop harvests that occurred in the simulation.",
+                    "filters": ["CropManagement._record_yield.harvest_yield.field='.*'"],
+                    "variables": [".*"],
+                    "date_fields": ("harvest_year", "harvest_day"),
+                },
+                datetime(2014, 1, 20),
+                "harvest_year",
+                "harvest_day",
+            ),
+            mocker.call(
+                {
+                    "name": "Fertilizer Applications",
+                    "description": "Collects all synthetic fertilizer applications that occurred in the simulation.",
+                    "filters": ["Field._record_fertilizer_application\\.fertilizer_application\\.field='.*'"],
+                    "variables": [".*"],
+                    "date_fields": ("year", "day"),
+                },
+                datetime(2014, 1, 20),
+                "year",
+                "day",
+            ),
+            mocker.call(
+                {
+                    "name": "Manure Applications",
+                    "description": "Collects all manure applications that occurred in the simulation.",
+                    "filters": ["Field._record_manure_application\\.manure_application\\.field='.*'"],
+                    "variables": [".*"],
+                    "date_fields": ("year", "day"),
+                },
+                datetime(2014, 1, 20),
+                "year",
+                "day",
+            ),
+            mocker.call(
+                {
+                    "name": "Manure Requests",
+                    "description": "Collects all manure requests that occurred in the simulation.",
+                    "filters": ["Field._record_manure_application\\.manure_request\\.field='.*'"],
+                    "variables": [".*"],
+                    "date_fields": ("year", "day"),
+                },
+                datetime(2014, 1, 20),
+                "year",
+                "day",
+            ),
+        ]
+    )
