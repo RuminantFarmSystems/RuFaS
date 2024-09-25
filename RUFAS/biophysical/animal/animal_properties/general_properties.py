@@ -26,18 +26,19 @@ class GeneralProperties:
     birth_date: str
     birth_weight: float
     body_weight: float
-    breed: Enum
+    breed: "Breed"
     culled: bool
-    daily_growth: float
     days_born: int
     days_in_preg: int
+    days_in_milk: int
+    dry_off_day_of_pregnancy: int  # Old name: days_in_preg_when_dry, used to be in AnimalBase.config
     events: AnimalEvents
     days_in_milk: int
     dry_off_day_of_pregnancy: int
     daily_milk_produced: float
     future_cull_date: int
     future_death_date: int
-    gender: Enum
+    gender: "Gender"
     id: int
     is_pregnant: bool
     mature_body_weight: float
@@ -46,8 +47,17 @@ class GeneralProperties:
     sold: bool
     sold_at_day: int
     wean_weight: float
-
+    
     @property
     def is_milking(self) -> bool:
         """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0
+
+class Breed(Enum):
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Gender(Enum):
+    MALE = "male"
+    FEMALE = "female"
