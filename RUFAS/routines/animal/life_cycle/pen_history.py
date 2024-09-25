@@ -4,7 +4,7 @@ from ....enums import AnimalCombination
 
 class PenHistory(TypedDict):
     """
-    A class  to represent the history of a pen on a farm.
+    A class to represent the history of a pen on a farm.
 
     This class tracks the usage of a pen including the start and end dates, the specific pen, and the classes
     of animals that have been in the pen.
