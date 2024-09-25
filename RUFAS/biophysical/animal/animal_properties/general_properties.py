@@ -47,11 +47,12 @@ class GeneralProperties:
     sold: bool
     sold_at_day: int
     wean_weight: float
-    
+
     @property
     def is_milking(self) -> bool:
         """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0
+
 
 class Breed(Enum):
     HO = "Holstein"
