@@ -175,7 +175,7 @@ class OutputManager(object):
         available_memory_gb = self.available_memory / (1024**3)
 
         self.saved_pool_chunks_path = Path.joinpath(
-            output_dir, f"saved_pool/{Utility.get_timestamp(include_millis=True)}"
+            output_dir, f"saved_pool/{self.__metadata_prefix}_{Utility.get_timestamp(include_millis=True)}"
         )
         self.create_directory(self.saved_pool_chunks_path)
 

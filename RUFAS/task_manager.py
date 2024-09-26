@@ -352,7 +352,7 @@ class TaskManager:
         output_manager.run_startup_sequence(
             LogVerbosity(args["log_verbosity"]),
             args["exclude_info_maps"],
-            Path(""),
+            Path("output/"),
             False,
             args["chunkification"],
             int(args["maximum_memory_usage_percent"] / workers),
