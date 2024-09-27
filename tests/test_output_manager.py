@@ -2972,7 +2972,7 @@ def test_filter_saved_pools(
     tmpdir,
     output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
-):
+) -> None:
     expected = {
         "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}, {}, {}, {}]},
         "b": {"values": ["a", "b", "c", "d", "e", "f"], "info_maps": [{}, {}, {}, {}, {}, {}]},
