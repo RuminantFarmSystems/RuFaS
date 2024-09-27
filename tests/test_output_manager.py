@@ -2418,16 +2418,17 @@ def test_load_variables_pool_from_file_raises_exception(
     output_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Checks that load_variables_pool_from_file raises exceptions with a bad filepath provided"""
+    mock_output_manager.variables_pool = {}
     mock_file.side_effect = FileNotFoundError
     with pytest.raises(FileNotFoundError):
         mock_output_manager.load_variables_pool_from_file(Path("bad/file/path"))
-        assert mock_output_manager.variables_pool == {}
+    assert mock_output_manager.variables_pool == {}
 
     mock_file.return_value.read.return_value = "this is not valid JSON"
     with patch("builtins.open", mock_open(read_data="bad/file/path")):
         with pytest.raises(json.JSONDecodeError):
             mock_output_manager.load_variables_pool_from_file(Path("bad/file/path.json"))
-            assert mock_output_manager.variables_pool == {}
+    assert mock_output_manager.variables_pool == {}
 
     mock_output_manager.load_variables_pool_from_file = output_manager_original_method_states[
         "load_variables_pool_from_file"
