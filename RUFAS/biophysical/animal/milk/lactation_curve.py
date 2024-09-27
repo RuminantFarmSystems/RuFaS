@@ -7,6 +7,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 from scipy.optimize import minimize
 from typing import Any
+from warnings import catch_warnings
 
 """
 Constant that is used to determine whether cows are considered to be milking twice or thrice daily when determining how
@@ -387,9 +388,21 @@ class LactationCurve:
         """
 
         bounds = [(max(l_param + LOWER_BOUND, 0.0), l_param + UPPER_BOUND)]
-        minimized_result = minimize(
-            cls._calculate_305_day_milk_yield_error, x0=l_param, args=(m_param, n_param, milk_yield), bounds=bounds
-        )
+
+        with catch_warnings(record=True) as caught_warnings:
+            minimized_result = minimize(
+                cls._calculate_305_day_milk_yield_error, x0=l_param, args=(m_param, n_param, milk_yield), bounds=bounds
+            )
+            for warning in caught_warnings:
+                cls._om.add_warning(
+                    f"Captured warning during optimization of type {warning.category.__name__}",
+                    f"{warning.message}. Warning generated in {warning.filename}",
+                    {
+                        "class": cls.__class__.__name__,
+                        "function": cls._fit_wood_l_param_to_milk_yield.__name__,
+                        "full_warning": warning,
+                    }
+                )
         l_param_best_fit = minimized_result.x[0]
 
         return l_param_best_fit
