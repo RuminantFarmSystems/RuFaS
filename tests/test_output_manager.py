@@ -2973,6 +2973,13 @@ def test_filter_saved_pools(
     output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ):
+    expected = {
+        "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}, {}, {}, {}]},
+        "b": {"values": ["a", "b", "c", "d", "e", "f"], "info_maps": [{}, {}, {}, {}, {}, {}]},
+        "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
+        "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
+    }
+
     mocker.patch.object(
         mock_output_manager,
         "filter_variables_pool",
@@ -2988,6 +2995,7 @@ def test_filter_saved_pools(
                 "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
             },
             {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
+            expected
         ],
     )
 
@@ -3002,13 +3010,6 @@ def test_filter_saved_pools(
     result = mock_output_manager.filter_saved_pools(
         filter_content={"dummy": "filter"}, list_of_dumped_files=list_of_dumped_files
     )
-
-    expected = {
-        "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}, {}, {}, {}]},
-        "b": {"values": ["a", "b", "c", "d", "e", "f"], "info_maps": [{}, {}, {}, {}, {}, {}]},
-        "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
-        "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
-    }
 
     assert result == expected
 
@@ -3158,6 +3159,7 @@ def test_run_startup_sequence_chunkification(
         dummy_output_prefix,
         dummy_version_number,
         dummy_task_id,
+        False
     )
     mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
     mock_flush_pools.assert_called_once()
@@ -3205,7 +3207,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory, "saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
     expected_available_memory_gb = expected_available_memory / (1024**3)
@@ -3259,7 +3261,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory, "saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
     expected_available_memory_gb = expected_available_memory / (1024**3)
@@ -3313,7 +3315,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
         )
 
     expected_saved_pool_chunks_path = Path.joinpath(
-        dummy_output_directory, "saved_pool/20-May-2024_Mon_13-14-00.000000"
+        dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
     )
     expected_available_memory = 1024
     expected_available_memory_gb = expected_available_memory / (1024**3)
