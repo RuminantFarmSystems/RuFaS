@@ -2995,7 +2995,7 @@ def test_filter_saved_pools(
                 "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
             },
             {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
-            expected
+            expected,
         ],
     )
 
@@ -3159,7 +3159,7 @@ def test_run_startup_sequence_chunkification(
         dummy_output_prefix,
         dummy_version_number,
         dummy_task_id,
-        False
+        False,
     )
     mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
     mock_flush_pools.assert_called_once()
