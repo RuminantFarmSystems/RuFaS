@@ -1,5 +1,5 @@
-from typing import List, Any
 from copy import copy
+from typing import Any, List
 
 from RUFAS.util import Utility
 

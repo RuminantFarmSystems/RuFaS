@@ -1,18 +1,20 @@
 import pytest
 from pytest_mock import MockerFixture
+
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.time import Time
+from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.hay import (
-    Hay,
-    ProtectedWrapped,
-    ProtectedTarped,
-    Unprotected,
-    PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT,
     PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT,
+    PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT,
     UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT,
+    Hay,
+    ProtectedTarped,
+    ProtectedWrapped,
+    Unprotected,
 )
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.time import Time
+
 from .sample_crop_data import sample_crop_data
 
 

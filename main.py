@@ -7,12 +7,12 @@ The main function run_rufas() will execute the model simulation(s). It accepts a
 file(s) or, if this input is not given, it will run in interactive mode and accept input from the user.
 """
 import argparse
+import sys
 import traceback
 from pathlib import Path
 from typing import Any
-import sys
 
-from RUFAS.output_manager import OutputManager, LogVerbosity
+from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.task_manager import TaskManager
 
 

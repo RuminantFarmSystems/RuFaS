@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import fields, dataclass
-from typing import Dict, Any
+from dataclasses import dataclass, fields
+from typing import Any, Dict
 
 from RUFAS.output_manager import OutputManager
 

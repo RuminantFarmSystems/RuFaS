@@ -1,7 +1,7 @@
-import pytest
 import math
-
 from unittest.mock import MagicMock
+
+import pytest
 
 from RUFAS.routines.field.soil.carbon_cycling.decomposition import Decomposition
 from RUFAS.routines.field.soil.layer_data import LayerData

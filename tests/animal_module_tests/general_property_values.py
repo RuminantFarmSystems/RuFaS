@@ -1,6 +1,5 @@
-from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
-
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 LAC_COW_PROPERTIES = {
     "animal_type": AnimalType.LAC_COW,
