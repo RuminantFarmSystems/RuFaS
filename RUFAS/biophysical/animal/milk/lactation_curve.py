@@ -38,13 +38,9 @@ PARITY_2_DEFAULT_FRACTION_OF_MILKING_COWS = 0.281
 PARITY_3_DEFAULT_FRACTION_OF_MILKING_COWS = 0.333
 
 
-"""
-These constants regulate the range and precision used to fit Wood's l lactation parameter to estimated 305 day milk
-yields.
-"""
+"""These constants regulate the range used to fit Wood's l lactation parameter to estimated 305 day milk yields."""
 UPPER_BOUND = 20
 LOWER_BOUND = -20
-STEP_SIZE = 0.01
 
 
 """Defines the accepted error tolerance when checking that fractions of parity 1, 2 and 3+ milking cows sum to 1.0."""
@@ -360,6 +356,11 @@ class LactationCurve:
             "parity_3": parity_3_305_day_milk_yield,
         }
 
+    @staticmethod
+    def _calculate_305_day_milk_yield_error(l_param: float, m_param: float, n_param: float, milk_yield: float) -> float:
+        """Calculates absolute difference between an estimated 305 day milk yield and a predetermined one."""
+        return abs(MilkProduction.calc_305_day_milk_yield(l_param, m_param, n_param) - milk_yield)
+
     @classmethod
     def _fit_wood_l_param_to_milk_yield(
         cls, l_param: float, m_param: float, n_param: float, milk_yield: float
@@ -385,11 +386,10 @@ class LactationCurve:
 
         """
 
-        def objective(l_param_varied: float) -> float:
-            return abs(MilkProduction.calc_305_day_milk_yield(l_param_varied, m_param, n_param) - milk_yield)
-
         bounds = [(max(l_param + LOWER_BOUND, 0.0), l_param + UPPER_BOUND)]
-        minimized_result = minimize(objective, x0=l_param, bounds=bounds)
+        minimized_result = minimize(
+            cls._calculate_305_day_milk_yield_error, x0=l_param, args=(m_param, n_param, milk_yield), bounds=bounds
+        )
         l_param_best_fit = minimized_result.x[0]
 
         return l_param_best_fit
