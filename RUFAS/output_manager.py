@@ -1023,7 +1023,8 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
+    def filter_variables_pool(self, filter_content: Dict[str, Any],
+                              apply_slicing: bool = True) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on options specified in filter_content.
 
@@ -1031,6 +1032,8 @@ class OutputManager(object):
         ----------
         filter_content : Dict[str, Any]
             A dictionary that contains filtering options.
+        apply_slicing: bool
+            Flag to indicate if slicing should be applied, default to True.
 
         Returns
         -------
@@ -1086,12 +1089,13 @@ class OutputManager(object):
                 error_msg = f"Unable to pad data for variables gathered for {filter_name=}."
                 self.add_error(error_title, error_msg, info_map)
 
-        slice_start: int = filter_content.get("slice_start", 0)
-        slice_end: int | None = filter_content.get("slice_end")
-        for key in results.keys():
-            if "info_maps" in results[key].keys():
-                results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
-            results[key]["values"] = results[key]["values"][slice_start:slice_end]
+        if apply_slicing:
+            slice_start: int = filter_content.get("slice_start", 0)
+            slice_end: int | None = filter_content.get("slice_end")
+            for key in results.keys():
+                if "info_maps" in results[key].keys():
+                    results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
+                results[key]["values"] = results[key]["values"][slice_start:slice_end]
 
         return results
 
@@ -1185,8 +1189,9 @@ class OutputManager(object):
         """
         Filters saved pools of data by applying specific filter criteria.
 
-        This method iterates over JSON files in the saved pool directory. It then loads each file and applies the
-        filter by calling the `filter_variables_pool()` method. The results are aggregated into a single dictionary,
+        This method iterates over JSON files in the saved pool directory. It then loads each file as the OutputManager
+        variable pool and applies the filter by calling the `filter_variables_pool()` method. The results are
+        aggregated into a single dictionary,
         combining entries under the same key by extending lists of info_maps and values.
 
         Parameters
@@ -1202,6 +1207,10 @@ class OutputManager(object):
         Dict[str, OutputManager.pool_element_type]:
             A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
             under the saved_pool_chunks_path directory.
+
+        Notes
+        -----
+        This function has a side effect that modifies the variable_pool of the OutputManager
         """
         filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
         for file in list_of_dumped_files:
@@ -1215,7 +1224,8 @@ class OutputManager(object):
                     filtered_pool[key] = value
             self.variables_pool = {}
 
-        return filtered_pool
+        self.variables_pool = filtered_pool
+        return self.filter_variables_pool(filter_content, True)
 
     def save_results(  # noqa: C901
         self,
