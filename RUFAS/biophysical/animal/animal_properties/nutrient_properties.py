@@ -23,3 +23,5 @@ class NutrientProperties:
     ration_phosphorus_concentration: float
     phosphorus_for_gestation: float
     phosphorus_for_gestation_required_for_calf: float
+    fecal_phosphorus: float
+    urine_phosphorus_required: float

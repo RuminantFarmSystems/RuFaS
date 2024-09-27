@@ -41,11 +41,13 @@ class GeneralProperties:
     id: int
     is_pregnant: bool
     mature_body_weight: float
-    nutrients: list[str]
+    nutrients: dict[str, float]
+    nutrient_concentrations: dict[str, float]
     ration_formulation = {"objective": 0.00}
     sold: bool
     sold_at_day: int
     wean_weight: float
+    metabolizable_energy_intake: float
 
     @property
     def is_milking(self) -> bool:
