@@ -1,12 +1,14 @@
-from typing import Any, Generator
-import pytest
-from unittest.mock import patch, MagicMock
-from pytest_mock import MockerFixture
+import multiprocessing
 from pathlib import Path
+from typing import Any, Generator
+from unittest.mock import patch, MagicMock, call
+
+import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
-from RUFAS.task_manager import TaskManager, TaskType
 from RUFAS.output_manager import LogVerbosity, OutputManager
+from RUFAS.task_manager import TaskManager, TaskType, RUFAS_VERSION
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 
@@ -38,10 +40,12 @@ def task_manager(mock_output_manager: MagicMock) -> TaskManager:
     ],
 )
 def test_task_type_from_string(input_str: str, expected: TaskType) -> None:
+    """Unit test for TaskType.from_string() with valid task types"""
     assert TaskType.from_string(input_str) == expected
 
 
 def test_invalid_task_type_from_string() -> None:
+    """Unit test for TaskType.from_string() with invalid task type"""
     with pytest.raises(ValueError):
         TaskType.from_string("non existing task type")
 
@@ -50,14 +54,106 @@ def test_task_manager_init(
     task_manager: TaskManager,
     mock_output_manager: Generator[Any, Any, Any],
 ) -> None:
+    """Unit test for TaskManager.__init__()"""
     assert task_manager.output_manager is mock_output_manager
 
 
-def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+@pytest.mark.parametrize(
+    "verbosity, exclude_info_maps, clear_output_directory, produce_graphics, suppress_log_files, metadata_depth_limit,"
+    "workers",
+    [
+        (LogVerbosity.LOGS, True, True, True, True, 8, 1),
+        (LogVerbosity.CREDITS, True, True, True, True, 8, 2),
+        (LogVerbosity.ERRORS, True, True, True, True, 8, 3),
+        (LogVerbosity.WARNINGS, True, True, True, True, 8, 4),
+        (LogVerbosity.NONE, True, True, True, True, 8, 5),
+        (LogVerbosity.LOGS, False, True, True, True, 8, 6),
+        (LogVerbosity.CREDITS, False, True, True, True, 8, 7),
+        (LogVerbosity.ERRORS, False, True, True, True, 8, 8),
+        (LogVerbosity.WARNINGS, False, True, True, True, 8, 9),
+        (LogVerbosity.NONE, False, True, True, True, 8, 10),
+    ],
+)
+def test_task_manager_start(
+    verbosity: LogVerbosity,
+    exclude_info_maps: bool,
+    clear_output_directory: bool,
+    produce_graphics: bool,
+    suppress_log_files: bool,
+    metadata_depth_limit: int,
+    workers: int,
+    mocker: MockerFixture,
+    mock_output_manager: Generator[Any, Any, Any],
+) -> None:
+    """Unit test for TaskManager.start()"""
     mock_task_manager = TaskManager()
-    mock_input_manager = InputManager()
+    mock_parse_input_tasks = mocker.patch.object(mock_task_manager, "_parse_input_tasks", return_value=([{}], [{}]))
+    mock_expand_multi_runs_to_single_runs = mocker.patch.object(
+        mock_task_manager, "_expand_multi_runs_to_single_runs", return_value=[{}]
+    )
+    mock_run_tasks = mocker.patch.object(mock_task_manager, "_run_tasks")
+
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
+    mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=workers)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
+    mock_task_manager.output_manager = mock_output_manager
+
+    mock_task_manager.start(
+        Path("metadata/path"),
+        verbosity,
+        exclude_info_maps,
+        Path("output/directory"),
+        Path("logs/directory"),
+        clear_output_directory,
+        produce_graphics,
+        suppress_log_files,
+        metadata_depth_limit,
+    )
+
+    mock_output_manager.run_startup_sequence.assert_called_once_with(
+        verbosity,
+        exclude_info_maps,
+        Path("output/directory"),
+        clear_output_directory,
+        Path(""),
+        "Task Manager",
+        RUFAS_VERSION,
+        "TASK MANAGER",
+        False,
+    )
+
+    info_map = {
+        "class": TaskManager.__name__,
+        "function": TaskManager.start.__name__,
+        "units": MeasurementUnits.UNITLESS,
+    }
+    expected_add_log_calls = [
+        call("Task Manager Start", "Task Manager Started.", info_map),
+        call("Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map),
+        call("Task Manager parsed tasks", "Parsed 2 tasks args.", info_map),
+        call("Task Manager expanded tasks", "Expanded task args to 2. Starting the tasks...", info_map),
+    ]
+    mock_output_manager.add_log.assert_has_calls(expected_add_log_calls)
+
+    mock_start_data.assert_called_once_with(Path("metadata/path"))
+    mock_get_data.assert_called_once_with("tasks.parallel_workers")
+
+    mock_parse_input_tasks.assert_called_once()
+    mock_expand_multi_runs_to_single_runs.assert_called_once()
+    mock_run_tasks.assert_called_once_with(
+        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit
+    )
+
+
+def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Unit test for TaskManager.start() with exception raised"""
+    mock_task_manager = TaskManager()
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_start_data = mocker.patch.object(mock_input_manager, "start_data_processing", return_value=False)
     mock_dump_get_data = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
     mock_task_manager.output_manager = mock_output_manager
     with pytest.raises(Exception) as exc_info:
         mock_task_manager.start(
@@ -69,7 +165,7 @@ def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager
             True,
             False,
             False,
-            None,
+            10,
         )
     assert "Task Manager's input data is invalid." in str(exc_info.value)
     mock_start_data.assert_called_once_with(Path("/fake/path"))
@@ -77,6 +173,7 @@ def test_task_manager_start_exception(mocker: MockerFixture, mock_output_manager
 
 
 def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Unit test for TaskManager.set_random_seed() with no specified random seed."""
     TaskManager.set_random_seed(1234, mock_output_manager)
     mock_output_manager.add_log.assert_called_with(
         "Random seed used",
@@ -85,33 +182,36 @@ def test_set_random_seed(mock_output_manager: Generator[Any, Any, Any]) -> None:
     )
 
 
-def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any]) -> None:
-    with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
-        TaskManager.set_random_seed(0, mock_output_manager)
-        mock_randint.assert_called_once_with(0, 2**32 - 1)
-        mock_output_manager.add_log.assert_called_with(
-            "Random seed used",
-            "Seeded libaries with random_seed=4321",
-            {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
-        )
+def test_set_random_seed_zero(mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture) -> None:
+    """Unit test for TaskManager.set_random_seed() when 0 is passed as random seed."""
+    mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
+    TaskManager.set_random_seed(0, mock_output_manager)
+    mock_randint.assert_called_once_with(0, 2**32 - 1)
+    mock_output_manager.add_log.assert_called_with(
+        "Random seed used",
+        "Seeded libaries with random_seed=4321",
+        {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
+    )
 
 
 @pytest.mark.parametrize("seed, expected", [(12345, 12345), (0, 4321)])
 def test_set_random_seed_with_parameters(
-    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any]
+    seed: int, expected: int, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
 ) -> None:
-    with patch("RUFAS.task_manager.random.randint", return_value=4321) as mock_randint:
-        TaskManager.set_random_seed(seed, mock_output_manager)
-        if seed == 0:
-            mock_randint.assert_called_once_with(0, 2**32 - 1)
-        mock_output_manager.add_log.assert_called_with(
-            "Random seed used",
-            f"Seeded libaries with random_seed={expected}",
-            {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
-        )
+    """Unit test for TaskManager.set_random_seed() with specified random seed."""
+    mock_randint = mocker.patch("RUFAS.task_manager.random.randint", return_value=4321)
+    TaskManager.set_random_seed(seed, mock_output_manager)
+    if seed == 0:
+        mock_randint.assert_called_once_with(0, 2**32 - 1)
+    mock_output_manager.add_log.assert_called_with(
+        "Random seed used",
+        f"Seeded libaries with random_seed={expected}",
+        {"class": "TaskManager", "function": "set_random_seed", "units": MeasurementUnits.UNITLESS},
+    )
 
 
 def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> None:
+    """Unit test for TaskManager._parse_input_tasks()"""
     task_data = [
         {
             "task_type": "Herd Initialization",
@@ -146,9 +246,11 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
             "comparison_properties_file_path": "path/to/comparison/properties",
         },
     ]
-    mock_input_manager = InputManager()
-    task_manager.input_manager = mock_input_manager
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_get_data = mocker.patch.object(mock_input_manager, "get_data", return_value=task_data)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    task_manager.input_manager = mock_input_manager
+
     single, multi = task_manager._parse_input_tasks()
     assert len(single) == 1
     assert len(multi) == 1
@@ -158,6 +260,7 @@ def test_parse_input_tasks(task_manager: TaskManager, mocker: MockerFixture) -> 
 
 
 def test_expand_multi_runs_to_single_runs(task_manager: TaskManager) -> None:
+    """Unit test for TaskManager._expand_multi_runs_to_single_runs()"""
     multi_run_args = [{"task_type": TaskType.SIMULATION_MULTI_RUN, "multi_run_counts": 3, "output_prefix": "sim"}]
     results = task_manager._expand_multi_runs_to_single_runs(multi_run_args)
     assert len(results) == 3
@@ -171,6 +274,7 @@ def test_handle_post_processing(
     suppress_logs: bool,
     mocker: MockerFixture,
 ) -> None:
+    """Unit test for TaskManager.handle_post_processing()"""
     args = {
         "filters_directory": Path("/fake/filters"),
         "exclude_info_maps": False,
@@ -183,9 +287,11 @@ def test_handle_post_processing(
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": suppress_logs,
     }
-    mock_input_manager = InputManager()
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_dump_data_logs = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
     task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
     if not suppress_logs:
         mock_dump_data_logs.call_count == 1
@@ -197,22 +303,113 @@ def test_handle_post_processing(
         mock_output_manager.dump_all_nondata_pools.assert_not_called()
 
 
+def test_handle_end_to_end_testing(
+    mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, mocker: MockerFixture
+) -> None:
+    """Test that end-to-end testing is executed correctly."""
+    sim_engine_run_tasks = mocker.patch.object(TaskManager, "_handle_simulation_engine_run_tasks")
+    post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+    args = {"json_output_directory": "json_path"}
+    compare_outputs = mocker.patch(
+        "RUFAS.e2e_test_results_comparer.E2ETestResultsComparer.compare_actual_and_expected_test_results"
+    )
+    mock_input_manager = mocker.MagicMock()
+    add_log = mocker.patch.object(mock_output_manager, "add_log")
+
+    task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", False)
+
+    sim_engine_run_tasks.assert_called_once_with(args, mock_input_manager, mock_output_manager, "test_task", False)
+    compare_outputs.assert_called_once_with(args["json_output_directory"])
+    assert add_log.call_count == 2
+    assert post_processing.call_count == 1
+
+
+def test_handle_post_processing_load_pool(
+    task_manager: TaskManager,
+    mock_output_manager: Generator[Any, Any, Any],
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for TaskManager.handle_post_processing() when load_pool_from_file is set to True."""
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
+    mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
+
+    args = {
+        "filters_directory": Path("/fake/filters"),
+        "exclude_info_maps": False,
+        "variable_name_style": "verbose",
+        "graphics_directory": Path("/fake/graphics"),
+        "csv_output_directory": Path("/fake/CSV"),
+        "json_output_directory": Path("/fake/JSON"),
+        "report_directory": Path("/fake/reports"),
+        "output_pool_path": Path("/fake/pool"),
+        "logs_directory": Path("/fake/logs"),
+        "suppress_log_files": True,
+    }
+    task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1", load_pool_from_file=True)
+
+    mock_output_manager.flush_pools.assert_called_once()
+    mock_output_manager.load_variables_pool_from_file.assert_called_once_with(args["output_pool_path"])
+    mock_output_manager.set_metadata_prefix.assert_called_once_with("reload")
+
+
+def test_handle_post_processing_save_result(
+    task_manager: TaskManager,
+    mock_output_manager: Generator[Any, Any, Any],
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for TaskManager.handle_post_processing() when save_result is set to True."""
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
+    mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
+
+    args = {
+        "filters_directory": Path("/fake/filters"),
+        "exclude_info_maps": False,
+        "variable_name_style": "verbose",
+        "graphics_directory": Path("/fake/graphics"),
+        "csv_output_directory": Path("/fake/CSV"),
+        "json_output_directory": Path("/fake/JSON"),
+        "report_directory": Path("/fake/reports"),
+        "output_pool_path": Path("/fake/pool"),
+        "logs_directory": Path("/fake/logs"),
+        "suppress_log_files": True,
+    }
+    task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1", save_results=True)
+
+    mock_output_manager.save_results.assert_called_once_with(
+        args["filters_directory"],
+        args["exclude_info_maps"],
+        False,
+        args["report_directory"],
+        args["graphics_directory"],
+        args["csv_output_directory"],
+        args["json_output_directory"],
+    )
+
+
 @pytest.mark.parametrize("suppress_logs", [True, False])
 def test_input_data_audit(
     mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager, suppress_logs: bool, mocker: MockerFixture
 ) -> None:
+    """Unit test for TaskManager.handle_input_data_audit()"""
     args = {
         "metadata_file_path": Path("/fake/metadata"),
         "output_prefix": "test",
         "logs_directory": Path("/fake/output/logs"),
         "suppress_log_files": suppress_logs,
     }
-    mock_input_manager = InputManager()
-    task_manager.input_manager = mock_input_manager
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mocker.patch.object(mock_input_manager, "start_data_processing", return_value=True)
     mock_save_metadata_properties = mocker.patch.object(
         mock_input_manager, "save_metadata_properties", return_value=None
     )
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+    task_manager.input_manager = mock_input_manager
 
     result = task_manager.handle_input_data_audit(args, mock_input_manager, mock_output_manager, True)
     assert result
@@ -235,6 +432,7 @@ def test_input_data_audit(
         [TaskType.HERD_INITIALIZATION, False],
         [TaskType.SIMULATION_SINGLE_RUN, False],
         [TaskType.POST_PROCESSING, False],
+        [TaskType.END_TO_END_TESTING, False],
     ],
 )
 def test_task(
@@ -280,6 +478,63 @@ def test_task(
         mock_handler.assert_called_once()
 
 
+def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator[Any, Any, Any]) -> None:
+    """Unit test for TaskManager.task() with invalid data"""
+    task_manager = TaskManager()
+    mock_im_init = mocker.patch.object(InputManager, "__init__", return_value=None)
+
+    mock_om_init = mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+
+    mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
+    mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=False)
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing")
+
+    args = {
+        "task_type": TaskType.SIMULATION_SINGLE_RUN,
+        "log_verbosity": LogVerbosity.LOGS,
+        "exclude_info_maps": False,
+        "output_prefix": "test",
+        "logs_directory": Path("/fake/logs"),
+        "task_id": 1,
+        "random_seed": 924,
+        "suppress_log_files": True,
+        "metadata_file_path": Path("/fake/logs"),
+        "properties_file_path": Path("more/fake/paths"),
+        "produce_graphics": False,
+    }
+    produce_graphics = False
+    result = task_manager.task(args, produce_graphics, 10)
+
+    assert result is None
+
+    mock_om_init.assert_called_once()
+    mock_output_manager.run_startup_sequence.assert_called_once_with(
+        LogVerbosity.LOGS,
+        args["exclude_info_maps"],
+        Path(""),
+        False,
+        Path(""),
+        args["output_prefix"],
+        RUFAS_VERSION,
+        args["task_id"],
+        False,
+    )
+    mock_im_init.assert_called_once_with(10)
+    mock_handler.assert_not_called()
+    mock_handle_input_data_audit.assert_called_once()
+
+    info_map = {
+        "class": TaskManager.__name__,
+        "function": TaskManager.task.__name__,
+        "units": MeasurementUnits.UNITLESS,
+    }
+    mock_output_manager.add_error.assert_called_once_with(
+        "No task run", f"Data not valid for {args['output_prefix']}, task not run", info_map
+    )
+
+    mock_handle_post_processing.assert_called_once()
+
+
 def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager) -> None:
     """Tests that error were handled correctly"""
     args = {
@@ -302,6 +557,79 @@ def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager
     produce_graphics = False
     result = task_manager.task(args, produce_graphics, 2, 10)
     assert result == "test (1)"
+
+
+@pytest.mark.parametrize(
+    "init_herd, save_animals, save_animals_directory",
+    [
+        (True, True, Path("dummy/path")),
+        (True, False, Path("dummy/path")),
+        (False, True, Path("dummy/path")),
+        (False, False, Path("dummy/path")),
+    ],
+)
+def test_handle_herd_initialization(
+    init_herd: bool,
+    save_animals: bool,
+    save_animals_directory: Path,
+    task_manager: TaskManager,
+    mock_output_manager: Generator[Any, Any, Any],
+    mocker: MockerFixture,
+) -> None:
+    """Unit test for TaskManager.handle_herd_initializaition()"""
+    args = {"init_herd": init_herd, "save_animals": save_animals, "save_animals_directory": save_animals_directory}
+    mock_herd_factory = mocker.patch("RUFAS.routines.animal.life_cycle.herd_factory.HerdFactory")
+    mock_herd_factory_init = mocker.patch("RUFAS.task_manager.HerdFactory", return_value=mock_herd_factory)
+    mock_initialize_herd = mocker.patch.object(mock_herd_factory, "initialize_herd")
+
+    task_manager.handle_herd_initializaition(args, mock_output_manager)
+
+    info_map = {
+        "class": TaskManager.__name__,
+        "function": TaskManager.handle_herd_initializaition.__name__,
+        "units": MeasurementUnits.UNITLESS,
+    }
+    om_add_log_call_list = [
+        call("Herd initialization start", "Initializing herd data...", info_map),
+        call("Herd initialization complete", "Herd data initialized.", info_map),
+    ]
+    mock_output_manager.add_log.assert_has_calls(om_add_log_call_list)
+
+    mock_herd_factory_init.assert_called_once_with(init_herd, save_animals, save_animals_directory)
+    mock_initialize_herd.assert_called_once()
+
+
+def test_single_simulation_run(
+    task_manager: TaskManager, mock_output_manager: Generator[Any, Any, Any], mocker: MockerFixture
+) -> None:
+    """Unit test for TaskManager.handle_single_simulation_run()"""
+    mock_handle_herd_initializaition = mocker.patch.object(TaskManager, "handle_herd_initializaition")
+
+    args: dict[str, Any] = {"task_type": TaskType.SIMULATION_SINGLE_RUN}
+
+    mock_simulation_engine = mocker.patch("RUFAS.simulation_engine.SimulationEngine")
+    mock_simulation_engine_init = mocker.patch(
+        "RUFAS.task_manager.SimulationEngine", return_value=mock_simulation_engine
+    )
+    mock_simulate = mocker.patch.object(mock_simulation_engine, "simulate")
+
+    task_manager.handle_single_simulation_run(args, mock_output_manager)
+
+    mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
+
+    info_map = {
+        "class": TaskManager.__name__,
+        "function": TaskManager.handle_single_simulation_run.__name__,
+        "units": MeasurementUnits.UNITLESS,
+    }
+    om_add_log_call_list = [
+        call("Starting the simulation", "Starting the simulation", info_map),
+        call("Simulation completed", "Simulation completed", info_map),
+    ]
+    mock_output_manager.add_log.assert_has_calls(om_add_log_call_list)
+
+    mock_simulation_engine_init.assert_called_once()
+    mock_simulate.assert_called_once()
 
 
 def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
@@ -329,7 +657,7 @@ def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
     )
 
 
-def test_herd_init_tasks() -> None:
+def test_herd_init_tasks(mocker: MockerFixture) -> None:
     """Tests that all herd initialization tasks were handled"""
     args = {
         "log_verbosity": "logs",
@@ -348,17 +676,18 @@ def test_herd_init_tasks() -> None:
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
-    with (
-        patch.object(TaskManager, "handle_herd_initializaition", return_value=None) as mock_handle_herd_initializaition,
-        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
-    ):
-        TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
-        mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
-        mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
+    mock_handle_herd_initializaition = mocker.patch.object(
+        TaskManager, "handle_herd_initializaition", return_value=None
+    )
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+
+    TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
+    mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
+    mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
 
 
 @pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
-def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) -> None:
+def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool, mocker: MockerFixture) -> None:
     """Tests that all simulation engine run tasks were handled"""
     args = {
         "log_verbosity": "logs",
@@ -375,30 +704,29 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool) 
     task_id = 5
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
-    with (
-        patch.object(
-            TaskManager, "handle_single_simulation_run", return_value=None
-        ) as mock_handle_single_simulation_run,
-        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
-        patch.object(Utility, "deep_merge", return_value=None) as mock_deep_merge,
-    ):
 
-        TaskManager._handle_simulation_engine_run_tasks(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
-        )
-        if input_patch:
-            mock_deep_merge.assert_called_once_with(mock_input_manager.pool, args["input_patch"])
-        else:
-            mock_deep_merge.assert_not_called()
+    mock_handle_single_simulation_run = mocker.patch.object(
+        TaskManager, "handle_single_simulation_run", return_value=None
+    )
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+    mock_deep_merge = mocker.patch.object(Utility, "deep_merge", return_value=None)
 
-        mock_handle_single_simulation_run.assert_called_once_with(args, mock_output_manager)
-        mock_handle_post_processing.assert_called_once_with(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True
-        )
+    TaskManager._handle_simulation_engine_run_tasks(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+    )
+    if input_patch:
+        mock_deep_merge.assert_called_once_with(mock_input_manager.pool, args["input_patch"])
+    else:
+        mock_deep_merge.assert_not_called()
+
+    mock_handle_single_simulation_run.assert_called_once_with(args, mock_output_manager)
+    mock_handle_post_processing.assert_called_once_with(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True
+    )
 
 
 @pytest.mark.parametrize("produce_graphics", [True, False])
-def test_postprocessing_tasks(produce_graphics: bool) -> None:
+def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> None:
     """Tests that all postprocessing tasks were handled"""
     args = {
         "log_verbosity": "logs",
@@ -414,16 +742,662 @@ def test_postprocessing_tasks(produce_graphics: bool) -> None:
     task_id = 5
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
-    with patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing:
-        TaskManager._handle_postprocessing_tasks(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
-        )
-        mock_handle_post_processing.assert_called_once_with(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
-        )
+
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+
+    TaskManager._handle_postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics)
+    mock_handle_post_processing.assert_called_once_with(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
+    )
 
 
-def test_call_handler():
+@pytest.mark.filterwarnings("ignore::DeprecationWarning", "ignore::UserWarning")
+@pytest.mark.parametrize(
+    "multi_run_args, expected_output_prefixes, expected_input_patches",
+    [
+        (
+            {
+                "task_type": "SENSITIVITY_ANALYSIS",
+                "output_prefix": "Task 2",
+                "log_verbosity": "errors",
+                "sampler": "fractional_factorial",
+                "SA_load_balancing_start": 0,
+                "SA_load_balancing_stop": 1,
+                "saltelli_skip": 0,
+                "saltelli_number": 2,
+                "SA_input_variables": [
+                    {
+                        "variable_name": "animal.herd_information.calf_num",
+                        "lower_bound": 6,
+                        "upper_bound": 10,
+                        "data_type": "int",
+                    },
+                    {
+                        "variable_name": "animal.herd_information.cow_num",
+                        "lower_bound": 98,
+                        "upper_bound": 102,
+                        "data_type": "int",
+                    },
+                    {
+                        "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                        "lower_bound": 378,
+                        "upper_bound": 382,
+                        "data_type": "int",
+                    },
+                ],
+            },
+            [
+                "Task 2 run 1",
+                "Task 2 run 2",
+                "Task 2 run 3",
+                "Task 2 run 4",
+                "Task 2 run 5",
+                "Task 2 run 6",
+                "Task 2 run 7",
+                "Task 2 run 8",
+            ],
+            [
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 382}},
+                    }
+                },
+            ],
+        ),
+        (
+            {
+                "task_type": "SENSITIVITY_ANALYSIS",
+                "output_prefix": "Task 3",
+                "log_verbosity": "errors",
+                "sampler": "saltelli_sobol",
+                "SA_load_balancing_start": 0,
+                "SA_load_balancing_stop": 1,
+                "saltelli_skip": 0,
+                "saltelli_number": 2,
+                "SA_input_variables": [
+                    {
+                        "variable_name": "animal.herd_information.calf_num",
+                        "lower_bound": 6,
+                        "upper_bound": 10,
+                        "data_type": "int",
+                    },
+                    {
+                        "variable_name": "animal.herd_information.cow_num",
+                        "lower_bound": 98,
+                        "upper_bound": 102,
+                        "data_type": "int",
+                    },
+                    {
+                        "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                        "lower_bound": 378,
+                        "upper_bound": 382,
+                        "data_type": "int",
+                    },
+                ],
+            },
+            [
+                "Task 3 run 01",
+                "Task 3 run 02",
+                "Task 3 run 03",
+                "Task 3 run 04",
+                "Task 3 run 05",
+                "Task 3 run 06",
+                "Task 3 run 07",
+                "Task 3 run 08",
+                "Task 3 run 09",
+                "Task 3 run 10",
+                "Task 3 run 11",
+                "Task 3 run 12",
+                "Task 3 run 13",
+                "Task 3 run 14",
+                "Task 3 run 15",
+                "Task 3 run 16",
+            ],
+            [
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+            ],
+        ),
+    ],
+)
+def test_expand_sensitivity_analysis_args(
+    multi_run_args: dict[str, Any],
+    expected_output_prefixes: list[str],
+    expected_input_patches: list[dict[str, dict[str, dict[str, Any]]]],
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
+) -> None:
+    """Unit test for TaskManager._expand_sensitivity_analysis_args() with fractional_factorial and saltelli_sobol as
+    samplers."""
+    result = task_manager._expand_sensitivity_analysis_args(multi_run_args)
+
+    expected_output = [
+        {
+            "task_type": TaskType.SIMULATION_SINGLE_RUN,
+            "output_prefix": expected_output_prefixes[i],
+            "log_verbosity": "errors",
+            "sampler": multi_run_args["sampler"],
+            "SA_load_balancing_start": 0,
+            "SA_load_balancing_stop": 1,
+            "saltelli_skip": 0,
+            "saltelli_number": 2,
+            "SA_input_variables": [
+                {
+                    "variable_name": "animal.herd_information.calf_num",
+                    "lower_bound": 6,
+                    "upper_bound": 10,
+                    "data_type": "int",
+                },
+                {
+                    "variable_name": "animal.herd_information.cow_num",
+                    "lower_bound": 98,
+                    "upper_bound": 102,
+                    "data_type": "int",
+                },
+                {
+                    "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                    "lower_bound": 378,
+                    "upper_bound": 382,
+                    "data_type": "int",
+                },
+            ],
+            "input_patch": expected_input_patches[i],
+        }
+        for i in range(len(expected_output_prefixes))
+    ]
+
+    assert result == expected_output
+
+
+@pytest.mark.parametrize(
+    "multi_run_args",
+    [
+        {
+            "task_type": "SENSITIVITY_ANALYSIS",
+            "output_prefix": "Task 4",
+            "log_verbosity": "errors",
+            "sampler": "invalid_sampler",
+            "SA_load_balancing_start": 0,
+            "SA_load_balancing_stop": 1,
+            "SA_input_variables": [
+                {
+                    "variable_name": "animal.herd_information.calf_num",
+                    "lower_bound": 6,
+                    "upper_bound": 10,
+                    "data_type": "int",
+                },
+                {
+                    "variable_name": "animal.herd_information.cow_num",
+                    "lower_bound": 98,
+                    "upper_bound": 102,
+                    "data_type": "int",
+                },
+                {
+                    "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                    "lower_bound": 378,
+                    "upper_bound": 382,
+                    "data_type": "int",
+                },
+            ],
+        },
+        {
+            "task_type": "SENSITIVITY_ANALYSIS",
+            "output_prefix": "Task 5",
+            "log_verbosity": "warning",
+            "sampler": "random_sampler",
+            "SA_load_balancing_start": 0,
+            "SA_load_balancing_stop": 1,
+            "SA_input_variables": [
+                {
+                    "variable_name": "animal.herd_information.calf_num",
+                    "lower_bound": 6,
+                    "upper_bound": 10,
+                    "data_type": "int",
+                },
+                {
+                    "variable_name": "animal.herd_information.cow_num",
+                    "lower_bound": 98,
+                    "upper_bound": 102,
+                    "data_type": "int",
+                },
+                {
+                    "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                    "lower_bound": 378,
+                    "upper_bound": 382,
+                    "data_type": "int",
+                },
+            ],
+        },
+    ],
+)
+def test_expand_sensitivity_analysis_args_invalid_sampler(
+    multi_run_args: dict[str, Any], mock_output_manager: Generator[Any, Any, Any], task_manager: TaskManager
+) -> None:
+    """Unit test for TaskManager._expand_sensitivity_analysis_args() with invalid sampler"""
+    task_manager.output_manager = mock_output_manager
+
+    with pytest.raises(ValueError) as exception_raised:
+        task_manager._expand_sensitivity_analysis_args(multi_run_args)
+
+    mock_output_manager.add_log.assert_called_once_with(
+        "Invalid sampler",
+        f"The sampler {multi_run_args['sampler']} is not supported",
+        {
+            "class": TaskManager.__name__,
+            "function": TaskManager.task.__name__,
+            "units": MeasurementUnits.UNITLESS,
+            "output_prefix": multi_run_args["output_prefix"],
+        },
+    )
+    assert str(exception_raised.value) == f"INVALID SAMPLER: The sampler {multi_run_args['sampler']} is not supported"
+
+
+@pytest.mark.parametrize(
+    "single_run_tasks, produce_graphics, metadata_depth_limit",
+    [
+        (
+            [
+                {
+                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
+                    "metadata_file_path": Path("input/metadata/default_metadata.json"),
+                    "output_prefix": "default",
+                    "log_verbosity": LogVerbosity.LOGS,
+                    "random_seed": 42,
+                    "properties_file_path": Path("input/metadata/properties/default.json"),
+                    "comparison_properties_file_path": Path("input/metadata/properties/default.json"),
+                    "variable_name_style": "basic",
+                    "exclude_info_maps": False,
+                    "init_herd": False,
+                    "save_animals": False,
+                    "save_animals_directory": Path("output"),
+                    "filters_directory": Path("output/output_filters"),
+                    "csv_output_directory": Path("output/CSVs"),
+                    "json_output_directory": Path("output/JSONs"),
+                    "report_directory": Path("output/reports"),
+                    "graphics_directory": Path("output/graphics"),
+                    "logs_directory": Path("output/logs"),
+                    "suppress_log_files": False,
+                    "output_pool_path": Path("."),
+                    "multi_run_counts": 4,
+                    "sampler": "saltelli_sobol",
+                    "saltelli_skip": 0,
+                    "saltelli_number": 2,
+                    "SA_load_balancing_start": 0,
+                    "SA_load_balancing_stop": 1,
+                    "input_patch": None,
+                    "task_id": 1,
+                },
+                {
+                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
+                    "metadata_file_path": Path("input/metadata/default_metadata.json"),
+                    "output_prefix": "default",
+                    "log_verbosity": LogVerbosity.WARNINGS,
+                    "random_seed": 31415,
+                    "properties_file_path": Path("input/metadata/properties/default.json"),
+                    "comparison_properties_file_path": Path("input/metadata/properties/default.json"),
+                    "variable_name_style": "basic",
+                    "exclude_info_maps": False,
+                    "init_herd": False,
+                    "save_animals": False,
+                    "save_animals_directory": Path("output"),
+                    "filters_directory": Path("output/output_filters"),
+                    "csv_output_directory": Path("output/CSVs"),
+                    "json_output_directory": Path("output/JSONs"),
+                    "report_directory": Path("output/reports"),
+                    "graphics_directory": Path("output/graphics"),
+                    "logs_directory": Path("output/logs"),
+                    "suppress_log_files": False,
+                    "output_pool_path": Path("."),
+                    "multi_run_counts": 4,
+                    "sampler": "saltelli_sobol",
+                    "saltelli_skip": 0,
+                    "saltelli_number": 2,
+                    "SA_load_balancing_start": 0,
+                    "SA_load_balancing_stop": 1,
+                    "input_patch": None,
+                    "task_id": 1,
+                },
+            ],
+            True,
+            10,
+        ),
+        (
+            [
+                {
+                    "task_type": "HERD_INITIALIZATION",
+                    "metadata_file_path": "input/metadata/default_metadata.json",
+                    "output_prefix": "herd_init",
+                    "save_animals": True,
+                    "log_verbosity": "errors",
+                    "random_seed": 42,
+                },
+                {
+                    "task_type": "SENSITIVITY_ANALYSIS",
+                    "output_prefix": "Task 5",
+                    "log_verbosity": "errors",
+                    "sampler": "fractional_factorial",
+                    "SA_load_balancing_start": 0,
+                    "SA_load_balancing_stop": 1,
+                    "SA_input_variables": [
+                        {
+                            "variable_name": "animal.herd_information.calf_num",
+                            "lower_bound": 6,
+                            "upper_bound": 10,
+                            "data_type": "int",
+                        },
+                        {
+                            "variable_name": "animal.herd_information.cow_num",
+                            "lower_bound": 98,
+                            "upper_bound": 102,
+                            "data_type": "int",
+                        },
+                        {
+                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                            "lower_bound": 378,
+                            "upper_bound": 382,
+                            "data_type": "int",
+                        },
+                    ],
+                },
+            ],
+            False,
+            8,
+        ),
+    ],
+)
+def test_run_tasks(
+    single_run_tasks: list[dict[str, Any]],
+    produce_graphics: bool,
+    metadata_depth_limit: int,
+    task_manager: TaskManager,
+    mocker: MockerFixture,
+) -> None:
+    """Unit tests for TaskManager._run_tasks() with all tasks run successfully"""
+    task_manager = TaskManager()
+    mock_task = mocker.patch.object(task_manager, "task")
+    mock_task.return_value = None
+
+    mock_pool = mocker.patch("multiprocessing.Pool")
+    mock_pool.return_value.imap = lambda func, args: map(func, args)
+    task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
+
+    task_manager._run_tasks(
+        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+    )
+
+    mock_task_call_list = [
+        call(single_run_task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit)
+        for single_run_task in single_run_tasks
+    ]
+    mock_task.assert_has_calls(mock_task_call_list)
+
+
+@pytest.mark.parametrize(
+    "single_run_tasks, produce_graphics, metadata_depth_limit, task_return_values",
+    [
+        (
+            [
+                {"dummy": "task"},
+                {
+                    "task_type": TaskType.SIMULATION_SINGLE_RUN,
+                    "metadata_file_path": Path("input/metadata/default_metadata.json"),
+                    "output_prefix": "default",
+                    "log_verbosity": LogVerbosity.WARNINGS,
+                    "random_seed": 42,
+                    "properties_file_path": Path("input/metadata/properties/default.json"),
+                    "comparison_properties_file_path": Path("input/metadata/properties/default.json"),
+                    "variable_name_style": "verbose",
+                    "exclude_info_maps": False,
+                    "init_herd": False,
+                    "save_animals": False,
+                    "save_animals_directory": Path("output"),
+                    "filters_directory": Path("output/output_filters"),
+                    "csv_output_directory": Path("output/CSVs"),
+                    "json_output_directory": Path("output/JSONs"),
+                    "report_directory": Path("output/reports"),
+                    "graphics_directory": Path("output/graphics"),
+                    "logs_directory": Path("output/logs"),
+                    "suppress_log_files": False,
+                    "output_pool_path": Path("."),
+                    "multi_run_counts": 4,
+                    "sampler": "saltelli_sobol",
+                    "saltelli_skip": 0,
+                    "saltelli_number": 2,
+                    "SA_load_balancing_start": 0,
+                    "SA_load_balancing_stop": 1,
+                    "input_patch": None,
+                    "task_id": 1,
+                },
+            ],
+            True,
+            10,
+            ["default (1)", None],
+        ),
+        (
+            [
+                {"dummy": "task"},
+                {
+                    "task_type": "SENSITIVITY_ANALYSIS",
+                    "output_prefix": "Task 1",
+                    "log_verbosity": "errors",
+                    "sampler": "fractional_factorial",
+                    "SA_load_balancing_start": 0,
+                    "SA_load_balancing_stop": 1,
+                    "SA_input_variables": [
+                        {
+                            "variable_name": "animal.herd_information.calf_num",
+                            "lower_bound": 6,
+                            "upper_bound": 10,
+                            "data_type": "int",
+                        },
+                        {
+                            "variable_name": "animal.herd_information.cow_num",
+                            "lower_bound": 98,
+                            "upper_bound": 102,
+                            "data_type": "int",
+                        },
+                        {
+                            "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                            "lower_bound": 378,
+                            "upper_bound": 382,
+                            "data_type": "int",
+                        },
+                    ],
+                },
+            ],
+            False,
+            8,
+            ["default (1)", None],
+        ),
+        (
+            [
+                {"dummy": "task"},
+                {"dummy": "task"},
+                {
+                    "task_type": "SIMULATION_SINGLE_RUN",
+                    "metadata_file_path": "input/metadata/default_metadata.json",
+                    "output_prefix": "Task 2",
+                    "log_verbosity": "errors",
+                    "random_seed": 42,
+                },
+            ],
+            False,
+            8,
+            ["default (1)", "default (2)", None],
+        ),
+    ],
+)
+def test_run_tasks_fail(
+    single_run_tasks: list[dict[str, Any]],
+    produce_graphics: bool,
+    metadata_depth_limit: int,
+    task_return_values: list[str | None],
+    mock_output_manager: Generator[Any, Any, Any],
+    task_manager: TaskManager,
+    mocker: MockerFixture,
+) -> None:
+    """Unit tests for TaskManager._run_tasks() with failed tasks."""
+    task_manager = TaskManager()
+    mock_task = mocker.patch.object(task_manager, "task")
+    mock_task.side_effect = task_return_values
+
+    mock_om_init = mocker.patch("RUFAS.task_manager.OutputManager", return_value=mock_output_manager)
+
+    mock_pool = mocker.patch("multiprocessing.Pool")
+
+    mock_pool.return_value.imap = lambda func, args: map(func, args)
+    task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
+
+    task_manager._run_tasks(
+        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+    )
+
+    mock_om_init.assert_called_once()
+    info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
+    failed = [fail for fail in task_return_values if fail is not None]
+    mock_output_manager.add_error.assert_called_once_with(
+        "Task(s) failed", f"Failed task(s) and output prefix are: {failed}", info_map
+    )
+
+
+def test_call_handler(mocker: MockerFixture) -> None:
     """Tests that wrapper handler function were handled"""
     args = {
         "log_verbosity": "logs",
@@ -442,22 +1416,23 @@ def test_call_handler():
     produce_graphics = False
 
     # Call the call_handler method
-    with patch.object(TaskManager, "_handle_postprocessing_tasks", return_value=None) as mock_handle_post_processing:
-        TaskManager.call_handler(
-            mock_handle_post_processing,
-            args=args,
-            input_manager=mock_input_manager,
-            output_manager=mock_output_manager,
-            task_id=task_id,
-            produce_graphics=produce_graphics,
-        )
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "_handle_postprocessing_tasks", return_value=None)
 
-        mock_handle_post_processing.assert_called_once_with(
-            args, mock_input_manager, mock_output_manager, task_id, produce_graphics
-        )
+    TaskManager.call_handler(
+        mock_handle_post_processing,
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        produce_graphics=produce_graphics,
+    )
+
+    mock_handle_post_processing.assert_called_once_with(
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+    )
 
 
-def test_input_data_audit_tasks() -> None:
+def test_input_data_audit_tasks(mocker: MockerFixture) -> None:
     """Tests that all input data audit tasks were handled"""
     args = {
         "log_verbosity": LogVerbosity.LOGS,
@@ -471,15 +1446,17 @@ def test_input_data_audit_tasks() -> None:
         "properties_file_path": Path("more/fake/paths"),
     }
     task_id = 5
-    im = InputManager()
-    om = OutputManager()
+
+    mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=None)
+    mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
+
+    mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
+
+    mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     produce_graphic = False
 
-    with (
-        patch.object(TaskManager, "handle_input_data_audit", return_value=None) as mock_handle_input_data_audit,
-        patch.object(TaskManager, "handle_post_processing", return_value=None) as mock_handle_post_processing,
-    ):
-        TaskManager._handle_input_data_audit_tasks(args, im, om, task_id, produce_graphic)
+    TaskManager._handle_input_data_audit_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
 
-        mock_handle_input_data_audit.assert_called_once_with(args, im, om, False)
-        mock_handle_post_processing.assert_called_once_with(args, im, om, task_id)
+    mock_handle_input_data_audit.assert_called_once_with(args, mock_input_manager, mock_output_manager, False)
+    mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)

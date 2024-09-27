@@ -2888,7 +2888,7 @@ def test_formulate_ration_hasattr(mocker: MockerFixture) -> None:
     mock_solution.success = False
     mock_ration_vals = mocker.MagicMock()
     mock_ration_config = mocker.MagicMock()
-    expected = (mock_pen.ration, mock_ration_vals)
+    expected = (mock_pen.ration_per_animal, mock_ration_vals)
     mock_attempt_optimization = mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.attempt_optimization",
         return_value=(mock_solution, mock_ration_vals, mock_ration_config),
@@ -2922,7 +2922,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     delattr(mock_pen, "ration_per_animal")
     mock_pen.animal_combination = mocker.MagicMock()
     mock_pen.animal_combination = AnimalCombination.LAC_COW
-    mock_pen.ration = None
+    mock_pen.ration_per_animal = None
     mock_animal = mocker.MagicMock()
     mock_body_weight_history = mocker.MagicMock()
     mock_body_weight_history.simulation_day = 100
@@ -2935,7 +2935,7 @@ def test_formulate_ration_noattr(mocker: MockerFixture) -> None:
     mock_solution_exists.success = True
     mock_ration_vals = mocker.MagicMock()
     mock_ration_config = mocker.MagicMock()
-    expected = (mock_pen.ration, mock_ration_vals)
+    expected = (mock_pen.ration_per_animal, mock_ration_vals)
     mock_attempt_optimization = mocker.patch(
         "RUFAS.routines.animal.ration.ration_optimizer.RationOptimizer.attempt_optimization",
         side_effect=[

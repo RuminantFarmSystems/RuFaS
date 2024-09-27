@@ -20,3 +20,4 @@ black
 coverage
 deepdiff
 psutil
+numba
