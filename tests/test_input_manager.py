@@ -1,7 +1,7 @@
 import json
 from functools import reduce
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Type, Union, Optional
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 from unittest.mock import ANY
 
 import pandas as pd

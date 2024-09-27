@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import math
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.animal_nutrients_daily_update.animal_phosphorus_status import AnimalPhosphorusStatus
 from RUFAS.routines.animal.animal_types import AnimalType

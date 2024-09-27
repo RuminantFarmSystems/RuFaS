@@ -1,12 +1,11 @@
-import pytest
-from unittest.mock import MagicMock, patch
 from math import exp, log
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import PhosphorusMineralization
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.phosphorus_cycling.phosphorus_mineralization import (
-    PhosphorusMineralization,
-)
 
 
 # --- Static method tests ---

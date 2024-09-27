@@ -1,18 +1,14 @@
-from mock import call
 import pytest
+from mock import call
 from pytest_mock import MockFixture
 
-from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
-    ManureModuleOutputManagerHelper,
-)
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.output_manager import OutputManager
 
 
 @pytest.mark.parametrize("simulate_animals,log_added", [(True, False), (False, True)])

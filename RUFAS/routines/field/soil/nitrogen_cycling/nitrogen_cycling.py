@@ -1,19 +1,11 @@
 from typing import Optional
 
-from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import (
-    LeachingRunoffErosion,
-)
-from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import (
-    NitrificationVolatilization,
-)
 from RUFAS.routines.field.soil.nitrogen_cycling.denitrification import Denitrification
-from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import (
-    MineralizationDecomposition,
-)
-from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import (
-    HumusMineralization,
-)
+from RUFAS.routines.field.soil.nitrogen_cycling.humus_mineralization import HumusMineralization
+from RUFAS.routines.field.soil.nitrogen_cycling.leaching_runoff_erosion import LeachingRunoffErosion
+from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
+from RUFAS.routines.field.soil.nitrogen_cycling.nitrification_volatilization import NitrificationVolatilization
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class NitrogenCycling:

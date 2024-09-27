@@ -1,8 +1,8 @@
 from typing import List
 
 from RUFAS.routines.EEE.enums import TillageImplement
-from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import TillageEvent
+from RUFAS.routines.field.manager.schedule import Schedule
 
 
 class TillageSchedule(Schedule):
