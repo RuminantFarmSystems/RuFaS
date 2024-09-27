@@ -53,3 +53,17 @@ class GeneralProperties:
     def is_milking(self) -> bool:
         """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0
+
+
+class Breed(Enum):
+    """Enum indicating the breed of the animal."""
+
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Gender(Enum):
+    """Enum indicating the gender of the animal."""
+
+    MALE = "male"
+    FEMALE = "female"

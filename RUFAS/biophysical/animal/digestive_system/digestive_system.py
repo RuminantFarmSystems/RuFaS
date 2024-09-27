@@ -42,7 +42,10 @@ class DigestiveSystem:
         Returns
         -------
         tuple[float, float, AnimalManureExcretions]
-            
+            The total amount of enteric methane produced by the given animal (g/day).
+            The total amount of phosphorus excreted by the given animal (g).
+            A dictionary that contains the manure excretion values as specified
+            in the AnimalManureExcretions class definition.
 
         """
         if general_properties.animal_type == AnimalType.CALF:
