@@ -1,13 +1,14 @@
-from .harvested_crop import HarvestedCrop
-from .storage import Storage
-from .enums import CropCategory
 from typing import Optional
+
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from ...general_constants import GeneralConstants
-from ...units import MeasurementUnits
-from ...output_manager import OutputManager
 
+from ...general_constants import GeneralConstants
+from ...output_manager import OutputManager
+from ...units import MeasurementUnits
+from .enums import CropCategory
+from .harvested_crop import HarvestedCrop
+from .storage import Storage
 
 """Fraction of effluent that is dry matter by mass."""
 DRY_MATTER_FRACTION_OF_EFFLUENT = 0.1035
