@@ -508,7 +508,7 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         "chunkification": False,
         "maximum_memory_usage_percent": 0,
         "maximum_memory_usage": 0,
-        "save_chunk_threshold_call_count": 0
+        "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
     result = task_manager.task(args, produce_graphics, 1, 10)
