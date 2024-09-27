@@ -7,7 +7,9 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Union, Type
 
 import pandas as pd
+import psutil
 import pytest
+from freezegun import freeze_time
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
 from pytest import raises
@@ -618,6 +620,232 @@ def test_add_variable(
 
 
 @pytest.mark.parametrize(
+    "name, value, info_map, first_map",
+    [
+        # Case 1: Everything correct, no exception should be raised
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+        # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
+        # Case 3: Value is a dict, should process sub-keys
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+    ],
+)
+def test_add_variable_chunkification_save_chunk_threshold_specified(
+    name: str,
+    value: Any,
+    info_map: Dict[str, Any],
+    first_map: bool,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the add_variable() method in output_manager.py.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    output_manager.chunkification = True
+    output_manager.current_pool_size = 1024
+    output_manager.average_add_variable_call_addition = 1024
+    output_manager.add_variable_call = 9
+    output_manager.save_chunk_threshold_call_count = 10
+    mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
+    mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
+    patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
+    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
+
+    expected_pool_size = 1024 + 1024
+
+    # Act
+    output_manager.add_variable(name, value, info_map, first_map)
+    # Assert
+    patched_add_to_pool.assert_called_once_with(
+        output_manager.variables_pool,
+        "key_with_prefix",
+        value,
+        {**info_map, "units": "validated_units"},
+        first_map,
+    )
+    if isinstance(value, dict):
+        for k in value.keys():
+            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+
+    assert output_manager.current_pool_size == expected_pool_size
+    assert output_manager.add_variable_call == 10
+    patched_save_current_variable_pool.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "name, value, info_map, first_map",
+    [
+        # Case 1: Everything correct, no exception should be raised
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+        # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
+        # Case 3: Value is a dict, should process sub-keys
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+    ],
+)
+def test_add_variable_chunkification_save_chunk_threshold_no_call(
+    name: str,
+    value: Any,
+    info_map: Dict[str, Any],
+    first_map: bool,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the add_variable() method in output_manager.py.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    output_manager.chunkification = True
+    output_manager.current_pool_size = 1024
+    output_manager.average_add_variable_call_addition = 1024
+    output_manager.add_variable_call = 8
+    output_manager.save_chunk_threshold_call_count = 10
+    mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
+    mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
+    patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
+    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
+
+    expected_pool_size = 1024 + 1024
+
+    # Act
+    output_manager.add_variable(name, value, info_map, first_map)
+    # Assert
+    patched_add_to_pool.assert_called_once_with(
+        output_manager.variables_pool,
+        "key_with_prefix",
+        value,
+        {**info_map, "units": "validated_units"},
+        first_map,
+    )
+    if isinstance(value, dict):
+        for k in value.keys():
+            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+
+    assert output_manager.current_pool_size == expected_pool_size
+    assert output_manager.add_variable_call == 9
+    patched_save_current_variable_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "name, value, info_map, first_map",
+    [
+        # Case 1: Everything correct, no exception should be raised
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+        # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
+        # Case 3: Value is a dict, should process sub-keys
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+    ],
+)
+def test_add_variable_chunkification_save_chunk_threshold_unspecified(
+    name: str,
+    value: Any,
+    info_map: Dict[str, Any],
+    first_map: bool,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the add_variable() method in output_manager.py.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    output_manager.chunkification = True
+    output_manager.current_pool_size = 1024
+    output_manager.average_add_variable_call_addition = 1024
+    output_manager.maximum_pool_size = 2000
+    output_manager.add_variable_call = 9
+    output_manager.save_chunk_threshold_call_count = 0
+    mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
+    mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
+    patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
+    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
+
+    expected_pool_size = 1024 + 1024
+
+    # Act
+    output_manager.add_variable(name, value, info_map, first_map)
+    # Assert
+    patched_add_to_pool.assert_called_once_with(
+        output_manager.variables_pool,
+        "key_with_prefix",
+        value,
+        {**info_map, "units": "validated_units"},
+        first_map,
+    )
+    if isinstance(value, dict):
+        for k in value.keys():
+            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+
+    assert output_manager.current_pool_size == expected_pool_size
+    assert output_manager.add_variable_call == 10
+    patched_save_current_variable_pool.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "name, value, info_map, first_map",
+    [
+        # Case 1: Everything correct, no exception should be raised
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+        # Case 1.5: Everything correct, no exception should be raised, only first info map should be recorded.
+        ("var1", 100, {"class": "TestClass", "function": "test_function", "units": "kg"}, False),
+        # Case 3: Value is a dict, should process sub-keys
+        ("var3", {"sub1": 10, "sub2": 20}, {"class": "TestClass", "function": "test_function", "units": "kg"}, True),
+    ],
+)
+def test_add_variable_chunkification_save_chunk_threshold_unspecified_no_call(
+    name: str,
+    value: Any,
+    info_map: Dict[str, Any],
+    first_map: bool,
+    mocker: MockerFixture,
+) -> None:
+    """
+    Unit test for the add_variable() method in output_manager.py.
+    """
+
+    # Arrange
+    output_manager = OutputManager()
+    output_manager.chunkification = True
+    output_manager.current_pool_size = 1024
+    output_manager.average_add_variable_call_addition = 1024
+    output_manager.maximum_pool_size = 4096
+    output_manager.add_variable_call = 9
+    output_manager.save_chunk_threshold_call_count = 0
+    mocker.patch.object(output_manager, "_stringify_units", return_value="validated_units")
+    mocker.patch.object(output_manager, "_generate_key", return_value="key_with_prefix")
+    patched_add_to_pool = mocker.patch.object(output_manager, "_add_to_pool")
+    mocker.patch.dict(output_manager._variables_usage_counter, {}, clear=True)
+    patched_save_current_variable_pool = mocker.patch.object(output_manager, "_save_current_variable_pool")
+
+    expected_pool_size = 1024 + 1024
+
+    # Act
+    output_manager.add_variable(name, value, info_map, first_map)
+    # Assert
+    patched_add_to_pool.assert_called_once_with(
+        output_manager.variables_pool,
+        "key_with_prefix",
+        value,
+        {**info_map, "units": "validated_units"},
+        first_map,
+    )
+    if isinstance(value, dict):
+        for k in value.keys():
+            assert output_manager._variables_usage_counter[f"key_with_prefix.{k}"] == 0
+
+    assert output_manager.current_pool_size == expected_pool_size
+    assert output_manager.add_variable_call == 10
+    patched_save_current_variable_pool.assert_not_called()
+
+
+@pytest.mark.parametrize(
     "units, expected_result",
     [
         (MeasurementUnits.ANIMALS, MeasurementUnits.ANIMALS.value),
@@ -824,6 +1052,7 @@ def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> 
 def test_flush_pools() -> None:
     """Test case for function flush_pools in output_manager.py"""
     om = OutputManager()
+    om.chunkification = False
     info_map = {"class": "dummy_class", "function": "dummy_func", "units": MeasurementUnits.ANIMALS}
     om.add_variable("dummy_name", "dummy_value", info_map)
     om.add_log("dummy_name", "dummy_msg", info_map)
@@ -878,6 +1107,7 @@ def output_manager_original_method_states(
         "filter_saved_pools": mock_output_manager.filter_saved_pools,
         "flush_pools": mock_output_manager.flush_pools,
         "set_exclude_info_maps_flag": mock_output_manager.set_exclude_info_maps_flag,
+        "setup_pool_overflow_control": mock_output_manager.setup_pool_overflow_control,
     }
 
 
@@ -2699,14 +2929,12 @@ def test_save_current_variable_pool(
     output_manager.variables_pool = dummy_variable_pool
     output_manager.current_pool_size = 1024
 
-    mock_create_directory = mocker.patch.object(output_manager, "create_directory")
     mock_generate_file_name = mocker.patch.object(output_manager, "generate_file_name", return_value="dummy_file.json")
     mock_dict_to_file_json = mocker.patch.object(output_manager, "dict_to_file_json")
     mock_add_log = mocker.patch.object(output_manager, "add_log")
 
     output_manager._save_current_variable_pool()
 
-    mock_create_directory.assert_called_once_with(output_manager.saved_pool_chunks_path)
     mock_generate_file_name.assert_called_once_with(f"saved_pool_{dummy_saved_pool_chunks_num}", "json")
 
     dummy_file_path = Path.joinpath(output_manager.saved_pool_chunks_path, "dummy_file.json")
@@ -2745,6 +2973,13 @@ def test_filter_saved_pools(
     output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ):
+    expected = {
+        "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}, {}, {}, {}]},
+        "b": {"values": ["a", "b", "c", "d", "e", "f"], "info_maps": [{}, {}, {}, {}, {}, {}]},
+        "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
+        "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
+    }
+
     mocker.patch.object(
         mock_output_manager,
         "filter_variables_pool",
@@ -2760,6 +2995,7 @@ def test_filter_saved_pools(
                 "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
             },
             {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
+            expected
         ],
     )
 
@@ -2775,13 +3011,6 @@ def test_filter_saved_pools(
         filter_content={"dummy": "filter"}, list_of_dumped_files=list_of_dumped_files
     )
 
-    expected = {
-        "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}, {}, {}, {}]},
-        "b": {"values": ["a", "b", "c", "d", "e", "f"], "info_maps": [{}, {}, {}, {}, {}, {}]},
-        "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
-        "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
-    }
-
     assert result == expected
 
 
@@ -2796,10 +3025,15 @@ def test_run_startup_sequence_clear_output_directory(
     mock_set_metadata_prefix = mocker.patch.object(mock_output_manager, "set_metadata_prefix")
     mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
     mock_clear_output_dir = mocker.patch.object(mock_output_manager, "clear_output_dir")
+    mock_setup_pool_overflow_control = mocker.patch.object(mock_output_manager, "setup_pool_overflow_control")
 
     dummy_verbosity: LogVerbosity = LogVerbosity.LOGS
     dummy_exclude_info_maps: bool = False
     dummy_output_directory: Path = Path("dummy/path")
+    dummy_chunkification: bool = False
+    dummy_max_memory_usage_percent: int = 80
+    dummy_max_memory_usage: int = 0
+    dummy_save_chunk_threshold_call_count: int = 0
     dummy_variables_file_path: Path = Path("dummy/path")
     dummy_output_prefix: str = "dummy_prefix"
     dummy_version_number: str = "0.0"
@@ -2811,6 +3045,10 @@ def test_run_startup_sequence_clear_output_directory(
         dummy_exclude_info_maps,
         dummy_output_directory,
         True,
+        dummy_chunkification,
+        dummy_max_memory_usage_percent,
+        dummy_max_memory_usage,
+        dummy_save_chunk_threshold_call_count,
         dummy_variables_file_path,
         dummy_output_prefix,
         dummy_version_number,
@@ -2825,6 +3063,7 @@ def test_run_startup_sequence_clear_output_directory(
     mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
     mock_create_directory.assert_called_once_with(dummy_output_directory)
     mock_clear_output_dir.assert_called_once_with(dummy_variables_file_path, dummy_output_directory)
+    mock_setup_pool_overflow_control.assert_not_called()
     assert mock_output_manager.is_end_to_end_testing_run == is_e2e_run
 
 
@@ -2839,10 +3078,15 @@ def test_run_startup_sequence_not_clear_output_directory(
     mock_set_metadata_prefix = mocker.patch.object(mock_output_manager, "set_metadata_prefix")
     mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
     mock_clear_output_dir = mocker.patch.object(mock_output_manager, "clear_output_dir")
+    mock_setup_pool_overflow_control = mocker.patch.object(mock_output_manager, "setup_pool_overflow_control")
 
     dummy_verbosity: LogVerbosity = LogVerbosity.LOGS
     dummy_exclude_info_maps: bool = False
     dummy_output_directory: Path = Path("dummy/path")
+    dummy_chunkification: bool = False
+    dummy_max_memory_usage_percent: int = 80
+    dummy_max_memory_usage: int = 0
+    dummy_save_chunk_threshold_call_count: int = 0
     dummy_variables_file_path: Path = Path("dummy/path")
     dummy_output_prefix: str = "dummy_prefix"
     dummy_version_number: str = "0.0"
@@ -2854,6 +3098,10 @@ def test_run_startup_sequence_not_clear_output_directory(
         dummy_exclude_info_maps,
         dummy_output_directory,
         False,
+        dummy_chunkification,
+        dummy_max_memory_usage_percent,
+        dummy_max_memory_usage,
+        dummy_save_chunk_threshold_call_count,
         dummy_variables_file_path,
         dummy_output_prefix,
         dummy_version_number,
@@ -2869,3 +3117,225 @@ def test_run_startup_sequence_not_clear_output_directory(
     mock_create_directory.assert_called_once_with(dummy_output_directory)
     mock_clear_output_dir.assert_not_called()
     assert mock_output_manager.is_end_to_end_testing_run == is_e2e_run
+    mock_setup_pool_overflow_control.assert_not_called()
+
+
+def test_run_startup_sequence_chunkification(
+    mock_output_manager: OutputManager,
+    output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
+) -> None:
+    mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
+    mock_flush_pools = mocker.patch.object(mock_output_manager, "flush_pools")
+    mock_set_exclude_info_maps_flag = mocker.patch.object(mock_output_manager, "set_exclude_info_maps_flag")
+    mock_set_log_verbose = mocker.patch.object(mock_output_manager, "set_log_verbose")
+    mock_set_metadata_prefix = mocker.patch.object(mock_output_manager, "set_metadata_prefix")
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    mock_clear_output_dir = mocker.patch.object(mock_output_manager, "clear_output_dir")
+    mock_setup_pool_overflow_control = mocker.patch.object(mock_output_manager, "setup_pool_overflow_control")
+
+    dummy_verbosity: LogVerbosity = LogVerbosity.LOGS
+    dummy_exclude_info_maps: bool = False
+    dummy_output_directory: Path = Path("dummy/path")
+    dummy_chunkification: bool = True
+    dummy_max_memory_usage_percent: int = 80
+    dummy_max_memory_usage: int = 0
+    dummy_save_chunk_threshold_call_count: int = 0
+    dummy_variables_file_path: Path = Path("dummy/path")
+    dummy_output_prefix: str = "dummy_prefix"
+    dummy_version_number: str = "0.0"
+    dummy_task_id: str = "dummy_task"
+
+    mock_output_manager.run_startup_sequence(
+        dummy_verbosity,
+        dummy_exclude_info_maps,
+        dummy_output_directory,
+        False,
+        dummy_chunkification,
+        dummy_max_memory_usage_percent,
+        dummy_max_memory_usage,
+        dummy_save_chunk_threshold_call_count,
+        dummy_variables_file_path,
+        dummy_output_prefix,
+        dummy_version_number,
+        dummy_task_id,
+        False
+    )
+    mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
+    mock_flush_pools.assert_called_once()
+    mock_set_exclude_info_maps_flag.assert_called_once_with(dummy_exclude_info_maps)
+    mock_set_log_verbose.assert_called_once_with(dummy_verbosity)
+    mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
+    mock_create_directory.assert_called_once_with(dummy_output_directory)
+    mock_clear_output_dir.assert_not_called()
+    mock_setup_pool_overflow_control.assert_called_once_with(
+        dummy_output_directory,
+        dummy_max_memory_usage_percent,
+        dummy_max_memory_usage,
+        dummy_save_chunk_threshold_call_count,
+    )
+
+
+def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count(
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
+    mock_output_manager.chunkification = False
+    mock_output_manager.available_memory = 0
+    mock_output_manager.saved_pool_chunks_path = Path("")
+    mock_output_manager.save_chunk_threshold_call_count = None
+    mock_output_manager.maximum_pool_size = 0
+
+    mock_output_manager.create_directory = MagicMock()
+    mock_output_manager.add_log = MagicMock()
+
+    psutil_virtual_memory_return = MagicMock()
+    psutil_virtual_memory_return.available = 1024
+    psutil.virtual_memory = MagicMock(return_value=psutil_virtual_memory_return)
+
+    dummy_output_directory: Path = Path("dummy/path")
+    dummy_max_memory_usage_percent: int = 80
+    dummy_max_memory_usage: int = 0
+    dummy_save_chunk_threshold_call_count: int = 15000
+
+    with freeze_time("2024-05-20 13:14:00"):
+        mock_output_manager.setup_pool_overflow_control(
+            dummy_output_directory,
+            dummy_max_memory_usage_percent,
+            dummy_max_memory_usage,
+            dummy_save_chunk_threshold_call_count,
+        )
+
+    expected_saved_pool_chunks_path = Path.joinpath(
+        dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
+    )
+    expected_available_memory = 1024
+    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_log_message = (
+        f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
+        f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
+        f"{expected_available_memory} Bytes.\n"
+        "The threshold add_variable_call count for saving pool chunk is set to "
+        f"{dummy_save_chunk_threshold_call_count}"
+    )
+
+    assert mock_output_manager.chunkification is True
+    assert mock_output_manager.available_memory == expected_available_memory
+    assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
+    assert mock_output_manager.save_chunk_threshold_call_count == dummy_save_chunk_threshold_call_count
+    assert mock_output_manager.maximum_pool_size == dummy_max_memory_usage
+    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+
+
+def test_setup_pool_overflow_control_user_define_max_memory_usage(
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
+    mock_output_manager.chunkification = False
+    mock_output_manager.available_memory = 0
+    mock_output_manager.saved_pool_chunks_path = Path("")
+    mock_output_manager.save_chunk_threshold_call_count = None
+    mock_output_manager.maximum_pool_size = 0
+
+    mock_output_manager.create_directory = MagicMock()
+    mock_output_manager.add_log = MagicMock()
+
+    psutil_virtual_memory_return = MagicMock()
+    psutil_virtual_memory_return.available = 1024
+    psutil.virtual_memory = MagicMock(return_value=psutil_virtual_memory_return)
+
+    dummy_output_directory: Path = Path("dummy/path")
+    dummy_max_memory_usage_percent: int = 80
+    dummy_max_memory_usage: int = 1024
+    dummy_save_chunk_threshold_call_count: int = 0
+
+    with freeze_time("2024-05-20 13:14:00"):
+        mock_output_manager.setup_pool_overflow_control(
+            dummy_output_directory,
+            dummy_max_memory_usage_percent,
+            dummy_max_memory_usage,
+            dummy_save_chunk_threshold_call_count,
+        )
+
+    expected_saved_pool_chunks_path = Path.joinpath(
+        dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
+    )
+    expected_available_memory = 1024
+    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_log_message = (
+        f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
+        f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
+        f"{expected_available_memory} Bytes.\n"
+        "The maximum output variable pool size is set to "
+        f"{dummy_max_memory_usage} Bytes"
+    )
+
+    assert mock_output_manager.chunkification is True
+    assert mock_output_manager.available_memory == expected_available_memory
+    assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
+    assert mock_output_manager.save_chunk_threshold_call_count is None
+    assert mock_output_manager.maximum_pool_size == dummy_max_memory_usage
+    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+
+
+def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
+    mock_output_manager: OutputManager, output_manager_original_method_states: Dict[str, Callable]
+) -> None:
+    info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
+    mock_output_manager.chunkification = False
+    mock_output_manager.available_memory = 0
+    mock_output_manager.saved_pool_chunks_path = Path("")
+    mock_output_manager.save_chunk_threshold_call_count = None
+    mock_output_manager.maximum_pool_size = 0
+
+    mock_output_manager.create_directory = MagicMock()
+    mock_output_manager.add_log = MagicMock()
+
+    psutil_virtual_memory_return = MagicMock()
+    psutil_virtual_memory_return.available = 1024
+    psutil.virtual_memory = MagicMock(return_value=psutil_virtual_memory_return)
+
+    dummy_output_directory: Path = Path("dummy/path")
+    dummy_max_memory_usage_percent: int = 80
+    dummy_max_memory_usage: int = 0
+    dummy_save_chunk_threshold_call_count: int = 0
+
+    with freeze_time("2024-05-20 13:14:00"):
+        mock_output_manager.setup_pool_overflow_control(
+            dummy_output_directory,
+            dummy_max_memory_usage_percent,
+            dummy_max_memory_usage,
+            dummy_save_chunk_threshold_call_count,
+        )
+
+    expected_saved_pool_chunks_path = Path.joinpath(
+        dummy_output_directory, "saved_pool/test_prefix_20-May-2024_Mon_13-14-00.000000"
+    )
+    expected_available_memory = 1024
+    expected_available_memory_gb = expected_available_memory / (1024**3)
+    expected_max_pool_size = (dummy_max_memory_usage_percent / 100) * expected_available_memory
+    expected_log_message = (
+        f"Created {expected_saved_pool_chunks_path} for saved pools during simulation.\n"
+        f"Current system available memory: {expected_available_memory_gb:.2f} GB = "
+        f"{expected_available_memory} Bytes.\n"
+        "The maximum output variable pool size is set to "
+        f"{expected_max_pool_size} Bytes"
+    )
+
+    assert mock_output_manager.chunkification is True
+    assert mock_output_manager.available_memory == expected_available_memory
+    assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
+    assert mock_output_manager.save_chunk_threshold_call_count is None
+    assert mock_output_manager.maximum_pool_size == expected_max_pool_size
+
+    mock_output_manager.chunkification = False
+    mock_output_manager.add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+
+    mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
+    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
