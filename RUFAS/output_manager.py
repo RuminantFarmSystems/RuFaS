@@ -1040,8 +1040,9 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def filter_variables_pool(self, filter_content: Dict[str, Any],
-                              apply_slicing: bool = True) -> Dict[str, pool_element_type]:
+    def filter_variables_pool(
+        self, filter_content: Dict[str, Any], apply_slicing: bool = True
+    ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on options specified in filter_content.
 
