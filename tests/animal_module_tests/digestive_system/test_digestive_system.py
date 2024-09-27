@@ -40,7 +40,7 @@ def mock_general_properties() -> GeneralProperties:
         daily_growth=15,
         is_pregnant=False,
         nutrient_concentrations={"dm": 0.7},
-        metabolizable_energy_intake=31.23
+        metabolizable_energy_intake=31.23,
     )
 
 
@@ -65,7 +65,7 @@ def mock_animal_nutrient_property() -> NutrientProperties:
         phosphorus_for_gestation=0,
         phosphorus_for_gestation_required_for_calf=0,
         fecal_phosphorus=0,
-        urine_phosphorus_required=0
+        urine_phosphorus_required=0,
     )
 
 
@@ -85,48 +85,48 @@ def mock_milk_production_property() -> MilkProductionProperties:
         wood_l=0,
         wood_m=0,
         wood_n=0,
-        milk_production_history=[MilkProductionRecord(simulation_day=0,
-                                                      days_in_milk=0,
-                                                      milk_production=0,
-                                                      days_born=0)],
+        milk_production_history=[
+            MilkProductionRecord(simulation_day=0, days_in_milk=0, milk_production=0, days_born=0)
+        ],
         daily_milk_production=0,
     )
 
 
-def test_daily_routine_calf(mock_general_properties: GeneralProperties,
-                            mock_milk_production_property: MilkProductionProperties,
-                            mock_animal_nutrient_property: NutrientProperties,
-                            mocker: MockerFixture) -> None:
+def test_daily_routine_calf(
+    mock_general_properties: GeneralProperties,
+    mock_milk_production_property: MilkProductionProperties,
+    mock_animal_nutrient_property: NutrientProperties,
+    mocker: MockerFixture,
+) -> None:
     """Test the daily update when animal is calf."""
     expected_excretions = AnimalManureExcretions(
-            urea=9.52,
-            urine=2.0,
-            manure_total_ammoniacal_nitrogen=4,
-            urine_nitrogen=5,
-            manure_nitrogen=6,
-            manure_mass=7,
-            total_solids=8,
-            degradable_volatile_solids=9,
-            non_degradable_volatile_solids=10,
-            inorganic_phosphorus_fraction=11,
-            organic_phosphorus_fraction=12,
-            non_water_inorganic_phosphorus_fraction=0.0,
-            non_water_organic_phosphorus_fraction=0.0,
-            phosphorus=13,
-            phosphorus_fraction=14,
-            potassium=0,
-        )
+        urea=9.52,
+        urine=2.0,
+        manure_total_ammoniacal_nitrogen=4,
+        urine_nitrogen=5,
+        manure_nitrogen=6,
+        manure_mass=7,
+        total_solids=8,
+        degradable_volatile_solids=9,
+        non_degradable_volatile_solids=10,
+        inorganic_phosphorus_fraction=11,
+        organic_phosphorus_fraction=12,
+        non_water_inorganic_phosphorus_fraction=0.0,
+        non_water_organic_phosphorus_fraction=0.0,
+        phosphorus=13,
+        phosphorus_fraction=14,
+        potassium=0,
+    )
     mock_emission = mocker.patch.object(EntericMethaneCalculator, "calf_methane", return_value=15.3)
-    mock_manure = mocker.patch.object(
-        ManureExcretionCalculator, "calf_manure", return_value=(3, expected_excretions))
+    mock_manure = mocker.patch.object(ManureExcretionCalculator, "calf_manure", return_value=(3, expected_excretions))
 
     DigestiveSystem.methane_model = "dummy model"
     DigestiveSystem.methane_mitigation_method = "dummy_method"
     DigestiveSystem.methane_mitigation_additive_amount = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = (
-        DigestiveSystem.daily_routine(
-            mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property))
+    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
+        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
+    )
 
     assert observed_emission == 15.3
     assert observed_phosphorus == 3
