@@ -1,22 +1,21 @@
+from math import exp
+
 import pytest
-from mock.mock import MagicMock, patch, PropertyMock
+from mock.mock import MagicMock, PropertyMock, patch
 from pytest_mock import MockerFixture
-from RUFAS.units import MeasurementUnits
-from RUFAS.time import Time
+
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_management import CropManagement
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    DEFAULT_DRY_MATTER_DIGESTIBILITY,
-)
 from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
-from math import exp
+from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture

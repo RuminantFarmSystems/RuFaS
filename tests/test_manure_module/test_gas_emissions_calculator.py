@@ -7,9 +7,7 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
 
 

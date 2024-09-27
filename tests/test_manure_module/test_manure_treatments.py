@@ -1,58 +1,33 @@
 import dataclasses
 import math
-from typing import Any, Type, Tuple
+from typing import Any, Tuple, Type
 
-from mock import MagicMock
 import pytest
+from mock import MagicMock
 from mock.mock import PropertyMock, call
 from pytest import approx
-from pytest_mock import MockFixture, MockerFixture
+from pytest_mock import MockerFixture, MockFixture
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import (
-    AnaerobicDigestion,
-)
-from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import (
-    AnaerobicDigestionAndLagoon,
-)
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
+from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
-from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import (
-    CompostBeddedPackBarn,
-)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.compost_bedded_pack_barn import CompostBeddedPackBarn
 from RUFAS.routines.manure.manure_treatments.composting import Composting
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import (
-    ManureTreatmentFactory,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.routines.manure.manure_treatments.open_lots import OpenLots
-from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import (
-    SlurryStorageOutdoor,
-)
-from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import (
-    SlurryStorageUnderfloor,
-)
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
-)
-
+from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
+from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 
 # Test ManureTreatmentDailyOutput
 # ===============================

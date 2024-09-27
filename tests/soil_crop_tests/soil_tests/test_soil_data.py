@@ -1,12 +1,13 @@
-import pytest
-from typing import List
 from math import inf
+from typing import List
+from unittest.mock import PropertyMock, patch
+
+import pytest
 from pytest_mock import MockerFixture
-from unittest.mock import patch, PropertyMock
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 def test_get_vectorized_layer_attribute() -> None:

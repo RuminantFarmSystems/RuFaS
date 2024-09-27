@@ -1,7 +1,6 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from tests.animal_module_tests.general_property_values import LAC_COW_PROPERTIES
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
@@ -9,6 +8,7 @@ from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProdu
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.time import Time
 from RUFAS.util import Utility
+from tests.animal_module_tests.general_property_values import LAC_COW_PROPERTIES
 
 
 @pytest.fixture
