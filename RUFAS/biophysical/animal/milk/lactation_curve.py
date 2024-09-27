@@ -403,6 +403,6 @@ class LactationCurve:
                         "full_warning": warning,
                     }
                 )
-        l_param_best_fit = minimized_result.x[0]
+        l_param_best_fit: float = minimized_result.x[0]
 
         return l_param_best_fit
