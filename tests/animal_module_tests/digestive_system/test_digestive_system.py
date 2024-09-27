@@ -136,10 +136,12 @@ def test_daily_routine_calf(
     mock_manure.assert_called_once_with(12, 0, 0, {"p": 77.7}, {"dm": 0.7})
 
 
-def test_daily_routine_heifer(mock_general_properties: GeneralProperties,
-                              mock_milk_production_property: MilkProductionProperties,
-                              mock_animal_nutrient_property: NutrientProperties,
-                              mocker: MockerFixture) -> None:
+def test_daily_routine_heifer(
+    mock_general_properties: GeneralProperties,
+    mock_milk_production_property: MilkProductionProperties,
+    mock_animal_nutrient_property: NutrientProperties,
+    mocker: MockerFixture,
+) -> None:
     """Test the daily update when animal is heifer."""
     expected_excretions = AnimalManureExcretions(
         urea=9.52,
@@ -161,16 +163,15 @@ def test_daily_routine_heifer(mock_general_properties: GeneralProperties,
     )
     mock_general_properties.animal_type = AnimalType.HEIFER_II
     mock_emission = mocker.patch.object(EntericMethaneCalculator, "heifer_methane", return_value=15.3)
-    mock_manure = mocker.patch.object(
-        ManureExcretionCalculator, "heifer_manure", return_value=(3, expected_excretions))
+    mock_manure = mocker.patch.object(ManureExcretionCalculator, "heifer_manure", return_value=(3, expected_excretions))
 
     DigestiveSystem.methane_model = "dummy model"
     DigestiveSystem.methane_mitigation_method = "dummy_method"
     DigestiveSystem.methane_mitigation_additive_amount = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = (
-        DigestiveSystem.daily_routine(
-            mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property))
+    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
+        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
+    )
 
     assert observed_emission == 15.3
     assert observed_phosphorus == 3
