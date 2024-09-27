@@ -117,6 +117,10 @@ def test_task_manager_start(
         exclude_info_maps,
         Path("output/directory"),
         clear_output_directory,
+        False,
+        0,
+        0,
+        0,
         Path(""),
         "Task Manager",
         RUFAS_VERSION,
@@ -143,7 +147,7 @@ def test_task_manager_start(
     mock_parse_input_tasks.assert_called_once()
     mock_expand_multi_runs_to_single_runs.assert_called_once()
     mock_run_tasks.assert_called_once_with(
-        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit
+        [{"task_id": "1/2"}, {"task_id": "2/2"}], produce_graphics, metadata_depth_limit, workers
     )
 
 
@@ -447,6 +451,10 @@ def test_task(
         "task_type": task_type,
         "log_verbosity": LogVerbosity.LOGS,
         "exclude_info_maps": False,
+        "chunkification": False,
+        "save_chunk_threshold_call_count": 0,
+        "maximum_memory_usage": 0,
+        "maximum_memory_usage_percent": 0,
         "output_prefix": "test",
         "logs_directory": Path("/fake/logs"),
         "task_id": 1,
@@ -463,7 +471,7 @@ def test_task(
     mock_handler = mocker.patch.object(TaskManager, "call_handler", return_value=None)
     mock_handle_input_data_audit = mocker.patch.object(TaskManager, "handle_input_data_audit", return_value=True)
     mock_set_random_seed = mocker.patch.object(TaskManager, "set_random_seed", return_value=None)
-    task_manager.task(args, produce_graphics, 10)
+    task_manager.task(args, produce_graphics, 2, 10)
     mock_im_init.assert_called_once_with(10)
 
     if pre_validate:
@@ -497,9 +505,13 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
         "produce_graphics": False,
+        "chunkification": False,
+        "maximum_memory_usage_percent": 0,
+        "maximum_memory_usage": 0,
+        "save_chunk_threshold_call_count": 0
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 10)
+    result = task_manager.task(args, produce_graphics, 1, 10)
 
     assert result is None
 
@@ -507,8 +519,12 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
     mock_output_manager.run_startup_sequence.assert_called_once_with(
         LogVerbosity.LOGS,
         args["exclude_info_maps"],
-        Path(""),
+        Path("output/"),
         False,
+        False,
+        0,
+        0,
+        0,
         Path(""),
         args["output_prefix"],
         RUFAS_VERSION,
@@ -545,9 +561,13 @@ def test_task_failed(mock_output_manager: Generator[Any, Any, Any], task_manager
         "metadata_file_path": Path("/fake/logs"),
         "properties_file_path": Path("more/fake/paths"),
         "produce_graphics": False,
+        "chunkification": False,
+        "maximum_memory_usage_percent": 1,
+        "maximum_memory_usage": 0,
+        "save_chunk_threshold_call_count": 0,
     }
     produce_graphics = False
-    result = task_manager.task(args, produce_graphics, 10)
+    result = task_manager.task(args, produce_graphics, 2, 10)
     assert result == "test (1)"
 
 
@@ -1251,11 +1271,11 @@ def test_run_tasks(
     task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
 
     task_manager._run_tasks(
-        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1
     )
 
     mock_task_call_list = [
-        call(single_run_task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit)
+        call(single_run_task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1)
         for single_run_task in single_run_tasks
     ]
     mock_task.assert_has_calls(mock_task_call_list)
@@ -1378,7 +1398,7 @@ def test_run_tasks_fail(
     task_manager.pool = multiprocessing.Pool(len(single_run_tasks), maxtasksperchild=1)
 
     task_manager._run_tasks(
-        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+        single_run_tasks, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=1
     )
 
     mock_om_init.assert_called_once()
