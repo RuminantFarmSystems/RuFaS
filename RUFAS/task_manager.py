@@ -348,28 +348,18 @@ class TaskManager:
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
         }
-        output_manager.run_startup_sequence(
-            LogVerbosity(args["log_verbosity"]),
-            args["exclude_info_maps"],
-            Path("output/"),
-            False,
-            args["chunkification"],
-            int(args["maximum_memory_usage_percent"] / workers),
-            int(args["maximum_memory_usage"] / workers),
-            args["save_chunk_threshold_call_count"],
-            Path(""),
-            args["output_prefix"],
-            RUFAS_VERSION,
-            task_id,
-        )
         try:
             task_type = args.get("task_type")
             is_end_to_end_test = True if task_type is TaskType.END_TO_END_TESTING else False
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
-                Path(""),
+                Path("output/"),
                 False,
+                args["chunkification"],
+                int(args["maximum_memory_usage_percent"] / workers),
+                int(args["maximum_memory_usage"] / workers),
+                args["save_chunk_threshold_call_count"],
                 Path(""),
                 args["output_prefix"],
                 RUFAS_VERSION,
