@@ -401,7 +401,7 @@ class LactationCurve:
                         "class": cls.__class__.__name__,
                         "function": cls._fit_wood_l_param_to_milk_yield.__name__,
                         "full_warning": warning,
-                    }
+                    },
                 )
         l_param_best_fit: float = minimized_result.x[0]
 
