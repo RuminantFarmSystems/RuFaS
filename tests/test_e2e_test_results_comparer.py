@@ -1,7 +1,7 @@
-import pytest
-
-from pytest_mock import MockerFixture
 from pathlib import Path
+
+import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer, ResultPathType
 

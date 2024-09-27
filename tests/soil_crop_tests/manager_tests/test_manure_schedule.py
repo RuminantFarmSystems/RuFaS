@@ -1,8 +1,9 @@
-import pytest
 from typing import List, Union
 
-from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+import pytest
+
 from RUFAS.routines.field.manager.events import ManureEvent
+from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 

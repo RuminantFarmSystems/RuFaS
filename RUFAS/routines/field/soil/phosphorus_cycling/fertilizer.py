@@ -1,12 +1,12 @@
-from typing import Optional, Dict
-from math import log, exp
+from math import exp, log
+from typing import Dict, Optional
 
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.crop_and_soil_constants import (
     HECTARES_TO_SQUARE_MILLIMETERS,
-    LITERS_TO_CUBIC_MILLIMETERS,
     KILOGRAMS_TO_MILLIGRAMS,
+    LITERS_TO_CUBIC_MILLIMETERS,
 )
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class Fertilizer:

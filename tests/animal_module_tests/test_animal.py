@@ -10,24 +10,17 @@ from pytest_mock import MockerFixture
 import RUFAS.routines.animal.clustering_pen_grouping
 from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_typed_dicts import (
-    AvailableFeedsTypedDict,
-    FeedInfoTypedDict,
-)
+from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict, FeedInfoTypedDict
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.clustering_pen_grouping import norm, percentile_list
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
-from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 from RUFAS.routines.animal.life_cycle.cow import Cow
+from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 from RUFAS.routines.animal.ration.ration_config import RationConfig
-from RUFAS.routines.animal.ration.ration_driver import (
-    AvailableFeeds,
-    RationManager,
-    RationReporter,
-)
+from RUFAS.routines.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
 
