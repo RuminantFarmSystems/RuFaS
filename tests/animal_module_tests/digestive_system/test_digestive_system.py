@@ -11,6 +11,7 @@ from RUFAS.biophysical.animal.digestive_system.digestive_system import Digestive
 from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import EntericMethaneCalculator
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.input_manager import InputManager
 
 
 @pytest.fixture
@@ -224,3 +225,20 @@ def test_daily_routine_cow(mock_general_properties: GeneralProperties,
     mock_emission.assert_called_once_with(False, 12, 0, 31.23, {"p": 77.7, "dm": 5.23},
                                           {"dm": 0.7}, "dummy_method", 16, "dummy model")
     mock_manure.assert_called_once_with(False, 12, 0, 0, 0, 0, 0, {"p": 77.7, "dm": 5.23}, {"dm": 0.7})
+
+
+def test_initialize_animal_methane_variables(mocker: MockerFixture) -> None:
+    """Tests that class variables of DigestiveSystem are correctly initiated."""
+    im = InputManager()
+    mock_get_data = mocker.patch.object(
+        im,
+        "get_data",
+        return_value={"methane_model": "test_model",
+                      "methane_mitigation": {"methane_mitigation_method": "test_mitigation_method",
+                                             "methane_mitigation_additive_amount": 26.4}},
+    )
+    DigestiveSystem.initialize_animal_methane_variables()
+    assert DigestiveSystem.methane_model == "test_model"
+    assert DigestiveSystem.methane_mitigation_method == "test_mitigation_method"
+    assert DigestiveSystem.methane_mitigation_additive_amount == 26.4
+    mock_get_data.assert_called_once_with("animal.animal_config")
