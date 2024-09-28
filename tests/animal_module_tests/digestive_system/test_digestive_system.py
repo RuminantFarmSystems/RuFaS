@@ -134,7 +134,7 @@ def test_daily_routine_calf(
     assert observed_excretions == expected_excretions
 
     mock_emission.assert_called_once_with("dummy model", 12)
-    mock_manure.assert_called_once_with(12, 0, 0, {'dm': 5.23, 'p': 77.7}, {"dm": 0.7})
+    mock_manure.assert_called_once_with(12, 0, 0, {"dm": 5.23, "p": 77.7}, {"dm": 0.7})
 
 
 def test_daily_routine_heifer(
@@ -235,9 +235,13 @@ def test_initialize_animal_methane_variables(mocker: MockerFixture) -> None:
     mock_get_data = mocker.patch.object(
         im,
         "get_data",
-        return_value={"methane_model": "test_model",
-                      "methane_mitigation": {"methane_mitigation_method": "test_mitigation_method",
-                                             "methane_mitigation_additive_amount": 26.4}},
+        return_value={
+            "methane_model": "test_model",
+            "methane_mitigation": {
+                "methane_mitigation_method": "test_mitigation_method",
+                "methane_mitigation_additive_amount": 26.4,
+            },
+        },
     )
     DigestiveSystem.initialize_animal_methane_variables()
     assert DigestiveSystem.methane_model == "test_model"
