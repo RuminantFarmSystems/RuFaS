@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from RUFAS.routines.animal.animal_types import AnimalType
+
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
 @dataclass

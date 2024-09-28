@@ -11,6 +11,9 @@ from RUFAS.input_manager import InputManager
 
 
 class DigestiveSystem:
+    methane_model: str
+    methane_mitigation_method: str
+    methane_mitigation_additive_amount: float
 
     @classmethod
     def initialize_animal_methane_variables(cls) -> None:
@@ -64,7 +67,7 @@ class DigestiveSystem:
             )
             return methane_emission, phosphorus, excretion
 
-        if general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
+        elif general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             methane_emission = EntericMethaneCalculator.heifer_methane(
                 DigestiveSystem.methane_model,
                 general_properties.nutrients["dm"],
@@ -80,7 +83,7 @@ class DigestiveSystem:
             )
             return methane_emission, phosphorus, excretion
 
-        if general_properties.animal_type in (AnimalType.DRY_COW, AnimalType.LAC_COW):
+        else:
             methane_emission = EntericMethaneCalculator.cow_methane(
                 general_properties.is_milking,
                 general_properties.body_weight,
