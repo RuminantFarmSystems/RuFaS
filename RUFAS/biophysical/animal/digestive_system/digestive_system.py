@@ -13,7 +13,7 @@ from RUFAS.input_manager import InputManager
 class DigestiveSystem:
 
     @classmethod
-    def initialize_animal_growth_variables(cls) -> None:
+    def initialize_animal_methane_variables(cls) -> None:
         """This function retrieves the user input data from the InputManager and initializes the class constants."""
         im = InputManager()
         animal_config: dict[str, Any] = im.get_data("animal.animal_config")
