@@ -1,28 +1,11 @@
-from typing import Any, Dict
-from typing import List
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingConfig
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
-    ManureHandlerConfig,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
-    ManureHandlerType,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
-    ManureSeparatorConfig,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
-    ManureSeparatorType,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.beddings.bedding_classes import BeddingConfig, BeddingType
+from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManureHandlerConfig, ManureHandlerType
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import ManureSeparatorConfig, ManureSeparatorType
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
 class ManureManagerConfigHandler:

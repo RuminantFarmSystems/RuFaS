@@ -1,19 +1,19 @@
 import copy
 import datetime
-from pathlib import Path
 import random
-from typing import List, Dict, Any, Type
+from pathlib import Path
+from typing import Any, Dict, List, Type
 
 from tqdm import tqdm
 
+from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
+from RUFAS.biophysical.animal.herd_manager import HerdManager
+from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
-from RUFAS.biophysical.animal.herd_manager import HerdManager
-from RUFAS.biophysical.feed.feed import Feed
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
-from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
-from RUFAS.biophysical.animal.animal import Animal
 
 om = OutputManager()
 

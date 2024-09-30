@@ -1,6 +1,7 @@
-from typing import Optional
-from RUFAS.routines.field.soil.soil_data import SoilData
 import math
+from typing import Optional
+
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class ResiduePartition:
