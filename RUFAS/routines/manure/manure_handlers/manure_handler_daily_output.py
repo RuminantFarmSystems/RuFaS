@@ -1,10 +1,8 @@
-from RUFAS.units import MeasurementUnits
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
-)
 from dataclasses import dataclass, field
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
+from RUFAS.units import MeasurementUnits
 
 
 @dataclass

@@ -2,9 +2,9 @@ import pytest
 from pytest import approx
 from pytest_mock import MockFixture
 
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 
 
 @pytest.mark.parametrize("methane_model", [None, "dummy"])

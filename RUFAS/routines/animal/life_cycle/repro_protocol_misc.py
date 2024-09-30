@@ -1,6 +1,4 @@
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
 
 
 class InternalReproSettings:

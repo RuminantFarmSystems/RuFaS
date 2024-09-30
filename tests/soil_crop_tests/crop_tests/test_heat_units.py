@@ -1,8 +1,8 @@
 import pytest
-
-from RUFAS.routines.field.crop.heat_units import HeatUnits
-from RUFAS.routines.field.crop.crop_data import CropData
 from pytest_mock import MockerFixture
+
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.heat_units import HeatUnits
 
 
 # ---- test helper functions ----
