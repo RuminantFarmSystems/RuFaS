@@ -399,7 +399,8 @@ def test_calculate_actual_purchased_feed_emissions_no_key(msg_name: str, message
                                                           , mocker: MockerFixture) -> None:
     """Test the amount of purchased feed emissions with key errors."""
     em = EmissionsEstimator()
-    mock_add = mocker.patch.object(OutputManager, "add_warning")
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_warning")
     mock_get_data = mocker.patch.object(em.im, "get_data", side_effect=[94545, {"emission1": 1.0}, {"emission2": 2.0}])
     mock_get_feed_data = mocker.patch.object(
         em, "_get_feed_emissions_data",
