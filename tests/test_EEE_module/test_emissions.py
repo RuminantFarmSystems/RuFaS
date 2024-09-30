@@ -274,26 +274,13 @@ def test_transform_outputs_to_list_of_dicts_length_unmatched(mocker: MockerFixtu
 @pytest.mark.parametrize(
     "purchased_feeds,expected",
     [
-        (
-            {
-                "100": 300.0,
-                "random": 500.0,
-                "not in list": 50.0
-            },
-            {'100': 100.0, 'random': 500.0, 'not in list': 50.0}
-        ),
-        (
-            {
-                "100": 100.0,
-                "random": 500.0,
-                "not in list": 50.0
-            },
-            {'100': 0.0, 'random': 500.0, 'not in list': 50.0}
-        )
+        ({"100": 300.0, "random": 500.0, "not in list": 50.0}, {"100": 100.0, "random": 500.0, "not in list": 50.0}),
+        ({"100": 100.0, "random": 500.0, "not in list": 50.0}, {"100": 0.0, "random": 500.0, "not in list": 50.0}),
     ],
 )
-def test_calculate_actual_purchased_feeds(purchased_feeds: dict[str, float], expected: dict[str, float],
-                                          mocker: MockerFixture) -> None:
+def test_calculate_actual_purchased_feeds(
+    purchased_feeds: dict[str, float], expected: dict[str, float], mocker: MockerFixture
+) -> None:
     """Tests that the amount of actual purchased feeds were calculated correctly."""
     em = EmissionsEstimator()
     homegrown_feeds = [
@@ -301,8 +288,9 @@ def test_calculate_actual_purchased_feeds(purchased_feeds: dict[str, float], exp
         {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 800, "dry_matter_content": 0.9},
     ]
 
-    mock_totals = mocker.patch.object(em, "_calculate_total_homegrown_feed_amounts_by_crop_type",
-                                      return_value={CropSpecies.ALFALFA_HAY: 200})
+    mock_totals = mocker.patch.object(
+        em, "_calculate_total_homegrown_feed_amounts_by_crop_type", return_value={CropSpecies.ALFALFA_HAY: 200}
+    )
 
     observed = em._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
     assert observed == expected
@@ -363,58 +351,61 @@ def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture) -> Non
     em = EmissionsEstimator()
     mock_get_data = mocker.patch.object(em.im, "get_data", side_effect=[94545, {"emission1": 1.0}, {"emission2": 2.0}])
     mock_get_feed_data = mocker.patch.object(
-        em, "_get_feed_emissions_data",
-        return_value={"100": 26.3, "total_dry_yield": 1200, "dry_matter_content": 0.35})
+        em, "_get_feed_emissions_data", return_value={"100": 26.3, "total_dry_yield": 1200, "dry_matter_content": 0.35}
+    )
 
     expected = ({"100": 263.0}, {"100": 263.0})
     observed = em._calculate_actual_purchased_feed_emissions({"100": 10})
     assert observed == expected
 
-    calls = [call(94545,
-                  {"emission1": 1.0}),
-             call(
-                 94545,
-                 {"emission2": 2.0}),
-             ]
+    calls = [
+        call(94545, {"emission1": 1.0}),
+        call(94545, {"emission2": 2.0}),
+    ]
     mock_get_feed_data.assert_has_calls(calls)
-    calls = [call("config.FIPS_county_code"), call("purchased_feeds_emissions"),
-             call("purchased_feed_land_use_change_emissions")]
+    calls = [
+        call("config.FIPS_county_code"),
+        call("purchased_feeds_emissions"),
+        call("purchased_feed_land_use_change_emissions"),
+    ]
     mock_get_data.assert_has_calls(calls)
 
 
 @pytest.mark.parametrize(
     "msg_name,message,emissions",
     [
-        ("Missing Purchased Feed Emissions",
-         "Missing data for RuFaS feed 100, omitting from purchased feed emissions estimation.",
-         [{'3': 100.0, 'random': 500.0, 'not in list': 50.0}, {'100': 100.0, 'random': 500.0, 'not in list': 50.0}]
-         ),
-        ("Missing Land Use Change Purchased Feed Emissions",
-         "Missing data for RuFaS feed 100, omitting from land use change purchased feed emissions estimation.",
-         [{'100': 100.0, 'random': 500.0, 'not in list': 50.0}, {'3': 100.0, 'random': 500.0, 'not in list': 50.0}]
-         )
+        (
+            "Missing Purchased Feed Emissions",
+            "Missing data for RuFaS feed 100, omitting from purchased feed emissions estimation.",
+            [{"3": 100.0, "random": 500.0, "not in list": 50.0}, {"100": 100.0, "random": 500.0, "not in list": 50.0}],
+        ),
+        (
+            "Missing Land Use Change Purchased Feed Emissions",
+            "Missing data for RuFaS feed 100, omitting from land use change purchased feed emissions estimation.",
+            [{"100": 100.0, "random": 500.0, "not in list": 50.0}, {"3": 100.0, "random": 500.0, "not in list": 50.0}],
+        ),
     ],
 )
-def test_calculate_actual_purchased_feed_emissions_no_key(msg_name: str, message: str, emissions: list[dict[str, float]]
-                                                          , mocker: MockerFixture) -> None:
+def test_calculate_actual_purchased_feed_emissions_no_key(
+    msg_name: str, message: str, emissions: list[dict[str, float]], mocker: MockerFixture
+) -> None:
     """Test the amount of purchased feed emissions with key errors."""
     em = EmissionsEstimator()
     mock_add = mocker.patch.object(OutputManager, "add_warning")
     mock_get_data = mocker.patch.object(em.im, "get_data", side_effect=[94545, {"emission1": 1.0}, {"emission2": 2.0}])
-    mock_get_feed_data = mocker.patch.object(
-        em, "_get_feed_emissions_data",
-        side_effect=emissions)
+    mock_get_feed_data = mocker.patch.object(em, "_get_feed_emissions_data", side_effect=emissions)
 
     em._calculate_actual_purchased_feed_emissions({"100": 10})
-    calls = [call(94545,
-                  {"emission1": 1.0}),
-             call(
-                 94545,
-                 {"emission2": 2.0}),
-             ]
+    calls = [
+        call(94545, {"emission1": 1.0}),
+        call(94545, {"emission2": 2.0}),
+    ]
     mock_get_feed_data.assert_has_calls(calls)
-    calls = [call("config.FIPS_county_code"), call("purchased_feeds_emissions"),
-             call("purchased_feed_land_use_change_emissions")]
+    calls = [
+        call("config.FIPS_county_code"),
+        call("purchased_feeds_emissions"),
+        call("purchased_feed_land_use_change_emissions"),
+    ]
     mock_get_data.assert_has_calls(calls)
     info_map = {
         "class": "EmissionsEstimator",
