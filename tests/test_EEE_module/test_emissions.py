@@ -8,6 +8,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.EEE.emissions import EmissionsEstimator
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.mark.parametrize(
@@ -153,7 +154,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture):
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-        "which crop yields and nutrient applications to estimate emissions for.",
+                       "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -270,10 +271,11 @@ def test_transform_outputs_to_list_of_dicts_length_unmatched(mocker: MockerFixtu
 
 
 def test_calculate_actual_purchased_feeds(mocker: MockerFixture) -> None:
+    """Tests that the amount of actual purchased feeds were calculated correctly."""
     em = EmissionsEstimator()
     homegrown_feeds = [
-        {"feed_name": CropSpecies.CORN_SILAGE, "quantity": 1200, "dry_matter_content": 0.35},
-        {"feed_name": CropSpecies.ALFALFA_HAY, "quantity": 800, "dry_matter_content": 0.9}
+        {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 800, "dry_matter_content": 0.9}
     ]
 
     purchased_feeds = {
@@ -291,3 +293,32 @@ def test_calculate_actual_purchased_feeds(mocker: MockerFixture) -> None:
     mock_totals.assert_called_once_with(homegrown_feeds)
 
 
+def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixture) -> None:
+    """Tests that the amount of homegrown feeds for all the crop types were calculated correctly."""
+    em = EmissionsEstimator()
+    homegrown_feeds = [
+        {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 800, "dry_matter_content": 0.9}
+    ]
+
+    mock_add = mocker.patch.object(OutputManager, "add_variable")
+    expected = {CropSpecies.ALFALFA_HAY: 800.0,
+                CropSpecies.ALFALFA_SILAGE: 0.0,
+                CropSpecies.ALFALFA_BALEAGE: 0.0, CropSpecies.CEREAL_RYE_HAY: 0.0, CropSpecies.CEREAL_RYE_GRAIN: 0.0,
+                CropSpecies.CEREAL_RYE_SILAGE: 0.0, CropSpecies.CEREAL_RYE_BALEAGE: 0.0, CropSpecies.CORN_GRAIN: 0.0,
+                CropSpecies.CORN_SILAGE: 1200.0, CropSpecies.SOYBEAN_HAY: 0.0, CropSpecies.SOYBEAN_GRAIN: 0.0,
+                CropSpecies.TALL_FESCUE_HAY: 0.0, CropSpecies.TALL_FESCUE_SILAGE: 0.0,
+                CropSpecies.TALL_FESCUE_BALEAGE: 0.0, CropSpecies.TRITICALE_HAY: 0.0, CropSpecies.TRITICALE_GRAIN: 0.0,
+                CropSpecies.TRITICALE_SILAGE: 0.0, CropSpecies.TRITICALE_BALEAGE: 0.0,
+                CropSpecies.WINTER_WHEAT_HAY: 0.0,
+                CropSpecies.WINTER_WHEAT_GRAIN: 0.0, CropSpecies.WINTER_WHEAT_SILAGE: 0.0,
+                CropSpecies.WINTER_WHEAT_BALEAGE: 0.0}
+
+    observed = em._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
+    assert observed == expected
+
+    mock_add.assert_called_once_with("homegrown_feed_totals",
+                                     expected,
+                                     {'class': 'EmissionsEstimator',
+                                      'function': '_calculate_total_homegrown_feed_amounts_by_crop_type',
+                                      'units': MeasurementUnits.KILOGRAMS})
