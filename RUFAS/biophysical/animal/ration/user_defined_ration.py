@@ -1,8 +1,8 @@
 from typing import Dict
 
-from RUFAS.enums import AnimalCombination
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.biophysical.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.enums import AnimalCombination
 
 
 class UserDefinedRationManager(object):

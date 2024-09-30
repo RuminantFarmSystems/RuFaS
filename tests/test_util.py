@@ -1,10 +1,11 @@
 import datetime
+import math
 import re
 from typing import Any, Dict, List
+
 import pytest
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
-import math
 
 from RUFAS.util import Utility
 

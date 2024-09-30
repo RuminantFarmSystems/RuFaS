@@ -1,21 +1,21 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Any, Optional, Type
+from typing import Any, Callable, Dict, List, Optional, Type
 from unittest.mock import patch
 
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.graph_generator import GraphGenerator
 
+from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import (
+    AGGREGATION_FUNCTIONS,
+    ReportGenerator,
     average_aggregator,
     division_aggregator,
     product_aggregator,
     sd_aggregator,
-    sum_aggregator,
     subtraction_aggregator,
-    ReportGenerator,
-    AGGREGATION_FUNCTIONS,
+    sum_aggregator,
 )
 
 

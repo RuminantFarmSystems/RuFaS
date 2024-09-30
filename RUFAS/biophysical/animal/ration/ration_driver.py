@@ -1,26 +1,20 @@
 import collections
 from typing import Any, Dict, List, Literal, Set, Tuple
 
-from RUFAS.enums import AnimalCombination
-
 import scipy
 
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
-    AvailableFeedsTypedDict,
-    FeedInfoTypedDict,
-)
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AvailableFeedsTypedDict, FeedInfoTypedDict
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration import animal_requirements
 from RUFAS.biophysical.animal.ration.ration_config import RationConfig
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
-from RUFAS.biophysical.animal.ration.user_defined_ration import (
-    UserDefinedRationManager as UserDefinedRationManager,
-)
+from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
 from RUFAS.biophysical.feed.feed import Feed
+from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
 udrm = UserDefinedRationManager()

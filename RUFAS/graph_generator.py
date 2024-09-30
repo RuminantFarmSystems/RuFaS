@@ -1,8 +1,8 @@
 import datetime
-import re
 import os
+import re
 from pathlib import Path
-from typing import Dict, List, Any, Callable, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
