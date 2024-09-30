@@ -1,8 +1,8 @@
 from datetime import date, datetime, timedelta
-from typing import Dict, Any
+from typing import Any, Dict
+from unittest.mock import patch
 
 import pytest
-from unittest.mock import patch
 from pytest_mock import MockerFixture
 
 from RUFAS.time import Time

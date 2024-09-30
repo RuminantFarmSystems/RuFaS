@@ -1,44 +1,23 @@
 from __future__ import annotations
 
-from abc import ABC
-from abc import abstractmethod
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from abc import ABC, abstractmethod
+from typing import Optional, Tuple, Union
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
-from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import (
-    ManureModuleOutputManagerHelper,
-)
+from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
+from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
+from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_classes import (
-    BaseManureSeparator,
-)
-from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import (
-    ManureSeparatorDailyOutput,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
-from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
-)
 
 
 class BaseManureTreatment(ABC):

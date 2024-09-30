@@ -1,13 +1,14 @@
 from datetime import datetime
+from typing import Callable
+from unittest.mock import MagicMock, patch
+
 import pytest
 from pytest_mock.plugin import MockerFixture
-from unittest.mock import MagicMock, patch
-from typing import Callable
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.output_manager import OutputManager
 
 
 @pytest.fixture

@@ -1,14 +1,14 @@
-from RUFAS.units import MeasurementUnits
-from . import nitrogen_loss, carbon_loss, protein_degradation
-from .feed_typed_dicts import PurchasedFeedTypedDict
-from RUFAS.output_manager import OutputManager
-from typing import Dict, List, Union, Any
-from RUFAS.input_manager import InputManager
-from RUFAS.routines.animal.ration.user_defined_ration import (
-    UserDefinedRationManager as UserDefinedRationManager,
-)
-from ...enums import AnimalCombination
 import math
+from typing import Any, Dict, List, Union
+
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
+from RUFAS.units import MeasurementUnits
+
+from ...enums import AnimalCombination
+from . import carbon_loss, nitrogen_loss, protein_degradation
+from .feed_typed_dicts import PurchasedFeedTypedDict
 
 udrm = UserDefinedRationManager()
 

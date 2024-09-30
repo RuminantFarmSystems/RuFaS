@@ -1,13 +1,15 @@
-from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
-from RUFAS.input_manager import InputManager
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
-from RUFAS.output_manager import OutputManager
-from RUFAS.util import Utility
-from scipy.optimize import minimize
 from typing import Any
 from warnings import catch_warnings
+
+from scipy.optimize import minimize
+
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+from RUFAS.util import Utility
 
 """
 Constant that is used to determine whether cows are considered to be milking twice or thrice daily when determining how

@@ -1,14 +1,15 @@
-import pytest
 from typing import List
+from unittest.mock import MagicMock, PropertyMock, patch
+
+import pytest
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop import Crop
+from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
-from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.manure.manure_manager import ManureManager
-from unittest.mock import patch, PropertyMock, MagicMock
 
 
 @pytest.mark.parametrize(

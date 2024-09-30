@@ -1,11 +1,13 @@
-from RUFAS.input_manager import InputManager
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
-from RUFAS.output_manager import OutputManager
-from RUFAS.util import Utility
+from typing import Any
+
 import numpy as np
 from scipy.integrate import quad
-from typing import Any
+
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
+from RUFAS.util import Utility
 
 """
 Constant that is used to determine whether cows are considered to be milking twice or thrice daily when determining how
