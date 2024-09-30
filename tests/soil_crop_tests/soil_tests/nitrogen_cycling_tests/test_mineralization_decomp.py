@@ -1,12 +1,11 @@
-import pytest
 from math import exp, inf
 from unittest.mock import MagicMock, call
 
-from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import (
-    MineralizationDecomposition,
-)
-from RUFAS.routines.field.soil.soil_data import SoilData
+import pytest
+
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.nitrogen_cycling.mineralization_decomp import MineralizationDecomposition
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- Static method tests ---
