@@ -32,6 +32,7 @@ v0.9.2
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
+- [1976](https://github.com/RuminantFarmSystems/MASM/pull/1976) - [minor change] [EEE] Add unit tests for the Emission module.
 - [1977](https://github.com/RuminantFarmSystems/MASM/pull/1977) - [minor change] [EEE] Improve emission.py codebase and clarity.
 - [1948](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [Soil and Crop] Utilize a residue tracker property method in the layer data pool that sums structural and metabolic litter.
 - [1980](https://github.com/RuminantFarmSystems/MASM/pull/1980) - [minor change] [Soil and Crop] Set return value and add warning when silt and clay are zero.
