@@ -1,4 +1,4 @@
-import math
+import numpy
 
 from RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator import MethaneMitigationCalculator
 from RUFAS.general_constants import GeneralConstants
@@ -232,7 +232,7 @@ class EntericMethaneCalculator:
         elif methane_model == "Mills":  # [A.3E.C.2]
             starch_to_ADF_concentration_ratio = -0.0011 * starch_concentration / ADF_concentration
             temp = -(starch_to_ADF_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
-            methane_emission = 45.98 * (1 - math.exp(temp)) / 0.05565
+            methane_emission = 45.98 * (1 - numpy.exp(temp)) / 0.05565
 
         elif methane_model == "IPCC":  # IPCC
             # Calculating gross energy concentration (Moraes et al. 2014)
@@ -312,7 +312,7 @@ class EntericMethaneCalculator:
             methane_emission = (
                 45.98
                 - 45.98
-                * math.exp(
+                * numpy.exp(
                     -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
                     * metabolizable_energy_intake
                     * 4.184
