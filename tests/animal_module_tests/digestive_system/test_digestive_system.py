@@ -125,7 +125,7 @@ def test_daily_routine_calf(
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
     DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
+    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.process_digestion(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
@@ -170,7 +170,7 @@ def test_daily_routine_heifer(
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
     DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
+    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.process_digestion(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
@@ -215,7 +215,7 @@ def test_daily_routine_cow(
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
     DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
+    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.process_digestion(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
