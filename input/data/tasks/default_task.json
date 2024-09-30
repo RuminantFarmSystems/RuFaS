@@ -2,7 +2,7 @@
   "parallel_workers": 4,
   "export_input_data_to_csv": true,
   "input_data_csv_export_path": "output/saved_input_data/",
-  "input_data_csv_import_path": "output/saved_input_data/saved_input_data.csv",
+  "input_data_csv_import_path": "",
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",

@@ -559,6 +559,7 @@ class TaskManager:
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
 
         if export_input_data_to_csv:
+            output_manager.create_directory(args["input_data_csv_export_path"])
             Utility.combine_saved_input_csv(
                 TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
                 args["input_data_csv_export_path"],
