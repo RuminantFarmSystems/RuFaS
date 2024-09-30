@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Gender
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Sex
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
@@ -31,7 +31,7 @@ def mock_general_properties() -> GeneralProperties:
         daily_milk_produced=0,
         future_cull_date=0,
         future_death_date=0,
-        gender=Gender.FEMALE,
+        gender=Sex.FEMALE,
         id=0,
         mature_body_weight=0,
         nutrients={"p": 77.7, "dm": 5.23},
