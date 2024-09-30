@@ -1,10 +1,10 @@
+from unittest.mock import MagicMock, PropertyMock, patch
+
 import pytest
 
+from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
-from RUFAS.routines.field.crop.crop_data import CropData
-from unittest.mock import MagicMock, patch, PropertyMock
-
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 

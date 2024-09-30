@@ -1,9 +1,7 @@
-from abc import ABC
-from abc import abstractmethod
-from enum import Enum
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict
-from typing import Type
+from enum import Enum
+from typing import Dict, Type
 
 
 class BeddingType(Enum):

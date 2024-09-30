@@ -1,9 +1,11 @@
-import pytest
 import math
 from unittest.mock import MagicMock, patch
+
+import pytest
 from pytest_mock import MockerFixture
-from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
+
 from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 

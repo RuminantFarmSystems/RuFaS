@@ -2,10 +2,7 @@ import pytest
 from pytest import approx
 
 from RUFAS.routines.animal.animal_types import AnimalType
-from RUFAS.routines.animal.ration.amino_acid import (
-    AminoAcidCalculator,
-    EssentialAminoAcidRequirements,
-)
+from RUFAS.routines.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
 
 
 @pytest.mark.parametrize(

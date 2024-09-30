@@ -1,5 +1,5 @@
-from enum import Enum, unique
 import re
+from enum import Enum, unique
 
 
 @unique

@@ -1,12 +1,14 @@
 from pathlib import Path
-from freezegun import freeze_time
 from typing import Any, Dict, List
 from unittest.mock import patch
-from matplotlib import pyplot as plt
-from mock.mock import MagicMock
+
 import numpy as np
 import pytest
+from freezegun import freeze_time
+from matplotlib import pyplot as plt
+from mock.mock import MagicMock
 from pytest_mock import MockerFixture
+
 from RUFAS.graph_generator import GraphGenerator
 
 

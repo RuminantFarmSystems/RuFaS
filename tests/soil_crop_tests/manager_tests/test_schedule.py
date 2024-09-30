@@ -1,5 +1,6 @@
+from typing import Any, List
+
 import pytest
-from typing import List, Any
 
 from RUFAS.routines.field.manager.schedule import Schedule
 
