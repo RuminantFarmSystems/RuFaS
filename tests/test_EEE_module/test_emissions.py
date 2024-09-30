@@ -153,7 +153,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture):
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                       "which crop yields and nutrient applications to estimate emissions for.",
+        "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -234,20 +234,22 @@ def test_gather_ration_feed_totals(mocker: MockerFixture) -> None:
     expected = {"test": 9.0}
     observed = em._gather_ration_feed_totals()
     assert observed == expected
-    mock_filter.assert_called_once_with({
-        "name": "Feed Ration Totals",
-        "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
-        "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
-        "variables": [r"^\d+$"],
-        "slice_start": -365,
-    })
+    mock_filter.assert_called_once_with(
+        {
+            "name": "Feed Ration Totals",
+            "description": "Gathers the amounts of purchased feeds fed to animals in the last year of the simulation.",
+            "filters": ["AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals.*"],
+            "variables": [r"^\d+$"],
+            "slice_start": -365,
+        }
+    )
 
 
 def test_transform_outputs_to_list_of_dicts() -> None:
     """Test that the function transform data to correct list of dicts."""
     em = EmissionsEstimator()
-    expected = [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}]
-    data = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}}
+    expected = [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}]
+    data = {"one": {"values": [1, 2, 3]}, "two": {"values": [4, 5, 6]}}
     observed = em._transform_outputs_to_list_of_dicts(data)
     assert observed == expected
 
@@ -256,32 +258,29 @@ def test_transform_outputs_to_list_of_dicts_length_unmatched(mocker: MockerFixtu
     """Test that the function transform data to correct list of dicts with unmatched list length."""
     em = EmissionsEstimator()
     mock_add_error = mocker.patch.object(em.om, "add_error")
-    expected = [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}]
-    data = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6, 9]}}
+    expected = [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}]
+    data = {"one": {"values": [1, 2, 3]}, "two": {"values": [4, 5, 6, 9]}}
     observed = em._transform_outputs_to_list_of_dicts(data)
     assert observed == expected
     mock_add_error.assert_called_once_with(
         "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
         "Ignoring extraneous data.",
-        {"class": "EmissionsEstimator", "function": "_transform_outputs_to_list_of_dicts"}
+        {"class": "EmissionsEstimator", "function": "_transform_outputs_to_list_of_dicts"},
     )
+
 
 def test_calculate_actual_purchased_feeds(mocker: MockerFixture) -> None:
     em = EmissionsEstimator()
     homegrown_feeds = [
         {"feed_name": "corn_silage", "quantity": 1200, "dry_matter_content": 0.35},
-        {"feed_name": "alfalfa_hay", "quantity": 800, "dry_matter_content": 0.9}
+        {"feed_name": "alfalfa_hay", "quantity": 800, "dry_matter_content": 0.9},
     ]
 
-    purchased_feeds = {
-        "corn_silage": 300.0,
-        "soybean_meal": 500.0,
-        "mineral_supplement": 50.0
-    }
+    purchased_feeds = {"corn_silage": 300.0, "soybean_meal": 500.0, "mineral_supplement": 50.0}
 
-    mock_totals = mocker.patch.object(em, "_calculate_total_homegrown_feed_amounts_by_crop_type",
-                                      return_value={CropSpecies.ALFALFA_HAY: 23.4})
+    mock_totals = mocker.patch.object(
+        em, "_calculate_total_homegrown_feed_amounts_by_crop_type", return_value={CropSpecies.ALFALFA_HAY: 23.4}
+    )
 
     observed = em._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
     print(observed)
-

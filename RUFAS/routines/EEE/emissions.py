@@ -163,9 +163,7 @@ class EmissionsEstimator:
 
         return processed_feeds
 
-    def _transform_outputs_to_list_of_dicts(
-        self, data: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    def _transform_outputs_to_list_of_dicts(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         """
         Transforms dictionary of lists collected from the Output Manager into list of dictionaries.
 
