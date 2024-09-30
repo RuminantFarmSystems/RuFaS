@@ -248,6 +248,7 @@ class EmissionsEstimator:
         actual_land_use_change_emissions = {}
         for feed_id, amount_fed in actual_purchased_feeds.items():
             try:
+                print(feed_id)
                 purchased_emissions = amount_fed * purchased_feed_emissions[feed_id]
                 actual_purchased_feed_emissions[feed_id] = purchased_emissions
             except KeyError:
