@@ -200,6 +200,7 @@ class EmissionsEstimator:
             homegrown_alternatives = [
                 crop for crop in homegrown_totals.keys() if feed_id in CROP_SPECIES_TO_PURCHASED_FEED_ID[crop]
             ]
+
             for homegrown_alternative in homegrown_alternatives:
                 alternative_amount_available = homegrown_totals[homegrown_alternative]
                 amount_used = min(amount, alternative_amount_available)

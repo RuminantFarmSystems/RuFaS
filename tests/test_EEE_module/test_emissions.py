@@ -272,15 +272,22 @@ def test_transform_outputs_to_list_of_dicts_length_unmatched(mocker: MockerFixtu
 def test_calculate_actual_purchased_feeds(mocker: MockerFixture) -> None:
     em = EmissionsEstimator()
     homegrown_feeds = [
-        {"feed_name": "corn_silage", "quantity": 1200, "dry_matter_content": 0.35},
-        {"feed_name": "alfalfa_hay", "quantity": 800, "dry_matter_content": 0.9},
+        {"feed_name": CropSpecies.CORN_SILAGE, "quantity": 1200, "dry_matter_content": 0.35},
+        {"feed_name": CropSpecies.ALFALFA_HAY, "quantity": 800, "dry_matter_content": 0.9}
     ]
 
-    purchased_feeds = {"corn_silage": 300.0, "soybean_meal": 500.0, "mineral_supplement": 50.0}
+    purchased_feeds = {
+        "100": 300.0,
+        "random": 500.0,
+        "not in list": 50.0
+    }
 
-    mock_totals = mocker.patch.object(
-        em, "_calculate_total_homegrown_feed_amounts_by_crop_type", return_value={CropSpecies.ALFALFA_HAY: 23.4}
-    )
+    mock_totals = mocker.patch.object(em, "_calculate_total_homegrown_feed_amounts_by_crop_type",
+                                      return_value={CropSpecies.ALFALFA_HAY: 200})
 
     observed = em._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
-    print(observed)
+    assert observed == {'100': 100.0, 'random': 500.0, 'not in list': 50.0}
+
+    mock_totals.assert_called_once_with(homegrown_feeds)
+
+
