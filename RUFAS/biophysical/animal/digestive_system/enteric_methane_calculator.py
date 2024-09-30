@@ -12,7 +12,7 @@ class EntericMethaneCalculator:
 
         Parameters
         ----------
-        methane_model: str
+        methane_model: str | None
             Methane model used for methane emission calculations, including Mutian, Mills, IPCC.
         body_weight: float
             Body weight of the current animal, kg.
