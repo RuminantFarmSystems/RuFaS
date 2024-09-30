@@ -62,7 +62,7 @@ class Breed(Enum):
     JE = "Jersey"
 
 
-class Gender(Enum):
+class Sex(Enum):
     """Enum indicating the gender of the animal."""
 
     MALE = "male"
