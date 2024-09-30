@@ -41,13 +41,29 @@ class GeneralProperties:
     id: int
     is_pregnant: bool
     mature_body_weight: float
-    nutrients: list[str]
+    nutrients: dict[str, float]
+    nutrient_concentrations: dict[str, float]
     ration_formulation = {"objective": 0.00}
     sold: bool
     sold_at_day: int
     wean_weight: float
+    metabolizable_energy_intake: float
 
     @property
     def is_milking(self) -> bool:
         """True if the animal is currently lactating, else False."""
         return self.days_in_milk > 0
+
+
+class Breed(Enum):
+    """Enum indicating the breed of the animal."""
+
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Sex(Enum):
+    """Enum indicating the gender of the animal."""
+
+    MALE = "male"
+    FEMALE = "female"
