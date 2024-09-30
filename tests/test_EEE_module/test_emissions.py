@@ -143,7 +143,7 @@ def test_calculate_purchased_feed_emissions(
     mock_calc_actual_emission.assert_called_once_with(actual_purchased_feeds)
 
 
-def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture):
+def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> None:
     em = EmissionsEstimator()
     mock_filter_variable = mocker.patch.object(
         em.om,
