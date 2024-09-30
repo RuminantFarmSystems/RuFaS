@@ -1,14 +1,15 @@
 from unittest.mock import patch
-from pytest_mock import MockerFixture
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.animal_types import AnimalType
 
+from pytest_mock import MockerFixture
+
+from RUFAS.enums import AnimalCombination
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
+from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.enums import AnimalCombination
 
 
 def test_constructor() -> None:

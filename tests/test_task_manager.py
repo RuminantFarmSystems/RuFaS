@@ -1,14 +1,14 @@
 import multiprocessing
 from pathlib import Path
 from typing import Any, Generator
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.task_manager import TaskManager, TaskType, RUFAS_VERSION
+from RUFAS.task_manager import RUFAS_VERSION, TaskManager, TaskType
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility
 

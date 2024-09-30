@@ -1,11 +1,12 @@
-import pytest
-from pytest_mock import MockerFixture
 from math import exp
 from unittest.mock import PropertyMock, call
 
+import pytest
+from pytest_mock import MockerFixture
+
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.nitrogen_cycling.denitrification import Denitrification
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.layer_data import LayerData
 
 
 @pytest.fixture

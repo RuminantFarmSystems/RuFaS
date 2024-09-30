@@ -1,5 +1,7 @@
+from unittest.mock import PropertyMock, patch
+
 import pytest
-from unittest.mock import patch, PropertyMock
+
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 
 

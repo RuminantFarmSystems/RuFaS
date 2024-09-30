@@ -1,12 +1,10 @@
 from typing import Dict
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 
-from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import (
-    manure_calculations,
-)
-from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
+from RUFAS.routines.animal.manure.growing_heifer_manure_excretion import manure_calculations
+from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
 om = OutputManager()
 

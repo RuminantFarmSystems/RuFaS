@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-from typing import Dict, Callable
+from typing import Callable, Dict
 
 import mock
 import pytest
@@ -9,16 +9,16 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
 from RUFAS.routines import Feed
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
-from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
+from RUFAS.time import Time
 
 
 @pytest.fixture
