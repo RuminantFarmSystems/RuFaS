@@ -1,11 +1,8 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
+from RUFAS.routines.field.crop_and_soil_constants import KILOGRAMS_TO_GRAMS, SQUARE_CENTIMETERS_TO_HECTARES
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    KILOGRAMS_TO_GRAMS,
-    SQUARE_CENTIMETERS_TO_HECTARES,
-)
 
 # This fraction was used in the evaluation of RuFaS Soil Nitrogen cycling, and was validated empirically.
 ACTIVE_FRACTION_OF_ORGANIC_NITROGEN = 0.9286
