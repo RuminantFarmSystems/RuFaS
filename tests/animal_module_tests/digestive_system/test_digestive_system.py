@@ -121,9 +121,9 @@ def test_daily_routine_calf(
     mock_emission = mocker.patch.object(EntericMethaneCalculator, "calf_methane", return_value=15.3)
     mock_manure = mocker.patch.object(ManureExcretionCalculator, "calf_manure", return_value=(3, expected_excretions))
 
-    DigestiveSystem.methane_model = "dummy model"
-    DigestiveSystem.methane_mitigation_method = "dummy_method"
-    DigestiveSystem.methane_mitigation_additive_amount = 16
+    DigestiveSystem.METHANE_MODEL = "dummy model"
+    DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
+    DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
     observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
@@ -166,9 +166,9 @@ def test_daily_routine_heifer(
     mock_emission = mocker.patch.object(EntericMethaneCalculator, "heifer_methane", return_value=15.3)
     mock_manure = mocker.patch.object(ManureExcretionCalculator, "heifer_manure", return_value=(3, expected_excretions))
 
-    DigestiveSystem.methane_model = "dummy model"
-    DigestiveSystem.methane_mitigation_method = "dummy_method"
-    DigestiveSystem.methane_mitigation_additive_amount = 16
+    DigestiveSystem.METHANE_MODEL = "dummy model"
+    DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
+    DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
     observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
@@ -211,9 +211,9 @@ def test_daily_routine_cow(
     mock_emission = mocker.patch.object(EntericMethaneCalculator, "cow_methane", return_value=15.3)
     mock_manure = mocker.patch.object(ManureExcretionCalculator, "cow_manure", return_value=(3, expected_excretions))
 
-    DigestiveSystem.methane_model = "dummy model"
-    DigestiveSystem.methane_mitigation_method = "dummy_method"
-    DigestiveSystem.methane_mitigation_additive_amount = 16
+    DigestiveSystem.METHANE_MODEL = "dummy model"
+    DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
+    DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
     observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.daily_routine(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
@@ -244,7 +244,7 @@ def test_initialize_animal_methane_variables(mocker: MockerFixture) -> None:
         },
     )
     DigestiveSystem.initialize_animal_methane_variables()
-    assert DigestiveSystem.methane_model == "test_model"
-    assert DigestiveSystem.methane_mitigation_method == "test_mitigation_method"
-    assert DigestiveSystem.methane_mitigation_additive_amount == 26.4
+    assert DigestiveSystem.METHANE_MODEL == "test_model"
+    assert DigestiveSystem.METHANE_MITIGATION_METHOD == "test_mitigation_method"
+    assert DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT == 26.4
     mock_get_data.assert_called_once_with("animal.animal_config")

@@ -11,18 +11,18 @@ from RUFAS.input_manager import InputManager
 
 
 class DigestiveSystem:
-    methane_model: str
-    methane_mitigation_method: str
-    methane_mitigation_additive_amount: float
+    METHANE_MODEL: str
+    METHANE_MITIGATION_METHOD: str
+    METHANE_MITIGATION_ADDITIVE_AMOUNT: float
 
     @classmethod
     def initialize_animal_methane_variables(cls) -> None:
         """This function retrieves the user input data from the InputManager and initializes the class constants."""
         im = InputManager()
         animal_config: dict[str, Any] = im.get_data("animal.animal_config")
-        cls.methane_model = animal_config["methane_model"]
-        cls.methane_mitigation_method = animal_config["methane_mitigation"]["methane_mitigation_method"]
-        cls.methane_mitigation_additive_amount = (animal_config)["methane_mitigation"][
+        cls.METHANE_MODEL = animal_config["methane_model"]
+        cls.METHANE_MITIGATION_METHOD = animal_config["methane_mitigation"]["methane_mitigation_method"]
+        cls.METHANE_MITIGATION_ADDITIVE_AMOUNT = (animal_config)["methane_mitigation"][
             "methane_mitigation_additive_amount"
         ]
 
@@ -55,7 +55,7 @@ class DigestiveSystem:
         """
         if general_properties.animal_type == AnimalType.CALF:
             methane_emission = EntericMethaneCalculator.calf_methane(
-                DigestiveSystem.methane_model,
+                DigestiveSystem.METHANE_MODEL,
                 general_properties.body_weight,
             )
             phosphorus, excretion = ManureExcretionCalculator.calf_manure(
@@ -69,7 +69,7 @@ class DigestiveSystem:
 
         elif general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             methane_emission = EntericMethaneCalculator.heifer_methane(
-                DigestiveSystem.methane_model,
+                DigestiveSystem.METHANE_MODEL,
                 general_properties.nutrients["dm"],
                 general_properties.nutrient_concentrations,
             )
@@ -91,9 +91,9 @@ class DigestiveSystem:
                 general_properties.metabolizable_energy_intake,
                 general_properties.nutrients,
                 general_properties.nutrient_concentrations,
-                DigestiveSystem.methane_mitigation_method,
-                DigestiveSystem.methane_mitigation_additive_amount,
-                DigestiveSystem.methane_model,
+                DigestiveSystem.METHANE_MITIGATION_METHOD,
+                DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT,
+                DigestiveSystem.METHANE_MODEL,
             )
 
             phosphorus, excretion = ManureExcretionCalculator.cow_manure(
