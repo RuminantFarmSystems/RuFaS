@@ -68,7 +68,9 @@ def test_cow_methane_is_lactating_with_mitigation(
     EE_concentration = nutrient_concentrations["EE"]
     starch_concentration = nutrient_concentrations["starch"]
 
-    mock_lactating_cow_manure = mocker.patch.object(EntericMethaneCalculator, "_calculate_lactating_cow_manure", return_value=25)
+    mock_lactating_cow_manure = mocker.patch.object(
+        EntericMethaneCalculator, "_calculate_lactating_cow_manure", return_value=25
+    )
 
     methane_yield = 25 / dry_matter_intake
     mock_methane_mitigation = mocker.patch.object(MethaneMitigationCalculator, "mitigate_methane", return_value=23.5)
