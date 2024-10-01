@@ -1,13 +1,16 @@
+from unittest.mock import call
+
 import pytest
 from pytest_mock import MockerFixture
-from unittest.mock import call
+
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.storage import Storage
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
+
 from .sample_crop_data import sample_crop_data
 
 

@@ -1,7 +1,7 @@
 from typing import Dict, List, TypedDict
 
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.general_constants import GeneralConstants
 
 
 class AminoAcidComposition(TypedDict):

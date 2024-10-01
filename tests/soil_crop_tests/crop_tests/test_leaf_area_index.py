@@ -1,8 +1,10 @@
-import pytest
-from unittest.mock import patch, PropertyMock
-from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
-from RUFAS.routines.field.crop.crop_data import CropData
 from math import exp, log, sqrt
+from unittest.mock import PropertyMock, patch
+
+import pytest
+
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
 
 
 @pytest.mark.parametrize(

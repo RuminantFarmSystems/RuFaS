@@ -1,6 +1,7 @@
 import math
 import re
 from typing import Any, Callable, Optional
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.units import MeasurementUnits

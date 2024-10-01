@@ -1,4 +1,4 @@
-from typing import Type, Any
+from typing import Any, Type
 
 import pytest
 from pytest_mock import MockFixture
@@ -6,10 +6,7 @@ from pytest_mock import MockFixture
 from RUFAS.routines.animal.life_cycle import animal_constants as const
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    CowReproProtocolEnum,
-    ReproStateEnum,
-)
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import CowReproProtocolEnum, ReproStateEnum
 from RUFAS.routines.animal.types.preg_check_config import PregCheckConfig
 
 

@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import math
-from RUFAS.general_constants import GeneralConstants
+
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.general_constants import GeneralConstants
 
 CALVES_AND_HEIFERS = [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]
 HEIFERS_AND_COWS = [AnimalType.DRY_COW, AnimalType.LAC_COW, AnimalType.HEIFER_II, AnimalType.HEIFER_II]
@@ -160,8 +162,8 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation section A.1E.E.5.
         """
-        if general_properties.milking:
-            return 0.0009 * general_properties.estimated_daily_milk_produced * GeneralConstants.KG_TO_GRAMS
+        if general_properties.is_milking:
+            return 0.0009 * general_properties.daily_milk_produced * GeneralConstants.KG_TO_GRAMS
         else:
             return 0.0
 
@@ -210,7 +212,7 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A.E.7, A.1B-D.E.7, A.1EF.E.7.
         """
-        if general_properties.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW] and general_properties.milking:
+        if general_properties.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW] and general_properties.is_milking:
             return absorbed_phosphorus / (
                 1.86696
                 - 5.01238 * phosphorus_status.ration_phosphorus_concentration

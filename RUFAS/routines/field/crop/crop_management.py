@@ -1,18 +1,16 @@
 from math import exp
 from typing import Optional
+
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.units import MeasurementUnits
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    DEFAULT_DRY_MATTER_DIGESTIBILITY,
-)
+from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
-from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 class CropManagement:
