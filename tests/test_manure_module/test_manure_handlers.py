@@ -362,7 +362,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
 
     current_barn_temp = 30.0
-    patch_for_adjust_air_temp = mocker.patch(
+    patch_for_determine_barn_temp = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
         "determine_barn_air_temperature",
         return_value=current_barn_temp,
@@ -415,7 +415,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
     assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 1
-    assert patch_for_adjust_air_temp.call_count == 1
+    assert patch_for_determine_barn_temp.call_count == 1
 
     # --- Test pen type that does not require GHG emissions estimations. ---
     mock_pen.pen_type = "compost bedded pack barn"
@@ -519,7 +519,7 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
         return_value=current_day_avg_tempC,
     )
     current_barn_temp = 30.0
-    patch_for_adjust_air_temp = mocker.patch(
+    patch_for_determine_barn_temp = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
         "determine_barn_air_temperature",
         return_value=current_barn_temp,
@@ -569,7 +569,7 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
     )
     assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 1
-    assert patch_for_adjust_air_temp.call_count == 1
+    assert patch_for_determine_barn_temp.call_count == 1
 
 
 def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None:
