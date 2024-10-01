@@ -156,7 +156,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-        "which crop yields and nutrient applications to estimate emissions for.",
+                       "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -424,3 +424,31 @@ def test_calculate_actual_purchased_feed_emissions_no_key(
         "function": "_calculate_actual_purchased_feed_emissions",
     }
     mock_add.assert_called_once_with(msg_name, message, info_map)
+
+
+@pytest.mark.parametrize(
+    "feed_emission_data,county_code,expected",
+    [
+        (
+            {"county_code": [53705, 94545],
+             "data1": [7.7, 92.4]},
+            53705,
+            {"data1": 7.7}
+        ),
+        (
+            {"county_code": [53705, 94545],
+             "data1": [7.7, 92.4],
+             "data2": [54.1, 35.4]},
+            94545,
+            {"data1": 92.4,
+             "data2": 35.4}
+        )
+    ],
+)
+def test_get_feed_emissions_data(feed_emission_data: dict[str, list[float]], county_code: int,
+                                 expected: dict[str, float]) -> None:
+    """Tests that feed emission data is correctly retrieved."""
+    em = EmissionsEstimator()
+    observed = em._get_feed_emissions_data(county_code, feed_emission_data)
+    assert observed == expected
+
