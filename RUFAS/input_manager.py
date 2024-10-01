@@ -88,7 +88,7 @@ class InputManager:
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
-            self.csv_report_generation_list = []
+            self.csv_report_generation_list: list[str] = []
         self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
@@ -500,7 +500,7 @@ class InputManager:
         """
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
-            error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
+            error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
             self.om.add_error("Missing required data", error_msg, info_map)
             raise KeyError(error_msg)
 

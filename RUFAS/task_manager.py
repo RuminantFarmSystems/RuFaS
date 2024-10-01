@@ -152,19 +152,23 @@ class TaskManager:
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
         self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
+
+        export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
+        input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
+        input_data_csv_import_path: str = task_config.get("input_data_csv_import_path", "")
         TaskManager.handle_post_processing(
             args={
                 "exclude_info_maps": exclude_info_maps,
                 "variable_name_style": "verbose",
                 "logs_directory": logs_directory,
                 "suppress_log_files": suppress_log_files,
-                "input_data_csv_export_path": Path(task_config.get("input_data_csv_export_path")),
-                "input_data_csv_import_path": Path(task_config.get("input_data_csv_import_path")),
+                "input_data_csv_export_path": Path(input_data_csv_export_path),
+                "input_data_csv_import_path": Path(input_data_csv_import_path),
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
             task_id="TASK_MANAGER",
-            export_input_data_to_csv=task_config.get("export_input_data_to_csv"),
+            export_input_data_to_csv=export_input_data_to_csv,
         )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:

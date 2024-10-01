@@ -91,10 +91,10 @@ class Utility:
 
     @staticmethod
     def expand_data_temporally(
-        data_to_expand: dict[str, dict[str, list[Any]]],
-        fill_value: Any = np.nan,
-        use_fill_value_in_gaps: bool = True,
-        use_fill_value_at_end: bool = True,
+            data_to_expand: dict[str, dict[str, list[Any]]],
+            fill_value: Any = np.nan,
+            use_fill_value_in_gaps: bool = True,
+            use_fill_value_at_end: bool = True,
     ) -> dict[str, dict[str, list[Any]]]:
         """
         Pads and expands data based on the simulation day(s) it was recorded on, relative to when other data was
@@ -451,7 +451,7 @@ class Utility:
 
     @staticmethod
     def filter_dictionary(
-        dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
+            dict_to_filter: Dict[str, Any], filter_patterns: List[str], filter_by_exclusion: bool
     ) -> Dict[Any, Any]:
         """
         Returns a filtered dictionary based on either inclusion or exclusion.
@@ -586,11 +586,14 @@ class Utility:
         return np.random.normal(mean, std_dev)
 
     @staticmethod
-    def flatten_dictionary(input_dictionary: dict[str, Any], parent_key="", separator=".") -> dict[str, Any]:
+    def flatten_dictionary(input_dictionary: dict[str, Any],
+                           parent_key: str = "",
+                           separator: str = "."
+                           ) -> dict[str, Any]:
         """
         Flatten a nested dictionary to a single level of depth by joining the keys with "."
         """
-        items = []
+        items: list[tuple[str, Any]] = []
         for key, value in input_dictionary.items():
             new_key = parent_key + separator + key if parent_key else key
             if isinstance(value, dict) and value:
@@ -604,7 +607,7 @@ class Utility:
 
     @staticmethod
     def combine_saved_input_csv(
-        saved_csv_working_folder: Path, output_csv_path: Path, import_csv_path: Path | None
+            saved_csv_working_folder: Path, output_csv_path: Path, import_csv_path: Path | None
     ) -> None:
         """
         Merge multiple saved input data CSVs files into one single CSV file for a direct side-by-side comparison.
@@ -623,7 +626,7 @@ class Utility:
             data_prefix = [col for col in list(current_df.columns) if col not in ["property_group", "variable_name"]][0]
 
             if data_prefix in list(result_df.columns) or any(
-                data_prefix in prefix for prefix in list(result_df.columns)
+                    data_prefix in prefix for prefix in list(result_df.columns)
             ):
                 same_prefix_columns: list[str] = [prefix for prefix in list(result_df.columns) if data_prefix in prefix]
                 if len(same_prefix_columns) == 1:
@@ -632,7 +635,7 @@ class Utility:
                 else:
                     suffix_numbers = [column_name.split(f"{data_prefix}_")[1] for column_name in same_prefix_columns]
                     current_df.rename(
-                        columns={data_prefix: f"{data_prefix}_{int(max(suffix_numbers))+1}"}, inplace=True
+                        columns={data_prefix: f"{data_prefix}_{int(max(suffix_numbers)) + 1}"}, inplace=True
                     )
             result_df = current_df.merge(result_df, how="outer", on=["property_group", "variable_name"])
         output_csv_path = output_csv_path / "saved_input_data.csv"
