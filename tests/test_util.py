@@ -7,7 +7,6 @@ from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 import pytest
-from mock.mock import call
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
 
