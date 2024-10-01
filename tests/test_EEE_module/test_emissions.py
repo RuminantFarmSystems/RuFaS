@@ -156,7 +156,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                       "which crop yields and nutrient applications to estimate emissions for.",
+        "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -262,18 +262,14 @@ def test_transform_outputs_to_list_of_dicts() -> None:
     [
         (
             {"one": {"values": [1, 2, 3]}, "two": {"values": [4, 5, 6, 9]}},
-            [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}]
+            [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}],
         ),
-        (
-            {"one": {"values": [1, 2, 3]}, "two": {"values": []}},
-            []
-        )
+        ({"one": {"values": [1, 2, 3]}, "two": {"values": []}}, []),
     ],
 )
 def test_transform_outputs_to_list_of_dicts_length_unmatched(
-    data: dict[str, dict[str, list[int]]],
-    expected: list[dict[str, int]],
-    mocker: MockerFixture) -> None:
+    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], mocker: MockerFixture
+) -> None:
     """Test that the function transform data to correct list of dicts with unmatched list length."""
     em = EmissionsEstimator()
     mock_add_error = mocker.patch.object(em.om, "add_error")
