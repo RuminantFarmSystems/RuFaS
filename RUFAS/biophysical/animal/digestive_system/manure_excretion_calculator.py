@@ -392,7 +392,7 @@ class ManureExcretionCalculator:
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
-        ASH_diet_content = nutrient_amounts["ash"]
+        ash_diet_content = nutrient_amounts["ash"]
         dry_matter_concentration = nutrient_concentrations["dm"]
         ADF_concentration = nutrient_concentrations["ADF"]
         CP_concentration = nutrient_concentrations["CP"]
@@ -436,7 +436,7 @@ class ManureExcretionCalculator:
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
         # Organic matter intake, kg [A.2.A.3]
-        organic_matter_intake = dry_matter_intake - ASH_diet_content
+        organic_matter_intake = dry_matter_intake - ash_diet_content
 
         # Degradable volatile solids, kg [A.3E.A.5]
         degradable_volatile_solids = (

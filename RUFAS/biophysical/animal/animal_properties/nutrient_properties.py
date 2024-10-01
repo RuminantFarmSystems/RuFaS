@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
 @dataclass
