@@ -6,7 +6,6 @@ from typing import Optional, Tuple, Union
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
 from RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper import ManureModuleOutputManagerHelper
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator
@@ -286,8 +285,8 @@ class BaseManureTreatment(ABC):
         Returns
         -------
         float
-            Nitrous oxide emission factor (kg Nitrous Oxide N/kg manure N) for different manure treatment and storage
-            systems.
+            Nitrous oxide emission factor for different manure treatment and storage
+            systems (kg N2O/kg manure N).
         """
 
         return GasEmissionConstants.NITROUS_OXIDE_EMISSION_FACTOR_KG_NITROUS_OXIDE_N_PER_KG_MANURE_N[
