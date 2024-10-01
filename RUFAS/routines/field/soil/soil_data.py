@@ -1,7 +1,8 @@
-from dataclasses import dataclass, InitVar, field
-from typing import List, Optional
-from math import inf
 from copy import deepcopy
+from dataclasses import InitVar, dataclass, field
+from math import inf
+from typing import List, Optional
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.layer_data import LayerData

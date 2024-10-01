@@ -2,11 +2,11 @@ import pytest
 from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
+from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.EEE.EEE_manager import EEEManager
 from RUFAS.simulation_engine import SimulationEngine
-from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.time import Time
 
 

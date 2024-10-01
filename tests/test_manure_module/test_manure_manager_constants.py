@@ -1,13 +1,9 @@
 from pytest import approx
 
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
 def test_manure_constants() -> None:

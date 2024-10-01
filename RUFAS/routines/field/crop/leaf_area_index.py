@@ -1,5 +1,6 @@
 from math import exp, log, sqrt
 from typing import List, Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 
 

@@ -1,14 +1,13 @@
 import copy
 import datetime
-from pathlib import Path
 import random
-from typing import List, Dict, Any, Type
+from pathlib import Path
+from typing import Any, Dict, List, Type
 
 from tqdm import tqdm
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.time import Time
 from RUFAS.routines.animal.animal_manager import AnimalManager, Feed
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
@@ -18,6 +17,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.time import Time
 
 om = OutputManager()
 
