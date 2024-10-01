@@ -70,7 +70,7 @@ def test_calf_manure(
         ),
     )
 
-    observed = ManureExcretionCalculator.calf_manure(
+    observed = ManureExcretionCalculator.calculate_calf_manure(
         body_weight, fecal_phosphorus, urine_phosphorus_required, nutrient_amounts, nutrient_concentrations
     )
 
@@ -162,7 +162,7 @@ def test_heifer_manure(
             potassium=potassium,
         ),
     )
-    observed = ManureExcretionCalculator.heifer_manure(
+    observed = ManureExcretionCalculator.calculate_heifer_manure(
         body_weight, fecal_phosphorus, urine_phosphorus_required, nutrient_amounts, nutrient_concentrations
     )
 
@@ -283,7 +283,7 @@ def test_lactating_cow_manure(
         ),
     )
 
-    observed = ManureExcretionCalculator._lactating_cow_manure(
+    observed = ManureExcretionCalculator._calculate_lactating_cow_manure(
         days_in_milk,
         milk_protein,
         daily_milk_production,
@@ -318,8 +318,8 @@ def test_cow_manure_lactating(
     nutrient_concentrations: dict[str, float],
     mocker: MockerFixture,
 ) -> None:
-    mock_lactating_cow_manure = mocker.patch.object(ManureExcretionCalculator, "_lactating_cow_manure")
-    ManureExcretionCalculator.cow_manure(
+    mock_lactating_cow_manure = mocker.patch.object(ManureExcretionCalculator, "_calculate_lactating_cow_manure")
+    ManureExcretionCalculator.calculate_cow_manure(
         True,
         body_weight,
         days_in_milk,
@@ -357,8 +357,8 @@ def test_cow_manure_dry(
     nutrient_concentrations: dict[str, float],
     mocker: MockerFixture,
 ) -> None:
-    mock_dry_cow_manure = mocker.patch.object(ManureExcretionCalculator, "_dry_cow_manure")
-    ManureExcretionCalculator.cow_manure(
+    mock_dry_cow_manure = mocker.patch.object(ManureExcretionCalculator, "_calculate_dry_cow_manure")
+    ManureExcretionCalculator.calculate_cow_manure(
         False,
         body_weight,
         days_in_milk,

@@ -1,6 +1,6 @@
 class MethaneMitigationCalculator:
     @staticmethod
-    def methane_mitigation(
+    def mitigate_methane(
         NDF_concentration: float,
         EE_concentration: float,
         starch_concentration: float,

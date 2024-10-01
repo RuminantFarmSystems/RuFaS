@@ -14,7 +14,7 @@ def test_methane_mitigation_3NOP(
     methane_mitigation_additive_amount: float,
     expected: float,
 ) -> None:
-    observed = MethaneMitigationCalculator.methane_mitigation(
+    observed = MethaneMitigationCalculator.mitigate_methane(
         NDF_concentration, EE_concentration, starch_concentration, "3-NOP", methane_mitigation_additive_amount
     )
     assert observed == pytest.approx(expected)
@@ -31,7 +31,7 @@ def test_methane_mitigation_monensin(
     methane_mitigation_additive_amount: float,
     expected: float,
 ) -> None:
-    observed = MethaneMitigationCalculator.methane_mitigation(
+    observed = MethaneMitigationCalculator.mitigate_methane(
         NDF_concentration, EE_concentration, starch_concentration, "Monensin", methane_mitigation_additive_amount
     )
     assert observed == pytest.approx(expected)
@@ -48,7 +48,7 @@ def test_methane_mitigation_no_spec(
     methane_mitigation_additive_amount: float,
     expected: float,
 ) -> None:
-    observed = MethaneMitigationCalculator.methane_mitigation(
+    observed = MethaneMitigationCalculator.mitigate_methane(
         NDF_concentration, EE_concentration, starch_concentration, "other", methane_mitigation_additive_amount
     )
     assert observed == expected
