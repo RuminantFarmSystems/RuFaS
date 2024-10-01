@@ -7,7 +7,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
+from typing import Any, Counter, Dict, List, TextIO, Tuple, Union
 
 import numpy as np
 import pandas as pd

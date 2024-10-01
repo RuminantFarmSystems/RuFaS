@@ -2,16 +2,16 @@ import json
 import os
 import re
 from copy import deepcopy
-from deepdiff import DeepDiff
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Sequence, Tuple, Union
+
 import pandas as pd
+from deepdiff import DeepDiff
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
-
 
 """
 Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.

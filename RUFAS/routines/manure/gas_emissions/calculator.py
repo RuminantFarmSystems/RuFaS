@@ -4,9 +4,7 @@ from typing import Tuple
 import numpy as np
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 
@@ -1322,7 +1320,7 @@ class GasEmissionsCalculator:
         )
 
     @staticmethod
-    def empirical_nitrogen_loss_from_nitrous_oxide_emission(
+    def calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
         emission_factor_kg_nitrous_oxide_N_per_kg_manure_N: float,
         manure_nitrogen_kg_N_per_day: float,
     ) -> float:

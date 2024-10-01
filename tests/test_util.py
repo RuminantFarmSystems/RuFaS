@@ -1,4 +1,5 @@
 import datetime
+import math
 import re
 from pathlib import Path
 from typing import Any, Dict, List
@@ -9,7 +10,6 @@ import pytest
 from mock.mock import call
 from pytest import approx, raises
 from pytest_mock.plugin import MockerFixture
-import math
 
 from RUFAS.util import Utility
 

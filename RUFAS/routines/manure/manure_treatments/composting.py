@@ -1,19 +1,11 @@
 import math
 
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
 from RUFAS.routines.manure.manure_treatments.composting_types import CompostingType
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 
 
 class Composting(BaseManureTreatment):

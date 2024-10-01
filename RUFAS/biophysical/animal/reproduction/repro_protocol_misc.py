@@ -1,6 +1,4 @@
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproProtocolEnum
 
 
 class InternalReproSettings:

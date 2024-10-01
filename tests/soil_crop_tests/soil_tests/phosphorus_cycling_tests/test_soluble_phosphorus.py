@@ -1,17 +1,16 @@
-import pytest
-from unittest.mock import MagicMock, patch
 from math import exp
+from unittest.mock import MagicMock, patch
 
-from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.layer_data import LayerData
+import pytest
+
 from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
     CUBIC_MILLIMETERS_TO_LITERS,
+    HECTARES_TO_SQUARE_MILLIMETERS,
     MILLIGRAMS_TO_KILOGRAMS,
 )
-from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import (
-    SolublePhosphorus,
-)
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.phosphorus_cycling.soluble_phosphorus import SolublePhosphorus
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 # --- Static method tests ---

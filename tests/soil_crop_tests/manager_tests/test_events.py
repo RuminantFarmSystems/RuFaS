@@ -1,17 +1,18 @@
-import pytest
 from unittest.mock import MagicMock
 
+import pytest
+
+from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.manager.events import (
     BaseFieldManagementEvent,
-    PlantingEvent,
-    HarvestEvent,
-    TillageEvent,
-    ManureEvent,
     FertilizerEvent,
+    HarvestEvent,
+    ManureEvent,
+    PlantingEvent,
+    TillageEvent,
 )
-from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.EEE.enums import TillageImplement
 
 
 @pytest.mark.parametrize(
