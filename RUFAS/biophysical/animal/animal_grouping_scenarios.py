@@ -1,8 +1,9 @@
 from enum import Enum
 from typing import Dict, List
 
-from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+
 from ...enums import AnimalCombination
 
 

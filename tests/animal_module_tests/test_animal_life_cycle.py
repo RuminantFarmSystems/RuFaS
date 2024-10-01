@@ -1,40 +1,29 @@
 import collections
-from typing import Dict
-from typing import List
-from typing import Type
+from typing import Dict, List, Type
 
 import pytest
-from pytest import approx
-from pytest import fixture
+from pytest import approx, fixture
 from pytest_mock import MockerFixture
-
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_typed_dicts import (
-    AnimalConfigTypedDict,
-    HerdInfoTypedDict,
-)
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
-from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
-from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
-from RUFAS.routines.animal.life_cycle.animal_constants import LOW_PROD_CULL
-from RUFAS.routines.animal.life_cycle.animal_constants import DEATH_CULL
+from RUFAS.routines.animal.life_cycle.animal_constants import DEATH_CULL, ENTER_HERD, INIT_HERD, LOW_PROD_CULL
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal, LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.feed.feed import Feed
 
 
 @fixture

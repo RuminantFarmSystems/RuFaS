@@ -1,14 +1,15 @@
 import copy
 from typing import List
-from .enums import CropCategory, CropType
-from .harvested_crop import HarvestedCrop
+
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
+from .enums import CropCategory, CropType
+from .harvested_crop import HarvestedCrop
 
 """
 These constants define the upper and lower bounds of temperatures that allow fermentation (in degrees C), the upper and

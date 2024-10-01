@@ -5,8 +5,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.manure_pool import ManurePool
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.phosphorus_cycling.manure import Manure
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize(
