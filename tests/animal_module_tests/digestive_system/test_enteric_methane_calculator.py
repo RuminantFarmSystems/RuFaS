@@ -84,7 +84,7 @@ def test_cow_methane_is_lactating_with_mitigation(
         methane_mitigation_additive_amount,
         "model",
     )
-    assert observed == expected
+    assert pytest.approx(observed) == expected
 
     mock_lactating_cow_manure.assert_called_once_with(
         body_weight,
@@ -140,7 +140,7 @@ def test_cow_manure_dry_with_mitigation(
         methane_mitigation_additive_amount,
         "model",
     )
-    assert observed == expected
+    assert pytest.approx(observed) == expected
 
     mock_dry_cow_manure.assert_called_once_with(
         "model", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations

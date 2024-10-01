@@ -28,10 +28,9 @@ def mock_general_properties() -> GeneralProperties:
         days_in_milk=0,
         dry_off_day_of_pregnancy=0,
         events=AnimalEvents(),
-        daily_milk_produced=0,
         future_cull_date=0,
         future_death_date=0,
-        gender=Sex.FEMALE,
+        sex=Sex.FEMALE,
         id=0,
         mature_body_weight=0,
         nutrients={"p": 77.7, "dm": 5.23},
@@ -48,7 +47,6 @@ def mock_general_properties() -> GeneralProperties:
 @pytest.fixture
 def mock_animal_nutrient_property() -> NutrientProperties:
     return NutrientProperties(
-        animal_type=AnimalType.CALF,
         body_weight=12,
         mature_body_weight=54,
         daily_growth=33.4,

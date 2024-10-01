@@ -1,4 +1,4 @@
-import numpy
+from numpy import exp
 
 from RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator import MethaneMitigationCalculator
 from RUFAS.general_constants import GeneralConstants
@@ -59,7 +59,7 @@ class EntericMethaneCalculator:
             NDF_concentration = nutrient_concentrations["NDF"]
             ASH_concentration = nutrient_concentrations["ash"]
             soluble_residue = (
-                (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration)
+                (100 - ASH_concentration)
                 - NDF_concentration
                 - CP_concentration
                 - EE_concentration
@@ -232,7 +232,7 @@ class EntericMethaneCalculator:
         elif methane_model == "Mills":  # [A.3E.C.2]
             starch_to_ADF_concentration_ratio = -0.0011 * starch_concentration / ADF_concentration
             temp = -(starch_to_ADF_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
-            methane_emission = 45.98 * (1 - numpy.exp(temp)) / 0.05565
+            methane_emission = 45.98 * (1 - exp(temp)) / 0.05565
 
         elif methane_model == "IPCC":  # IPCC
             # Calculating gross energy concentration (Moraes et al. 2014)
@@ -302,7 +302,7 @@ class EntericMethaneCalculator:
         EE_concentration = nutrient_concentrations["EE"]
         starch_concentration = nutrient_concentrations["starch"]
         soluble_residue = (
-            (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration)
+            (100 - ASH_concentration)
             - NDF_concentration
             - CP_concentration
             - EE_concentration
@@ -312,7 +312,7 @@ class EntericMethaneCalculator:
             methane_emission = (
                 45.98
                 - 45.98
-                * numpy.exp(
+                * exp(
                     -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045)
                     * metabolizable_energy_intake
                     * 4.184
