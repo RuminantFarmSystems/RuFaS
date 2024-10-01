@@ -58,12 +58,7 @@ class EntericMethaneCalculator:
             EE_concentration = nutrient_concentrations["EE"]
             NDF_concentration = nutrient_concentrations["NDF"]
             ASH_concentration = nutrient_concentrations["ash"]
-            soluble_residue = (
-                (100 - ASH_concentration)
-                - NDF_concentration
-                - CP_concentration
-                - EE_concentration
-            )
+            soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
             gross_energy_concentration = (
                 0.263 * CP_concentration
                 + 0.522 * EE_concentration
@@ -301,12 +296,7 @@ class EntericMethaneCalculator:
         NDF_concentration = nutrient_concentrations["NDF"]
         EE_concentration = nutrient_concentrations["EE"]
         starch_concentration = nutrient_concentrations["starch"]
-        soluble_residue = (
-            (100 - ASH_concentration)
-            - NDF_concentration
-            - CP_concentration
-            - EE_concentration
-        )
+        soluble_residue = (100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration
         if methane_model == "Mills":
             # Methane model = 'Mills' [A.3E.C.2]
             methane_emission = (

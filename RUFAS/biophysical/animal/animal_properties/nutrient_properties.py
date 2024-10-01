@@ -15,6 +15,7 @@ class NutrientProperties:
         Amount of phosphorus required for urine production, g.
 
     """
+
     body_weight: float
     mature_body_weight: float
     daily_growth: float
