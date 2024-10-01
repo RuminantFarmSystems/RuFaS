@@ -1,5 +1,6 @@
 from typing import Any
 
+from RUFAS.biophysical.animal.animal_properties.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
@@ -31,12 +32,15 @@ class DigestiveSystem:
         general_properties: GeneralProperties,
         animal_nutrient_property: NutrientProperties,
         milk_production_properties: MilkProductionProperties,
-    ) -> tuple[float, float, AnimalManureExcretions]:
+        statistics: AnimalStatistics
+    ) -> tuple[AnimalStatistics, AnimalManureExcretions]:
         """
         Handles an animal's daily digest updates.
 
         Parameters
         ----------
+        statistics: AnimalStatistics
+            Animal properties that are used for animal statistics.
         general_properties: GeneralProperties
             Animal properties that are general or are used to determine many animal outcomes.
         animal_nutrient_property: AnimalGrowthProperties
@@ -46,9 +50,8 @@ class DigestiveSystem:
 
         Returns
         -------
-        tuple[float, float, AnimalManureExcretions]
-            The total amount of enteric methane produced by the given animal (g/day).
-            The total amount of phosphorus excreted by the given animal (g).
+        tuple[AnimalStatistics, AnimalManureExcretions]
+            An updated AnimalStatistics class.
             A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
@@ -65,7 +68,9 @@ class DigestiveSystem:
                 general_properties.nutrients,
                 general_properties.nutrient_concentrations,
             )
-            return methane_emission, phosphorus, excretion
+            statistics.methane_emission = methane_emission
+            statistics.phosphorus_excreted = phosphorus
+            return statistics, excretion
 
         elif general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
@@ -81,7 +86,9 @@ class DigestiveSystem:
                 general_properties.nutrients,
                 general_properties.nutrient_concentrations,
             )
-            return methane_emission, phosphorus, excretion
+            statistics.methane_emission = methane_emission
+            statistics.phosphorus_excreted = phosphorus
+            return statistics, excretion
 
         else:
             methane_emission = EntericMethaneCalculator.calculate_cow_methane(
@@ -107,4 +114,6 @@ class DigestiveSystem:
                 general_properties.nutrients,
                 general_properties.nutrient_concentrations,
             )
-            return methane_emission, phosphorus, excretion
+            statistics.methane_emission = methane_emission
+            statistics.phosphorus_excreted = phosphorus
+            return statistics, excretion

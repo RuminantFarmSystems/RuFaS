@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal.animal_properties.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Sex
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
@@ -91,10 +92,19 @@ def mock_milk_production_property() -> MilkProductionProperties:
     )
 
 
+@pytest.fixture
+def mock_statistics() -> AnimalStatistics:
+    return AnimalStatistics(
+        methane_emission=0,
+        phosphorus_excreted=0
+    )
+
+
 def test_daily_routine_calf(
     mock_general_properties: GeneralProperties,
     mock_milk_production_property: MilkProductionProperties,
     mock_animal_nutrient_property: NutrientProperties,
+    mock_statistics: AnimalStatistics,
     mocker: MockerFixture,
 ) -> None:
     """Test the daily update when animal is calf."""
@@ -125,12 +135,11 @@ def test_daily_routine_calf(
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
     DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.process_digestion(
-        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
+    observed_statistics, observed_excretions = DigestiveSystem.process_digestion(
+        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property, mock_statistics
     )
 
-    assert observed_emission == 15.3
-    assert observed_phosphorus == 3
+    assert mock_statistics == AnimalStatistics(phosphorus_excreted=3, methane_emission=15.3)
     assert observed_excretions == expected_excretions
 
     mock_emission.assert_called_once_with("dummy model", 12)
@@ -141,6 +150,7 @@ def test_daily_routine_heifer(
     mock_general_properties: GeneralProperties,
     mock_milk_production_property: MilkProductionProperties,
     mock_animal_nutrient_property: NutrientProperties,
+    mock_statistics: AnimalStatistics,
     mocker: MockerFixture,
 ) -> None:
     """Test the daily update when animal is heifer."""
@@ -172,12 +182,11 @@ def test_daily_routine_heifer(
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
     DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.process_digestion(
-        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
+    observed_statistics, observed_excretions = DigestiveSystem.process_digestion(
+        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property, mock_statistics
     )
 
-    assert observed_emission == 15.3
-    assert observed_phosphorus == 3
+    assert mock_statistics == AnimalStatistics(phosphorus_excreted=3, methane_emission=15.3)
     assert observed_excretions == expected_excretions
 
     mock_emission.assert_called_once_with("dummy model", 5.23, {"dm": 0.7})
@@ -188,6 +197,7 @@ def test_daily_routine_cow(
     mock_general_properties: GeneralProperties,
     mock_milk_production_property: MilkProductionProperties,
     mock_animal_nutrient_property: NutrientProperties,
+    mock_statistics: AnimalStatistics,
     mocker: MockerFixture,
 ) -> None:
     """Test the daily update when animal is cow."""
@@ -219,12 +229,11 @@ def test_daily_routine_cow(
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
     DigestiveSystem.METHANE_MITIGATION_ADDITIVE_AMOUNT = 16
 
-    observed_emission, observed_phosphorus, observed_excretions = DigestiveSystem.process_digestion(
-        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
+    observed_statistics, observed_excretions = DigestiveSystem.process_digestion(
+        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property, mock_statistics
     )
 
-    assert observed_emission == 15.3
-    assert observed_phosphorus == 3
+    assert observed_statistics == AnimalStatistics(phosphorus_excreted=3, methane_emission=15.3)
     assert observed_excretions == expected_excretions
 
     mock_emission.assert_called_once_with(
