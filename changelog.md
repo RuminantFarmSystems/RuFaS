@@ -28,7 +28,8 @@ v0.9.2
 - [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
 - [2022](https://github.com/RuminantFarmSystems/MASM/pull/2022) - [minor change] [Manure] Removes DefaultEnum class and all references to it in the Manure module.
 - [2025](https://github.com/RuminantFarmSystems/MASM/pull/2025) - [minor change] [Formatting] Sorts import statements in codebase.
-- - [2004](https://github.com/RuminantFarmSystems/MASM/pull/2004) - [minor change] [Animal] Implement the animal digestive system in the biophysical folder.
+- [2004](https://github.com/RuminantFarmSystems/MASM/pull/2004) - [minor change] [Animal] Implement the animal digestive system in the biophysical folder.
+- [2017](https://github.com/RuminantFarmSystems/MASM/pull/2017) - [minor change] [Animal] Deduplicates references to lactation parameters in the `LactationCurve` submodule and reorganizes structure to be consistent with other animal submodules.
 
 ### v0.9.2
 
