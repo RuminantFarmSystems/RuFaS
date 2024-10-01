@@ -452,3 +452,7 @@ def test_get_feed_emissions_data(feed_emission_data: dict[str, list[float]], cou
     observed = em._get_feed_emissions_data(county_code, feed_emission_data)
     assert observed == expected
 
+
+def test_calculate_homegrown_feed_emissions(mocker: MockerFixture) -> None:
+    """Tests the result of calculated homegrown feed emissions."""
+
