@@ -127,7 +127,6 @@ class SimulationEngine:
         if self.is_end_to_end_test_run:
             process_degradations_today = self.time.current_julian_day % FEED_DEGRADATION_INTERVAL_LENGTH == 0
             if process_degradations_today:
-                print(self.time.simulation_day)
                 self.feed_manager.process_degradations(self.weather, self.time)
 
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
