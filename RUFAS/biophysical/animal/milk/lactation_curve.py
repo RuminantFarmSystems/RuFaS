@@ -397,7 +397,7 @@ class LactationCurve:
             )
             for warning in caught_warnings:
                 cls._om.add_warning(
-                    f"Captured warning during optimization of type {warning.category.__name__}",
+                    f"Captured warning during minimization of type {warning.category.__name__}",
                     f"{warning.message}. Warning generated in {warning.filename}",
                     {
                         "class": cls.__class__.__name__,
