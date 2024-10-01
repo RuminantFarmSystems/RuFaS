@@ -248,7 +248,6 @@ class EmissionsEstimator:
         actual_land_use_change_emissions = {}
         for feed_id, amount_fed in actual_purchased_feeds.items():
             try:
-                print(feed_id)
                 purchased_emissions = amount_fed * purchased_feed_emissions[feed_id]
                 actual_purchased_feed_emissions[feed_id] = purchased_emissions
             except KeyError:
@@ -442,7 +441,6 @@ class EmissionsEstimator:
         """
         Partitions emissions from the field where crops/feeds were grown to those crops.
         """
-        # skip
         field_size = feeds_grown[0]["field_size"]
         total_dry_mass_per_ha_grown = sum([crop["dry_yield"] for crop in feeds_grown])
 
