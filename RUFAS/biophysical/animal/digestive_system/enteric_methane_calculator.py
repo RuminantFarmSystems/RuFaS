@@ -165,7 +165,7 @@ class EntericMethaneCalculator:
 
             methane_emission = (
                 methane_yield
-                * (1 + methane_yield_reduction / GeneralConstants.FRACTION_TO_PERCENTAGE)
+                * (1 + methane_yield_reduction * GeneralConstants.PERCENTAGE_TO_FRACTION)
                 * dry_matter_intake
             )
 
