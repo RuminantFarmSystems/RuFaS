@@ -11,6 +11,8 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class AnaerobicLagoon(BaseManureTreatment):

@@ -13,6 +13,7 @@ from RUFAS.routines.manure.constants_and_units.gas_emission_constants import Gas
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion import AnaerobicDigestion
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
 from RUFAS.routines.manure.manure_treatments.anaerobic_lagoon import AnaerobicLagoon
@@ -27,6 +28,7 @@ from RUFAS.routines.manure.manure_treatments.manure_treatment_types import Manur
 from RUFAS.routines.manure.manure_treatments.open_lots import OpenLots
 from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 from RUFAS.time import Time
 from RUFAS.weather import Weather
