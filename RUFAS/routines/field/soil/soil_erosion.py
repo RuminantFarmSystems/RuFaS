@@ -1,5 +1,5 @@
+from math import atan, exp, log, sin
 from typing import Optional
-from math import exp, log, atan, sin
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_KILOMETERS

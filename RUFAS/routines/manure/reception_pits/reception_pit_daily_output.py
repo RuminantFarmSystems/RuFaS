@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 from RUFAS.units import MeasurementUnits
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
-)
 
 
 @dataclass
