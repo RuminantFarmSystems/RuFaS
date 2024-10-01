@@ -7,7 +7,7 @@ from RUFAS.general_constants import GeneralConstants
 
 class ManureExcretionCalculator:
     @staticmethod
-    def calf_manure(
+    def calculate_calf_manure(
         body_weight: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
@@ -110,7 +110,7 @@ class ManureExcretionCalculator:
         return total_phosphorus_excreted, manure_excretion_values
 
     @staticmethod
-    def heifer_manure(
+    def calculate_heifer_manure(
         body_weight: float,
         fecal_phosphorus: float,
         urine_phosphorus_required: float,
@@ -259,7 +259,7 @@ class ManureExcretionCalculator:
         return total_phosphorus_excreted, manure_excretion_values
 
     @staticmethod
-    def cow_manure(
+    def calculate_cow_manure(
         is_lactating: bool,
         body_weight: float,
         days_in_milk: int,
@@ -319,7 +319,7 @@ class ManureExcretionCalculator:
 
         """
         if is_lactating:
-            return ManureExcretionCalculator._lactating_cow_manure(
+            return ManureExcretionCalculator._calculate_lactating_cow_manure(
                 days_in_milk,
                 milk_protein,
                 daily_milk_production,
@@ -329,7 +329,7 @@ class ManureExcretionCalculator:
                 nutrient_concentrations,
             )
         else:
-            return ManureExcretionCalculator._dry_cow_manure(
+            return ManureExcretionCalculator._calculate_dry_cow_manure(
                 body_weight,
                 daily_milk_production,
                 fecal_phosphorus,
@@ -339,7 +339,7 @@ class ManureExcretionCalculator:
             )
 
     @staticmethod
-    def _lactating_cow_manure(
+    def _calculate_lactating_cow_manure(
         days_in_milk: int,
         milk_protein: float,
         daily_milk_production: float,
@@ -501,7 +501,7 @@ class ManureExcretionCalculator:
         return total_phosphorus_excreted, manure_excretion_values
 
     @staticmethod
-    def _dry_cow_manure(
+    def _calculate_dry_cow_manure(
         body_weight: float,
         daily_milk_production: float,
         fecal_phosphorus: float,

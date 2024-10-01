@@ -54,11 +54,11 @@ class DigestiveSystem:
 
         """
         if general_properties.animal_type == AnimalType.CALF:
-            methane_emission = EntericMethaneCalculator.calf_methane(
+            methane_emission = EntericMethaneCalculator.calculate_calf_methane(
                 DigestiveSystem.METHANE_MODEL,
                 general_properties.body_weight,
             )
-            phosphorus, excretion = ManureExcretionCalculator.calf_manure(
+            phosphorus, excretion = ManureExcretionCalculator.calculate_calf_manure(
                 general_properties.body_weight,
                 animal_nutrient_property.fecal_phosphorus,
                 animal_nutrient_property.urine_phosphorus_required,
@@ -68,13 +68,13 @@ class DigestiveSystem:
             return methane_emission, phosphorus, excretion
 
         elif general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
-            methane_emission = EntericMethaneCalculator.heifer_methane(
+            methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
                 DigestiveSystem.METHANE_MODEL,
                 general_properties.nutrients["dm"],
                 general_properties.nutrient_concentrations,
             )
 
-            phosphorus, excretion = ManureExcretionCalculator.heifer_manure(
+            phosphorus, excretion = ManureExcretionCalculator.calculate_heifer_manure(
                 general_properties.body_weight,
                 animal_nutrient_property.fecal_phosphorus,
                 animal_nutrient_property.urine_phosphorus_required,
@@ -84,7 +84,7 @@ class DigestiveSystem:
             return methane_emission, phosphorus, excretion
 
         else:
-            methane_emission = EntericMethaneCalculator.cow_methane(
+            methane_emission = EntericMethaneCalculator.calculate_cow_methane(
                 general_properties.is_milking,
                 general_properties.body_weight,
                 milk_production_properties.fat_content,
@@ -96,7 +96,7 @@ class DigestiveSystem:
                 DigestiveSystem.METHANE_MODEL,
             )
 
-            phosphorus, excretion = ManureExcretionCalculator.cow_manure(
+            phosphorus, excretion = ManureExcretionCalculator.calculate_cow_manure(
                 general_properties.is_milking,
                 general_properties.body_weight,
                 general_properties.days_in_milk,

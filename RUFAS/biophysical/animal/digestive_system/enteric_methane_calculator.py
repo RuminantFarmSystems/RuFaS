@@ -6,7 +6,7 @@ from RUFAS.general_constants import GeneralConstants
 
 class EntericMethaneCalculator:
     @staticmethod
-    def calf_methane(methane_model: str | None, body_weight: float) -> float:
+    def calculate_calf_methane(methane_model: str | None, body_weight: float) -> float:
         """
         Calculates the amount of methane emission for calf.
 
@@ -30,7 +30,7 @@ class EntericMethaneCalculator:
         return methane_emission
 
     @staticmethod
-    def heifer_methane(
+    def calculate_heifer_methane(
         methane_model: str | None, dry_matter_intake: float, nutrient_concentrations: dict[str, float]
     ) -> float:
         """
@@ -70,7 +70,7 @@ class EntericMethaneCalculator:
         return methane_emission
 
     @staticmethod
-    def cow_methane(
+    def calculate_cow_methane(
         is_lactating: bool,
         body_weight: float,
         milk_fat: float,
@@ -132,7 +132,7 @@ class EntericMethaneCalculator:
         starch_concentration = nutrient_concentrations["starch"]
 
         if is_lactating:
-            methane_emission = EntericMethaneCalculator._lactating_cow_manure(
+            methane_emission = EntericMethaneCalculator._calculate_lactating_cow_manure(
                 body_weight,
                 milk_fat,
                 metabolizable_energy_intake,
@@ -141,7 +141,7 @@ class EntericMethaneCalculator:
                 methane_model,
             )
         else:
-            methane_emission = EntericMethaneCalculator._dry_cow_manure(
+            methane_emission = EntericMethaneCalculator._calculate_dry_cow_manure(
                 methane_model, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
             )
 
@@ -150,7 +150,7 @@ class EntericMethaneCalculator:
             methane_yield_reduction = 0.0
             if dry_matter_intake != 0:
                 methane_yield = methane_emission / dry_matter_intake
-                methane_yield_reduction = MethaneMitigationCalculator.methane_mitigation(
+                methane_yield_reduction = MethaneMitigationCalculator.mitigate_methane(
                     NDF_concentration,
                     EE_concentration,
                     starch_concentration,
@@ -167,7 +167,7 @@ class EntericMethaneCalculator:
         return methane_emission
 
     @staticmethod
-    def _lactating_cow_manure(
+    def _calculate_lactating_cow_manure(
         body_weight: float,
         milk_fat: float,
         metabolizable_energy_intake: float,
@@ -249,7 +249,7 @@ class EntericMethaneCalculator:
         return methane_emission
 
     @staticmethod
-    def _dry_cow_manure(
+    def _calculate_dry_cow_manure(
         methane_model: str,
         metabolizable_energy_intake: float,
         nutrient_amounts: dict[str, float],

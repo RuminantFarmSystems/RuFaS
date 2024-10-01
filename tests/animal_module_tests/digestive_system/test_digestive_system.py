@@ -116,8 +116,8 @@ def test_daily_routine_calf(
         phosphorus_fraction=14,
         potassium=0,
     )
-    mock_emission = mocker.patch.object(EntericMethaneCalculator, "calf_methane", return_value=15.3)
-    mock_manure = mocker.patch.object(ManureExcretionCalculator, "calf_manure", return_value=(3, expected_excretions))
+    mock_emission = mocker.patch.object(EntericMethaneCalculator, "calculate_calf_methane", return_value=15.3)
+    mock_manure = mocker.patch.object(ManureExcretionCalculator, "calculate_calf_manure", return_value=(3, expected_excretions))
 
     DigestiveSystem.METHANE_MODEL = "dummy model"
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
@@ -161,8 +161,8 @@ def test_daily_routine_heifer(
         potassium=0,
     )
     mock_general_properties.animal_type = AnimalType.HEIFER_II
-    mock_emission = mocker.patch.object(EntericMethaneCalculator, "heifer_methane", return_value=15.3)
-    mock_manure = mocker.patch.object(ManureExcretionCalculator, "heifer_manure", return_value=(3, expected_excretions))
+    mock_emission = mocker.patch.object(EntericMethaneCalculator, "calculate_heifer_methane", return_value=15.3)
+    mock_manure = mocker.patch.object(ManureExcretionCalculator, "calculate_heifer_manure", return_value=(3, expected_excretions))
 
     DigestiveSystem.METHANE_MODEL = "dummy model"
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
@@ -206,8 +206,8 @@ def test_daily_routine_cow(
         potassium=0,
     )
     mock_general_properties.animal_type = AnimalType.DRY_COW
-    mock_emission = mocker.patch.object(EntericMethaneCalculator, "cow_methane", return_value=15.3)
-    mock_manure = mocker.patch.object(ManureExcretionCalculator, "cow_manure", return_value=(3, expected_excretions))
+    mock_emission = mocker.patch.object(EntericMethaneCalculator, "calculate_cow_methane", return_value=15.3)
+    mock_manure = mocker.patch.object(ManureExcretionCalculator, "calculate_cow_manure", return_value=(3, expected_excretions))
 
     DigestiveSystem.METHANE_MODEL = "dummy model"
     DigestiveSystem.METHANE_MITIGATION_METHOD = "dummy_method"
