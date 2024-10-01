@@ -15,11 +15,9 @@ class NutrientProperties:
 
     """
 
-    body_weight: float
     mature_body_weight: float
     daily_growth: float
     days_in_preg: int
-    milking: bool
     estimated_daily_milk_produced: float
     phosphorus_excess_in_diet: float
     phosphorus_intake: float
