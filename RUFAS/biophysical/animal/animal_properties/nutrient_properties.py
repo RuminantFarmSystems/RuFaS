@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-
-from RUFAS.routines.animal.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
 @dataclass
@@ -24,3 +23,5 @@ class NutrientProperties:
     ration_phosphorus_concentration: float
     phosphorus_for_gestation: float
     phosphorus_for_gestation_required_for_calf: float
+    fecal_phosphorus: float
+    urine_phosphorus_required: float
