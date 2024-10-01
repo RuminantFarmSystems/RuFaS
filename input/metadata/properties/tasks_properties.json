@@ -6,6 +6,21 @@
       "default": 1,
       "minimum": 1
     },
+    "export_input_data_to_csv": {
+      "type": "bool",
+      "description": "Select this flag to export the input data pool into a CSV file for all tasks.",
+      "default": false
+    },
+    "input_data_csv_export_path": {
+      "type": "string",
+      "description": "The path to save the exported input data CSV file.",
+      "default": "output/saved_input_data/"
+    },
+    "input_data_csv_import_path": {
+      "type": "string",
+      "description": "If user wish to compare the input data with previous runs, the user can pass in the previously saved input data CSV path. The result will be combined together for a side-by-side comparison.",
+      "default": ""
+    },
     "tasks": {
       "type": "array",
       "description": "The list of things that Task Manager should do in an unordered manner",
