@@ -1,8 +1,10 @@
+from unittest.mock import MagicMock
+
 import pytest
 from pytest_mock import MockFixture
-from unittest.mock import MagicMock
-from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
+
 from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
 
 
 # ---- helper functions tests ----

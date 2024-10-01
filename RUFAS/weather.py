@@ -2,10 +2,10 @@ import datetime
 
 import numpy as np
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 class Weather:

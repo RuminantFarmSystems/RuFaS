@@ -1,27 +1,28 @@
-import mock
+from typing import Callable, Dict, List
+from unittest.mock import MagicMock, call, patch
 
+import mock
+import pytest
+from pytest_mock.plugin import MockerFixture
+
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
-from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.manager.crop_schedule import CropSchedule
+from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
+from RUFAS.routines.field.manager.field_manager import FieldManager
+from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.routines.manure.manure_manager import ManureManager
-import pytest
-from pytest_mock.plugin import MockerFixture
-from typing import List, Dict, Callable
-from unittest.mock import MagicMock, patch, call
 
 im = InputManager()
 om = OutputManager()
