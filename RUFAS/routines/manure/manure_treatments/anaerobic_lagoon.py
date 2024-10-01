@@ -19,7 +19,7 @@ class AnaerobicLagoon(BaseManureTreatment):
     LAGOON_SLOPE = 2.0
     """The slope of the lagoon (unitless). Default is set to 2.0."""
 
-    def __init__(self, weather, time, manure_treatment_config: ManureTreatmentConfig):
+    def __init__(self, weather: Weather, time: Time, manure_treatment_config: ManureTreatmentConfig) -> None:
         super().__init__(weather, time, manure_treatment_config)
         self.freeboard_input = self.config.freeboard_input
         self._accumulated_precipitation_volume = 0.0
@@ -178,11 +178,14 @@ class AnaerobicLagoon(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
-
-        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            manure_treatment_type=ManureTreatmentType.ANAEROBIC_LAGOON,
-            manure_cover=self.config.manure_cover,
-            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
+        emissions_factor = self._get_nitrous_oxide_emissions_factor(
+            ManureTreatmentType.ANAEROBIC_LAGOON, self.config.manure_cover
+        )
+        daily_output.storage_nitrous_oxide = (
+            GasEmissionsCalculator.calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+                emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=emissions_factor,
+                manure_nitrogen_kg_N_per_day=daily_input.liquid_manure_nitrogen,
+            )
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
         self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide
@@ -233,7 +236,7 @@ class AnaerobicLagoon(BaseManureTreatment):
             return 0.0
 
     @property
-    def volume_needed(self):
+    def volume_needed(self) -> float:
         """Returns volume needed.
 
         Returns:
@@ -333,7 +336,7 @@ class AnaerobicLagoon(BaseManureTreatment):
         if root1 < 0 and root2 < 0:
             return 0.0
 
-        return max(root1, root2)
+        return float(max(root1, root2))
 
     @property
     def lagoon_length(self) -> float:
