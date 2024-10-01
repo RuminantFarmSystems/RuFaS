@@ -1,4 +1,3 @@
-import copy
 from typing import List
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -180,7 +179,7 @@ class Storage:
                 crop.sugar, self.sugar_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
-            crop.last_time_degraded = copy.deepcopy(time)
+            crop.last_time_degraded = Time(time.start_date, time.end_date, time.current_date)
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
