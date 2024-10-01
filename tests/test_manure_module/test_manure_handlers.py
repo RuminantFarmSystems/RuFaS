@@ -2,36 +2,25 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     AlleyScraper,
-    Tillage,
-    Harrowing,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     BaseManureHandler,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManualScraping
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    FlushSystem,
+    Harrowing,
+    ManualScraping,
     ManureHandlerConfig,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerFactory,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerType,
+    Tillage,
 )
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 # Test ManureHandlerDailyOutput
 # ============================

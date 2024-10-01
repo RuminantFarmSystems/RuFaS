@@ -2,14 +2,13 @@ import pytest
 from mock.mock import call
 from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_manager import AnimalManager
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
-from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.routines.animal.animal_manager import AnimalManager
-
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle import animal_constants
 
 om = OutputManager()
 

@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 
 from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 
 
 @dataclass

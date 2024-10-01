@@ -1,7 +1,6 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from tests.animal_module_tests.general_property_values import LAC_COW_PROPERTIES
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
@@ -9,6 +8,7 @@ from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProdu
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.time import Time
 from RUFAS.util import Utility
+from tests.animal_module_tests.general_property_values import LAC_COW_PROPERTIES
 
 
 @pytest.fixture
@@ -164,6 +164,17 @@ def test_get_milk_yield_values_wood_curve(
 ) -> None:
     """Test that milk yield on a given day is estimated correctly."""
     actual = MilkProduction.calculate_daily_milk_production(day, l_param, m_param, n_param)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "l_param,m_param,n_param,expected",
+    [(17.8, 0.229, 0.00331, 9745.195761), (19.9, 0.231, 0.00299, 11523.229036), (22.1, 0.334, 0.00400, 17955.511169)],
+)
+def test_calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float, expected: float) -> None:
+    """Test that 305 day milk yields are estimated correctly."""
+    actual = MilkProduction.calc_305_day_milk_yield(l_param, m_param, n_param)
 
     assert pytest.approx(actual) == expected
 

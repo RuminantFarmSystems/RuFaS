@@ -1,9 +1,10 @@
 import datetime
 import re
 import shutil
-import numpy as np
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+import numpy as np
 
 from .general_constants import GeneralConstants
 
