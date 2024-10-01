@@ -1,5 +1,5 @@
-from .storage import Storage
 from .enums import CropCategory
+from .storage import Storage
 
 
 class Grain(Storage):

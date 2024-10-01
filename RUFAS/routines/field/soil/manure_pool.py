@@ -1,5 +1,5 @@
-from typing import Any, Union
 from math import exp, sqrt
+from typing import Any, Union
 
 from RUFAS.general_constants import GeneralConstants
 

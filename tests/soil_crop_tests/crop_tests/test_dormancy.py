@@ -1,8 +1,9 @@
-import pytest
 from unittest.mock import MagicMock
 
-from RUFAS.routines.field.crop.dormancy import Dormancy
+import pytest
+
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
+from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 

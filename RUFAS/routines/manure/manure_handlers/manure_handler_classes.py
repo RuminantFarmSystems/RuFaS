@@ -2,20 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
-from typing import Type
+from typing import Dict, Type
 
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class ManureHandlerType(Enum):

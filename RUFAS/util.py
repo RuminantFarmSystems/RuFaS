@@ -2,9 +2,10 @@ import datetime
 import os
 import re
 import shutil
-import numpy as np
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
+import numpy as np
 
 import pandas as pd
 

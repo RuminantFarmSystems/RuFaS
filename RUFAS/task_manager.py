@@ -1,17 +1,18 @@
+import multiprocessing
+import random
+import traceback
 from enum import Enum
 from functools import partial
-import multiprocessing
-import numpy
 from pathlib import Path
-import random
+from typing import Any, Callable, Dict, List, Tuple
+
+import numpy
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
-import traceback
-from typing import Any, Dict, List, Tuple, Callable
 
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager, LogVerbosity
+from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
