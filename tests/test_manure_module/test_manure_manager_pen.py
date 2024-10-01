@@ -1,10 +1,10 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
-from RUFAS.enums import AnimalCombination
 from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
+from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
 
 def test_manure_manager_pen_init(mocker: MockerFixture) -> None:

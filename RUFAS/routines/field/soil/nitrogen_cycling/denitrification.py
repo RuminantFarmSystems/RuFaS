@@ -1,9 +1,9 @@
+from math import atan, e, exp, pi
 from typing import Optional
-from math import exp, pi, atan, e
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class Denitrification:

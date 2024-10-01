@@ -1,11 +1,8 @@
 from typing import List
 
+from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
+from RUFAS.routines.field.manager.events import HarvestEvent, PlantingEvent
 from RUFAS.routines.field.manager.schedule import Schedule
-from RUFAS.routines.field.crop.harvest_operations import (
-    HarvestOperation,
-    FINAL_HARVEST_OPERATIONS,
-)
-from RUFAS.routines.field.manager.events import PlantingEvent, HarvestEvent
 
 
 class CropSchedule(Schedule):

@@ -1,11 +1,13 @@
+import datetime
+from typing import Any
+
 import pytest
 from pytest_mock import MockerFixture
+
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.util import Utility
-from typing import Any
-import datetime
 
 
 @pytest.fixture

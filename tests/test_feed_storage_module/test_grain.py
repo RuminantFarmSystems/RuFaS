@@ -1,6 +1,7 @@
 import pytest
-from RUFAS.routines.feed_storage.grain import Grain
+
 from RUFAS.routines.feed_storage.enums import CropCategory
+from RUFAS.routines.feed_storage.grain import Grain
 
 
 @pytest.fixture
