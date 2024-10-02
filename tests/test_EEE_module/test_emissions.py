@@ -264,29 +264,39 @@ def test_transform_outputs_to_list_of_dicts() -> None:
 
 
 @pytest.mark.parametrize(
-    "data,expected",
+    "data,expected,expect_error",
     [
         (
             {"one": {"values": [1, 2, 3]}, "two": {"values": [4, 5, 6, 9]}},
             [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}],
+            False
         ),
-        ({"one": {"values": [1, 2, 3]}, "two": {"values": []}}, []),
+        ({"one": {"values": [1, 2, 3]}, "two": {"values": []}}, [], False),
+        ({"one": {"values": [1, 2, 3]}, "two": {}}, [], True)
     ],
 )
 def test_transform_outputs_to_list_of_dicts_length_unmatched(
-    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], mocker: MockerFixture
+    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], expect_error: bool, mocker: MockerFixture
 ) -> None:
     """Test that the function transform data to correct list of dicts with unmatched list length."""
     em = EmissionsEstimator()
     mock_add_error = mocker.patch.object(em.om, "add_error")
-    observed = em._transform_outputs_to_list_of_dicts(data)
+    if expect_error:
+        try:
+            em._transform_outputs_to_list_of_dicts(data)
 
-    assert observed == expected
-    mock_add_error.assert_called_once_with(
-        "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
-        "Ignoring extraneous data.",
-        {"class": "EmissionsEstimator", "function": "_transform_outputs_to_list_of_dicts"},
-    )
+            assert False
+        except KeyError:
+            assert True
+    else:
+        observed = em._transform_outputs_to_list_of_dicts(data)
+
+        assert observed == expected
+        mock_add_error.assert_called_once_with(
+            "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
+            "Ignoring extraneous data.",
+            {"class": "EmissionsEstimator", "function": "_transform_outputs_to_list_of_dicts"},
+        )
 
 
 @pytest.mark.parametrize(
