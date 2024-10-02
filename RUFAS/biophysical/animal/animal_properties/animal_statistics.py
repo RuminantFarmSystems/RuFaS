@@ -12,5 +12,6 @@ class AnimalStatistics:
         The total amount of enteric methane produced by the given animal (g/day).
 
     """
+
     phosphorus_excreted: float
     methane_emission: float

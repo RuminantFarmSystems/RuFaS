@@ -94,10 +94,7 @@ def mock_milk_production_property() -> MilkProductionProperties:
 
 @pytest.fixture
 def mock_statistics() -> AnimalStatistics:
-    return AnimalStatistics(
-        methane_emission=0,
-        phosphorus_excreted=0
-    )
+    return AnimalStatistics(methane_emission=0, phosphorus_excreted=0)
 
 
 def test_daily_routine_calf(
