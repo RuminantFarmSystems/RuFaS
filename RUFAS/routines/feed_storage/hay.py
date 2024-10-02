@@ -1,6 +1,8 @@
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+from RUFAS.weather import Weather
 
 from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
@@ -65,6 +67,38 @@ class Hay(Storage):
             The diameter of the hay bale (meters).
         """
         return DEFAULT_BALE_DIAMETER
+
+    def process_degradations(self, weather: Weather, time: Time) -> None:
+        """
+        Processes the loss of moisture in hayed crops, and calls the base class's implementation of
+        `process_degradations` to process the loss of dry matter.
+
+        Parameters
+        ----------
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_degradations.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        total_moisture_loss = 0.0
+        for crop in self.stored:
+            processed_moisture_loss = self._calculate_moisture_loss(crop, crop.last_time_degraded)
+            cumulative_moisture_loss = self._calculate_moisture_loss(crop, time)
+            actual_moisture_loss = cumulative_moisture_loss - processed_moisture_loss
+
+            total_moisture_loss += actual_moisture_loss
+
+            self.reset_mass_attributes_after_loss(crop, 0.0, actual_moisture_loss)
+
+        self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
+
+        super().process_degradations(weather, time)
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
