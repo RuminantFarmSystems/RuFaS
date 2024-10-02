@@ -255,7 +255,7 @@ class BaseManureTreatment(ABC):
 
     @staticmethod
     def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
-        """Determines the temperature of the manure storage for outdoor storages.
+        """Determines the temperature of the manure in outdoor liquid and slurry storages.
 
         Parameters
         ----------
