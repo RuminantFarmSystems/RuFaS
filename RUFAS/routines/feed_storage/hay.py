@@ -12,6 +12,9 @@ Documentation equation 1.2.6.
 """
 FINAL_MOISTURE_PERCENTAGE = 12
 
+"""Number of days after a hayed crop is stored during which it experiences increased dry matter and moisture loss."""
+INITIAL_LOSS_PERIOD = 30
+
 """
 These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
 References Feed Storage Scientific Documentation table 1.2.9.
@@ -78,6 +81,12 @@ class Hay(Storage):
         time : Time
             Time instance containing the time that loss should be processed up to.
 
+        Returns
+        -------
+        float
+            Mass of gaseous dry matter lost since from hayed crop since the last time it losses were processed for it
+            (kg).
+
         References
         ----------
         .. [1] Feed Storage Scientific Documentation, equations 1.2.3 and 1.2.7.
@@ -125,10 +134,9 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
-        days_in_window = min(days_stored, 30)
-        fraction_of_total_loss = days_in_window / 30
+        days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
+        fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
 
-        crop.initial_dry_matter_percentage
         initial_moisture_percentage = 100 - crop.initial_dry_matter_percentage
 
         numerator = crop.total_sensible_heat_generated + 2433 * (
@@ -164,7 +172,7 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
-        days_past_30_day_window = max(0, days_stored - 30)
+        days_past_30_day_window = max(0, days_stored - INITIAL_LOSS_PERIOD)
 
         return 0.0001 * days_past_30_day_window
 
@@ -208,6 +216,43 @@ class Hay(Storage):
         ]
         additional_loss = sum(conditions)
         return additional_loss * constant_factor
+
+    def _calculate_moisture_loss(self, crop: HarvestedCrop, time: Time) -> float:
+        """
+        Calculates the moisture lost from a hayed crop since it was stored.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+
+        Returns
+        -------
+        float
+            Moisture loss from the hayed crop that occurred in the first 30 days of storage (kg).
+
+        """
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
+        fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
+
+        initial_moisture_percentage = 100.0 - crop.initial_dry_matter_percentage
+
+        initial_fresh_mass = crop.initial_dry_matter_mass / (
+            crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        percentage_of_fresh_mass_lost_as_moisture = max(0.0, initial_moisture_percentage - FINAL_MOISTURE_PERCENTAGE)
+
+        moisture_loss = (
+            initial_fresh_mass
+            * percentage_of_fresh_mass_lost_as_moisture
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
+            * fraction_of_total_loss
+        )
+
+        return moisture_loss
 
 
 class ProtectedIndoors(Hay):
