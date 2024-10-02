@@ -1,5 +1,5 @@
 {
-    "parallel_workers": 5,
+    "parallel_workers": 8,
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
@@ -8,8 +8,8 @@
         "sampler": "sobol",
         "saltelli_number": 256,
         "saltelli_skip": 2048,
-        "SA_load_balancing_start": 0.5,
-        "SA_load_balancing_stop": 0.6,
+        "SA_load_balancing_start": 0.894,
+        "SA_load_balancing_stop": 1.0,
         "random_seed": 42,
         "SA_input_variables": [
           {

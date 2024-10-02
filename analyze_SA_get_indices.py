@@ -15,7 +15,7 @@ with open(config_json_filename) as json_file:
 for analysis in config_json["analyses"]:  # noqa
     print(analysis)
     input_file = analysis["input_file"]
-    output_path = analysis["output_path"]
+    output_path = analysis["output_path"] + "reports/"
     report_name = analysis["report_name"]
     only_inputs = analysis["only_inputs"]
     plot_whole_new = analysis["plot_whole_new"]
@@ -40,7 +40,7 @@ for analysis in config_json["analyses"]:  # noqa
     sampled_values = SA_helpers.get_sampled_values(task_to_analyze, parsed_SA_input_variables)
     total_num_files = len(sampled_values)
     namesfornames = [name for name in parsed_SA_input_variables["names"]]
-    with open(output_path + output_prefix + "_inputs.csv", "w", newline="") as f:
+    with open(output_path + "analyzed/" + output_prefix + "_inputs.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(namesfornames)
         writer.writerows(sampled_values)
@@ -57,12 +57,12 @@ for analysis in config_json["analyses"]:  # noqa
     whole_output = SA_helpers.get_whole_output(
         collated_outputs, sampled_values, task_to_analyze, parsed_SA_input_variables
     )
-    with open(output_path + output_prefix + "_whole analysis.csv", "w", newline="") as f:
+    with open(output_path + 'analyzed/' + output_prefix + "_whole analysis.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(whole_output)
 
     new_whole_output = SA_helpers.get_new_whole_output(whole_output)
-    with open(output_path + output_prefix + "_new whole analysis.csv", "w", newline="") as f:
+    with open(output_path + 'analyzed/' + output_prefix + "_new whole analysis.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(new_whole_output)
 
@@ -77,6 +77,7 @@ for analysis in config_json["analyses"]:  # noqa
         column_names = list(new_whole_output_pd.columns)
 
     for input in inputs_to_collate:
+        pass
         try:
             if sampler == "fractional_factorial":
                 # get the input column starts with ME:
@@ -144,11 +145,14 @@ for analysis in config_json["analyses"]:  # noqa
             )
             output_pd = pd.concat([threethings, newcols_pd], axis=1)
             output_pd.rename(
-                {output_pd.columns[0]: output_pd.columns[0] + str(minmax.iloc[0].values)}, axis=1, inplace=True
+                {output_pd.columns[0]: output_pd.columns[0].replace("S1:", "").replace("numberaskey", "")}, axis=1, inplace=True
             )
-            output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
-            output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
-            filenameout = output_path + output_prefix + "_inputs_META_" + input + "_summarytable.csv"
+            # to rename with min.max in the name
+            # + str(minmax.iloc[0].values)
+            # output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
+            output_pd.sort_values(by=output_pd.columns[0], axis=0, ascending=False, inplace=True)
+            output_pd.rename({0: "slope", 1: "R2 value", 2: "p-value"}, axis=1, inplace=True)
+            filenameout = output_path + 'analyzed/' + output_prefix + "_inputs_META_" + input + "_summarytable.csv"
             output_pd.to_csv(filenameout)
             #ENDTRY
         except:
@@ -162,7 +166,6 @@ for analysis in config_json["analyses"]:  # noqa
     # here for a single output, we sort and explore all the inputs
     for output in outputs_to_collate:
         try:
-
             just_output = pd.DataFrame(new_whole_output_pd.loc[output])
             MEnames = [name for name in column_names if "ME:" in name or "S1:" in name or "mu_star" in name]
             temp_output = just_output.loc[MEnames]
@@ -229,11 +232,15 @@ for analysis in config_json["analyses"]:  # noqa
             bounds2_pd.index = output_temp.index[0 : len(bounds2)]  # TODO
             # the previous line might need to be reverted to remove the info in hard brackets
             newcols_pd.index = output_temp.index
-            output_pd = pd.concat([bounds2_pd, output_temp, newcols_pd], axis=1)
-            output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
+            index_names = pd.DataFrame([val.replace("S1:", "").replace("numberaskey", "") for val in output_temp.index.values])
+            index_names.index = output_temp.index
+            index_names.rename({0: "Input name"})
+            output_pd = pd.concat([bounds2_pd, output_temp, newcols_pd, index_names], axis=1)
+            # output_pd.sort_values(by="total_effects", axis=0, ascending=False, inplace=True)
+            output_pd.sort_values(by=output_pd.columns[2], axis=0, ascending=False, inplace=True)
             output_pd.rename({0: "slope", 1: "r2_value", 2: "p_value"}, axis=1, inplace=True)
             output_reformatted = output.replace("/", " per ")
-            filenameout = output_path + output_prefix + "_outputs_META_" + output_reformatted + "_summarytable.csv"
+            filenameout = output_path + 'analyzed/' + output_prefix + "_outputs_META_" + output_reformatted + "_summarytable.csv"
             output_pd.to_csv(filenameout)
         except:
             print(f'analysis of {output} failed')

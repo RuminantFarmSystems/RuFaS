@@ -9,11 +9,20 @@ from itertools import combinations, chain
 import time
 import gc
 
-logfilepath = "output/logs/"
-fileprefix = "fftest_1"
+
+config_json_filename = "model_evaluation/sensitivity_analysis/SA_analyze.json"
+
+with open(config_json_filename) as json_file:
+    config_json = json.load(json_file)
+
+analysis = config_json["analyses"][0]
+
+logfilepath = analysis["output_path"]
+# fileprefix = "fftest_1"
+fileprefix = analysis["analysis_prefix"]
 
 # read the CSV
-input_list = f"output/reports/{fileprefix}_inputs.csv"
+input_list = logfilepath + "analyzed/" + f"{fileprefix}_inputs.csv"
 input_list_read = pd.read_csv(input_list)
 # add the index for each, 0-X is a columns for run
 df = pd.DataFrame(input_list_read)

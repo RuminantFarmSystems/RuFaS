@@ -1,11 +1,11 @@
 import os
 import csv
 
-fileprefix = "test-18"
-directory = "E:\\Backup\\RUFAS_SA\\output\\reports\\"
-report_prefix = "report_"
+fileprefix = "animal_S128"
+directory = "D:\\RUFAS\\S128\\all\\"
+report_prefix = "report_S365"
 
-num_files = 128
+num_files = 14336
 digits = len(str(num_files))
 
 logfiles = [filename for filename in os.listdir(directory) if filename.startswith(fileprefix) and report_prefix in filename]

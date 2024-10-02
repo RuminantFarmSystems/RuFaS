@@ -66,11 +66,42 @@ def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[
         + list(analysis["ST_conf"])
         + list(analysis["S2_conf"])
     )
-    len(rowvalues)
-    rowvalues[21]
-
     analysis_out = [colnames, rowvalues]
-    return analysis_out
+
+    expanded_names = [str(x) for x in intnames]
+    interaction_names = []
+    for _ in expanded_names:
+        for pos, name in enumerate(expanded_names):
+            interaction_names.append(f'{name} * {expanded_names[pos]}')
+
+    interaction_values = []
+    as2 = analysis["S2"]
+    for a in as2:
+            # print(a)
+            for i in a:
+                # print(i)
+                interaction_values.append(i)
+
+    colnames_expanded = (
+        ["S1:" + x for x in intnames]
+        + ["ST:" + str(x) for x in intnames]
+        + interaction_names
+        + ["S1_conf:" + x for x in intnames]
+        + ["ST_conf:" + str(x) for x in intnames]
+        + ["S2_conf:" + str(x) for x in intnames]
+    )
+    rowvalues_expanded = (
+        list(analysis["S1"])
+        + list(analysis["ST"])
+        + interaction_values
+        + list(analysis["S1_conf"])
+        + list(analysis["ST_conf"])
+        + list(analysis["S2_conf"])
+    )
+    analysis_out_expanded = [colnames_expanded, rowvalues_expanded]
+
+
+    return analysis_out_expanded
 
 
 def rewrite_morris_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[Any]:
@@ -246,7 +277,28 @@ def get_whole_output(
             for thing in out[1]:
                 line_for_whole_output.append(thing)
             whole_output.append(line_for_whole_output)
-    return whole_output
+
+    colidx = []
+    colidx.append(999)
+    for column in range(1, len(whole_output[0])):
+        colidx.append(0)
+        for row in range(1, len(whole_output)):
+            val = whole_output[row][column]
+            if type(val) == np.ndarray or str(val) == 'nan':
+                pass
+            else:
+                colidx[column] += 1
+
+    whole_output_expanded = []
+    for row in whole_output:
+        whole_output_expanded.append([row[i] for i in range(len(row)) if colidx[i]])
+   
+    # print(len(whole_output))
+    # print(len(whole_output[0]))
+    # print(len(whole_output_expanded))
+    # print(len(whole_output_expanded[0]))
+
+    return whole_output_expanded
 
 
 def get_new_whole_output(whole_output: List[Any]) -> List[Any]:
@@ -262,7 +314,7 @@ def get_new_whole_output(whole_output: List[Any]) -> List[Any]:
         reformatted_line = []
         for item in whole_output[line_num]:
             if type(item) is float or type(item) is np.float64:
-                if item < 0.01:
+                if item < 0.001:
                     item = 0
             reformatted_line.append(item)
         new_whole_output.append(reformatted_line)
@@ -341,3 +393,38 @@ def regression_stuff(X: List[float], xname: str, Y: List[float], yname: str, plo
         plt.show()
 
     return (slope, r2_value, p_value)
+
+
+
+def collate_raw(
+    basedirectory: str, all_report_filenames: List[str], total_num_files: int
+) -> Dict[str, List[float]]:
+    collected: Dict[str, List[float]] = {}
+    digits = len(str(total_num_files))
+
+    for i in range(0, total_num_files):
+        file_ID = f"{i+1}".zfill(digits) + "_"
+        try:
+            file_ID_found = [filename for filename in all_report_filenames if file_ID in filename][-1]
+        except:
+            file_ID_backup = f"{1}".zfill(digits) + "_"
+            file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
+            print('used dummy')
+            print(i/total_num_files)
+            print(i)
+        file = pd.read_csv(basedirectory + file_ID_found)
+        variable_names: List[str] = []
+        if not variable_names:
+            variable_names = list(file.columns)
+        for variable_name in variable_names:
+            if variable_name not in collected.keys():
+                collected[variable_name] = []
+            valuetoappend = file[variable_name].values[0]
+            # if type(valuetoappend) is not str:
+            if valuetoappend == 'Under construction, use the results with caution.':
+                pass
+            else:
+                valuetoappend = float(valuetoappend)
+                collected[variable_name].append(valuetoappend)
+                
+    return collected
