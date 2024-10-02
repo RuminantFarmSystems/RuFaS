@@ -16,8 +16,6 @@ class PenManureData(TypedDict):
         The number of animals in this pen.
     num_lactating_cows : int
         The number of lactating cows in this pen.
-    classes_in_pen : Set[str]
-        Set of unique animal classes in this pen.
     animal_combination : AnimalCombination
         An AnimalCombination enum that describes the current animal makeup in this pen.
     housing_type : str
@@ -45,7 +43,6 @@ class PenManureData(TypedDict):
 
     id: int
     num_animals: int
-    classes_in_pen: set[str]
     animal_combination: AnimalCombination
     housing_type: str
     pen_type: str

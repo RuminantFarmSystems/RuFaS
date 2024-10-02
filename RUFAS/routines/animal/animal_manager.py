@@ -998,8 +998,9 @@ class AnimalManager:
         """
         for animal in animal_type_list:
             current_pen_id = self.animal_to_pen_id_map[animal.id]
-            classes_in_pen = self.all_pens[current_pen_id].classes_in_pen
-            animal.update_pen_history(current_pen_id, self.simulation_day, classes_in_pen)
+            animal.update_pen_history(
+                current_pen_id, self.simulation_day, self.all_pens[current_pen_id].animal_combination
+            )
 
     def collect_pen_manure_data(self) -> list[PenManureData]:
         """Returns the manure information from all pens in PenManureData."""
@@ -1183,26 +1184,6 @@ class AnimalManager:
             animal_types_in_pen.add(animal_type)
 
         return animal_types_in_pen
-
-    @classmethod
-    def _determine_classes_in_pen(cls, pen: Pen) -> Set[str]:
-        """
-        Get the classes of animals in the pen.
-
-        Parameters
-        ----------
-        pen : Pen
-            The pen to get the classes of animals from.
-
-        Returns
-        -------
-        Set
-            The set of classes of animals in the pen.
-
-        """
-
-        animal_types_in_pen = cls._get_animal_types_in_pen(pen)
-        return {animal_type.value for animal_type in animal_types_in_pen}
 
     def _get_animals_snapshot(self) -> Dict[str, set]:
         """
@@ -1451,7 +1432,6 @@ class AnimalManager:
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def collect_manure_excretions_output_data(self, pen: Pen, manure_excretions_output_data: Dict) -> None:
-        pen.classes_in_pen = self._determine_classes_in_pen(pen)
         pen.calc_total_manure(
             self.methane_model,
             self.methane_mitigation_method,

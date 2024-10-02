@@ -189,7 +189,9 @@ def test_report_milk(mocker: MockerFixture) -> None:
         animal.calves = test_milk_data_update["parity"]
         animal.id = test_milk_data_update["cow_id"]
         animal.pen_history = [
-            PenHistory(start_date=0, end_date=0, pen=test_milk_data_update["pen_id"], classes_in_pen=[])
+            PenHistory(
+                start_date=0, end_date=0, pen=test_milk_data_update["pen_id"], animal_combination=mocker.MagicMock()
+            )
         ]
     # act
     AnimalModuleReporter.report_milk(pen, simulation_day)

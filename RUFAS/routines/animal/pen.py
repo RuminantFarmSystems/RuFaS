@@ -86,9 +86,6 @@ class Pen:
     animals_in_pen : dictionary
         A dictionary of all animals in this pen that maps animal id to animal object.
 
-    classes_in_pen : set
-        The set (no repeats) of all the classes to which the animals in the pen belong.
-
     avg_DBW : float
         The average daily change in (delta) body weight of the animals in the pen.
         Used for ration formulation.
@@ -223,8 +220,6 @@ class Pen:
         self.avg_p_animal = 0.0
 
         self.animals_in_pen = {}
-
-        self.classes_in_pen = set()
 
         self.avg_BW = 0.0
         self.avg_DMIest = 0.0
@@ -393,16 +388,6 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    # TODO: Remove this functionality once pen has been fully switched to AnimalCombination enum GitHub Issue #1208
-    def update_classes_in_pen(self) -> None:
-        """
-        Updates the classes contained within the pen
-        """
-        self.classes_in_pen = set()
-        for animal in list(self.animals_in_pen.values()):
-            life_cycle_stage = type(animal).__name__
-            self.classes_in_pen.add(life_cycle_stage)
-
     def update_animals(self, new_animals: List[Any], animal_combination: AnimalCombination) -> None:
         """
         Calls functions that will add new animals to the pen and update associated attributes.
@@ -418,7 +403,6 @@ class Pen:
         self.add_new_animals(new_animals)
         self.calc_daily_walking_dist()
         self.update_animal_combination(animal_combination)
-        self.update_classes_in_pen()
 
     def manure_sums(
         self, manure: Dict[float, int], curr_manure: AnimalManureExcretions, animal_dict: Dict[float, int]
@@ -530,15 +514,13 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if "Cow" in self.classes_in_pen:
+        if self.animal_combination in AnimalCombination.LAC_COW or self.animal_combination in AnimalCombination.CLOSE_UP:
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     def call_p_rqmts(self):
-        """
-        Calls each animal's method to calculate phosphorus requirements.
-        """
+        """Calls each animal's method to calculate phosphorus requirements."""
         # since each animal in the pen receives the same ration
         if len(self.animals_in_pen) > 0:
             DMI = self.ration_nutrient_amount["dm"]
@@ -943,7 +925,6 @@ class Pen:
         return PenManureData(
             id=self.id,
             num_animals=len(self.animals_in_pen),
-            classes_in_pen=self.classes_in_pen,
             animal_combination=self.animal_combination,
             housing_type=self.housing_type,
             pen_type=self.pen_type,

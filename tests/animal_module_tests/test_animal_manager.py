@@ -2550,11 +2550,6 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         mock_all_pens.append(mock_pen)
     mock_animal_manager.all_pens = mock_all_pens
 
-    mock_classes_in_pen = mocker.MagicMock()
-    patch_for_determine_classes_in_pen = mocker.patch.object(
-        AnimalManager, "_determine_classes_in_pen", return_value=mock_classes_in_pen
-    )
-
     patch_for_clear_pens = mocker.patch.object(AnimalManager, "clear_pens", return_value=None)
     patch_for_allocate_animals_to_pens = mocker.patch.object(
         AnimalManager, "allocate_animals_to_pens", return_value=None
@@ -2617,8 +2612,6 @@ def test_daily_updates(is_end_ration_interval: bool, mocker: MockerFixture) -> N
         list(mock_animals_added) + list(mock_calves_born), mock_feed, temp
     )
 
-    patch_for_determine_classes_in_pen.assert_has_calls([mocker.call(mock_pen) for mock_pen in mock_all_pens])
-
     for mock_pen in mock_all_pens:
         mock_pen.calc_total_manure.assert_called_once_with(
             mock_methane_model,
@@ -2653,7 +2646,6 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
     manure_excretions_output_data = mocker.MagicMock()
 
     animal_manager = mocker.MagicMock()
-    animal_manager._determine_classes_in_pen = mocker.MagicMock()
     animal_manager.methane_model = mocker.MagicMock()
     animal_manager.methane_mitigation_method = mocker.MagicMock()
     animal_manager.methane_mitigation_additive_amount = mocker.MagicMock()
@@ -2662,7 +2654,6 @@ def test_collect_manure_excretions_output_data(mocker: MockerFixture) -> None:
     AnimalManager.collect_manure_excretions_output_data(animal_manager, pen, manure_excretions_output_data)
 
     # assert
-    animal_manager._determine_classes_in_pen.assert_called_once_with(pen)
     pen.calc_total_manure.assert_called_once_with(
         animal_manager.methane_model,
         animal_manager.methane_mitigation_method,

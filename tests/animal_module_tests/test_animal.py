@@ -1501,29 +1501,29 @@ def test_update_pen_history(cow_fixture: AnimalBase) -> None:
 
     # Case 1
     # update hist with designated vals, using the time and the obj itself
-    cow_fixture.update_pen_history(3, 2, set(["Cow"]))
+    cow_fixture.update_pen_history(3, 2, AnimalCombination.GROWING_AND_CLOSE_UP)
     assert cow_fixture.pen_history[0]["pen"] == 3
     assert cow_fixture.pen_history[-1]["pen"] == 3
-    assert cow_fixture.pen_history[-1]["classes_in_pen"] == ["Cow"]
+    assert cow_fixture.pen_history[-1]["animal_combination"] == AnimalCombination.GROWING_AND_CLOSE_UP
     assert cow_fixture.pen_history[-1]["start_date"] == 2
     assert cow_fixture.pen_history[-1]["end_date"] == 2
 
     # Case 2
     # check that it changes pens to 4
-    cow_fixture.update_pen_history(4, 3, set(["Cow"]))
+    cow_fixture.update_pen_history(4, 3, AnimalCombination.LAC_COW)
     # check previous history remains the same, then check newest
     assert cow_fixture.pen_history[0]["pen"] == 3
     assert cow_fixture.pen_history[-1]["pen"] == 4
-    assert cow_fixture.pen_history[-1]["classes_in_pen"] == ["Cow"]
+    assert cow_fixture.pen_history[-1]["animal_combination"] == AnimalCombination.LAC_COW
     assert cow_fixture.pen_history[-1]["start_date"] == 3
     assert cow_fixture.pen_history[-1]["end_date"] == 3
 
     # Case 3
     # check that the start date remains the date of the change
-    cow_fixture.update_pen_history(4, 4, set(["Cow"]))
+    cow_fixture.update_pen_history(4, 4, AnimalCombination.CLOSE_UP)
     assert cow_fixture.pen_history[0]["pen"] == 3
     assert cow_fixture.pen_history[-1]["pen"] == 4
-    assert cow_fixture.pen_history[-1]["classes_in_pen"] == ["Cow"]
+    assert cow_fixture.pen_history[-1]["animal_combination"] == AnimalCombination.CLOSE_UP
     assert cow_fixture.pen_history[-1]["start_date"] == 3
     assert cow_fixture.pen_history[-1]["end_date"] == 4
 
