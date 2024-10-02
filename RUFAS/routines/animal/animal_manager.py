@@ -3,9 +3,8 @@ from __future__ import annotations
 import collections
 import math
 from statistics import mean
-from typing import Any, Dict, Tuple, List, Set, Union, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -22,20 +21,18 @@ from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.routines.animal.ration import ration_driver as ration_driver
-from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.ration.ration_driver import RationManager
-from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
-    PurchasedFeedEmissionsEstimator,
-)
-
 from RUFAS.routines.animal.ration import user_defined_ration as udr
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
+from RUFAS.routines.animal.ration.ration_driver import RationManager, RationReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from ...enums import AnimalCombination
+
 from ...data_structures.pen_manure_data import PenManureData
+from ...enums import AnimalCombination
 
 om = OutputManager()
 

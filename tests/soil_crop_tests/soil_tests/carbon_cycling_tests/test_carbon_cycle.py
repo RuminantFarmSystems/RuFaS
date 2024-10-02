@@ -1,12 +1,14 @@
-import pytest
 from unittest.mock import MagicMock
+
+import pytest
+
+from RUFAS.routines.field.crop_and_soil_constants import (
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
+    HECTARES_TO_SQUARE_MILLIMETERS,
+)
 from RUFAS.routines.field.soil.carbon_cycling.carbon_cycle import CarbonCycling
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
-)
 
 
 @pytest.mark.parametrize(

@@ -5,9 +5,9 @@ from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
+from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.routines.animal.ration.amino_acid import EssentialAminoAcidRequirements
-from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.time import Time
 from RUFAS.enums import AnimalCombination
 

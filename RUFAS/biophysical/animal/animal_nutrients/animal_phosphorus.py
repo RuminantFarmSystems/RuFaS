@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import math
-from RUFAS.general_constants import GeneralConstants
+
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.general_constants import GeneralConstants
 
 CALVES_AND_HEIFERS = [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]
 HEIFERS_AND_COWS = [AnimalType.DRY_COW, AnimalType.LAC_COW, AnimalType.HEIFER_II, AnimalType.HEIFER_II]

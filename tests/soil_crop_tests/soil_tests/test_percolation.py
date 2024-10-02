@@ -1,12 +1,13 @@
+from math import exp, inf
 from typing import List
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from pytest_mock import MockerFixture
-from unittest.mock import MagicMock, patch, PropertyMock
+
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.percolation import Percolation
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.layer_data import LayerData
-from math import exp, inf
 
 
 # --- Static function tests ---
