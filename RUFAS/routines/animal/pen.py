@@ -514,7 +514,10 @@ class Pen:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
-        if self.animal_combination in AnimalCombination.LAC_COW or self.animal_combination in AnimalCombination.CLOSE_UP:
+        if (
+            self.animal_combination in AnimalCombination.LAC_COW
+            or self.animal_combination in AnimalCombination.CLOSE_UP
+        ):
             for animal in list(self.animals_in_pen.values()):
                 if type(animal).__name__ == "Cow":
                     animal.calc_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
