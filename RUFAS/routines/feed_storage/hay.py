@@ -1,15 +1,16 @@
-from ...current_day_conditions import CurrentDayConditions
-from ...general_constants import GeneralConstants
-from ...time import Time
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
+
 from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
 
 """
-This final moisture fraction that expected to be contained in a hay crop. References Feed Storage Scientific
+This final moisture percentage that expected to be contained in a hay crop. References Feed Storage Scientific
 Documentation equation 1.2.6.
 """
-FINAL_MOISTURE_FRACTION = 0.12
+FINAL_MOISTURE_PERCENTAGE = 12
 
 """
 These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
@@ -127,13 +128,16 @@ class Hay(Storage):
         days_in_window = min(days_stored, 30)
         fraction_of_total_loss = days_in_window / 30
 
-        dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        moisture_fraction = 1 - dry_fraction
+        crop.initial_dry_matter_percentage
+        initial_moisture_percentage = 100 - crop.initial_dry_matter_percentage
 
         numerator = crop.total_sensible_heat_generated + 2433 * (
-            moisture_fraction - (FINAL_MOISTURE_FRACTION * dry_fraction) / (1 - FINAL_MOISTURE_FRACTION)
+            initial_moisture_percentage
+            - (FINAL_MOISTURE_PERCENTAGE * crop.initial_dry_matter_percentage) / (1 - FINAL_MOISTURE_PERCENTAGE)
         )
-        denominator = dry_fraction * (14206 - 2433 * FINAL_MOISTURE_FRACTION / (1 - FINAL_MOISTURE_FRACTION))
+        denominator = crop.initial_dry_matter_percentage * (
+            14206 - 2433 * FINAL_MOISTURE_PERCENTAGE / (1 - FINAL_MOISTURE_PERCENTAGE)
+        )
 
         fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
