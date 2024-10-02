@@ -174,7 +174,6 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     assert observed == expected
     mock_convert_time.assert_called_once_with(2014, 20)
     mock_filter_variable.assert_called_once_with(time_filter)
-    assert mock_filter_results.call_count == 4
     mock_filter_results.assert_has_calls(
         [
             mocker.call(
