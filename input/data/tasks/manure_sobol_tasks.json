@@ -3,10 +3,10 @@
     "tasks": [
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "manure_sobol_4",
+        "output_prefix": "manure_sobol_4_256",
         "log_verbosity": "errors",
         "sampler": "sobol",
-        "saltelli_number": 32,
+        "saltelli_number": 256,
         "saltelli_skip": 128,
         "SA_load_balancing_start": 0,
         "SA_load_balancing_stop": 1,
