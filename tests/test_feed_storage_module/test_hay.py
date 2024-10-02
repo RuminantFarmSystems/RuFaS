@@ -161,15 +161,18 @@ def test_calculate_additional_dry_matter_loss(
     assert pytest.approx(actual) == expected
 
 
-@pytest.mark.parametrize("days,initial_moisture,expected", [
-    (0, 60.0, 0.0),
-    (3, 60.0, 48.0),
-    (10, 60.0, 160.0),
-    (30, 60.0, 480.0),
-    (40, 60.0, 480.0),
-    (10, 12.0, 0.0),
-    (10, 8.0, 0.0)
-])
+@pytest.mark.parametrize(
+    "days,initial_moisture,expected",
+    [
+        (0, 60.0, 0.0),
+        (3, 60.0, 48.0),
+        (10, 60.0, 160.0),
+        (30, 60.0, 480.0),
+        (40, 60.0, 480.0),
+        (10, 12.0, 0.0),
+        (10, 8.0, 0.0),
+    ],
+)
 def test_calculate_moisture_loss(
     hay: Hay, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, initial_moisture: float, expected: float
 ) -> None:
