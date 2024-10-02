@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 from typing import Any
 from unittest.mock import call
@@ -456,5 +457,333 @@ def test_get_feed_emissions_data(feed_emission_data: dict[str, list[float]], cou
 def test_calculate_homegrown_feed_emissions(mocker: MockerFixture) -> None:
     """Tests the result of calculated homegrown feed emissions."""
     em = EmissionsEstimator()
-    mock_aggregate = mocker.patch.object(em, )
+    mock_aggregate = mocker.patch.object(em, "_aggregate_data", return_value={"f1": {"nitrogen": 50}})
+    mock_collect_target = mocker.patch.object(em, "_collect_target_soil_characteristics",
+                                              return_value={"f1": {"characteristics1": 3}})
+    mock_calculate_emissions = mocker.patch.object(em, "_calculate_emissions_by_field",
+                                                   return_value=[{"crop": "corn",
+                                                                  "nitrous_oxide_emissions": 5,
+                                                                  "ammonia_emissions": 6,
+                                                                  "carbon_stock_change": 7,
+                                                                  "nitrogen_fertilizer_used": 8,
+                                                                  "nitrogen_fertilizer_embedded_CO2_emissions": 9,
+                                                                  "phosphorus_fertilizer_used": 10,
+                                                                  "phosphorus_fertilizer_embedded_CO2_emissions": 11,
+                                                                  "potassium_fertilizer_used": 12,
+                                                                  "potassium_fertilizer_embedded_CO2_emissions": 13,
+                                                                  "manure_nitrogen_used": 14,
+                                                                  "manure_nitrogen_requested": 15,
+                                                                  "field_name": "f1"
+                                                                  }])
+    mock_add = mocker.patch.object(em.om, "add_variable")
+    homegrown_feeds = [
+        {"field_name": "f1", "crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35}
+    ]
+    fertilizer_application = [{"field_name": "f1", "phosphorus": 60}]
+    manure_application = [{"field_name": "f1", "phosphorus": 60}]
+    manure_requests = [{"field_name": "f1", "phosphorus": 60}]
 
+    em._calculate_homegrown_feed_emissions(homegrown_feeds, fertilizer_application, manure_application, manure_requests)
+
+    mock_aggregate.assert_called_with([{'field_name': 'f1', 'phosphorus': 60}], ['f1'], ['nitrogen', 'phosphorus'])
+    mock_collect_target.assert_called_once_with(['f1'])
+    mock_calculate_emissions.assert_called_once_with('f1',
+                                                     [{'crop': CropSpecies.CORN_SILAGE,
+                                                       'dry_matter_content': 0.35,
+                                                       'field_name': 'f1',
+                                                       'total_dry_yield': 1200}],
+                                                     {'characteristics1': 3},
+                                                     {'nitrogen': 50},
+                                                     {'nitrogen': 50},
+                                                     [{'field_name': 'f1', 'phosphorus': 60}])
+    mock_add.assert_called_once_with('homegrown_corn_emissions',
+                                     {'ammonia_emissions': 6,
+                                      'carbon_stock_change': 7,
+                                      'crop_type': 'corn',
+                                      'field_name': 'f1',
+                                      'manure_nitrogen_requested': 15,
+                                      'manure_nitrogen_used': 14,
+                                      'nitrogen_fertilizer_embedded_CO2_emissions': 9,
+                                      'nitrogen_fertilizer_used': 8,
+                                      'nitrous_oxide_emissions': 5,
+                                      'phosphorus_fertilizer_embedded_CO2_emissions': 11,
+                                      'phosphorus_fertilizer_used': 10,
+                                      'potassium_fertilizer_embedded_CO2_emissions': 13,
+                                      'potassium_fertilizer_used': 12},
+                                     {'class': 'EmissionsEstimator',
+                                      'function': '_calculate_homegrown_feed_emissions',
+                                      'units': {'ammonia_emisssions': MeasurementUnits.KILOGRAMS,
+                                                'carbon_stock_change': MeasurementUnits.KILOGRAMS_PER_HECTARE,
+                                                'crop_type': MeasurementUnits.UNITLESS,
+                                                'field_name': MeasurementUnits.UNITLESS,
+                                                'manure_nitrogen_requested': MeasurementUnits.KILOGRAMS,
+                                                'manure_nitrogen_used': MeasurementUnits.KILOGRAMS,
+                                                'nitrogen_fertilizer_embedded_CO2_emissions': MeasurementUnits.KILOGRAMS,
+                                                'nitrogen_fertilizer_used': MeasurementUnits.KILOGRAMS,
+                                                'nitrous_oxide_emissions': MeasurementUnits.KILOGRAMS,
+                                                'phosphorus_fertilizer_embedded_CO2_emissions': MeasurementUnits.KILOGRAMS,
+                                                'phosphorus_fertilizer_used': MeasurementUnits.KILOGRAMS,
+                                                'potassium_fertilizer_embedded_CO2_emissions': MeasurementUnits.KILOGRAMS,
+                                                'potassium_fertilizer_used': MeasurementUnits.KILOGRAMS}})
+
+
+def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
+    """Tests the collection of soil characteristics."""
+    em = EmissionsEstimator()
+    mock_update = mocker.patch.object(em, "_soil_data_update", return_value={"data1": 0, "data2": 0})
+    mock_filter = mocker.patch.object(em.om, "filter_variables_pool", side_effect=[{
+        "field1": {"values": [100]},
+        "field2": {"values": [200]},
+        "field3": {"values": [150]}
+    }, {
+        "field1": {"values": [100]},
+        "field2": {"values": [200]},
+        "field3": {"values": [100]}
+    }])
+
+    observed = em._collect_target_soil_characteristics(["field1"])
+    mock_update.assert_called_with({'ammonia': {'description': 'Collects the ammonia emissions from all soil '
+                                                               'layers in the field in the last year of the '
+                                                               'simulation.',
+                                                'filters': [
+                                                    "FieldDataReporter.send_daily_variables.ammonia_emissions.field"
+                                                    "='field1',layer=.*"],
+                                                'name': 'Soil Ammonia emissions',
+                                                'slice_start': -365},
+                                    'nitrous_oxide': {'description': 'Collects the nitrous oxide emissions from '
+                                                                     'all soil layers in the field in the last '
+                                                                     'year of the simulation.',
+                                                      'filters': [
+                                                          "FieldDataReporter.send_daily_variables"
+                                                          ".nitrous_oxide_emissions.field='field1',layer=.*"],
+                                                      'name': 'Soil Nitrous Oxide emissions',
+                                                      'slice_start': -365}})
+
+    starting_carbon_stock_filter_expected = {
+        'name': 'Starting soil profile carbon stock',
+        'description': 'Collects the soil carbon stock level 365 days before the simulation ended.',
+        'filters': ["FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='field1'"],
+        'slice_start': -365,
+        'slice_end': -364
+    }
+
+    ending_carbon_stock_filter_expected = {
+        'name': 'Ending soil profile carbon stock',
+        'description': 'Collects the soil carbon stock level on the last day of the simulation.',
+        'filters': ["FieldDataReporter.send_daily_variables.total_soil_carbon_amount.field='field1'"],
+        'slice_start': -1
+    }
+
+    calls = [
+        call(deepcopy(starting_carbon_stock_filter_expected)),
+        call(deepcopy(ending_carbon_stock_filter_expected))
+    ]
+    mock_filter.assert_called_with(ending_carbon_stock_filter_expected)
+
+    assert mock_filter.call_count == 2
+    assert mock_filter.call_args_list == calls
+    assert observed == {'field1': {'data1': 0, 'data2': 0, 'carbon_stock_change': -50}}
+
+
+def test_calculate_emissions_by_field_zero_dry_mass(mocker: MockerFixture) -> None:
+    """Tests the partitions emissions from the field where crops/feeds were grown to those crops when no dry yield."""
+    em = EmissionsEstimator()
+    feeds_grown = [
+        {"crop_name": "corn_silage", "dry_yield": 0, "area": 10, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3},
+        {"crop_name": "alfalfa", "dry_yield": 0, "area": 5, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3},
+        {"crop_name": "wheat", "dry_yield": 0, "area": 7, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3}
+    ]
+    field_emissions = {
+        "field1": 120.5,
+        "field2": 200.75,
+        "field3": 150.0
+    }
+
+    manure_applications = {
+        "field1": 100.0,
+        "field2": 50.5,
+        "field3": 75.75
+    }
+
+    manure_requests = {
+        "field1": 90.0,
+        "field2": 60.5,
+        "field3": 80.25
+    }
+
+    fertilizer_applications_data = [
+        {"field_name": "field1", "nitrogen": 30.5, "phosphorus": 20.0},
+        {"field_name": "field2", "nitrogen": 25.0, "phosphorus": 15.0},
+        {"field_name": "field3", "nitrogen": 40.0, "phosphorus": 25.5}
+    ]
+
+    observed = em._calculate_emissions_by_field("field1", feeds_grown, field_emissions, manure_applications,
+                                                manure_requests, fertilizer_applications_data)
+
+    assert observed == feeds_grown
+
+
+def test_calculate_emissions_by_field(mocker: MockerFixture) -> None:
+    """Tests the partitions emissions from the field where crops/feeds were grown to those crops."""
+    em = EmissionsEstimator()
+    feeds_grown = [
+        {"crop_name": "corn_silage", "dry_yield": 3, "area": 10, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3},
+        {"crop_name": "alfalfa", "dry_yield": 9, "area": 5, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3},
+        {"crop_name": "wheat", "dry_yield": 500, "area": 7, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3}
+    ]
+
+    field_emissions = {
+        "nitrous_oxide": 120.5,
+        "ammonia": 200.75,
+        "carbon_stock_change": 150.0
+    }
+
+    manure_applications = {
+        "nitrogen": 100.0
+    }
+
+    manure_requests = {
+        "nitrogen": 90.0
+    }
+
+    fertilizer_applications_data = [
+        {"field_name": "field1", "nitrogen": 30.5, "phosphorus": 20.0, "year": 2024, "day": 314},
+        {"field_name": "field2", "nitrogen": 25.0, "phosphorus": 15.0, "year": 2024, "day": 314},
+        {"field_name": "field3", "nitrogen": 40.0, "phosphorus": 25.5, "year": 2024, "day": 314}
+    ]
+    mock_partition = mocker.patch.object(em, "_partition_applied_crop_fertilizer_emissions")
+    mock_extract = mocker.patch.object(em, "_extract_applied_crops",
+                                       return_value=[
+                                           {'crop_name': 'corn_silage', 'dry_yield': 3, 'area': 10, 'field_size': 200,
+                                            'planting_year': 2024, 'planting_day': 3,
+                                            'nitrous_oxide_emissions': 141.2109375, 'ammonia_emissions': 235.25390625,
+                                            'carbon_stock_change': 175.78125, 'nitrogen_fertilizer_used': 0.0,
+                                            'nitrogen_fertilizer_embedded_CO2_emissions': 0.0,
+                                            'phosphorus_fertilizer_used': 0.0,
+                                            'phosphorus_fertilizer_embedded_CO2_emissions': 0.0,
+                                            'potassium_fertilizer_used': 0.0,
+                                            'potassium_fertilizer_embedded_CO2_emissions': 0.0,
+                                            'manure_nitrogen_used': 0.5859375, 'manure_nitrogen_requested': 0.52734375},
+                                           {'crop_name': 'alfalfa', 'dry_yield': 9, 'area': 5, 'field_size': 200,
+                                            'planting_year': 2024, 'planting_day': 3,
+                                            'nitrous_oxide_emissions': 423.6328125, 'ammonia_emissions': 705.76171875,
+                                            'carbon_stock_change': 527.34375, 'nitrogen_fertilizer_used': 0.0,
+                                            'nitrogen_fertilizer_embedded_CO2_emissions': 0.0,
+                                            'phosphorus_fertilizer_used': 0.0,
+                                            'phosphorus_fertilizer_embedded_CO2_emissions': 0.0,
+                                            'potassium_fertilizer_used': 0.0,
+                                            'potassium_fertilizer_embedded_CO2_emissions': 0.0,
+                                            'manure_nitrogen_used': 1.7578125, 'manure_nitrogen_requested': 1.58203125}]
+                                       )
+    observed = em._calculate_emissions_by_field("field1", feeds_grown, field_emissions, manure_applications,
+                                                manure_requests, fertilizer_applications_data)
+
+    mock_partition.assert_called_once()
+    mock_extract.assert_called_once()
+    assert observed == [{'crop_name': 'corn_silage', 'dry_yield': 3, 'area': 10, 'field_size': 200,
+                         'planting_year': 2024,
+                         'planting_day': 3, 'nitrous_oxide_emissions': 141.2109375, 'ammonia_emissions': 235.25390625,
+                         'carbon_stock_change': 175.78125, 'nitrogen_fertilizer_used': 0.0,
+                         'nitrogen_fertilizer_embedded_CO2_emissions': 0.0, 'phosphorus_fertilizer_used': 0.0,
+                         'phosphorus_fertilizer_embedded_CO2_emissions': 0.0, 'potassium_fertilizer_used': 0.0,
+                         'potassium_fertilizer_embedded_CO2_emissions': 0.0, 'manure_nitrogen_used': 0.5859375,
+                         'manure_nitrogen_requested': 0.52734375}, {'crop_name': 'alfalfa', 'dry_yield': 9,
+                                                                    'area': 5, 'field_size': 200, 'planting_year': 2024,
+                                                                    'planting_day': 3,
+                                                                    'nitrous_oxide_emissions': 423.6328125,
+                                                                    'ammonia_emissions': 705.76171875,
+                                                                    'carbon_stock_change': 527.34375,
+                                                                    'nitrogen_fertilizer_used': 0.0,
+                                                                    'nitrogen_fertilizer_embedded_CO2_emissions': 0.0,
+                                                                    'phosphorus_fertilizer_used': 0.0,
+                                                                    'phosphorus_fertilizer_embedded_CO2_emissions': 0.0,
+                                                                    'potassium_fertilizer_used': 0.0,
+                                                                    'potassium_fertilizer_embedded_CO2_emissions': 0.0,
+                                                                    'manure_nitrogen_used': 1.7578125,
+                                                                    'manure_nitrogen_requested': 1.58203125},
+                        {'crop_name': 'wheat', 'dry_yield': 500, 'area': 7, 'field_size': 200, 'planting_year': 2024,
+                         'planting_day': 3, 'nitrous_oxide_emissions': 23535.15625, 'ammonia_emissions': 39208.984375,
+                         'carbon_stock_change': 29296.875, 'nitrogen_fertilizer_used': 0.0,
+                         'nitrogen_fertilizer_embedded_CO2_emissions': 0.0, 'phosphorus_fertilizer_used': 0.0,
+                         'phosphorus_fertilizer_embedded_CO2_emissions': 0.0, 'potassium_fertilizer_used': 0.0,
+                         'potassium_fertilizer_embedded_CO2_emissions': 0.0, 'manure_nitrogen_used': 97.65625,
+                         'manure_nitrogen_requested': 87.890625}]
+
+
+def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture) -> None:
+    """Tests the partitions emissions from the field where crops/feeds were grown to those crops where no applications
+     happened."""
+    em = EmissionsEstimator()
+    feeds_grown = [
+        {"crop_name": "corn_silage", "dry_yield": 3, "area": 10, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3},
+        {"crop_name": "alfalfa", "dry_yield": 9, "area": 5, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3},
+        {"crop_name": "wheat", "dry_yield": 500, "area": 7, "field_size": 200, "planting_year": 2024,
+         "planting_day": 3}
+    ]
+
+    field_emissions = {
+        "nitrous_oxide": 120.5,
+        "ammonia": 200.75,
+        "carbon_stock_change": 150.0
+    }
+
+    manure_applications = {
+        "nitrogen": 100.0
+    }
+
+    manure_requests = {
+        "nitrogen": 90.0
+    }
+
+    fertilizer_applications_data = [
+        {"field_name": "field1", "nitrogen": 30.5, "phosphorus": 20.0, "year": 2024, "day": 314},
+        {"field_name": "field2", "nitrogen": 25.0, "phosphorus": 15.0, "year": 2024, "day": 314},
+        {"field_name": "field3", "nitrogen": 40.0, "phosphorus": 25.5, "year": 2024, "day": 314}
+    ]
+    mock_applied = mocker.patch.object(em, "_apply_fertilizer_to_next_crop", return_value=False)
+    mock_add_warning = mocker.patch.object(em.om, "add_warning")
+    mock_extract = mocker.patch.object(em, "_extract_applied_crops",
+                                       return_value=[])
+    observed = em._calculate_emissions_by_field("field1", feeds_grown, field_emissions, manure_applications,
+                                                manure_requests, fertilizer_applications_data)
+
+    mock_applied.assert_called_once()
+    mock_extract.assert_called_once()
+    mock_add_warning.assert_called_once()
+
+    assert observed == [{'crop_name': 'corn_silage', 'dry_yield': 3, 'area': 10, 'field_size': 200,
+                         'planting_year': 2024,
+                         'planting_day': 3, 'nitrous_oxide_emissions': 141.2109375, 'ammonia_emissions': 235.25390625,
+                         'carbon_stock_change': 175.78125, 'nitrogen_fertilizer_used': 0.0,
+                         'nitrogen_fertilizer_embedded_CO2_emissions': 0.0, 'phosphorus_fertilizer_used': 0.0,
+                         'phosphorus_fertilizer_embedded_CO2_emissions': 0.0, 'potassium_fertilizer_used': 0.0,
+                         'potassium_fertilizer_embedded_CO2_emissions': 0.0, 'manure_nitrogen_used': 0.5859375,
+                         'manure_nitrogen_requested': 0.52734375}, {'crop_name': 'alfalfa', 'dry_yield': 9,
+                                                                    'area': 5, 'field_size': 200, 'planting_year': 2024,
+                                                                    'planting_day': 3,
+                                                                    'nitrous_oxide_emissions': 423.6328125,
+                                                                    'ammonia_emissions': 705.76171875,
+                                                                    'carbon_stock_change': 527.34375,
+                                                                    'nitrogen_fertilizer_used': 0.0,
+                                                                    'nitrogen_fertilizer_embedded_CO2_emissions': 0.0,
+                                                                    'phosphorus_fertilizer_used': 0.0,
+                                                                    'phosphorus_fertilizer_embedded_CO2_emissions': 0.0,
+                                                                    'potassium_fertilizer_used': 0.0,
+                                                                    'potassium_fertilizer_embedded_CO2_emissions': 0.0,
+                                                                    'manure_nitrogen_used': 1.7578125,
+                                                                    'manure_nitrogen_requested': 1.58203125},
+                        {'crop_name': 'wheat', 'dry_yield': 500, 'area': 7, 'field_size': 200, 'planting_year': 2024,
+                         'planting_day': 3, 'nitrous_oxide_emissions': 23535.15625, 'ammonia_emissions': 39208.984375,
+                         'carbon_stock_change': 29296.875, 'nitrogen_fertilizer_used': 0.0,
+                         'nitrogen_fertilizer_embedded_CO2_emissions': 0.0, 'phosphorus_fertilizer_used': 0.0,
+                         'phosphorus_fertilizer_embedded_CO2_emissions': 0.0, 'potassium_fertilizer_used': 0.0,
+                         'potassium_fertilizer_embedded_CO2_emissions': 0.0, 'manure_nitrogen_used': 97.65625,
+                         'manure_nitrogen_requested': 87.890625}]

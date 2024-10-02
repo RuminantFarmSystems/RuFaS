@@ -312,7 +312,8 @@ class EmissionsEstimator:
 
         aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen", "phosphorus"])
 
-        grouped_soil_characteristics: dict[str, dict[str, Any]] = self._collect_target_soil_characteristics(grouped_feeds.keys())
+        grouped_soil_characteristics: dict[str, dict[str, Any]] = self._collect_target_soil_characteristics(
+            list(grouped_feeds.keys()))
 
         crops_with_emissions = []
         for field in grouped_feeds.keys():
@@ -474,6 +475,7 @@ class EmissionsEstimator:
             crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
 
         filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
+
         for fertilizer_application in filtered_fertilizers:
             fertilizer_application_date = Time.convert_year_jday_to_date(
                 fertilizer_application["year"], fertilizer_application["day"]
