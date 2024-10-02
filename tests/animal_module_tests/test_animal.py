@@ -30,7 +30,6 @@ from RUFAS.routines.animal.ration.ration_driver import (
 )
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager
-from RUFAS.enums import AnimalCombination
 
 om = OutputManager()
 

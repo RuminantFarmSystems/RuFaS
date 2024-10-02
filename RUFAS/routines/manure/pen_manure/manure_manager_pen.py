@@ -4,7 +4,6 @@ from typing import Set
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 from ....enums import AnimalCombination
 from ....data_structures.pen_manure_data import PenManureData
-from RUFAS.routines.animal.animal_types import AnimalType
 
 
 class ManureManagerPen:
