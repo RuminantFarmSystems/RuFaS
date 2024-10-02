@@ -32,7 +32,7 @@ class DigestiveSystem:
         general_properties: GeneralProperties,
         animal_nutrient_property: NutrientProperties,
         milk_production_properties: MilkProductionProperties,
-        statistics: AnimalStatistics
+        statistics: AnimalStatistics,
     ) -> tuple[AnimalStatistics, AnimalManureExcretions]:
         """
         Handles an animal's daily digest updates.
