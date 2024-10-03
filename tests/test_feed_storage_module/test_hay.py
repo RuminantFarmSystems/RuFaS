@@ -148,7 +148,7 @@ def test_calculate_initial_dry_matter_loss(
 ) -> None:
     """Tests _calculate_initial_dry_matter_loss in Hay."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    harvested_crop.storage_time.simulation_day = 1
+    setattr(harvested_crop.storage_time, "simulation_day", 1)
     harvested_crop.initial_dry_matter_percentage = 20.0
     harvested_crop.initial_dry_matter_mass = 1_000.0
     harvested_crop.total_sensible_heat_generated = 500.0
@@ -166,7 +166,7 @@ def test_calculate_subsequent_dry_matter_loss(
 ) -> None:
     """Tests _calculate_subsequent_dry_matter_loss in Hay."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    harvested_crop.storage_time.simulation_day = 1
+    setattr(harvested_crop.storage_time, "simulation_day", 1)
     mock_time = mocker.MagicMock(autospec=Time)
     mock_time.simulation_day = days + 1
 
@@ -228,11 +228,11 @@ def test_calculate_moisture_loss(
 ) -> None:
     """Tests that moisture losses from a hayed crop are calculated correctly."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    harvested_crop.storage_time.simulation_day = 1
+    setattr(harvested_crop.storage_time, "simulation_day", 1)
     harvested_crop.initial_dry_matter_percentage = 100.0 - initial_moisture
     harvested_crop.initial_dry_matter_mass = 400.0
     mock_time = mocker.MagicMock(autospec=Time)
-    mock_time.simulation_day = days + 1
+    setattr(mock_time, "simulation_day", days + 1)
 
     actual = hay._calculate_moisture_loss(harvested_crop, mock_time)
 
