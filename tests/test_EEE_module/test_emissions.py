@@ -1063,3 +1063,52 @@ def test_apply_fertilizer_to_next_crop(fertilizer_application: dict[str, Any],
                                  'phosphorus_fertilizer_embedded_CO2_emissions': 4, 'potassium_fertilizer_used': 1,
                                  'potassium_fertilizer_embedded_CO2_emissions': 3, 'planting_year': 2029,
                                  'planting_day': 26, 'harvest_year': 2029, 'harvest_day': 23}]
+
+
+@pytest.mark.parametrize(
+    "sorted_crops, fertilizer_application_date",
+    [
+        ([{"crop_name": "corn", "nitrogen_fertilizer_used": 1, "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+           "phosphorus_fertilizer_used": 4, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2001,
+           "planting_day": 26, "harvest_year": 2015, "harvest_day": 23},
+          {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+           "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2024,
+           "planting_day": 26, "harvest_year": 2014, "harvest_day": 23},
+          {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+           "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2029,
+           "planting_day": 26, "harvest_year": 2029, "harvest_day": 23}
+          ],
+         date(2013, 2, 13))
+    ]
+)
+def test_extract_applied_crops(sorted_crops: list[dict[str, Any]], fertilizer_application_date: date) -> None:
+    """Tests that applied crops are extracted correctly."""
+    expected = [{'crop_name': 'corn', 'nitrogen_fertilizer_used': 1, 'nitrogen_fertilizer_embedded_CO2_emissions': 2,
+                 'phosphorus_fertilizer_used': 4, 'phosphorus_fertilizer_embedded_CO2_emissions': 4,
+                 'potassium_fertilizer_used': 1, 'potassium_fertilizer_embedded_CO2_emissions': 3,
+                 'planting_year': 2001, 'planting_day': 26, 'harvest_year': 2015, 'harvest_day': 23}]
+
+    em = EmissionsEstimator()
+
+    observed = em._extract_applied_crops(sorted_crops, fertilizer_application_date)
+    assert observed == expected
+
+
+def test_soil_data_update(mocker: MockerFixture) -> None:
+    """Tests the update of soil data."""
+    em = EmissionsEstimator()
+    filters = {"filter1": {"property1": "p1"}, "filter2": {"property1": "p1"}}
+    expected = {'filter1': 376.3, 'filter2': 376.3}
+
+    mock_filter = mocker.patch.object(em.om, "filter_variables_pool",
+                                      return_value={
+                                          "a": {"values": [150, 201]},
+                                          "b": {"values": [25.3]}
+                                      })
+
+    observed = em._soil_data_update(filters)
+
+    assert observed == expected

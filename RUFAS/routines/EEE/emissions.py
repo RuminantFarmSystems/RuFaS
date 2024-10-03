@@ -646,9 +646,8 @@ class EmissionsEstimator:
         applied_crops = []
 
         for crop in sorted_crops:
-            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"])
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
-
+            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
+            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops
