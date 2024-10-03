@@ -977,13 +977,15 @@ def test_filter_results(mocker: MockerFixture) -> None:
     """Tests that the filters taken in were correctly filtered."""
     em = EmissionsEstimator()
     mock_filter = mocker.patch.object(em.om, "filter_variables_pool",
-                                      return_value={"data1", {"nested1": ["test"]}})
+                                      return_value={"data1": {"nested1": ["test"]}})
     mock_trans = mocker.patch.object(em, "_transform_outputs_to_list_of_dicts",
                                      return_value=[{"year": 2019, "day": 18}, {"year": 2024, "day": 18}])
 
-    expected = [{"year": 2019, "day": 18}]
+    expected = [{"year": 2024, "day": 18}]
 
     observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24),
                                   "year", "day")
 
     assert observed == expected
+    mock_filter.assert_called_once_with({"filter name": "f1"})
+    mock_trans.assert_called_once_with({"data1": {"nested1": ["test"]}})
