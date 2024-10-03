@@ -272,7 +272,11 @@ def test_transform_outputs_to_list_of_dicts() -> None:
             False
         ),
         ({"one": {"values": [1, 2, 3]}, "two": {"values": []}}, [], False),
-        ({"one": {"values": [1, 2, 3]}, "two": {}}, [], True)
+        ({"one": {"values": [1, 2, 3]}, "two": {}}, [], True),
+        ({"one": {"values": [1, 2, 3], "info_maps": [{"v1": 1}, {"v2": 2}, {"v3": 3}]},
+          "two": {"values": [4, 5, 6, 9], "info_maps": [{"v1": 1}, {"v2": 2}]}},
+         [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}],
+         False)
     ],
 )
 def test_transform_outputs_to_list_of_dicts_length_unmatched(
