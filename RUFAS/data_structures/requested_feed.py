@@ -1,0 +1,4 @@
+
+
+class RequestedFeed:
+    pass
