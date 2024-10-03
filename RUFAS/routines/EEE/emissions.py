@@ -313,7 +313,8 @@ class EmissionsEstimator:
         aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen", "phosphorus"])
 
         grouped_soil_characteristics: dict[str, dict[str, Any]] = self._collect_target_soil_characteristics(
-            list(grouped_feeds.keys()))
+            list(grouped_feeds.keys())
+        )
 
         crops_with_emissions = []
         for field in grouped_feeds.keys():
