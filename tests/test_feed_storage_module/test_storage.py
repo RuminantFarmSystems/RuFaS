@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import call
 
 import pytest
@@ -105,7 +106,11 @@ def test_process_degradations(
     }
     mock_weather = mocker.MagicMock(autospec=Weather)
     mock_conditions = [mocker.MagicMock(autospec=CurrentDayConditions)] * 3
-    mock_time = mocker.MagicMock(autospec=Time)
+    mock_init_time = mocker.patch.object(Time, "__init__", return_value=None)
+    mock_time = Time()
+    mock_time.start_date = date(year=2024, month=1, day=1)
+    mock_time.end_date = date(year=2024, month=12, day=31)
+    mock_time.current_date = date(year=2024, month=6, day=1)
     mock_first_crop = mocker.MagicMock(autospec=HarvestedCrop)
     mock_second_crop = mocker.MagicMock(autospec=HarvestedCrop)
     storage.stored = [mock_first_crop, mock_second_crop]
@@ -113,7 +118,6 @@ def test_process_degradations(
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
     mock_add_var = mocker.patch.object(storage.om, "add_variable")
-    mock_deepcopy = mocker.patch("RUFAS.routines.feed_storage.storage.copy.deepcopy", return_value=mock_time)
     mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
     mock_record = mocker.patch.object(storage, "record_stored_crops")
     expected_get_conditions_calls = [
@@ -127,7 +131,7 @@ def test_process_degradations(
 
     storage.process_degradations(mock_weather, mock_time)
 
-    expected_recalculate_percentage_call_count = len(storage.stored) * 4
+    expected_recalculate_percentage_call_count = len(storage.stored) * 6
     expected_reset_mass_calls = [
         call(mock_first_crop, loss, moisture_loss=0.0),
         call(mock_second_crop, loss, moisture_loss=0.0),
@@ -136,19 +140,22 @@ def test_process_degradations(
     mock_get_conditions.assert_has_calls(expected_get_conditions_calls)
     mock_dry_matter_loss.assert_has_calls(expected_dry_mass_loss_calls)
     assert mock_recalc_percentage.call_count == expected_recalculate_percentage_call_count
+    assert mock_init_time.call_count == 3
     mock_reset_mass.assert_has_calls(expected_reset_mass_calls)
     mock_add_var.assert_called_once_with("gaseous_dry_matter_loss", loss * len(storage.stored), expected_info_map)
     mock_record.assert_called_once()
     assert mock_first_crop.crude_protein_percent == percentage
+    assert mock_first_crop.starch == percentage
     assert mock_first_crop.adf == percentage
     assert mock_first_crop.ndf == percentage
-    assert mock_first_crop.sugar == percentage
+    assert mock_first_crop.lignin == percentage
+    assert mock_first_crop.ash == percentage
     assert mock_second_crop.crude_protein_percent == percentage
+    assert mock_second_crop.starch == percentage
     assert mock_second_crop.adf == percentage
     assert mock_second_crop.ndf == percentage
-    assert mock_second_crop.sugar == percentage
-    assert mock_deepcopy.call_count == 2
-    assert mock_first_crop.last_time_degraded == mock_second_crop.last_time_degraded == mock_time
+    assert mock_second_crop.lignin == percentage
+    assert mock_second_crop.ash == percentage
 
 
 @pytest.mark.parametrize(

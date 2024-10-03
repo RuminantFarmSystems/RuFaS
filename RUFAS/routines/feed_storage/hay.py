@@ -1,15 +1,21 @@
-from ...current_day_conditions import CurrentDayConditions
-from ...general_constants import GeneralConstants
-from ...time import Time
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+from RUFAS.weather import Weather
+
 from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
 from .storage import Storage
 
 """
-This final moisture fraction that expected to be contained in a hay crop. References Feed Storage Scientific
+This final moisture percentage that expected to be contained in a hay crop. References Feed Storage Scientific
 Documentation equation 1.2.6.
 """
-FINAL_MOISTURE_FRACTION = 0.12
+FINAL_MOISTURE_PERCENTAGE = 12
+
+"""Number of days after a hayed crop is stored during which it experiences increased dry matter and moisture loss."""
+INITIAL_LOSS_PERIOD = 30
 
 """
 These loss coefficients determine how much additional dry matter is lost in specific types of hayed crops.
@@ -62,6 +68,38 @@ class Hay(Storage):
         """
         return DEFAULT_BALE_DIAMETER
 
+    def process_degradations(self, weather: Weather, time: Time) -> None:
+        """
+        Processes the loss of moisture in hayed crops, and calls the base class's implementation of
+        `process_degradations` to process the loss of dry matter.
+
+        Parameters
+        ----------
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_degradations.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        total_moisture_loss = 0.0
+        for crop in self.stored:
+            processed_moisture_loss = self._calculate_moisture_loss(crop, crop.last_time_degraded)
+            cumulative_moisture_loss = self._calculate_moisture_loss(crop, time)
+            actual_moisture_loss = cumulative_moisture_loss - processed_moisture_loss
+
+            total_moisture_loss += actual_moisture_loss
+
+            self.reset_mass_attributes_after_loss(crop, 0.0, actual_moisture_loss)
+
+        self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
+
+        super().process_degradations(weather, time)
+
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time
     ) -> float:
@@ -76,6 +114,12 @@ class Hay(Storage):
             List of daily weather conditions over which dry matter loss will be calculated.
         time : Time
             Time instance containing the time that loss should be processed up to.
+
+        Returns
+        -------
+        float
+            Mass of gaseous dry matter lost since from hayed crop since the last time it losses were processed for it
+            (kg).
 
         References
         ----------
@@ -124,16 +168,18 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
-        days_in_window = min(days_stored, 30)
-        fraction_of_total_loss = days_in_window / 30
+        days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
+        fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
 
-        dry_fraction = crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-        moisture_fraction = 1 - dry_fraction
+        initial_moisture_percentage = 100 - crop.initial_dry_matter_percentage
 
         numerator = crop.total_sensible_heat_generated + 2433 * (
-            moisture_fraction - (FINAL_MOISTURE_FRACTION * dry_fraction) / (1 - FINAL_MOISTURE_FRACTION)
+            initial_moisture_percentage
+            - (FINAL_MOISTURE_PERCENTAGE * crop.initial_dry_matter_percentage) / (1 - FINAL_MOISTURE_PERCENTAGE)
         )
-        denominator = dry_fraction * (14206 - 2433 * FINAL_MOISTURE_FRACTION / (1 - FINAL_MOISTURE_FRACTION))
+        denominator = crop.initial_dry_matter_percentage * (
+            14206 - 2433 * FINAL_MOISTURE_PERCENTAGE / (1 - FINAL_MOISTURE_PERCENTAGE)
+        )
 
         fraction_of_initial_dry_matter_lost = numerator / denominator * fraction_of_total_loss
         return crop.initial_dry_matter_mass * fraction_of_initial_dry_matter_lost
@@ -160,7 +206,7 @@ class Hay(Storage):
 
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
-        days_past_30_day_window = max(0, days_stored - 30)
+        days_past_30_day_window = max(0, days_stored - INITIAL_LOSS_PERIOD)
 
         return 0.0001 * days_past_30_day_window
 
@@ -204,6 +250,47 @@ class Hay(Storage):
         ]
         additional_loss = sum(conditions)
         return additional_loss * constant_factor
+
+    def _calculate_moisture_loss(self, crop: HarvestedCrop, time: Time) -> float:
+        """
+        Calculates the moisture lost from a hayed crop since it was stored.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The hayed crop to process dry matter loss in.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+
+        Returns
+        -------
+        float
+            Moisture loss from the hayed crop that occurred in the first 30 days of storage (kg).
+
+        References
+        ----------
+        .. Feed Storage Scientific Documentation, equation. 1.2.9
+
+        """
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
+        fraction_of_total_loss = days_in_window / INITIAL_LOSS_PERIOD
+
+        initial_moisture_percentage = 100.0 - crop.initial_dry_matter_percentage
+
+        initial_fresh_mass = crop.initial_dry_matter_mass / (
+            crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        percentage_of_fresh_mass_lost_as_moisture = max(0.0, initial_moisture_percentage - FINAL_MOISTURE_PERCENTAGE)
+
+        moisture_loss = (
+            initial_fresh_mass
+            * percentage_of_fresh_mass_lost_as_moisture
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
+            * fraction_of_total_loss
+        )
+
+        return moisture_loss
 
 
 class ProtectedIndoors(Hay):
