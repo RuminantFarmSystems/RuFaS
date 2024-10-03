@@ -267,6 +267,10 @@ class Hay(Storage):
         float
             Moisture loss from the hayed crop that occurred in the first 30 days of storage (kg).
 
+        References
+        ----------
+        .. Feed Storage Scientific Documentation, equation. 1.2.9
+
         """
         days_stored = time.simulation_day - crop.storage_time.simulation_day
         days_in_window = min(days_stored, INITIAL_LOSS_PERIOD)
