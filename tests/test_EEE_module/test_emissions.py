@@ -1112,3 +1112,4 @@ def test_soil_data_update(mocker: MockerFixture) -> None:
     observed = em._soil_data_update(filters)
 
     assert observed == expected
+    mock_filter.assert_has_calls([call({"property1": "p1"}), call({"property1": "p1"})])
