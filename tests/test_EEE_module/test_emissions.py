@@ -157,7 +157,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                       "which crop yields and nutrient applications to estimate emissions for.",
+        "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -582,16 +582,16 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
         {
             "ammonia": {
                 "description": "Collects the ammonia emissions from all soil "
-                               "layers in the field in the last year of the "
-                               "simulation.",
+                "layers in the field in the last year of the "
+                "simulation.",
                 "filters": ["FieldDataReporter.send_daily_variables.ammonia_emissions.field" "='field1',layer=.*"],
                 "name": "Soil Ammonia emissions",
                 "slice_start": -365,
             },
             "nitrous_oxide": {
                 "description": "Collects the nitrous oxide emissions from "
-                               "all soil layers in the field in the last "
-                               "year of the simulation.",
+                "all soil layers in the field in the last "
+                "year of the simulation.",
                 "filters": [
                     "FieldDataReporter.send_daily_variables" ".nitrous_oxide_emissions.field='field1',layer=.*"
                 ],
@@ -936,35 +936,80 @@ def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture) -> None:
 @pytest.mark.parametrize(
     "fertilizer_application,applied_crops,expected",
     [
-        ({"nitrogen": 5, "phosphorus": 10, "potassium": 15},
-         [{"crop_name": "corn", "nitrogen_fertilizer_used": 1, "nitrogen_fertilizer_embedded_CO2_emissions": 2,
-           "phosphorus_fertilizer_used": 4, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3}],
-         [{'crop_name': 'corn', 'nitrogen_fertilizer_used': 6.0, 'nitrogen_fertilizer_embedded_CO2_emissions': 28.6,
-           'phosphorus_fertilizer_used': 14.0, 'phosphorus_fertilizer_embedded_CO2_emissions': 34.7,
-           'potassium_fertilizer_used': 16.0, 'potassium_fertilizer_embedded_CO2_emissions': 22.5}]),
-        ({"nitrogen": 5, "phosphorus": 10, "potassium": 15},
-         [{"crop_name": "corn", "nitrogen_fertilizer_used": 1, "nitrogen_fertilizer_embedded_CO2_emissions": 2,
-           "phosphorus_fertilizer_used": 4, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3},
-          {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
-           "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3}
-          ],
-         [{'crop_name': 'corn', 'nitrogen_fertilizer_used': 3.5, 'nitrogen_fertilizer_embedded_CO2_emissions': 15.3,
-           'phosphorus_fertilizer_used': 9.0, 'phosphorus_fertilizer_embedded_CO2_emissions': 19.35,
-           'potassium_fertilizer_used': 8.5, 'potassium_fertilizer_embedded_CO2_emissions': 12.75},
-          {'crop_name': 'Alfafa', 'nitrogen_fertilizer_used': 6.5, 'nitrogen_fertilizer_embedded_CO2_emissions': 17.3,
-           'phosphorus_fertilizer_used': 6.0, 'phosphorus_fertilizer_embedded_CO2_emissions': 19.35,
-           'potassium_fertilizer_used': 8.5, 'potassium_fertilizer_embedded_CO2_emissions': 12.75}]),
-        ({"nitrogen": 5, "phosphorus": 10, "potassium": 15},
-         [],
-         [])
-    ]
+        (
+            {"nitrogen": 5, "phosphorus": 10, "potassium": 15},
+            [
+                {
+                    "crop_name": "corn",
+                    "nitrogen_fertilizer_used": 1,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+                    "phosphorus_fertilizer_used": 4,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                }
+            ],
+            [
+                {
+                    "crop_name": "corn",
+                    "nitrogen_fertilizer_used": 6.0,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 28.6,
+                    "phosphorus_fertilizer_used": 14.0,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 34.7,
+                    "potassium_fertilizer_used": 16.0,
+                    "potassium_fertilizer_embedded_CO2_emissions": 22.5,
+                }
+            ],
+        ),
+        (
+            {"nitrogen": 5, "phosphorus": 10, "potassium": 15},
+            [
+                {
+                    "crop_name": "corn",
+                    "nitrogen_fertilizer_used": 1,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+                    "phosphorus_fertilizer_used": 4,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                },
+                {
+                    "crop_name": "Alfafa",
+                    "nitrogen_fertilizer_used": 4,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+                    "phosphorus_fertilizer_used": 1,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                },
+            ],
+            [
+                {
+                    "crop_name": "corn",
+                    "nitrogen_fertilizer_used": 3.5,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 15.3,
+                    "phosphorus_fertilizer_used": 9.0,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 19.35,
+                    "potassium_fertilizer_used": 8.5,
+                    "potassium_fertilizer_embedded_CO2_emissions": 12.75,
+                },
+                {
+                    "crop_name": "Alfafa",
+                    "nitrogen_fertilizer_used": 6.5,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 17.3,
+                    "phosphorus_fertilizer_used": 6.0,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 19.35,
+                    "potassium_fertilizer_used": 8.5,
+                    "potassium_fertilizer_embedded_CO2_emissions": 12.75,
+                },
+            ],
+        ),
+        ({"nitrogen": 5, "phosphorus": 10, "potassium": 15}, [], []),
+    ],
 )
-def test_partition_applied_crop_fertilizer_emissions(fertilizer_application: dict[str, float],
-                                                     applied_crops: list[dict[str, Any]],
-                                                     expected: list[dict[str, Any]]) -> None:
+def test_partition_applied_crop_fertilizer_emissions(
+    fertilizer_application: dict[str, float], applied_crops: list[dict[str, Any]], expected: list[dict[str, Any]]
+) -> None:
     """Tests that the partition of nutrients is applied to the crop correctly."""
     em = EmissionsEstimator()
 
@@ -976,15 +1021,14 @@ def test_partition_applied_crop_fertilizer_emissions(fertilizer_application: dic
 def test_filter_results(mocker: MockerFixture) -> None:
     """Tests that the filters taken in were correctly filtered."""
     em = EmissionsEstimator()
-    mock_filter = mocker.patch.object(em.om, "filter_variables_pool",
-                                      return_value={"data1": {"nested1": ["test"]}})
-    mock_trans = mocker.patch.object(em, "_transform_outputs_to_list_of_dicts",
-                                     return_value=[{"year": 2019, "day": 18}, {"year": 2024, "day": 18}])
+    mock_filter = mocker.patch.object(em.om, "filter_variables_pool", return_value={"data1": {"nested1": ["test"]}})
+    mock_trans = mocker.patch.object(
+        em, "_transform_outputs_to_list_of_dicts", return_value=[{"year": 2019, "day": 18}, {"year": 2024, "day": 18}]
+    )
 
     expected = [{"year": 2024, "day": 18}]
 
-    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24),
-                                  "year", "day")
+    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24), "year", "day")
 
     assert observed == expected
     mock_filter.assert_called_once_with({"filter name": "f1"})
@@ -995,15 +1039,18 @@ def test_aggregate_data() -> None:
     """Tests nutrient data for different types of applications aggregated correctly."""
     em = EmissionsEstimator()
 
-    expected = {'field1': {'phosphorus': 90.0, 'nitrogen': 82.0}, 'field2': {'phosphorus': 54.3, 'nitrogen': 124.7}}
+    expected = {"field1": {"phosphorus": 90.0, "nitrogen": 82.0}, "field2": {"phosphorus": 54.3, "nitrogen": 124.7}}
 
-    observed = em._aggregate_data([{"field_name": "field1", "phosphorus": 60, "nitrogen": 35},
-                                   {"field_name": "field2", "phosphorus": 30, "nitrogen": 47},
-                                   {"field_name": "field1", "phosphorus": 30, "nitrogen": 47},
-                                   {"field_name": "field2", "phosphorus": 24.3, "nitrogen": 77.7}],
-                                  ["field1", "field2"],
-                                  ["phosphorus", "nitrogen"]
-                                  )
+    observed = em._aggregate_data(
+        [
+            {"field_name": "field1", "phosphorus": 60, "nitrogen": 35},
+            {"field_name": "field2", "phosphorus": 30, "nitrogen": 47},
+            {"field_name": "field1", "phosphorus": 30, "nitrogen": 47},
+            {"field_name": "field2", "phosphorus": 24.3, "nitrogen": 77.7},
+        ],
+        ["field1", "field2"],
+        ["phosphorus", "nitrogen"],
+    )
 
     assert observed == expected
 
@@ -1011,85 +1058,176 @@ def test_aggregate_data() -> None:
 @pytest.mark.parametrize(
     "fertilizer_application,sorted_crops,fertilizer_application_date,no_next",
     [
-        (
-            {"field_name": "f1"},
-            [],
-            date(2019, 2, 13),
-            True
-        ),
+        ({"field_name": "f1"}, [], date(2019, 2, 13), True),
         (
             {"nitrogen": 5, "phosphorus": 10, "potassium": 15},
-            [{"crop_name": "corn", "nitrogen_fertilizer_used": 1, "nitrogen_fertilizer_embedded_CO2_emissions": 2,
-              "phosphorus_fertilizer_used": 4, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-              "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2001,
-              "planting_day": 26, "harvest_year": 2012, "harvest_day": 23},
-             {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
-              "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-              "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2024,
-              "planting_day": 26, "harvest_year": 2014, "harvest_day": 23},
-             {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
-              "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-              "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2029,
-              "planting_day": 26, "harvest_year": 2029, "harvest_day": 23}
-             ],
+            [
+                {
+                    "crop_name": "corn",
+                    "nitrogen_fertilizer_used": 1,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+                    "phosphorus_fertilizer_used": 4,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                    "planting_year": 2001,
+                    "planting_day": 26,
+                    "harvest_year": 2012,
+                    "harvest_day": 23,
+                },
+                {
+                    "crop_name": "Alfafa",
+                    "nitrogen_fertilizer_used": 4,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+                    "phosphorus_fertilizer_used": 1,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                    "planting_year": 2024,
+                    "planting_day": 26,
+                    "harvest_year": 2014,
+                    "harvest_day": 23,
+                },
+                {
+                    "crop_name": "Alfafa",
+                    "nitrogen_fertilizer_used": 4,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+                    "phosphorus_fertilizer_used": 1,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                    "planting_year": 2029,
+                    "planting_day": 26,
+                    "harvest_year": 2029,
+                    "harvest_day": 23,
+                },
+            ],
             date(2013, 2, 13),
-            False
-
-        )
+            False,
+        ),
     ],
 )
-def test_apply_fertilizer_to_next_crop(fertilizer_application: dict[str, Any],
-                                       sorted_crops: list[dict[str, Any]],
-                                       fertilizer_application_date: date,
-                                       no_next: bool) -> None:
+def test_apply_fertilizer_to_next_crop(
+    fertilizer_application: dict[str, Any],
+    sorted_crops: list[dict[str, Any]],
+    fertilizer_application_date: date,
+    no_next: bool,
+) -> None:
     """Tests that the fertilizer is successfully applied to the next crop."""
     em = EmissionsEstimator()
     if no_next:
         assert not em._apply_fertilizer_to_next_crop(fertilizer_application, sorted_crops, fertilizer_application_date)
     else:
         assert em._apply_fertilizer_to_next_crop(fertilizer_application, sorted_crops, fertilizer_application_date)
-        assert sorted_crops == [{'crop_name': 'corn', 'nitrogen_fertilizer_used': 1,
-                                 'nitrogen_fertilizer_embedded_CO2_emissions': 2, 'phosphorus_fertilizer_used': 4,
-                                 'phosphorus_fertilizer_embedded_CO2_emissions': 4, 'potassium_fertilizer_used': 1,
-                                 'potassium_fertilizer_embedded_CO2_emissions': 3, 'planting_year': 2001,
-                                 'planting_day': 26, 'harvest_year': 2012, 'harvest_day': 23},
-                                {'crop_name': 'Alfafa', 'nitrogen_fertilizer_used': 9,
-                                 'nitrogen_fertilizer_embedded_CO2_emissions': 30.6,
-                                 'phosphorus_fertilizer_used': 11, 'phosphorus_fertilizer_embedded_CO2_emissions': 34.7,
-                                 'potassium_fertilizer_used': 16, 'potassium_fertilizer_embedded_CO2_emissions': 22.5,
-                                 'planting_year': 2024, 'planting_day': 26, 'harvest_year': 2014, 'harvest_day': 23},
-                                {'crop_name': 'Alfafa', 'nitrogen_fertilizer_used': 4,
-                                 'nitrogen_fertilizer_embedded_CO2_emissions': 4, 'phosphorus_fertilizer_used': 1,
-                                 'phosphorus_fertilizer_embedded_CO2_emissions': 4, 'potassium_fertilizer_used': 1,
-                                 'potassium_fertilizer_embedded_CO2_emissions': 3, 'planting_year': 2029,
-                                 'planting_day': 26, 'harvest_year': 2029, 'harvest_day': 23}]
+        assert sorted_crops == [
+            {
+                "crop_name": "corn",
+                "nitrogen_fertilizer_used": 1,
+                "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+                "phosphorus_fertilizer_used": 4,
+                "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                "potassium_fertilizer_used": 1,
+                "potassium_fertilizer_embedded_CO2_emissions": 3,
+                "planting_year": 2001,
+                "planting_day": 26,
+                "harvest_year": 2012,
+                "harvest_day": 23,
+            },
+            {
+                "crop_name": "Alfafa",
+                "nitrogen_fertilizer_used": 9,
+                "nitrogen_fertilizer_embedded_CO2_emissions": 30.6,
+                "phosphorus_fertilizer_used": 11,
+                "phosphorus_fertilizer_embedded_CO2_emissions": 34.7,
+                "potassium_fertilizer_used": 16,
+                "potassium_fertilizer_embedded_CO2_emissions": 22.5,
+                "planting_year": 2024,
+                "planting_day": 26,
+                "harvest_year": 2014,
+                "harvest_day": 23,
+            },
+            {
+                "crop_name": "Alfafa",
+                "nitrogen_fertilizer_used": 4,
+                "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+                "phosphorus_fertilizer_used": 1,
+                "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                "potassium_fertilizer_used": 1,
+                "potassium_fertilizer_embedded_CO2_emissions": 3,
+                "planting_year": 2029,
+                "planting_day": 26,
+                "harvest_year": 2029,
+                "harvest_day": 23,
+            },
+        ]
 
 
 @pytest.mark.parametrize(
     "sorted_crops, fertilizer_application_date",
     [
-        ([{"crop_name": "corn", "nitrogen_fertilizer_used": 1, "nitrogen_fertilizer_embedded_CO2_emissions": 2,
-           "phosphorus_fertilizer_used": 4, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2001,
-           "planting_day": 26, "harvest_year": 2015, "harvest_day": 23},
-          {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
-           "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2024,
-           "planting_day": 26, "harvest_year": 2014, "harvest_day": 23},
-          {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
-           "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
-           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3, "planting_year": 2029,
-           "planting_day": 26, "harvest_year": 2029, "harvest_day": 23}
-          ],
-         date(2013, 2, 13))
-    ]
+        (
+            [
+                {
+                    "crop_name": "corn",
+                    "nitrogen_fertilizer_used": 1,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+                    "phosphorus_fertilizer_used": 4,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                    "planting_year": 2001,
+                    "planting_day": 26,
+                    "harvest_year": 2015,
+                    "harvest_day": 23,
+                },
+                {
+                    "crop_name": "Alfafa",
+                    "nitrogen_fertilizer_used": 4,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+                    "phosphorus_fertilizer_used": 1,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                    "planting_year": 2024,
+                    "planting_day": 26,
+                    "harvest_year": 2014,
+                    "harvest_day": 23,
+                },
+                {
+                    "crop_name": "Alfafa",
+                    "nitrogen_fertilizer_used": 4,
+                    "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+                    "phosphorus_fertilizer_used": 1,
+                    "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+                    "potassium_fertilizer_used": 1,
+                    "potassium_fertilizer_embedded_CO2_emissions": 3,
+                    "planting_year": 2029,
+                    "planting_day": 26,
+                    "harvest_year": 2029,
+                    "harvest_day": 23,
+                },
+            ],
+            date(2013, 2, 13),
+        )
+    ],
 )
 def test_extract_applied_crops(sorted_crops: list[dict[str, Any]], fertilizer_application_date: date) -> None:
     """Tests that applied crops are extracted correctly."""
-    expected = [{'crop_name': 'corn', 'nitrogen_fertilizer_used': 1, 'nitrogen_fertilizer_embedded_CO2_emissions': 2,
-                 'phosphorus_fertilizer_used': 4, 'phosphorus_fertilizer_embedded_CO2_emissions': 4,
-                 'potassium_fertilizer_used': 1, 'potassium_fertilizer_embedded_CO2_emissions': 3,
-                 'planting_year': 2001, 'planting_day': 26, 'harvest_year': 2015, 'harvest_day': 23}]
+    expected = [
+        {
+            "crop_name": "corn",
+            "nitrogen_fertilizer_used": 1,
+            "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+            "phosphorus_fertilizer_used": 4,
+            "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+            "potassium_fertilizer_used": 1,
+            "potassium_fertilizer_embedded_CO2_emissions": 3,
+            "planting_year": 2001,
+            "planting_day": 26,
+            "harvest_year": 2015,
+            "harvest_day": 23,
+        }
+    ]
 
     em = EmissionsEstimator()
 
@@ -1101,13 +1239,11 @@ def test_soil_data_update(mocker: MockerFixture) -> None:
     """Tests the update of soil data."""
     em = EmissionsEstimator()
     filters = {"filter1": {"property1": "p1"}, "filter2": {"property1": "p1"}}
-    expected = {'filter1': 376.3, 'filter2': 376.3}
+    expected = {"filter1": 376.3, "filter2": 376.3}
 
-    mock_filter = mocker.patch.object(em.om, "filter_variables_pool",
-                                      return_value={
-                                          "a": {"values": [150, 201]},
-                                          "b": {"values": [25.3]}
-                                      })
+    mock_filter = mocker.patch.object(
+        em.om, "filter_variables_pool", return_value={"a": {"values": [150, 201]}, "b": {"values": [25.3]}}
+    )
 
     observed = em._soil_data_update(filters)
 
