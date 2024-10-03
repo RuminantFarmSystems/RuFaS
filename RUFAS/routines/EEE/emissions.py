@@ -312,7 +312,9 @@ class EmissionsEstimator:
 
         aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen", "phosphorus"])
 
-        grouped_soil_characteristics: dict[str, float] = self._collect_target_soil_characteristics(grouped_feeds.keys())
+        grouped_soil_characteristics: dict[str, dict[str, Any]] = self._collect_target_soil_characteristics(
+            list(grouped_feeds.keys())
+        )
 
         crops_with_emissions = []
         for field in grouped_feeds.keys():
@@ -474,6 +476,7 @@ class EmissionsEstimator:
             crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
 
         filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
+
         for fertilizer_application in filtered_fertilizers:
             fertilizer_application_date = Time.convert_year_jday_to_date(
                 fertilizer_application["year"], fertilizer_application["day"]
@@ -598,14 +601,16 @@ class EmissionsEstimator:
         Returns True if fertilizer was applied, False otherwise.
         """
         for index, crop in enumerate(sorted_crops):
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
+            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             next_crop_exists = index + 1 < len(sorted_crops)
+
             if next_crop_exists:
                 next_crop = sorted_crops[index + 1]
                 next_crop_planting_date = Time.convert_year_jday_to_date(
                     next_crop["planting_year"], next_crop["planting_day"]
-                )
+                ).date()
                 if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
+
                     next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
                     next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] += (
                         fertilizer_application["nitrogen"] * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
@@ -641,9 +646,8 @@ class EmissionsEstimator:
         applied_crops = []
 
         for crop in sorted_crops:
-            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"])
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
-
+            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
+            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops
