@@ -169,6 +169,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
         "Manure Applications": [{"dry_yield": 4, "field_size": 2, "total_dry_yield": 8}],
         "Manure Requests": [{"dry_yield": 4, "field_size": 2, "total_dry_yield": 8}],
     }
+
     observed = em._gather_homegrown_feeds_and_fertilizer_apps()
 
     assert observed == expected
@@ -234,8 +235,11 @@ def test_gather_ration_feed_totals(mocker: MockerFixture) -> None:
     """
     em = EmissionsEstimator()
     mock_filter = mocker.patch.object(em.om, "filter_variables_pool", return_value={"test": {"values": [2, 3, 4]}})
+
     expected = {"test": 9.0}
+
     observed = em._gather_ration_feed_totals()
+
     assert observed == expected
     mock_filter.assert_called_once_with(
         {
@@ -252,34 +256,56 @@ def test_transform_outputs_to_list_of_dicts() -> None:
     """Test that the function transform data to correct list of dicts."""
     em = EmissionsEstimator()
     expected = [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}]
+
     data = {"one": {"values": [1, 2, 3]}, "two": {"values": [4, 5, 6]}}
+
     observed = em._transform_outputs_to_list_of_dicts(data)
+
     assert observed == expected
 
 
 @pytest.mark.parametrize(
-    "data,expected",
+    "data,expected,expect_error",
     [
         (
             {"one": {"values": [1, 2, 3]}, "two": {"values": [4, 5, 6, 9]}},
             [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}],
+            False,
         ),
-        ({"one": {"values": [1, 2, 3]}, "two": {"values": []}}, []),
+        ({"one": {"values": [1, 2, 3]}, "two": {"values": []}}, [], False),
+        ({"one": {"values": [1, 2, 3]}, "two": {}}, [], True),
+        (
+            {
+                "one": {"values": [1, 2, 3], "info_maps": [{"v1": 1}, {"v2": 2}, {"v3": 3}]},
+                "two": {"values": [4, 5, 6, 9], "info_maps": [{"v1": 1}, {"v2": 2}]},
+            },
+            [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}],
+            False,
+        ),
     ],
 )
 def test_transform_outputs_to_list_of_dicts_length_unmatched(
-    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], mocker: MockerFixture
+    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], expect_error: bool, mocker: MockerFixture
 ) -> None:
     """Test that the function transform data to correct list of dicts with unmatched list length."""
     em = EmissionsEstimator()
     mock_add_error = mocker.patch.object(em.om, "add_error")
-    observed = em._transform_outputs_to_list_of_dicts(data)
-    assert observed == expected
-    mock_add_error.assert_called_once_with(
-        "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
-        "Ignoring extraneous data.",
-        {"class": "EmissionsEstimator", "function": "_transform_outputs_to_list_of_dicts"},
-    )
+    if expect_error:
+        try:
+            em._transform_outputs_to_list_of_dicts(data)
+
+            assert False
+        except KeyError:
+            assert True
+    else:
+        observed = em._transform_outputs_to_list_of_dicts(data)
+
+        assert observed == expected
+        mock_add_error.assert_called_once_with(
+            "Found unequal lengths of data while processing simulation outputs for emissions estimation.",
+            "Ignoring extraneous data.",
+            {"class": "EmissionsEstimator", "function": "_transform_outputs_to_list_of_dicts"},
+        )
 
 
 @pytest.mark.parametrize(
@@ -296,7 +322,9 @@ def test_calculate_actual_purchased_feeds(
     em = EmissionsEstimator()
     homegrown_feeds = [
         {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 800, "dry_matter_content": 0.9},
+        {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
+        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 10, "dry_matter_content": 0.9},
+        {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 10, "dry_matter_content": 0.9},
     ]
 
     mock_totals = mocker.patch.object(
@@ -304,8 +332,8 @@ def test_calculate_actual_purchased_feeds(
     )
 
     observed = em._calculate_actual_purchased_feeds(homegrown_feeds, purchased_feeds)
-    assert observed == expected
 
+    assert observed == expected
     mock_totals.assert_called_once_with(homegrown_feeds)
 
 
@@ -318,6 +346,7 @@ def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixtu
     ]
 
     mock_add = mocker.patch.object(OutputManager, "add_variable")
+
     expected = {
         CropSpecies.ALFALFA_HAY: 800.0,
         CropSpecies.ALFALFA_SILAGE: 0.0,
@@ -344,8 +373,8 @@ def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixtu
     }
 
     observed = em._calculate_total_homegrown_feed_amounts_by_crop_type(homegrown_feeds)
-    assert observed == expected
 
+    assert observed == expected
     mock_add.assert_called_once_with(
         "homegrown_feed_totals",
         expected,
@@ -366,9 +395,10 @@ def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture) -> Non
     )
 
     expected = ({"100": 263.0}, {"100": 263.0})
-    observed = em._calculate_actual_purchased_feed_emissions({"100": 10})
-    assert observed == expected
 
+    observed = em._calculate_actual_purchased_feed_emissions({"100": 10})
+
+    assert observed == expected
     calls = [
         call(94545, {"emission1": 1.0}),
         call(94545, {"emission2": 2.0}),
@@ -408,6 +438,7 @@ def test_calculate_actual_purchased_feed_emissions_no_key(
     mock_get_feed_data = mocker.patch.object(em, "_get_feed_emissions_data", side_effect=emissions)
 
     em._calculate_actual_purchased_feed_emissions({"100": 10})
+
     calls = [
         call(94545, {"emission1": 1.0}),
         call(94545, {"emission2": 2.0}),
