@@ -157,7 +157,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-        "which crop yields and nutrient applications to estimate emissions for.",
+                       "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -582,16 +582,16 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
         {
             "ammonia": {
                 "description": "Collects the ammonia emissions from all soil "
-                "layers in the field in the last year of the "
-                "simulation.",
+                               "layers in the field in the last year of the "
+                               "simulation.",
                 "filters": ["FieldDataReporter.send_daily_variables.ammonia_emissions.field" "='field1',layer=.*"],
                 "name": "Soil Ammonia emissions",
                 "slice_start": -365,
             },
             "nitrous_oxide": {
                 "description": "Collects the nitrous oxide emissions from "
-                "all soil layers in the field in the last "
-                "year of the simulation.",
+                               "all soil layers in the field in the last "
+                               "year of the simulation.",
                 "filters": [
                     "FieldDataReporter.send_daily_variables" ".nitrous_oxide_emissions.field='field1',layer=.*"
                 ],
@@ -751,6 +751,7 @@ def test_calculate_emissions_by_field(mocker: MockerFixture) -> None:
             },
         ],
     )
+
     observed = em._calculate_emissions_by_field(
         "field1", feeds_grown, field_emissions, manure_applications, manure_requests, fertilizer_applications_data
     )
@@ -863,6 +864,7 @@ def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture) -> None:
     mock_applied = mocker.patch.object(em, "_apply_fertilizer_to_next_crop", return_value=False)
     mock_add_warning = mocker.patch.object(em.om, "add_warning")
     mock_extract = mocker.patch.object(em, "_extract_applied_crops", return_value=[])
+
     observed = em._calculate_emissions_by_field(
         "field1", feeds_grown, field_emissions, manure_applications, manure_requests, fertilizer_applications_data
     )
@@ -870,7 +872,6 @@ def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture) -> None:
     mock_applied.assert_called_once()
     mock_extract.assert_called_once()
     mock_add_warning.assert_called_once()
-
     assert observed == [
         {
             "crop_name": "corn_silage",
@@ -930,3 +931,59 @@ def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture) -> None:
             "manure_nitrogen_requested": 87.890625,
         },
     ]
+
+
+@pytest.mark.parametrize(
+    "fertilizer_application,applied_crops,expected",
+    [
+        ({"nitrogen": 5, "phosphorus": 10, "potassium": 15},
+         [{"crop_name": "corn", "nitrogen_fertilizer_used": 1, "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+           "phosphorus_fertilizer_used": 4, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3}],
+         [{'crop_name': 'corn', 'nitrogen_fertilizer_used': 6.0, 'nitrogen_fertilizer_embedded_CO2_emissions': 28.6,
+           'phosphorus_fertilizer_used': 14.0, 'phosphorus_fertilizer_embedded_CO2_emissions': 34.7,
+           'potassium_fertilizer_used': 16.0, 'potassium_fertilizer_embedded_CO2_emissions': 22.5}]),
+        ({"nitrogen": 5, "phosphorus": 10, "potassium": 15},
+         [{"crop_name": "corn", "nitrogen_fertilizer_used": 1, "nitrogen_fertilizer_embedded_CO2_emissions": 2,
+           "phosphorus_fertilizer_used": 4, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3},
+          {"crop_name": "Alfafa", "nitrogen_fertilizer_used": 4, "nitrogen_fertilizer_embedded_CO2_emissions": 4,
+           "phosphorus_fertilizer_used": 1, "phosphorus_fertilizer_embedded_CO2_emissions": 4,
+           "potassium_fertilizer_used": 1, "potassium_fertilizer_embedded_CO2_emissions": 3}
+          ],
+         [{'crop_name': 'corn', 'nitrogen_fertilizer_used': 3.5, 'nitrogen_fertilizer_embedded_CO2_emissions': 15.3,
+           'phosphorus_fertilizer_used': 9.0, 'phosphorus_fertilizer_embedded_CO2_emissions': 19.35,
+           'potassium_fertilizer_used': 8.5, 'potassium_fertilizer_embedded_CO2_emissions': 12.75},
+          {'crop_name': 'Alfafa', 'nitrogen_fertilizer_used': 6.5, 'nitrogen_fertilizer_embedded_CO2_emissions': 17.3,
+           'phosphorus_fertilizer_used': 6.0, 'phosphorus_fertilizer_embedded_CO2_emissions': 19.35,
+           'potassium_fertilizer_used': 8.5, 'potassium_fertilizer_embedded_CO2_emissions': 12.75}]),
+        ({"nitrogen": 5, "phosphorus": 10, "potassium": 15},
+         [],
+         [])
+    ]
+)
+def test_partition_applied_crop_fertilizer_emissions(fertilizer_application: dict[str, float],
+                                                     applied_crops: list[dict[str, Any]],
+                                                     expected: list[dict[str, Any]]) -> None:
+    """Tests that the partition of nutrients is applied to the crop correctly."""
+    em = EmissionsEstimator()
+
+    em._partition_applied_crop_fertilizer_emissions(fertilizer_application, applied_crops)
+
+    assert applied_crops == expected
+
+
+def test_filter_results(mocker: MockerFixture) -> None:
+    """Tests that the filters taken in were correctly filtered."""
+    em = EmissionsEstimator()
+    mock_filter = mocker.patch.object(em.om, "filter_variables_pool",
+                                      return_value={"data1", {"nested1": ["test"]}})
+    mock_trans = mocker.patch.object(em, "_transform_outputs_to_list_of_dicts",
+                                     return_value=[{"year": 2019, "day": 18}, {"year": 2024, "day": 18}])
+
+    expected = [{"year": 2019, "day": 18}]
+
+    observed = em._filter_results({"filter name": "f1"}, datetime(2022, 9, 24),
+                                  "year", "day")
+
+    assert observed == expected
