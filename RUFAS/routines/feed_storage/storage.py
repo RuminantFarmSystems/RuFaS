@@ -1,4 +1,3 @@
-import copy
 from typing import List
 
 from RUFAS.current_day_conditions import CurrentDayConditions
@@ -49,12 +48,16 @@ class Storage:
         A list of HarvestedCrop objects representing the crops stored.
     crude_protein_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust crude protein after dry matter loss.
+    starch_loss_coefficient : float, default 0.0
+        Fractional coefficient used to adjust starch after dry matter loss.
     adf_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust ADF after dry matter loss.
     ndf_loss_coefficient : float, default 0.0
         Fractional coefficient used to adjust NDF after dry matter loss.
-    sugar_loss_coefficient : float, default 0.0
-        Fractional coefficient used to adjust sugar after dry matter loss.
+    lignin_loss_coefficient : float, default 0.0
+        Fractional coefficient used to adjust lignin after dry matter loss.
+    ash_loss_coefficient : float, default 0.0
+        Fractional coefficient used to adjust ash after dry matter loss.
 
     Methods
     -------
@@ -89,9 +92,11 @@ class Storage:
         self.capacity = capacity
         self.stored: List[HarvestedCrop] = []
         self.crude_protein_loss_coefficient = 0.0
+        self.starch_loss_coefficient = 0.0
         self.adf_loss_coefficient = 0.0
         self.ndf_loss_coefficient = 0.0
-        self.sugar_loss_coefficient = 0.0
+        self.lignin_loss_coefficient = 0.0
+        self.ash_loss_coefficient = 0.0
         self.om = OutputManager()
 
     @property
@@ -170,17 +175,23 @@ class Storage:
                 gaseous_dry_matter_loss,
                 crop.dry_matter_mass,
             )
+            crop.starch = self.recalculate_nutrient_percentage(
+                crop.starch, self.starch_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
             crop.adf = self.recalculate_nutrient_percentage(
                 crop.adf, self.adf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
             crop.ndf = self.recalculate_nutrient_percentage(
                 crop.ndf, self.ndf_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
-            crop.sugar = self.recalculate_nutrient_percentage(
-                crop.sugar, self.sugar_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            crop.lignin = self.recalculate_nutrient_percentage(
+                crop.lignin, self.lignin_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
+            )
+            crop.ash = self.recalculate_nutrient_percentage(
+                crop.ash, self.ash_loss_coefficient, gaseous_dry_matter_loss, crop.dry_matter_mass
             )
 
-            crop.last_time_degraded = copy.deepcopy(time)
+            crop.last_time_degraded = Time(time.start_date, time.end_date, time.current_date)
             self.reset_mass_attributes_after_loss(crop, gaseous_dry_matter_loss, moisture_loss=0.0)
         self.om.add_variable("gaseous_dry_matter_loss", total_gaseous_dry_matter_loss, info_map)
         self.record_stored_crops()
