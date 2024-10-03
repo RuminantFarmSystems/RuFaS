@@ -601,14 +601,16 @@ class EmissionsEstimator:
         Returns True if fertilizer was applied, False otherwise.
         """
         for index, crop in enumerate(sorted_crops):
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
+            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             next_crop_exists = index + 1 < len(sorted_crops)
+
             if next_crop_exists:
                 next_crop = sorted_crops[index + 1]
                 next_crop_planting_date = Time.convert_year_jday_to_date(
                     next_crop["planting_year"], next_crop["planting_day"]
-                )
+                ).date()
                 if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
+
                     next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
                     next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] += (
                         fertilizer_application["nitrogen"] * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
