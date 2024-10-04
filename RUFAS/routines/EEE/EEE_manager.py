@@ -1,4 +1,4 @@
-from ...output_manager import OutputManager
+from RUFAS.output_manager import OutputManager
 from .emissions import EmissionsEstimator
 
 

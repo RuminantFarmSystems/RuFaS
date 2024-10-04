@@ -7,7 +7,7 @@ from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.units import MeasurementUnits
 
-from ....data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 
 
 @dataclass

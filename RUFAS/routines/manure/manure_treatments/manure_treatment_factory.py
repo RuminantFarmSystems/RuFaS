@@ -12,8 +12,8 @@ from RUFAS.routines.manure.manure_treatments.open_lots import OpenLots
 from RUFAS.routines.manure.manure_treatments.slurry_storage_outdoor import SlurryStorageOutdoor
 from RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor import SlurryStorageUnderfloor
 
-from ....time import Time
-from ....weather import Weather
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class ManureTreatmentFactory:
