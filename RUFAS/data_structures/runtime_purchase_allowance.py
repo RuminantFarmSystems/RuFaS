@@ -1,0 +1,4 @@
+
+
+class RuntimePurchaseAllowance:
+    pass
