@@ -687,7 +687,7 @@ def test_arrhenius_exponent(
 def test_calculate_methane_emission_from_slurry_storage(
     mocker: MockerFixture,
     total_volatile_solids: float,
-    temp: float | None,
+    temp: float,
     expected: Tuple[float, float] | Exception,
     error_message: str | None,
 ) -> None:
