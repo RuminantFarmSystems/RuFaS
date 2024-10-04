@@ -1,4 +1,6 @@
+# flake8: noqa
 import os
+
 # import csv
 # import json
 import pandas as pd
@@ -11,13 +13,18 @@ from typing import List, Dict, Any
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 from SALib.sample import sobol as sobol_sampler
-from SALib.analyze import sobol as sobol_analyzer
+from SALib.sample import morris as morris_sampler
 from SALib.analyze import ff as ff_analyzer
+from SALib.analyze import sobol as sobol_analyzer
+from SALib.analyze import morris as morris_analyzer
+
 # from SALib.test_functions import Ishigami
-from sklearn import datasets, linear_model
-from sklearn.metrics import mean_squared_error, r2_score
+# from sklearn import datasets, linear_model
+# from sklearn.metrics import mean_squared_error, r2_score
 import statsmodels.api as sm
-from scipy import stats
+
+# from scipy import stats
+
 
 def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
     """
@@ -26,8 +33,8 @@ def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
     This will place the main effects and interaction effects into grouped columns in a single dataframe
     """
     intnames = analysis["interaction_names"]
-    intnames = [str(x).replace('(', "") for x in intnames]
-    intnames = [str(x).replace(')', "") for x in intnames]
+    intnames = [str(x).replace("(", "") for x in intnames]
+    intnames = [str(x).replace(")", "") for x in intnames]
     intnames = [str(x).replace(",", "*") for x in intnames]
     intnames = [str(x).replace(" ", "") for x in intnames]
     colnames = ["ME:" + x for x in analysis["names"]] + ["IE:" + str(x) for x in intnames]
@@ -38,7 +45,7 @@ def rewrite_ff_analysis(analysis: Dict[str, Any]) -> List[Any]:
 
 def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[Any]:
     """
-    This reformats the output of the ff_sobol function
+    This reformats the output of the sobol function
     Forces into something easier to parse into csvs for printing
     This will place the main effects and interaction effects into grouped columns in a single dataframe
     """
@@ -59,8 +66,60 @@ def rewrite_sobol_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[
         + list(analysis["ST_conf"])
         + list(analysis["S2_conf"])
     )
-    len(rowvalues)
-    rowvalues[7]
+    analysis_out = [colnames, rowvalues]
+
+    expanded_names = [str(x) for x in intnames]
+    interaction_names = []
+    for _ in expanded_names:
+        for pos, name in enumerate(expanded_names):
+            interaction_names.append(f'{name} * {expanded_names[pos]}')
+
+    interaction_values = []
+    as2 = analysis["S2"]
+    for a in as2:
+            # print(a)
+            for i in a:
+                # print(i)
+                interaction_values.append(i)
+
+    colnames_expanded = (
+        ["S1:" + x for x in intnames]
+        + ["ST:" + str(x) for x in intnames]
+        + interaction_names
+        + ["S1_conf:" + x for x in intnames]
+        + ["ST_conf:" + str(x) for x in intnames]
+        + ["S2_conf:" + str(x) for x in intnames]
+    )
+    rowvalues_expanded = (
+        list(analysis["S1"])
+        + list(analysis["ST"])
+        + interaction_values
+        + list(analysis["S1_conf"])
+        + list(analysis["ST_conf"])
+        + list(analysis["S2_conf"])
+    )
+    analysis_out_expanded = [colnames_expanded, rowvalues_expanded]
+
+
+    return analysis_out_expanded
+
+
+def rewrite_morris_analysis(analysis: Dict[str, Any], p: Dict[str, Any]) -> List[Any]:
+    """
+    This reformats the output of the morris function
+    Forces into something easier to parse into csvs for printing
+    This will place the main effects and interaction effects into grouped columns in a single dataframe
+    """
+    intnames = p["names"]
+    colnames = (
+        ["mu:" + x for x in intnames]
+        + ["mu_star:" + x for x in intnames]
+        + ["sigma:" + str(x) for x in intnames]
+        + ["mu_st_conf:" + str(x) for x in intnames]
+    )
+    rowvalues = (
+        list(analysis["mu"]) + list(analysis["mu_star"]) + list(analysis["sigma"]) + list(analysis["mu_st_conf"])
+    )
 
     analysis_out = [colnames, rowvalues]
     return analysis_out
@@ -74,20 +133,28 @@ def get_all_output_files(basedirectory: str, output_prefix: str, report_name: st
     ]
 
 
-def collate_outputs(basedirectory: str,
-                    all_report_filenames: List[str],
-                    total_num_files: int) -> Dict[str, List[float]]:
+def collate_outputs(
+    basedirectory: str, all_report_filenames: List[str], total_num_files: int
+) -> Dict[str, List[float]]:
     collected: Dict[str, List[float]] = {}
     digits = len(str(total_num_files))
 
     for i in range(0, total_num_files):
         file_ID = f"{i+1}".zfill(digits) + "_"
-        file_ID_found = [filename for filename in all_report_filenames if file_ID in filename][-1]
+        try:
+            file_ID_found = [filename for filename in all_report_filenames if file_ID in filename][-1]
+        except:
+            file_ID_backup = f"{1}".zfill(digits) + "_"
+            file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
+            print('used dummy')
+            print(f"File processing progress: {i/total_num_files:.2%}")
+            print(f"Processing fallback file for index {i}")
+        
         file = pd.read_csv(basedirectory + file_ID_found)
-        variable_names: List[str] = []
-        if not variable_names:
-            variable_names = list(file.columns)
+        variable_names: List[str] = list(file.columns)
         for variable_name in variable_names:
+            if variable_name == "DISCLAIMER":
+                  continue
             if variable_name not in collected.keys():
                 collected[variable_name] = []
             valuetoappend = file[variable_name].values[0]
@@ -97,27 +164,101 @@ def collate_outputs(basedirectory: str,
     return collected
 
 
+# def collate_outputs(
+#     basedirectory: str, all_report_filenames: List[str], total_num_files: int
+# ) -> Dict[str, List[float]]:
+#     collected: Dict[str, List[float]] = {}
+#     digits = len(str(total_num_files))
+
+#     for i in range(0, total_num_files):
+#         # Generate zero-padded file ID
+#         file_ID = f"{i+1}".zfill(digits) + "_"
+#         try:
+#             # Find the corresponding filename with the generated file_ID
+#             file_ID_found = [filename for filename in all_report_filenames if file_ID in filename][-1]
+#         except:
+#             # If no file matches, fallback to a dummy file (file 1)
+#             file_ID_backup = f"{1}".zfill(digits) + "_"
+#             file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
+#             print('used dummy')
+#             print(f"File processing progress: {i/total_num_files:.2%}")
+#             print(f"Processing fallback file for index {i}")
+
+#         try:
+#             # Read the file
+#             print(f"Processing file: {file_ID_found}")  # Track each file
+#             file = pd.read_csv(basedirectory + file_ID_found)
+#             print(f"File read successfully: {file_ID_found}")
+
+#             # Extract variable names from the file's columns directly
+#             variable_names: List[str] = list(file.columns)
+#             print(f"Variable names extracted: {variable_names}")
+
+#             # Process each variable name and its corresponding values
+#             for variable_name in variable_names:
+#                 # Skip non-numeric variables like "DISCLAIMER"
+#                 if variable_name == "DISCLAIMER":
+#                     print(f"Skipping non-numeric variable: {variable_name}")
+#                     continue
+
+#                 # Check for duplicates
+#                 if variable_name not in collected:
+#                     collected[variable_name] = []
+#                 else:
+#                     print(f"Duplicate variable name found: {variable_name}. Skipping...")
+#                     continue
+                
+#                 # Extract the first value of the variable (assuming it’s the first row)
+#                 valuetoappend = file[variable_name].values[0]
+                
+#                 # Skip invalid data types (e.g., strings)
+#                 if isinstance(valuetoappend, (int, float)):
+#                     collected[variable_name].append(float(valuetoappend))
+#                 else:
+#                     print(f"Invalid data type for variable: {variable_name} in file: {file_ID_found}")
+        
+#         except Exception as e:
+#             print(f"Error processing file {file_ID_found}: {e}")
+    
+#     # Final count of collected outputs
+#     print(f"Number of collated outputs: {len(collected)}")
+#     return collected
+
+
+
+
 def analyze_it(
     task_specified: Dict[str, Any],
     parsed_SA_input_variables: Dict[str, Any],
-    sampled_values: np.ndarray[Any],
+    sampled_values: np.ndarray[Any, Any],
     output_to_analyze: List[float],
 ) -> List[Any]:
     print_analysis = False
     if task_specified["sampler"] == "sobol":
-        analyzed = sobol_analyzer.analyze(parsed_SA_input_variables,
-                                          np.array(output_to_analyze),
-                                          print_to_console=print_analysis,
-                                          seed=task_specified["random_seed"]
-                                          )
+        analyzed = sobol_analyzer.analyze(
+            parsed_SA_input_variables,
+            np.array(output_to_analyze),
+            print_to_console=print_analysis,
+            seed=task_specified["random_seed"],
+        )
         analyzed_formatted = rewrite_sobol_analysis(analyzed, parsed_SA_input_variables)
-    elif task_specified["sampler"] == "saltelli_sobol":
-        analyzed = sobol_analyzer.analyze(parsed_SA_input_variables,
-                                          np.array(output_to_analyze),
-                                          print_to_console=print_analysis,
-                                          seed=task_specified["random_seed"]
-                                          )
+    elif task_specified["sampler"] == "saltelli":
+        analyzed = sobol_analyzer.analyze(
+            parsed_SA_input_variables,
+            np.array(output_to_analyze),
+            print_to_console=print_analysis,
+            seed=task_specified["random_seed"],
+        )
         analyzed_formatted = rewrite_sobol_analysis(analyzed, parsed_SA_input_variables)
+    elif task_specified["sampler"] == "morris":
+        analyzed = morris_analyzer.analyze(
+            parsed_SA_input_variables,
+            sampled_values,
+            np.array(output_to_analyze),
+            print_to_console=print_analysis,
+            seed=task_specified["random_seed"],
+        )
+        analyzed_formatted = rewrite_morris_analysis(analyzed, parsed_SA_input_variables)
     else:
         analyzed = ff_analyzer.analyze(
             parsed_SA_input_variables,
@@ -125,26 +266,31 @@ def analyze_it(
             output_to_analyze,
             second_order=True,
             seed=task_specified["random_seed"],
-            print_to_console=print_analysis
+            print_to_console=print_analysis,
         )
         analyzed_formatted = rewrite_ff_analysis(analyzed)
     return analyzed_formatted
 
 
-def get_sampled_values(task_to_analyze: Dict[str, Any],
-                       parsed_SA_input_variables: Dict[str, Any]) -> np.ndarray | Any:
+def get_sampled_values(task_to_analyze: Dict[str, Any], parsed_SA_input_variables: Dict[str, Any]) -> np.ndarray | Any:
     if task_to_analyze["sampler"] == "sobol":
         sampled_values = sobol_sampler.sample(
             parsed_SA_input_variables,
             task_to_analyze["saltelli_number"],
             skip_values=task_to_analyze["saltelli_skip"],
-            seed=task_to_analyze["random_seed"]
+            seed=task_to_analyze["random_seed"],
         )
     elif task_to_analyze["sampler"] == "saltelli_sobol":
         sampled_values = saltelli_sampler.sample(
             parsed_SA_input_variables,
             task_to_analyze["saltelli_number"],
             skip_values=task_to_analyze["saltelli_skip"],
+        )
+    elif task_to_analyze["sampler"] == "morris":
+        sampled_values = morris_sampler.sample(
+            parsed_SA_input_variables,
+            task_to_analyze["saltelli_number"],
+            seed=task_to_analyze["random_seed"],
         )
     else:
         sampled_values = fractional_factorial_sampler.sample(
@@ -180,16 +326,13 @@ def get_whole_output(
     for variable_name_for_analysis in list(collated_outputs.keys()):
         output_as_list = collated_outputs[variable_name_for_analysis]
         if len(output_as_list) == len(sampled_values):
-            out = analyze_it(task_to_analyze,
-                             parsed_SA_input_variables,
-                             sampled_values,
-                             output_as_list)
+            out = analyze_it(task_to_analyze, parsed_SA_input_variables, sampled_values, output_as_list)
             # outdf = pd.DataFrame(out)
             # prettier_variable_name = variable_name_for_analysis.replace("/", " per ")
             # prettier_variable_name = prettier_variable_name.replace(",", " ")
             # outdf.to_csv(path_or_buf=basedirectory + output_prefix + '_' + prettier_variable_name + '.csv')
             if not whole_output:
-                names_and_header = ['']
+                names_and_header = [""]
                 for name in out[0]:
                     names_and_header.append(name)
                 whole_output.append(names_and_header)
@@ -198,7 +341,28 @@ def get_whole_output(
             for thing in out[1]:
                 line_for_whole_output.append(thing)
             whole_output.append(line_for_whole_output)
-    return whole_output
+
+    colidx = []
+    colidx.append(999)
+    for column in range(1, len(whole_output[0])):
+        colidx.append(0)
+        for row in range(1, len(whole_output)):
+            val = whole_output[row][column]
+            if type(val) == np.ndarray or str(val) == 'nan':
+                pass
+            else:
+                colidx[column] += 1
+
+    whole_output_expanded = []
+    for row in whole_output:
+        whole_output_expanded.append([row[i] for i in range(len(row)) if colidx[i]])
+   
+    # print(len(whole_output))
+    # print(len(whole_output[0]))
+    # print(len(whole_output_expanded))
+    # print(len(whole_output_expanded[0]))
+
+    return whole_output_expanded
 
 
 def get_new_whole_output(whole_output: List[Any]) -> List[Any]:
@@ -214,25 +378,24 @@ def get_new_whole_output(whole_output: List[Any]) -> List[Any]:
         reformatted_line = []
         for item in whole_output[line_num]:
             if type(item) is float or type(item) is np.float64:
-                if item < 0.01:
+                if item < 0.001:
                     item = 0
             reformatted_line.append(item)
         new_whole_output.append(reformatted_line)
     return new_whole_output
 
 
-def plot_whole_new(output_path: str,
-                   output_prefix: str,
-                   ) -> None:
-    whole_new_output_report = pd.read_csv(
-        output_path + output_prefix + "_new whole analysis.csv",
-        index_col=0)
+def plot_whole_new(
+    output_path: str,
+    output_prefix: str,
+) -> None:
+    whole_new_output_report = pd.read_csv(output_path + output_prefix + "_new whole analysis.csv", index_col=0)
     # ,
     #     names=0, encoding='utf-8'
     # )
 
     df = pd.DataFrame(whole_new_output_report)
-    df_trimmed = df.select_dtypes(include=['float'])
+    df_trimmed = df.select_dtypes(include=["float"])
     # df_trimmed = df.drop(df.columns[99:], axis=1)
 
     plt.figure()
@@ -294,3 +457,38 @@ def regression_stuff(X: List[float], xname: str, Y: List[float], yname: str, plo
         plt.show()
 
     return (slope, r2_value, p_value)
+
+
+
+def collate_raw(
+    basedirectory: str, all_report_filenames: List[str], total_num_files: int
+) -> Dict[str, List[float]]:
+    collected: Dict[str, List[float]] = {}
+    digits = len(str(total_num_files))
+
+    for i in range(0, total_num_files):
+        file_ID = f"{i+1}".zfill(digits) + "_"
+        try:
+            file_ID_found = [filename for filename in all_report_filenames if file_ID in filename][-1]
+        except:
+            file_ID_backup = f"{1}".zfill(digits) + "_"
+            file_ID_found = [filename for filename in all_report_filenames if file_ID_backup in filename][-1]
+            print('used dummy')
+            print(i/total_num_files)
+            print(i)
+        file = pd.read_csv(basedirectory + file_ID_found)
+        variable_names: List[str] = []
+        if not variable_names:
+            variable_names = list(file.columns)
+        for variable_name in variable_names:
+            if variable_name not in collected.keys():
+                collected[variable_name] = []
+            valuetoappend = file[variable_name].values[0]
+            # if type(valuetoappend) is not str:
+            if valuetoappend == 'Under construction, use the results with caution.':
+                pass
+            else:
+                valuetoappend = float(valuetoappend)
+                collected[variable_name].append(valuetoappend)
+                
+    return collected
