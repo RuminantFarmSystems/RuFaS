@@ -720,6 +720,7 @@ def test_calculate_methane_emission_from_slurry_storage(
         assert actual == approx(expected, rel=1e-6)
         patch_for_arrhenius_exponent.assert_called_once_with(temp)
 
+
 @pytest.mark.parametrize(
     "num_animals, storage_area, manure_tan, manure_volume, manure_density," "temp, pH, expected, error_message",
     [
