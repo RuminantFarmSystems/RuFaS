@@ -61,6 +61,10 @@ class SlurryStorageUnderfloor(BaseManureTreatment):
             methane_emission_from_degradable_volatile_solids: methane emission from total degradable solids,
             (kg :math:`CH_4`/day).
 
+        Notes
+        -----
+        Barn temperature is being calculated and used here because the slurry is indoors.
+
         """
         air_temperature = self._get_current_day_average_temperature_celsius()
         barn_temperature = GasEmissionsCalculator.determine_barn_air_temperature(air_temperature)
