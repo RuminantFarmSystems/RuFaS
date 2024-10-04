@@ -28,12 +28,15 @@ v0.9.2
 - [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
 - [2022](https://github.com/RuminantFarmSystems/MASM/pull/2022) - [minor change] [Manure] Removes DefaultEnum class and all references to it in the Manure module.
 - [2006](https://github.com/RuminantFarmSystems/MASM/pull/2006) - [minor change] [Manure] Adds a method to determine storage manure temperature based on outdoor air temperature for use in calculations of emissions associated with Manure Storages.
+- [2023](https://github.com/RuminantFarmSystems/MASM/pull/2023) - [minor change] [Manure] Fixes calculation of organic bedding dry solids added to manure in manure handler.
 - [2025](https://github.com/RuminantFarmSystems/MASM/pull/2025) - [minor change] [Formatting] Sorts import statements in codebase.
 - [2017](https://github.com/RuminantFarmSystems/MASM/pull/2017) - [minor change] [Animal] Deduplicates references to lactation parameters in the `LactationCurve` submodule and reorganizes structure to be consistent with other animal submodules.
+- [1985](https://github.com/RuminantFarmSystems/MASM/pull/1985) - [minor change] [TaskManager] extracts all the input data values (for all input variables from JSON input files) for each task and combines them into a single CSV file for side-by-side comparison.
 
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
+- [1976](https://github.com/RuminantFarmSystems/MASM/pull/1976) - [minor change] [EEE] Add unit tests for the Emission module.
 - [1977](https://github.com/RuminantFarmSystems/MASM/pull/1977) - [minor change] [EEE] Improve emission.py codebase and clarity.
 - [1948](https://github.com/RuminantFarmSystems/MASM/pull/1948) - [minor change] [Soil and Crop] Utilize a residue tracker property method in the layer data pool that sums structural and metabolic litter.
 - [1980](https://github.com/RuminantFarmSystems/MASM/pull/1980) - [minor change] [Soil and Crop] Set return value and add warning when silt and clay are zero.
