@@ -1,6 +1,7 @@
 from typing import TypedDict
 
 from RUFAS.enums import AnimalCombination
+
 from .animal_manure_excretions import AnimalManureExcretions
 
 

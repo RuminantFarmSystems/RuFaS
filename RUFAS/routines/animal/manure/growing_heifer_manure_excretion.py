@@ -1,9 +1,8 @@
 from typing import Dict, Tuple
 
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
-
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 
 
 def manure_calculations(

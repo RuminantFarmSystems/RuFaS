@@ -4,9 +4,9 @@ from typing import Any, Literal
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
     CropSpecies.ALFALFA_HAY: ["100", "103", "106", "107", "108"],

@@ -1,8 +1,7 @@
 from typing import Tuple
 
-from RUFAS.general_constants import GeneralConstants
-
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.general_constants import GeneralConstants
 
 
 def get_default_animal_manure_excretions() -> AnimalManureExcretions:

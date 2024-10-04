@@ -1,5 +1,6 @@
 import numpy as np
 from numba import njit
+from scipy.integrate import quad
 
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
@@ -9,7 +10,6 @@ from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProdu
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.util import Utility
-from scipy.integrate import quad
 
 
 class MilkProduction:
