@@ -668,8 +668,6 @@ def test_arrhenius_exponent(
         # Standard case
         (1.0, 20.0, (0.00155838924852, 0.001542959652), None),
         (10.0, 20.0, (0.015583892485199996, 0.015429596519999997), None),
-        # Case when temperature is not provided, default should be used
-        (1.0, None, (0.00155838924852, 0.001542959652), None),
         # Exception case: Zero total volatile solids
         (
             0.0,
@@ -686,7 +684,7 @@ def test_arrhenius_exponent(
         ),
     ],
 )
-def test_methane_emission_from_slurry_storage(
+def test_calculate_methane_emission_from_slurry_storage(
     mocker: MockerFixture,
     total_volatile_solids: float,
     temp: float | None,
@@ -694,7 +692,7 @@ def test_methane_emission_from_slurry_storage(
     error_message: str | None,
 ) -> None:
     """
-    Unit test for methane_emission_from_slurry_storage() method in calculator.py.
+    Unit test for calculate_methane_emission_from_slurry_storage() method in calculator.py.
 
     This test verifies that the method correctly calculates the methane emission from manure storage
     given the total volatile solids and temperature. It also checks that the method raises an exception for
@@ -711,23 +709,16 @@ def test_methane_emission_from_slurry_storage(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator.methane_emission_from_slurry_storage(
+            GasEmissionsCalculator.calculate_liquid_storage_methane(
                 total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
     else:
-        if temp is None:
-            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_degradable_volatile_solids, total_non_degradable_volatile_solids
-            )
-        else:
-            actual = GasEmissionsCalculator.methane_emission_from_slurry_storage(
-                total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
-            )
-        assert actual == approx(expected, rel=1e-6)
-
-        patch_for_arrhenius_exponent.assert_called_once_with(
-            temp if temp is not None else GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE
+        actual = GasEmissionsCalculator.calculate_liquid_storage_methane(
+            total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
         )
+
+        assert actual == approx(expected, rel=1e-6)
+        patch_for_arrhenius_exponent.assert_called_once_with(temp)
 
 
 @pytest.mark.parametrize(
@@ -802,7 +793,7 @@ def test_methane_emission_from_slurry_storage(
         ),
     ],
 )
-def test_storage_ammonia_emission(
+def test_calculate_storage_ammonia_emission(
     num_animals: int,
     storage_area: float,
     manure_tan: float,
@@ -814,7 +805,7 @@ def test_storage_ammonia_emission(
     error_message: str | None,
 ) -> None:
     """
-    Unit test for storage_ammonia_emission() method in calculator.py.
+    Unit test for calculate_storage_ammonia_emission() method in calculator.py.
 
     This test verifies that the method correctly calculates the ammonia storage emissions
     given the number of animals, the storage area, manure total ammoniacal nitrogen, manure volume,
@@ -824,7 +815,7 @@ def test_storage_ammonia_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.storage_ammonia_emission(
+            GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
                 num_animals,
                 manure_tan,
                 manure_volume,
@@ -834,7 +825,7 @@ def test_storage_ammonia_emission(
                 pH,
             )
     else:
-        actual = GasEmissionsCalculator.storage_ammonia_emission(
+        actual = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
             num_animals,
             manure_tan,
             manure_volume,
