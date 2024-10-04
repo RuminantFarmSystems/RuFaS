@@ -7,7 +7,7 @@
         "log_verbosity": "errors",
         "sampler": "sobol",
         "saltelli_number": 256,
-        "saltelli_skip": 128,
+        "saltelli_skip": 256,
         "SA_load_balancing_start": 0,
         "SA_load_balancing_stop": 1,
         "random_seed": 42,
