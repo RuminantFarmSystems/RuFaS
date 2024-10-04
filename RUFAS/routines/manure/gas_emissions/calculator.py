@@ -14,7 +14,7 @@ class GasEmissionsCalculator:
         cls,
         accumulated_liquid_manure_total_degradable_volatile_solids: float,
         accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
-        stored_manure_temperature: float = GasEmissionConstants.DEFAULT_SLURRY_STORAGE_TEMPERATURE,
+        stored_manure_temperature: float,
     ) -> Tuple[float, float]:
         """
         Calculate the methane emission from manure storage using total volatile solids.
@@ -54,9 +54,8 @@ class GasEmissionsCalculator:
             Total degradable volatile solids in manure (kg).
         accumulated_liquid_manure_total_non_degradable_volatile_solids: float,
             Total non-degradable volatile solids in manure (kg).
-        storage_temperature : float
-            Temperature of the manure in storage in Celsius (:math:`^\\circ C`). Default is set to 20 degrees Celsius.
-            This value is listed as :attr:`DEFAULT_SLURRY_STORAGE_TEMPERATURE` in :class:`GasEmissionConstants`.
+        stored_manure_temperature : float
+            Temperature of the manure in storage in Celsius (:math:`^\\circ C`).
 
         Returns
         -------
@@ -459,7 +458,7 @@ class GasEmissionsCalculator:
         pH: float = GasEmissionConstants.DEFAULT_PH_FOR_STORAGE_AMMONIA,
     ) -> float:
         """
-        Calculate storage ammonia emissions for liquid manure treatments.
+        Calculate storage ammonia emissions for liquidmanure treatments.
 
         Notes
         -----

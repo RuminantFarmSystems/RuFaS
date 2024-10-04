@@ -889,7 +889,7 @@ def test_slurry_storage_calc_methane_emission(
     expected_methane_loss = (2.0, 1.98)
     patch_for_calc_methane_emission_from_slurry_storage = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.slurry_storage_underfloor."
-        "GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage",
+        "GasEmissionsCalculator.calculate_liquid_storage_methane",
         return_value=expected_methane_loss,
     )
     expected_new_accumulated_liquid_manure_total_volatile_solids = max(
@@ -925,7 +925,7 @@ def test_slurry_storage_calc_methane_emission(
                 accumulated_liquid_manure_total_degradable_volatile_solids),
             accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                 accumulated_liquid_manure_total_non_degradable_volatile_solids),
-            storage_temperature=current_barn_temp,
+            stored_manure_temperature=current_barn_temp,
         )
     else:
         patch_for_calc_methane_emission_from_slurry_storage.assert_called_once_with(
@@ -933,7 +933,7 @@ def test_slurry_storage_calc_methane_emission(
                 accumulated_liquid_manure_total_degradable_volatile_solids),
             accumulated_liquid_manure_total_non_degradable_volatile_solids=(
                 accumulated_liquid_manure_total_non_degradable_volatile_solids),
-            storage_temperature=current_storage_temp,
+            stored_manure_temperature=current_storage_temp,
         )
     # fmt: on
     assert actual_methane_loss == expected_methane_loss[0]
@@ -977,7 +977,7 @@ def test_slurry_storage_calc_ammonia_emission(
     )
     expected_ammonia_loss = 2.0
     patch_for_calc_ammonia_emission_for_slurry_storage = mocker.patch.object(
-        GasEmissionsCalculator, "calculate_storage_ammonia_emission", return_value=expected_ammonia_loss
+        GasEmissionsCalculator, "calculate_liquid_storage_ammonia_emission", return_value=expected_ammonia_loss
     )
 
     expected_new_accumulated_manure_total_ammoniacal_nitrogen = max(
@@ -1507,7 +1507,7 @@ def test_anaerobic_lagoon_update_methane_emission(
 
     patch_for_calc_methane_emission_from_slurry_storage = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon"
-        ".GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage",
+        ".GasEmissionsCalculator.calculate_liquid_storage_methane",
         return_value=initial_methane_emission,
     )
 
@@ -1539,7 +1539,7 @@ def test_anaerobic_lagoon_update_methane_emission(
             anaerobic_lagoon._accumulated_output.liquid_manure_total_degradable_volatile_solids),
         accumulated_liquid_manure_total_non_degradable_volatile_solids=(
             anaerobic_lagoon._accumulated_output.liquid_manure_total_non_degradable_volatile_solids),
-        storage_temperature=current_storage_temp,
+        stored_manure_temperature=current_storage_temp,
     )
     # fmt: on
     patch_for_get_current_day_average_temperature_celsius.assert_called_once()
@@ -1574,7 +1574,7 @@ def test_anaerobic_lagoon_update_ammonia_emission(
 
     patch_for_calc_storage_ammonia_emission = mocker.patch(
         "RUFAS.routines.manure.manure_treatments.anaerobic_lagoon"
-        ".GasEmissionsCalculator.calculate_storage_ammonia_emission",
+        ".GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission",
         return_value=mock_storage_ammonia_emission_value,
     )
 
