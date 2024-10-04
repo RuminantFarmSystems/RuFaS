@@ -240,19 +240,22 @@
             ],
             "horizontal_aggregation": "division"
            },
+
         {
             "name": "Lact cow DMI, kg",
             "filters": [
                 "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_.*_LAC_COW"
             ],
-            "variables": ["dry_matter_intake_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
-            "slice_start": -365
+            "horizontal_aggregation": "sum",
+            "slice_start": -365,
+            "use_name": true
         },
         {
             "name": "Lact cow DMI/cow/d, kg",
             "cross_references": [
-                "Lact cow DMI, kg_dry_matter_intake_total_ver_agg",
+                "Lact cow DMI, kg_ver_hor_agg",
                 "Milking cows_ver_agg"
             ],
             "constants": {
@@ -260,7 +263,7 @@
             },
             "horizontal_aggregation": "division",
             "horizontal_order": [
-                "Lact cow DMI, kg_dry_matter_intake_total_ver_agg",
+                "Lact cow DMI, kg_ver_hor_agg",
                 "Milking cows_ver_agg",
                 "Days per year"
             ]
@@ -813,41 +816,49 @@
                 "Herd FPCM, kg_hor_agg"
             ]
         },
-        {
+          {
             "name": "Calf purchased feed emissions, kg",
             "filters": [
-                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_CALF"
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_CALF"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
-            "slice_start": -365
+            "horizontal_aggregation": "sum",
+            "slice_start": -365,
+            "use_name": true
         },
         {
             "name": "Growing purchased feed emissions, kg",
             "filters": [
-                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_GROWING"
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_GROWING"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
-            "slice_start": -365
+            "horizontal_aggregation": "sum",
+            "slice_start": -365,
+            "use_name": true
         },
         {
             "name": "Close up purchased feed emissions, kg",
             "filters": [
-                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_CLOSE_UP"
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_CLOSE_UP"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
-            "slice_start": -365
+            "horizontal_aggregation": "sum",
+            "slice_start": -365,
+            "use_name": true
         },
         {
             "name": "Lact cow purchased feed emissions, kg",
             "filters": [
-                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_animal_LAC_COW"
+                "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_LAC_COW"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
-            "slice_start": -365
+            "horizontal_aggregation": "sum",
+            "slice_start": -365,
+            "use_name": true
         },
         {
             "name":"Lact cow feed CO2 kg/cow/d",
