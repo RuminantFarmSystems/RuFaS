@@ -1,4 +1,2 @@
-
-
 class AdvancePurchaseAllowance:
     pass

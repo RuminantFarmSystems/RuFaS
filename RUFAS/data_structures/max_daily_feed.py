@@ -1,4 +1,2 @@
-
-
 class MaxDailyFeed:
     pass
