@@ -711,16 +711,16 @@ def test_calculate_methane_emission_from_slurry_storage(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):
-            GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
+            GasEmissionsCalculator.calculate_liquid_storage_methane(
                 total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
     else:
         if temp is None:
-            actual = GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
+            actual = GasEmissionsCalculator.calculate_liquid_storage_methane(
                 total_degradable_volatile_solids, total_non_degradable_volatile_solids
             )
         else:
-            actual = GasEmissionsCalculator.calculate_methane_emission_from_slurry_storage(
+            actual = GasEmissionsCalculator.calculate_liquid_storage_methane(
                 total_degradable_volatile_solids, total_non_degradable_volatile_solids, temp
             )
         assert actual == approx(expected, rel=1e-6)
@@ -824,7 +824,7 @@ def test_calculate_storage_ammonia_emission(
     # Act and assert
     if isinstance(expected, type) and issubclass(expected, Exception):
         with pytest.raises(expected, match=error_message):  # type: ignore
-            GasEmissionsCalculator.calculate_storage_ammonia_emission(
+            GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
                 num_animals,
                 manure_tan,
                 manure_volume,
@@ -834,7 +834,7 @@ def test_calculate_storage_ammonia_emission(
                 pH,
             )
     else:
-        actual = GasEmissionsCalculator.calculate_storage_ammonia_emission(
+        actual = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
             num_animals,
             manure_tan,
             manure_volume,
