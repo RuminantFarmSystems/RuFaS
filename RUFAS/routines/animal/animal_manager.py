@@ -31,8 +31,8 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
-from ...data_structures.pen_manure_data import PenManureData
-from ...enums import AnimalCombination
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 
 om = OutputManager()
 

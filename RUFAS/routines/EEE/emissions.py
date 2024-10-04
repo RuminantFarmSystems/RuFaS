@@ -2,11 +2,11 @@ import re
 from datetime import date
 from typing import Any, Literal
 
-from ...input_manager import InputManager
-from ...output_manager import OutputManager
-from ...time import Time
-from ...units import MeasurementUnits
-from ..field.crop.crop_enum import CropSpecies
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
     CropSpecies.ALFALFA_HAY: ["100", "103", "106", "107", "108"],

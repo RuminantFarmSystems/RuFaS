@@ -17,8 +17,8 @@ from RUFAS.routines.animal.manure.general_manure import (
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
 
-from ...data_structures.pen_manure_data import PenManureData
-from ...enums import AnimalCombination
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from .ration.amino_acid import EssentialAminoAcidRequirements
 
 om = OutputManager()
