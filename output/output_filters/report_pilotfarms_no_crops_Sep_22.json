@@ -343,6 +343,17 @@
             "vertical_aggregation": "sum",
             "slice_start": -365
         },
+
+        {
+            "name": "Lact cow DMI-2, kg",
+            "filters": [
+                "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_.*_LAC_COW"
+            ],
+            "variables": ["^[0-9]+$"],
+            "vertical_aggregation": "sum",
+            "horizontal_aggregation": "sum",
+            "slice_start": -365
+        },
       {
             "name": "Growing DMI, kg",
             "filters": [
