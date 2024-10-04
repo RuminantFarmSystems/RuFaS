@@ -334,34 +334,28 @@
             "vertical_aggregation": "sum",
             "slice_start": -365
         },
-        {
-            "name": "Lact cow DMI, kg",
-            "filters": [
-                "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_.*_LAC_COW"
-            ],
-            "variables": ["dry_matter_intake_total"],
-            "vertical_aggregation": "sum",
-            "slice_start": -365
-        },
 
         {
-            "name": "Lact cow DMI-2, kg",
+            "name": "Lact cow DMI, kg",
             "filters": [
                 "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_.*_LAC_COW"
             ],
             "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
             "horizontal_aggregation": "sum",
-            "slice_start": -365
+            "slice_start": -365,
+            "use_name": true
         },
       {
             "name": "Growing DMI, kg",
             "filters": [
                 "AnimalModuleReporter.report_daily_ration.ration_daily_feed_totals_.*_GROWING"
             ],
-            "variables": ["dry_matter_intake_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
-            "slice_start": -365
+            "horizontal_aggregation": "sum",
+            "slice_start": -365,
+            "use_name": true
         },
         {
             "name": "Total herd DMI, kg",
@@ -397,7 +391,7 @@
         {
             "name": "Lact cow DMI/cow/d, kg",
             "cross_references": [
-                "Lact cow DMI, kg_dry_matter_intake_total_ver_agg",
+                "Lact cow DMI, kg_ver_hor_agg",
                 "Milking cows_ver_agg"
             ],
             "constants": {
@@ -405,7 +399,7 @@
             },
             "horizontal_aggregation": "division",
             "horizontal_order": [
-                "Lact cow DMI, kg_dry_matter_intake_total_ver_agg",
+                "Lact cow DMI, kg_ver_hor_agg",
                 "Milking cows_ver_agg",
                 "Days per year"
             ]
