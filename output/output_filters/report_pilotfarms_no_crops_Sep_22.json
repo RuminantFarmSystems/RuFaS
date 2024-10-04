@@ -1085,40 +1085,44 @@
             "filters": [
                 "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_CALF"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
             "horizontal_aggregation": "sum",
-            "slice_start": -365
+            "slice_start": -365,
+            "use_name": true
         }, 
         {
             "name": "Growing purchased feed emissions, kg",
             "filters": [
                 "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_GROWING"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
             "horizontal_aggregation": "sum",
-            "slice_start": -365
+            "slice_start": -365,
+            "use_name": true
         }, 
         {
             "name": "Close up purchased feed emissions, kg",
             "filters": [
                 "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_CLOSE_UP"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
             "horizontal_aggregation": "sum",
-            "slice_start": -365
+            "slice_start": -365,
+            "use_name": true
         }, 
         {
             "name": "Lact cow purchased feed emissions, kg",
             "filters": [
                 "AnimalModuleReporter.report_daily_feed_emissions.purchased_feed_emissions_.*_LAC_COW"
             ],
-            "variables": ["feed_emissions_total"],
+            "variables": ["^[0-9]+$"],
             "vertical_aggregation": "sum",
             "horizontal_aggregation": "sum",
-            "slice_start": -365
+            "slice_start": -365,
+            "use_name": true
         }, 
         {
             "name":"Lact cow feed CO2 kg/cow/d",
