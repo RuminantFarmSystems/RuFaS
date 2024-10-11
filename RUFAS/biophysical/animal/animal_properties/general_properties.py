@@ -60,6 +60,7 @@ class GeneralProperties:
     sold_at_day: int
     wean_weight: float
     metabolizable_energy_intake: float
+    daily_milk_produced: float
 
     @property
     def is_milking(self) -> bool:
