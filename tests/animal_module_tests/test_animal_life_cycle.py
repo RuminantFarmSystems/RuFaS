@@ -1892,7 +1892,7 @@ def test_calf_init_values(
     calf = mocker.MagicMock(autospec=Calf)
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf", return_value=calf)
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf.random", return_value=0.5)
-    calf.gender = mocker.MagicMock(autospec=str)
+    calf.sex = mocker.MagicMock(autospec=str)
     calf.sold = mocker.MagicMock(autospec=bool)
     mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.Calf.config", calf)
     animal_config = {
@@ -1926,11 +1926,11 @@ def test_calf_init_values(
     if 0.5 < birth_rate:
         assert calf.culled
     if 0.5 < conventional_semen:
-        assert calf.gender == "male"
+        assert calf.sex == "male"
         assert calf.sold
     else:
-        assert calf.gender == "female"
-    if calf.gender == "female" or 0.5 < female_calf_rate:
+        assert calf.sex == "female"
+    if calf.sex == "female" or 0.5 < female_calf_rate:
         assert not calf.sold
     assert calf.birth_weight == args["birth_weight"]
     assert calf.body_weight == args["birth_weight"]
@@ -1952,7 +1952,7 @@ def test_calf_assign_values(mocker: MockerFixture) -> None:
     # assert
     assert not calf.culled
     assert not calf.sold
-    assert calf.gender == "female"
+    assert calf.sex == "female"
     calf.events.init_from_string.assert_called()
 
 
