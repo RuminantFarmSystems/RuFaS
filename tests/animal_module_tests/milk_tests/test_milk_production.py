@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_constants import DRY
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Sex
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -28,12 +28,15 @@ def milking_properties() -> MilkProductionProperties:
         wood_m=0.25,
         wood_n=0.003,
         milk_production_history=[],
+        daily_milk_production=2.3,
     )
 
 
 @pytest.fixture
 def general_properties() -> GeneralProperties:
-    return GeneralProperties(**LAC_COW_PROPERTIES)
+    return GeneralProperties(
+        **LAC_COW_PROPERTIES, nutrient_concentrations={"dm": 0.23}, metabolizable_energy_intake=2.4
+    )
 
 
 @pytest.fixture
