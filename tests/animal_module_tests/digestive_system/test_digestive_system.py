@@ -49,9 +49,6 @@ def mock_general_properties() -> GeneralProperties:
 @pytest.fixture
 def mock_animal_nutrient_property() -> NutrientProperties:
     return NutrientProperties(
-        mature_body_weight=54,
-        daily_growth=33.4,
-        days_in_preg=15,
         estimated_daily_milk_produced=3,
         phosphorus_excess_in_diet=14.2,
         phosphorus_intake=56,
@@ -86,8 +83,7 @@ def mock_milk_production_property() -> MilkProductionProperties:
         wood_n=0,
         milk_production_history=[
             MilkProductionRecord(simulation_day=0, days_in_milk=0, milk_production=0, days_born=0)
-        ],
-        daily_milk_production=0,
+        ]
     )
 
 

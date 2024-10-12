@@ -108,7 +108,7 @@ class DigestiveSystem:
                 general_properties.body_weight,
                 general_properties.days_in_milk,
                 milk_production_properties.crude_protein_content,
-                milk_production_properties.daily_milk_production,
+                general_properties.daily_milk_produced,
                 animal_nutrient_property.fecal_phosphorus,
                 animal_nutrient_property.urine_phosphorus_required,
                 general_properties.nutrients,

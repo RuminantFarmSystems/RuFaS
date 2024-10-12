@@ -27,8 +27,7 @@ def milking_properties() -> MilkProductionProperties:
         wood_l=29.0,
         wood_m=0.25,
         wood_n=0.003,
-        milk_production_history=[],
-        daily_milk_production=2.3,
+        milk_production_history=[]
     )
 
 

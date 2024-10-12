@@ -39,8 +39,6 @@ class MilkProductionProperties:
         Wood's "n" lactation curve parameter (unitless).
     milk_production_history : list[MilkProductionRecord]
         History of milk production.
-    daily_milk_production : float
-        Daily milk production of the current animal (kg).
 
     """
 
@@ -58,4 +56,3 @@ class MilkProductionProperties:
     wood_m: float
     wood_n: float
     milk_production_history: list[MilkProductionRecord]
-    daily_milk_production: float
