@@ -42,17 +42,16 @@ def mock_general_properties() -> GeneralProperties:
         is_pregnant=False,
         nutrient_concentrations={"dm": 0.7},
         metabolizable_energy_intake=31.23,
+        daily_milk_produced=17
     )
 
 
 @pytest.fixture
 def mock_animal_nutrient_property() -> NutrientProperties:
     return NutrientProperties(
-        body_weight=12,
         mature_body_weight=54,
         daily_growth=33.4,
         days_in_preg=15,
-        milking=True,
         estimated_daily_milk_produced=3,
         phosphorus_excess_in_diet=14.2,
         phosphorus_intake=56,

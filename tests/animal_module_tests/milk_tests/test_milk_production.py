@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_constants import DRY
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Sex
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
