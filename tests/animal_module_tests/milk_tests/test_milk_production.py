@@ -27,13 +27,15 @@ def milking_properties() -> MilkProductionProperties:
         wood_l=29.0,
         wood_m=0.25,
         wood_n=0.003,
-        milk_production_history=[],
+        milk_production_history=[]
     )
 
 
 @pytest.fixture
 def general_properties() -> GeneralProperties:
-    return GeneralProperties(**LAC_COW_PROPERTIES)
+    return GeneralProperties(
+        **LAC_COW_PROPERTIES, nutrient_concentrations={"dm": 0.23}, metabolizable_energy_intake=2.4
+    )
 
 
 @pytest.fixture
