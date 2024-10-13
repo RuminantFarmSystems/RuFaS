@@ -83,7 +83,7 @@ def mock_milk_production_property() -> MilkProductionProperties:
         wood_n=0,
         milk_production_history=[
             MilkProductionRecord(simulation_day=0, days_in_milk=0, milk_production=0, days_born=0)
-        ]
+        ],
     )
 
 
