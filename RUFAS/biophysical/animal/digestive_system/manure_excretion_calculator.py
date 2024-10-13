@@ -64,7 +64,9 @@ class ManureExcretionCalculator:
 
         # Nitrogen excretion
         # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
-        manure_nitrogen = (112.55 * dry_matter_intake * (crude_protein_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
+        manure_nitrogen = (
+            112.55 * dry_matter_intake * (crude_protein_concentration / 100)
+        ) * GeneralConstants.GRAMS_TO_KG
 
         # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
         urine_nitrogen = 0.45 * manure_nitrogen
@@ -410,8 +412,12 @@ class ManureExcretionCalculator:
 
         # Total Solids, kg [A.3E.A.2]
         # The amount of fecal solids is assumed to be equivalent to the amount of total solids
-        fecal_solids = (-0.576 + 0.370 * dry_matter_intake - 0.075 * crude_protein_concentration + 0.059 *
-                        acid_detergent_fiber_concentrations)
+        fecal_solids = (
+            -0.576
+            + 0.370 * dry_matter_intake
+            - 0.075 * crude_protein_concentration
+            + 0.059 * acid_detergent_fiber_concentrations
+        )
 
         # Total urine, kg [A.3E.A.3]
         urine = -7.742 + 0.388 * dry_matter_intake + 0.726 * crude_protein_concentration + 2.066 * milk_protein
@@ -441,14 +447,18 @@ class ManureExcretionCalculator:
 
         # Degradable volatile solids, kg [A.3E.A.5]
         degradable_volatile_solids = (
-            -1.017 + 0.364 * organic_matter_intake + 0.029 * neutral_detergent_fiber_concentration -
-            0.023 * crude_protein_concentration
+            -1.017
+            + 0.364 * organic_matter_intake
+            + 0.029 * neutral_detergent_fiber_concentration
+            - 0.023 * crude_protein_concentration
         )
 
         # Total volatile solids, kg [A.3E.A.6]
         total_volatile_solids = (
-            -1.201 + 0.402 * organic_matter_intake + 0.036 * neutral_detergent_fiber_concentration - 0.024 *
-            crude_protein_concentration
+            -1.201
+            + 0.402 * organic_matter_intake
+            + 0.036 * neutral_detergent_fiber_concentration
+            - 0.024 * crude_protein_concentration
         )
 
         # Non-degradable volatile solids, kg [A.3A.A.6]
@@ -572,8 +582,12 @@ class ManureExcretionCalculator:
 
         # Manure excretion
         # Amount of feces and urine excreted daily by the dry cow, kg [A.3F.A.2]
-        total_manure_excreted = (0.00711 * body_weight + 0.324 * crude_protein_concentration + 0.259 *
-                                 neutral_detergent_fiber_concentration + 8.05)
+        total_manure_excreted = (
+            0.00711 * body_weight
+            + 0.324 * crude_protein_concentration
+            + 0.259 * neutral_detergent_fiber_concentration
+            + 8.05
+        )
 
         # Total solids excretion
         # Amount of dry material excreted by the dry cow, kg [A.3F.A.3]
@@ -589,14 +603,18 @@ class ManureExcretionCalculator:
 
         # Total volatile solids, kg [A.3E.A.6]
         total_volatile_solids = (
-            -1.201 + 0.402 * organic_matter_intake + 0.036 *
-            neutral_detergent_fiber_concentration - 0.024 * crude_protein_concentration
+            -1.201
+            + 0.402 * organic_matter_intake
+            + 0.036 * neutral_detergent_fiber_concentration
+            - 0.024 * crude_protein_concentration
         )
 
         # Degradable volatile solids, kg [A.3E.A.5]
         degradable_volatile_solids = (
-            -1.017 + 0.364 * organic_matter_intake + 0.029 *
-            neutral_detergent_fiber_concentration - 0.023 * crude_protein_concentration
+            -1.017
+            + 0.364 * organic_matter_intake
+            + 0.029 * neutral_detergent_fiber_concentration
+            - 0.023 * crude_protein_concentration
         )
 
         # Non-degradable volatile solids, kg [A.3A.A.6]

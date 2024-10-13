@@ -58,8 +58,12 @@ class EntericMethaneCalculator:
             ethyl_ester_concentration = nutrient_concentrations["EE"]
             neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
             ash_concentration = nutrient_concentrations["ash"]
-            soluble_residue = ((100 - ash_concentration) - neutral_detergent_fiber_concentration -
-                               crude_protein_concentration - ethyl_ester_concentration)
+            soluble_residue = (
+                (100 - ash_concentration)
+                - neutral_detergent_fiber_concentration
+                - crude_protein_concentration
+                - ethyl_ester_concentration
+            )
             gross_energy_concentration = (
                 0.263 * crude_protein_concentration
                 + 0.522 * ethyl_ester_concentration
@@ -222,13 +226,17 @@ class EntericMethaneCalculator:
         methane_emission = 0.0
         if methane_model == "Mutian":  # [A.3E.C.1]
             methane_emission = (
-                -126 + 11.3 * dry_matter_intake + 2.30 * neutral_detergent_fiber_concentration +
-                28.8 * milk_fat + 0.148 * body_weight
+                -126
+                + 11.3 * dry_matter_intake
+                + 2.30 * neutral_detergent_fiber_concentration
+                + 28.8 * milk_fat
+                + 0.148 * body_weight
             )
 
         elif methane_model == "Mills":  # [A.3E.C.2]
-            starch_to_acid_detergent_fiber_concentration_ratio = (-0.0011 * starch_concentration /
-                                                                  acid_detergent_fiber_concentrations)
+            starch_to_acid_detergent_fiber_concentration_ratio = (
+                -0.0011 * starch_concentration / acid_detergent_fiber_concentrations
+            )
             temp = -(starch_to_acid_detergent_fiber_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
             methane_emission = 45.98 * (1 - exp(temp)) / 0.05565
 
@@ -299,8 +307,12 @@ class EntericMethaneCalculator:
         neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
         ethyl_ester_concentration = nutrient_concentrations["EE"]
         starch_concentration = nutrient_concentrations["starch"]
-        soluble_residue = ((100 - ash_concentration) - neutral_detergent_fiber_concentration -
-                           crude_protein_concentration - ethyl_ester_concentration)
+        soluble_residue = (
+            (100 - ash_concentration)
+            - neutral_detergent_fiber_concentration
+            - crude_protein_concentration
+            - ethyl_ester_concentration
+        )
         if methane_model == "Mills":
             # Methane model = 'Mills' [A.3E.C.2]
             methane_emission = (
