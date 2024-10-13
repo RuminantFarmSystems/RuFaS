@@ -231,7 +231,7 @@ def test_daily_routine_cow(
     mock_emission.assert_called_once_with(
         False, 12, 0, 31.23, {"p": 77.7, "dm": 5.23}, {"dm": 0.7}, "dummy_method", 16, "dummy model"
     )
-    mock_manure.assert_called_once_with(False, 12, 0, 0, 0, 0, 0, {"p": 77.7, "dm": 5.23}, {"dm": 0.7})
+    mock_manure.assert_called_once_with(False, 12, 0, 0, 17, 0, 0, {"p": 77.7, "dm": 5.23}, {"dm": 0.7})
 
 
 def test_initialize_animal_methane_variables(mocker: MockerFixture) -> None:

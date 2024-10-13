@@ -40,7 +40,7 @@ class ManureExcretionCalculator:
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
-        CP_concentration = nutrient_concentrations["CP"]
+        crude_protein_concentration = nutrient_concentrations["CP"]
 
         # Manure excretion
         # Amount of feces and urine excreted daily by the calf, kg [A.3A.A.1]
@@ -64,7 +64,7 @@ class ManureExcretionCalculator:
 
         # Nitrogen excretion
         # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
-        manure_nitrogen = (112.55 * dry_matter_intake * (CP_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
+        manure_nitrogen = (112.55 * dry_matter_intake * (crude_protein_concentration / 100)) * GeneralConstants.GRAMS_TO_KG
 
         # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
         urine_nitrogen = 0.45 * manure_nitrogen
@@ -160,7 +160,7 @@ class ManureExcretionCalculator:
         nutrient_amounts = nutrient_amount
         nutrient_concentrations = nutrient_conc
         dry_matter_intake = nutrient_amounts["dm"]
-        CP_concentration = nutrient_concentrations["CP"]
+        crude_protein_concentration = nutrient_concentrations["CP"]
         potassium_concentration = nutrient_concentrations["potassium"]
 
         # Soluble residue
@@ -191,7 +191,7 @@ class ManureExcretionCalculator:
             15.1
             + 0.83
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
@@ -200,7 +200,7 @@ class ManureExcretionCalculator:
             0.345
             + 0.317
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
@@ -394,26 +394,27 @@ class ManureExcretionCalculator:
         dry_matter_intake = nutrient_amounts["dm"]
         ash_diet_content = nutrient_amounts["ash"]
         dry_matter_concentration = nutrient_concentrations["dm"]
-        ADF_concentration = nutrient_concentrations["ADF"]
-        CP_concentration = nutrient_concentrations["CP"]
-        NDF_concentration = nutrient_concentrations["NDF"]
+        acid_detergent_fiber_concentrations = nutrient_concentrations["ADF"]
+        crude_protein_concentration = nutrient_concentrations["CP"]
+        neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
         potassium_concentration = nutrient_concentrations["potassium"]
 
         # Fecal water, kg [A.3E.A.1]
         fecal_water = (
             1.987 * dry_matter_intake
-            + 0.348 * ADF_concentration
-            - 0.412 * CP_concentration
+            + 0.348 * acid_detergent_fiber_concentrations
+            - 0.412 * crude_protein_concentration
             - 0.074 * dry_matter_concentration
             - 0.0057 * days_in_milk
         )
 
         # Total Solids, kg [A.3E.A.2]
         # The amount of fecal solids is assumed to be equivalent to the amount of total solids
-        fecal_solids = -0.576 + 0.370 * dry_matter_intake - 0.075 * CP_concentration + 0.059 * ADF_concentration
+        fecal_solids = (-0.576 + 0.370 * dry_matter_intake - 0.075 * crude_protein_concentration + 0.059 *
+                        acid_detergent_fiber_concentrations)
 
         # Total urine, kg [A.3E.A.3]
-        urine = -7.742 + 0.388 * dry_matter_intake + 0.726 * CP_concentration + 2.066 * milk_protein
+        urine = -7.742 + 0.388 * dry_matter_intake + 0.726 * crude_protein_concentration + 2.066 * milk_protein
 
         # Manure excretion
         # Amount of feces and urine excreted daily by the growing heifer, kg [A.3E.A.4]
@@ -424,7 +425,7 @@ class ManureExcretionCalculator:
             20.3
             + 0.654
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
@@ -440,12 +441,14 @@ class ManureExcretionCalculator:
 
         # Degradable volatile solids, kg [A.3E.A.5]
         degradable_volatile_solids = (
-            -1.017 + 0.364 * organic_matter_intake + 0.029 * NDF_concentration - 0.023 * CP_concentration
+            -1.017 + 0.364 * organic_matter_intake + 0.029 * neutral_detergent_fiber_concentration -
+            0.023 * crude_protein_concentration
         )
 
         # Total volatile solids, kg [A.3E.A.6]
         total_volatile_solids = (
-            -1.201 + 0.402 * organic_matter_intake + 0.036 * NDF_concentration - 0.024 * CP_concentration
+            -1.201 + 0.402 * organic_matter_intake + 0.036 * neutral_detergent_fiber_concentration - 0.024 *
+            crude_protein_concentration
         )
 
         # Non-degradable volatile solids, kg [A.3A.A.6]
@@ -553,10 +556,10 @@ class ManureExcretionCalculator:
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
         # TODO: Rename abbreviated key names to full names - GitHub Issue #1218
         dry_matter_intake = nutrient_amounts["dm"]
-        CP_concentration = nutrient_concentrations["CP"]
+        crude_protein_concentration = nutrient_concentrations["CP"]
         potassium_concentration = nutrient_concentrations["potassium"]
-        ASH_concentration = nutrient_concentrations["ash"]
-        NDF_concentration = nutrient_concentrations["NDF"]
+        ash_concentration = nutrient_concentrations["ash"]
+        neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
         # Soluble residue
         # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
         # TODO: Further calculations to account for entire diet:- GitHub Issue #1218
@@ -569,7 +572,8 @@ class ManureExcretionCalculator:
 
         # Manure excretion
         # Amount of feces and urine excreted daily by the dry cow, kg [A.3F.A.2]
-        total_manure_excreted = 0.00711 * body_weight + 0.324 * CP_concentration + 0.259 * NDF_concentration + 8.05
+        total_manure_excreted = (0.00711 * body_weight + 0.324 * crude_protein_concentration + 0.259 *
+                                 neutral_detergent_fiber_concentration + 8.05)
 
         # Total solids excretion
         # Amount of dry material excreted by the dry cow, kg [A.3F.A.3]
@@ -579,18 +583,20 @@ class ManureExcretionCalculator:
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
         organic_matter_intake = (
             dry_matter_intake
-            * (GeneralConstants.FRACTION_TO_PERCENTAGE - ASH_concentration)
+            * (GeneralConstants.FRACTION_TO_PERCENTAGE - ash_concentration)
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         )
 
         # Total volatile solids, kg [A.3E.A.6]
         total_volatile_solids = (
-            -1.201 + 0.402 * organic_matter_intake + 0.036 * NDF_concentration - 0.024 * CP_concentration
+            -1.201 + 0.402 * organic_matter_intake + 0.036 *
+            neutral_detergent_fiber_concentration - 0.024 * crude_protein_concentration
         )
 
         # Degradable volatile solids, kg [A.3E.A.5]
         degradable_volatile_solids = (
-            -1.017 + 0.364 * organic_matter_intake + 0.029 * NDF_concentration - 0.023 * CP_concentration
+            -1.017 + 0.364 * organic_matter_intake + 0.029 *
+            neutral_detergent_fiber_concentration - 0.023 * crude_protein_concentration
         )
 
         # Non-degradable volatile solids, kg [A.3A.A.6]
@@ -601,7 +607,7 @@ class ManureExcretionCalculator:
             15.1
             + 0.83
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
@@ -610,7 +616,7 @@ class ManureExcretionCalculator:
             0.345
             + 0.317
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
-            * (CP_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
+            * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 

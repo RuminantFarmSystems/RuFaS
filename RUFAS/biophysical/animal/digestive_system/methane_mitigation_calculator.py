@@ -1,8 +1,8 @@
 class MethaneMitigationCalculator:
     @staticmethod
     def mitigate_methane(
-        NDF_concentration: float,
-        EE_concentration: float,
+        neutral_detergent_fiber_concentration: float,
+        ethyl_ester_concentration: float,
         starch_concentration: float,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
@@ -12,9 +12,9 @@ class MethaneMitigationCalculator:
 
         Parameters
         ----------
-        NDF_concentration : float
+        neutral_detergent_fiber_concentration : float
             Concentration of neutral detergent fiber (NDF) in the ration.
-        EE_concentration : float
+        ethyl_ester_concentration : float
             Concentration of ether extract (EE) in the ration.
         starch_concentration : float
             Concentration of starch in the ration.
@@ -37,8 +37,8 @@ class MethaneMitigationCalculator:
             methane_yield_reduction = (
                 -30.8
                 - 0.226 * (methane_mitigation_additive_amount - 70.5)
-                + 0.906 * (NDF_concentration - 32.9)
-                + 3.871 * (EE_concentration - 4.2)
+                + 0.906 * (neutral_detergent_fiber_concentration - 32.9)
+                + 3.871 * (ethyl_ester_concentration - 4.2)
                 - 0.337 * (starch_concentration - 21.1)
             )
         elif methane_mitigation_method == "Monensin":
