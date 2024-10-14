@@ -47,7 +47,7 @@ class ManurePool:
         inorganic_phosphorus_runoff: float = 0.0,
         annual_runoff_manure_inorganic_phosphorus: float = 0.0,
         annual_runoff_manure_organic_phosphorus: float = 0.0,
-        total_decomposed_manure: float = 0.0
+        total_decomposed_manure: float = 0.0,
     ) -> None:
         self.manure_dry_mass = manure_dry_mass
         self.manure_applied_mass = manure_applied_mass
@@ -136,11 +136,13 @@ class ManurePool:
             self.manure_moisture_factor,
         )
 
-        self.water_extractable_organic_phosphorus = max(0.0, self.water_extractable_organic_phosphorus
-                                                        - mineralized_water_extractable_organic)
+        self.water_extractable_organic_phosphorus = max(
+            0.0, self.water_extractable_organic_phosphorus - mineralized_water_extractable_organic
+        )
 
-        self.total_decomposed_manure += (mineralized_water_extractable_organic + mineralized_stable_organic +
-                                         mineralized_stable_inorganic)
+        self.total_decomposed_manure += (
+            mineralized_water_extractable_organic + mineralized_stable_organic + mineralized_stable_inorganic
+        )
 
         assimilated_mass, assimilated_coverage = self.determine_assimilated_surface_manure(
             temperature_factor, field_size
@@ -181,9 +183,7 @@ class ManurePool:
         )
 
         self.water_extractable_organic_phosphorus = max(
-            0.0,
-            self.water_extractable_organic_phosphorus
-            - assimilated_water_extractable_organic
+            0.0, self.water_extractable_organic_phosphorus - assimilated_water_extractable_organic
         )
 
         self.water_extractable_inorganic_phosphorus = max(
