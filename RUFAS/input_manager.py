@@ -1890,11 +1890,13 @@ class InputManager:
         else:
             return False
 
-    def add_variable_to_pool(self,
-                             variable_name: str,
-                             data: Dict[str, List[Any]] | List[Any],
-                             properties_blob_key: str,
-                             eager_termination: bool) -> bool:
+    def add_variable_to_pool(
+        self,
+        variable_name: str,
+        data: Dict[str, List[Any]] | List[Any],
+        properties_blob_key: str,
+        eager_termination: bool,
+    ) -> bool:
         """
 
         Parameters
