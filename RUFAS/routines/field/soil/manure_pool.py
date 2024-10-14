@@ -29,7 +29,8 @@ class ManurePool:
         Amount of organic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff (kg).
     inorganic_phosphorus_runoff : float, default 0.0
         Amount of inorganic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff (kg).
-
+    total_decomposed_manure : float, default 0.0
+        Amount of total manure decomposed/mineralized (kg).
 
     """
 
