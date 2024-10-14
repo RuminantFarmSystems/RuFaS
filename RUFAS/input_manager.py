@@ -1890,6 +1890,30 @@ class InputManager:
         else:
             return False
 
+    def add_variable_to_pool(self,
+                             variable_name: str,
+                             data: Dict[str, List[Any]] | List[Any],
+                             properties_blob_key: str,
+                             eager_termination: bool) -> bool:
+        """
+
+        Parameters
+        ----------
+        variable_name
+        data
+        properties_blob_key
+        eager_termination
+
+        Returns
+        -------
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.add_variable_to_pool.__name__,
+        }
+        return False
+
     def dump_get_data_logs(self, path: Path) -> None:
         """
         Dumps the stored get data logs to a JSON file at the specified path.
