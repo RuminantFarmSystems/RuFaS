@@ -144,7 +144,7 @@ class SimulationEngine:
             date_for_feed_projection = self.time.current_date + timedelta(days=self.planning_cycle_length)
             total_inventory: TotalInventory = self.feed_manager.get_total_inventory(date_for_feed_projection)
             self.animal_manager.plan_new_ration_cycle(total_inventory)
-        if is_new_ration_interval or is_new_planning_cycle:
+        if is_new_ration_interval:
             self._orchestrate_ration_formulation()
 
         requested_feeds: RequestedFeed = self.animal_manager.collect_daily_feed_amounts()
