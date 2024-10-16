@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 import time as timer
+from datetime import timedelta
 from enum import Enum
 
 from RUFAS import routines
@@ -16,6 +17,9 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
+from .data_types.total_inventory import TotalInventory
+from .data_types.feeds_to_purchase import FeedsToPurchase
+from .data_types.requested_feed import RequestedFeed
 from .routines.EEE.EEE_manager import EEEManager
 
 """
@@ -56,7 +60,7 @@ class SimulationEngine:
         TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
         Indicates if a simulation is being run for end-to-end testing. Set to True if end-to-end testing inputs are
         found in the Input Manager.
-    planning_interval_length : int
+    planning_cycle_length : int
         Number of days before re-evaluating inventory of feeds and calculating maximum daily feed quotas for animals.
     ration_interval_length : int
         Number of days between re-formulations of animals' rations.
@@ -133,13 +137,20 @@ class SimulationEngine:
             if process_degradations_today:
                 self.feed_manager.process_degradations(self.weather, self.time)
 
-        is_new_planning_interval: bool = self.time.simulation_day % self.planning_interval_length == 0
+        is_new_planning_cycle: bool = self.time.simulation_day % self.planning_cycle_length == 0
         is_new_ration_interval: bool = self.time.simulation_day % self.ration_interval_length == 0
 
-        if is_new_planning_interval:
-            pass
-        if is_new_ration_interval or is_new_planning_interval:
-            pass
+        if is_new_planning_cycle:
+            date_for_feed_projection = self.time.current_date + timedelta(days=self.planning_cycle_length)
+            total_inventory: TotalInventory = self.feed_manager.get_total_inventory(date_for_feed_projection)
+            self.animal_manager.plan_new_ration_cycle(total_inventory)
+        if is_new_ration_interval or is_new_planning_cycle:
+            self._orchestrate_ration_formulation()
+
+        requested_feeds: RequestedFeed = self.animal_manager.collect_daily_feed_amounts()
+        is_ration_reformulation_needed: bool = self.feed_manager.handle_feed_request(requested_feeds)
+        if is_ration_reformulation_needed:
+            self._orchestrate_ration_formulation()
 
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
@@ -151,6 +162,11 @@ class SimulationEngine:
         self.weather.record_weather(self.time)
 
         self._advance_time()
+
+    def _orchestrate_ration_formulation(self) -> None:
+        feeds_to_purchase: FeedsToPurchase | None = self.animal_manager.formulate_ration()
+        if feeds_to_purchase:
+            self.feed_manager.purchase_feeds(feeds_to_purchase)  # TODO: if can't purchase feeds, raise error or retry ration formulation?
 
     def _advance_time(self) -> None:
         """
@@ -211,7 +227,7 @@ class SimulationEngine:
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
         # TODO: remove these hard coded values with values from animal and/or feed inputs.
-        self.planning_interval_length = 183
+        self.planning_cycle_length = 183
         self.ration_interval_length = 30
 
         self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
