@@ -17,7 +17,7 @@ from RUFAS.routines.feed import Feed
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
-from ...data_structures.animal_manure_excretions import AnimalManureExcretions
+from ...data_types.animal_manure_excretions import AnimalManureExcretions
 from ...enums import AnimalCombination
 
 om = OutputManager()
