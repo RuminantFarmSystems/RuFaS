@@ -3,7 +3,7 @@ from typing import Dict, Tuple
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.manure.general_manure import calculate_phosphorus_excretion_values
 
-from ....data_structures.animal_manure_excretions import AnimalManureExcretions
+from ....data_types.animal_manure_excretions import AnimalManureExcretions
 
 
 def manure_calculations(

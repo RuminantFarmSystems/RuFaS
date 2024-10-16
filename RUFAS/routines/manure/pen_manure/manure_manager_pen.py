@@ -2,7 +2,7 @@ from typing import NamedTuple, Set
 
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
 
-from ....data_structures.pen_manure_data import PenManureData
+from ....data_types.pen_manure_data import PenManureData
 from ....enums import AnimalCombination
 
 
