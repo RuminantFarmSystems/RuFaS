@@ -48,15 +48,17 @@ class Animal:
         return self.general_properties.days_born == AnimalConfig.heifer_breed_start_day
 
     def _evaluate_heiferII_for_heiferIII(self) -> bool:
-        return self.general_properties.days_born > AnimalConfig.heifer_breed_start_day and \
-               self.general_properties.is_pregnant and \
-               self.general_properties.days_in_preg > (
-                       self.reproduction_properties.gestation_length - AnimalConfig.heifer_prefresh_day
-               )
+        return (
+            self.general_properties.days_born > AnimalConfig.heifer_breed_start_day
+            and self.general_properties.is_pregnant
+            and self.general_properties.days_in_preg
+            > (self.reproduction_properties.gestation_length - AnimalConfig.heifer_prefresh_day)
+        )
 
     def _evaluate_heiferII_for_culling(self) -> bool:
-        return (not self.general_properties.is_pregnant) and \
-               (self.general_properties.days_born > AnimalConfig.heifer_reproduction_cull_day)
+        return (not self.general_properties.is_pregnant) and (
+            self.general_properties.days_born > AnimalConfig.heifer_reproduction_cull_day
+        )
 
     def _evaluate_heiferIII_for_cow(self) -> bool:
         return self.general_properties.days_born == self.reproduction_properties.gestation_length
@@ -68,10 +70,16 @@ class Animal:
         self.reproduction_properties.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
         self.reproduction_properties.heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program
 
-        self.reproduction_properties.heifer_tai_method = AnimalConfig.heifer_reproduction_sub_program if \
-            AnimalConfig.heifer_reproduction_program == HeiferReproProtocolEnum.TAI.value else ""
-        self.reproduction_properties.heifer_synch_ed_method = AnimalConfig.heifer_reproduction_sub_program if \
-            AnimalConfig.heifer_reproduction_program == HeiferReproProtocolEnum.SynchED.value else ""
+        self.reproduction_properties.heifer_tai_method = (
+            AnimalConfig.heifer_reproduction_sub_program
+            if AnimalConfig.heifer_reproduction_program == HeiferReproProtocolEnum.TAI.value
+            else ""
+        )
+        self.reproduction_properties.heifer_synch_ed_method = (
+            AnimalConfig.heifer_reproduction_sub_program
+            if AnimalConfig.heifer_reproduction_program == HeiferReproProtocolEnum.SynchED.value
+            else ""
+        )
 
         self.general_properties.animal_type = AnimalType.HEIFER_II
 

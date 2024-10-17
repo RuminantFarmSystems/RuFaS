@@ -12,12 +12,12 @@ om = OutputManager()
 
 class HerdManager:
     def __init__(
-            self,
-            data: Dict[str, Any],
-            feed: Feed,
-            weather: Weather,
-            time: Time,
-            feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
+        self,
+        data: Dict[str, Any],
+        feed: Feed,
+        weather: Weather,
+        time: Time,
+        feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ) -> None:
         """
         Initializes the pens and animals in the simulation with data from the
@@ -109,5 +109,5 @@ class HerdManager:
         self._print_animal_num_warnings(data["herd_information"])
 
         self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = (
-                feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
+            feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
         )
