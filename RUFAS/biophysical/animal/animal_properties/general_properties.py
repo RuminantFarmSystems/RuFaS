@@ -35,6 +35,7 @@ class GeneralProperties:
     days_in_milk: int
     dry_off_day_of_pregnancy: int
     daily_milk_produced: float
+    cull_reason: str
     future_cull_date: int
     future_death_date: int
     gender: Enum
