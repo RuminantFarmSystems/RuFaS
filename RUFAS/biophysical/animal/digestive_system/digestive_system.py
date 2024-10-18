@@ -31,16 +31,13 @@ class DigestiveSystem:
     def process_digestion(
         general_properties: GeneralProperties,
         animal_nutrient_property: NutrientProperties,
-        milk_production_properties: MilkProductionProperties,
-        statistics: AnimalStatistics,
-    ) -> tuple[AnimalStatistics, AnimalManureExcretions]:
+        milk_production_properties: MilkProductionProperties
+    ) -> tuple[dict[str, float], AnimalManureExcretions]:
         """
         Handles an animal's daily digest updates.
 
         Parameters
         ----------
-        statistics: AnimalStatistics
-            Animal properties that are used for animal statistics.
         general_properties: GeneralProperties
             Animal properties that are general or are used to determine many animal outcomes.
         animal_nutrient_property: AnimalGrowthProperties
@@ -56,6 +53,7 @@ class DigestiveSystem:
             in the AnimalManureExcretions class definition.
 
         """
+        statistics = {}
         if general_properties.animal_type == AnimalType.CALF:
             methane_emission = EntericMethaneCalculator.calculate_calf_methane(
                 DigestiveSystem.METHANE_MODEL,
@@ -68,8 +66,8 @@ class DigestiveSystem:
                 general_properties.nutrients,
                 general_properties.nutrient_concentrations,
             )
-            statistics.methane_emission = methane_emission
-            statistics.phosphorus_excreted = phosphorus
+            statistics["methane_emission"] = methane_emission
+            statistics["phosphorus_excreted"] = phosphorus
             return statistics, excretion
 
         elif general_properties.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
@@ -86,8 +84,8 @@ class DigestiveSystem:
                 general_properties.nutrients,
                 general_properties.nutrient_concentrations,
             )
-            statistics.methane_emission = methane_emission
-            statistics.phosphorus_excreted = phosphorus
+            statistics["methane_emission"] = methane_emission
+            statistics["phosphorus_excreted"] = phosphorus
             return statistics, excretion
 
         else:
@@ -114,6 +112,6 @@ class DigestiveSystem:
                 general_properties.nutrients,
                 general_properties.nutrient_concentrations,
             )
-            statistics.methane_emission = methane_emission
-            statistics.phosphorus_excreted = phosphorus
+            statistics["methane_emission"] = methane_emission
+            statistics["phosphorus_excreted"] = phosphorus
             return statistics, excretion
