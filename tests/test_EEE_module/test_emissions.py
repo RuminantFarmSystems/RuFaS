@@ -545,11 +545,13 @@ def test_get_feed_emissions_data_invalid_county_code(
 
 def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests the result of calculated homegrown feed emissions."""
-    mock_aggregate = mocker.patch.object(em, "_aggregate_data", return_value={"f1": {"nitrogen": 50},
-                                                                              "f2": {"nitrogen": 50}})
+    mock_aggregate = mocker.patch.object(
+        em, "_aggregate_data", return_value={"f1": {"nitrogen": 50}, "f2": {"nitrogen": 50}}
+    )
     mock_collect_target = mocker.patch.object(
-        em, "_collect_target_soil_characteristics", return_value={"f1": {"characteristics1": 3},
-                                                                  "f2": {"characteristics1": 3}}
+        em,
+        "_collect_target_soil_characteristics",
+        return_value={"f1": {"characteristics1": 3}, "f2": {"characteristics1": 3}},
     )
     mock_calculate_emissions = mocker.patch.object(
         em,
@@ -575,7 +577,7 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
     mock_add = mocker.patch.object(em.om, "add_variable")
     homegrown_feeds = [
         {"field_name": "f1", "crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
-        {"field_name": "f2", "crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35}
+        {"field_name": "f2", "crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
     ]
     fertilizer_application = [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}]
     manure_application = [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}]
@@ -583,29 +585,45 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
 
     em._calculate_homegrown_feed_emissions(homegrown_feeds, fertilizer_application, manure_application, manure_requests)
 
-    mock_aggregate.assert_called_with([{'field_name': 'f1', 'phosphorus': 60},
-                                       {'field_name': 'f2', 'phosphorus': 60}],
-                                      ['f2', 'f1'],
-                                      ['nitrogen', 'phosphorus'])
-    mock_collect_target.assert_called_once_with(['f1', 'f2'])
+    mock_aggregate.assert_called_with(
+        [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}],
+        ["f2", "f1"],
+        ["nitrogen", "phosphorus"],
+    )
+    mock_collect_target.assert_called_once_with(["f1", "f2"])
     mock_calculate_emissions.assert_has_calls(
-        [call("f1",
-              [{"crop": CropSpecies.CORN_SILAGE, "dry_matter_content": 0.35, "field_name": "f1",
-                "total_dry_yield": 1200}],
-              {"characteristics1": 3},
-              {"nitrogen": 50},
-              {"nitrogen": 50},
-              [{"field_name": "f1", "phosphorus": 60},
-               {'field_name': 'f2', 'phosphorus': 60}]),
-         call("f2",
-              [{"crop": CropSpecies.CORN_SILAGE, "dry_matter_content": 0.35, "field_name": "f2",
-                "total_dry_yield": 1200}],
-              {"characteristics1": 3},
-              {"nitrogen": 50},
-              {"nitrogen": 50},
-              [{"field_name": "f1", "phosphorus": 60},
-               {'field_name': 'f2', 'phosphorus': 60}])]
-        ,
+        [
+            call(
+                "f1",
+                [
+                    {
+                        "crop": CropSpecies.CORN_SILAGE,
+                        "dry_matter_content": 0.35,
+                        "field_name": "f1",
+                        "total_dry_yield": 1200,
+                    }
+                ],
+                {"characteristics1": 3},
+                {"nitrogen": 50},
+                {"nitrogen": 50},
+                [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}],
+            ),
+            call(
+                "f2",
+                [
+                    {
+                        "crop": CropSpecies.CORN_SILAGE,
+                        "dry_matter_content": 0.35,
+                        "field_name": "f2",
+                        "total_dry_yield": 1200,
+                    }
+                ],
+                {"characteristics1": 3},
+                {"nitrogen": 50},
+                {"nitrogen": 50},
+                [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}],
+            ),
+        ],
     )
     mock_add.assert_called_with(
         "homegrown_corn_emissions",
