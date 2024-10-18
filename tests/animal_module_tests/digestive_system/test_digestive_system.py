@@ -96,7 +96,7 @@ def test_daily_routine_calf(
     mock_general_properties: GeneralProperties,
     mock_milk_production_property: MilkProductionProperties,
     mock_animal_nutrient_property: NutrientProperties,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Test the daily update when animal is calf."""
     expected_excretions = AnimalManureExcretions(
@@ -141,7 +141,7 @@ def test_daily_routine_heifer(
     mock_general_properties: GeneralProperties,
     mock_milk_production_property: MilkProductionProperties,
     mock_animal_nutrient_property: NutrientProperties,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Test the daily update when animal is heifer."""
     expected_excretions = AnimalManureExcretions(
@@ -187,7 +187,7 @@ def test_daily_routine_cow(
     mock_general_properties: GeneralProperties,
     mock_milk_production_property: MilkProductionProperties,
     mock_animal_nutrient_property: NutrientProperties,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Test the daily update when animal is cow."""
     expected_excretions = AnimalManureExcretions(
