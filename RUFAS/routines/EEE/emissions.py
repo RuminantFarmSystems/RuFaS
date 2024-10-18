@@ -289,10 +289,11 @@ class EmissionsEstimator:
                 "class": self.__class__.__name__,
                 "function": self._get_feed_emissions_data.__name__,
             }
-            self.om.add_error("Invalid country code access.",
-                              f"Emission data have county codes {county_codes},"
-                              f"Tried to get data with county code: {county_code}",
-                              info_map)
+            self.om.add_error(
+                "Invalid country code access.",
+                f"Emission data have county codes {county_codes}," f"Tried to get data with county code: {county_code}",
+                info_map,
+            )
             raise e
 
         feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
