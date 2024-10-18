@@ -13,6 +13,11 @@ from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
+def em() -> EmissionsEstimator:
+    return EmissionsEstimator()
+
+
+@pytest.fixture
 def feeds_grown() -> list[dict[str, Any]]:
     feeds_grown = [
         {
@@ -109,10 +114,10 @@ def test_estimate_emissions(
     fertilizer_applications: list[dict[str, Any]],
     manure_applications: list[dict[str, Any]],
     manure_requests: list[dict[str, Any]],
+    em: EmissionsEstimator,
     mocker: MockerFixture,
 ) -> None:
     """Tests the estimation routines are called correctly."""
-    em = EmissionsEstimator()
     mock_gather = mocker.patch.object(
         em,
         "_gather_homegrown_feeds_and_fertilizer_apps",
@@ -153,10 +158,10 @@ def test_calculate_purchased_feed_emissions(
     actual_purchased_feeds: dict[str, float],
     actual_purchased_feed_emissions: dict[str, float],
     actual_land_use_change_emissions: dict[str, float],
+    em: EmissionsEstimator,
     mocker: MockerFixture,
 ) -> None:
     """Tests the calculation of purchased feed emissions."""
-    em = EmissionsEstimator()
     mock_add = mocker.patch.object(OutputManager, "add_variable")
     mock_gather_feeds = mocker.patch.object(em, "_gather_ration_feed_totals", return_value=purchased_feeds)
     mock_calc_actual = mocker.patch.object(em, "_calculate_actual_purchased_feeds", return_value=actual_purchased_feeds)
@@ -174,9 +179,8 @@ def test_calculate_purchased_feed_emissions(
     mock_calc_actual_emission.assert_called_once_with(actual_purchased_feeds)
 
 
-def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> None:
+def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests that the homegrown feeds and fertilizer applications were gathered correctly."""
-    em = EmissionsEstimator()
     mock_filter_variable = mocker.patch.object(
         em.om,
         "filter_variables_pool",
@@ -187,7 +191,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-        "which crop yields and nutrient applications to estimate emissions for.",
+                       "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -259,11 +263,10 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     )
 
 
-def test_gather_ration_feed_totals(mocker: MockerFixture) -> None:
+def test_gather_ration_feed_totals(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """
     Test that the totals of feeds from rations given to animals in the last 365 days of the simulation are correct.
     """
-    em = EmissionsEstimator()
     mock_filter = mocker.patch.object(em.om, "filter_variables_pool", return_value={"test": {"values": [2, 3, 4]}})
 
     expected = {"test": 9.0}
@@ -282,9 +285,8 @@ def test_gather_ration_feed_totals(mocker: MockerFixture) -> None:
     )
 
 
-def test_transform_outputs_to_list_of_dicts() -> None:
+def test_transform_outputs_to_list_of_dicts(em: EmissionsEstimator) -> None:
     """Test that the function transform data to correct list of dicts."""
-    em = EmissionsEstimator()
     expected = [{"one": 1, "two": 4}, {"one": 2, "two": 5}, {"one": 3, "two": 6}]
 
     data = {"one": {"values": [1, 2, 3]}, "two": {"values": [4, 5, 6]}}
@@ -315,10 +317,10 @@ def test_transform_outputs_to_list_of_dicts() -> None:
     ],
 )
 def test_transform_outputs_to_list_of_dicts_length_unmatched(
-    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], expect_error: bool, mocker: MockerFixture
+    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], expect_error: bool, mocker: MockerFixture,
+    em: EmissionsEstimator
 ) -> None:
     """Test that the function transform data to correct list of dicts with unmatched list length."""
-    em = EmissionsEstimator()
     mock_add_error = mocker.patch.object(em.om, "add_error")
     if expect_error:
         try:
@@ -346,10 +348,9 @@ def test_transform_outputs_to_list_of_dicts_length_unmatched(
     ],
 )
 def test_calculate_actual_purchased_feeds(
-    purchased_feeds: dict[str, float], expected: dict[str, float], mocker: MockerFixture
+    purchased_feeds: dict[str, float], expected: dict[str, float], mocker: MockerFixture, em: EmissionsEstimator
 ) -> None:
     """Tests that the amount of actual purchased feeds were calculated correctly."""
-    em = EmissionsEstimator()
     homegrown_feeds = [
         {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
         {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
@@ -367,9 +368,8 @@ def test_calculate_actual_purchased_feeds(
     mock_totals.assert_called_once_with(homegrown_feeds)
 
 
-def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixture) -> None:
+def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests that the amount of homegrown feeds for all the crop types were calculated correctly."""
-    em = EmissionsEstimator()
     homegrown_feeds = [
         {"crop": CropSpecies.CORN_SILAGE, "total_dry_yield": 1200, "dry_matter_content": 0.35},
         {"crop": CropSpecies.ALFALFA_HAY, "total_dry_yield": 800, "dry_matter_content": 0.9},
@@ -416,9 +416,8 @@ def test_calculate_total_homegrown_feed_amounts_by_crop_type(mocker: MockerFixtu
     )
 
 
-def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture) -> None:
+def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Test the amount of purchased feed emissions with no errors."""
-    em = EmissionsEstimator()
     mock_get_data = mocker.patch.object(em.im, "get_data", side_effect=[94545, {"emission1": 1.0}, {"emission2": 2.0}])
     mock_get_feed_data = mocker.patch.object(
         em, "_get_feed_emissions_data", return_value={"100": 26.3, "total_dry_yield": 1200, "dry_matter_content": 0.35}
@@ -458,10 +457,9 @@ def test_calculate_actual_purchased_feed_emissions(mocker: MockerFixture) -> Non
     ],
 )
 def test_calculate_actual_purchased_feed_emissions_no_key(
-    msg_name: str, message: str, emissions: list[dict[str, float]], mocker: MockerFixture
+    msg_name: str, message: str, emissions: list[dict[str, float]], mocker: MockerFixture, em: EmissionsEstimator
 ) -> None:
     """Test the amount of purchased feed emissions with key errors."""
-    em = EmissionsEstimator()
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_warning")
     mock_get_data = mocker.patch.object(em.im, "get_data", side_effect=[94545, {"emission1": 1.0}, {"emission2": 2.0}])
@@ -499,10 +497,9 @@ def test_calculate_actual_purchased_feed_emissions_no_key(
     ],
 )
 def test_get_feed_emissions_data(
-    feed_emission_data: dict[str, list[float]], county_code: int, expected: dict[str, float]
+    feed_emission_data: dict[str, list[float]], county_code: int, expected: dict[str, float], em: EmissionsEstimator
 ) -> None:
     """Tests that feed emission data is correctly retrieved."""
-    em = EmissionsEstimator()
     observed = em._get_feed_emissions_data(county_code, feed_emission_data)
     assert observed == expected
 
@@ -513,26 +510,25 @@ def test_get_feed_emissions_data(
         ({"county_code": [53705, 94545], "data1": [7.7, 92.4]}, 53706),
     ],
 )
-def test_get_feed_emissions_data_invalid_county_code(
-    feed_emission_data: dict[str, list[float]], county_code: int, mocker: MockerFixture
-) -> None:
+def test_get_feed_emissions_data_invalid_county_code(feed_emission_data: dict[str, list[float]],
+                                                     county_code: int,
+                                                     mocker: MockerFixture,
+                                                     em: EmissionsEstimator) -> None:
     """Tests errors were handled when trying to access invalid county code."""
-    em = EmissionsEstimator()
     mock_add_error = mocker.patch.object(em.om, "add_error")
     try:
-        observed = em._get_feed_emissions_data(county_code, feed_emission_data)
+        em._get_feed_emissions_data(county_code, feed_emission_data)
         assert False
     except ValueError:
-        mock_add_error.assert_called_once_with(
-            "Invalid country code access.",
-            f"Emission data have county codes [53705, 94545]," f"Tried to get data with county code: 53706",
-            {"class": "EmissionsEstimator", "function": "_get_feed_emissions_data"},
-        )
+        mock_add_error.assert_called_once_with("Invalid country code access.",
+                                               "Emission data have county codes [53705, 94545],"
+                                               "Tried to get data with county code: 53706",
+                                               {'class': 'EmissionsEstimator', 'function': '_get_feed_emissions_data'}
+                                               )
 
 
-def test_calculate_homegrown_feed_emissions(mocker: MockerFixture) -> None:
+def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests the result of calculated homegrown feed emissions."""
-    em = EmissionsEstimator()
     mock_aggregate = mocker.patch.object(em, "_aggregate_data", return_value={"f1": {"nitrogen": 50}})
     mock_collect_target = mocker.patch.object(
         em, "_collect_target_soil_characteristics", return_value={"f1": {"characteristics1": 3}}
@@ -617,9 +613,8 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture) -> None:
     )
 
 
-def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
+def test_collect_target_soil_characteristics(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests the collection of soil characteristics."""
-    em = EmissionsEstimator()
     mock_update = mocker.patch.object(em, "_soil_data_update", return_value={"data1": 0, "data2": 0})
     mock_filter = mocker.patch.object(
         em.om,
@@ -635,16 +630,16 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
         {
             "ammonia": {
                 "description": "Collects the ammonia emissions from all soil "
-                "layers in the field in the last year of the "
-                "simulation.",
+                               "layers in the field in the last year of the "
+                               "simulation.",
                 "filters": ["FieldDataReporter.send_daily_variables.ammonia_emissions.field" "='field1',layer=.*"],
                 "name": "Soil Ammonia emissions",
                 "slice_start": -365,
             },
             "nitrous_oxide": {
                 "description": "Collects the nitrous oxide emissions from "
-                "all soil layers in the field in the last "
-                "year of the simulation.",
+                               "all soil layers in the field in the last "
+                               "year of the simulation.",
                 "filters": [
                     "FieldDataReporter.send_daily_variables" ".nitrous_oxide_emissions.field='field1',layer=.*"
                 ],
@@ -677,9 +672,8 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
     assert observed == {"field1": {"data1": 0, "data2": 0, "carbon_stock_change": -50}}
 
 
-def test_calculate_emissions_by_field_zero_dry_mass(feeds_grown) -> None:
+def test_calculate_emissions_by_field_zero_dry_mass(em: EmissionsEstimator) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops when no dry yield."""
-    em = EmissionsEstimator()
     feeds_grown = [
         {
             "crop_name": "corn_silage",
@@ -718,9 +712,10 @@ def test_calculate_emissions_by_field_zero_dry_mass(feeds_grown) -> None:
     assert observed == feeds_grown
 
 
-def test_calculate_emissions_by_field(mocker: MockerFixture, feeds_grown: list[dict[str, Any]]) -> None:
+def test_calculate_emissions_by_field(mocker: MockerFixture,
+                                      feeds_grown: list[dict[str, Any]],
+                                      em: EmissionsEstimator) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops."""
-    em = EmissionsEstimator()
 
     field_emissions = {"nitrous_oxide": 120.5, "ammonia": 200.75, "carbon_stock_change": 150.0}
 
@@ -846,10 +841,11 @@ def test_calculate_emissions_by_field(mocker: MockerFixture, feeds_grown: list[d
     ]
 
 
-def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture, feeds_grown: list[dict[str, Any]]) -> None:
+def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture,
+                                                 feeds_grown: list[dict[str, Any]],
+                                                 em: EmissionsEstimator) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops where no applications
     happened."""
-    em = EmissionsEstimator()
 
     field_emissions = {"nitrous_oxide": 120.5, "ammonia": 200.75, "carbon_stock_change": 150.0}
 
@@ -1009,19 +1005,20 @@ def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture, feeds_gr
     ],
 )
 def test_partition_applied_crop_fertilizer_emissions(
-    fertilizer_application: dict[str, float], applied_crops: list[dict[str, Any]], expected: list[dict[str, Any]]
+    fertilizer_application: dict[str, float],
+    applied_crops: list[dict[str, Any]],
+    expected: list[dict[str, Any]],
+    em: EmissionsEstimator
 ) -> None:
     """Tests that the partition of nutrients is applied to the crop correctly."""
-    em = EmissionsEstimator()
 
     em._partition_applied_crop_fertilizer_emissions(fertilizer_application, applied_crops)
 
     assert applied_crops == expected
 
 
-def test_filter_results(mocker: MockerFixture) -> None:
+def test_filter_results(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests that the filters taken in were correctly filtered."""
-    em = EmissionsEstimator()
     mock_filter = mocker.patch.object(em.om, "filter_variables_pool", return_value={"data1": {"nested1": ["test"]}})
     mock_trans = mocker.patch.object(
         em, "_transform_outputs_to_list_of_dicts", return_value=[{"year": 2019, "day": 18}, {"year": 2024, "day": 18}]
@@ -1036,9 +1033,8 @@ def test_filter_results(mocker: MockerFixture) -> None:
     mock_trans.assert_called_once_with({"data1": {"nested1": ["test"]}})
 
 
-def test_aggregate_data() -> None:
+def test_aggregate_data(em: EmissionsEstimator) -> None:
     """Tests nutrient data for different types of applications aggregated correctly."""
-    em = EmissionsEstimator()
 
     expected = {"field1": {"phosphorus": 90.0, "nitrogen": 82.0}, "field2": {"phosphorus": 54.3, "nitrogen": 124.7}}
 
@@ -1113,9 +1109,9 @@ def test_apply_fertilizer_to_next_crop(
     sorted_crops: list[dict[str, Any]],
     fertilizer_application_date: date,
     no_next: bool,
+    em: EmissionsEstimator
 ) -> None:
     """Tests that the fertilizer is successfully applied to the next crop."""
-    em = EmissionsEstimator()
     if no_next:
         assert not em._apply_fertilizer_to_next_crop(fertilizer_application, sorted_crops, fertilizer_application_date)
     else:
@@ -1212,7 +1208,8 @@ def test_apply_fertilizer_to_next_crop(
         )
     ],
 )
-def test_extract_applied_crops(sorted_crops: list[dict[str, Any]], fertilizer_application_date: date) -> None:
+def test_extract_applied_crops(sorted_crops: list[dict[str, Any]], fertilizer_application_date: date,
+                               em: EmissionsEstimator) -> None:
     """Tests that applied crops are extracted correctly."""
     expected = [
         {
@@ -1230,15 +1227,12 @@ def test_extract_applied_crops(sorted_crops: list[dict[str, Any]], fertilizer_ap
         }
     ]
 
-    em = EmissionsEstimator()
-
     observed = em._extract_applied_crops(sorted_crops, fertilizer_application_date)
     assert observed == expected
 
 
-def test_soil_data_update(mocker: MockerFixture) -> None:
+def test_soil_data_update(mocker: MockerFixture, em: EmissionsEstimator) -> None:
     """Tests the update of soil data."""
-    em = EmissionsEstimator()
     filters = {"filter1": {"property1": "p1"}, "filter2": {"property1": "p1"}}
     expected = {"filter1": 376.3, "filter2": 376.3}
 
