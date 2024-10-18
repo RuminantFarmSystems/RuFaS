@@ -31,6 +31,7 @@ v0.9.2
 - [2025](https://github.com/RuminantFarmSystems/MASM/pull/2025) - [minor change] [Formatting] Sorts import statements in codebase.
 - [2017](https://github.com/RuminantFarmSystems/MASM/pull/2017) - [minor change] [Animal] Deduplicates references to lactation parameters in the `LactationCurve` submodule and reorganizes structure to be consistent with other animal submodules.
 - [1985](https://github.com/RuminantFarmSystems/MASM/pull/1985) - [minor change] [TaskManager] extracts all the input data values (for all input variables from JSON input files) for each task and combines them into a single CSV file for side-by-side comparison.
+- [2029](https://github.com/RuminantFarmSystems/MASM/pull/2029) - [minor change] [EEE] Adding tests for emission.py (2/2)
 
 ### v0.9.2
 
