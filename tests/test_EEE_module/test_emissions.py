@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import date, datetime
 from typing import Any
 from unittest.mock import call
@@ -11,6 +10,37 @@ from RUFAS.routines.EEE.emissions import EmissionsEstimator
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
+
+
+@pytest.fixture
+def feeds_grown() -> list[dict[str, Any]]:
+    feeds_grown = [
+        {
+            "crop_name": "corn_silage",
+            "dry_yield": 3,
+            "area": 10,
+            "field_size": 200,
+            "planting_year": 2024,
+            "planting_day": 3,
+        },
+        {
+            "crop_name": "alfalfa",
+            "dry_yield": 9,
+            "area": 5,
+            "field_size": 200,
+            "planting_year": 2024,
+            "planting_day": 3,
+        },
+        {
+            "crop_name": "wheat",
+            "dry_yield": 500,
+            "area": 7,
+            "field_size": 200,
+            "planting_year": 2024,
+            "planting_day": 3,
+        },
+    ]
+    return feeds_grown
 
 
 @pytest.mark.parametrize(
@@ -157,7 +187,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-        "which crop yields and nutrient applications to estimate emissions for.",
+                       "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -477,6 +507,29 @@ def test_get_feed_emissions_data(
     assert observed == expected
 
 
+@pytest.mark.parametrize(
+    "feed_emission_data,county_code",
+    [
+        ({"county_code": [53705, 94545], "data1": [7.7, 92.4]}, 53706),
+    ],
+)
+def test_get_feed_emissions_data_invalid_county_code(feed_emission_data: dict[str, list[float]],
+                                                     county_code: int,
+                                                     mocker: MockerFixture) -> None:
+    """Tests errors were handled when trying to access invalid county code."""
+    em = EmissionsEstimator()
+    mock_add_error = mocker.patch.object(em.om, "add_error")
+    try:
+        observed = em._get_feed_emissions_data(county_code, feed_emission_data)
+        assert False
+    except ValueError:
+        mock_add_error.assert_called_once_with("Invalid country code access.",
+                                               f"Emission data have county codes [53705, 94545],"
+                                               f"Tried to get data with county code: 53706",
+                                               {'class': 'EmissionsEstimator', 'function': '_get_feed_emissions_data'}
+                                               )
+
+
 def test_calculate_homegrown_feed_emissions(mocker: MockerFixture) -> None:
     """Tests the result of calculated homegrown feed emissions."""
     em = EmissionsEstimator()
@@ -582,16 +635,16 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
         {
             "ammonia": {
                 "description": "Collects the ammonia emissions from all soil "
-                "layers in the field in the last year of the "
-                "simulation.",
+                               "layers in the field in the last year of the "
+                               "simulation.",
                 "filters": ["FieldDataReporter.send_daily_variables.ammonia_emissions.field" "='field1',layer=.*"],
                 "name": "Soil Ammonia emissions",
                 "slice_start": -365,
             },
             "nitrous_oxide": {
                 "description": "Collects the nitrous oxide emissions from "
-                "all soil layers in the field in the last "
-                "year of the simulation.",
+                               "all soil layers in the field in the last "
+                               "year of the simulation.",
                 "filters": [
                     "FieldDataReporter.send_daily_variables" ".nitrous_oxide_emissions.field='field1',layer=.*"
                 ],
@@ -616,7 +669,7 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
         "slice_start": -1,
     }
 
-    calls = [call(deepcopy(starting_carbon_stock_filter_expected)), call(deepcopy(ending_carbon_stock_filter_expected))]
+    calls = [call(starting_carbon_stock_filter_expected), call(ending_carbon_stock_filter_expected)]
     mock_filter.assert_called_with(ending_carbon_stock_filter_expected)
 
     assert mock_filter.call_count == 2
@@ -624,7 +677,7 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
     assert observed == {"field1": {"data1": 0, "data2": 0, "carbon_stock_change": -50}}
 
 
-def test_calculate_emissions_by_field_zero_dry_mass(mocker: MockerFixture) -> None:
+def test_calculate_emissions_by_field_zero_dry_mass(feeds_grown) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops when no dry yield."""
     em = EmissionsEstimator()
     feeds_grown = [
@@ -665,35 +718,9 @@ def test_calculate_emissions_by_field_zero_dry_mass(mocker: MockerFixture) -> No
     assert observed == feeds_grown
 
 
-def test_calculate_emissions_by_field(mocker: MockerFixture) -> None:
+def test_calculate_emissions_by_field(mocker: MockerFixture, feeds_grown: list[dict[str, Any]]) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops."""
     em = EmissionsEstimator()
-    feeds_grown = [
-        {
-            "crop_name": "corn_silage",
-            "dry_yield": 3,
-            "area": 10,
-            "field_size": 200,
-            "planting_year": 2024,
-            "planting_day": 3,
-        },
-        {
-            "crop_name": "alfalfa",
-            "dry_yield": 9,
-            "area": 5,
-            "field_size": 200,
-            "planting_year": 2024,
-            "planting_day": 3,
-        },
-        {
-            "crop_name": "wheat",
-            "dry_yield": 500,
-            "area": 7,
-            "field_size": 200,
-            "planting_year": 2024,
-            "planting_day": 3,
-        },
-    ]
 
     field_emissions = {"nitrous_oxide": 120.5, "ammonia": 200.75, "carbon_stock_change": 150.0}
 
@@ -819,36 +846,10 @@ def test_calculate_emissions_by_field(mocker: MockerFixture) -> None:
     ]
 
 
-def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture) -> None:
+def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture, feeds_grown: list[dict[str, Any]]) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops where no applications
     happened."""
     em = EmissionsEstimator()
-    feeds_grown = [
-        {
-            "crop_name": "corn_silage",
-            "dry_yield": 3,
-            "area": 10,
-            "field_size": 200,
-            "planting_year": 2024,
-            "planting_day": 3,
-        },
-        {
-            "crop_name": "alfalfa",
-            "dry_yield": 9,
-            "area": 5,
-            "field_size": 200,
-            "planting_year": 2024,
-            "planting_day": 3,
-        },
-        {
-            "crop_name": "wheat",
-            "dry_yield": 500,
-            "area": 7,
-            "field_size": 200,
-            "planting_year": 2024,
-            "planting_day": 3,
-        },
-    ]
 
     field_emissions = {"nitrous_oxide": 120.5, "ammonia": 200.75, "carbon_stock_change": 150.0}
 

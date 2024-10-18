@@ -282,7 +282,18 @@ class EmissionsEstimator:
     ) -> dict[str, float]:
         """Grabs the appropriate list of emissions for purchased feeds for the location of the simulation."""
         county_codes = feed_emissions_data["county_code"]
-        emissions_index = county_codes.index(county_code)
+        try:
+            emissions_index = county_codes.index(county_code)
+        except ValueError as e:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._get_feed_emissions_data.__name__,
+            }
+            self.om.add_error("Invalid country code access.",
+                              f"Emission data have county codes {county_codes},"
+                              f"Tried to get data with county code: {county_code}",
+                              info_map)
+            raise e
 
         feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
