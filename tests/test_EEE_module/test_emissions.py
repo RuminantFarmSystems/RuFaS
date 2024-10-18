@@ -48,6 +48,20 @@ def feeds_grown() -> list[dict[str, Any]]:
     return feeds_grown
 
 
+@pytest.fixture
+def field_emissions() -> dict[str, float]:
+    return {"nitrous_oxide": 120.5, "ammonia": 200.75, "carbon_stock_change": 150.0}
+
+
+@pytest.fixture
+def fertilizer_applications_data() -> list[dict[str, Any]]:
+    return [
+        {"field_name": "field1", "nitrogen": 30.5, "phosphorus": 20.0, "year": 2024, "day": 314},
+        {"field_name": "field2", "nitrogen": 25.0, "phosphorus": 15.0, "year": 2024, "day": 314},
+        {"field_name": "field3", "nitrogen": 40.0, "phosphorus": 25.5, "year": 2024, "day": 314},
+    ]
+
+
 @pytest.mark.parametrize(
     "homegrown_feeds,fertilizer_applications,manure_applications,manure_requests",
     [
@@ -714,20 +728,14 @@ def test_calculate_emissions_by_field_zero_dry_mass(em: EmissionsEstimator) -> N
 
 def test_calculate_emissions_by_field(mocker: MockerFixture,
                                       feeds_grown: list[dict[str, Any]],
-                                      em: EmissionsEstimator) -> None:
+                                      em: EmissionsEstimator,
+                                      field_emissions: dict[str, float],
+                                      fertilizer_applications_data: list[dict[str, Any]]) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops."""
-
-    field_emissions = {"nitrous_oxide": 120.5, "ammonia": 200.75, "carbon_stock_change": 150.0}
 
     manure_applications = {"nitrogen": 100.0}
 
     manure_requests = {"nitrogen": 90.0}
-
-    fertilizer_applications_data = [
-        {"field_name": "field1", "nitrogen": 30.5, "phosphorus": 20.0, "year": 2024, "day": 314},
-        {"field_name": "field2", "nitrogen": 25.0, "phosphorus": 15.0, "year": 2024, "day": 314},
-        {"field_name": "field3", "nitrogen": 40.0, "phosphorus": 25.5, "year": 2024, "day": 314},
-    ]
     mock_partition = mocker.patch.object(em, "_partition_applied_crop_fertilizer_emissions")
     mock_extract = mocker.patch.object(
         em,
@@ -843,21 +851,16 @@ def test_calculate_emissions_by_field(mocker: MockerFixture,
 
 def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture,
                                                  feeds_grown: list[dict[str, Any]],
-                                                 em: EmissionsEstimator) -> None:
+                                                 em: EmissionsEstimator,
+                                                 field_emissions: dict[str, float],
+                                                 fertilizer_applications_data: list[dict[str, Any]]) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops where no applications
     happened."""
-
-    field_emissions = {"nitrous_oxide": 120.5, "ammonia": 200.75, "carbon_stock_change": 150.0}
 
     manure_applications = {"nitrogen": 100.0}
 
     manure_requests = {"nitrogen": 90.0}
 
-    fertilizer_applications_data = [
-        {"field_name": "field1", "nitrogen": 30.5, "phosphorus": 20.0, "year": 2024, "day": 314},
-        {"field_name": "field2", "nitrogen": 25.0, "phosphorus": 15.0, "year": 2024, "day": 314},
-        {"field_name": "field3", "nitrogen": 40.0, "phosphorus": 25.5, "year": 2024, "day": 314},
-    ]
     mock_applied = mocker.patch.object(em, "_apply_fertilizer_to_next_crop", return_value=False)
     mock_add_warning = mocker.patch.object(em.om, "add_warning")
     mock_extract = mocker.patch.object(em, "_extract_applied_crops", return_value=[])
