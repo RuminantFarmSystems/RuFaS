@@ -205,7 +205,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture, em: E
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                       "which crop yields and nutrient applications to estimate emissions for.",
+        "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -331,8 +331,11 @@ def test_transform_outputs_to_list_of_dicts(em: EmissionsEstimator) -> None:
     ],
 )
 def test_transform_outputs_to_list_of_dicts_length_unmatched(
-    data: dict[str, dict[str, list[int]]], expected: list[dict[str, int]], expect_error: bool, mocker: MockerFixture,
-    em: EmissionsEstimator
+    data: dict[str, dict[str, list[int]]],
+    expected: list[dict[str, int]],
+    expect_error: bool,
+    mocker: MockerFixture,
+    em: EmissionsEstimator,
 ) -> None:
     """Test that the function transform data to correct list of dicts with unmatched list length."""
     mock_add_error = mocker.patch.object(em.om, "add_error")
@@ -524,21 +527,20 @@ def test_get_feed_emissions_data(
         ({"county_code": [53705, 94545], "data1": [7.7, 92.4]}, 53706),
     ],
 )
-def test_get_feed_emissions_data_invalid_county_code(feed_emission_data: dict[str, list[float]],
-                                                     county_code: int,
-                                                     mocker: MockerFixture,
-                                                     em: EmissionsEstimator) -> None:
+def test_get_feed_emissions_data_invalid_county_code(
+    feed_emission_data: dict[str, list[float]], county_code: int, mocker: MockerFixture, em: EmissionsEstimator
+) -> None:
     """Tests errors were handled when trying to access invalid county code."""
     mock_add_error = mocker.patch.object(em.om, "add_error")
     try:
         em._get_feed_emissions_data(county_code, feed_emission_data)
         assert False
     except ValueError:
-        mock_add_error.assert_called_once_with("Invalid country code access.",
-                                               "Emission data have county codes [53705, 94545],"
-                                               "Tried to get data with county code: 53706",
-                                               {'class': 'EmissionsEstimator', 'function': '_get_feed_emissions_data'}
-                                               )
+        mock_add_error.assert_called_once_with(
+            "Invalid country code access.",
+            "Emission data have county codes [53705, 94545]," "Tried to get data with county code: 53706",
+            {"class": "EmissionsEstimator", "function": "_get_feed_emissions_data"},
+        )
 
 
 def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: EmissionsEstimator) -> None:
@@ -644,16 +646,16 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture, em: Emission
         {
             "ammonia": {
                 "description": "Collects the ammonia emissions from all soil "
-                               "layers in the field in the last year of the "
-                               "simulation.",
+                "layers in the field in the last year of the "
+                "simulation.",
                 "filters": ["FieldDataReporter.send_daily_variables.ammonia_emissions.field" "='field1',layer=.*"],
                 "name": "Soil Ammonia emissions",
                 "slice_start": -365,
             },
             "nitrous_oxide": {
                 "description": "Collects the nitrous oxide emissions from "
-                               "all soil layers in the field in the last "
-                               "year of the simulation.",
+                "all soil layers in the field in the last "
+                "year of the simulation.",
                 "filters": [
                     "FieldDataReporter.send_daily_variables" ".nitrous_oxide_emissions.field='field1',layer=.*"
                 ],
@@ -726,11 +728,13 @@ def test_calculate_emissions_by_field_zero_dry_mass(em: EmissionsEstimator) -> N
     assert observed == feeds_grown
 
 
-def test_calculate_emissions_by_field(mocker: MockerFixture,
-                                      feeds_grown: list[dict[str, Any]],
-                                      em: EmissionsEstimator,
-                                      field_emissions: dict[str, float],
-                                      fertilizer_applications_data: list[dict[str, Any]]) -> None:
+def test_calculate_emissions_by_field(
+    mocker: MockerFixture,
+    feeds_grown: list[dict[str, Any]],
+    em: EmissionsEstimator,
+    field_emissions: dict[str, float],
+    fertilizer_applications_data: list[dict[str, Any]],
+) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops."""
 
     manure_applications = {"nitrogen": 100.0}
@@ -849,11 +853,13 @@ def test_calculate_emissions_by_field(mocker: MockerFixture,
     ]
 
 
-def test_calculate_emissions_by_field_no_applied(mocker: MockerFixture,
-                                                 feeds_grown: list[dict[str, Any]],
-                                                 em: EmissionsEstimator,
-                                                 field_emissions: dict[str, float],
-                                                 fertilizer_applications_data: list[dict[str, Any]]) -> None:
+def test_calculate_emissions_by_field_no_applied(
+    mocker: MockerFixture,
+    feeds_grown: list[dict[str, Any]],
+    em: EmissionsEstimator,
+    field_emissions: dict[str, float],
+    fertilizer_applications_data: list[dict[str, Any]],
+) -> None:
     """Tests the partitions emissions from the field where crops/feeds were grown to those crops where no applications
     happened."""
 
@@ -1011,7 +1017,7 @@ def test_partition_applied_crop_fertilizer_emissions(
     fertilizer_application: dict[str, float],
     applied_crops: list[dict[str, Any]],
     expected: list[dict[str, Any]],
-    em: EmissionsEstimator
+    em: EmissionsEstimator,
 ) -> None:
     """Tests that the partition of nutrients is applied to the crop correctly."""
 
@@ -1112,7 +1118,7 @@ def test_apply_fertilizer_to_next_crop(
     sorted_crops: list[dict[str, Any]],
     fertilizer_application_date: date,
     no_next: bool,
-    em: EmissionsEstimator
+    em: EmissionsEstimator,
 ) -> None:
     """Tests that the fertilizer is successfully applied to the next crop."""
     if no_next:
@@ -1211,8 +1217,9 @@ def test_apply_fertilizer_to_next_crop(
         )
     ],
 )
-def test_extract_applied_crops(sorted_crops: list[dict[str, Any]], fertilizer_application_date: date,
-                               em: EmissionsEstimator) -> None:
+def test_extract_applied_crops(
+    sorted_crops: list[dict[str, Any]], fertilizer_application_date: date, em: EmissionsEstimator
+) -> None:
     """Tests that applied crops are extracted correctly."""
     expected = [
         {
