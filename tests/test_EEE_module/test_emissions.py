@@ -187,7 +187,7 @@ def test_gather_homegrown_feeds_and_fertilizer_apps(mocker: MockerFixture) -> No
     time_filter = {
         "name": "Time Filter",
         "description": "Collects the date a year before the simulation ended, to be used as a cutoff for deciding "
-                       "which crop yields and nutrient applications to estimate emissions for.",
+        "which crop yields and nutrient applications to estimate emissions for.",
         "filters": ["Time.(day|calendar_year)"],
         "slice_start": -365,
         "slice_end": -364,
@@ -513,9 +513,9 @@ def test_get_feed_emissions_data(
         ({"county_code": [53705, 94545], "data1": [7.7, 92.4]}, 53706),
     ],
 )
-def test_get_feed_emissions_data_invalid_county_code(feed_emission_data: dict[str, list[float]],
-                                                     county_code: int,
-                                                     mocker: MockerFixture) -> None:
+def test_get_feed_emissions_data_invalid_county_code(
+    feed_emission_data: dict[str, list[float]], county_code: int, mocker: MockerFixture
+) -> None:
     """Tests errors were handled when trying to access invalid county code."""
     em = EmissionsEstimator()
     mock_add_error = mocker.patch.object(em.om, "add_error")
@@ -523,11 +523,11 @@ def test_get_feed_emissions_data_invalid_county_code(feed_emission_data: dict[st
         observed = em._get_feed_emissions_data(county_code, feed_emission_data)
         assert False
     except ValueError:
-        mock_add_error.assert_called_once_with("Invalid country code access.",
-                                               f"Emission data have county codes [53705, 94545],"
-                                               f"Tried to get data with county code: 53706",
-                                               {'class': 'EmissionsEstimator', 'function': '_get_feed_emissions_data'}
-                                               )
+        mock_add_error.assert_called_once_with(
+            "Invalid country code access.",
+            f"Emission data have county codes [53705, 94545]," f"Tried to get data with county code: 53706",
+            {"class": "EmissionsEstimator", "function": "_get_feed_emissions_data"},
+        )
 
 
 def test_calculate_homegrown_feed_emissions(mocker: MockerFixture) -> None:
@@ -635,16 +635,16 @@ def test_collect_target_soil_characteristics(mocker: MockerFixture) -> None:
         {
             "ammonia": {
                 "description": "Collects the ammonia emissions from all soil "
-                               "layers in the field in the last year of the "
-                               "simulation.",
+                "layers in the field in the last year of the "
+                "simulation.",
                 "filters": ["FieldDataReporter.send_daily_variables.ammonia_emissions.field" "='field1',layer=.*"],
                 "name": "Soil Ammonia emissions",
                 "slice_start": -365,
             },
             "nitrous_oxide": {
                 "description": "Collects the nitrous oxide emissions from "
-                               "all soil layers in the field in the last "
-                               "year of the simulation.",
+                "all soil layers in the field in the last "
+                "year of the simulation.",
                 "filters": [
                     "FieldDataReporter.send_daily_variables" ".nitrous_oxide_emissions.field='field1',layer=.*"
                 ],
