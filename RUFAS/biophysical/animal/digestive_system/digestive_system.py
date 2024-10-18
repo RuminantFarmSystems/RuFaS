@@ -1,6 +1,5 @@
 from typing import Any
 
-from RUFAS.biophysical.animal.animal_properties.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
@@ -23,7 +22,7 @@ class DigestiveSystem:
         animal_config: dict[str, Any] = im.get_data("animal.animal_config")
         cls.METHANE_MODEL = animal_config["methane_model"]
         cls.METHANE_MITIGATION_METHOD = animal_config["methane_mitigation"]["methane_mitigation_method"]
-        cls.METHANE_MITIGATION_ADDITIVE_AMOUNT = (animal_config)["methane_mitigation"][
+        cls.METHANE_MITIGATION_ADDITIVE_AMOUNT = animal_config["methane_mitigation"][
             "methane_mitigation_additive_amount"
         ]
 
@@ -47,8 +46,7 @@ class DigestiveSystem:
 
         Returns
         -------
-        tuple[AnimalStatistics, AnimalManureExcretions]
-            An updated AnimalStatistics class.
+        tuple[dict[str, float], AnimalManureExcretions]
             A dictionary that contains the manure excretion values as specified
             in the AnimalManureExcretions class definition.
 
