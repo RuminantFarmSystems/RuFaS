@@ -370,7 +370,12 @@ def test_process_moisture_loss(
     ],
 )
 def test_calculate_moisture_loss(
-    storage: Storage, mocker: MockerFixture, harvested_crop: HarvestedCrop, days: int, initial_moisture: float, expected: float
+    storage: Storage,
+    mocker: MockerFixture,
+    harvested_crop: HarvestedCrop,
+    days: int,
+    initial_moisture: float,
+    expected: float,
 ) -> None:
     """Tests that moisture losses from a hayed crop are calculated correctly."""
     harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
