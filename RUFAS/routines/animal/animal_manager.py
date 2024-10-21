@@ -5,6 +5,8 @@ import math
 from statistics import mean
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -30,9 +32,6 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-
-from ...data_structures.pen_manure_data import PenManureData
-from ...enums import AnimalCombination
 
 om = OutputManager()
 
