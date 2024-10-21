@@ -98,7 +98,7 @@ class EntericMethaneCalculator:
         is_lactating: bool
             Indicator of cow's lactating status.
         milk_fat: float
-            Milk fat (from animal input), % of milk.
+            Milk fat, % of milk.
         metabolizable_energy_intake: float
             Metabolizable energy intake, Mcal/kg dry matter.
         nutrient_amounts: Dict[str, float]
