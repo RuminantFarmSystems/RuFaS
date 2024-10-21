@@ -393,6 +393,44 @@ class Storage:
 
         return conditions
 
+    def _process_moisture_loss(
+        self, time: Time, loss_period: int, final_moisture_percentage: float
+    ) -> None:
+        """
+        Calculates the total amount of moisture that has been lost from all crops in storage since the last time
+        degradations were processed.
+
+        Parameters
+        ----------
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+        loss_period : int
+            Number of days over which moisture is lost after crop is stored.
+        final_moisture_percentage : float
+            Percentage of fresh mass that is moisture in the crop after all moisture loss has occurred.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.process_degradations.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
+        total_moisture_loss = 0.0
+        for crop in self.stored:
+            processed_moisture_loss = self._calculate_moisture_loss(
+                crop, crop.last_time_degraded, loss_period, final_moisture_percentage
+            )
+            cumulative_moisture_loss = self._calculate_moisture_loss(
+                crop, time, loss_period, final_moisture_percentage
+            )
+            actual_moisture_loss = cumulative_moisture_loss - processed_moisture_loss
+
+            total_moisture_loss += actual_moisture_loss
+
+            self.reset_mass_attributes_after_loss(crop, 0.0, actual_moisture_loss)
+
+        self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
+
     def _calculate_moisture_loss(
         self, crop: HarvestedCrop, time: Time, loss_period: int, final_moisture_percentage: float
     ) -> float:

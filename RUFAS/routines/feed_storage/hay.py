@@ -1,7 +1,6 @@
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 from .enums import CropCategory
@@ -81,26 +80,7 @@ class Hay(Storage):
             Time instance tracking the current time of the simulation.
 
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.process_degradations.__name__,
-            "units": MeasurementUnits.KILOGRAMS,
-        }
-        total_moisture_loss = 0.0
-        for crop in self.stored:
-            processed_moisture_loss = self._calculate_moisture_loss(
-                crop, crop.last_time_degraded, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE
-            )
-            cumulative_moisture_loss = self._calculate_moisture_loss(
-                crop, time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE
-            )
-            actual_moisture_loss = cumulative_moisture_loss - processed_moisture_loss
-
-            total_moisture_loss += actual_moisture_loss
-
-            self.reset_mass_attributes_after_loss(crop, 0.0, actual_moisture_loss)
-
-        self.om.add_variable("total_moisture_loss", total_moisture_loss, info_map)
+        self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
 
         super().process_degradations(weather, time)
 

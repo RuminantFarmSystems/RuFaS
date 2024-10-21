@@ -1,9 +1,15 @@
+from RUFAS.time import Time
+from RUFAS.weather import Weather
+
 from .enums import CropCategory
 from .storage import Storage
 
 
-"""Defines the final moisture level that baleage will dry down to."""
-# TODO: make this value a user input.
+"""Number of days over which baled crops dry down after storage."""
+INITIAL_LOSS_PERIOD = 30
+
+
+"""Defines the final moisture level that baleage will dry down to. TODO: make this value a user input."""
 DEFAULT_FINAL_MOISTURE_PERCENTAGE = 50.0
 
 
@@ -30,6 +36,23 @@ class Baleage(Storage):
             CropCategory.SMALL_GRAIN,
         ]
         self.bale_density: float = 0
+
+    def process_degradations(self, weather: Weather, time: Time) -> None:
+        """
+        Processes the loss of moisture in baled crops, and calls the base class's implementation of
+        `process_degradations` to process the loss of dry matter.
+
+        Parameters
+        ----------
+        weather : Weather
+            Weather instance containing all weather information for the simulation.
+        time : Time
+            Time instance tracking the current time of the simulation.
+
+        """
+        self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, DEFAULT_FINAL_MOISTURE_PERCENTAGE)
+
+        super().process_degradations(weather, time)
 
     def calculate_protein_loss(self) -> None:
         """
