@@ -51,9 +51,9 @@ def test_get_dry_matter_intake() -> None:
     ],
 )
 def test_calculate_total_animal_phosphorus(
-    phosphorus_intake, phosphorus_requirement, initial_reserves,
-    phosphorus_for_gestation, phosphorus_for_growth,
-    expected_excess_in_diet, expected_reserves, expected_total_phosphorus
+    phosphorus_intake: float, phosphorus_requirement: float, initial_reserves: float,
+    phosphorus_for_gestation: float, phosphorus_for_growth: float,
+    expected_excess_in_diet: float, expected_reserves: float, expected_total_phosphorus: float,
 ) -> None:
     """Tests that total animal phosphorus is calculated correctly for different scenarios."""
     mock_phosphorus_status = MagicMock()
@@ -84,7 +84,8 @@ def test_calculate_total_animal_phosphorus(
         (AnimalType.LAC_COW, 20.0, 0.001 * 20.0 * GeneralConstants.KG_TO_GRAMS),
     ],
 )
-def test_calculate_phosphorus_endogenous_loss(animal_type, dry_matter_intake, expected_loss) -> None:
+def test_calculate_phosphorus_endogenous_loss(animal_type: AnimalType, dry_matter_intake: float, expected_loss: float,
+                                              ) -> None:
     """Tests that phosphorus endogenous loss is calculated correctly for different animal types."""
     mock_general_properties = MagicMock()
     mock_general_properties.animal_type = animal_type
@@ -106,9 +107,9 @@ def test_calculate_phosphorus_endogenous_loss(animal_type, dry_matter_intake, ex
     ],
 )
 def test_calculate_phosphorus_requirements(
-    animal_type, body_weight, dry_matter_intake, endogenous_loss, growth_phosphorus,
-    gestation_phosphorus, milk_phosphorus, absorbed_phosphorus, expected_urine_phosphorus,
-    monkeypatch
+    animal_type: AnimalType, body_weight: float, dry_matter_intake: float, endogenous_loss: float,
+    growth_phosphorus: float, gestation_phosphorus: float, milk_phosphorus: float, absorbed_phosphorus: float,
+    expected_urine_phosphorus: float, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Tests that phosphorus requirements are calculated correctly for different animal scenarios."""
     mock_general_properties = MagicMock()
@@ -128,12 +129,10 @@ def test_calculate_phosphorus_requirements(
     monkeypatch.setattr(AnimalNutrients, '_calculate_animal_phosphorus_requirement',
                         MagicMock(return_value=absorbed_phosphorus))
 
-    # Call the function under test
     result = AnimalNutrients._calculate_phosphorus_requirements(
         mock_general_properties, mock_phosphorus_status, dry_matter_intake
     )
 
-    # Assertions
     assert result.phosphorus_endogenous_loss == endogenous_loss
     assert result.phosphorus_for_growth == growth_phosphorus
     assert result.phosphorus_for_gestation == gestation_phosphorus
@@ -155,7 +154,7 @@ def test_calculate_phosphorus_requirements(
     ],
 )
 def test_calculate_phosphorus_for_growth(
-    animal_type, body_weight, mature_body_weight, daily_growth
+    animal_type: AnimalType, body_weight: float, mature_body_weight: float, daily_growth: float,
 ) -> None:
     """Tests that phosphorus retained for growth is calculated correctly for different scenarios."""
     mock_general_properties = MagicMock()
@@ -181,18 +180,18 @@ def test_calculate_phosphorus_for_growth(
     "days_in_preg, expected_phosphorus",
     [
         # Case 1: days_in_preg >= 190 (should calculate gestational phosphorus)
-        (190, (0.00002743 * math.exp((0.05527 - 0.000075 * 190) * 190) 
-              - 0.00002743 * math.exp((0.05527 - 0.000075 * 189) * 189)) 
-              * GeneralConstants.KG_TO_GRAMS),
+        (190, (0.00002743 * math.exp((0.05527 - 0.000075 * 190) * 190)
+               - 0.00002743 * math.exp((0.05527 - 0.000075 * 189) * 189))
+            * GeneralConstants.KG_TO_GRAMS),
         # Case 2: days_in_preg < 190 (should return 0.0)
         (150, 0.0),
         # Case 3: days_in_preg exactly on the threshold
-        (191, (0.00002743 * math.exp((0.05527 - 0.000075 * 191) * 191) 
-              - 0.00002743 * math.exp((0.05527 - 0.000075 * 190) * 190)) 
-              * GeneralConstants.KG_TO_GRAMS),
+        (191, (0.00002743 * math.exp((0.05527 - 0.000075 * 191) * 191)
+               - 0.00002743 * math.exp((0.05527 - 0.000075 * 190) * 190))
+            * GeneralConstants.KG_TO_GRAMS),
     ],
 )
-def test_calculate_gestational_phosphorus(days_in_preg, expected_phosphorus) -> None:
+def test_calculate_gestational_phosphorus(days_in_preg: int, expected_phosphorus: float) -> None:
     """Tests that gestational phosphorus is calculated correctly based on days in pregnancy."""
     mock_general_properties = MagicMock()
     mock_general_properties.days_in_preg = days_in_preg
@@ -213,7 +212,8 @@ def test_calculate_gestational_phosphorus(days_in_preg, expected_phosphorus) -> 
         (True, 0.0, 0.0),
     ],
 )
-def test_calculate_milk_phosphorus(is_milking, daily_milk_produced, expected_milk_phosphorus) -> None:
+def test_calculate_milk_phosphorus(is_milking: bool, daily_milk_produced: float, expected_milk_phosphorus: float
+                                   ) -> None:
     """Tests that milk phosphorus is calculated correctly based on milking status and milk production."""
     mock_general_properties = MagicMock()
     mock_general_properties.is_milking = is_milking
@@ -225,7 +225,8 @@ def test_calculate_milk_phosphorus(is_milking, daily_milk_produced, expected_mil
 
 
 @pytest.mark.parametrize(
-    "animal_type, endogenous_loss, growth_phosphorus, gestation_phosphorus, milk_phosphorus, urine_production_phosphorus, expected_absorbed_phosphorus",
+    "animal_type, endogenous_loss, growth_phosphorus, gestation_phosphorus, milk_phosphorus,"
+    "urine_production_phosphorus, expected_absorbed_phosphorus",
     [
         # Case 1: Animal is a dry cow or lactating cow (includes milk phosphorus)
         (AnimalType.DRY_COW, 0.5, 1.0, 2.0, 3.0, 0.2, 0.2 + 0.5 + 1.0 + 2.0 + 3.0),
@@ -238,8 +239,8 @@ def test_calculate_milk_phosphorus(is_milking, daily_milk_produced, expected_mil
     ],
 )
 def test_calculate_absorbed_phosphorus(
-    animal_type, endogenous_loss, growth_phosphorus, gestation_phosphorus,
-    milk_phosphorus, urine_production_phosphorus, expected_absorbed_phosphorus
+    animal_type: AnimalType, endogenous_loss: float, growth_phosphorus: float, gestation_phosphorus: float,
+    milk_phosphorus: float, urine_production_phosphorus: float, expected_absorbed_phosphorus: float,
 ) -> None:
     """Tests that absorbed phosphorus is calculated correctly based on animal type."""
     mock_general_properties = MagicMock()
@@ -274,7 +275,8 @@ def test_calculate_absorbed_phosphorus(
     ],
 )
 def test_calculate_animal_phosphorus_requirement(
-    animal_type, is_milking, ration_phosphorus_concentration, absorbed_phosphorus, expected_requirement
+    animal_type: AnimalType, is_milking: bool, ration_phosphorus_concentration: float, absorbed_phosphorus: float,
+    expected_requirement,
 ) -> None:
     """Tests that the animal phosphorus requirement is calculated correctly based on the animal type and conditions."""
     mock_general_properties = MagicMock()
@@ -304,7 +306,7 @@ def test_calculate_animal_phosphorus_requirement(
         (AnimalType.LAC_COW, False),
     ],
 )
-def test_is_calf_or_heifer(animal_type, expected_result) -> None:
+def test_is_calf_or_heifer(animal_type: AnimalType, expected_result: bool) -> None:
     """Tests that the function correctly identifies calves and heifers."""
     result = AnimalNutrients._is_calf_or_heifer(animal_type)
     assert result == expected_result
