@@ -145,17 +145,8 @@ class ManureExcretionCalculator:
 
         Notes
         -----
-        nutrient_amount_units = {
-            "dm": "kg/animal",
-            "CP": "percent of DM",
-            "ADF": "percent of DM",
-            "NDF": "percent of DM",
-            "lignin": "percent of DM",
-            "ash": "percent of DM",
-            "phosphorus": "percent of DM",
-            "potassium": "percent of DM",
-            "N": "percent of DM",
-        }
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
@@ -307,17 +298,8 @@ class ManureExcretionCalculator:
 
         Notes
         -----
-        nutrient_amount_units = {
-            "dm": "kg/animal",
-            "CP": "percent of DM",
-            "ADF": "percent of DM",
-            "NDF": "percent of DM",
-            "lignin": "percent of DM",
-            "ash": "percent of DM",
-            "phosphorus": "percent of DM",
-            "potassium": "percent of DM",
-            "N": "percent of DM",
-        }
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         if is_lactating:
@@ -380,17 +362,8 @@ class ManureExcretionCalculator:
 
         Notes
         -----
-        nutrient_amount_units = {
-            "dm": "kg/animal",
-            "CP": "percent of DM",
-            "ADF": "percent of DM",
-            "NDF": "percent of DM",
-            "lignin": "percent of DM",
-            "ash": "percent of DM",
-            "phosphorus": "percent of DM",
-            "potassium": "percent of DM",
-            "N": "percent of DM",
-        }
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
@@ -549,17 +522,8 @@ class ManureExcretionCalculator:
 
         Notes
         -----
-        nutrient_amount_units = {
-            "dm": "kg/animal",
-            "CP": "percent of DM",
-            "ADF": "percent of DM",
-            "NDF": "percent of DM",
-            "lignin": "percent of DM",
-            "ash": "percent of DM",
-            "phosphorus": "percent of DM",
-            "potassium": "percent of DM",
-            "N": "percent of DM",
-        }
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218

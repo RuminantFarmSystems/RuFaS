@@ -116,19 +116,10 @@ class EntericMethaneCalculator:
         float
             The daily enteric emissions for cows (g/day).
 
-            Notes
-            -----
-            nutrient_amount_units = {
-                "dm": "kg/animal",
-                "CP": "percent of DM",
-                "ADF": "percent of DM",
-                "NDF": "percent of DM",
-                "lignin": "percent of DM",
-                "ash": "percent of DM",
-                "phosphorus": "percent of DM",
-                "potassium": "percent of DM",
-                "N": "percent of DM",
-            }
+        Notes
+        -----
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
@@ -203,17 +194,8 @@ class EntericMethaneCalculator:
 
         Notes
         -----
-        nutrient_amount_units = {
-            "dm": "kg/animal",
-            "CP": "percent of DM",
-            "ADF": "percent of DM",
-            "NDF": "percent of DM",
-            "lignin": "percent of DM",
-            "ash": "percent of DM",
-            "phosphorus": "percent of DM",
-            "potassium": "percent of DM",
-            "N": "percent of DM",
-        }
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
@@ -287,17 +269,8 @@ class EntericMethaneCalculator:
 
         Notes
         -----
-        nutrient_amount_units = {
-            "dm": "kg/animal",
-            "CP": "percent of DM",
-            "ADF": "percent of DM",
-            "NDF": "percent of DM",
-            "lignin": "percent of DM",
-            "ash": "percent of DM",
-            "phosphorus": "percent of DM",
-            "potassium": "percent of DM",
-            "N": "percent of DM",
-        }
+        The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
+        and nitrogen ("N") are all percentages of dry matter.
 
         """
         dry_matter_intake = nutrient_amounts["dm"]
