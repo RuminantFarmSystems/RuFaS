@@ -4,8 +4,8 @@ from RUFAS.routines.animal.animal_types import AnimalType
 
 
 @dataclass
-class AnimalPhosphorusStatus:
-    """Dataclass representing the phosphorus status of the animal."""
+class AnimalNutrientsStatus:
+    """Dataclass representing the nutrients status of the animal."""
 
     animal_type: AnimalType
     body_weight: float
