@@ -9,18 +9,27 @@ from RUFAS.biophysical.animal.animal_properties.general_properties import Genera
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
 from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.time import Time
 
 
 class Animal:
-    def __init__(self) -> None:
+    def __init__(self, args: AnimalBaseInitArgsTypedDict) -> None:
         self.id = 0
+        self.last_visited: int = 0
 
-        self.general_properties: GeneralProperties = GeneralProperties()
+        self.general_properties: GeneralProperties = GeneralProperties(
+            id=args.get("id"),
+            breed=args.get("breed"),
+            birth_date=args.get("birth_date"),
+            days_born=args.get("days_born"),
+            birth_weight=args.get("birth_weight"),
+        )
         self.growth_properties: AnimalGrowthProperties = AnimalGrowthProperties()
         self.health_properties: AnimalHealthProperties = AnimalHealthProperties()
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
@@ -29,6 +38,10 @@ class Animal:
         self.nutrient_properties: NutrientProperties = NutrientProperties()
         self.reproduction_properties: ReproductionProperties = ReproductionProperties()
 
+    @classmethod
+    def setup_lactation_curve_parameters(cls, time: Time) -> None:
+        LactationCurve.set_lactation_parameters(time)
+
     def daily_routines(self, time: Time) -> None:
         self.general_properties.days_born += 1
 
@@ -36,10 +49,28 @@ class Animal:
         # DigestiveSystem
         MilkProduction.perform_daily_milking_update(self.milk_production_properties, self.general_properties, time)
         # AnimalGrowth.
-        # Reproduction.
+        # Reproduction.     # newborn possibility
 
-    def animal_life_stage_update(self) -> bool:
-        pass
+        self.animal_life_stage_update()
+        self.last_visited = time.simulation_day
+
+    def animal_life_stage_update(self) -> None:
+        if self.general_properties.animal_type == AnimalType.CALF and self._evaluate_calf_for_heiferI():
+            self._transition_calf_to_heiferI()
+        elif self.general_properties.animal_type == AnimalType.HEIFER_I and self._evaluate_heiferI_for_heiferII():
+            self._transition_heiferI_to_heiferII()
+        elif self.general_properties.animal_type == AnimalType.HEIFER_II and self._evaluate_heiferII_for_heiferIII():
+            if not self._evaluate_heiferII_for_culling():
+                self._transition_heiferII_to_heiferIII()
+            else:
+                self.general_properties.culled = True
+        elif self.general_properties.animal_type == AnimalType.HEIFER_III and self._evaluate_heiferIII_for_cow():
+            self._transition_heiferIII_to_cow()
+
+        if self.general_properties.days_born == self.general_properties.future_cull_date:
+            self.general_properties.culled = True
+        if self.general_properties.days_born == self.general_properties.future_death_date:
+            self.general_properties.dead = True
 
     def _evaluate_calf_for_heiferI(self) -> bool:
         return self.general_properties.days_born == AnimalConfig.wean_day

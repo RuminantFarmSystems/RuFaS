@@ -3,9 +3,13 @@ from typing import Any, Optional
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.pen import Pen
+from RUFAS.biophysical.feed.feed import Feed
+from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 om = OutputManager()
 
@@ -13,7 +17,7 @@ om = OutputManager()
 class HerdManager:
     def __init__(
         self,
-        data: Dict[str, Any],
+        data: dict[str, Any],
         feed: Feed,
         weather: Weather,
         time: Time,
@@ -111,3 +115,128 @@ class HerdManager:
         self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = (
             feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
         )
+
+    def daily_routines(self, time: Time) -> None:
+        # calf update
+        for calf in self.calves:
+            if calf.last_visited != time.simulation_day:
+                calf.daily_routines(time)
+        # heiferI update
+        for heiferI in self.heiferIs:
+            if heiferI.last_visited != time.simulation_day:
+                heiferI.daily_routines(time)
+        # heiferII update
+        for heiferII in self.heiferIIs:
+            if heiferII.last_visited != time.simulation_day:
+                heiferII.daily_routines(time)
+        # heiferIII update
+        for heiferIII in self.heiferIIIs:
+            if heiferIII.last_visited != time.simulation_day:
+                heiferIII.daily_routines(time)
+        # cow update
+        for cow in self.cows:
+            if cow.last_visited != time.simulation_day:
+                cow.daily_routines(time)
+        pass
+
+    #-------------------------#
+    def init_pens(self, all_pen_data: list, manure_management_scenarios: dict[str, Any]) -> None:
+        """
+        Populates the list of pens with the information from the input json file.
+
+        Parameters
+        ----------
+        all_pen_data: list[dict[str, Any]]
+            List containing information about the pens.
+        manure_management_scenarios : Dict[str, Any]
+            Dictionary containing information about the manure management scenarios.
+
+        """
+
+        # Initialize pens from all_pen_data
+        for pen_data in all_pen_data:
+            pen_data["pen_id"] = pen_data.pop("id")
+            pen_data["animal_combination"] = AnimalCombination[pen_data.pop("animal_combination")]
+
+            manure_management_scenario_id = pen_data.pop("manure_management_scenario_id")
+            manure_management_scenario = [
+                scenario
+                for scenario in manure_management_scenarios
+                if scenario["scenario_id"] == manure_management_scenario_id
+            ][0]
+            pen_data["bedding_type"] = manure_management_scenario["bedding_type"]
+            pen_data["manure_handling"] = manure_management_scenario["manure_handler"]
+            pen_data["manure_separator"] = manure_management_scenario["manure_separator"]
+            pen_data["manure_separator_after_digestion"] = manure_management_scenario[
+                "manure_separator_after_digestion"
+            ]
+            pen_data["manure_storage"] = manure_management_scenario["manure_treatment"]
+
+            pen = Pen(**pen_data)
+
+            self.all_pens.append(pen)
+
+    def _handle_pen_ration(self, feed: Feed, pen: Pen) -> None:
+        """
+        Calculate the ration for each pen at the given interval and update the
+        ration for each animal in the pen.
+
+        Notes
+        -----
+        It is important to set the variable `ration_per_animal` for each pen object. This forms the
+        basis for scaling the ration for each pen based on the current number of animals in the pen.
+
+        Parameters
+        ----------
+        feed : Feed
+            Instance of the Feed class
+        pen : Pen
+            Instance of Pen class.
+
+        """
+        available_feeds = ration_driver.AvailableFeeds()
+        available_feeds.feed_nutrients(feed)
+        if not pen.is_populated:
+            return
+        pen.subset_class_feeds(feed)
+        pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
+
+        ration_per_animal: Dict[str, float | str] = {}
+        ration_vals = {}
+
+        while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
+            if pen.animal_combination == AnimalCombination.CALF:
+                ration_per_animal = CalfRationManager.optimize()
+                ration_vals = {"ME_total": 0}
+            else:
+                ration_per_animal, ration_vals = RationManager.formulate_ration(
+                    pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO, self.simulation_day
+                )
+
+        # recording ration nutrition information in pen
+        nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
+        pen.ration_nutrient_amount = nutrient_amount
+        pen.ration_nutrient_conc = nutrient_conc
+        pen.MEdiet = ration_vals["ME_total"]
+        pen.dry_matter_intake = nutrient_amount["dm"]
+
+        ration_report = {}
+        ration_report["nutrient_amount"] = nutrient_amount
+        ration_report["nutrient_conc"] = nutrient_conc
+
+        for animal in list(pen.animals_in_pen.values()):
+            animal.set_ration(ration_per_animal, nutrient_amount["dm"])
+            animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
+
+        ration_per_pen = {}
+        num_animals = len(pen.animals_in_pen)
+        for key in ration_per_animal:
+            if key == "status":
+                ration_per_pen[key] = ration_per_animal[key]
+            else:
+                ration_per_pen[key] = ration_per_animal[key] * num_animals
+
+        pen.ration = ration_per_pen
+        pen.ration_per_animal = ration_per_animal
+
+

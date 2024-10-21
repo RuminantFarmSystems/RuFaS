@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from enum import Enum
 
@@ -27,25 +28,26 @@ class GeneralProperties:
     birth_weight: float
     body_weight: float
     breed: Enum
-    culled: bool
-    daily_growth: float
-    days_born: int
-    days_in_preg: int
-    events: AnimalEvents
-    days_in_milk: int
-    dry_off_day_of_pregnancy: int
-    daily_milk_produced: float
-    future_cull_date: int
-    future_death_date: int
     gender: Enum
     id: int
-    is_pregnant: bool
     mature_body_weight: float
     nutrients: list[str]
+    culled: bool = False
+    dead: bool = False
+    daily_growth: float = 0.0
+    days_born: int = 0
+    days_in_preg: int = 0
+    is_pregnant: bool = False
+    events: AnimalEvents = AnimalEvents()
+    days_in_milk: int = 0
+    dry_off_day_of_pregnancy: int = 0
+    daily_milk_produced: float = 0.0
+    future_cull_date: int = int(math.inf)
+    future_death_date: int = int(math.inf)
     ration_formulation = {"objective": 0.00}
-    sold: bool
-    sold_at_day: int
-    wean_weight: float
+    sold: bool = False
+    sold_at_day: int = int(math.inf)
+    wean_weight: float = 0.0
 
     @property
     def is_milking(self) -> bool:
