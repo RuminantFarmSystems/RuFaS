@@ -393,9 +393,7 @@ class Storage:
 
         return conditions
 
-    def _process_moisture_loss(
-        self, time: Time, loss_period: int, final_moisture_percentage: float
-    ) -> None:
+    def _process_moisture_loss(self, time: Time, loss_period: int, final_moisture_percentage: float) -> None:
         """
         Calculates the total amount of moisture that has been lost from all crops in storage since the last time
         degradations were processed.
@@ -420,9 +418,7 @@ class Storage:
             processed_moisture_loss = self._calculate_moisture_loss(
                 crop, crop.last_time_degraded, loss_period, final_moisture_percentage
             )
-            cumulative_moisture_loss = self._calculate_moisture_loss(
-                crop, time, loss_period, final_moisture_percentage
-            )
+            cumulative_moisture_loss = self._calculate_moisture_loss(crop, time, loss_period, final_moisture_percentage)
             actual_moisture_loss = cumulative_moisture_loss - processed_moisture_loss
 
             total_moisture_loss += actual_moisture_loss
