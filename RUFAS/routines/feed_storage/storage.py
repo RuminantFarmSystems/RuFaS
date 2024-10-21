@@ -393,6 +393,53 @@ class Storage:
 
         return conditions
 
+    def _calculate_moisture_loss(
+        self, crop: HarvestedCrop, time: Time, loss_period: int, final_moisture_percentage: float
+    ) -> float:
+        """
+        Calculates the moisture lost from a crop since it was stored.
+
+        Parameters
+        ----------
+        crop : HarvestedCrop
+            The  crop to process moisture loss in.
+        time : Time
+            Time instance containing the time that loss should be processed up to.
+        loss_period : int
+            Number of days over which moisture is lost after crop is stored.
+        final_moisture_percentage : float
+            Amount of moisture left in the crop after all moisture loss has occurred.
+
+        Returns
+        -------
+        float
+            Moisture loss from the crop that occurred in the first 30 days of storage (kg).
+
+        References
+        ----------
+        .. Feed Storage Scientific Documentation, equation. 1.2.9
+
+        """
+        days_stored = time.simulation_day - crop.storage_time.simulation_day
+        days_in_window = min(days_stored, loss_period)
+        fraction_of_total_loss = days_in_window / loss_period
+
+        initial_moisture_percentage = 100.0 - crop.initial_dry_matter_percentage
+
+        initial_fresh_mass = crop.initial_dry_matter_mass / (
+            crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+        )
+        percentage_of_fresh_mass_lost_as_moisture = max(0.0, initial_moisture_percentage - final_moisture_percentage)
+
+        moisture_loss = (
+            initial_fresh_mass
+            * percentage_of_fresh_mass_lost_as_moisture
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
+            * fraction_of_total_loss
+        )
+
+        return moisture_loss
+
     def recalculate_nutrient_percentage(
         self,
         initial_nutrient_percentage: float,

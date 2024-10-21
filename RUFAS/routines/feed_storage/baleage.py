@@ -2,6 +2,11 @@ from .enums import CropCategory
 from .storage import Storage
 
 
+"""Defines the final moisture level that baleage will dry down to."""
+# TODO: make this value a user input.
+DEFAULT_FINAL_MOISTURE_PERCENTAGE = 50.0
+
+
 class Baleage(Storage):
     """
     Class representing Baleage storage, a subclass of Storage.
