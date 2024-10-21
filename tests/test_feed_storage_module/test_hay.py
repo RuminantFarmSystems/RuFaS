@@ -5,6 +5,8 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.hay import (
+    FINAL_MOISTURE_PERCENTAGE,
+    INITIAL_LOSS_PERIOD,
     PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT,
     PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT,
     UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT,
@@ -13,9 +15,7 @@ from RUFAS.routines.feed_storage.hay import (
     ProtectedWrapped,
     Unprotected,
 )
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
 
 from .sample_crop_data import sample_crop_data
 
@@ -57,51 +57,21 @@ def test_acceptable_crops(hay: Hay) -> None:
     ]
 
 
-@pytest.mark.parametrize(
-    "days,fresh_mass,moisture,expected_loss",
-    [
-        (1, 1_000.0, 24.0, 4.0),
-        (3, 1_000.0, 24.0, 12.0),
-        (6, 20_000.0, 30.0, 720.0),
-        (40, 10_000.0, 80.0, 6_800.0),
-        (20, 6_000.0, 10.0, 0.0),
-    ],
-)
 def test_process_degradations(
     hay: Hay,
     harvested_crop: HarvestedCrop,
     mocker: MockerFixture,
-    days: int,
-    fresh_mass: float,
-    moisture: float,
-    expected_loss: float,
 ) -> None:
     """Tests process_degradations in Hay."""
-    expected_info_map = {
-        "class": hay.__class__.__name__,
-        "function": hay.process_degradations.__name__,
-        "units": MeasurementUnits.KILOGRAMS,
-    }
-    harvested_crop.initial_dry_matter_percentage = 100.0 - moisture
-    harvested_crop.initial_dry_matter_mass = (
-        fresh_mass * harvested_crop.initial_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
-    )
-    harvested_crop.fresh_mass = fresh_mass
-    harvested_crop.storage_time = mocker.MagicMock(autospec=Time)
-    setattr(harvested_crop.storage_time, "simulation_day", 0)
-    harvested_crop.last_time_degraded = mocker.MagicMock(autospec=Time)
-    setattr(harvested_crop.last_time_degraded, "simulation_day", 0)
     mock_time = mocker.MagicMock(autospec=Time)
-    setattr(mock_time, "simulation_day", days)
     hay.stored = [harvested_crop]
+    mock_moisture_loss = mocker.patch.object(hay, "_process_moisture_loss")
     mock_storage_process_degradations = mocker.patch("RUFAS.routines.feed_storage.storage.Storage.process_degradations")
-    mock_add_var = mocker.patch.object(hay.om, "add_variable")
     mock_weather = mocker.MagicMock()
 
     hay.process_degradations(mock_weather, mock_time)
 
-    mock_add_var.assert_called_once_with("total_moisture_loss", expected_loss, expected_info_map)
-    assert harvested_crop.fresh_mass == fresh_mass - expected_loss
+    mock_moisture_loss.assert_called_once_with(mock_time, INITIAL_LOSS_PERIOD, FINAL_MOISTURE_PERCENTAGE)
     mock_storage_process_degradations.assert_called_once_with(mock_weather, mock_time)
 
 
