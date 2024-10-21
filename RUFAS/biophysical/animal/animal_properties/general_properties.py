@@ -13,7 +13,7 @@ class Breed(Enum):
 
 
 class Sex(Enum):
-    """Enum indicating the gender of the animal."""
+    """Enum indicating the sex of the animal."""
 
     MALE = "male"
     FEMALE = "female"
