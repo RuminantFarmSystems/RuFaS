@@ -276,7 +276,7 @@ def test_calculate_absorbed_phosphorus(
 )
 def test_calculate_animal_phosphorus_requirement(
     animal_type: AnimalType, is_milking: bool, ration_phosphorus_concentration: float, absorbed_phosphorus: float,
-    expected_requirement,
+    expected_requirement: float,
 ) -> None:
     """Tests that the animal phosphorus requirement is calculated correctly based on the animal type and conditions."""
     mock_general_properties = MagicMock()
