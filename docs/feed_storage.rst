@@ -3,8 +3,8 @@ Feed Storage Scientific Documentation
 
 This document details how stored feeds lose dry matter and nutrients.
 
-1 Dry Matter Loss
------------------
+1 Mass Loss
+-----------
 
 1.1 Grain
 ~~~~~~~~~
@@ -153,7 +153,7 @@ Table: :math:`1.2.9`
 Hayed crops will lose moisture in the first 30 days of storage if they
 have a moisture percentage greater than :math:`MF` when they are stored.
 
-The cumulative amount of moisture (kg) that is lost from a hayed crop's fresh
+The cumulative amount of moisture (kg) that is lost from hayed and baled crop's fresh
 mass is calculated with the following equation:
 
 .. math::
@@ -161,10 +161,9 @@ mass is calculated with the following equation:
 
    M = F_i \cdot \frac{max(0.0, moisture - MF)}{100} \cdot \frac{min(30, d)}{30} \tag{1.2.9}
 
-Where :math:`F_i` is the fresh mass of the hayed crop when it is stored
-(:math:`kg`), :math:`moisture` is the percentage of the fresh mass that is not dry matter
-when the crop is stored, and :math:`d` is the number of days that the crop
-has been stored for.
+Where :math:`F_i` is the fresh mass of the crop when it is stored (:math:`kg`), :math:`moisture`
+is the percentage of the fresh mass that is not dry matter when the crop is stored, and
+:math:`d` is the number of days that the crop has been stored for.
 
 1.3 Silage and Baleage
 ~~~~~~~~~~~~~~~~~~~~~~
