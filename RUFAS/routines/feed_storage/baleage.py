@@ -9,7 +9,7 @@ from .storage import Storage
 INITIAL_LOSS_PERIOD = 30
 
 
-"""Defines the final moisture level that baleage will dry down to. TODO: make this value a user input."""
+"""Defines the final moisture level that baleage will dry down to. TODO: make this value a user input - #2038"""
 DEFAULT_FINAL_MOISTURE_PERCENTAGE = 50.0
 
 
