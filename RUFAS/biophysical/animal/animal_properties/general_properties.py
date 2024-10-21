@@ -32,6 +32,8 @@ class GeneralProperties:
         Number of days into pregnancy when a lactating cow stops milking.
     metabolizable_energy_intake : float
         Metabolizable energy intake, Mcal/kg dry matter.
+    daily_milk_produced : float
+        Milk production of the animal on a single day (kg).
 
     """
 
