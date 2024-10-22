@@ -1902,7 +1902,8 @@ class InputManager:
 
         Notes
         -----
-        This function takes in a variable (dictionary or tabular data) along with its name and a key to access its validation metadata.
+        This function takes in a variable (dictionary or tabular data) along with its name and a key to access its
+        validation metadata.
         It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
 
         Parameters
