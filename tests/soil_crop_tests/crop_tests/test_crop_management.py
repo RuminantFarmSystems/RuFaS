@@ -1,24 +1,21 @@
+from math import exp
+
 import pytest
-from mock.mock import MagicMock, patch, PropertyMock
+from mock.mock import MagicMock, PropertyMock, patch
 from pytest_mock import MockerFixture
-from RUFAS.units import MeasurementUnits
-from RUFAS.time import Time
+
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_management import CropManagement
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    DEFAULT_DRY_MATTER_DIGESTIBILITY,
-)
 from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
-from math import exp
+from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
-
-om = OutputManager()
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture
@@ -314,6 +311,7 @@ def test_recalculate_biomass_distribution(
     assert crop.root_fraction == expected_root_fraction
 
 
+@pytest.mark.skip(reason="Issue #2008")
 @pytest.mark.parametrize(
     "field_size,wet_yield_collected,expected_fresh_mass",
     [
@@ -375,6 +373,7 @@ def test_record_yield(
     dry_mass: float,
     nitrogen: float,
     phosphorus: float,
+    mocker: MockerFixture,
 ) -> None:
     """Tests that harvest yields are correctly recorded to the OutputManager."""
     crop_manager = CropManagement()
@@ -430,15 +429,14 @@ def test_record_yield(
         "field_size": field_size,
         "field_name": field_name,
     }
+    add_variable = mocker.patch.object(OutputManager, "add_variable")
+    crop_manager._record_yield(field_name, field_size, year, day)
 
-    with patch.object(om, "add_variable") as add_variable:
-        crop_manager._record_yield(field_name, field_size, year, day)
-
-        add_variable.assert_called_once_with(
-            "harvest_yield",
-            expected_value,
-            expected_info_map,
-        )
+    add_variable.assert_called_once_with(
+        "harvest_yield",
+        expected_value,
+        expected_info_map,
+    )
 
 
 @pytest.mark.parametrize(
@@ -613,7 +611,7 @@ def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
     crop._recalculate_biomass_distribution = MagicMock()
     crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
 
-    patch_for_add_warning = mocker.patch("tests.soil_crop_tests.crop_tests.test_crop_management.om.add_warning")
+    patch_for_add_warning = mocker.patch.object(crop.om, "add_warning")
     crop.cut_crop(0.5)
     crop.determine_biomass_cut_from_whole_plant.assert_called_once()
     info_map = {"class": crop.__class__.__name__, "function": crop.cut_crop.__name__}

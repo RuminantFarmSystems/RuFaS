@@ -15,7 +15,14 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
+
 from .routines.EEE.EEE_manager import EEEManager
+
+"""
+Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
+TODO: remove this constant after Animal and Feed Storage modules are connected - #1878
+"""
+FEED_DEGRADATION_INTERVAL_LENGTH = 15
 
 
 class SimulationEngine:
@@ -23,6 +30,12 @@ class SimulationEngine:
     The SimulationEngine class is responsible for orchestrating the entire simulation
     process for RuFaS. It manages the simulation's lifecycle, advancing time, executing daily
     and annual routines, and logging simulation progress.
+
+    Parameters
+    ----------
+    is_end_to_end_test_run : bool
+        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        Indicates if a simulation is being run for end-to-end testing.
 
     Attributes
     ----------
@@ -39,6 +52,10 @@ class SimulationEngine:
         handlers, reception pits, manure separators, and manure storage treatments.
     field_manager: FieldManager
         The FieldManager object that manages all fields in the simulation.
+    is_end_to_end_test_run : bool
+        TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        Indicates if a simulation is being run for end-to-end testing. Set to True if end-to-end testing inputs are
+        found in the Input Manager.
 
     Methods
     -------
@@ -46,13 +63,17 @@ class SimulationEngine:
         Execute the simulation process.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, is_end_to_end_test_run: bool) -> None:
         """
         Initializes the simulation engine.
         """
         self.om = OutputManager()
         self.im = InputManager()
         self.time = Time()
+
+        # TODO: remove this attribute after Animal and Feed Storage modules are connected - #1878
+        self.is_end_to_end_test_run = is_end_to_end_test_run
+
         self._initialize_simulation()
 
     def simulate(self) -> None:
@@ -101,6 +122,13 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
+
+        # TODO: remove this code after Animal and Feed Storage modules are connected - #1878
+        if self.is_end_to_end_test_run:
+            process_degradations_today = self.time.current_julian_day % FEED_DEGRADATION_INTERVAL_LENGTH == 0
+            if process_degradations_today:
+                self.feed_manager.process_degradations(self.weather, self.time)
+
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
@@ -178,3 +206,9 @@ class SimulationEngine:
         )
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
+
+        # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
+        if self.is_end_to_end_test_run:
+            end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
+            self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)
+            self.feed_manager.process_degradations(self.weather, self.time)

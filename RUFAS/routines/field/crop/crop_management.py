@@ -1,20 +1,16 @@
 from math import exp
 from typing import Optional
+
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.units import MeasurementUnits
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    DEFAULT_DRY_MATTER_DIGESTIBILITY,
-)
+from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
-from RUFAS.output_manager import OutputManager
-
-om = OutputManager()
+from RUFAS.units import MeasurementUnits
 
 
 class CropManagement:
@@ -41,6 +37,7 @@ class CropManagement:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.om = OutputManager()
 
     # ---- Main Methods ----
     def manage_harvest(
@@ -190,7 +187,7 @@ class CropManagement:
                 f"The variable 'biomass' in CropData has an invalid value: '{self.data.biomass}'. "
             )
 
-            om.add_warning(warning_name, warning_message, info_map)
+            self.om.add_warning(warning_name, warning_message, info_map)
             return None
 
         self.data.biomass -= self.data.cut_biomass
@@ -345,7 +342,7 @@ class CropManagement:
             "field_size": field_size,
             "field_name": field_name,
         }
-        om.add_variable("harvest_yield", value, info_map)
+        self.om.add_variable("harvest_yield", value, info_map)
 
     def _transfer_residue(self, soil_data: SoilData, killed: bool) -> None:
         """

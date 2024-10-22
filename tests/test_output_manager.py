@@ -4,7 +4,7 @@ import sys
 from collections import Counter
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Union, Type
+from typing import Any, Callable, Dict, List, Type, Union
 
 import pandas as pd
 import pytest
@@ -887,6 +887,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     # Arrange
     output_manager = OutputManager()
     path = "dummy_path"
+    patch_create_dir = mocker.patch.object(output_manager, "create_directory")
     patch_for_dump_errors = mocker.patch.object(output_manager, "dump_errors")
     patch_for_dump_warnings = mocker.patch.object(output_manager, "dump_warnings")
     patch_for_dump_logs = mocker.patch.object(output_manager, "dump_logs")
@@ -897,6 +898,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     output_manager.dump_all_nondata_pools(path, False, "verbose")
 
     # Assert
+    patch_create_dir.assert_called_once_with(path)
     patch_for_dump_variable_names_and_contexts.assert_called_once_with(path, False, "verbose")
     patch_for_dump_errors.assert_called_once_with(path)
     patch_for_dump_warnings.assert_called_once_with(path)
@@ -907,6 +909,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     output_manager.dump_all_nondata_pools(path, True, "verbose")
 
     # Assert
+    assert patch_create_dir.call_count == 2
     assert patch_for_dump_variable_names_and_contexts.call_count == 2
     assert patch_for_dump_errors.call_count == 2
     assert patch_for_dump_warnings.call_count == 2
@@ -2784,7 +2787,6 @@ def test_filter_saved_pools(
 
 def test_run_startup_sequence_clear_output_directory(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
@@ -2802,6 +2804,7 @@ def test_run_startup_sequence_clear_output_directory(
     dummy_output_prefix: str = "dummy_prefix"
     dummy_version_number: str = "0.0"
     dummy_task_id: str = "dummy_task"
+    is_e2e_run: bool = True
 
     mock_output_manager.run_startup_sequence(
         dummy_verbosity,
@@ -2812,6 +2815,7 @@ def test_run_startup_sequence_clear_output_directory(
         dummy_output_prefix,
         dummy_version_number,
         dummy_task_id,
+        is_e2e_run,
     )
 
     mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
@@ -2821,11 +2825,11 @@ def test_run_startup_sequence_clear_output_directory(
     mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
     mock_create_directory.assert_called_once_with(dummy_output_directory)
     mock_clear_output_dir.assert_called_once_with(dummy_variables_file_path, dummy_output_directory)
+    assert mock_output_manager.is_end_to_end_testing_run == is_e2e_run
 
 
 def test_run_startup_sequence_not_clear_output_directory(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
@@ -2843,6 +2847,7 @@ def test_run_startup_sequence_not_clear_output_directory(
     dummy_output_prefix: str = "dummy_prefix"
     dummy_version_number: str = "0.0"
     dummy_task_id: str = "dummy_task"
+    is_e2e_run: bool = False
 
     mock_output_manager.run_startup_sequence(
         dummy_verbosity,
@@ -2853,6 +2858,7 @@ def test_run_startup_sequence_not_clear_output_directory(
         dummy_output_prefix,
         dummy_version_number,
         dummy_task_id,
+        False,
     )
 
     mock_print_credits.assert_called_once_with(dummy_version_number, dummy_task_id)
@@ -2862,3 +2868,4 @@ def test_run_startup_sequence_not_clear_output_directory(
     mock_set_metadata_prefix.assert_called_once_with(dummy_output_prefix)
     mock_create_directory.assert_called_once_with(dummy_output_directory)
     mock_clear_output_dir.assert_not_called()
+    assert mock_output_manager.is_end_to_end_testing_run == is_e2e_run

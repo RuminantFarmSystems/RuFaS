@@ -1,6 +1,6 @@
 from typing import Optional
-from RUFAS.routines.field.crop.crop_data import CropData
 
+from RUFAS.routines.field.crop.crop_data import CropData
 
 # TODO: This module needs to be updated to include water uptake by plants and evapotranspiration (implemented in Field?)
 
@@ -41,7 +41,7 @@ class WaterDynamics:
             Evaporation on a given day (mm).
         transpiration : float
             Transpiration on a given day (mm).
-        potential_evapotranspiration:
+        potential_evapotranspiration : float
             Potential evapotranspiration on a given day (mm).
 
         Notes

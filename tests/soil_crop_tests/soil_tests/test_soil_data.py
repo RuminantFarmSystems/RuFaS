@@ -1,11 +1,13 @@
-import pytest
-from typing import List
 from math import inf
-from pytest_mock import MockerFixture
-from unittest.mock import patch, PropertyMock
+from typing import List
+from unittest.mock import PropertyMock, patch
 
-from RUFAS.routines.field.soil.soil_data import SoilData
+import pytest
+from pytest_mock import MockerFixture
+
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 def test_get_vectorized_layer_attribute() -> None:
@@ -463,3 +465,30 @@ def test_cover_factor(cover_type: str) -> None:
                 str(e) == f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', "
                 f"received: '{cover_type}'."
             )
+
+
+def test_zero_silt_clay_warning(mocker: MockerFixture) -> None:
+    """Tests the case when silt and clay are zero."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_warning")
+    soil_layers = [
+        LayerData(
+            top_depth=0,
+            bottom_depth=20,
+            soil_water_concentration=500,
+            field_capacity_water_concentration=0.15,
+            saturation_point_water_concentration=0.2,
+            field_size=1.55,
+            silt_fraction=0,
+            clay_fraction=0,
+        )
+    ]
+    data = SoilData(soil_layers=soil_layers, field_size=0.95)  # noqa: F841
+    info_map = {"class": "SoilData", "function": "__post_init__"}
+    mock_add.assert_called_once_with(
+        "Silt and clay fractions in the soil are 0, which will lead to unreliable "
+        "predictions of erosion and soil emissions",
+        "It is assumed that the ratio of clay to silt in the soil layer will not have "
+        "any effect on the amount of erosion from the soil.",
+        info_map,
+    )

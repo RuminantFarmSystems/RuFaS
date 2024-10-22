@@ -1,22 +1,23 @@
+from typing import Dict, List, Tuple
+
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.weather import Weather
-from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
-from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
+from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from typing import Dict, List, Tuple
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
+from RUFAS.weather import Weather
 
 
 class FieldManager:
@@ -433,6 +434,7 @@ class FieldManager:
             "field_capacity_water_concentration",
             "saturation_point_water_concentration",
             "saturated_hydraulic_conductivity",
+            "pH",
             "bulk_density",
             "organic_carbon_fraction",
             "clay_fraction",

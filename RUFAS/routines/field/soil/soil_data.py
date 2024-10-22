@@ -1,8 +1,10 @@
-from dataclasses import dataclass, InitVar, field
-from typing import List, Optional
-from math import inf
 from copy import deepcopy
+from dataclasses import InitVar, dataclass, field
+from math import inf
+from typing import List, Optional
+
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.manure_pool import ManurePool
 
@@ -325,6 +327,20 @@ class SoilData:
         # Set the initial water content for the first year of the simulation
         self.initial_water_content = self.profile_soil_water_content
         self.initial_nitrates_total = self.profile_nitrates_total
+
+        if self.soil_layers[0].silt_fraction == 0 and self.soil_layers[0].clay_fraction == 0:
+            om = OutputManager()
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self.__post_init__.__name__,
+            }
+            om.add_warning(
+                "Silt and clay fractions in the soil are 0, which will lead to unreliable predictions of erosion"
+                " and soil emissions",
+                "It is assumed that the ratio of clay to silt in the soil layer will not have any effect on the "
+                "amount of erosion from the soil.",
+                info_map,
+            )
 
     def _subdivide_top_layer(self, field_size: float) -> None:
         """

@@ -1,14 +1,15 @@
 import copy
 from typing import List
-from .enums import CropCategory, CropType
-from .harvested_crop import HarvestedCrop
+
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.time import Time
 from RUFAS.output_manager import OutputManager
+from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
+from .enums import CropCategory, CropType
+from .harvested_crop import HarvestedCrop
 
 """
 These constants define the upper and lower bounds of temperatures that allow fermentation (in degrees C), the upper and
@@ -135,8 +136,7 @@ class Storage:
                 f"Adding {crop.fresh_mass} to currently stored ({self.stored_mass})\
                     exceeds the storage capacity ({self.capacity})"
             )
-        storage_crop = copy.deepcopy(crop)
-        self.stored.append(storage_crop)
+        self.stored.append(crop)
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
@@ -232,7 +232,11 @@ class Storage:
         """
         Records the total mass and nutrient amounts held in storage.
         """
-        info_map = {"class": self.__class__.__name__, "function": self.record_stored_crops.__name__, "units": "kg"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.record_stored_crops.__name__,
+            "units": MeasurementUnits.KILOGRAMS,
+        }
         self.om.add_variable("total_fresh_mass", self.stored_mass, info_map)
 
         total_dry_matter_mass = sum([crop.dry_matter_mass for crop in self.stored])

@@ -1,25 +1,19 @@
 import collections
 from typing import Any, Dict, List, Literal, Set, Tuple
 
-from RUFAS.enums import AnimalCombination
-
 import scipy
 
+from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.routines.animal.animal_typed_dicts import (
-    AvailableFeedsTypedDict,
-    FeedInfoTypedDict,
-)
+from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict, FeedInfoTypedDict
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration import animal_requirements
 from RUFAS.routines.animal.ration.ration_config import RationConfig
 from RUFAS.routines.animal.ration.ration_optimizer import RationOptimizer
-from RUFAS.routines.animal.ration.user_defined_ration import (
-    UserDefinedRationManager as UserDefinedRationManager,
-)
+from RUFAS.routines.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.units import MeasurementUnits
 
@@ -143,8 +137,8 @@ class RationManager:
             return ration, ration_vals
         # safeguard if scipy SLSQP bounds error still occurs after many iterations
         # using previous cycles ration for this pen
-        elif pen.ration != {}:
-            return pen.ration, ration_vals
+        elif pen.ration_per_animal != {}:
+            return pen.ration_per_animal, ration_vals
         else:
             om.add_error(
                 "No previous ration available",

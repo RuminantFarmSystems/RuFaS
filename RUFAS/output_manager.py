@@ -7,7 +7,7 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
+from typing import Any, Counter, Dict, List, TextIO, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -106,6 +106,12 @@ class OutputManager(object):
         Set to True to exclude info_maps when adding variables to the variables_pool
     _variables_usage_counter : Counter[str]
         A Counter object used to keep track of the number of times a variables in the variables_pool is used.
+    is_end_to_end_testing_run : bool, default False
+        Indicates if end-to-end testing is being run.
+    is_first_post_processing : bool, default True
+        True if post-processing (i.e. filtering and saving variables) has not occurred yet. This variable is used during
+        end-to-end testing to manage which filters are used during different post-processing runs.
+
     """
 
     __instance = None
@@ -133,6 +139,10 @@ class OutputManager(object):
                 "json": "json_",
                 "report": "report_",
             }
+            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
+                "json": "e2e_json_",
+                "comparison": "e2e_comparison_",
+            }
             self.__log_verbose: LogVerbosity = LogVerbosity.CREDITS
 
             self.chunkification: bool = False
@@ -149,6 +159,16 @@ class OutputManager(object):
             )
             self.time = None
             self._variables_usage_counter: Counter[str] = collections.Counter()
+            self.is_end_to_end_testing_run: bool = False
+            self.is_first_post_processing: bool = True
+
+    @property
+    def _filter_prefixes(self) -> dict[str, str]:
+        """Returns the appropriate set of acceptable filter prefixes."""
+        if self.is_end_to_end_testing_run:
+            return self.__end_to_end_testing_filter_prefixes
+        else:
+            return self.__supported_filter_types_prefixes
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -863,16 +883,13 @@ class OutputManager(object):
             all_files = os.listdir(dir_path)
             for filename in all_files:
                 if filename.endswith(".txt") or filename.endswith(".json"):
-                    for (
-                        _,
-                        supported_prefix,
-                    ) in self.__supported_filter_types_prefixes.items():
+                    for supported_prefix in self._filter_prefixes.values():
                         if filename.startswith(supported_prefix):
                             break
                     else:
                         self.add_warning(
                             "invalid filter file prefix",
-                            f"{filename} prefix is not in {list(self.__supported_filter_types_prefixes.values())}",
+                            f"{filename} prefix is not in {list(self._filter_prefixes.values())}",
                             info_map,
                         )
                         continue
@@ -1281,7 +1298,9 @@ class OutputManager(object):
             "class": self.__class__.__name__,
             "function": self._route_save_functions.__name__,
         }
-        if filter_file.startswith(self.__supported_filter_types_prefixes["json"]):
+
+        is_json = filter_file.startswith(self._filter_prefixes.get("json", "Better than a key error."))
+        if is_json and self.is_first_post_processing:
             self.create_directory(json_dir)
             self._save_to_json(
                 filter_file,
@@ -1289,12 +1308,13 @@ class OutputManager(object):
                 filtered_pool,
                 filter_content,
             )
-
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["csv"]):
+            return
+        if filter_file.startswith(self._filter_prefixes.get("csv", "Better than a key error.")):
             self.create_directory(csv_dir)
             variable_csv_file_path = csv_dir / self.generate_file_name(f"saved_variables_{filter_file}", "csv")
             self._dict_to_file_csv(filtered_pool, variable_csv_file_path)
-        elif filter_file.startswith(self.__supported_filter_types_prefixes["graph"]):
+            return
+        if filter_file.startswith(self._filter_prefixes.get("graph", "Better than a key error.")):
             self.create_directory(graphics_dir)
             if produce_graphics:
                 try:
@@ -1311,6 +1331,16 @@ class OutputManager(object):
                     f"Graphic generation is disabled, skipping {filter_file=}",
                     info_map,
                 )
+            return
+        is_comparison = filter_file.startswith(self._filter_prefixes.get("comparison", "Better than a key error."))
+        if is_comparison and not self.is_first_post_processing:
+            self.create_directory(json_dir)
+            self._save_to_json(
+                filter_file,
+                json_dir,
+                filtered_pool,
+                filter_content,
+            )
 
     def _save_to_json(
         self,
@@ -1539,6 +1569,7 @@ class OutputManager(object):
         """
         Dumps all non-data pools into the given path to a directory.
         """
+        self.create_directory(path)
         self.dump_variable_names_and_contexts(path, exclude_info_maps, format_option)
         self.dump_logs(path)
         self.dump_warnings(path)
@@ -1733,6 +1764,7 @@ class OutputManager(object):
         output_prefix: str,
         version_number: str,
         task_id: str,
+        is_end_to_end_testing_run: bool,
     ) -> None:
         """Performs various tasks that are needed to setup and run the Output Manager."""
         self.print_credits(version_number, task_id)
@@ -1743,3 +1775,4 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+        self.is_end_to_end_testing_run = is_end_to_end_testing_run

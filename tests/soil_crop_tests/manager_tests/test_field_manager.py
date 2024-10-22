@@ -1,27 +1,28 @@
-import mock
+from typing import Callable, Dict, List
+from unittest.mock import MagicMock, call, patch
 
+import mock
+import pytest
+from pytest_mock.plugin import MockerFixture
+
+from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
-from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.manager.crop_schedule import CropSchedule
+from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
+from RUFAS.routines.field.manager.field_manager import FieldManager
+from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.routines.manure.manure_manager import ManureManager
-import pytest
-from pytest_mock.plugin import MockerFixture
-from typing import List, Dict, Callable
-from unittest.mock import MagicMock, patch, call
 
 im = InputManager()
 om = OutputManager()
@@ -59,7 +60,6 @@ def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) 
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)
     )
     add_warning = mocker.patch.object(om, "add_warning")
-
     field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
 
     assert len(field_manager.fields) == len(field_blob_names)
@@ -1303,6 +1303,7 @@ def test_crop_schedule_setup(
                 "field_capacity_water_concentration": 0.29,
                 "saturation_point_water_concentration": 0.58,
                 "saturated_hydraulic_conductivity": 9.17,
+                "pH": 9.9,
                 "initial_temperature": 15.77575,
                 "bulk_density": 1.34,
                 "organic_carbon_fraction": 0.012,
@@ -1329,6 +1330,7 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.29,
                 saturation_point_water_concentration=0.58,
                 saturated_hydraulic_conductivity=9.17,
+                pH=9.9,
                 clay_fraction=0.2195,
                 temperature=15.77575,
                 bulk_density=1.34,
@@ -1358,6 +1360,7 @@ def test_crop_schedule_setup(
                 "field_capacity_water_concentration": 0.306,
                 "saturation_point_water_concentration": 0.5,
                 "saturated_hydraulic_conductivity": 9.17,
+                "pH": 6.5,
                 "initial_temperature": 14.50797297,
                 "bulk_density": 1.42,
                 "organic_carbon_fraction": 0.012,
@@ -1384,6 +1387,7 @@ def test_crop_schedule_setup(
                 field_capacity_water_concentration=0.306,
                 saturation_point_water_concentration=0.5,
                 saturated_hydraulic_conductivity=9.17,
+                pH=6.5,
                 clay_fraction=0.2727,
                 temperature=14.50797297,
                 bulk_density=1.42,
