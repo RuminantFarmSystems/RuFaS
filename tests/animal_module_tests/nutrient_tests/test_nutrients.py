@@ -132,13 +132,9 @@ def test_calculate_phosphorus_requirements(
     mock_phosphorus_status = MagicMock()
     mock_phosphorus_status.phosphorus_for_gestation_required_for_calf = 0.0
 
-    monkeypatch.setattr(
-        Nutrients, "_calculate_phosphorus_endogenous_loss", MagicMock(return_value=endogenous_loss)
-    )
+    monkeypatch.setattr(Nutrients, "_calculate_phosphorus_endogenous_loss", MagicMock(return_value=endogenous_loss))
     monkeypatch.setattr(Nutrients, "_calculate_phosphorus_for_growth", MagicMock(return_value=growth_phosphorus))
-    monkeypatch.setattr(
-        Nutrients, "_calculate_gestational_phosphorus", MagicMock(return_value=gestation_phosphorus)
-    )
+    monkeypatch.setattr(Nutrients, "_calculate_gestational_phosphorus", MagicMock(return_value=gestation_phosphorus))
     monkeypatch.setattr(Nutrients, "_calculate_milk_phosphorus", MagicMock(return_value=milk_phosphorus))
     monkeypatch.setattr(Nutrients, "_calculate_absorbed_phosphorus", MagicMock(return_value=absorbed_phosphorus))
     monkeypatch.setattr(
