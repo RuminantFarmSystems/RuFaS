@@ -3120,6 +3120,7 @@ def test_add_variable_to_pool_nested(
 
     if (not is_modifiable_during_runtime) and eager_termination:
         with pytest.raises(PermissionError):
+            print("h")
             input_manager._add_variable_to_pool(
                 variable_name=variable_name,
                 input_data=data,
@@ -3127,6 +3128,7 @@ def test_add_variable_to_pool_nested(
                 eager_termination=eager_termination,
             )
     elif not is_modifiable_during_runtime:
+        print("a")
         assert not input_manager._add_variable_to_pool(
             variable_name=variable_name,
             input_data=data,
@@ -3134,6 +3136,7 @@ def test_add_variable_to_pool_nested(
             eager_termination=eager_termination,
         )
     else:
+        print("b")
         result = input_manager._add_variable_to_pool(
             variable_name=variable_name,
             input_data=data,
@@ -4881,6 +4884,7 @@ def test_check_modifiability_error(
 
     try:
         input_manager._check_modifiability(variable_name, metadata_properties, eager_termination)
+        print("a")
     except PermissionError as e:
         mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
 
