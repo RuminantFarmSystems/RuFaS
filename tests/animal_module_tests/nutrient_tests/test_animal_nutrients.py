@@ -99,9 +99,7 @@ def test_calculate_phosphorus_endogenous_loss(
     mock_general_properties = MagicMock()
     mock_general_properties.animal_type = animal_type
 
-    result = AnimalNutrients._calculate_phosphorus_endogenous_loss(
-        mock_general_properties, dry_matter_intake
-    )
+    result = AnimalNutrients._calculate_phosphorus_endogenous_loss(mock_general_properties, dry_matter_intake)
 
     assert result == pytest.approx(expected_loss, 1e-3)
 
