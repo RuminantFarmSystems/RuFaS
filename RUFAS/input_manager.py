@@ -1942,7 +1942,8 @@ class InputManager:
                 info_map,
             )
             raise TypeError(
-                "Incorrect variable type. Expected `Dict[str, Any]`, `List[Any]`, or `Dict[str, List[Any]]`.")
+                "Incorrect variable type. Expected `Dict[str, Any]`, `List[Any]`, or `Dict[str, List[Any]]`."
+            )
 
         if isinstance(data, List):
             data = {variable_name: data}
