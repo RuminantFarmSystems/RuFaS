@@ -1890,6 +1890,78 @@ class InputManager:
         else:
             return False
 
+    def add_variable_to_pool(
+        self,
+        variable_name: str,
+        data: Union[Dict[str, Any], List[Any], Dict[str, List[Any]]],
+        properties_blob_key: str,
+        eager_termination: bool,
+    ) -> bool:
+        """
+        Adds a variable (either dictionary or tabular) to the InputManager's pool after validating it against metadata.
+
+        Notes
+        -----
+        This function takes in a variable (dictionary or tabular data) along with its name and a key to access its validation metadata.
+        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
+
+        Parameters
+        ----------
+        variable_name: str
+            The name of the variable to be added.
+        data : Union[Dict[str, Any], List[Any], Dict[str, List[Any]]]
+            The data of the variable, either as a dictionary, a list, or a dictionary of lists.
+        properties_blob_key : str
+            A key used to locate the metadata for validation of the variable.
+        eager_termination : bool
+            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
+            If False, the function returns False.
+
+        Returns
+        -------
+        bool
+            True if the variable is successfully validated and added to the pool.
+            False if the variable is invalid and not added to the pool.
+
+        Raises
+        ------
+        TypeError
+            If `data` is not the expected type of Dict[str, Any], List[Any], or Dict[str, List[Any]].
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.add_variable_to_pool.__name__,
+        }
+
+        # Validate data type
+        if not (isinstance(data, Dict) or isinstance(data, List)):
+            self.om.add_error(
+                "Incorrect variable type",
+                f"Variable {variable_name} has type {type(data)}, does not match "
+                f"the expected types: `Dict[str, Any]`, `List[Any]`, or `Dict[str, List[Any]]`.",
+                info_map,
+            )
+            raise TypeError(
+                "Incorrect variable type. Expected `Dict[str, Any]`, `List[Any]`, or `Dict[str, List[Any]]`.")
+
+        if isinstance(data, List):
+            data = {variable_name: data}
+
+        metadata_properties_exist = self._metadata_properties_exist(
+            variable_name=variable_name, properties_blob_key=properties_blob_key
+        )
+
+        if metadata_properties_exist:
+            add_variable_success = self._add_variable_to_pool(
+                variable_name=variable_name,
+                input_data=data,
+                properties_blob_key=properties_blob_key,
+                eager_termination=eager_termination,
+            )
+            return add_variable_success
+        else:
+            return False
+
     def dump_get_data_logs(self, path: Path) -> None:
         """
         Dumps the stored get data logs to a JSON file at the specified path.
