@@ -1,5 +1,5 @@
-from typing import Optional
 from math import exp, inf
+from typing import Optional
 
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -43,12 +43,12 @@ class MineralizationDecomposition:
             return
 
         carbon_nitrogen_ratio = self._calculate_residue_nutrient_ratio(
-            self.data.soil_layers[0].total_soil_carbon_amount,
+            self.data.soil_layers[0].carbon_residue_amount,
             self.data.soil_layers[0].fresh_organic_nitrogen_content,
             self.data.soil_layers[0].nitrate_content,
         )
         carbon_phosphorus_ratio = self._calculate_residue_nutrient_ratio(
-            self.data.soil_layers[0].total_soil_carbon_amount,
+            self.data.soil_layers[0].carbon_residue_amount,
             self.data.soil_layers[0].fresh_organic_phosphorus_content,
             self.data.soil_layers[0].labile_inorganic_phosphorus_content,
         )

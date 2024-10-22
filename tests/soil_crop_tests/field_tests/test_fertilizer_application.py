@@ -1,6 +1,7 @@
-import pytest
 from typing import List
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.soil.layer_data import LayerData

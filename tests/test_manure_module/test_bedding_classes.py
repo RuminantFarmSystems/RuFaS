@@ -2,17 +2,17 @@ import pytest
 from pytest import approx
 
 from RUFAS.routines.manure.beddings.bedding_classes import (
-    BeddingConfig,
-    StrawBedding,
-    CBPBSawdustBedding,
     BaseBedding,
+    BeddingConfig,
+    BeddingFactory,
+    BeddingType,
+    CBPBSawdustBedding,
+    ManureSolidsBedding,
+    NoBedding,
+    SandBedding,
+    SawdustBedding,
+    StrawBedding,
 )
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingFactory
-from RUFAS.routines.manure.beddings.bedding_classes import BeddingType
-from RUFAS.routines.manure.beddings.bedding_classes import ManureSolidsBedding
-from RUFAS.routines.manure.beddings.bedding_classes import SandBedding
-from RUFAS.routines.manure.beddings.bedding_classes import SawdustBedding
-from RUFAS.routines.manure.beddings.bedding_classes import NoBedding
 
 
 @pytest.mark.parametrize(
@@ -152,6 +152,33 @@ def test_bedding_public_methods(
     assert actual_total_bedding_dry_solids == approx(expected_total_bedding_dry_solids)
 
 
+@pytest.mark.parametrize(
+    "bedding_type,clean_frac,bedding_mass,expected",
+    [
+        (BeddingType.SAWDUST, 0.5, 100.0, 50.0),
+        (BeddingType.CBPB_SAWDUST, 0.0, 20.0, 0.0),
+        (BeddingType.MANURE_SOLIDS, 1.0, 75.0, 75.0),
+        (BeddingType.STRAW, 0.25, 200.0, 50.0),
+        (BeddingType.SAND, 0.5, 100.0, 0.0),
+    ],
+)
+def test_calc_organic_bedding_mass_added_to_manure(
+    bedding_type: BeddingType,
+    clean_frac: float,
+    bedding_mass: float,
+    expected: float,
+    dummy_bedding_config: BeddingConfig,
+) -> None:
+    """Tests that calc_organic_bedding_mass_added_to_manure functions correctly for organic and sand beddings."""
+    dummy_bedding_config.bedding_cleaned_fraction = clean_frac
+    dummy_bedding_config.bedding_type = bedding_type
+    bedding = BeddingFactory.get_instance("test", dummy_bedding_config)
+
+    actual = bedding.calc_organic_bedding_mass_added_to_manure(bedding_mass)
+
+    assert actual == expected
+
+
 def test_no_bedding_public_methods(dummy_bedding_config: BeddingConfig) -> None:
     """Tests that the NONE_BEDDING_CONFIG public methods behave as expected."""
     dummy_bedding_config.bedding_type = BeddingType.NONE
@@ -160,6 +187,7 @@ def test_no_bedding_public_methods(dummy_bedding_config: BeddingConfig) -> None:
 
     assert bedding.calc_total_bedding_washed(8) == 0.0
     assert bedding.calc_total_bedding_mass(10) == 0.0
+    assert bedding.calc_organic_bedding_mass_added_to_manure(10) == 0.0
     assert bedding.calc_total_bedding_volume(100) == 0.0
     assert bedding.calc_total_bedding_volume(1) == 0.0
     assert bedding.calc_total_bedding_dry_solids(-3) == 0.0

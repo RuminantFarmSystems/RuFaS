@@ -1,12 +1,5 @@
 from collections import defaultdict
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import TypeVar
-from typing import Union
+from typing import Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -19,15 +12,12 @@ from RUFAS.routines.animal.animal_typed_dicts import (
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
-
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
 from RUFAS.util import Utility
 
 # GenericAnimal is a placeholder/generic type that represents any of the five classes listed in the union.
@@ -201,8 +191,9 @@ class LifeCycleManager:
         heiferIIs = self._get_animals(HeiferII)
         heiferIIIs = self._get_animals(HeiferIII)
         cows = self._get_animals(Cow)
+        corrected_cows = self._correct_cows_milking_attributes(cows)
         self.replacement_market = self.animal_population.get_replacement_cows()
-        return calves, heiferIs, heiferIIs, heiferIIIs, cows
+        return calves, heiferIs, heiferIIs, heiferIIIs, corrected_cows
 
     def _set_avg_CI(self) -> None:
         if "use_input_calving_interval" in self.animal_config and self.animal_config["use_input_calving_interval"]:
@@ -234,7 +225,41 @@ class LifeCycleManager:
         animals = animal_getter_by_animal_type[animal_type]()
         for animal in animals:
             animal.events.add_event(animal.days_born, 0, animal_constants.INIT_HERD)
+
         return animals
+
+    def _correct_cows_milking_attributes(self, cows: list[Cow]) -> list[Cow]:
+        """
+        Corrects any attributes from cows entering the herd at initization for conditions incompatible with the
+        user-specified management practices.
+
+        Parameters
+        ----------
+        cows : list[Cow]
+            Cow instances that need to be checked for invalid attribute/state combinations before the simulations
+            starts.
+
+        Returns
+        -------
+        list[Cow]
+            The list of Cow instances with their milking attributes checked and corrected.
+
+        """
+        for cow in cows:
+            if not cow.is_pregnant:
+                continue
+            is_milking_expected = cow.days_in_preg < AnimalBase.config["days_in_preg_when_dry"]
+            valid_milking_status = cow.milking == is_milking_expected
+            if not valid_milking_status and is_milking_expected:
+                date_of_last_birth = cow.events.get_most_recent_date(animal_constants.NEW_BIRTH)
+                cow.days_in_milk = cow.days_born - date_of_last_birth
+                cow.milking = True
+                om.add_warning(
+                    "Cow in initialization herd has dried off before reaching dry period of pregnancy",
+                    f"Setting cow {cow.id}'s milking status to true and days_in_milk to be {cow.days_in_milk}",
+                    {"class": self.__class__.__name__, "function": "__init__"},
+                )
+        return cows
 
     def daily_update(
         self,
