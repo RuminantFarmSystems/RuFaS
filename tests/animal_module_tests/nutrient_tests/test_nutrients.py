@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_nutrients.animal_nutrients import AnimalNutrients
+from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
 
@@ -13,19 +13,19 @@ def test_perform_daily_phosphorus_update(mocker: MockerFixture) -> None:
     mock_general_properties = MagicMock()
 
     mock_get_dmi = mocker.patch(
-        "RUFAS.biophysical.animal.animal_nutrients.animal_nutrients.AnimalNutrients." "_get_dry_matter_intake",
+        "RUFAS.biophysical.animal.nutrients.nutrients.Nutrients." "_get_dry_matter_intake",
         return_value=10.0,
     )
     mock_calc_phosphorus_requirements = mocker.patch(
-        "RUFAS.biophysical.animal.animal_nutrients.animal_nutrients.AnimalNutrients._calculate_phosphorus_requirements",
+        "RUFAS.biophysical.animal.nutrients.nutrients.Nutrients._calculate_phosphorus_requirements",
         return_value=mock_animal_status,
     )
     mock_calc_total_phosphorus = mocker.patch(
-        "RUFAS.biophysical.animal.animal_nutrients.animal_nutrients.AnimalNutrients._calculate_total_animal_phosphorus",
+        "RUFAS.biophysical.animal.nutrients.nutrients.Nutrients._calculate_total_animal_phosphorus",
         return_value=mock_animal_status,
     )
 
-    result = AnimalNutrients.perform_daily_phosphorus_update(mock_animal_status, mock_general_properties)
+    result = Nutrients.perform_daily_phosphorus_update(mock_animal_status, mock_general_properties)
 
     mock_get_dmi.assert_called_once()
     mock_calc_phosphorus_requirements.assert_called_once_with(mock_general_properties, mock_animal_status, 10.0)
@@ -70,7 +70,7 @@ def test_calculate_total_animal_phosphorus(
     mock_phosphorus_status.phosphorus_for_growth = phosphorus_for_growth
     mock_phosphorus_status.total_phosphorus_in_animal = 100.0
 
-    AnimalNutrients._calculate_total_animal_phosphorus(mock_phosphorus_status)
+    Nutrients._calculate_total_animal_phosphorus(mock_phosphorus_status)
 
     assert mock_phosphorus_status.phosphorus_excess_in_diet == expected_excess_in_diet
     assert mock_phosphorus_status.phosphorus_reserves == pytest.approx(expected_reserves, 1e-3)
@@ -99,7 +99,7 @@ def test_calculate_phosphorus_endogenous_loss(
     mock_general_properties = MagicMock()
     mock_general_properties.animal_type = animal_type
 
-    result = AnimalNutrients._calculate_phosphorus_endogenous_loss(mock_general_properties, dry_matter_intake)
+    result = Nutrients._calculate_phosphorus_endogenous_loss(mock_general_properties, dry_matter_intake)
 
     assert result == pytest.approx(expected_loss, 1e-3)
 
@@ -133,19 +133,19 @@ def test_calculate_phosphorus_requirements(
     mock_phosphorus_status.phosphorus_for_gestation_required_for_calf = 0.0
 
     monkeypatch.setattr(
-        AnimalNutrients, "_calculate_phosphorus_endogenous_loss", MagicMock(return_value=endogenous_loss)
+        Nutrients, "_calculate_phosphorus_endogenous_loss", MagicMock(return_value=endogenous_loss)
     )
-    monkeypatch.setattr(AnimalNutrients, "_calculate_phosphorus_for_growth", MagicMock(return_value=growth_phosphorus))
+    monkeypatch.setattr(Nutrients, "_calculate_phosphorus_for_growth", MagicMock(return_value=growth_phosphorus))
     monkeypatch.setattr(
-        AnimalNutrients, "_calculate_gestational_phosphorus", MagicMock(return_value=gestation_phosphorus)
+        Nutrients, "_calculate_gestational_phosphorus", MagicMock(return_value=gestation_phosphorus)
     )
-    monkeypatch.setattr(AnimalNutrients, "_calculate_milk_phosphorus", MagicMock(return_value=milk_phosphorus))
-    monkeypatch.setattr(AnimalNutrients, "_calculate_absorbed_phosphorus", MagicMock(return_value=absorbed_phosphorus))
+    monkeypatch.setattr(Nutrients, "_calculate_milk_phosphorus", MagicMock(return_value=milk_phosphorus))
+    monkeypatch.setattr(Nutrients, "_calculate_absorbed_phosphorus", MagicMock(return_value=absorbed_phosphorus))
     monkeypatch.setattr(
-        AnimalNutrients, "_calculate_animal_phosphorus_requirement", MagicMock(return_value=absorbed_phosphorus)
+        Nutrients, "_calculate_animal_phosphorus_requirement", MagicMock(return_value=absorbed_phosphorus)
     )
 
-    result = AnimalNutrients._calculate_phosphorus_requirements(
+    result = Nutrients._calculate_phosphorus_requirements(
         mock_general_properties, mock_phosphorus_status, dry_matter_intake
     )
 
@@ -184,7 +184,7 @@ def test_calculate_phosphorus_for_growth(
     mock_general_properties.mature_body_weight = mature_body_weight
     mock_general_properties.daily_growth = daily_growth
 
-    result = AnimalNutrients._calculate_phosphorus_for_growth(mock_general_properties)
+    result = Nutrients._calculate_phosphorus_for_growth(mock_general_properties)
 
     assert result == pytest.approx(expected_growth_phosphorus, 1e-3)
 
@@ -211,7 +211,7 @@ def test_calculate_gestational_phosphorus(days_in_preg: int, expected_phosphorus
     mock_general_properties = MagicMock()
     mock_general_properties.days_in_preg = days_in_preg
 
-    result = AnimalNutrients._calculate_gestational_phosphorus(mock_general_properties)
+    result = Nutrients._calculate_gestational_phosphorus(mock_general_properties)
 
     assert result == pytest.approx(expected_phosphorus, 1e-3)
 
@@ -235,7 +235,7 @@ def test_calculate_milk_phosphorus(
     mock_general_properties.is_milking = is_milking
     mock_general_properties.daily_milk_produced = daily_milk_produced
 
-    result = AnimalNutrients._calculate_milk_phosphorus(mock_general_properties)
+    result = Nutrients._calculate_milk_phosphorus(mock_general_properties)
 
     assert result == pytest.approx(expected_milk_phosphorus, 1e-3)
 
@@ -272,7 +272,7 @@ def test_calculate_absorbed_phosphorus(
     mock_phosphorus_status.phosphorus_for_growth = growth_phosphorus
     mock_phosphorus_status.phosphorus_for_gestation = gestation_phosphorus
 
-    result = AnimalNutrients._calculate_absorbed_phosphorus(
+    result = Nutrients._calculate_absorbed_phosphorus(
         mock_general_properties, mock_phosphorus_status, milk_phosphorus, urine_production_phosphorus
     )
 
@@ -307,7 +307,7 @@ def test_calculate_animal_phosphorus_requirement(
     mock_phosphorus_status = MagicMock()
     mock_phosphorus_status.ration_phosphorus_concentration = ration_phosphorus_concentration
 
-    result = AnimalNutrients._calculate_animal_phosphorus_requirement(
+    result = Nutrients._calculate_animal_phosphorus_requirement(
         mock_general_properties, mock_phosphorus_status, absorbed_phosphorus
     )
 
@@ -330,5 +330,5 @@ def test_calculate_animal_phosphorus_requirement(
 def test_is_cow(animal_type: AnimalType, expected_result: bool) -> None:
     """Tests that the function correctly identifies that the animal is either AnimalType.LAC_COW or
     AnimalType.DRY_COW."""
-    result = AnimalNutrients._is_cow(animal_type)
+    result = Nutrients._is_cow(animal_type)
     assert result == expected_result
