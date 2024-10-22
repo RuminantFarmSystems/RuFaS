@@ -342,6 +342,43 @@ class OutputManager(object):
         self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
         self.saved_pool_chunks_num += 1
 
+    def _load_and_filter_saved_pools(self, filters_dir_path: Path) -> None:
+        all_filters = self._load_all_filters(filters_dir_path)
+        list_of_dumped_files = self._sort_saved_chunk_files()
+
+        filtered_pool: dict[str, OutputManager.pool_element_type] = {}
+        for file in list_of_dumped_files:
+            self.load_variables_pool_from_file(file)
+            temp_filtered_pool: dict[str, OutputManager.pool_element_type] = {}
+            for filter_content in all_filters:
+                current_filter_result = self.filter_variables_pool(filter_content, False)
+                temp_filtered_pool = self._extend_variable_pool(temp_filtered_pool, current_filter_result)
+            filtered_pool = self._extend_variable_pool(filtered_pool, temp_filtered_pool)
+            self.variables_pool = {}
+
+        self.variables_pool = filtered_pool
+
+    def _load_all_filters(self, filters_dir_path: Path) -> list[dict[str, str | bool]]:
+        filter_list: list[dict[str, str|bool]] = []
+        filter_files_list = self._list_filter_files_in_dir(filters_dir_path)
+        for filter_file in filter_files_list:
+            filter_file_path = filters_dir_path / filter_file
+            filter_list += self._load_filter_file_content(filter_file_path)
+        print(filter_list)
+        return filter_list
+
+    def _extend_variable_pool(
+            self,
+            original_pool: dict[str, OutputManager.pool_element_type],
+            additional_pool: dict[str, OutputManager.pool_element_type]) -> dict[str, OutputManager.pool_element_type]:
+        for key, value in additional_pool.items():
+            if key in original_pool.keys():
+                original_pool[key]["info_maps"].extend(value["info_maps"])
+                original_pool[key]["values"].extend(value["values"])
+            else:
+                original_pool[key] = value
+        return original_pool
+
     def _stringify_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
         Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
@@ -1293,6 +1330,7 @@ class OutputManager(object):
         report_generator = ReportGenerator(self.time)
         if self.chunkification:
             self._save_current_variable_pool()
+            self._load_and_filter_saved_pools(filters_dir_path)
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = filters_dir_path / filter_file
@@ -1320,11 +1358,7 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = (
-                        self.filter_saved_pools(filter_content, self._sort_saved_chunk_files())
-                        if self.chunkification
-                        else self.filter_variables_pool(filter_content)
-                    )
+                    filtered_pool = self.filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
