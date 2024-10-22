@@ -320,17 +320,17 @@ def test_calculate_animal_phosphorus_requirement(
     "animal_type, expected_result",
     [
         # Cases where the animal is a calf or heifer
-        (AnimalType.CALF, True),
-        (AnimalType.HEIFER_I, True),
-        (AnimalType.HEIFER_II, True),
-        (AnimalType.HEIFER_III, True),
-        # Cases where the animal is not a calf or heifer
-        (AnimalType.DRY_COW, False),
-        (AnimalType.LAC_COW, False),
+        (AnimalType.CALF, False),
+        (AnimalType.HEIFER_I, False),
+        (AnimalType.HEIFER_II, False),
+        (AnimalType.HEIFER_III, False),
+        # Cases where the animal is neither a calf nor heifer
+        (AnimalType.DRY_COW, True),
+        (AnimalType.LAC_COW, True),
     ],
 )
 def test_is_cow(animal_type: AnimalType, expected_result: bool) -> None:
     """Tests that the function correctly identifies that the animal is either AnimalType.LAC_COW or
     AnimalType.DRY_COW."""
-    result = not AnimalNutrients._is_cow(animal_type)
+    result = AnimalNutrients._is_cow(animal_type)
     assert result == expected_result
