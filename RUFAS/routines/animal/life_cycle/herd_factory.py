@@ -1,8 +1,8 @@
 import copy
 import datetime
-from pathlib import Path
 import random
-from typing import List, Dict, Any, Type
+from pathlib import Path
+from typing import Any, Dict, List, Type
 
 from tqdm import tqdm
 
@@ -17,6 +17,7 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
+from RUFAS.time import Time
 
 om = OutputManager()
 
@@ -359,6 +360,10 @@ class HerdFactory:
         """
         AnimalBase.set_config(AnimalManager.get_animal_config(self.im.get_data("animal.animal_config")))
         AnimalBase.set_nutrient_list(Feed(self.im.get_data("feed")).nutrient_rqmts)
+
+        time = Time()
+        AnimalBase.setup_lactation_curve_parameters(time)
+
         if self.init_herd:
             self.pre_animal_population = self._generate_animals()
             if self.save_animals:

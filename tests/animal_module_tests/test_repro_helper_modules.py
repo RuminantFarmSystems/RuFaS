@@ -4,13 +4,8 @@ from typing import Any
 
 import pytest
 
-from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import (
-    HormoneDeliverySchedule,
-)
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-    CowReproProtocolEnum,
-)
+from RUFAS.routines.animal.life_cycle.hormone_delivery_schedule import HormoneDeliverySchedule
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import CowReproProtocolEnum, HeiferReproProtocolEnum
 from RUFAS.routines.animal.life_cycle.repro_protocol_misc import InternalReproSettings
 
 

@@ -2,20 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
-from typing import Type
+from typing import Dict, Type
 
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class ManureHandlerType(Enum):
@@ -134,24 +129,38 @@ class BaseManureHandler:
         housing_carbon_dioxide_emission = 0.0
         housing_ammonia_emission = 0.0
 
+        air_temperature = self._get_current_day_average_temperature_in_celsius()
+        barn_temperature = GasEmissionsCalculator.determine_barn_air_temperature(air_temperature)
+
         if pen.pen_type in ["freestall", "tiestall"]:
-            housing_methane_emission = GasEmissionsCalculator.housing_methane_emission(
+            housing_methane_emission = GasEmissionsCalculator.calculate_housing_methane_emission(
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
-                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+                barn_temperature=barn_temperature,
             )
 
-            housing_carbon_dioxide_emission = GasEmissionsCalculator.housing_carbon_dioxide_emission(
+            housing_carbon_dioxide_emission = GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission(
                 barn_area=pen.exposed_manure_surface_area_from_pen_type,
-                barn_temp=self._get_current_day_average_temperature_in_celsius(),
+                barn_temperature=barn_temperature,
             )
 
-            housing_ammonia_emission = GasEmissionsCalculator.housing_ammonia_emission(
+            housing_ammonia_emission = GasEmissionsCalculator.calculate_housing_ammonia_emission(
                 num_animals=pen.num_animals,
-                barn_area=pen.exposed_manure_surface_area_from_pen_type,  # m^2/animal
-                urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,  # kg
-                urine=pen.manure.urine,  # kg
-                temp=self._get_current_day_average_temperature_in_celsius(),
+                barn_area=pen.exposed_manure_surface_area_from_pen_type,
+                urine_total_ammoniacal_nitrogen=pen.manure.manure_total_ammoniacal_nitrogen,
+                urine=pen.manure.urine,
+                barn_temperature=barn_temperature,
             )
+
+        if bedding:
+            total_bedding_mass = bedding.calc_total_bedding_mass(pen.num_animals)
+            total_organic_bedding_mass_added = bedding.calc_organic_bedding_mass_added_to_manure(total_bedding_mass)
+            organic_bedding_dry_solids = total_organic_bedding_mass_added * bedding.bedding_dry_matter_content
+        else:
+            total_bedding_mass = 0.0
+            total_organic_bedding_mass_added = 0.0
+            organic_bedding_dry_solids = 0.0
+
+        non_degradable_volatile_solids = pen.manure.non_degradable_volatile_solids + organic_bedding_dry_solids
 
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,
@@ -166,7 +175,7 @@ class BaseManureHandler:
             liquid_manure_nitrogen=pen.manure.nitrogen,
             liquid_manure_total_solids=pen.manure.total_solids,
             liquid_manure_total_degradable_volatile_solids=pen.manure.degradable_volatile_solids,
-            liquid_manure_total_non_degradable_volatile_solids=pen.manure.non_degradable_volatile_solids,
+            liquid_manure_total_non_degradable_volatile_solids=non_degradable_volatile_solids,
             liquid_manure_phosphorus=pen.manure.phosphorus,
             liquid_manure_potassium=pen.manure.potassium,
             housing_methane=housing_methane_emission,
@@ -175,11 +184,13 @@ class BaseManureHandler:
             manure_volume=pen.manure.manure_volume,
             cleaning_water_volume=self.calc_cleaning_water_volume_in_main_barn(pen.num_animals),
             total_bedding_volume=bedding.calc_total_bedding_volume(pen.num_animals) if bedding is not None else 0.0,
-            total_bedding_mass=bedding.calc_total_bedding_mass(pen.num_animals) if bedding is not None else 0.0,
+            total_bedding_mass=total_bedding_mass,
+            organic_bedding_added_to_manure=total_organic_bedding_mass_added,
             total_water_volume_in_milking_parlor=(
                 self.milking_parlor.calc_total_water_volume_used_in_milking_parlor(pen.num_lactating_cows)
             ),
-            tempC=self._get_current_day_average_temperature_in_celsius(),
+            air_temperature=air_temperature,
+            barn_temperature=barn_temperature,
             num_animals=pen.num_animals,
         )
 

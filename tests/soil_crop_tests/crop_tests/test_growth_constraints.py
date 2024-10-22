@@ -1,8 +1,10 @@
-from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
-from RUFAS.routines.field.crop.crop_data import CropData
+from math import exp
+
 import pytest
 from pytest_mock import MockerFixture
-from math import exp
+
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
 
 
 # ---- helper function tests ----

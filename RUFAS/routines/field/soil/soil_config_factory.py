@@ -1,5 +1,6 @@
-from enum import Enum
 import dataclasses
+from enum import Enum
+
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 

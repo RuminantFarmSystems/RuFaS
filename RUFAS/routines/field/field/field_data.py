@@ -1,10 +1,8 @@
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
+
 from RUFAS.routines.field.crop.dormancy import Dormancy
-from RUFAS.routines.field.crop_and_soil_constants import (
-    LITERS_TO_CUBIC_MILLIMETERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-)
+from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, LITERS_TO_CUBIC_MILLIMETERS
 
 
 @dataclass(kw_only=True)

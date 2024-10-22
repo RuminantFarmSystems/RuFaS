@@ -1,9 +1,9 @@
-from copy import deepcopy
 from dataclasses import dataclass, field
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
-from .enums import CropCategory, CropType
 
+from .enums import CropCategory, CropType
 
 """This is the dry matter fraction above which an ensiled crop will not experience any effluent loss."""
 EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION = 0.3
@@ -137,7 +137,9 @@ class HarvestedCrop:
         self.total_sensible_heat_generated = self._calculate_total_sensible_heat_generated()
         self.initial_dry_matter_percentage = self.dry_matter_percentage
         self.initial_dry_matter_mass = self.dry_matter_mass
-        self.last_time_degraded = deepcopy(self.storage_time)
+        self.last_time_degraded = Time(
+            self.storage_time.start_date, self.storage_time.end_date, self.storage_time.current_date
+        )
 
     @property
     def dry_matter_mass(self) -> float:

@@ -1,10 +1,13 @@
-import pytest
-from typing import List
 from math import inf
-from unittest.mock import patch, PropertyMock
+from typing import List
+from unittest.mock import PropertyMock, patch
 
-from RUFAS.routines.field.soil.soil_data import SoilData
+import pytest
+from pytest_mock import MockerFixture
+
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 def test_get_vectorized_layer_attribute() -> None:
@@ -216,10 +219,10 @@ def test_annual_reset() -> None:
     soil_data.annual_eroded_sediment_total = 3
     soil_data.annual_surface_runoff_total = 4
     soil_data.annual_runoff_fertilizer_phosphorus = 5
-    soil_data.annual_runoff_machine_manure_organic_phosphorus = 6
-    soil_data.annual_runoff_machine_manure_inorganic_phosphorus = 7
-    soil_data.annual_runoff_grazing_manure_organic_phosphorus = 8
-    soil_data.annual_runoff_grazing_manure_inorganic_phosphorus = 9
+    soil_data.machine_manure.annual_runoff_manure_organic_phosphorus = 6
+    soil_data.machine_manure.annual_runoff_manure_inorganic_phosphorus = 7
+    soil_data.grazing_manure.annual_runoff_manure_organic_phosphorus = 8
+    soil_data.grazing_manure.annual_runoff_manure_inorganic_phosphorus = 9
     soil_data.annual_soil_phosphorus_runoff = 10
     soil_data.annual_runoff_nitrates_total = 11
     soil_data.annual_runoff_ammonium_total = 12
@@ -241,10 +244,10 @@ def test_annual_reset() -> None:
         assert soil_data.annual_eroded_sediment_total == 0
         assert soil_data.annual_surface_runoff_total == 0
         assert soil_data.annual_runoff_fertilizer_phosphorus == 0
-        assert soil_data.annual_runoff_machine_manure_organic_phosphorus == 0
-        assert soil_data.annual_runoff_machine_manure_inorganic_phosphorus == 0
-        assert soil_data.annual_runoff_grazing_manure_organic_phosphorus == 0
-        assert soil_data.annual_runoff_grazing_manure_inorganic_phosphorus == 0
+        assert soil_data.machine_manure.annual_runoff_manure_organic_phosphorus == 0
+        assert soil_data.machine_manure.annual_runoff_manure_inorganic_phosphorus == 0
+        assert soil_data.grazing_manure.annual_runoff_manure_organic_phosphorus == 0
+        assert soil_data.grazing_manure.annual_runoff_manure_inorganic_phosphorus == 0
         assert soil_data.annual_soil_phosphorus_runoff == 0
         assert soil_data.annual_runoff_nitrates_total == 0
         assert soil_data.annual_runoff_ammonium_total == 0
@@ -418,23 +421,18 @@ def test_profile_nitrates_total(layers: List[LayerData]) -> None:
 
 
 @pytest.mark.parametrize(
-    "plant_surface_residue,plant_root_residue,expected",
-    [(16, 4, 20), (16.5, 4.5, 21), (0, 0, 0)],
+    "residues,expected",
+    [([0.5, 12.0, 15.0, 0.0], 27.5), ([0.0, 0.0, 0.0], 0.0), ([10.0, 10.0, 10.0], 30.0)],
 )
-def test_all_residue(plant_surface_residue: float, plant_root_residue: float, expected: float) -> None:
-    """Tests the property method all_residue sums up the residues correctly"""
-    with (
-        patch(
-            "RUFAS.routines.field.soil.soil_data.SoilData.plant_surface_residue",
-            plant_surface_residue,
-        ),
-        patch(
-            "RUFAS.routines.field.soil.soil_data.SoilData.plant_root_residue",
-            plant_root_residue,
-        ),
-    ):
-        soil_data = SoilData(field_size=0.98)
-        assert soil_data.all_residue == expected
+def test_total_residue(mocker: MockerFixture, residues: list[float], expected: float) -> None:
+    """Tests the property method total_residue sums up the residues correctly"""
+    soil_data = SoilData(field_size=0.98)
+    get_vec_attr = mocker.patch.object(soil_data, "get_vectorized_layer_attribute", return_value=residues)
+
+    actual = soil_data.total_residue
+
+    assert actual == expected
+    get_vec_attr.assert_called_once_with("plant_residue")
 
 
 def test_soil_data_post_init_error() -> None:
@@ -467,3 +465,30 @@ def test_cover_factor(cover_type: str) -> None:
                 str(e) == f"Expected cover type to be 'BARE', 'RESIDUE_COVER', or 'GRASSED', "
                 f"received: '{cover_type}'."
             )
+
+
+def test_zero_silt_clay_warning(mocker: MockerFixture) -> None:
+    """Tests the case when silt and clay are zero."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_warning")
+    soil_layers = [
+        LayerData(
+            top_depth=0,
+            bottom_depth=20,
+            soil_water_concentration=500,
+            field_capacity_water_concentration=0.15,
+            saturation_point_water_concentration=0.2,
+            field_size=1.55,
+            silt_fraction=0,
+            clay_fraction=0,
+        )
+    ]
+    data = SoilData(soil_layers=soil_layers, field_size=0.95)  # noqa: F841
+    info_map = {"class": "SoilData", "function": "__post_init__"}
+    mock_add.assert_called_once_with(
+        "Silt and clay fractions in the soil are 0, which will lead to unreliable "
+        "predictions of erosion and soil emissions",
+        "It is assumed that the ratio of clay to silt in the soil layer will not have "
+        "any effect on the amount of erosion from the soil.",
+        info_map,
+    )

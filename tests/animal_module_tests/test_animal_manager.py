@@ -1,15 +1,15 @@
-from typing import Any
-from typing import List, Dict, Union
+from typing import Any, Dict, List, Union
 
 import pytest
-from mock import MagicMock, patch, call
+from mock import MagicMock, call, patch
 from pytest_mock import MockerFixture
 
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.enums import AnimalCombination
-from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.routines.animal.animal_manager import AnimalManager
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
@@ -17,10 +17,7 @@ from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.routines.animal.pen import Pen
-from RUFAS.routines.animal.purchased_feed_emissions_estimator import (
-    PurchasedFeedEmissionsEstimator,
-)
-from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 
 om = OutputManager()
 
@@ -275,7 +272,10 @@ def mock_im_pool() -> Dict[str, Dict[str, Any]]:
 
 
 @pytest.fixture
-def animal_manager(input_manager: InputManager, mock_im_pool: Dict[str, Dict[str, Any]]) -> AnimalManager:
+def animal_manager(
+    input_manager: InputManager, mock_im_pool: Dict[str, Dict[str, Any]], mocker: MockerFixture
+) -> AnimalManager:
+    mocker.patch.object(AnimalBase, "setup_lactation_curve_parameters")
     init_pens_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_pens")
     init_animals_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_animals")
     init_nutrient_rqmts_patch = patch("RUFAS.routines.animal.animal_manager.AnimalManager.init_nutrient_rqmts")
@@ -1732,7 +1732,7 @@ def setup_dummy_animal_manager_with_pens(
 
         dummy_pen = setup_dummy_pen(pen_dict["pen_id"], pen_dict["num_stalls"], animal_list)
 
-        dummy_pen.ration = pen_dict["ration"]
+        dummy_pen.ration_per_animal = pen_dict["ration_per_animal"]
 
         for animal in animal_list:
             dummy_pen.animals_in_pen[animal.id] = animal

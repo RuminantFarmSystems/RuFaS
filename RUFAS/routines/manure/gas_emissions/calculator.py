@@ -1,10 +1,10 @@
 import math
 from typing import Tuple
 
+import numpy as np
+
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.manure.constants_and_units.gas_emission_constants import (
-    GasEmissionConstants,
-)
+from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 
 
@@ -203,7 +203,7 @@ class GasEmissionsCalculator:
             return -math.tanh(hours + 3.5) / 3.5
 
     @classmethod
-    def housing_methane_emission(cls, barn_area: float, barn_temp: float) -> float:
+    def calculate_housing_methane_emission(cls, barn_area: float, barn_temperature: float) -> float:
         """
         Calculate housing methane emissions from manure handlers.
 
@@ -227,7 +227,7 @@ class GasEmissionsCalculator:
         ----------
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
-        barn_temp : float
+        barn_temperature : float
             Current barn temperature (:math:`^{\\circ}C`).
 
         Returns
@@ -244,10 +244,10 @@ class GasEmissionsCalculator:
         if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        return max(0.0, 0.13 * barn_temp) * barn_area / 1000
+        return max(0.0, 0.13 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def housing_carbon_dioxide_emission(cls, barn_area: float, barn_temp: float) -> float:
+    def calculate_housing_carbon_dioxide_emission(cls, barn_area: float, barn_temperature: float) -> float:
         """
         Calculate carbon dioxide housing emission.
 
@@ -271,7 +271,7 @@ class GasEmissionsCalculator:
         ----------
         barn_area : float
             Barn area per animal based on housing type (:math:`m^2`).
-        barn_temp : float
+        barn_temperature : float
             Current barn temperature (:math:`^{\\circ}C`).
 
         Returns
@@ -288,16 +288,16 @@ class GasEmissionsCalculator:
         if barn_area < 0:
             raise ValueError("Barn area must be greater than or equal to 0.")
 
-        return max(0.0, 0.0065 + 0.0192 * barn_temp) * barn_area / 1000
+        return max(0.0, 0.0065 + 0.0192 * barn_temperature) * barn_area / 1000
 
     @classmethod
-    def housing_ammonia_emission(
+    def calculate_housing_ammonia_emission(
         cls,
         num_animals: int,
         barn_area: float,
         urine_total_ammoniacal_nitrogen: float,
         urine: float,
-        temp: float,
+        barn_temperature: float,
         pH: float = GasEmissionConstants.DEFAULT_PH_FOR_HOUSING_AMMONIA,
         housing_specific_constant: float = GasEmissionConstants.HOUSING_HSC,
     ) -> float:
@@ -397,7 +397,7 @@ class GasEmissionsCalculator:
             Total ammoniacal nitrogen in manure (kg).
         urine : float
             Amount of manure produced by animals in the barn (kg).
-        temp : float
+        barn_temperature : float
             Current barn temperature (:math:`^{\\circ}C`).
         pH : float, optional
             pH value for housing ammonia emission (unitless). Default is set to 7.7. This value is listed as
@@ -437,8 +437,8 @@ class GasEmissionsCalculator:
         total_ammoniacal_nitrogen = urine_total_ammoniacal_nitrogen / total_barn_area
         manure_density = ManureConstants.SLURRY_MANURE_DENSITY  # kg/m^3
         seconds_per_day = GeneralConstants.SECONDS_PER_DAY
-        temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(temp)
-        ammonia_resistance = cls._ammonia_resistance(temp, housing_specific_constant)
+        temperature_kelvin = cls._convert_temperature_celsius_to_kelvin(barn_temperature)
+        ammonia_resistance = cls._ammonia_resistance(barn_temperature, housing_specific_constant)
         manure_per_area = urine / total_barn_area  # kg/m^2
         equilibrium_coefficient = cls._equilibrium_coefficient(temperature_kelvin, pH)
         ammonia_loss = (total_ammoniacal_nitrogen * seconds_per_day * manure_density) / (
@@ -779,46 +779,70 @@ class GasEmissionsCalculator:
         return temperature_celsius + 273.15
 
     @classmethod
-    def methane_volume_via_Chen_equation(
-        cls, manure_total_degradable_volatile_solids: float, hydraulic_retention_time: int
-    ) -> float:
-        """Calculates CH4 generation volume using the Chen-Hashimoto equation.
+    def calculate_CSTR_methane_volume(cls, manure_total_volatile_solids: float) -> float:
+        """
+        Calculates CH4 generation volume of anaerobic digestion in a continuously-stirred tank reactor.
 
-        Args:
-            manure_total_degradable_volatile_solids: total volatile solids, kg.
-            hydraulic_retention_time: hydraulic retention time, days.
+        Parameters
+        ----------
+        manure_total_volatile_solids : float
+            Total volatile solids, kg.
 
-        Returns:
+        Returns
+        -------
+        float
             CH4 generation volume, m^3.
 
+        Notes
+        -----
+        This function originates from personal communications with subject matter experts Wei Liao (liaow@msu.edu) and
+        April Leytem (april.leytem@usda.gov). The equation is a simplification of the IPCC Tier II estimate of CH4
+        emissions from anaerobic digesters, where CH4 generated in the digester is assumed to be equivalent to the
+        amount of manure volatile solids loaded per day, multiplied by the generally-accepted methane potential value
+        for dairy manure (240 L CH4 per kg of manure volatile solids).
+
         """
-        return (
-            GasEmissionConstants.METHANE_POTENTIAL_Go
-            * (
-                1
-                - GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                / (
-                    hydraulic_retention_time * GasEmissionConstants.SPECIFIC_GROWTH_RATE
-                    + GasEmissionConstants.CHEN_HASHIMOTO_KINETIC_CONSTANT_KCH
-                    - 1
-                )
-            )
-            * manure_total_degradable_volatile_solids
-            * GeneralConstants.GRAMS_TO_KG
-        )
+        return GasEmissionConstants.ACHIEVABLE_METHANE_EMISSION * manure_total_volatile_solids
 
     @classmethod
-    def biogas_energy_content(cls, methane_volume: float) -> float:
-        """Calculates biogas energy content.
+    def calculate_digester_methane_leakage(
+        cls, generated_methane_mass: float, digester_methane_leakage_fraction: float
+    ) -> float:
+        """
+        Calculates the mass of methane lost from a digester.
 
-        Args:
-            methane_volume: Methane generation volume, m^3.
+        Parameters
+        ----------
+        generated_methane_mass : float
+            Amount of methane generated within the digester, kg.
+        digester_methane_leakage_fraction : float
+            Fraction of generated methane that escapes as leakage (unitless).
 
-        Returns:
-            Biogas energy content, MJ.
+        Returns
+        -------
+        float
+            Mass of methane lost as leakage, kg.
 
         """
-        return methane_volume * GasEmissionConstants.AD_METHANE_DENSITY * GasEmissionConstants.METHANE_ENERGY_DENSITY
+        return generated_methane_mass * digester_methane_leakage_fraction
+
+    @classmethod
+    def calculate_methane_energy_content(cls, methane_mass: float) -> float:
+        """
+        Calculates energy content of methane generated in a digester.
+
+        Parameters
+        ----------
+        methane_mass : float
+            Methane generation mass, kg.
+
+        Returns
+        -------
+        float
+            Methane energy content, MJ.
+
+        """
+        return methane_mass * GasEmissionConstants.METHANE_ENERGY_DENSITY
 
     @classmethod
     def methane_emission_from_anaerobic_lagoon(cls, manure_volatile_solids: float) -> float:
@@ -837,7 +861,7 @@ class GasEmissionsCalculator:
 
             :math:`E_{CH_4}` is methane emissions from anaerobic lagoon (kg :math:`CH_4`-N/day),
 
-            :math:`Bo` is the achievable emission of methane during anaerobic digestion (kg :math:`CH_4`/kg VS),
+            :math:`Bo` is the achievable emission of methane during anaerobic digestion (:math:`m^3 CH_4`/kg VS),
 
             :math:`MCF` is the methane conversion factor (unitless),
 
@@ -1296,7 +1320,7 @@ class GasEmissionsCalculator:
         )
 
     @staticmethod
-    def empirical_nitrogen_loss_from_nitrous_oxide_emission(
+    def calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
         emission_factor_kg_nitrous_oxide_N_per_kg_manure_N: float,
         manure_nitrogen_kg_N_per_day: float,
     ) -> float:
@@ -1319,3 +1343,27 @@ class GasEmissionsCalculator:
         """
 
         return emission_factor_kg_nitrous_oxide_N_per_kg_manure_N * manure_nitrogen_kg_N_per_day
+
+    @staticmethod
+    def determine_barn_air_temperature(air_temperature: float) -> float:
+        """Determines the ambient inside barn temperature based on the outdoor air temperature.
+
+        Parameters
+        ----------
+        air_temperature : float
+            The air temperature (°C).
+
+        Returns
+        -------
+        float
+            The barn temperature (°C).
+
+        References
+        ----------
+        Between 5 and 30 C, barn temperature is assumed to be equal to outdoor air temperature.
+        This function assumes that barn temperature does not drop below 5 C or increase above 30 C.
+        These bounds were suggested by manure SMEs and are supported by barn temperature ranges
+        reported in Bucklin et al. (FL, upper limit; https://doi.org/10.13031/2013.28851).
+        The lower bound (5 C) suggested by SMEs was based on general industry standards/conditions.
+        """
+        return float(np.clip(air_temperature, 5.0, 30.0))

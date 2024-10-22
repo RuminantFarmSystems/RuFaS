@@ -1,17 +1,17 @@
+from unittest.mock import call
+
 import pytest
 from pytest_mock import MockerFixture
-from unittest.mock import call
+
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.storage import Storage
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.enums import CropCategory, CropType
+from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.time import Time
-from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from .sample_crop_data import sample_crop_data
 
-om = OutputManager()
+from .sample_crop_data import sample_crop_data
 
 
 @pytest.fixture
@@ -112,7 +112,7 @@ def test_process_degradations(
     mock_get_conditions = mocker.patch.object(storage, "_get_conditions", return_value=mock_conditions)
     mock_dry_matter_loss = mocker.patch.object(storage, "calculate_dry_matter_loss_to_gas", return_value=loss)
     mock_recalc_percentage = mocker.patch.object(storage, "recalculate_nutrient_percentage", return_value=percentage)
-    mock_add_var = mocker.patch.object(om, "add_variable")
+    mock_add_var = mocker.patch.object(storage.om, "add_variable")
     mock_deepcopy = mocker.patch("RUFAS.routines.feed_storage.storage.copy.deepcopy", return_value=mock_time)
     mock_reset_mass = mocker.patch.object(storage, "reset_mass_attributes_after_loss")
     mock_record = mocker.patch.object(storage, "record_stored_crops")
@@ -187,7 +187,7 @@ def test_record_stored_crops(storage: Storage, mocker: MockerFixture) -> None:
         "RUFAS.routines.feed_storage.storage.Storage.stored_mass", new_callable=mocker.PropertyMock
     )
     mock_total_amount = mocker.patch.object(storage, "_get_total_nutritive_amount")
-    mock_add_var = mocker.patch.object(om, "add_variable")
+    mock_add_var = mocker.patch.object(storage.om, "add_variable")
     expected_get_total_amount_call_count = 9
     expected_add_var_call_count = 11
 
@@ -328,7 +328,7 @@ def test_recalculate_nutrient_percentage(
     """
     Test the recalculate_nutrient_percentage method of the Storage class.
     """
-    mock_warn = mocker.patch.object(om, "add_warning")
+    mock_warn = mocker.patch.object(storage.om, "add_warning")
     actual = storage.recalculate_nutrient_percentage(nutrients, loss_coefficient, dry_matter_loss, dry_matter)
 
     assert pytest.approx(actual) == expected

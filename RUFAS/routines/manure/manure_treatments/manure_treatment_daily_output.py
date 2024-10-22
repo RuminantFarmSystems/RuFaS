@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import astuple, fields
-from dataclasses import dataclass
+from dataclasses import astuple, dataclass, fields
 
+from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import LiquidManurePortionProtocol
 from RUFAS.units import MeasurementUnits
-from RUFAS.routines.manure.protocols.liquid_manure_portion_protocol import (
-    LiquidManurePortionProtocol,
-)
 
 
 @dataclass
@@ -156,18 +153,23 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         Daily mass of solid manure, kg.
     solid_manure_daily_mass_unit: MeasurementUnits
         Unit for solid_manure_daily_mass.
-    biogas: float
-        Amount of biogas produced, m^3.
-    biogas_unit: MeasurementUnits
-        Unit for biogas.
-    biogas_energy_content: float
-        Energy content of biogas, MJ/m^3.
-    biogas_energy_content_unit: MeasurementUnits
-        Unit for biogas_energy_content.
+    biogas: float, default 0.0
+        Mass of biogas (methane) produced from anaerobic digestion, kg.
+    biogas_unit: MeasurementUnits, default MeasurementUnits.KILOGRAMS_PER_DAY
+        Unit for biogas (methane).
+    biogas_energy_content : float, default 0.0
+        Energy content of biogas (methane), MJ.
+    biogas_energy_content_unit: MeasurementUnits, default MeasurementUnits.MEGAJOULES
+        Unit for biogas_energy_content (energy from methane).
     methane_generation_volume: float
         Amount of methane generated, m^3.
     methane_generation_volume_unit: MeasurementUnits
         Unit for methane_generation_volume.
+    methane_leakage_mass : float, default 0.0
+        Methane generated in a digester that escapes to the atmosphere through unintended leakage and is not collected
+        by the gas capture system, kg.
+    methane_leakage_mass_unit : MeasurementUnits, default MeasurementUnits.KILOGRAMS
+        Unit of methane leakage mass.
     heating_input_energy: float
         Amount of energy input to the heating system, MJ.
     heating_input_energy_unit: MeasurementUnits
@@ -188,6 +190,10 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
         Carbon decomposition, kg.
     solid_manure_carbon_decomposition_unit: MeasurementUnits
         Unit for solid_manure_carbon_decomposition.
+    storage_methane_burned: float
+        Amount of storage methane burned, kg.
+    storage_methane_burned_unit: MeasurementUnits
+        Unit for storage_methane_burned.
     """
 
     pen_id: int = -1
@@ -296,15 +302,17 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
     solid_manure_daily_mass: float = 0.0
     solid_manure_daily_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
 
-    # different unit from docMeasurementUnitsing m^3 vs m^3/day?
-    biogas: float = 0.0  # biogas production per day (m3/day)
-    biogas_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS_PER_DAY
+    biogas: float = 0.0
+    biogas_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS_PER_DAY
 
-    biogas_energy_content: float = 0.0  # biogas energy content (MJ/m3)
-    biogas_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES_PER_CUBIC_METER
+    biogas_energy_content: float = 0.0
+    biogas_energy_content_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES
 
     methane_generation_volume: float = 0.0
     methane_generation_volume_unit: MeasurementUnits = MeasurementUnits.CUBIC_METERS
+
+    methane_leakage_mass: float = 0.0
+    methane_leakage_mass_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
 
     heating_input_energy: float = 0.0
     heating_input_energy_unit: MeasurementUnits = MeasurementUnits.MEGAJOULES
@@ -320,6 +328,9 @@ class ManureTreatmentDailyOutput(LiquidManurePortionProtocol):
 
     solid_manure_carbon_decomposition: float = 0.0
     solid_manure_carbon_decomposition_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
+
+    storage_methane_burned: float = 0.0
+    storage_methane_burned_unit: MeasurementUnits = MeasurementUnits.KILOGRAMS
 
     def __post_init__(self) -> None:
         """Ensures that the daily volume is set to the final manure volume."""
