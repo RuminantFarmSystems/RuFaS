@@ -108,7 +108,7 @@ class AnimalNutrients:
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A-D.E.1, A.1EF.E.1.
         """
-        if AnimalNutrients._is_calf_or_heifer(general_properties.animal_type):
+        if not AnimalNutrients._is_cow(general_properties.animal_type):
             return 0.0008 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
         else:
             return 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
@@ -122,7 +122,7 @@ class AnimalNutrients:
         RuFaS Phosphorus Animal Module documentation section A.1A-F.E.3.
         """
         if (
-            AnimalNutrients._is_calf_or_heifer(general_properties.animal_type)
+            not AnimalNutrients._is_cow(general_properties.animal_type)
             or general_properties.body_weight < general_properties.mature_body_weight
         ):
             return (
@@ -224,5 +224,6 @@ class AnimalNutrients:
             return absorbed_phosphorus / 0.664
 
     @staticmethod
-    def _is_calf_or_heifer(animal_type: AnimalType) -> bool:
-        return animal_type in CALVES_AND_HEIFERS
+    def _is_cow(animal_type: AnimalType) -> bool:
+        """Identifies that the animal is either AnimalType.LAC_COW or AnimalType.DRY_COW."""
+        return animal_type not in CALVES_AND_HEIFERS
