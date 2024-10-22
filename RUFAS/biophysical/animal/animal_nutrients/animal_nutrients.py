@@ -80,7 +80,7 @@ class AnimalNutrients:
     ) -> NutrientProperties:
         """Calculates animal's phosophorus requirements"""
         phosphorus_status.phosphorus_endogenous_loss = AnimalNutrients._calculate_phosphorus_endogenous_loss(
-            general_properties, phosphorus_status, dry_matter_intake
+            general_properties, dry_matter_intake
         )
         urine_production_phosphorus = 0.000002 * general_properties.body_weight * GeneralConstants.KG_TO_GRAMS
         phosphorus_status.phosphorus_for_growth = AnimalNutrients._calculate_phosphorus_for_growth(general_properties)
@@ -100,7 +100,7 @@ class AnimalNutrients:
 
     @staticmethod
     def _calculate_phosphorus_endogenous_loss(
-        general_properties: GeneralProperties, phosphorus_status: NutrientProperties, dry_matter_intake: float
+        general_properties: GeneralProperties, dry_matter_intake: float
     ) -> float:
         """Calculates phosphorus required for endogenous loss based on animal type.
 

@@ -45,11 +45,11 @@ def test_get_dry_matter_intake() -> None:
     "expected_excess_in_diet, expected_reserves, expected_total_phosphorus",
     [
         # Case 1: phosphorus_intake < phosphorus_requirement (if condition)
-        (5.0, 8.0, -5.0, 2.0, 1.0, 0.0, -8.0, 100.0 + 2.0 + 1.0 + (-8.0 + 5.0)),
+        (5.0, 8.0, -5.0, 2.0, 1.0, 0.0, -8.0, 100.0),
         # Case 2: phosphorus_intake >= phosphorus_requirement and reserves < 0 (elif condition)
-        (10.0, 8.0, -5.0, 2.0, 1.0, 2.0, 0.7 * 2.0 - 5.0, 100.0 + 2.0 + 1.0 + ((0.7 * 2.0 - 5.0) + 5.0)),
+        (10.0, 8.0, -5.0, 2.0, 1.0, 2.0, 0.7 * 2.0 - 5.0, 104.4),
         # Case 3: phosphorus_intake >= phosphorus_requirement and reserves >= 0 (else condition)
-        (10.0, 8.0, 5.0, 2.0, 1.0, 2.0, 0.0, 100.0 + 2.0 + 1.0 + (0.0 - 5.0)),
+        (10.0, 8.0, 5.0, 2.0, 1.0, 2.0, 0.0, 98.0),
     ],
 )
 def test_calculate_total_animal_phosphorus(
@@ -82,13 +82,13 @@ def test_calculate_total_animal_phosphorus(
     "animal_type, dry_matter_intake, expected_loss",
     [
         # Case 1: Animal is a calf or heifer (if condition)
-        (AnimalType.CALF, 10.0, 0.0008 * 10.0 * GeneralConstants.KG_TO_GRAMS),
-        (AnimalType.HEIFER_I, 15.0, 0.0008 * 15.0 * GeneralConstants.KG_TO_GRAMS),
-        (AnimalType.HEIFER_II, 20.0, 0.0008 * 20.0 * GeneralConstants.KG_TO_GRAMS),
-        (AnimalType.HEIFER_III, 25.0, 0.0008 * 25.0 * GeneralConstants.KG_TO_GRAMS),
+        (AnimalType.CALF, 10.0, 8.0),
+        (AnimalType.HEIFER_I, 15.0, 12.0),
+        (AnimalType.HEIFER_II, 20.0, 16.0),
+        (AnimalType.HEIFER_III, 25.0, 20.0),
         # Case 2: Animal is not a calf or heifer (else condition)
-        (AnimalType.DRY_COW, 10.0, 0.001 * 10.0 * GeneralConstants.KG_TO_GRAMS),
-        (AnimalType.LAC_COW, 20.0, 0.001 * 20.0 * GeneralConstants.KG_TO_GRAMS),
+        (AnimalType.DRY_COW, 10.0, 10.0),
+        (AnimalType.LAC_COW, 20.0, 20.0),
     ],
 )
 def test_calculate_phosphorus_endogenous_loss(
@@ -99,10 +99,9 @@ def test_calculate_phosphorus_endogenous_loss(
     """Tests that phosphorus endogenous loss is calculated correctly for different animal types."""
     mock_general_properties = MagicMock()
     mock_general_properties.animal_type = animal_type
-    mock_phosphorus_status = MagicMock()
 
     result = AnimalNutrients._calculate_phosphorus_endogenous_loss(
-        mock_general_properties, mock_phosphorus_status, dry_matter_intake
+        mock_general_properties, dry_matter_intake
     )
 
     assert result == pytest.approx(expected_loss, 1e-3)
@@ -112,8 +111,8 @@ def test_calculate_phosphorus_endogenous_loss(
     "animal_type, body_weight, dry_matter_intake, endogenous_loss, growth_phosphorus, gestation_phosphorus,"
     "milk_phosphorus, absorbed_phosphorus, expected_urine_phosphorus",
     [
-        (AnimalType.CALF, 100.0, 10.0, 0.8, 2.0, 1.5, 0.5, 3.0, 0.000002 * 100.0 * GeneralConstants.KG_TO_GRAMS),
-        (AnimalType.LAC_COW, 500.0, 25.0, 1.0, 3.0, 2.5, 1.0, 6.0, 0.000002 * 500.0 * GeneralConstants.KG_TO_GRAMS),
+        (AnimalType.CALF, 100.0, 10.0, 0.8, 2.0, 1.5, 0.5, 3.0, 0.2),
+        (AnimalType.LAC_COW, 500.0, 25.0, 1.0, 3.0, 2.5, 1.0, 6.0, 1.0),
     ],
 )
 def test_calculate_phosphorus_requirements(
@@ -164,14 +163,14 @@ def test_calculate_phosphorus_requirements(
 
 
 @pytest.mark.parametrize(
-    "animal_type, body_weight, mature_body_weight, daily_growth",
+    "animal_type, body_weight, mature_body_weight, daily_growth, expected_growth_phosphorus",
     [
         # Case 1: Animal is a heifer (should calculate growth phosphorus)
-        (AnimalType.HEIFER_I, 100.0, 400.0, 0.5),
+        (AnimalType.HEIFER_I, 100.0, 400.0, 0.5, 3.90),
         # Case 2: Animal weight is less than mature body weight (should calculate growth phosphorus)
-        (AnimalType.LAC_COW, 300.0, 500.0, 0.8),
+        (AnimalType.LAC_COW, 300.0, 500.0, 0.8, 5.32),
         # Case 3: Animal is not a calf or heifer and body weight is equal to mature weight (should return 0.0)
-        (AnimalType.DRY_COW, 500.0, 500.0, 0.6),
+        (AnimalType.DRY_COW, 500.0, 500.0, 0.6, 0.0),
     ],
 )
 def test_calculate_phosphorus_for_growth(
@@ -179,6 +178,7 @@ def test_calculate_phosphorus_for_growth(
     body_weight: float,
     mature_body_weight: float,
     daily_growth: float,
+    expected_growth_phosphorus: float,
 ) -> None:
     """Tests that phosphorus retained for growth is calculated correctly for different scenarios."""
     mock_general_properties = MagicMock()
@@ -186,16 +186,6 @@ def test_calculate_phosphorus_for_growth(
     mock_general_properties.body_weight = body_weight
     mock_general_properties.mature_body_weight = mature_body_weight
     mock_general_properties.daily_growth = daily_growth
-
-    if animal_type in CALVES_AND_HEIFERS or body_weight < mature_body_weight:
-        expected_growth_phosphorus = (
-            (0.0012 + 0.004635 * (mature_body_weight**0.22) * (body_weight**-0.22))
-            * daily_growth
-            / 0.96
-            * GeneralConstants.KG_TO_GRAMS
-        )
-    else:
-        expected_growth_phosphorus = 0.0
 
     result = AnimalNutrients._calculate_phosphorus_for_growth(mock_general_properties)
 
@@ -208,22 +198,14 @@ def test_calculate_phosphorus_for_growth(
         # Case 1: days_in_preg >= 190 (should calculate gestational phosphorus)
         (
             190,
-            (
-                0.00002743 * math.exp((0.05527 - 0.000075 * 190) * 190)
-                - 0.00002743 * math.exp((0.05527 - 0.000075 * 189) * 189)
-            )
-            * GeneralConstants.KG_TO_GRAMS,
+            1.762,
         ),
         # Case 2: days_in_preg < 190 (should return 0.0)
         (150, 0.0),
         # Case 3: days_in_preg exactly on the threshold
         (
             191,
-            (
-                0.00002743 * math.exp((0.05527 - 0.000075 * 191) * 191)
-                - 0.00002743 * math.exp((0.05527 - 0.000075 * 190) * 190)
-            )
-            * GeneralConstants.KG_TO_GRAMS,
+            1.800,
         ),
     ],
 )
@@ -241,7 +223,7 @@ def test_calculate_gestational_phosphorus(days_in_preg: int, expected_phosphorus
     "is_milking, daily_milk_produced, expected_milk_phosphorus",
     [
         # Case 1: Animal is milking (should calculate milk phosphorus)
-        (True, 30.0, 0.0009 * 30.0 * GeneralConstants.KG_TO_GRAMS),
+        (True, 30.0, 27.0),
         # Case 2: Animal is not milking (should return 0.0)
         (False, 30.0, 0.0),
         # Case 3: No milk production but animal is marked as milking
@@ -266,13 +248,13 @@ def test_calculate_milk_phosphorus(
     "urine_production_phosphorus, expected_absorbed_phosphorus",
     [
         # Case 1: Animal is a dry cow or lactating cow (includes milk phosphorus)
-        (AnimalType.DRY_COW, 0.5, 1.0, 2.0, 3.0, 0.2, 0.2 + 0.5 + 1.0 + 2.0 + 3.0),
-        (AnimalType.LAC_COW, 0.4, 0.9, 1.8, 2.5, 0.1, 0.1 + 0.4 + 0.9 + 1.8 + 2.5),
+        (AnimalType.DRY_COW, 0.5, 1.0, 2.0, 3.0, 0.2, 6.7),
+        (AnimalType.LAC_COW, 0.4, 0.9, 1.8, 2.5, 0.1, 5.7),
         # Case 2: Animal is a heifer (does not include milk phosphorus)
-        (AnimalType.HEIFER_II, 0.3, 0.8, 1.5, 2.0, 0.05, 0.05 + 0.3 + 0.8 + 1.5),
-        (AnimalType.HEIFER_III, 0.2, 0.7, 1.2, 1.5, 0.04, 0.04 + 0.2 + 0.7 + 1.2),
+        (AnimalType.HEIFER_II, 0.3, 0.8, 1.5, 2.0, 0.05, 2.65),
+        (AnimalType.HEIFER_III, 0.2, 0.7, 1.2, 1.5, 0.04, 2.14),
         # Case 3: Other animal types (does not include milk or gestation phosphorus)
-        (AnimalType.CALF, 0.1, 0.6, 1.0, 1.0, 0.03, 0.03 + 0.1 + 0.6),
+        (AnimalType.CALF, 0.1, 0.6, 1.0, 1.0, 0.03, 0.73),
     ],
 )
 def test_calculate_absorbed_phosphorus(
@@ -304,13 +286,13 @@ def test_calculate_absorbed_phosphorus(
     "animal_type, is_milking, ration_phosphorus_concentration, absorbed_phosphorus, expected_requirement",
     [
         # Case 1: Animal is a dry or lactating cow and is milking (complex formula)
-        (AnimalType.LAC_COW, True, 0.3, 5.0, 5.0 / (1.86696 - 5.01238 * 0.3 + 5.12286 * 0.3**2)),
-        (AnimalType.DRY_COW, True, 0.2, 4.0, 4.0 / (1.86696 - 5.01238 * 0.2 + 5.12286 * 0.2**2)),
+        (AnimalType.LAC_COW, True, 0.3, 5.0, 6.066),
+        (AnimalType.DRY_COW, True, 0.2, 4.0, 3.740),
         # Case 2: Animal is a calf (should use 0.90 as divisor)
-        (AnimalType.CALF, False, 0.1, 3.0, 3.0 / 0.90),
+        (AnimalType.CALF, False, 0.1, 3.0, 3.333),
         # Case 3: Other animal types (should use 0.664 as divisor)
-        (AnimalType.HEIFER_II, False, 0.1, 2.5, 2.5 / 0.664),
-        (AnimalType.HEIFER_III, False, 0.1, 2.0, 2.0 / 0.664),
+        (AnimalType.HEIFER_II, False, 0.1, 2.5, 3.765),
+        (AnimalType.HEIFER_III, False, 0.1, 2.0, 3.012),
     ],
 )
 def test_calculate_animal_phosphorus_requirement(
