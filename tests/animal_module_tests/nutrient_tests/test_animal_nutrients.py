@@ -1,9 +1,8 @@
-import math
 from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_nutrients.animal_nutrients import CALVES_AND_HEIFERS, AnimalNutrients
+from RUFAS.biophysical.animal.animal_nutrients.animal_nutrients import AnimalNutrients
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
 
