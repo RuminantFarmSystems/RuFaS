@@ -37,7 +37,8 @@ def harvested_crop() -> HarvestedCrop:
     return HarvestedCrop(category=category, type=crop_type, **sample_crop_data)  # type: ignore[arg-type]
 
 
-def test_acceptable_crops(baleage: Baleage):
+def test_acceptable_crops(baleage: Baleage) -> None:
+    """Tests that Baleage has acceptable_crops set correctly."""
     assert baleage.acceptable_crops == [
         CropCategory.ALFALFA,
         CropCategory.GRASS,
