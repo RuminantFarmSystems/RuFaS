@@ -3120,7 +3120,12 @@ def test_add_variable_to_pool_nested(
 
     if (not is_modifiable_during_runtime) and eager_termination:
         with pytest.raises(PermissionError):
-            print("h")
+            print(input_manager._add_variable_to_pool(
+                variable_name=variable_name,
+                input_data=data,
+                properties_blob_key=properties_blob_key,
+                eager_termination=eager_termination,
+            ))
             input_manager._add_variable_to_pool(
                 variable_name=variable_name,
                 input_data=data,
@@ -3147,6 +3152,14 @@ def test_add_variable_to_pool_nested(
         assert result
         assert patch_for_add_warning.call_count == expected_add_warning_call_count
         assert input_manager.get_data(variable_name) == list(data.values())[0]
+
+    result = input_manager._add_variable_to_pool(
+        variable_name=variable_name,
+        input_data=data,
+        properties_blob_key=properties_blob_key,
+        eager_termination=False,
+    )
+    print(result)
 
 
 def test_dump_get_data_logs(
