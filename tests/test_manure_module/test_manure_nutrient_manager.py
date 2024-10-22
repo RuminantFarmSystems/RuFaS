@@ -4,16 +4,12 @@ import re
 
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
-from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import (
-    ManureNutrientManager,
-)
+from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
-    NutrientRequestResults,
-)
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
 @pytest.mark.parametrize("manure_type", [ManureType.LIQUID, ManureType.SOLID])
@@ -702,9 +698,7 @@ def test_remove_nutrients_more_than_available(
     manager = ManureNutrientManager()
     if initial_nutrients:
         manager.add_nutrients(initial_nutrients)
-    patch_for_om_add_warning = mocker.patch(
-        "RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager.om.add_warning"
-    )
+    patch_for_om_add_warning = mocker.patch.object(manager.om, "add_warning")
 
     # Act & Assert
     if isinstance(manure_type, ManureType):

@@ -1,8 +1,9 @@
+from math import exp
+
 import pytest
 
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
-from math import exp
 
 
 # ---- helper function tests ----

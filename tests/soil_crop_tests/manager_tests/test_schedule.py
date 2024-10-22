@@ -1,5 +1,6 @@
+from typing import Any, List
+
 import pytest
-from typing import List, Any
 
 from RUFAS.routines.field.manager.schedule import Schedule
 
@@ -129,13 +130,3 @@ def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected
         test = Schedule(name, [], [], skip, repeat)
         test._validate_pattern_parameters()
     assert str(e.value) == expected
-
-
-@pytest.mark.parametrize(
-    "year,expected",
-    [(1999, False), (2001, False), (2004, True), (2016, True), (1900, False)],
-)
-def test_is_leap_year(year: int, expected: bool) -> None:
-    """Tests that a year is correctly determined to be a leap year or non-leap year."""
-    actual = Schedule.is_leap_year(year)
-    assert actual == expected

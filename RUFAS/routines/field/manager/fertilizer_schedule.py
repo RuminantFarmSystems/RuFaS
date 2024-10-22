@@ -1,11 +1,7 @@
-from typing import List, Any
+from typing import Any, List
 
-from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.routines.field.manager.events import FertilizerEvent
-from RUFAS.output_manager import OutputManager
-
-
-om = OutputManager()
+from RUFAS.routines.field.manager.schedule import Schedule
 
 
 class FertilizerSchedule(Schedule):

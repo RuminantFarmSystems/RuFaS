@@ -1,44 +1,36 @@
 import collections
-from typing import Dict
-from typing import List
-from typing import Type
+from typing import Dict, List, Type
 
 import pytest
-from pytest import approx
-from pytest import fixture
+from pytest import approx, fixture
 from pytest_mock import MockerFixture
 
-
 from RUFAS.input_manager import InputManager
-from RUFAS.routines.animal.animal_typed_dicts import (
-    AnimalConfigTypedDict,
-    HerdInfoTypedDict,
-)
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.animal.animal_typed_dicts import AnimalConfigTypedDict, HerdInfoTypedDict
 from RUFAS.routines.animal.life_cycle import animal_constants
-from RUFAS.routines.animal.life_cycle.animal_constants import ENTER_HERD
-from RUFAS.routines.animal.life_cycle.animal_constants import INIT_HERD
-from RUFAS.routines.animal.life_cycle.animal_constants import LOW_PROD_CULL
-from RUFAS.routines.animal.life_cycle.animal_constants import DEATH_CULL
+from RUFAS.routines.animal.life_cycle.animal_constants import DEATH_CULL, ENTER_HERD, INIT_HERD, LOW_PROD_CULL
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
+from RUFAS.routines.animal.life_cycle.life_cycle import GenericAnimal, LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
-from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.routines.feed.feed import Feed
 
 
 @fixture
 def life_cycle_manager(mocker: MockerFixture) -> LifeCycleManager:
-    return LifeCycleManager(data=mocker.MagicMock(autospec=AnimalConfigTypedDict))
+    life_cycle_manager = LifeCycleManager(data=mocker.MagicMock(autospec=AnimalConfigTypedDict))
+    life_cycle_manager.om = OutputManager()
+    return life_cycle_manager
 
 
 @pytest.mark.parametrize(
@@ -161,6 +153,7 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
         return_value=mock_animal_population,
     )
 
+    patch_correct_cow_attributes = mocker.patch.object(life_cycle_manager, "_correct_cows_milking_attributes")
     patch_set_avg_CI = mocker.patch.object(life_cycle_manager, "_set_avg_CI")
     patch_get_animals = mocker.patch.object(life_cycle_manager, "_get_animals")
 
@@ -175,9 +168,44 @@ def test_initialize_herd(mocker: MockerFixture, life_cycle_manager: LifeCycleMan
     assert patch_get_animals.call_args_list[2] == mocker.call(HeiferII)
     assert patch_get_animals.call_args_list[3] == mocker.call(HeiferIII)
     assert patch_get_animals.call_args_list[4] == mocker.call(Cow)
+    assert patch_correct_cow_attributes.call_count == 1
     mock_animal_population.get_replacement_cows.assert_called_once_with()
     assert life_cycle_manager.replacement_market == mock_replacement_cows
     assert len(results) == 5
+
+
+@pytest.mark.parametrize(
+    "is_pregnant,days_pregnant,days_in_preg_dry,is_milking,expected_milking,expected_warning",
+    [(True, 100, 120, False, True, True), (True, 140, 133, False, False, False), (False, 0, 120, True, True, False)],
+)
+def test_correct_cows_milking_attributes(
+    mocker: MockerFixture,
+    life_cycle_manager: LifeCycleManager,
+    is_pregnant: bool,
+    days_pregnant: int,
+    days_in_preg_dry: int,
+    is_milking: bool,
+    expected_milking: bool,
+    expected_warning: bool,
+) -> None:
+    """Tests _correct_cow_attributes in LifeCycleManager."""
+    mock_cow = mocker.MagicMock(autospec=Cow)
+    mock_cow.is_pregnant = is_pregnant
+    mock_cow.days_in_preg = days_pregnant
+    mock_cow.milking = is_milking
+    mock_cow.events = mocker.MagicMock()
+
+    animal_base_config = {"days_in_preg_when_dry": days_in_preg_dry}
+    mocker.patch("RUFAS.routines.animal.life_cycle.life_cycle.AnimalBase.config", animal_base_config)
+    patch_warning = mocker.patch.object(life_cycle_manager.om, "add_warning")
+
+    actual_cow = life_cycle_manager._correct_cows_milking_attributes([mock_cow])[0]
+
+    assert actual_cow.milking == expected_milking
+    if expected_warning:
+        patch_warning.assert_called_once()
+    else:
+        patch_warning.assert_not_called()
 
 
 def test_reset_parity(life_cycle_manager: LifeCycleManager) -> None:

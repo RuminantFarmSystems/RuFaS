@@ -1,14 +1,13 @@
 from math import exp
 from typing import List
+from unittest.mock import MagicMock, call, patch
 
 import pytest
-from unittest.mock import MagicMock, patch, call
 
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.water_uptake import WaterUptake
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
-
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 # TODO: Since, these will be updated/replaced along with Issue #450, these tests are simple and won't test wrappers
 
