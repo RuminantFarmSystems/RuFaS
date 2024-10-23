@@ -70,7 +70,7 @@ def test_calf_manure(
         ),
     )
 
-    observed = ManureExcretionCalculator.calculate_calf_manure(
+    actual = ManureExcretionCalculator.calculate_calf_manure(
         body_weight, fecal_phosphorus, urine_phosphorus_required, nutrient_amounts, nutrient_concentrations
     )
 
@@ -81,7 +81,7 @@ def test_calf_manure(
         urine_phosphorus_required=urine_phosphorus_required,
     )
 
-    assert observed == expected
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -162,7 +162,7 @@ def test_heifer_manure(
             potassium=potassium,
         ),
     )
-    observed = ManureExcretionCalculator.calculate_heifer_manure(
+    actual = ManureExcretionCalculator.calculate_heifer_manure(
         body_weight, fecal_phosphorus, urine_phosphorus_required, nutrient_amounts, nutrient_concentrations
     )
 
@@ -173,7 +173,7 @@ def test_heifer_manure(
         urine_phosphorus_required=urine_phosphorus_required,
     )
 
-    assert observed == expected
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -283,7 +283,7 @@ def test_lactating_cow_manure(
         ),
     )
 
-    observed = ManureExcretionCalculator._calculate_lactating_cow_manure(
+    actual = ManureExcretionCalculator._calculate_lactating_cow_manure(
         days_in_milk,
         milk_protein,
         daily_milk_production,
@@ -293,7 +293,7 @@ def test_lactating_cow_manure(
         nutrient_concentrations,
     )
 
-    assert expected == observed
+    assert expected == actual
     mock_phosphorus_excretion.assert_called_once_with(
         daily_milk_production=daily_milk_production,
         total_manure_excreted=total_manure_excreted,
