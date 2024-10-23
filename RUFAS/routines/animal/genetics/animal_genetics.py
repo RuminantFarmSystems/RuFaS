@@ -32,6 +32,7 @@ class AnimalGenetics:
         Lookup table of Top Listing Semen estimated Predicted Transmitting Ability, separated by breed.
 
     """
+
     net_merit: dict[str, dict[str, dict[str, float]]] = {}
     top_semen: dict[str, dict[str, float]] = {}
 
