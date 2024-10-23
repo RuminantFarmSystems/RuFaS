@@ -166,7 +166,9 @@ class SimulationEngine:
     def _orchestrate_ration_formulation(self) -> None:
         feeds_to_purchase: FeedsToPurchase | None = self.animal_manager.formulate_ration()
         if feeds_to_purchase:
-            self.feed_manager.purchase_feeds(feeds_to_purchase)  # TODO: if can't purchase feeds, raise error or retry ration formulation?
+            self.feed_manager.purchase_feeds(
+                feeds_to_purchase
+            )  # TODO: if can't purchase feeds, raise error or retry ration formulation?
 
     def _advance_time(self) -> None:
         """
