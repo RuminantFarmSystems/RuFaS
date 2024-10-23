@@ -1118,8 +1118,26 @@ class AnimalManager:
 
         while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
             if pen.animal_combination == AnimalCombination.CALF:
-                ration_per_animal = CalfRationManager.optimize()
-                ration_vals = {"ME_total": 0}
+                # IF USER DEFINED RATION
+                wean_day = AnimalBase.config['wean_day']
+                wean_length = AnimalBase.config['wean_length']
+                if 202 in pen_specific_feed_data['feed_id']:
+                    milk_type = "whole"
+                else:
+                    milk_type = "replacer"
+                for calf_id in pen.animals_in_pen:
+                    animal_intake = CalfRationManager.calc_intake(pen.animals_in_pen[calf_id],
+                                                                  feed, wean_day=wean_day,
+                                                                  wean_length=wean_length,
+                                                                  milk_type=milk_type)
+                    calf_requirements = CalfRationManager.calc_requirements(pen.animals_in_pen[calf_id],
+                                                                            feed,
+                                                                            temp = 15,
+                                                                            animal_intake=animal_intake)
+                # ration_per_animal = CalfRationManager.optimize()
+                # ration_vals = {"ME_total": 0}
+                ration_per_animal = CalfRationManager.formulate_ration(pen_specific_feed_data, animal_intake)
+                ration_vals = {"ME_total": animal_intake['me_intake']}
             else:
                 ration_per_animal, ration_vals = RationManager.formulate_ration(
                     pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO, self.simulation_day
