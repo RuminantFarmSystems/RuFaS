@@ -1493,7 +1493,7 @@ class AnimalManager:
                 calves_born,
                 *rest,
             ) = self.life_cycle_manager.daily_update(
-                self.simulation_day,
+                time,
                 self.calves,
                 self.heiferIs,
                 self.heiferIIs,
