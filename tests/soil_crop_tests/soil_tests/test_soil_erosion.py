@@ -1,6 +1,7 @@
-import pytest
-from math import exp, log, atan, sin
+from math import atan, exp, log, sin
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.soil_data import SoilData

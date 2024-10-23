@@ -1,12 +1,5 @@
 from collections import defaultdict
-from typing import Callable
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import TypeVar
-from typing import Union
+from typing import Callable, Dict, List, Optional, Tuple, Type, TypeVar, Union
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -20,15 +13,12 @@ from RUFAS.routines.animal.genetics.animal_genetics import AnimalGenetics
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.animal_population import AnimalPopulation
-
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    HeiferReproProtocolEnum,
-)
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import HeiferReproProtocolEnum
 from RUFAS.time import Time
 from RUFAS.util import Utility
 

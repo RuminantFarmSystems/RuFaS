@@ -2,16 +2,16 @@ import json
 import os
 import re
 from copy import deepcopy
-from deepdiff import DeepDiff
 from enum import Enum
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Union, Callable, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Sequence, Tuple, Union
+
 import pandas as pd
+from deepdiff import DeepDiff
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
-
 
 """
 Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
@@ -88,6 +88,7 @@ class InputManager:
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
+            self.csv_report_generation_list: list[str] = []
         self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
@@ -328,6 +329,8 @@ class InputManager:
         valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
+            if file_details["type"] == "json":
+                self.csv_report_generation_list.append(file_blob_key)
 
             try:
                 data_loader = data_type_to_loader_map[file_details["type"]]
@@ -497,7 +500,7 @@ class InputManager:
         """
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
-            error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
+            error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
             self.om.add_error("Missing required data", error_msg, info_map)
             raise KeyError(error_msg)
 
@@ -2466,6 +2469,46 @@ class InputManager:
                 info_map,
             )
             raise
+
+    def export_pool_to_csv(self, output_prefix: str, output_path: Path) -> None:
+        """
+        Flatten the interested input data and export the variables with their values into a CSV.
+
+        Parameters
+        ----------
+        output_prefix: str
+            The output prefix for the current task.
+        output_path: Path
+            The folder to save the output CSV.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.export_pool_to_csv.__name__,
+        }
+
+        result_df = pd.DataFrame(columns=["property_group", "variable_name", f"{output_prefix}_value"])
+        for property_group in self.csv_report_generation_list:
+            if property_group == "animal_population":
+                continue
+            result = Utility.flatten_dictionary(self.pool[property_group])
+            for key, value in result.items():
+                result_df.loc[len(result_df)] = [property_group, key, value]
+
+        try:
+            self.om.create_directory(output_path)
+            output_file = output_path / f"{output_prefix}.csv"
+            result_df.to_csv(output_file, index=False)
+            self.om.add_log("Save input data CSV success.", f"Successfully saved to {output_path}.", info_map)
+
+        except FileNotFoundError as fnfe:
+            self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {fnfe}.", info_map)
+            raise fnfe
+        except PermissionError as pe:
+            self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {pe}.", info_map)
+            raise pe
+        except OSError as e:
+            self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
+            raise e
 
 
 class ElementState(Enum):

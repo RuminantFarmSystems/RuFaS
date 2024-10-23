@@ -1,42 +1,38 @@
 from math import exp
-from typing import List, Dict
-from unittest.mock import MagicMock, PropertyMock, patch, call
+from typing import Dict, List
+from unittest.mock import MagicMock, PropertyMock, call, patch
 
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.units import MeasurementUnits
+
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.routines.field.crop.dormancy import Dormancy
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, LITERS_TO_CUBIC_MILLIMETERS
+from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.events import (
     BaseFieldManagementEvent,
-    PlantingEvent,
-    HarvestEvent,
     FertilizerEvent,
+    HarvestEvent,
     ManureEvent,
+    PlantingEvent,
+    TillageEvent,
 )
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.field.field import Field
-from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from RUFAS.routines.field.crop.dormancy import Dormancy
-from RUFAS.routines.field.crop_and_soil_constants import (
-    LITERS_TO_CUBIC_MILLIMETERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-)
-from RUFAS.time import Time
-from RUFAS.routines.field.manager.events import TillageEvent
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
-    NutrientRequestResults,
-)
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.fixture

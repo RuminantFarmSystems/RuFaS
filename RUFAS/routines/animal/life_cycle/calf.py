@@ -1,13 +1,14 @@
 from random import random
-from scipy.stats import truncnorm
 from typing import Dict
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
-from RUFAS.routines.animal.life_cycle import animal_constants as const
+from scipy.stats import truncnorm
+
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 
 om = OutputManager()
 

@@ -1,12 +1,12 @@
-from datetime import date
-
-from ..field.crop.crop_enum import CropSpecies
-from ...input_manager import InputManager
-from ...time import Time
-from ...units import MeasurementUnits
-from ...output_manager import OutputManager
-from typing import Any, Literal
 import re
+from datetime import date
+from typing import Any, Literal
+
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
     CropSpecies.ALFALFA_HAY: ["100", "103", "106", "107", "108"],
@@ -163,15 +163,13 @@ class EmissionsEstimator:
 
         return processed_feeds
 
-    def _transform_outputs_to_list_of_dicts(
-        self, data: dict[str, OutputManager.pool_element_type]
-    ) -> list[dict[str, Any]]:
+    def _transform_outputs_to_list_of_dicts(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         """
         Transforms dictionary of lists collected from the Output Manager into list of dictionaries.
 
         Examples
         --------
-        >>> a = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}]}
+        >>> a = {'one': {'values': [1, 2, 3]}, 'two': {'values': [4, 5, 6]}}
         >>> _transform_outputs_to_list_of_dicts(a)
         [{'one': 1, 'two': 4}, {'one': 2, 'two': 5}, {'one': 3, 'two': 6}]
 
@@ -202,6 +200,7 @@ class EmissionsEstimator:
             homegrown_alternatives = [
                 crop for crop in homegrown_totals.keys() if feed_id in CROP_SPECIES_TO_PURCHASED_FEED_ID[crop]
             ]
+
             for homegrown_alternative in homegrown_alternatives:
                 alternative_amount_available = homegrown_totals[homegrown_alternative]
                 amount_used = min(amount, alternative_amount_available)
