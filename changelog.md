@@ -35,7 +35,7 @@ v0.9.2
 - [2029](https://github.com/RuminantFarmSystems/MASM/pull/2029) - [minor change] [EEE] Adding tests for emission.py (2/2)
 - [2031](https://github.com/RuminantFarmSystems/MASM/pull/2031) - [minor change] [Formatting] Changes all relative import statements that import from higher-level modules to be absolute import statements.
 - [2039](https://github.com/RuminantFarmSystems/MASM/pull/2039) - [minor change] [Animal][Testing] Renames AnimalNutrients to Nutrients and adds full unit testing coverage for this class.
-
+- [1785](https://github.com/RuminantFarmSystems/MASM/pull/1785/) - [minor change] [TaskManager] Adds sobol and morris samplers, updates argument names.
 
 ### v0.9.2
 
