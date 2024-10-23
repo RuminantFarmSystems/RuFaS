@@ -11,7 +11,6 @@ from mock.mock import call
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
-from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -2517,6 +2516,7 @@ def test_add_variable_to_pool_type_error(
     mocker_add_error.assert_called_once()
     mock_metadata_properties_exist.assert_not_called()
     mock_add_variable_to_pool.assert_not_called()
+
 
 # @pytest.mark.parametrize(
 #     "variable_name, data, properties_blob_key",
@@ -5057,7 +5057,7 @@ def test_validate_data(
         "_validate_input_by_type",
         # fmt: off
         side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
-                           elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None,
+        elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None,
         # fmt: on
     )
 
