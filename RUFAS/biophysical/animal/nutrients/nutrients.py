@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import math
 
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties

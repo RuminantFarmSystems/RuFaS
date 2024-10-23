@@ -46,7 +46,7 @@ def test_get_dry_matter_intake() -> None:
         # Case 1: phosphorus_intake < phosphorus_requirement (if condition)
         (5.0, 8.0, -5.0, 2.0, 1.0, 0.0, -8.0, 100.0),
         # Case 2: phosphorus_intake >= phosphorus_requirement and reserves < 0 (elif condition)
-        (10.0, 8.0, -5.0, 2.0, 1.0, 2.0, 0.7 * 2.0 - 5.0, 104.4),
+        (10.0, 8.0, -5.0, 2.0, 1.0, 2.0, -3.6, 104.4),
         # Case 3: phosphorus_intake >= phosphorus_requirement and reserves >= 0 (else condition)
         (10.0, 8.0, 5.0, 2.0, 1.0, 2.0, 0.0, 98.0),
     ],
