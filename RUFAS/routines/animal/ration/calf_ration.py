@@ -3,6 +3,7 @@ import math
 from typing import Any, Dict, List
 from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.feed.feed import Feed
+from RUFAS.routines.animal.ration import user_defined_ration as udr
 
 
 class CalfRationManager:
@@ -377,4 +378,36 @@ class CalfRationManager:
             ration_per_animal[key] = ration_per_animal[key] / len(individual_calf_rations)
         ration_per_animal["status"] = "Optimal"
         ration_per_animal["objective"] = 4.5
+        return ration_per_animal
+
+    @classmethod
+    def make_ration_from_user_values(
+        cls,
+        average_calf_ration : Dict[str, float]
+    ) -> Dict[str, float | str]:
+        """
+        Generate ration dict from user ration percents input,
+        scaled to their estimated dry matter intake (DMI)
+
+        Parameters
+        ----------
+        average_calf_ration : Dict[str, float]
+            Formulated ration on a per animal basis using automated methods, for reference to dm total.
+
+        Returns
+        -------
+        Dict[str, float]
+            dictionary of formulated ration
+
+        """
+        ration_per_animal: Dict[str, float | str] = {}
+        total_dm = 0.0
+        for key in average_calf_ration:
+            if key not in ["status", "optimize"]:
+                total_dm += average_calf_ration[key]
+        udrm = udr.UserDefinedRationManager()
+        for key in udrm.calf_ration:
+            ration_per_animal[key] = udrm.calf_ration[key] * total_dm
+        ration_per_animal["status"] = "Optimal"
+        ration_per_animal["objective"] = 0.0
         return ration_per_animal

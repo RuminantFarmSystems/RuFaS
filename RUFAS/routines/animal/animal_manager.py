@@ -1140,6 +1140,9 @@ class AnimalManager:
                     ration_per_calf = CalfRationManager.formulate_ration(pen_specific_feed_data['feed_id'], animal_intake)
                     individual_calf_rations.append(ration_per_calf)
                 ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
+                udrm = udr.UserDefinedRationManager()
+                if udrm.use_user_defined_ration:
+                    ration_per_animal = CalfRationManager.make_ration_from_user_values(ration_per_animal)
                 ration_vals = {"ME_total": animal_intake['me_intake']}
             else:
                 ration_per_animal, ration_vals = RationManager.formulate_ration(
