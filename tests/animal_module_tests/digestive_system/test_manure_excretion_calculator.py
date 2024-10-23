@@ -247,9 +247,7 @@ def test_lactating_cow_manure(
     non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
     urinary_nitrogen_concentration = (urine_nitrogen * 1000) / urine
     urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
-    potassium = (
-        7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5
-    )
+    potassium = 7.21 * dry_matter_intake + 15944 * potassium_concentration / 100 - 164.5
     mock_phosphorus_excretion = mocker.patch.object(
         ManureExcretionCalculator,
         "_calculate_phosphorus_excretion_values",
