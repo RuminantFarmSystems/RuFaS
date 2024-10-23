@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.animal_growth.animal_growth import AnimalGrowth
 from RUFAS.biophysical.animal.animal_properties.animal_growth_properties import AnimalGrowthProperties
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Gender
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Sex
 from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -28,7 +28,7 @@ def mock_general_properties() -> GeneralProperties:
         daily_milk_produced=0,
         future_cull_date=0,
         future_death_date=0,
-        gender=Gender.FEMALE,
+        sex=Sex.FEMALE,
         id=0,
         mature_body_weight=0,
         nutrients=[],
