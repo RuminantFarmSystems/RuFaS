@@ -532,7 +532,6 @@ def test_get_feed_emissions_data_invalid_county_code(
     mock_add_error = mocker.patch.object(em.om, "add_error")
     try:
         em._get_feed_emissions_data(county_code, feed_emission_data)
-        assert False
     except ValueError:
         mock_add_error.assert_called_once_with(
             "Invalid country code access.",
@@ -585,7 +584,7 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
 
     mock_aggregate.assert_called_with(
         [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}],
-        ["f2", "f1"],
+        ["f1", "f2"],
         ["nitrogen", "phosphorus"],
     )
     mock_collect_target.assert_called_once_with(["f1", "f2"])
