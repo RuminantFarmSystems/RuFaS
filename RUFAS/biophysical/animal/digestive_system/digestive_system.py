@@ -3,14 +3,27 @@ from typing import Any
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
+from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import EntericMethaneCalculator
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+
 from RUFAS.input_manager import InputManager
 
 
 class DigestiveSystem:
+    """
+    This class serves as an entry point for the animal digestive systems.
+
+    Attributes
+    ----------
+    METHANE_MODEL: str
+        The equation used to calculate methane.
+    METHANE_MITIGATION_METHOD: str
+        The feed additives that reduce methane emissions.
+    METHANE_MITIGATION_ADDITIVE_AMOUNT: float
+        The amount of feed additives that reduce methane emissions (kg).
+    """
     METHANE_MODEL: str
     METHANE_MITIGATION_METHOD: str
     METHANE_MITIGATION_ADDITIVE_AMOUNT: float
