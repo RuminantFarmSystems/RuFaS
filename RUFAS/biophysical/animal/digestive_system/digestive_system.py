@@ -24,6 +24,7 @@ class DigestiveSystem:
     METHANE_MITIGATION_ADDITIVE_AMOUNT: float
         The amount of feed additives that reduce methane emissions (kg).
     """
+
     METHANE_MODEL: str
     METHANE_MITIGATION_METHOD: str
     METHANE_MITIGATION_ADDITIVE_AMOUNT: float
