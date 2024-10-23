@@ -160,7 +160,7 @@
           "minimum": 0,
           "default": 0
         },
-        "N_sampler": {
+        "sampler_n": {
           "type": "number",
           "description": "The number of samples to generate for Sensitivity Analysis. Ideally a power of 2 and <= 'skip_values'",
           "minimum": 2,
