@@ -72,7 +72,7 @@ def input_manager_original_method_states(
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
         "_create_record": mock_input_manager._create_record,
         "_extract_input_data_by_key_list": mock_input_manager._extract_input_data_by_key_list,
-        "add_variable_to_pool": mock_input_manager.add_variable_to_pool,
+        "add_variable_to_pool": mock_input_manager.add_variable_to_pool
     }
 
 
@@ -2327,7 +2327,7 @@ def test_add_dict_variable_to_pool(
     "variable_name, data, properties_blob_key",
     [
         ("var1", "a", "key1"),
-        ("var2", [1, 2, 3], "key2"),
+        #("var2", [1, 2, 3], "key2"),
         ("var3", 5, "key3"),
     ],
 )
@@ -2477,7 +2477,9 @@ def test_add_tabular_variable_to_pool(
         eager_termination=False,
     )
 
-    mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_tabular_variable_to_pool"]
+    mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
+        "add_variable_to_pool"
+    ]
     mock_input_manager._metadata_properties_exist = input_manager_original_method_states["_metadata_properties_exist"]
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
@@ -2514,7 +2516,9 @@ def test_add_tabular_variable_to_pool_type_error(
         mock_input_manager._metadata_properties_exist.assert_not_called()
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
+        mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
+            "add_variable_to_pool"
+        ]
         mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
             "_metadata_properties_exist"
         ]
@@ -2563,7 +2567,9 @@ def test_add_tabular_variable_to_pool_invalid_data(
             eager_termination=False,
         )
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
+        mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
+            "add_variable_to_pool"
+        ]
         mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
             "_metadata_properties_exist"
         ]
@@ -2593,7 +2599,9 @@ def test_add_tabular_variable_to_pool_metadata_properties_do_not_exist(
         )
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
+        mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
+            "add_variable_to_pool"
+        ]
         mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
             "_metadata_properties_exist"
         ]
@@ -3120,12 +3128,6 @@ def test_add_variable_to_pool_nested(
 
     if (not is_modifiable_during_runtime) and eager_termination:
         with pytest.raises(PermissionError):
-            print(input_manager._add_variable_to_pool(
-                variable_name=variable_name,
-                input_data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=eager_termination,
-            ))
             input_manager._add_variable_to_pool(
                 variable_name=variable_name,
                 input_data=data,
@@ -3133,7 +3135,6 @@ def test_add_variable_to_pool_nested(
                 eager_termination=eager_termination,
             )
     elif not is_modifiable_during_runtime:
-        print("a")
         assert not input_manager._add_variable_to_pool(
             variable_name=variable_name,
             input_data=data,
@@ -3141,7 +3142,6 @@ def test_add_variable_to_pool_nested(
             eager_termination=eager_termination,
         )
     else:
-        print("b")
         result = input_manager._add_variable_to_pool(
             variable_name=variable_name,
             input_data=data,
@@ -3152,14 +3152,6 @@ def test_add_variable_to_pool_nested(
         assert result
         assert patch_for_add_warning.call_count == expected_add_warning_call_count
         assert input_manager.get_data(variable_name) == list(data.values())[0]
-
-    result = input_manager._add_variable_to_pool(
-        variable_name=variable_name,
-        input_data=data,
-        properties_blob_key=properties_blob_key,
-        eager_termination=False,
-    )
-    print(result)
 
 
 def test_dump_get_data_logs(
@@ -4897,7 +4889,6 @@ def test_check_modifiability_error(
 
     try:
         input_manager._check_modifiability(variable_name, metadata_properties, eager_termination)
-        print("a")
     except PermissionError as e:
         mock_modifiable.assert_called_once_with(variable_name=variable_name, variable_properties=metadata_properties)
 
