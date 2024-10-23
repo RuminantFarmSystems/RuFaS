@@ -151,6 +151,15 @@ class AnimalGrowth:
         -------
         float
             The daily body weight growth for non-pregnant heifers (kg).
+
+        References
+        ----------
+        Life cycle pseudocode @[A.1A.C.6] in pseudocode, which are from Fox et al. 1999 and NRC 2001.
+
+        Notes
+        -----
+        For animals over 55% of their mature body weight, the equation results in a negative return.
+        Therefore, when the result is negative, the minimum BW change constant is returned instead.
         """
         divisor = max(1, abs(AnimalGrowth.TARGET_HEIFER_PREGNANT_DAY - general_properties.days_born))
         return max(
@@ -214,6 +223,10 @@ class AnimalGrowth:
         tuple[float, float, float]
             The daily body weight growth for pregnant heifers (kg), the updated conceptus weight (kg), and the updated
             tissue changed (kg).
+
+        References
+        ----------
+        Life cycle pseudocode @[A.1A.C.56/57/58]
         """
         (conceptus_growth, reproduction_properties.conceptus_weight, animal_growth_properties.tissue_changed) = (
             AnimalGrowth._calculate_cow_conceptus_growth(

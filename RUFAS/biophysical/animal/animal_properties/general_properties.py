@@ -36,7 +36,7 @@ class GeneralProperties:
     daily_milk_produced: float
     future_cull_date: int
     future_death_date: int
-    gender: "Gender"
+    sex: "Sex"
     id: int
     mature_body_weight: float
     nutrients: list[str]
@@ -63,8 +63,8 @@ class Breed(Enum):
     JE = "Jersey"
 
 
-class Gender(Enum):
-    """Enum indicating the gender of the animal."""
+class Sex(Enum):
+    """Enum indicating the sex of the animal."""
 
     MALE = "male"
     FEMALE = "female"
