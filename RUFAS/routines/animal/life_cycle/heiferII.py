@@ -235,6 +235,7 @@ class HeiferII(HeiferI):
             "gestation_length": self.gestation_length,
             "p_gest_for_calf": self.p_gest_for_calf,
             "calf_birth_weight": self.calf_birth_weight,
+            "net_merit": self.net_merit,
         }
         return values
 

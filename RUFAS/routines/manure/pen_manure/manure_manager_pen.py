@@ -1,9 +1,8 @@
 from typing import NamedTuple, Set
 
+from RUFAS.data_types.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-
-from ....data_types.pen_manure_data import PenManureData
-from ....enums import AnimalCombination
 
 
 class ManureManagerPen:

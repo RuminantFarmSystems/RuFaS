@@ -3,6 +3,8 @@ from typing import Any, Dict, List, Sequence
 
 import numpy as np
 
+from RUFAS.data_types.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -16,9 +18,6 @@ from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed import Feed
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
-
-from ...data_types.animal_manure_excretions import AnimalManureExcretions
-from ...enums import AnimalCombination
 
 om = OutputManager()
 
