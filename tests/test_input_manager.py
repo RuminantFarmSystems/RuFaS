@@ -11,6 +11,7 @@ from mock.mock import call
 from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import ElementsCounter, ElementState, InputManager, Modifiability
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -1067,7 +1068,7 @@ def test_fix_string_type_fixable_data(
     dummy_input_data = mock_input_string_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
 
-    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning,):
+    with (patch("RUFAS.output_manager.OutputManager.add_warning") as add_warning, ):
         result = mock_input_manager._fix_data(
             dummy_variable_properties,
             dummy_element_hierarchy,
@@ -1715,8 +1716,8 @@ def test_get_metadata_raises_exception(
         error_message = key_error.value.__str__().strip("'")
         assert (
             error_message == f'Data not found: Cannot find "{dummy_metadata_path}", '
-            f'"{expected_error_parent_address}" does not have attribute '
-            f'"{expected_error_invalid_key}".'
+                             f'"{expected_error_parent_address}" does not have attribute '
+                             f'"{expected_error_invalid_key}".'
         )
         assert add_error.call_count == expected_warning_call_count
 
@@ -2327,7 +2328,7 @@ def test_add_dict_variable_to_pool(
     "variable_name, data, properties_blob_key",
     [
         ("var1", "a", "key1"),
-        #("var2", [1, 2, 3], "key2"),
+        # ("var2", [1, 2, 3], "key2"),
         ("var3", 5, "key3"),
     ],
 )
@@ -2433,6 +2434,51 @@ def test_add_dict_variable_to_pool_metadata_properties_do_not_exist(
             "_metadata_properties_exist"
         ]
         mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
+
+
+@pytest.mark.parametrize(
+    "variable_name, data, properties_blob_key, is_tabular",
+    [
+        ("var1", {}, "key1", False),
+        ("var2", {"a": 1}, "key2", False),
+        ("var3", {"a": "A", "b": 2, "c": True}, "key3", False),
+        ("var4", [1, 2, 3], "key1", True),
+        ("var5", ["a", "b", "c"], "key2", True),
+        ("var6", [0.0, 1.1, 2.2], "key3", True),
+        ("var7", {"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [0.0, 1.1, 2.2]}, "key4", True)
+    ],
+)
+def test_add_variable_to_pool(variable_name: str,
+                              data: Dict[str, Any],
+                              properties_blob_key: str,
+                              mock_input_manager: InputManager,
+                              is_tabular: bool,
+                              mocker: MockerFixture) -> None:
+    mock_metadata_properties_exist = mocker.patch.object(mock_input_manager,
+                                                         "_metadata_properties_exist",
+                                                         return_value=True)
+    mock_add_variable_to_pool = mocker.patch.object(mock_input_manager,
+                                                    "_add_variable_to_pool",
+                                                    return_value=True)
+    mocker_add_error = mocker.patch.object(mock_input_manager.om, "add_error")
+
+    actual = mock_input_manager.add_variable_to_pool(
+        variable_name=variable_name,
+        data=data,
+        properties_blob_key=properties_blob_key,
+        eager_termination=False,
+    )
+    if is_tabular:
+        data = {variable_name: data} if isinstance(data, List) else data
+
+    assert actual
+    mocker_add_error.assert_not_called()
+    mock_metadata_properties_exist.assert_called_once_with(variable_name=variable_name,
+                                                           properties_blob_key=properties_blob_key)
+    mock_add_variable_to_pool.assert_called_once_with(variable_name=variable_name,
+                                                      input_data=data,
+                                                      properties_blob_key=properties_blob_key,
+                                                      eager_termination=False)
 
 
 @pytest.mark.parametrize(
@@ -4974,7 +5020,7 @@ def test_validate_data(
         "_validate_input_by_type",
         # fmt: off
         side_effect=lambda variable_path, variable_properties, input_data, eager_termination, properties_blob_key,
-        elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None,
+                           elements_counter, called_during_initialization: input_data.get(variable_path[0]) is not None,
         # fmt: on
     )
 
