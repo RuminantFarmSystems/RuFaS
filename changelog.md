@@ -20,6 +20,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 ## Changelog Entries
 
 ### Current version
+- [1945](https://github.com/RuminantFarmSystems/MASM/pull/1945) - [minor change] [Animal] Implements Animal Genetics submodule.
 
 v0.9.1
 
