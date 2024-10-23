@@ -319,8 +319,7 @@ class CalfRationManager:
         return animal_intake
 
     @classmethod
-    def formulate_ration(cls, calf_feed_ids: List[int],
-                         animal_intake: Dict[str, float]) -> Dict[str, float]:
+    def formulate_ration(cls, calf_feed_ids: List[int], animal_intake: Dict[str, float]) -> Dict[str, float]:
         """
         Generates formulated ration dictionary per calf.
 
@@ -345,16 +344,15 @@ class CalfRationManager:
 
         for feed_id in calf_feed_ids:
             if feed_id == 202:
-                ration_per_animal[str(feed_id)] = animal_intake['whole_milk_intake']
+                ration_per_animal[str(feed_id)] = animal_intake["whole_milk_intake"]
             elif feed_id in replacers_selected:
-                ration_per_animal[str(feed_id)] = animal_intake['milk_replacer_intake'] / len(replacers_selected)
+                ration_per_animal[str(feed_id)] = animal_intake["milk_replacer_intake"] / len(replacers_selected)
             elif feed_id in starter_options:
-                ration_per_animal[str(feed_id)] = animal_intake['starter_intake'] / len(starters_selected)
+                ration_per_animal[str(feed_id)] = animal_intake["starter_intake"] / len(starters_selected)
         return ration_per_animal
 
     @classmethod
-    def get_average_calf_ration(cls,
-                                individual_calf_rations: List[Dict[str, float]]) -> Dict[str, float | str]:
+    def get_average_calf_ration(cls, individual_calf_rations: List[Dict[str, float]]) -> Dict[str, float | str]:
         """
         Get average calf ration for feedout.
 

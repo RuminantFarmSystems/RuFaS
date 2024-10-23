@@ -1120,24 +1120,28 @@ class AnimalManager:
             if pen.animal_combination == AnimalCombination.CALF:
                 individual_calf_rations = []
                 # IF USER DEFINED RATION
-                wean_day = AnimalBase.config['wean_day']
-                wean_length = AnimalBase.config['wean_length']
-                if 202 in pen_specific_feed_data['feed_id']:
+                wean_day = AnimalBase.config["wean_day"]
+                wean_length = AnimalBase.config["wean_length"]
+                if 202 in pen_specific_feed_data["feed_id"]:
                     milk_type = "whole"
                 else:
                     milk_type = "replacer"
                 for calf_id in pen.animals_in_pen:
-                    animal_intake = CalfRationManager.calc_intake(pen.animals_in_pen[calf_id],
-                                                                  feed, wean_day=wean_day,
-                                                                  wean_length=wean_length,
-                                                                  milk_type=milk_type)
-                    calf_requirements = CalfRationManager.calc_requirements(pen.animals_in_pen[calf_id],
-                                                                            feed,
-                                                                            temp = 15,
-                                                                            animal_intake=animal_intake)
-                # ration_per_animal = CalfRationManager.optimize()
-                # ration_vals = {"ME_total": 0}
-                    ration_per_calf = CalfRationManager.formulate_ration(pen_specific_feed_data['feed_id'], animal_intake)
+                    animal_intake = CalfRationManager.calc_intake(
+                        pen.animals_in_pen[calf_id],
+                        feed,
+                        wean_day=wean_day,
+                        wean_length=wean_length,
+                        milk_type=milk_type,
+                    )
+                    calf_requirements = CalfRationManager.calc_requirements(
+                        pen.animals_in_pen[calf_id], feed, temp=15, animal_intake=animal_intake
+                    )
+                    # ration_per_animal = CalfRationManager.optimize()
+                    # ration_vals = {"ME_total": 0}
+                    ration_per_calf = CalfRationManager.formulate_ration(
+                        pen_specific_feed_data["feed_id"], animal_intake
+                    )
                     individual_calf_rations.append(ration_per_calf)
                 ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
                 udrm = udr.UserDefinedRationManager()
