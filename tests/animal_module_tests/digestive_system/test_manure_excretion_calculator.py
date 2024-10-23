@@ -3,7 +3,6 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.general_constants import GeneralConstants
 
 
 @pytest.mark.parametrize(
