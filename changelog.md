@@ -26,7 +26,7 @@ v0.9.2
 
 ### Next Version Updates
 
-- [2011](https://github.com/RuminantFarmSystems/MASM/pull/2011) - [minor change] [Animal] Implements the AnimalGrowth submodule logic and tests.
+- [2011](https://github.com/RuminantFarmSystems/MASM/pull/2011) - [minor change] [Animal] Implements the Animal Growth submodule logic and tests.
 - [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
 - [2022](https://github.com/RuminantFarmSystems/MASM/pull/2022) - [minor change] [Manure] Removes DefaultEnum class and all references to it in the Manure module.
 - [2023](https://github.com/RuminantFarmSystems/MASM/pull/2023) - [minor change] [Manure] Fixes calculation of organic bedding dry solids added to manure in manure handler.

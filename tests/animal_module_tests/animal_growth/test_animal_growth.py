@@ -1,8 +1,8 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_growth.animal_growth import AnimalGrowth
-from RUFAS.biophysical.animal.animal_properties.animal_growth_properties import AnimalGrowthProperties
+from RUFAS.biophysical.animal.growth.growth import Growth
+from RUFAS.biophysical.animal.animal_properties.growth_properties import GrowthProperties
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Sex
 from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
@@ -39,8 +39,8 @@ def mock_general_properties() -> GeneralProperties:
 
 
 @pytest.fixture
-def mock_animal_growth_properties() -> AnimalGrowthProperties:
-    return AnimalGrowthProperties(daily_growth=0, tissue_changed=0)
+def mock_animal_growth_properties() -> GrowthProperties:
+    return GrowthProperties(daily_growth=0, tissue_changed=0)
 
 
 @pytest.fixture
@@ -59,10 +59,10 @@ def test_initialize_animal_growth_variables(wean_day: int, target_heifer_preg_da
         return_value={"calf": {"wean_day": wean_day}, "bodyweight": {"target_heifer_preg_day": target_heifer_preg_day}},
     )
 
-    AnimalGrowth.initialize_animal_growth_variables()
+    Growth.initialize_animal_growth_variables()
 
-    assert AnimalGrowth.WEAN_DAY == wean_day
-    assert AnimalGrowth.TARGET_HEIFER_PREGNANT_DAY == target_heifer_preg_day
+    assert Growth.WEAN_DAY == wean_day
+    assert Growth.TARGET_HEIFER_PREGNANT_DAY == target_heifer_preg_day
     mock_get_data.assert_called_once_with("animal.animal_config.farm_level")
 
 
@@ -90,7 +90,7 @@ def test_daily_routines(
     mature_body_weight: float,
     is_pregnant: bool,
     mock_general_properties: GeneralProperties,
-    mock_animal_growth_properties: AnimalGrowthProperties,
+    mock_animal_growth_properties: GrowthProperties,
     mock_reproduction_properties: ReproductionProperties,
     mocker: MockerFixture,
 ) -> None:
@@ -109,24 +109,24 @@ def test_daily_routines(
     dummy_conceptus_weight = 233
     dummy_tissue_changed = 18
     mock_calf_bw_change = mocker.patch.object(
-        AnimalGrowth, "calculate_calf_body_weight_change", return_value=dummy_daily_growth
+        Growth, "calculate_calf_body_weight_change", return_value=dummy_daily_growth
     )
     mock_non_preg_heifer_bw_change = mocker.patch.object(
-        AnimalGrowth, "calculate_non_pregnant_heifer_body_weight_change", return_value=dummy_daily_growth
+        Growth, "calculate_non_pregnant_heifer_body_weight_change", return_value=dummy_daily_growth
     )
     mock_preg_heifer_bw_change = mocker.patch.object(
-        AnimalGrowth,
+        Growth,
         "calculate_pregnant_heifer_body_weight_change",
         return_value=(dummy_daily_growth, dummy_conceptus_weight),
     )
     mock_cow_bw_change = mocker.patch.object(
-        AnimalGrowth,
+        Growth,
         "calculate_cow_body_weight_change",
         return_value=(dummy_daily_growth, dummy_conceptus_weight, dummy_tissue_changed),
     )
 
     (result_animal_growth_properties, result_reproduction_properties, result_general_properties) = (
-        AnimalGrowth.evaluate_body_weight_change(
+        Growth.evaluate_body_weight_change(
             mock_general_properties, mock_animal_growth_properties, mock_reproduction_properties, mock_time
         )
     )
@@ -189,10 +189,10 @@ def test_daily_routines(
 def test_calculate_calf_body_weight_change(
     birth_weight: float, wean_day: int, mock_general_properties: GeneralProperties
 ) -> None:
-    AnimalGrowth.WEAN_DAY = wean_day
+    Growth.WEAN_DAY = wean_day
     mock_general_properties.birth_weight = birth_weight
 
-    result = AnimalGrowth.calculate_calf_body_weight_change(mock_general_properties)
+    result = Growth.calculate_calf_body_weight_change(mock_general_properties)
 
     assert result == birth_weight / wean_day
 
@@ -214,13 +214,13 @@ def test_calculate_non_pregnant_heifer_body_weight_change(
     expected: float,
     mock_general_properties: GeneralProperties,
 ) -> None:
-    AnimalGrowth.TARGET_HEIFER_PREGNANT_DAY = target_heifer_pregnant_day
+    Growth.TARGET_HEIFER_PREGNANT_DAY = target_heifer_pregnant_day
 
     mock_general_properties.days_born = days_born
     mock_general_properties.body_weight = body_weight
     mock_general_properties.mature_body_weight = mature_body_weight
 
-    result = AnimalGrowth.calculate_non_pregnant_heifer_body_weight_change(mock_general_properties)
+    result = Growth.calculate_non_pregnant_heifer_body_weight_change(mock_general_properties)
 
     assert pytest.approx(result) == expected
 
@@ -236,15 +236,15 @@ def test_calculate_pregnant_heifer_body_weight_change(
     dummy_conceptus_weight = 1.88
 
     mock_calculate_pregnant_heifer_target_daily_growth = mocker.patch.object(
-        AnimalGrowth, "_calculate_pregnant_heifer_target_daily_growth", return_value=daily_growth
+        Growth, "_calculate_pregnant_heifer_target_daily_growth", return_value=daily_growth
     )
     mock_calculate_pregnant_heifer_conceptus_growth = mocker.patch.object(
-        AnimalGrowth,
+        Growth,
         "_calculate_pregnant_heifer_conceptus_growth",
         return_value=(conceptus_growth, dummy_conceptus_weight),
     )
 
-    (result_bw_change, result_conceptus_weight) = AnimalGrowth.calculate_pregnant_heifer_body_weight_change(
+    (result_bw_change, result_conceptus_weight) = Growth.calculate_pregnant_heifer_body_weight_change(
         mock_reproduction_properties, mock_general_properties
     )
 
@@ -266,27 +266,27 @@ def test_calculate_cow_body_weight_change(
     body_weight_tissue: float,
     mock_general_properties: GeneralProperties,
     mock_reproduction_properties: ReproductionProperties,
-    mock_animal_growth_properties: AnimalGrowthProperties,
+    mock_animal_growth_properties: GrowthProperties,
     mocker: MockerFixture,
 ) -> None:
     dummy_conceptus_weight = 1.88
     dummy_tissue_changed = 10.24
 
     mock__calculate_cow_target_daily_growth = mocker.patch.object(
-        AnimalGrowth, "_calculate_cow_target_daily_growth", return_value=daily_growth
+        Growth, "_calculate_cow_target_daily_growth", return_value=daily_growth
     )
     mock_calculate_cow_conceptus_growth = mocker.patch.object(
-        AnimalGrowth,
+        Growth,
         "_calculate_cow_conceptus_growth",
         return_value=(conceptus_growth, dummy_conceptus_weight, dummy_tissue_changed),
     )
     mock_calculate_cow_body_weight_tissue_change = mocker.patch.object(
-        AnimalGrowth,
+        Growth,
         "_calculate_cow_body_weight_tissue_change",
         return_value=(body_weight_tissue, dummy_tissue_changed),
     )
 
-    (result_bw_change, result_conceptus_weight, result_tissue_changed) = AnimalGrowth.calculate_cow_body_weight_change(
+    (result_bw_change, result_conceptus_weight, result_tissue_changed) = Growth.calculate_cow_body_weight_change(
         mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
     )
 
@@ -329,7 +329,7 @@ def test_calculate_pregnant_heifer_conceptus_growth(
     mock_reproduction_properties.calf_birth_weight = calf_birth_weight
     mock_general_properties.days_in_preg = days_in_preg
 
-    actual_conceptus_growth, actual_conceptus_weight = AnimalGrowth._calculate_pregnant_heifer_conceptus_growth(
+    actual_conceptus_growth, actual_conceptus_weight = Growth._calculate_pregnant_heifer_conceptus_growth(
         mock_reproduction_properties, mock_general_properties
     )
 
@@ -351,11 +351,11 @@ def test_calculate_cow_conceptus_growth(
     expected_tissue_change: float,
     mock_reproduction_properties: ReproductionProperties,
     mock_general_properties: GeneralProperties,
-    mock_animal_growth_properties: AnimalGrowthProperties,
+    mock_animal_growth_properties: GrowthProperties,
     mocker: MockerFixture,
 ) -> None:
     mocker.patch.object(
-        AnimalGrowth,
+        Growth,
         "_calculate_pregnant_heifer_conceptus_growth",
         return_value=(expected_conceptus_growth, expected_conceptus_weight),
     )
@@ -365,7 +365,7 @@ def test_calculate_cow_conceptus_growth(
     mock_animal_growth_properties.tissue_changed = tissue_changed
 
     (actual_conceptus_growth, actual_conceptus_weight, actual_tissue_change) = (
-        AnimalGrowth._calculate_cow_conceptus_growth(
+        Growth._calculate_cow_conceptus_growth(
             mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
         )
     )
@@ -400,7 +400,7 @@ def test_calculate_pregnant_heifer_target_daily_growth(
     mock_general_properties.mature_body_weight = mature_body_weight
     mock_general_properties.body_weight = body_weight
 
-    actual = AnimalGrowth._calculate_pregnant_heifer_target_daily_growth(
+    actual = Growth._calculate_pregnant_heifer_target_daily_growth(
         mock_reproduction_properties, mock_general_properties
     )
 
@@ -435,7 +435,7 @@ def test_calculate_cow_target_daily_growth(
     mock_general_properties.mature_body_weight = mature_body_weight
     mock_general_properties.body_weight = body_weight
 
-    actual = AnimalGrowth._calculate_cow_target_daily_growth(mock_reproduction_properties, mock_general_properties)
+    actual = Growth._calculate_cow_target_daily_growth(mock_reproduction_properties, mock_general_properties)
 
     assert pytest.approx(actual) == expected
 
@@ -460,7 +460,7 @@ def test_calculate_cow_body_weight_tissue_change(
     gestation_length: int,
     expected_body_weight_tissue: float,
     expected_updated_tissue_changed: float,
-    mock_animal_growth_properties: AnimalGrowthProperties,
+    mock_animal_growth_properties: GrowthProperties,
     mock_reproduction_properties: ReproductionProperties,
     mock_general_properties: GeneralProperties,
 ) -> None:
@@ -471,7 +471,7 @@ def test_calculate_cow_body_weight_tissue_change(
     mock_general_properties.days_in_preg = days_in_preg
     mock_general_properties.dry_off_day_of_pregnancy = dry_off_day_of_pregnancy
 
-    actual_body_weight_tissue, actual_updated_tissue_changed = AnimalGrowth._calculate_cow_body_weight_tissue_change(
+    actual_body_weight_tissue, actual_updated_tissue_changed = Growth._calculate_cow_body_weight_tissue_change(
         mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
     )
 
