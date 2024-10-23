@@ -378,10 +378,7 @@ class CalfRationManager:
         return ration_per_animal
 
     @classmethod
-    def make_ration_from_user_values(
-        cls,
-        average_calf_ration : Dict[str, float]
-    ) -> Dict[str, float | str]:
+    def make_ration_from_user_values(cls, average_calf_ration: Dict[str, float]) -> Dict[str, float | str]:
         """
         Generate ration dict from user ration percents input,
         scaled to their estimated dry matter intake (DMI)
