@@ -1,17 +1,17 @@
-import pytest
-from unittest.mock import MagicMock, call, PropertyMock
 from typing import List
+from unittest.mock import MagicMock, PropertyMock, call
 
+import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.units import MeasurementUnits
+from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.field.tillage_application import TillageApplication
-from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.units import MeasurementUnits
 
 
 @pytest.mark.parametrize(

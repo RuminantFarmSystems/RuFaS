@@ -1,6 +1,7 @@
-from math import log, exp
 from bisect import bisect
+from math import exp, log
 from typing import List, Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.soil_data import SoilData
 

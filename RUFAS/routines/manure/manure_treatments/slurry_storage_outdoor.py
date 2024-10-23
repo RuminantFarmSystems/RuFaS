@@ -1,27 +1,16 @@
 from __future__ import annotations
 
+import math
 from typing import Tuple
 
-import math
-
-from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_treatments.base_manure_treatment import (
-    BaseManureTreatment,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import (
-    ManureTreatmentConfig,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import (
-    ManureTreatmentDailyOutput,
-)
-from RUFAS.routines.manure.manure_treatments.manure_treatment_types import (
-    ManureTreatmentType,
-)
+from RUFAS.routines.manure.enums.ManureCoverEnum import ManureCoverEnum
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseManureTreatment
+from RUFAS.routines.manure.manure_treatments.manure_treatment_configs import ManureTreatmentConfig
+from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
+from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
@@ -400,11 +389,14 @@ class SlurryStorageOutdoor(BaseManureTreatment):
         self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen = (
             new_accumulated_liquid_manure_total_ammoniacal_nitrogen
         )
-
-        daily_output.storage_nitrous_oxide = self._calc_empirical_nitrogen_loss_from_nitrous_oxide_emission(
-            manure_treatment_type=ManureTreatmentType.SLURRY_STORAGE_OUTDOOR,
-            manure_cover=self.config.manure_cover,
-            manure_nitrogen_kg_N_per_day=daily_output.liquid_manure_nitrogen,
+        emissions_factor = self._get_nitrous_oxide_emissions_factor(
+            ManureTreatmentType.SLURRY_STORAGE_OUTDOOR, self.config.manure_cover
+        )
+        daily_output.storage_nitrous_oxide = (
+            GasEmissionsCalculator.calculate_empirical_nitrogen_loss_from_nitrous_oxide_emission(
+                emission_factor_kg_nitrous_oxide_N_per_kg_manure_N=emissions_factor,
+                manure_nitrogen_kg_N_per_day=daily_input.liquid_manure_nitrogen,
+            )
         )
         daily_output.liquid_manure_nitrogen -= daily_output.storage_nitrous_oxide
         self._accumulated_output.storage_nitrous_oxide += daily_output.storage_nitrous_oxide

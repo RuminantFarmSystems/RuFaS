@@ -1,8 +1,8 @@
 from typing import List
 
-from RUFAS.units import MeasurementUnits
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
+from RUFAS.units import MeasurementUnits
 
 
 class FieldDataReporter:
