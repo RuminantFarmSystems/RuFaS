@@ -37,7 +37,31 @@ class PenTypedDict(TypedDict):
 
 
 class AnimalBaseInitArgsTypedDict(TypedDict):
-    """List of expected keys for animal base initialization arguments dictionary"""
+    """
+    List of expected keys for animal base initialization arguments dictionary
+    id: int
+        The ID of the animal.
+    breed: str
+        The breed of the animal.
+    birth_date: str
+        The birthdate of the animal.
+    days_born: int
+        The age of the animal, days.
+    birth_weight: float
+        The birth weight of the animal, kg.
+    p_init: int
+        The initial phosphorus amount, kg.
+    body_weight_history: NotRequired[List]
+        The body weight history of the animal.
+    pen_history: NotRequired[List]
+        The pen history of the animal.
+    conceptus_weight: NotRequired[float]
+        The conceptus weight of the animal, kg.
+    calf_birth_weight: NotRequired[float]
+        The birth weight of the calf, kg.
+    net_merit: float
+        The net merit value that represents the genetic value of the animal, $USD.
+    """
 
     id: int
     breed: str
@@ -49,6 +73,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
     pen_history: NotRequired[List]
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
+    net_merit: NotRequired[float]
 
 
 class CalfValuesTypedDict(TypedDict):
