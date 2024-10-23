@@ -532,6 +532,7 @@ def test_get_feed_emissions_data_invalid_county_code(
     mock_add_error = mocker.patch.object(em.om, "add_error")
     try:
         em._get_feed_emissions_data(county_code, feed_emission_data)
+        assert False
     except ValueError:
         mock_add_error.assert_called_once_with(
             "Invalid country code access.",
