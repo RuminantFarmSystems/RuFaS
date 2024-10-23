@@ -1,7 +1,6 @@
 # from .hardcoded_ration import get_ration
 import math
 from typing import Any, Dict, List
-from RUFAS.routines.animal.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration import user_defined_ration as udr
 
@@ -363,12 +362,12 @@ class CalfRationManager:
 
         Returns
         -------
-        ration_per_animal : Dict[str, float]
+        ration_per_animal : Dict[str, float | str]
             Average ration per animal for given calf pen.
         """
-        ration_per_animal = {}
+        ration_per_animal: Dict[str, float | str] = {}
         for key in individual_calf_rations[0]:
-            ration_per_animal[key] = 0
+            ration_per_animal[key] = 0.0
         for calf_ration in individual_calf_rations:
             for key in individual_calf_rations[0]:
                 ration_per_animal[key] += calf_ration[key]
