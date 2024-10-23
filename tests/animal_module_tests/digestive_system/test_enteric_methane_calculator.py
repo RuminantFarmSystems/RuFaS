@@ -9,21 +9,21 @@ from RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator imp
 
 def test_calf_methane_no_model() -> None:
     """Test the calf methane result without model provided."""
-    observed = EntericMethaneCalculator.calculate_calf_methane(None, 30)
-    assert observed == 0
+    actual = EntericMethaneCalculator.calculate_calf_methane(None, 30)
+    assert actual == 0
 
 
 @pytest.mark.parametrize("body_weight,expected", [(30, 12.52883), (195.45, 51.09126)])
 def test_calf_methane_with_model(body_weight: float, expected: float) -> None:
     """Test the calf methane result without model provided."""
-    observed = EntericMethaneCalculator.calculate_calf_methane("model", body_weight)
-    assert pytest.approx(observed) == expected
+    actual = EntericMethaneCalculator.calculate_calf_methane("model", body_weight)
+    assert pytest.approx(actual) == expected
 
 
 def test_heifer_methane_no_model() -> None:
     """Test the heifer methane result without model provided."""
-    observed = EntericMethaneCalculator.calculate_heifer_methane(None, 30, {})
-    assert observed == 0
+    actual = EntericMethaneCalculator.calculate_heifer_methane(None, 30, {})
+    assert actual == 0
 
 
 @pytest.mark.parametrize(
@@ -43,8 +43,8 @@ def test_heifer_methane_with_model(dry_matter_intake: float, nutrient_concentrat
         + 0.160 * ((100 - ASH_concentration) - NDF_concentration - CP_concentration - EE_concentration)
     )
     expected = (0.065 * expected_gross_energy_concentration * dry_matter_intake) / 0.05565
-    observed = EntericMethaneCalculator.calculate_heifer_methane("model", dry_matter_intake, nutrient_concentrations)
-    assert pytest.approx(observed) == expected
+    actual = EntericMethaneCalculator.calculate_heifer_methane("model", dry_matter_intake, nutrient_concentrations)
+    assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize(
@@ -75,7 +75,7 @@ def test_cow_methane_is_lactating_with_mitigation(
     methane_yield = 25 / dry_matter_intake
     mock_methane_mitigation = mocker.patch.object(MethaneMitigationCalculator, "mitigate_methane", return_value=23.5)
     expected = methane_yield * (1 + 23.5 / 100) * dry_matter_intake
-    observed = EntericMethaneCalculator.calculate_cow_methane(
+    actual = EntericMethaneCalculator.calculate_cow_methane(
         True,
         body_weight,
         milk_fat,
@@ -86,7 +86,7 @@ def test_cow_methane_is_lactating_with_mitigation(
         methane_mitigation_additive_amount,
         "model",
     )
-    assert pytest.approx(observed) == expected
+    assert pytest.approx(actual) == expected
 
     mock_lactating_cow_manure.assert_called_once_with(
         body_weight,
@@ -131,7 +131,7 @@ def test_cow_manure_dry_with_mitigation(
     methane_yield = 25 / dry_matter_intake
     mock_methane_mitigation = mocker.patch.object(MethaneMitigationCalculator, "mitigate_methane", return_value=23.5)
     expected = methane_yield * (1 + 23.5 / 100) * dry_matter_intake
-    observed = EntericMethaneCalculator.calculate_cow_methane(
+    actual = EntericMethaneCalculator.calculate_cow_methane(
         False,
         body_weight,
         milk_fat,
@@ -142,7 +142,7 @@ def test_cow_manure_dry_with_mitigation(
         methane_mitigation_additive_amount,
         "model",
     )
-    assert pytest.approx(observed) == expected
+    assert pytest.approx(actual) == expected
 
     mock_dry_cow_manure.assert_called_once_with(
         "model", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
@@ -179,10 +179,10 @@ def test_lactating_cow_manure_mutian(
     dry_matter_intake = nutrient_amounts["dm"]
     NDF_concentration = nutrient_concentrations["NDF"]
     expected = -126 + 11.3 * dry_matter_intake + 2.30 * NDF_concentration + 28.8 * milk_fat + 0.148 * body_weight
-    observed = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
         body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "Mutian"
     )
-    assert expected == observed
+    assert expected == actual
 
 
 @pytest.mark.parametrize(
@@ -217,10 +217,10 @@ def test_lactating_cow_manure_mills(
         )
         / 0.05565
     )
-    observed = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
         body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "Mills"
     )
-    assert expected == observed
+    assert expected == actual
 
 
 @pytest.mark.parametrize(
@@ -253,15 +253,15 @@ def test_lactating_cow_manure_IPCC(
         0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue
     )
     expected = 0.065 * gross_energy_concentration * dry_matter_intake / 0.05565
-    observed = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
         body_weight, milk_fat, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations, "IPCC"
     )
-    assert expected == observed
+    assert expected == actual
 
 
 def test_lactating_cow_manure_other() -> None:
     """Test the daily enteric emissions for lactating cows with no specific method."""
-    observed = EntericMethaneCalculator._calculate_lactating_cow_manure(
+    actual = EntericMethaneCalculator._calculate_lactating_cow_manure(
         59.67,
         6.31,
         5.25,
@@ -269,7 +269,7 @@ def test_lactating_cow_manure_other() -> None:
         {"ash": 39.14, "ADF": 39.54, "CP": 26.14, "NDF": 48.14, "EE": 35.4, "starch": 54.2},
         "test",
     )
-    assert observed == 0
+    assert actual == 0
 
 
 @pytest.mark.parametrize(
@@ -289,10 +289,10 @@ def test_dry_cow_manure_mills(
             -((-0.0011 * starch_concentration / ADF_concentration) + 0.0045) * metabolizable_energy_intake * 4.184
         )
     ) / 0.05565
-    observed = EntericMethaneCalculator._calculate_dry_cow_manure(
+    actual = EntericMethaneCalculator._calculate_dry_cow_manure(
         "Mills", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
     )
-    assert expected == observed
+    assert expected == actual
 
 
 @pytest.mark.parametrize(
@@ -314,7 +314,7 @@ def test_dry_cow_manure_others(
         * (0.263 * CP_concentration + 0.522 * EE_concentration + 0.198 * NDF_concentration + 0.160 * soluble_residue)
         * dry_matter_intake
     ) / 0.05565
-    observed = EntericMethaneCalculator._calculate_dry_cow_manure(
+    actual = EntericMethaneCalculator._calculate_dry_cow_manure(
         "other", metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
     )
-    assert expected == observed
+    assert expected == actual

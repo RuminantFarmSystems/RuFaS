@@ -34,7 +34,7 @@ class GeneralProperties:
         Metabolizable energy intake, Mcal/kg dry matter.
     daily_milk_produced : float
         Milk production of the animal on a single day (kg).
-    is_milking : bool
+    is_milking
 
     """
 
