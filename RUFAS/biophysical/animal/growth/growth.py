@@ -12,10 +12,10 @@ from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstan
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
 from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
-from RUFAS.biophysical.animal.animal_properties.animal_growth_properties import AnimalGrowthProperties
+from RUFAS.biophysical.animal.animal_properties.growth_properties import GrowthProperties
 
 
-class AnimalGrowth:
+class Growth:
     """
     Handles updating the body weight growth related animal attributes.
 
@@ -43,10 +43,10 @@ class AnimalGrowth:
     @staticmethod
     def evaluate_body_weight_change(
         general_properties: GeneralProperties,
-        animal_growth_properties: AnimalGrowthProperties,
+        animal_growth_properties: GrowthProperties,
         reproduction_properties: ReproductionProperties,
         time: Time,
-    ) -> tuple[AnimalGrowthProperties, ReproductionProperties, GeneralProperties]:
+    ) -> tuple[GrowthProperties, ReproductionProperties, GeneralProperties]:
         """
         Handles an animal's daily growth updates.
 
@@ -54,7 +54,7 @@ class AnimalGrowth:
         ----------
         general_properties: GeneralProperties
             Animal properties that are general or are used to determine many animal outcomes.
-        animal_growth_properties: AnimalGrowthProperties
+        animal_growth_properties: GrowthProperties
             Animal properties that are related to body weight growth.
         reproduction_properties: ReproductionProperties
             Animal properties that are related to animal reproduction.
@@ -75,11 +75,11 @@ class AnimalGrowth:
         )
 
         if general_properties.animal_type == AnimalType.CALF:
-            animal_growth_properties.daily_growth = AnimalGrowth.calculate_calf_body_weight_change(general_properties)
+            animal_growth_properties.daily_growth = Growth.calculate_calf_body_weight_change(general_properties)
             general_properties.body_weight += animal_growth_properties.daily_growth
 
         elif is_non_pregnant_heifer:
-            animal_growth_properties.daily_growth = AnimalGrowth.calculate_non_pregnant_heifer_body_weight_change(
+            animal_growth_properties.daily_growth = Growth.calculate_non_pregnant_heifer_body_weight_change(
                 general_properties
             )
             general_properties.body_weight += animal_growth_properties.daily_growth
@@ -87,7 +87,7 @@ class AnimalGrowth:
         elif is_pregnant_heifer:
             if general_properties.body_weight < general_properties.mature_body_weight:
                 (animal_growth_properties.daily_growth, reproduction_properties.conceptus_weight) = (
-                    AnimalGrowth.calculate_pregnant_heifer_body_weight_change(
+                    Growth.calculate_pregnant_heifer_body_weight_change(
                         reproduction_properties, general_properties
                     )
                 )
@@ -103,7 +103,7 @@ class AnimalGrowth:
                 animal_growth_properties.daily_growth,
                 reproduction_properties.conceptus_weight,
                 animal_growth_properties.tissue_changed,
-            ) = AnimalGrowth.calculate_cow_body_weight_change(
+            ) = Growth.calculate_cow_body_weight_change(
                 animal_growth_properties, reproduction_properties, general_properties
             )
             general_properties.body_weight += animal_growth_properties.daily_growth
@@ -113,8 +113,8 @@ class AnimalGrowth:
                 "Unexpected Animal Type",
                 f"{general_properties.animal_type} is not a valid animal type.",
                 {
-                    "class": AnimalGrowth.__class__.__name__,
-                    "function": AnimalGrowth.evaluate_body_weight_change.__name__,
+                    "class": Growth.__class__.__name__,
+                    "function": Growth.evaluate_body_weight_change.__name__,
                 },
             )
 
@@ -135,7 +135,7 @@ class AnimalGrowth:
         float
             The daily body weight growth for calves (kg).
         """
-        return general_properties.birth_weight / AnimalGrowth.WEAN_DAY
+        return general_properties.birth_weight / Growth.WEAN_DAY
 
     @staticmethod
     def calculate_non_pregnant_heifer_body_weight_change(general_properties: GeneralProperties) -> float:
@@ -161,7 +161,7 @@ class AnimalGrowth:
         For animals over 55% of their mature body weight, the equation results in a negative return.
         Therefore, when the result is negative, the minimum BW change constant is returned instead.
         """
-        divisor = max(1, abs(AnimalGrowth.TARGET_HEIFER_PREGNANT_DAY - general_properties.days_born))
+        divisor = max(1, abs(Growth.TARGET_HEIFER_PREGNANT_DAY - general_properties.days_born))
         return max(
             (0.55 * 0.96 * general_properties.mature_body_weight - 0.96 * general_properties.body_weight) / divisor,
             AnimalModuleConstants.MINIMUM_HEIFER_DAILY_GROWTH_RATE,
@@ -187,12 +187,12 @@ class AnimalGrowth:
         tuple[float, float]
             The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
         """
-        target_average_daily_growth_pregnant_heifer = AnimalGrowth._calculate_pregnant_heifer_target_daily_growth(
+        target_average_daily_growth_pregnant_heifer = Growth._calculate_pregnant_heifer_target_daily_growth(
             reproduction_properties, general_properties
         )
 
         (conceptus_growth, reproduction_properties.conceptus_weight) = (
-            AnimalGrowth._calculate_pregnant_heifer_conceptus_growth(reproduction_properties, general_properties)
+            Growth._calculate_pregnant_heifer_conceptus_growth(reproduction_properties, general_properties)
         )
 
         return (
@@ -202,7 +202,7 @@ class AnimalGrowth:
 
     @staticmethod
     def calculate_cow_body_weight_change(
-        animal_growth_properties: AnimalGrowthProperties,
+        animal_growth_properties: GrowthProperties,
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float, float]:
@@ -211,7 +211,7 @@ class AnimalGrowth:
 
         Parameters
         ----------
-        animal_growth_properties: AnimalGrowthProperties
+        animal_growth_properties: GrowthProperties
             Animal properties that are related to body weight growth.
         reproduction_properties: ReproductionProperties
             Animal properties that are related to animal reproduction.
@@ -229,15 +229,15 @@ class AnimalGrowth:
         Life cycle pseudocode @[A.1A.C.56/57/58]
         """
         (conceptus_growth, reproduction_properties.conceptus_weight, animal_growth_properties.tissue_changed) = (
-            AnimalGrowth._calculate_cow_conceptus_growth(
+            Growth._calculate_cow_conceptus_growth(
                 animal_growth_properties, reproduction_properties, general_properties
             )
         )
 
-        target_adg_cow = AnimalGrowth._calculate_cow_target_daily_growth(reproduction_properties, general_properties)
+        target_adg_cow = Growth._calculate_cow_target_daily_growth(reproduction_properties, general_properties)
 
         (body_weight_tissue, animal_growth_properties.tissue_changed) = (
-            AnimalGrowth._calculate_cow_body_weight_tissue_change(
+            Growth._calculate_cow_body_weight_tissue_change(
                 animal_growth_properties, reproduction_properties, general_properties
             )
         )
@@ -285,7 +285,7 @@ class AnimalGrowth:
 
     @staticmethod
     def _calculate_cow_conceptus_growth(
-        animal_growth_properties: AnimalGrowthProperties,
+        animal_growth_properties: GrowthProperties,
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float, float]:
@@ -294,7 +294,7 @@ class AnimalGrowth:
 
         Parameters
         ----------
-        animal_growth_properties: AnimalGrowthProperties
+        animal_growth_properties: GrowthProperties
             Animal properties that are related to body weight growth.
         reproduction_properties: ReproductionProperties
             Animal properties that are related to animal reproduction.
@@ -313,7 +313,7 @@ class AnimalGrowth:
             else animal_growth_properties.tissue_changed
         )
 
-        conceptus_growth, updated_conceptus_weight = AnimalGrowth._calculate_pregnant_heifer_conceptus_growth(
+        conceptus_growth, updated_conceptus_weight = Growth._calculate_pregnant_heifer_conceptus_growth(
             reproduction_properties, general_properties
         )
 
@@ -387,7 +387,7 @@ class AnimalGrowth:
 
     @staticmethod
     def _calculate_cow_body_weight_tissue_change(
-        animal_growth_properties: AnimalGrowthProperties,
+        animal_growth_properties: GrowthProperties,
         reproduction_properties: ReproductionProperties,
         general_properties: GeneralProperties,
     ) -> tuple[float, float]:
@@ -396,7 +396,7 @@ class AnimalGrowth:
 
         Parameters
         ----------
-        animal_growth_properties: AnimalGrowthProperties
+        animal_growth_properties: GrowthProperties
             Animal properties that are related to body weight growth.
         reproduction_properties: ReproductionProperties
             Animal properties that are related to animal reproduction.

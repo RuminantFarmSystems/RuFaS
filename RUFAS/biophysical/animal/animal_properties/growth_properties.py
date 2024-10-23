@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class AnimalGrowthProperties:
+class GrowthProperties:
     """
     Collection of animal properties that are related to reproduction.
 
