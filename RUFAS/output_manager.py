@@ -359,7 +359,7 @@ class OutputManager(object):
         self.variables_pool = filtered_pool
 
     def _load_all_filters(self, filters_dir_path: Path) -> list[dict[str, str | bool]]:
-        filter_list: list[dict[str, str|bool]] = []
+        filter_list: list[dict[str, str | bool]] = []
         filter_files_list = self._list_filter_files_in_dir(filters_dir_path)
         for filter_file in filter_files_list:
             filter_file_path = filters_dir_path / filter_file
@@ -368,9 +368,10 @@ class OutputManager(object):
         return filter_list
 
     def _extend_variable_pool(
-            self,
-            original_pool: dict[str, OutputManager.pool_element_type],
-            additional_pool: dict[str, OutputManager.pool_element_type]) -> dict[str, OutputManager.pool_element_type]:
+        self,
+        original_pool: dict[str, OutputManager.pool_element_type],
+        additional_pool: dict[str, OutputManager.pool_element_type],
+    ) -> dict[str, OutputManager.pool_element_type]:
         for key, value in additional_pool.items():
             if key in original_pool.keys():
                 original_pool[key]["info_maps"].extend(value["info_maps"])
