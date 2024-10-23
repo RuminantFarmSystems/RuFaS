@@ -73,7 +73,7 @@ def input_manager_original_method_states(
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
         "_create_record": mock_input_manager._create_record,
         "_extract_input_data_by_key_list": mock_input_manager._extract_input_data_by_key_list,
-        "add_variable_to_pool": mock_input_manager.add_variable_to_pool
+        "add_variable_to_pool": mock_input_manager.add_variable_to_pool,
     }
 
 
@@ -2523,9 +2523,7 @@ def test_add_tabular_variable_to_pool(
         eager_termination=False,
     )
 
-    mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
-        "add_variable_to_pool"
-    ]
+    mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
     mock_input_manager._metadata_properties_exist = input_manager_original_method_states["_metadata_properties_exist"]
     mock_input_manager._add_variable_to_pool = input_manager_original_method_states["_add_variable_to_pool"]
 
@@ -2562,9 +2560,7 @@ def test_add_tabular_variable_to_pool_type_error(
         mock_input_manager._metadata_properties_exist.assert_not_called()
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
-            "add_variable_to_pool"
-        ]
+        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
         mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
             "_metadata_properties_exist"
         ]
@@ -2613,9 +2609,7 @@ def test_add_tabular_variable_to_pool_invalid_data(
             eager_termination=False,
         )
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
-            "add_variable_to_pool"
-        ]
+        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
         mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
             "_metadata_properties_exist"
         ]
@@ -2645,9 +2639,7 @@ def test_add_tabular_variable_to_pool_metadata_properties_do_not_exist(
         )
         mock_input_manager._add_variable_to_pool.assert_not_called()
 
-        mock_input_manager.add_variable_to_pool = input_manager_original_method_states[
-            "add_variable_to_pool"
-        ]
+        mock_input_manager.add_variable_to_pool = input_manager_original_method_states["add_variable_to_pool"]
         mock_input_manager._metadata_properties_exist = input_manager_original_method_states[
             "_metadata_properties_exist"
         ]
