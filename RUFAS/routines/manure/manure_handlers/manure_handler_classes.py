@@ -2,20 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict
-from typing import Type
+from typing import Dict, Type
 
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
-from RUFAS.routines.manure.gas_emissions.calculator import (
-    GasEmissionsCalculator,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.gas_emissions.calculator import GasEmissionsCalculator
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 
 class ManureHandlerType(Enum):
@@ -159,11 +154,13 @@ class BaseManureHandler:
         if bedding:
             total_bedding_mass = bedding.calc_total_bedding_mass(pen.num_animals)
             total_organic_bedding_mass_added = bedding.calc_organic_bedding_mass_added_to_manure(total_bedding_mass)
+            organic_bedding_dry_solids = total_organic_bedding_mass_added * bedding.bedding_dry_matter_content
         else:
             total_bedding_mass = 0.0
             total_organic_bedding_mass_added = 0.0
+            organic_bedding_dry_solids = 0.0
 
-        non_degradable_volatile_solids = pen.manure.non_degradable_volatile_solids + total_organic_bedding_mass_added
+        non_degradable_volatile_solids = pen.manure.non_degradable_volatile_solids + organic_bedding_dry_solids
 
         daily_output = ManureHandlerDailyOutput(
             simulation_day=sim_day,

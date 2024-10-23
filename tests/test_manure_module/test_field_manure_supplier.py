@@ -1,8 +1,9 @@
 import pytest
+
+from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier
 
 
 @pytest.mark.parametrize(

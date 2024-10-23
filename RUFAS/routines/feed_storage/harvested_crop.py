@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
-from .enums import CropCategory, CropType
 
+from .enums import CropCategory, CropType
 
 """This is the dry matter fraction above which an ensiled crop will not experience any effluent loss."""
 EFFLUENT_MAXIMUM_DRY_MATTER_FRACTION = 0.3
