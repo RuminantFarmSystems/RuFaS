@@ -1147,7 +1147,7 @@ class AnimalManager:
                 udrm = udr.UserDefinedRationManager()
                 if udrm.use_user_defined_ration:
                     ration_per_animal = CalfRationManager.make_ration_from_user_values(ration_per_animal)
-                ration_vals = {"ME_total": animal_intake['me_intake']}
+                ration_vals = {"ME_total": animal_intake["me_intake"]}
             else:
                 ration_per_animal, ration_vals = RationManager.formulate_ration(
                     pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO, self.simulation_day
