@@ -1137,7 +1137,7 @@ class AnimalManager:
                                                                             animal_intake=animal_intake)
                 # ration_per_animal = CalfRationManager.optimize()
                 # ration_vals = {"ME_total": 0}
-                    ration_per_calf = CalfRationManager.formulate_ration(pen_specific_feed_data, animal_intake)
+                    ration_per_calf = CalfRationManager.formulate_ration(pen_specific_feed_data['feed_id'], animal_intake)
                     individual_calf_rations.append(ration_per_calf)
                 ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
                 ration_vals = {"ME_total": animal_intake['me_intake']}

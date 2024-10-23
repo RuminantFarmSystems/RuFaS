@@ -45,7 +45,7 @@ class CalfRationManager:
     def calc_requirements(
         cls,
         calf,
-        feed: Dict[str, float],
+        feed: Feed,
         temp: float,
         animal_intake: Dict[str, int | float],
     ) -> Dict[str, Dict[str, Any]]:
@@ -368,6 +368,8 @@ class CalfRationManager:
             Average ration per animal for given calf pen.
         """
         ration_per_animal = {}
+        for key in individual_calf_rations[0]:
+            ration_per_animal[key] = 0
         for calf_ration in individual_calf_rations:
             for key in individual_calf_rations[0]:
                 ration_per_animal[key] += calf_ration[key]
