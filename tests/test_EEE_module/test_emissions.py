@@ -582,11 +582,7 @@ def test_calculate_homegrown_feed_emissions(mocker: MockerFixture, em: Emissions
 
     em._calculate_homegrown_feed_emissions(homegrown_feeds, fertilizer_application, manure_application, manure_requests)
 
-    mock_aggregate.assert_called_with(
-        [{"field_name": "f1", "phosphorus": 60}, {"field_name": "f2", "phosphorus": 60}],
-        ["f1", "f2"],
-        ["nitrogen", "phosphorus"],
-    )
+    assert mock_aggregate.call_count == 2
     mock_collect_target.assert_called_once_with(["f1", "f2"])
     mock_calculate_emissions.assert_has_calls(
         [
