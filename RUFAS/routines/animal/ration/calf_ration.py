@@ -407,7 +407,7 @@ class CalfRationManager:
                 total_dm += average_calf_ration[key]
         udrm = udr.UserDefinedRationManager()
         for key in udrm.calf_ration:
-            ration_per_animal[key] = udrm.calf_ration[key] * total_dm
+            ration_per_animal[key] = udrm.calf_ration[key] / 100 * total_dm
         ration_per_animal["status"] = "Optimal"
         ration_per_animal["objective"] = 0.0
         return ration_per_animal
