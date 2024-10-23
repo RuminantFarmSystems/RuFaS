@@ -4,7 +4,7 @@ import pytest
 from mock import MagicMock, call, patch
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_types.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager

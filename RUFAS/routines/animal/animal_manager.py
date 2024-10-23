@@ -5,7 +5,7 @@ import math
 from statistics import mean
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_types.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager

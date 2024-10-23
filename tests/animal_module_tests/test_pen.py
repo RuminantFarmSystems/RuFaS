@@ -8,8 +8,8 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 from pytest_mock.plugin import MockerFixture
 
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_types.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_types.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow

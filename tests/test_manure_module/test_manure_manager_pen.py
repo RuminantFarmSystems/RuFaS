@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_types.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure

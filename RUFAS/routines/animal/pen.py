@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 from typing import Any, Dict, List, Tuple, Union
 
-from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_types.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType

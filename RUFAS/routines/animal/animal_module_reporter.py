@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Sequence
 
 import numpy as np
 
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants
