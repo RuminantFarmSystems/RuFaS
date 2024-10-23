@@ -24,27 +24,15 @@ BASE_CHANGE_LOOKUP_TABLE = {
 
 class AnimalGenetics:
     """
-    The Net Merit lookup table.
-    {
-        breed: {
-            "year_month": {
-                "average": float,
-                "std: float
-            }
-        }
-    }
-    """
+    Attributes
+    ----------
+    net_merit : dict[str, dict[str, dict[str, float]]]
+        Lookup table of Net Merit averages and standard deviations (lifetime USD), separated by breed and time.
+    top_semen : dict[str, dict[str, float]]
+        Lookup table of Top Listing Semen estimated Predicted Transmitting Ability, separated by breed.
 
+    """
     net_merit: dict[str, dict[str, dict[str, float]]] = {}
-
-    """
-        The Top Listing Semen lookup table.
-        {
-            breed: {
-                "year_month": float
-            }
-        }
-        """
     top_semen: dict[str, dict[str, float]] = {}
 
     @classmethod
