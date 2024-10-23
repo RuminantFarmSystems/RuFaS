@@ -1562,10 +1562,10 @@
     },
     "estimated_PTA": {
       "type": "array",
-      "description": "The estimated PTA value for the top listing semen.",
+      "description": "The estimated semen_predicted_transmitting_ability value for the top listing semen.",
       "properties": {
         "type": "number",
-        "description": "The estimated PTA value for the top listing semen."
+        "description": "The estimated semen_predicted_transmitting_ability value for the top listing semen."
       }
     }
   },

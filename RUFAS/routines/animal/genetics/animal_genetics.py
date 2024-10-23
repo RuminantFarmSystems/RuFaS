@@ -1,10 +1,10 @@
-import numpy as np
+from numpy import sqrt
+from datetime import date
 
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 from RUFAS.util import Utility
 
-import datetime
 
 """
 The base change time and value in the net merit value.
@@ -15,10 +15,10 @@ CDCB website
 
 """
 BASE_CHANGE_LOOKUP_TABLE = {
-    datetime.date.fromisoformat("2020-04-01"): 231,
-    datetime.date.fromisoformat("2014-12-01"): 184,
-    datetime.date.fromisoformat("2010-01-01"): 132,
-    datetime.date.fromisoformat("2005-01-01"): 0,
+    date.fromisoformat("2020-04-01"): 231,
+    date.fromisoformat("2014-12-01"): 184,
+    date.fromisoformat("2010-01-01"): 132,
+    date.fromisoformat("2005-01-01"): 0,
 }
 
 
@@ -107,7 +107,7 @@ class AnimalGenetics:
             adjusted_net_merit[breed] = {}
             for year_month in original_net_merit[breed].keys():
                 adjusted_net_merit[breed][year_month] = {}
-                datetime_year_month = datetime.date.fromisoformat(year_month + "-01")
+                datetime_year_month = date.fromisoformat(year_month + "-01")
                 increase = sum(
                     [
                         BASE_CHANGE_LOOKUP_TABLE[base_change_time]
@@ -193,7 +193,7 @@ class AnimalGenetics:
         Parameters
         ----------
         birth_date: str
-            The birthdate of the animal in the format "%Y-%m-%d".
+            The birthdate of the animal in the format "YYYY-MM-DD".
         breed: str
             The breed of the animal.
 
@@ -242,7 +242,7 @@ class AnimalGenetics:
         population variance.
         """
         birth_year_month = str(time.current_calendar_year) + "-" + str(time.current_month).zfill(2)
-        semen_PTA: float = AnimalGenetics.top_semen[breed][birth_year_month]
-        average_net_merit = semen_PTA + dam_net_merit_value
+        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed][birth_year_month]
+        average_net_merit = semen_predicted_transmitting_ability + dam_net_merit_value
         variance = ((AnimalGenetics.net_merit[breed][birth_year_month]["std"]) ** 2) / 2
-        return Utility.generate_random_number(average_net_merit, np.sqrt(variance))
+        return Utility.generate_random_number(average_net_merit, sqrt(variance))
