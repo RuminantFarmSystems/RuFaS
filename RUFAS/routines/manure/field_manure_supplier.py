@@ -2,7 +2,6 @@ from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequ
 from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
-
 """
 The Field Manure Supplier uses ratios of dry mass to wet mass, Nitrogen to dry mass, and Phosphorus to dry mass to
 project total amounts of manure applied. These ratios were derived from the ManureDB

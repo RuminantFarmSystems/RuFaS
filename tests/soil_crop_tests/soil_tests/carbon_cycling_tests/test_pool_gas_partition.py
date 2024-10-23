@@ -1,6 +1,6 @@
-import pytest
-
 from unittest.mock import MagicMock
+
+import pytest
 
 from RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
 from RUFAS.routines.field.soil.layer_data import LayerData

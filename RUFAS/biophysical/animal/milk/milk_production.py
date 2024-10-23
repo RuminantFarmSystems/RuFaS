@@ -1,4 +1,6 @@
+import numpy as np
 from numba import njit
+from scipy.integrate import quad
 
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
@@ -8,8 +10,6 @@ from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProdu
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.util import Utility
-
-import numpy as np
 
 
 class MilkProduction:
@@ -141,6 +141,30 @@ class MilkProduction:
 
         """
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
+
+    @staticmethod
+    def calc_305_day_milk_yield(l_param: float, m_param: float, n_param: float) -> float:
+        """
+        Calculates the total milk yield from day 1 to day 305 of the lactation.
+
+        Parameters
+        ----------
+        l_param: float
+            Wood's lactation curve parameter l.
+        m_param: float
+            Wood's lactation curve parameter m.
+        n_param: float
+            Wood's lactation curve parameter n.
+
+        Returns
+        -------
+        float
+            305 day milk yield for a cow with the given lactation curve (kg).
+
+        """
+
+        result, _ = quad(MilkProduction.calculate_daily_milk_production, 1, 305, args=(l_param, m_param, n_param))
+        return float(result)
 
     @staticmethod
     def _adjust_milk_production(

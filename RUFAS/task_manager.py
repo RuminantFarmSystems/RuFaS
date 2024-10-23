@@ -1,17 +1,18 @@
+import multiprocessing
+import random
+import traceback
 from enum import Enum
 from functools import partial
-import multiprocessing
-import numpy
 from pathlib import Path
-import random
+from typing import Any, Callable, Dict, List, Tuple
+
+import numpy
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
-import traceback
-from typing import Any, Dict, List, Tuple, Callable
 
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
-from RUFAS.output_manager import OutputManager, LogVerbosity
+from RUFAS.output_manager import LogVerbosity, OutputManager
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
@@ -52,6 +53,8 @@ class TaskType(Enum):
 
 class TaskManager:
     """Manager class for handling tasks related to simulations and analyses."""
+
+    INPUT_DATA_CSV_WORKING_FOLDER = Path("output/saved_pool_working_folder/")
 
     def __init__(self) -> None:
         self.output_manager = OutputManager()
@@ -129,7 +132,8 @@ class TaskManager:
                 "TASK_MANAGER",
             )
             raise Exception("Task Manager's input data is invalid.")
-        workers: int = self.input_manager.get_data("tasks.parallel_workers")
+        task_config: dict[str, Any] = self.input_manager.get_data("tasks")
+        workers: int = task_config["parallel_workers"]
         self.output_manager.add_log(
             "Task Manager workers", f"Task Manager is going to run {workers} in parallel.", info_map
         )
@@ -152,16 +156,23 @@ class TaskManager:
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
         self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
+
+        export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
+        input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
+        input_data_csv_import_path: str = task_config.get("input_data_csv_import_path", "")
         TaskManager.handle_post_processing(
             args={
                 "exclude_info_maps": exclude_info_maps,
                 "variable_name_style": "verbose",
                 "logs_directory": logs_directory,
                 "suppress_log_files": suppress_log_files,
+                "input_data_csv_export_path": Path(input_data_csv_export_path),
+                "input_data_csv_import_path": Path(input_data_csv_import_path),
             },
             input_manager=self.input_manager,
             output_manager=self.output_manager,
             task_id="TASK_MANAGER",
+            export_input_data_to_csv=export_input_data_to_csv,
         )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -175,7 +186,11 @@ class TaskManager:
         """
         parsed_single_run_args: List[Dict[str, Any]] = []
         parsed_multi_run_args: List[Dict[str, Any]] = []
-        tasks_from_input: List[Dict[str, Any]] = self.input_manager.get_data("tasks.tasks")
+        task_config: Dict[str, Any] = self.input_manager.get_data("tasks")
+        tasks_from_input: List[Dict[str, Any]] = task_config.get("tasks")
+        export_input_data_to_csv = task_config.get("export_input_data_to_csv")
+        input_data_csv_export_path = Path(task_config.get("input_data_csv_export_path"))
+        input_data_csv_import_path = Path(task_config.get("input_data_csv_import_path"))
         for input_task in tasks_from_input:
             input_task["task_type"] = TaskType.from_string(input_task["task_type"])
             input_task["input_patch"] = None
@@ -191,6 +206,9 @@ class TaskManager:
             input_task["report_directory"] = Path(input_task["report_directory"])
             input_task["graphics_directory"] = Path(input_task["graphics_directory"])
             input_task["output_pool_path"] = Path(input_task["output_pool_path"])
+            input_task["export_input_data_to_csv"] = export_input_data_to_csv
+            input_task["input_data_csv_export_path"] = input_data_csv_export_path
+            input_task["input_data_csv_import_path"] = input_data_csv_import_path
             if input_task["task_type"].is_multi_run():
                 parsed_multi_run_args.append(input_task)
             else:
@@ -510,6 +528,9 @@ class TaskManager:
             )
             input_manager.save_metadata_properties(args["logs_directory"])
 
+        if args["export_input_data_to_csv"]:
+            input_manager.export_pool_to_csv(args["output_prefix"], TaskManager.INPUT_DATA_CSV_WORKING_FOLDER)
+
         return is_data_valid
 
     @staticmethod
@@ -521,6 +542,7 @@ class TaskManager:
         produce_graphics: bool = False,
         save_results: bool = False,
         load_pool_from_file: bool = False,
+        export_input_data_to_csv: bool = False,
     ) -> None:
         """
         Handles post-processing tasks based on specified arguments.
@@ -541,7 +563,8 @@ class TaskManager:
             Whether to save results after processing.
         load_pool_from_file : bool
             Whether to load data pool from file.
-
+        export_input_data_to_csv: bool
+            Whether to export the input data to a CSV file.
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -549,6 +572,14 @@ class TaskManager:
             "units": MeasurementUnits.UNITLESS,
         }
         output_manager.add_log("Validation counts", f"{str(input_manager.elements_counter)}", info_map)
+
+        if export_input_data_to_csv:
+            output_manager.create_directory(args["input_data_csv_export_path"])
+            Utility.combine_saved_input_csv(
+                TaskManager.INPUT_DATA_CSV_WORKING_FOLDER,
+                args["input_data_csv_export_path"],
+                args["input_data_csv_import_path"],
+            )
 
         if load_pool_from_file:
             output_manager.flush_pools()
