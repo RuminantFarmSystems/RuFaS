@@ -1118,8 +1118,34 @@ class AnimalManager:
 
         while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
             if pen.animal_combination == AnimalCombination.CALF:
-                ration_per_animal = CalfRationManager.optimize()
-                ration_vals = {"ME_total": 0}
+                individual_calf_rations = []
+                wean_day = AnimalBase.config["wean_day"]
+                wean_length = AnimalBase.config["wean_length"]
+                if 202 in pen_specific_feed_data["feed_id"]:
+                    milk_type = "whole"
+                else:
+                    milk_type = "replacer"
+                for calf_id in pen.animals_in_pen:
+                    animal_intake = CalfRationManager.calc_intake(
+                        pen.animals_in_pen[calf_id],
+                        feed,
+                        wean_day=wean_day,
+                        wean_length=wean_length,
+                        milk_type=milk_type,
+                    )
+                    # TODO consider reporting the below in AnimalReporter
+                    # calf_requirements = CalfRationManager.calc_requirements(
+                    #     pen.animals_in_pen[calf_id], feed, temp=15, animal_intake=animal_intake
+                    # )
+                    ration_per_calf = CalfRationManager.formulate_ration(
+                        pen_specific_feed_data["feed_id"], animal_intake
+                    )
+                    individual_calf_rations.append(ration_per_calf)
+                ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
+                udrm = udr.UserDefinedRationManager()
+                if udrm.use_user_defined_ration:
+                    ration_per_animal = CalfRationManager.make_ration_from_user_values(ration_per_animal)
+                ration_vals = {"ME_total": animal_intake["me_intake"]}
             else:
                 ration_per_animal, ration_vals = RationManager.formulate_ration(
                     pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO, self.simulation_day
