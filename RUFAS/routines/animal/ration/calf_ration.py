@@ -350,3 +350,29 @@ class CalfRationManager:
             elif feed_id in starter_options:
                 ration_per_animal[str(feed_id)] = animal_intake['starter_intake'] / len(starters_selected)
         return ration_per_animal
+
+    @classmethod
+    def get_average_calf_ration(cls,
+                                individual_calf_rations: List[Dict[str, float]]) -> Dict[str, float | str]:
+        """
+        Get average calf ration for feedout.
+
+        Parameters
+        ----------
+        individual_calf_rations : List[Dict[str, float]]
+            Each calf's ration.
+
+        Returns
+        -------
+        ration_per_animal : Dict[str, float]
+            Average ration per animal for given calf pen.
+        """
+        ration_per_animal = {}
+        for calf_ration in individual_calf_rations:
+            for key in individual_calf_rations[0]:
+                ration_per_animal[key] += calf_ration[key]
+        for key in individual_calf_rations[0]:
+            ration_per_animal[key] = ration_per_animal[key] / len(individual_calf_rations)
+        ration_per_animal["status"] = "Optimal"
+        ration_per_animal["objective"] = 4.5
+        return ration_per_animal

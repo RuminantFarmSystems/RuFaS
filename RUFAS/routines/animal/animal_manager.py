@@ -1118,6 +1118,7 @@ class AnimalManager:
 
         while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
             if pen.animal_combination == AnimalCombination.CALF:
+                individual_calf_rations = []
                 # IF USER DEFINED RATION
                 wean_day = AnimalBase.config['wean_day']
                 wean_length = AnimalBase.config['wean_length']
@@ -1136,7 +1137,9 @@ class AnimalManager:
                                                                             animal_intake=animal_intake)
                 # ration_per_animal = CalfRationManager.optimize()
                 # ration_vals = {"ME_total": 0}
-                ration_per_animal = CalfRationManager.formulate_ration(pen_specific_feed_data, animal_intake)
+                    ration_per_calf = CalfRationManager.formulate_ration(pen_specific_feed_data, animal_intake)
+                    individual_calf_rations.append(ration_per_calf)
+                ration_per_animal = CalfRationManager.get_average_calf_ration(individual_calf_rations)
                 ration_vals = {"ME_total": animal_intake['me_intake']}
             else:
                 ration_per_animal, ration_vals = RationManager.formulate_ration(
