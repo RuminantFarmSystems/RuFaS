@@ -87,9 +87,7 @@ class Growth:
         elif is_pregnant_heifer:
             if general_properties.body_weight < general_properties.mature_body_weight:
                 (animal_growth_properties.daily_growth, reproduction_properties.conceptus_weight) = (
-                    Growth.calculate_pregnant_heifer_body_weight_change(
-                        reproduction_properties, general_properties
-                    )
+                    Growth.calculate_pregnant_heifer_body_weight_change(reproduction_properties, general_properties)
                 )
                 general_properties.body_weight += animal_growth_properties.daily_growth
             else:
@@ -240,10 +238,8 @@ class Growth:
 
         target_adg_cow = Growth._calculate_cow_target_daily_growth(reproduction_properties, general_properties)
 
-        (body_weight_tissue, animal_growth_properties.tissue_changed) = (
-            Growth._calculate_cow_body_weight_tissue_change(
-                animal_growth_properties, reproduction_properties, general_properties
-            )
+        (body_weight_tissue, animal_growth_properties.tissue_changed) = Growth._calculate_cow_body_weight_tissue_change(
+            animal_growth_properties, reproduction_properties, general_properties
         )
 
         return (
