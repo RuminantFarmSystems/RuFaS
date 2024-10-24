@@ -506,7 +506,7 @@ def test_daily_manure_update(rain: float, area: float, mean_temp: float, mocker:
     assert pool.stable_inorganic_phosphorus == 0
     assert pool.water_extractable_organic_phosphorus == 1
     assert pool.water_extractable_inorganic_phosphorus == 11
-    assert pool.total_decomposed_manure == 12
+    assert pool.annual_decomposed_manure == 12
 
     assert observed == 16
 
