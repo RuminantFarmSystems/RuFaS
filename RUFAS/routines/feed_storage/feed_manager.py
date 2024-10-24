@@ -189,7 +189,8 @@ class FeedManager:
     def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:
         """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
         reusable_values = feeds_info["reusable_values"]
-        reusable_values.update({"harvest_time": time, "storage_time": time})
+        time_copy = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
+        reusable_values.update({"harvest_time": time_copy, "storage_time": time_copy})
 
         hay_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
             "hay_values"
