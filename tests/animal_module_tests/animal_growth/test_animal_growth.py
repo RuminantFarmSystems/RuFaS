@@ -364,10 +364,8 @@ def test_calculate_cow_conceptus_growth(
     mock_general_properties.days_in_preg = days_in_preg
     mock_animal_growth_properties.tissue_changed = tissue_changed
 
-    (actual_conceptus_growth, actual_conceptus_weight, actual_tissue_change) = (
-        Growth._calculate_cow_conceptus_growth(
-            mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
-        )
+    (actual_conceptus_growth, actual_conceptus_weight, actual_tissue_change) = Growth._calculate_cow_conceptus_growth(
+        mock_animal_growth_properties, mock_reproduction_properties, mock_general_properties
     )
 
     assert pytest.approx(actual_conceptus_growth) == expected_conceptus_growth
