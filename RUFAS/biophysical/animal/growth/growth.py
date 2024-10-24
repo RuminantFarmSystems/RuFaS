@@ -186,6 +186,10 @@ class Growth:
         -------
         tuple[float, float]
             The daily body weight growth for pregnant heifers (kg), and the updated conceptus weight (kg).
+
+        References
+        ----------
+        Life cycle pseudocode @[A.1A.C.9]
         """
         target_average_daily_growth_pregnant_heifer = Growth._calculate_pregnant_heifer_target_daily_growth(
             reproduction_properties, general_properties
