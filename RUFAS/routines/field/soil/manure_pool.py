@@ -29,8 +29,8 @@ class ManurePool:
         Amount of organic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff (kg).
     inorganic_phosphorus_runoff : float, default 0.0
         Amount of inorganic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff (kg).
-    total_decomposed_manure : float, default 0.0
-        Amount of total manure decomposed/mineralized (kg).
+    annual_decomposed_manure : float, default 0.0
+        Amount of annual manure decomposed/mineralized (kg).
 
     """
 
@@ -48,7 +48,7 @@ class ManurePool:
         inorganic_phosphorus_runoff: float = 0.0,
         annual_runoff_manure_inorganic_phosphorus: float = 0.0,
         annual_runoff_manure_organic_phosphorus: float = 0.0,
-        total_decomposed_manure: float = 0.0,
+        annual_decomposed_manure: float = 0.0,
     ) -> None:
         self.manure_dry_mass = manure_dry_mass
         self.manure_applied_mass = manure_applied_mass
@@ -62,7 +62,7 @@ class ManurePool:
         self.inorganic_phosphorus_runoff = inorganic_phosphorus_runoff
         self.annual_runoff_manure_inorganic_phosphorus = annual_runoff_manure_inorganic_phosphorus
         self.annual_runoff_manure_organic_phosphorus = annual_runoff_manure_organic_phosphorus
-        self.total_decomposed_manure = total_decomposed_manure
+        self.annual_decomposed_manure = annual_decomposed_manure
 
     def __eq__(self, other: Union["ManurePool", object]) -> Any:
         if not isinstance(other, ManurePool):
@@ -141,7 +141,7 @@ class ManurePool:
             0.0, self.water_extractable_organic_phosphorus - mineralized_water_extractable_organic
         )
 
-        self.total_decomposed_manure += (
+        self.annual_decomposed_manure += (
             mineralized_water_extractable_organic + mineralized_stable_organic + mineralized_stable_inorganic
         )
 
