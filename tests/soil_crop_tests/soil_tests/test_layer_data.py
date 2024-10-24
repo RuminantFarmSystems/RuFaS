@@ -1,17 +1,24 @@
-from unittest.mock import patch, PropertyMock, MagicMock
-from math import log, exp
+from math import exp, log
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from pytest import approx
+from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.crop_and_soil_constants import (
     CUBIC_MILLIMETERS_TO_CUBIC_METERS,
     HECTARES_TO_SQUARE_MILLIMETERS,
     KILOGRAMS_TO_MILLIGRAMS,
-    MILLIGRAMS_TO_KILOGRAMS,
     MEGAGRAMS_TO_KILOGRAMS,
+    MILLIGRAMS_TO_KILOGRAMS,
 )
 from RUFAS.routines.field.soil.layer_data import LayerData
+
+
+@pytest.fixture
+def layer(mocker: MockerFixture) -> LayerData:
+    mocker.patch.object(LayerData, "__init__", return_value=None)
+    return LayerData()
 
 
 @pytest.mark.parametrize(
@@ -47,6 +54,19 @@ def test_water_factor(
         layer.water_content = water_content
         actual = layer.water_factor
         assert expected == approx(actual)
+
+
+@pytest.mark.parametrize("water,saturation,expected", [(30.0, 60.0, 0.5), (0.0, 20.0, 0.0), (45.0, 45.0, 1.0)])
+def test_water_filled_pore_space(
+    layer: LayerData, mocker: MockerFixture, water: float, saturation: float, expected: float
+) -> None:
+    """Tests that the water-filled pore space is calculated correctly for a soil layer."""
+    layer.water_content = water
+    mocker.patch.object(LayerData, "saturation_content", new_callable=PropertyMock, return_value=saturation)
+
+    actual = layer.water_filled_pore_space
+
+    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -454,3 +474,14 @@ def test_nutrient_cycling_water_factor(water_content: float, field_capacity: flo
         observed = layer.nutrient_cycling_water_factor
         expected = max(0.05, water_content / field_capacity)
         assert observed == expected
+
+
+@pytest.mark.parametrize("metabolic,structural,expected", [(2, 3, 5), (14.332, 12.445, 26.777), (0, 5.334, 5.334)])
+def test_carbon_residue_amount(metabolic: float, structural: float, expected: float, mocker: MockerFixture) -> None:
+    """Test that the carbon_residue_amount adds carbon residue correctly."""
+    layer = LayerData(top_depth=15, bottom_depth=40, field_size=1.8)
+    mocker.patch.object(layer, "metabolic_litter_amount", metabolic)
+    mocker.patch.object(layer, "structural_litter_amount", structural)
+
+    observed = layer.carbon_residue_amount
+    assert observed == expected

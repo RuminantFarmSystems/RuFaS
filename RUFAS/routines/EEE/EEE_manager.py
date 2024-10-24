@@ -1,7 +1,6 @@
-from .emissions import EmissionsEstimator
-from ...output_manager import OutputManager
+from RUFAS.output_manager import OutputManager
 
-om = OutputManager()
+from .emissions import EmissionsEstimator
 
 
 class EEEManager:
@@ -12,6 +11,7 @@ class EEEManager:
     @staticmethod
     def estimate_all() -> None:
         """Runs all estimation functions and records all results from them."""
+        om = OutputManager()
         info_map = {"class": EEEManager.__class__.__name__, "function": EEEManager.estimate_all.__name__}
 
         om.add_log("Emissions Processing", "Starting processing of emissions.", info_map)

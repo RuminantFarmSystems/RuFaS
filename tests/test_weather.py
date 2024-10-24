@@ -1,15 +1,14 @@
 from datetime import datetime
+from typing import Callable
+from unittest.mock import MagicMock, patch
+
 import pytest
 from pytest_mock.plugin import MockerFixture
-from unittest.mock import MagicMock, patch
-from typing import Callable
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.output_manager import OutputManager
-
-om = OutputManager()
 
 
 @pytest.fixture
@@ -44,6 +43,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     """Fixture for Weather object."""
     mocker.patch("RUFAS.weather.Weather.__init__", return_value=None)
     mock_weather = Weather({}, mock_time)
+    mock_weather.om = OutputManager()
     weather_data = {
         datetime(2023, 9, 24): CurrentDayConditions(
             incoming_light=1,
@@ -82,7 +82,6 @@ def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]
     return {
         "_calculate_average_annual_temperature": mock_weather._calculate_average_annual_temperature,
         "get_current_day_conditions": mock_weather.get_current_day_conditions,
-        "_get_latitude": mock_weather._get_latitude(),
     }
 
 
@@ -90,6 +89,7 @@ def weather_original_method_states(mock_weather: Weather) -> dict[str, Callable]
 def mock_current_day_conditions() -> CurrentDayConditions:
     """Fixture for CurrentDayConditions object."""
     mock_current_weather = MagicMock(CurrentDayConditions)
+    mock_current_weather.incoming_light = 12.0
     mock_current_weather.precipitation = 5.0
     mock_current_weather.rainfall = 5.0
     mock_current_weather.snowfall = 0.0
@@ -133,11 +133,12 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
 
 
 @pytest.mark.parametrize(
-    "day,calendar_year,expected,time",
+    "day,calendar_year,latitude,expected,time",
     [
         (
             1,
             1,
+            43.0,
             CurrentDayConditions(
                 incoming_light=1,
                 min_air_temperature=1,
@@ -153,6 +154,7 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
         (
             3,
             1,
+            None,
             CurrentDayConditions(
                 incoming_light=2,
                 min_air_temperature=2,
@@ -160,7 +162,7 @@ def test_calculate_average_annual_temperature(avg_daily_temperatures: list[float
                 max_air_temperature=2,
                 precipitation=2,
                 irrigation=2,
-                daylength=10.0,
+                daylength=None,
                 annual_mean_air_temperature=77,
             ),
             datetime(2023, 9, 25),
@@ -172,6 +174,7 @@ def test_get_current_day_conditions(
     mock_weather: Weather,
     day: int,
     calendar_year: int,
+    latitude: float | None,
     expected: CurrentDayConditions,
     time: datetime,
 ) -> None:
@@ -181,13 +184,14 @@ def test_get_current_day_conditions(
     setattr(mocked_time, "current_calendar_year", calendar_year)
     setattr(mocked_time, "current_julian_day", day)
     daylength = mocker.patch("RUFAS.current_day_conditions.CurrentDayConditions.determine_daylength", return_value=10.0)
-    latitude = mocker.patch("RUFAS.weather.Weather._get_latitude", return_value=20)
 
-    actual = mock_weather.get_current_day_conditions(mocked_time)
+    actual = mock_weather.get_current_day_conditions(mocked_time, latitude)
 
     assert actual == expected
-    latitude.assert_called_once()
-    daylength.assert_called_once_with(day, 20, calendar_year)
+    if latitude:
+        daylength.assert_called_once_with(day, latitude, calendar_year)
+    else:
+        daylength.assert_not_called
 
 
 @pytest.mark.parametrize(
@@ -219,11 +223,12 @@ def test_get_current_day_conditions_error(
 
 
 @pytest.mark.parametrize(
-    "start,end,expected",
+    "start,end,latitude,expected",
     [
         (
             -1,
             1,
+            43.0,
             [
                 CurrentDayConditions(
                     incoming_light=1,
@@ -256,7 +261,44 @@ def test_get_current_day_conditions_error(
                     annual_mean_air_temperature=77,
                 ),
             ],
-        )
+        ),
+        (
+            -1,
+            1,
+            None,
+            [
+                CurrentDayConditions(
+                    incoming_light=1,
+                    min_air_temperature=1,
+                    mean_air_temperature=1,
+                    max_air_temperature=1,
+                    precipitation=1,
+                    irrigation=1,
+                    daylength=None,
+                    annual_mean_air_temperature=77,
+                ),
+                CurrentDayConditions(
+                    incoming_light=2,
+                    min_air_temperature=2,
+                    mean_air_temperature=2,
+                    max_air_temperature=2,
+                    precipitation=2,
+                    irrigation=2,
+                    daylength=None,
+                    annual_mean_air_temperature=77,
+                ),
+                CurrentDayConditions(
+                    incoming_light=3,
+                    min_air_temperature=3,
+                    mean_air_temperature=3,
+                    max_air_temperature=3,
+                    precipitation=3,
+                    irrigation=3,
+                    daylength=None,
+                    annual_mean_air_temperature=77,
+                ),
+            ],
+        ),
     ],
 )
 def test_get_conditions_series(
@@ -265,67 +307,32 @@ def test_get_conditions_series(
     mocker: MockerFixture,
     start: int,
     end: int,
+    latitude: float | None,
     expected: list[CurrentDayConditions],
 ) -> None:
     """Tests that series of CurrentDayConditions are created correctly."""
     setattr(mock_time, "current_date", datetime(2023, 9, 25))
     daylength = mocker.patch.object(CurrentDayConditions, "determine_daylength", return_value=15.6)
 
-    actual = mock_weather.get_conditions_series(mock_time, start, end)
+    actual = mock_weather.get_conditions_series(mock_time, start, end, latitude)
 
     assert actual == expected
-    assert daylength.call_count == len(expected)
+    assert daylength.call_count == (len(expected) if latitude else 0)
 
 
 def test_record_weather(
-    mock_weather: Weather,
-    mock_current_day_conditions: CurrentDayConditions,
-    mock_time: Time,
+    mock_weather: Weather, mock_current_day_conditions: CurrentDayConditions, mock_time: Time, mocker: MockerFixture
 ) -> None:
     """Tests that weather conditions are correctly recorded to the OutputManager."""
-    with (
-        patch("RUFAS.output_manager.OutputManager.add_variable") as add_var,
-        patch.object(
-            mock_weather,
-            "get_current_day_conditions",
-            return_value=mock_current_day_conditions,
-        ) as mock_current_day_conditions,
-    ):
-        mock_weather.record_weather(mock_time)
-        assert mock_current_day_conditions.call_count == 1
-        assert add_var.call_count == 9
 
+    add_var = mocker.patch("RUFAS.output_manager.OutputManager.add_variable")
+    mock_current_day_conditions = mocker.patch.object(
+        mock_weather, "get_current_day_conditions", return_value=mock_current_day_conditions
+    )
 
-@pytest.mark.parametrize(
-    "field_keys,field_data,expected_latitude",
-    [(["field_1", "field_2"], 34.1, 34.1), ([], None, 43.0723)],
-)
-def test_get_latitude(
-    field_keys: list[str],
-    field_data: float,
-    expected_latitude: float,
-    mock_weather: Weather,
-) -> None:
-    """Test that Weather correctly gets a latitude from Input Manager or uses the default."""
-    with (
-        patch(
-            "RUFAS.input_manager.InputManager.get_data_keys_by_properties",
-            return_value=field_keys,
-        ) as keys,
-        patch("RUFAS.input_manager.InputManager.get_data", return_value=field_data) as data,
-        patch.object(om, "add_warning") as warning,
-    ):
-        actual = mock_weather._get_latitude()
-
-        keys.assert_called_once_with("field_properties")
-        if field_data:
-            expected_data_address = f"{field_keys[0]}.absolute_latitude"
-            data.assert_called_once_with(expected_data_address)
-            warning.assert_not_called()
-        else:
-            data.assert_not_called()
-            warning.assert_called_once()
-        assert actual == expected_latitude
+    mock_weather.record_weather(mock_time)
+    assert mock_current_day_conditions.call_count == 1
+    assert add_var.call_count == 8
 
 
 @pytest.mark.parametrize("weather_file", [{"year": [2023], "jday": [267, 268, 269, 270, 271]}])

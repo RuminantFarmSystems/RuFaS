@@ -1,15 +1,15 @@
-from dataclasses import dataclass, field, InitVar
+from dataclasses import InitVar, dataclass, field
+from math import exp, log
 from typing import Optional
-from math import log, exp
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop_and_soil_constants import (
-    MEGAGRAMS_TO_KILOGRAMS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
     CUBIC_MILLIMETERS_TO_CUBIC_METERS,
-    KILOGRAMS_TO_MILLIGRAMS,
-    MILLIGRAMS_TO_KILOGRAMS,
     FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    KILOGRAMS_TO_MILLIGRAMS,
+    MEGAGRAMS_TO_KILOGRAMS,
+    MILLIGRAMS_TO_KILOGRAMS,
 )
 
 
@@ -30,6 +30,8 @@ class LayerData:
         Top depth of the layer (mm).
     bottom_depth : float, optional
         Bottom depth of the layer (mm).
+    pH : float, default 7.0
+        pH of the soil layer.
     soil_water_concentration : float, optional, default 0.25
         Soil water concentration of the layer (mm water / mm soil).
     water_content : float, optional
@@ -183,6 +185,8 @@ class LayerData:
         Fraction of metabolic carbon incorporated into soil during tillage (unitless).
     structural_carbon_transfer_amount : float, default 0.0
         The amount of transfer of structural carbon during tillage (kg/ha).
+    plant_residue : float, default 0.0
+        Residue added to the soil which is to be transferred to the metabolic and structural litter pools (kg/ha).
     soil_dry_matter_residue_amount : float, default 0.0
         The amount of soil dry matter residue at harvest (kg/ha).
     plant_dry_matter_residue_amount : float, default 0.0
@@ -224,6 +228,8 @@ class LayerData:
         Amount of nitrous oxide emitted from this soil layer on the current day (kg/ha).
     annual_nitrous_oxide_emissions_total : float, default 0.0
         Cumulative total amount of nitrates that have denitrified in a year (kg/ha).
+    dinitrogen_emissions : float, default 0.0
+        Amount of dinitrogen emitted from this soil layer on the current day (kg/ha).
     humus_mineralization_rate_factor : float, default 0.0003
         Rate factor for humus mineralization of active organic nutrients (nitrogen and phosphorus) (unitless).
         Reference: SWAT Input .BSN file, see "CMN" on page 101.
@@ -266,6 +272,8 @@ class LayerData:
     residue: InitVar[float] = 0
     top_depth: Optional[float] = None
     bottom_depth: Optional[float] = None
+
+    pH: float = 7.0
 
     # --- Water
     soil_water_concentration: float = 0.25  # arbitrary
@@ -380,6 +388,7 @@ class LayerData:
     metabolic_litter_amount: float = 0.0
     tillage_fraction: float = 0.0
     structural_carbon_transfer_amount: float = 0.0
+    plant_residue: float = 0.0
     soil_dry_matter_residue_amount: float = 0.0
     plant_dry_matter_residue_amount: float = 0.0
     plant_residue_metabolic_fraction: float = 0.0
@@ -403,6 +412,8 @@ class LayerData:
 
     nitrous_oxide_emissions: float = 0.0
     annual_nitrous_oxide_emissions_total: float = 0.0
+
+    dinitrogen_emissions: float = 0.0
 
     humus_mineralization_rate_factor: float = 0.0003
     denitrification_rate_coefficient: float = 1.4
@@ -960,6 +971,11 @@ class LayerData:
             )
 
     @property
+    def water_filled_pore_space(self) -> float:
+        """Returns the fraction of pore space that is currently filled by water (unitless)."""
+        return self.water_content / self.saturation_content
+
+    @property
     def silt_clay_content(self):
         """
         Combined silt and clay fraction in the soil (unitless).
@@ -989,6 +1005,14 @@ class LayerData:
 
         """
         return self.active_carbon_to_slow_loss + self.slow_carbon_co2_lost_amount + self.passive_carbon_co2_lost_amount
+
+    @property
+    def carbon_residue_amount(self) -> float:
+        """
+        Tracks the total amount of carbon residue in a soil layer (kg / ha).
+
+        """
+        return self.metabolic_litter_amount + self.structural_litter_amount
 
     def do_annual_reset(self) -> None:
         """

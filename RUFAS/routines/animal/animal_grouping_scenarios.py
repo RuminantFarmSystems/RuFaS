@@ -1,13 +1,13 @@
 from enum import Enum
 from typing import Dict, List, Union
 
+from RUFAS.enums import AnimalCombination
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from ...enums import AnimalCombination
 
 
 class AnimalGroupingScenario(Enum):

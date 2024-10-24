@@ -1,13 +1,14 @@
 from random import random
-from scipy.stats import truncnorm
 from typing import Dict
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 
-from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
-from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
-from RUFAS.routines.animal.life_cycle import animal_constants as const
+from scipy.stats import truncnorm
+
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle import animal_constants as const
+from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
+from RUFAS.routines.animal.manure.calf_manure_excretion import manure_calculations
+from RUFAS.routines.animal.ration.calf_ration import CalfRationManager
 
 om = OutputManager()
 
@@ -99,6 +100,7 @@ class Calf(AnimalBase):
         self.wean_weight = args["wean_weight"]
         self.mature_body_weight = args["mature_body_weight"]
         self.events.init_from_string(args["events"])
+        self.net_merit = args.get("net_merit", 0.0)
 
     def get_calf_values(self):
         """
@@ -114,6 +116,7 @@ class Calf(AnimalBase):
             "wean_weight": self.wean_weight,
             "mature_body_weight": self.mature_body_weight,
             "events": str(self.events),
+            "net_merit": self.net_merit,
         }
         return values
 

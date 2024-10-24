@@ -1,10 +1,10 @@
-from .storage import Storage
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.time import Time
+
 from .enums import CropCategory
 from .harvested_crop import HarvestedCrop
-from ...current_day_conditions import CurrentDayConditions
-from ...general_constants import GeneralConstants
-from ...time import Time
-
+from .storage import Storage
 
 """
 This final moisture fraction that expected to be contained in a hay crop. References Feed Storage Scientific
@@ -19,6 +19,10 @@ References Feed Storage Scientific Documentation table 1.2.9.
 PROTECTED_WRAPPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_021_6
 PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_010_8
 UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
+
+
+# TODO: remove this default as part of issue #1960
+DEFAULT_BALE_DIAMETER = 1.5
 
 
 class Hay(Storage):
@@ -57,7 +61,7 @@ class Hay(Storage):
         float
             The diameter of the hay bale (meters).
         """
-        pass
+        return DEFAULT_BALE_DIAMETER
 
     def calculate_dry_matter_loss_to_gas(
         self, crop: HarvestedCrop, weather_conditions: list[CurrentDayConditions], time: Time

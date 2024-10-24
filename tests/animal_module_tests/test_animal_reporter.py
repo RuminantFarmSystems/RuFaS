@@ -2,13 +2,13 @@ import pytest
 from mock.mock import call
 from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_manager import AnimalManager
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
+from RUFAS.routines.animal.life_cycle import animal_constants
+from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
-from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.routines.animal.animal_manager import AnimalManager
-
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle import animal_constants
 
 om = OutputManager()
 
@@ -188,7 +188,9 @@ def test_report_milk(mocker: MockerFixture) -> None:
         animal.milking = test_milk_data_update["lactating"]
         animal.calves = test_milk_data_update["parity"]
         animal.id = test_milk_data_update["cow_id"]
-        animal.pen_history[-1].pen = test_milk_data_update["pen_id"]
+        animal.pen_history = [
+            PenHistory(start_date=0, end_date=0, pen=test_milk_data_update["pen_id"], classes_in_pen=[])
+        ]
     # act
     AnimalModuleReporter.report_milk(pen, simulation_day)
     # assert
