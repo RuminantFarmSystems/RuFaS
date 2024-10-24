@@ -1,15 +1,14 @@
+from typing import Optional
+
+from RUFAS.routines.field.crop_and_soil_constants import (
+    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
+    HECTARES_TO_SQUARE_MILLIMETERS,
+    MEGAGRAMS_TO_KILOGRAMS,
+)
 from RUFAS.routines.field.soil.carbon_cycling.decomposition import Decomposition
 from RUFAS.routines.field.soil.carbon_cycling.pool_gas_partition import PoolGasPartition
 from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import MEGAGRAMS_TO_KILOGRAMS
-
-
-from typing import Optional
-from RUFAS.routines.field.crop_and_soil_constants import (
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
-)
 
 
 class CarbonCycling:

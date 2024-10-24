@@ -731,7 +731,7 @@ def test_get_data_returns_none(
     # Arrange
     input_manager = InputManager()
     mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_get_data)
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
 
     # Act
     result = input_manager.get_data(dummy_data_path)
@@ -1014,14 +1014,14 @@ def test_get_metadata_raises_exception(
 
 
 def test_get_data_by_properties_no_data(
-    mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    mock_input_manager: InputManager, input_manager_original_method_states: Dict[str, Callable], mocker: MockerFixture
 ) -> None:
     """Tests that error is handled properly when get_metadata() raises KeyError."""
     mock_input_manager.get_metadata = MagicMock(side_effect=KeyError)
 
-    with patch("RUFAS.output_manager.OutputManager.add_error") as add_error:
-        actual = mock_input_manager.get_data_keys_by_properties("dummy_property")
+    add_error = mocker.patch.object(mock_input_manager.om, "add_error")
+
+    actual = mock_input_manager.get_data_keys_by_properties("dummy_property")
 
     assert add_error.call_count == 1
     assert actual == []
@@ -1284,8 +1284,8 @@ def test_add_variable_to_pool_valid(
     patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", wraps=input_manager._prepare_data)
 
     expected_add_warning_count = 1 if starting_im_pool else 0
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
+    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
 
     # Act
     result = input_manager._add_variable_to_pool(
@@ -1551,8 +1551,8 @@ def test_add_variable_to_pool_eager_termination(
     mock_elements_counter = mocker.MagicMock()
     mock_elements_counter.invalid_elements = 1
     mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
+    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
 
     # Act
     with pytest.raises(ValueError):
@@ -2457,13 +2457,14 @@ def test_dump_get_data_logs(
     }
     mock_dir_path = Path("dummy_path")
     mock_generated_file_name = "dummy_file_name.json"
-    patch_for_generate_file_name = mocker.patch(
-        "RUFAS.input_manager.om.generate_file_name", return_value=mock_generated_file_name
+    patch_for_generate_file_name = mocker.patch.object(
+        mock_input_manager.om, "generate_file_name", return_value=mock_generated_file_name
     )
     patch_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
 
-    with patch("RUFAS.output_manager.OutputManager.dict_to_file_json") as mock_dict_to_file_json:
-        mock_input_manager.dump_get_data_logs(path=mock_dir_path)
+    mock_dict_to_file_json = mocker.patch.object(mock_input_manager.om, "dict_to_file_json")
+
+    mock_input_manager.dump_get_data_logs(path=mock_dir_path)
 
     patch_for_generate_file_name.assert_called_once_with(base_name="InputManager_get_data_log", extension="json")
     patch_create_dir.assert_called_once_with(mock_dir_path)
@@ -2543,8 +2544,8 @@ def test_save_metadata_properties_errors(
     mock_parse = mocker.patch.object(mock_input_manager, "_parse_metadata_properties", return_value=mock_records)
     mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
     mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
-    mocker.patch("RUFAS.input_manager.om.generate_file_name", return_value=generated_filename)
-    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    mocker.patch.object(mock_input_manager.om, "generate_file_name", return_value=generated_filename)
+    mock_add_error = mocker.patch.object(mock_input_manager.om, "add_error")
 
     with pytest.raises(exception) as exc_info:
         mock_input_manager.save_metadata_properties(output_dir)
@@ -3177,3 +3178,67 @@ def test_add_to_pool(
     input_manager._add_to_pool(variable_name, validated_data)
     mock_add_warning.assert_called_once()
     assert input_manager.pool["module1"] == {"test": "random"}
+
+
+def test_export_pool_to_csv(mock_input_manager: InputManager, mocker: MockerFixture) -> None:
+    """Tests export_pool_to_csv() function in InputManager."""
+    mock_pool = {"a": {"A": 1}, "b": {"B": 2}, "c": {"C": 3}, "d": {"D": [1, 2, 3]}, "animal_population": {}}
+    mock_input_manager.csv_report_generation_list = ["a", "c", "d", "animal_population"]
+    mock_input_manager.pool = mock_pool
+
+    output_dir = Path("/fake/directory")
+
+    mock_flatten_dictionary = mocker.patch.object(
+        Utility, "flatten_dictionary", side_effect=[{"A": 1}, {"C": 3}, {"D": [1, 2, 3]}]
+    )
+
+    mock_create_dir = mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
+    mock_add_log = mocker.patch("RUFAS.output_manager.OutputManager.add_log")
+
+    mock_to_csv = mocker.patch("pandas.DataFrame.to_csv")
+
+    mock_input_manager.export_pool_to_csv("dummy_prefix", output_dir)
+
+    mock_flatten_dictionary.assert_has_calls([call({"A": 1}), call({"C": 3}), call({"D": [1, 2, 3]})], any_order=True)
+    mock_create_dir.assert_called_once_with(output_dir)
+    mock_to_csv.assert_called_once_with(output_dir / "dummy_prefix.csv", index=False)
+    mock_add_log.assert_called_once_with(
+        "Save input data CSV success.",
+        f"Successfully saved to {output_dir}.",
+        {
+            "class": mock_input_manager.__class__.__name__,
+            "function": mock_input_manager.export_pool_to_csv.__name__,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "exception, error_message",
+    [(FileNotFoundError, "No such file or directory"), (PermissionError, "Permission denied"), (OSError, "OS error")],
+)
+def test_export_pool_to_csv_errors(
+    mock_input_manager: InputManager,
+    mocker: MockerFixture,
+    exception: Type[FileNotFoundError | PermissionError | OSError],
+    error_message: str,
+) -> None:
+    """Tests all the possible errors in export_pool_to_csv() function of InputManager."""
+    mock_pool = {"a": {"A": 1}, "b": {"B": 2}, "c": {"C": 3}, "d": {"D": [1, 2, 3]}, "animal_population": {}}
+    mock_input_manager.csv_report_generation_list = ["a", "c", "d"]
+    mock_input_manager.pool = mock_pool
+
+    output_dir = Path("/fake/directory")
+
+    mocker.patch.object(Utility, "flatten_dictionary")
+    mocker.patch("RUFAS.output_manager.OutputManager.create_directory")
+    mocker.patch("pandas.DataFrame.to_csv", side_effect=exception(error_message))
+    mock_add_error = mocker.patch.object(mock_input_manager.om, "add_error")
+
+    with pytest.raises(exception) as exc_info:
+        mock_input_manager.export_pool_to_csv("dummy_prefix", output_dir)
+
+    assert str(exc_info.value) == error_message
+
+    mock_add_error.assert_called_once_with(
+        "Save CSV failure.", f"Unable to save to {output_dir} because of {error_message}.", ANY
+    )

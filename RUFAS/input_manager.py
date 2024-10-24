@@ -3,7 +3,7 @@ import os
 from copy import deepcopy
 from functools import reduce
 from pathlib import Path
-from typing import Any, Dict, List, Callable, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import pandas as pd
 from deepdiff import DeepDiff
@@ -11,8 +11,6 @@ from deepdiff import DeepDiff
 from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
-
-om = OutputManager()
 
 """
 Set enumerating the input data types that the Input Manager will attempt to fix while validating input data.
@@ -40,12 +38,14 @@ class InputManager:
         return cls.instance
 
     def __init__(self, metadata_depth_limit: int | None = None) -> None:
+        self.om = OutputManager()
         if InputManager.__instance is None:
             InputManager.__instance = self
             self.__metadata: Dict[str, Any] = {}
             self.__pool: Dict[str, Any] = {}
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
+            self.csv_report_generation_list: list[str] = []
         self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
@@ -115,7 +115,7 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_metadata.__name__,
         }
-        om.add_log(
+        self.om.add_log(
             "load_metadata_attempt",
             f"Attempting to load metadata from {metadata_path}.",
             info_map,
@@ -123,7 +123,7 @@ class InputManager:
         try:
             with open(metadata_path) as metadata_file:
                 self.__metadata = json.load(metadata_file)
-                om.add_log(
+                self.om.add_log(
                     "load_metadata_success",
                     f"Successfully loaded metadata from {metadata_path}",
                     info_map,
@@ -154,7 +154,7 @@ class InputManager:
         }
         try:
             properties_path = Path(self.__metadata["files"]["properties"]["path"])
-            om.add_log(
+            self.om.add_log(
                 "load_properties_attempt",
                 f"Attempting to load properties from {properties_path}",
                 info_map,
@@ -165,20 +165,20 @@ class InputManager:
             del self.__metadata["files"]["properties"]
 
             self.__metadata["properties"] = self._load_data_from_json(properties_path)
-            om.add_log(
+            self.om.add_log(
                 "load_properties_success",
                 f"Successfully loaded properties from {properties_path}",
                 info_map,
             )
 
         except FileNotFoundError as fnfe:
-            om.add_error("load_properties_file_not_found", str(fnfe), info_map)
+            self.om.add_error("load_properties_file_not_found", str(fnfe), info_map)
             raise
         except json.JSONDecodeError as jde:
-            om.add_error("load_properties_json_error", str(jde), info_map)
+            self.om.add_error("load_properties_json_error", str(jde), info_map)
             raise
         except Exception as e:
-            om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
+            self.om.add_error("load_properties_error", f"Unexpected error: {e}", info_map)
             raise
 
     def _load_data_from_json(self, file_path: Path) -> Dict[str, Any]:
@@ -205,11 +205,11 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_data_from_json.__name__,
         }
-        om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
+        self.om.add_log("open_json_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path) as json_file:
                 data: Dict[str, Any] = json.load(json_file)
-                om.add_log(
+                self.om.add_log(
                     "load_data_successful",
                     f"Successfully loaded data from {file_path}.",
                     info_map,
@@ -244,13 +244,13 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self._load_data_from_csv.__name__,
         }
-        om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
+        self.om.add_log("open_csv_file", f"Attempting to open {file_path}.", info_map)
         try:
             with open(file_path, "r", encoding="utf-8") as csv_file:
                 data_frame = pd.read_csv(csv_file)
                 data_dict = {column: data_frame[column].tolist() for column in data_frame.columns}
                 if not data_frame.empty:
-                    om.add_log(
+                    self.om.add_log(
                         "load_data_successful",
                         f"Successfully loaded data from {file_path}.",
                         info_map,
@@ -290,6 +290,8 @@ class InputManager:
         valid_data = True
         for file_blob_key, file_details in self.__metadata["files"].items():
             file_path = file_details["path"]
+            if file_details["type"] == "json":
+                self.csv_report_generation_list.append(file_blob_key)
 
             try:
                 data_loader = data_type_to_loader_map[file_details["type"]]
@@ -369,7 +371,7 @@ class InputManager:
         try:
             return Modifiability.__getitem__("_".join(modifiability.strip().upper().split()))
         except KeyError:
-            om.add_warning(
+            self.om.add_warning(
                 "Unknown modifiability entry",
                 f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability should be "
                 f"one of {Modifiability.values()}. Using the default value: {default}",
@@ -461,11 +463,11 @@ class InputManager:
         info_map = {"class": self.__class__.__name__, "function": self._log_missing_data.__name__}
         if not called_during_initialization:
             error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
-            om.add_error("Missing required data", error_msg, info_map)
+            self.om.add_error("Missing required data", error_msg, info_map)
             raise KeyError(error_msg)
 
         if self._is_input_required_upon_initialization(variable_name=var_name, variable_properties=variable_properties):
-            om.add_error(
+            self.om.add_error(
                 "Missing required data",
                 f"Key {var_name} not found in input data. Input value is required for this "
                 "variable upon program initialization.",
@@ -475,7 +477,7 @@ class InputManager:
                 f"Key {var_name} not found in input data. Input value is required for this "
                 "variable upon program initialization."
             )
-        om.add_warning(
+        self.om.add_warning(
             "Validation: key not found in input data -- input not required upon initialization",
             f"Key {var_name} not found in input data. Input value is not required for this "
             "variable upon program initialization, setting the variable value to None.",
@@ -538,7 +540,7 @@ class InputManager:
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
         except KeyError as key_error:
-            om.add_error("Validation: data not found", str(key_error), info_map)
+            self.om.add_error("Validation: data not found", str(key_error), info_map)
 
         return None
 
@@ -637,7 +639,7 @@ class InputManager:
             invalid_key = element_hierarchy[-1]
             parent_address = ".".join(element_hierarchy[:-1])
 
-            om.add_error(
+            self.om.add_error(
                 "Validation: data not found:",
                 f'Cannot find "{metadata_address}", '
                 f'"{parent_address}" does not have attribute '
@@ -709,7 +711,7 @@ class InputManager:
         except KeyError:
             error_name = "Cannot find data"
             error_message = "Could not find input metadata."
-            om.add_error(error_name, error_message, info_map)
+            self.om.add_error(error_name, error_message, info_map)
             return data_keys
 
         data_keys = [key for key, data in input_data.items() if data.get("properties") == target_properties]
@@ -725,7 +727,7 @@ class InputManager:
             "function": self.flush_pool.__name__,
         }
         self.__pool = {}
-        om.add_log("Clear variable pool", "The pool is emptied.", info_map)
+        self.om.add_log("Clear variable pool", "The pool is emptied.", info_map)
 
     def _metadata_properties_exist(self, variable_name: str, properties_blob_key: str) -> bool:
         """
@@ -762,14 +764,14 @@ class InputManager:
             "function": self._metadata_properties_exist.__name__,
         }
         if not self.__metadata:
-            om.add_error(
+            self.om.add_error(
                 "No metadata loaded",
                 "No metadata is loaded to the InputManager.",
                 info_map,
             )
             raise ValueError("No metadata loaded.")
         if properties_blob_key not in self.__metadata["properties"]:
-            om.add_error(
+            self.om.add_error(
                 "No metadata found",
                 f"No metadata is found for variable '{variable_name}' with given "
                 f"properties_blob_key {properties_blob_key}. Consider adding variable "
@@ -846,7 +848,7 @@ class InputManager:
             elements_counter += elements_counter
 
         if elements_counter.invalid_elements > 0:
-            om.add_error(
+            self.om.add_error(
                 "Invalid variable",
                 f"Variable {variable_name} has invalid components. Only successfully validated components are "
                 f"added to InputManager pool during runtime.",
@@ -931,10 +933,12 @@ class InputManager:
             variable_name=variable_name, variable_properties=metadata_properties
         )
         if not is_modifiable_during_runtime and eager_termination:
-            om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            self.om.add_error("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
             raise PermissionError(f"IM Runtime Modification Error: {variable_name} is not modifiable during runtime.")
         elif not is_modifiable_during_runtime:
-            om.add_warning("IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map)
+            self.om.add_warning(
+                "IM Runtime Modification", f"{variable_name} is not modifiable during runtime.", info_map
+            )
             return False
         return True
 
@@ -1009,7 +1013,7 @@ class InputManager:
                 "class": self.__class__.__name__,
                 "function": self._add_to_pool.__name__,
             }
-            om.add_warning(
+            self.om.add_warning(
                 "Overwriting existing variable",
                 f"Variable {variable_name} already exists in InputManager pool, overwriting the old value.",
                 info_map,
@@ -1059,7 +1063,7 @@ class InputManager:
             "function": self.add_dict_variable_to_pool.__name__,
         }
         if not (isinstance(data, Dict)):
-            om.add_error(
+            self.om.add_error(
                 "Incorrect variable type",
                 f"Variable {variable_name} has type {type(data)}, does not match "
                 f"the expected type of `Dict[str, Any]`.",
@@ -1126,7 +1130,7 @@ class InputManager:
             "function": self.add_tabular_variable_to_pool.__name__,
         }
         if not (isinstance(data, Dict) or isinstance(data, List)):
-            om.add_error(
+            self.om.add_error(
                 "Incorrect variable type",
                 f"Variable {variable_name} has type {type(data)}, does not match "
                 f"the expected type of `Dict[str, List[Any]] | List[Any]`.",
@@ -1161,10 +1165,10 @@ class InputManager:
             The directory path where the JSON file will be saved.
 
         """
-        file_name = om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
+        file_name = self.om.generate_file_name(base_name="InputManager_get_data_log", extension="json")
         file_path = path / file_name
-        om.create_directory(path)
-        om.dict_to_file_json(self.__get_data_logs_pool, file_path)
+        self.om.create_directory(path)
+        self.om.dict_to_file_json(self.__get_data_logs_pool, file_path)
 
     def save_metadata_properties(self, output_dir: Path) -> None:
         """
@@ -1190,20 +1194,22 @@ class InputManager:
         }
         records = self._parse_metadata_properties(self.__metadata["properties"])
         df = pd.DataFrame(records)
-        path_to_save = output_dir / om.generate_file_name("InputManager_metadata_properties", extension="csv")
-        om.add_log("CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map)
+        path_to_save = output_dir / self.om.generate_file_name("InputManager_metadata_properties", extension="csv")
+        self.om.add_log(
+            "CSV save attempt.", f"Attempting to save metadata properties as CSV to {path_to_save}", info_map
+        )
         try:
-            om.create_directory(output_dir)
+            self.om.create_directory(output_dir)
             df.to_csv(path_to_save, index=False)
-            om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
+            self.om.add_log("Save CSV success.", f"Successfully saved to {path_to_save}.", info_map)
         except FileNotFoundError as fnfe:
-            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
+            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {fnfe}.", info_map)
             raise fnfe
         except PermissionError as pe:
-            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
+            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {pe}.", info_map)
             raise pe
         except OSError as e:
-            om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
+            self.om.add_error("Save CSV failure.", f"Unable to save to {path_to_save} because of {e}.", info_map)
             raise e
 
     def _parse_metadata_properties(
@@ -1310,7 +1316,7 @@ class InputManager:
             "class": self.__class__.__name__,
             "function": self.compare_metadata_properties.__name__,
         }
-        om.create_directory(output_directory)
+        self.om.create_directory(output_directory)
         self._load_metadata(properties_file_path)
         properties1 = deepcopy(self.meta_data)
         self.meta_data = {}
@@ -1324,7 +1330,7 @@ class InputManager:
         file_name = f"diff_results_{first_file_path}_vs_{second_file_path}"
 
         try:
-            om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
+            self.om.add_log("Save metadata diff try", f"Attempting to save to {file_name}", info_map)
             with open(f"{str(output_directory)}/{file_name}.txt", "w") as file:
                 file.write(
                     f"Comparing changes going from '{properties_file_path}'"
@@ -1347,17 +1353,17 @@ class InputManager:
                                 file.write(f"{sub_key}: {value}\n")
                             file.write("\n")
 
-            om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
+            self.om.add_log("Save metadata diff successful", f"Successfully saved to {file_name}", info_map)
 
         except PermissionError:
-            om.add_error(
+            self.om.add_error(
                 "Permission error in saving file",
                 f"Permission denied when trying to write to {file_name}.txt.",
                 info_map,
             )
             raise
         except OSError as e:
-            om.add_error(
+            self.om.add_error(
                 "Unexpected error in saving file",
                 f"An unexpected OS error occurred: {e}",
                 info_map,

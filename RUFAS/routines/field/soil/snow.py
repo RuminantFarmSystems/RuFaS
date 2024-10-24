@@ -1,11 +1,8 @@
 import math
 from typing import Optional
 
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.output_manager import OutputManager
-
-om = OutputManager()
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class Snow:

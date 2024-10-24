@@ -1,5 +1,5 @@
+from math import atan, exp, log, sin
 from typing import Optional
-from math import exp, log, atan, sin
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_KILOMETERS
@@ -169,8 +169,8 @@ class SoilErosion:
 
         """
         if silt_fraction == 0 and clay_fraction == 0:
-            raise ValueError("Cannot have fractions of silt and clay in the soil both be 0")
-        return (silt_fraction / ((clay_fraction) + (silt_fraction))) ** 0.3
+            return 1
+        return (silt_fraction / (clay_fraction + silt_fraction)) ** 0.3
 
     @staticmethod
     def _determine_carbon_content_factor(organic_carbon_fraction: float) -> float:

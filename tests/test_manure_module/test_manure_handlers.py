@@ -2,36 +2,25 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     AlleyScraper,
-    Tillage,
-    Harrowing,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     BaseManureHandler,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManualScraping
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    FlushSystem,
+    Harrowing,
+    ManualScraping,
     ManureHandlerConfig,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerFactory,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerType,
+    Tillage,
 )
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 # Test ManureHandlerDailyOutput
 # ============================
@@ -63,7 +52,8 @@ from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
                 "total_bedding_mass": 0.0,
                 "total_water_volume_in_milking_parlor": 0.0,
                 "liquid_manure_daily_volume": 0.0,
-                "tempC": 0.0,
+                "barn_temperature": 0.0,
+                "air_temperature": 0.0,
             },
         ),
         # Assign a value to each attribute in the initializer
@@ -87,7 +77,8 @@ from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
                 "total_bedding_volume": 16.0,
                 "total_bedding_mass": 17.0,
                 "total_water_volume_in_milking_parlor": 18.0,
-                "tempC": 19.0,
+                "barn_temperature": 19.0,
+                "air_temperature": 19.0,
             },
             {
                 "pen_id": 1,
@@ -111,7 +102,8 @@ from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
                 "total_water_volume_in_milking_parlor": approx(0.018),
                 "total_daily_manure_volume": approx(30.033),
                 "liquid_manure_daily_volume": approx(30.033),
-                "tempC": approx(19.0),
+                "barn_temperature": approx(19.0),
+                "air_temperature": approx(19.0),
             },
         ),
     ],
@@ -323,24 +315,28 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_bedding.calc_total_bedding_volume.return_value = total_bedding_volume = 30.0
     mock_bedding.calc_total_bedding_mass.return_value = total_bedding_mass = 31.0
     mock_bedding.calc_organic_bedding_mass_added_to_manure.return_value = organic_bedding_added = 32.0
+    mock_bedding.bedding_dry_matter_content = bedding_dry_matter_content = 0.8
 
-    expected_total_non_degradable_volatile_solids = VSnd + organic_bedding_added
+    expected_organic_bedding_dry_solids = organic_bedding_added * bedding_dry_matter_content
+    expected_total_non_degradable_volatile_solids = VSnd + expected_organic_bedding_dry_solids
 
     sim_day = 10
     housing_ammonia_emission = 1.0
     patch_for_calc_housing_ammonia_emission = mocker.patch(
-        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_ammonia_emission",
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
+        "calculate_housing_ammonia_emission",
         return_value=housing_ammonia_emission,
     )
     housing_methane_emission = 2.0
     patch_for_calc_housing_methane_emission = mocker.patch(
-        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_methane_emission",
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
+        "calculate_housing_methane_emission",
         return_value=housing_methane_emission,
     )
     housing_carbon_dioxide_emission = 3.0
     patch_for_calc_housing_carbon_dioxide_emission = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes."
-        "GasEmissionsCalculator.housing_carbon_dioxide_emission",
+        "GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission",
         return_value=housing_carbon_dioxide_emission,
     )
 
@@ -367,6 +363,13 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         return_value=current_day_avg_tempC,
     )
 
+    current_barn_temp = 30.0
+    patch_for_adjust_air_temp = mocker.patch(
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
+        "determine_barn_air_temperature",
+        return_value=current_barn_temp,
+    )
+
     # Act
     manure_handler_daily_output = mock_manure_handler.daily_update(pen=mock_pen, bedding=mock_bedding, sim_day=sim_day)
 
@@ -376,15 +379,15 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
         barn_area=exposed_manure_surface_area_from_pen_type,
         urine_total_ammoniacal_nitrogen=TAN,
         urine=urine,
-        temp=current_day_avg_tempC,
+        barn_temperature=current_barn_temp,
     )
     patch_for_calc_housing_methane_emission.assert_called_once_with(
         barn_area=exposed_manure_surface_area_from_pen_type,
-        barn_temp=current_day_avg_tempC,
+        barn_temperature=current_barn_temp,
     )
     patch_for_calc_housing_carbon_dioxide_emission.assert_called_once_with(
         barn_area=exposed_manure_surface_area_from_pen_type,
-        barn_temp=current_day_avg_tempC,
+        barn_temperature=current_barn_temp,
     )
     assert manure_handler_daily_output.simulation_day == sim_day
     assert manure_handler_daily_output.pen_id == pen_id
@@ -392,7 +395,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.liquid_manure_total_ammoniacal_nitrogen == (
         approx(max(0.0, TAN - housing_ammonia_emission))
     )
-    assert manure_handler_daily_output.liquid_manure_nitrogen == approx(N)
+    assert manure_handler_daily_output.liquid_manure_nitrogen == N
     assert manure_handler_daily_output.liquid_manure_total_solids == approx(TS)
     assert manure_handler_daily_output.liquid_manure_total_degradable_volatile_solids == approx(VSd)
     assert manure_handler_daily_output.liquid_manure_total_non_degradable_volatile_solids == approx(
@@ -412,8 +415,9 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(
         total_water_volume_in_milking_parlor * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
-    assert manure_handler_daily_output.tempC == approx(current_day_avg_tempC)
-    assert patch_for_get_current_day_avg_tempC.call_count == 4
+    assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
+    assert patch_for_get_current_day_avg_tempC.call_count == 1
+    assert patch_for_adjust_air_temp.call_count == 1
 
     # --- Test pen type that does not require GHG emissions estimations. ---
     mock_pen.pen_type = "compost bedded pack barn"
@@ -447,8 +451,8 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(
         total_water_volume_in_milking_parlor * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
-    assert manure_handler_daily_output.tempC == approx(current_day_avg_tempC)
-    assert patch_for_get_current_day_avg_tempC.call_count == 5
+    assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
+    assert patch_for_get_current_day_avg_tempC.call_count == 2
 
 
 def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
@@ -477,18 +481,20 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
     sim_day = 10
     housing_ammonia_emission = 1.0
     patch_for_calc_housing_ammonia_emission = mocker.patch(
-        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_ammonia_emission",
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
+        "calculate_housing_ammonia_emission",
         return_value=housing_ammonia_emission,
     )
     housing_methane_emission = 2.0
     patch_for_calc_housing_methane_emission = mocker.patch(
-        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator.housing_methane_emission",
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
+        "calculate_housing_methane_emission",
         return_value=housing_methane_emission,
     )
     housing_carbon_dioxide_emission = 3.0
     patch_for_calc_housing_carbon_dioxide_emission = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes."
-        "GasEmissionsCalculator.housing_carbon_dioxide_emission",
+        "GasEmissionsCalculator.calculate_housing_carbon_dioxide_emission",
         return_value=housing_carbon_dioxide_emission,
     )
 
@@ -514,6 +520,12 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
         "_get_current_day_average_temperature_in_celsius",
         return_value=current_day_avg_tempC,
     )
+    current_barn_temp = 30.0
+    patch_for_adjust_air_temp = mocker.patch(
+        "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
+        "determine_barn_air_temperature",
+        return_value=current_barn_temp,
+    )
 
     manure_handler_daily_output = mock_manure_handler.daily_update(pen=mock_pen, bedding=None, sim_day=sim_day)
 
@@ -522,15 +534,15 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
         barn_area=exposed_manure_surface_area_from_pen_type,
         urine_total_ammoniacal_nitrogen=TAN,
         urine=urine,
-        temp=current_day_avg_tempC,
+        barn_temperature=current_barn_temp,
     )
     patch_for_calc_housing_methane_emission.assert_called_once_with(
         barn_area=exposed_manure_surface_area_from_pen_type,
-        barn_temp=current_day_avg_tempC,
+        barn_temperature=current_barn_temp,
     )
     patch_for_calc_housing_carbon_dioxide_emission.assert_called_once_with(
         barn_area=exposed_manure_surface_area_from_pen_type,
-        barn_temp=current_day_avg_tempC,
+        barn_temperature=current_barn_temp,
     )
     assert manure_handler_daily_output.simulation_day == sim_day
     assert manure_handler_daily_output.pen_id == pen_id
@@ -557,8 +569,9 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
     assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(
         total_water_volume_in_milking_parlor * GeneralConstants.LITERS_TO_CUBIC_METERS
     )
-    assert manure_handler_daily_output.tempC == approx(current_day_avg_tempC)
-    assert patch_for_get_current_day_avg_tempC.call_count == 4
+    assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
+    assert patch_for_get_current_day_avg_tempC.call_count == 1
+    assert patch_for_adjust_air_temp.call_count == 1
 
 
 def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None:
@@ -602,4 +615,5 @@ def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None
     assert manure_handler_daily_output.total_bedding_volume == approx(0.0)
     assert manure_handler_daily_output.total_bedding_mass == approx(0.0)
     assert manure_handler_daily_output.total_water_volume_in_milking_parlor == approx(0.0)
-    assert manure_handler_daily_output.tempC == approx(0.0)
+    assert manure_handler_daily_output.barn_temperature == approx(0.0)
+    assert manure_handler_daily_output.air_temperature == approx(0.0)

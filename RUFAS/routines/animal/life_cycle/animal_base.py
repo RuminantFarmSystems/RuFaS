@@ -5,12 +5,16 @@ from RUFAS.input_manager import InputManager
 from RUFAS.routines.animal.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.routines.animal.life_cycle.body_weight_history import BodyWeightHistory
+from RUFAS.routines.animal.life_cycle.lactation_curve import LactationCurve
 from RUFAS.routines.animal.life_cycle.pen_history import PenHistory
+from RUFAS.routines.animal.ration.amino_acid import EssentialAminoAcidRequirements
+from RUFAS.time import Time
 
 
 class AnimalBase:
     config: Dict[str, Any] = {}
     nutrients = None
+    lactation_curve = None
 
     @staticmethod
     def set_nutrient_list(nutrients):
@@ -23,6 +27,11 @@ class AnimalBase:
         AnimalBase.config["nutrient_standard"] = im.get_data("config.nutrient_standard")
         AnimalBase.config["breed"] = im.get_data("animal.herd_information.breed")
         AnimalBase.config["ration"] = im.get_data("animal.ration")
+
+    @classmethod
+    def setup_lactation_curve_parameters(cls, time: Time) -> None:
+        """Initializes the LactationCurve class attribute."""
+        cls.lactation_curve = LactationCurve(time)
 
     def __init__(self, args: AnimalBaseInitArgsTypedDict):
         """
@@ -38,10 +47,11 @@ class AnimalBase:
                         args.wean_weight: the wean weight of the animal
                         args.mature_body_weight: the mature body weight of the animal
                         args.events: events of the animal
+                        args.net_merit: The net merit value that represents the animal's genetic value in US Dollars.
         """
         self.id = args["id"]
         self.breed = args["breed"]
-        self.birth_date = args["birth_date"]
+        self.birth_date: str = args["birth_date"]
         self.days_born = args["days_born"]
         self.semen_used = self.config["semen_type"]
         self.culled = False
@@ -73,7 +83,19 @@ class AnimalBase:
         self.conceptus_weight = 0.0
         self.calf_birth_weight = 0.0
         self.tissue_changed = 0.0
+        self.essential_amino_acid_requirement: EssentialAminoAcidRequirements = EssentialAminoAcidRequirements(
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
+        )
         self.sold_at_day: int | None = None
+        self.net_merit: float = args.get("net_merit", 0.0)
         if "body_weight_history" in args:
             self.body_weight_history = args["body_weight_history"]
             self.pen_history = args["pen_history"]
@@ -180,12 +202,14 @@ class AnimalBase:
             curr_day: the current simulation day
             classes_in_pen: the classes in the animal's current pen
         """
-        last_pen = self.pen_history[-1].pen if len(self.pen_history) > 0 else None
+        last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != curr_pen:
-            self.pen_history.append(PenHistory(curr_day, curr_day, curr_pen, list(classes_in_pen)))
+            self.pen_history.append(
+                PenHistory(start_date=curr_day, end_date=curr_day, pen=curr_pen, classes_in_pen=list(classes_in_pen))
+            )
         else:  # last_pen == curr_pen
-            self.pen_history[-1].end_date = curr_day
-            self.pen_history[-1].classes_in_pen = list(classes_in_pen)
+            self.pen_history[-1]["end_date"] = curr_day
+            self.pen_history[-1]["classes_in_pen"] = list(classes_in_pen)
 
     def update_body_weight_history(self, sim_day: int) -> None:
         """
@@ -195,4 +219,6 @@ class AnimalBase:
         Args:
             sim_day: simulation day
         """
-        self.body_weight_history.append(BodyWeightHistory(sim_day, self.days_born, self.body_weight))
+        self.body_weight_history.append(
+            BodyWeightHistory(simulation_day=sim_day, days_born=self.days_born, body_weight=self.body_weight)
+        )
