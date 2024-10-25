@@ -1,4 +1,5 @@
 {
     "name": "e2e_animal",
-    "filters": []
+    "filters": ["AnimalModuleReporter*"],
+    "expected_results": {}
 }
