@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 from pytest_mock import MockerFixture
 
@@ -13,6 +15,7 @@ from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 from RUFAS.biophysical.animal.data_types.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 
 
 @pytest.fixture
@@ -227,6 +230,43 @@ def test_daily_routine_cow(
         False, 12, 0, 31.23, {"p": 77.7, "dm": 5.23}, {"dm": 0.7}, "dummy_method", 16, "dummy model"
     )
     mock_manure.assert_called_once_with(False, 12, 0, 0, 17, 0, 0, {"p": 77.7, "dm": 5.23}, {"dm": 0.7})
+
+
+def test_daily_routine_error(
+    mock_general_properties: GeneralProperties,
+    mock_milk_production_property: MilkProductionProperties,
+    mock_animal_nutrient_property: NutrientProperties,
+    mocker: MockerFixture,
+) -> None:
+    """Test the daily update when animal is cow."""
+    expected_excretions = AnimalManureExcretions(
+        urea=9.52,
+        urine=2.0,
+        manure_total_ammoniacal_nitrogen=4,
+        urine_nitrogen=5,
+        manure_nitrogen=6,
+        manure_mass=7,
+        total_solids=8,
+        degradable_volatile_solids=9,
+        non_degradable_volatile_solids=10,
+        inorganic_phosphorus_fraction=11,
+        organic_phosphorus_fraction=12,
+        non_water_inorganic_phosphorus_fraction=0.0,
+        non_water_organic_phosphorus_fraction=0.0,
+        phosphorus=13,
+        phosphorus_fraction=14,
+        potassium=0,
+    )
+    mock_animal = Mock()
+    mock_animal.is_cow = False
+    mock_general_properties.animal_type = mock_animal
+    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+
+    DigestiveSystem.process_digestion(
+        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
+    )
+
+    mock_add_error.assert_called_once()
 
 
 def test_initialize_animal_methane_variables(mocker: MockerFixture) -> None:
