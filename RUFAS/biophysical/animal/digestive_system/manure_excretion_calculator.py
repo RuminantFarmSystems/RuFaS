@@ -212,7 +212,7 @@ class ManureExcretionCalculator:
         # Amount of potassium excreted, g [A.3B.B.4]
         potassium = (
             dry_matter_intake
-            * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
+            * (potassium_concentration * GeneralConstants.PERCENTAGE_TO_FRACTION)
             * GeneralConstants.KG_TO_GRAMS
         )
 
