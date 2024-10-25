@@ -291,7 +291,7 @@ class ManureExcretionCalculator:
         Returns
         -------
         float
-        Total amount of phosphorus excreted by the given animal (g).
+            Total amount of phosphorus excreted by the given animal (g).
 
         AnimalManureExcretions
             A dictionary that contains the manure excretion values as specified
