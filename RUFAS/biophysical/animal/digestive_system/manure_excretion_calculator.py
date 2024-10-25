@@ -406,7 +406,7 @@ class ManureExcretionCalculator:
             + 0.654
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
             * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-            / GeneralConstants.FRACTION_TO_PERCENTAGE
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
         # Fecal nitrogen, kg [A.3B.B.2]
