@@ -66,7 +66,7 @@ class ManureExcretionCalculator:
         # Nitrogen excretion
         # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
         manure_nitrogen = (
-            112.55 * dry_matter_intake * (crude_protein_concentration / 100)
+            112.55 * dry_matter_intake * (crude_protein_concentration * GeneralConstants.PERCENTAGE_TO_FRACTION)
         ) * GeneralConstants.GRAMS_TO_KG
 
         # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
