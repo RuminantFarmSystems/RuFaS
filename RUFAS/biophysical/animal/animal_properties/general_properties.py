@@ -5,6 +5,20 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
+class Breed(Enum):
+    """Enum indicating the breed of the animal."""
+
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Sex(Enum):
+    """Enum indicating the sex of the animal."""
+
+    MALE = "male"
+    FEMALE = "female"
+
+
 @dataclass
 class GeneralProperties:
     """
@@ -16,6 +30,8 @@ class GeneralProperties:
         Number of days the animal has been milking for in its current lactation.
     dry_off_day_of_pregnancy : int
         Number of days into pregnancy when a lactating cow stops milking.
+    metabolizable_energy_intake : float
+        Metabolizable energy intake, Mcal/kg dry matter.
     daily_milk_produced : float
         Milk production of the animal on a single day (kg).
     is_milking
@@ -26,24 +42,26 @@ class GeneralProperties:
     birth_date: str
     birth_weight: float
     body_weight: float
-    breed: "Breed"
+    breed: Breed
     culled: bool
     days_born: int
     days_in_preg: int
     days_in_milk: int
     dry_off_day_of_pregnancy: int
-    events: AnimalEvents
-    daily_milk_produced: float
     future_cull_date: int
     future_death_date: int
-    sex: "Sex"
+    sex: Sex
+    events: AnimalEvents
     id: int
     mature_body_weight: float
-    nutrients: list[str]
+    nutrients: dict[str, float]
+    nutrient_concentrations: dict[str, float]
     ration_formulation = {"objective": 0.00}
     sold: bool
     sold_at_day: int
     wean_weight: float
+    metabolizable_energy_intake: float
+    daily_milk_produced: float
 
     @property
     def is_milking(self) -> bool:
