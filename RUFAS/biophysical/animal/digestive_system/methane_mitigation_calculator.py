@@ -19,8 +19,8 @@ class MethaneMitigationCalculator:
         starch_concentration : float
             Concentration of starch in the ration.
         methane_mitigation_method: str
-            Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin",
-            "EssentialOils", and "Seaweed".
+            Methane mitigation method used to reduce enteric methane emissions, including "3-NOP", "Monensin" and
+            "EssentialOils".
         methane_mitigation_additive_amount: float
             The amount of methane mitigation feed additive that is added, mg/kg dry matter intake (DMI).
             The recommended dose for 3-NOP is
