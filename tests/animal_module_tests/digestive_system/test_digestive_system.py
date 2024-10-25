@@ -239,28 +239,11 @@ def test_daily_routine_error(
     mocker: MockerFixture,
 ) -> None:
     """Test the daily update when animal is cow."""
-    expected_excretions = AnimalManureExcretions(
-        urea=9.52,
-        urine=2.0,
-        manure_total_ammoniacal_nitrogen=4,
-        urine_nitrogen=5,
-        manure_nitrogen=6,
-        manure_mass=7,
-        total_solids=8,
-        degradable_volatile_solids=9,
-        non_degradable_volatile_solids=10,
-        inorganic_phosphorus_fraction=11,
-        organic_phosphorus_fraction=12,
-        non_water_inorganic_phosphorus_fraction=0.0,
-        non_water_organic_phosphorus_fraction=0.0,
-        phosphorus=13,
-        phosphorus_fraction=14,
-        potassium=0,
-    )
+    om = OutputManager()
     mock_animal = Mock()
     mock_animal.is_cow = False
     mock_general_properties.animal_type = mock_animal
-    mock_add_error = mocker.patch.object(OutputManager, "add_error")
+    mock_add_error = mocker.patch.object(om, "add_error")
 
     DigestiveSystem.process_digestion(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
