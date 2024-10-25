@@ -36,7 +36,7 @@ def mock_general_properties() -> GeneralProperties:
         sold_at_day=0,
         wean_weight=0,
         nutrient_concentrations={"a": 0},
-        metabolizable_energy_intake=0
+        metabolizable_energy_intake=0,
     )
 
 
