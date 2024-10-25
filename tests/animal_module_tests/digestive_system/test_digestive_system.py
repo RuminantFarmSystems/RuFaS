@@ -38,8 +38,6 @@ def mock_general_properties() -> GeneralProperties:
         sold=False,
         sold_at_day=0,
         wean_weight=0,
-        daily_growth=15,
-        is_pregnant=False,
         nutrient_concentrations={"dm": 0.7},
         metabolizable_energy_intake=31.23,
         daily_milk_produced=17,
