@@ -563,7 +563,7 @@ class ManureExcretionCalculator:
         organic_matter_intake = (
             dry_matter_intake
             * (GeneralConstants.FRACTION_TO_PERCENTAGE - ash_concentration)
-            / GeneralConstants.FRACTION_TO_PERCENTAGE
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         )
 
         # Total volatile solids, kg [A.3E.A.6]
