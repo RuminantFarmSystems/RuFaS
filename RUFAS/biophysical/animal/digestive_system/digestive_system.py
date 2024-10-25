@@ -9,6 +9,7 @@ from RUFAS.biophysical.animal.digestive_system.enteric_methane_calculator import
 from RUFAS.biophysical.animal.digestive_system.manure_excretion_calculator import ManureExcretionCalculator
 
 from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
 
 
 class DigestiveSystem:
@@ -65,6 +66,7 @@ class DigestiveSystem:
             in the AnimalManureExcretions class definition.
 
         """
+        om = OutputManager()
         statistics = {}
         if general_properties.animal_type == AnimalType.CALF:
             methane_emission = EntericMethaneCalculator.calculate_calf_methane(
@@ -100,7 +102,7 @@ class DigestiveSystem:
             statistics["phosphorus_excreted"] = phosphorus
             return statistics, excretion
 
-        else:
+        elif general_properties.animal_type.is_cow:
             methane_emission = EntericMethaneCalculator.calculate_cow_methane(
                 general_properties.is_milking,
                 general_properties.body_weight,
@@ -127,3 +129,13 @@ class DigestiveSystem:
             statistics["methane_emission"] = methane_emission
             statistics["phosphorus_excreted"] = phosphorus
             return statistics, excretion
+        else:
+            info_map = {
+                "class": DigestiveSystem.__name__,
+                "function": DigestiveSystem.process_digestion.__name__,
+            }
+            om.add_error(
+                "Unsupported animal type",
+                f"Supported animal types are cow, heifer and calf. Got {general_properties.animal_type}",
+                info_map,
+            )
