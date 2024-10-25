@@ -56,7 +56,7 @@ class DigestiveSystem:
             Animal properties that are general or are used to determine many animal outcomes.
         animal_nutrient_property: AnimalGrowthProperties
             Animal properties that are related to animal nutrients.
-        milk_production_properties: ReproductionProperties
+        milk_production_properties: MilkProductionProperties
             Animal properties that are related to animal milk production.
 
         Returns
