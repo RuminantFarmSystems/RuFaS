@@ -2072,7 +2072,6 @@ def test_save_results(
     mock_output_manager.time = MagicMock()
     mock_output_manager.chunkification = chunkification
     mock_save_current_variable_pool = mocker.patch.object(mock_output_manager, "_save_current_variable_pool")
-    mock_sort_saved_chunk_files = mocker.patch.object(mock_output_manager, "_sort_saved_chunk_files")
     mock_load_saved_pools = mocker.patch.object(mock_output_manager, "load_saved_pools", return_value={})
 
     # Act
