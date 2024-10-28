@@ -112,7 +112,24 @@ class OutputManager(object):
     is_first_post_processing : bool, default True
         True if post-processing (i.e. filtering and saving variables) has not occurred yet. This variable is used during
         end-to-end testing to manage which filters are used during different post-processing runs.
-
+    chunkification : bool
+        Set to True to enable chunkification of the output variable pool.
+    saved_pool_chunks_num : int
+        The number of saved pool chunks.
+    saved_pool_chunks_path : Path | None
+        The path to the directory where saved pool chunks are stored.
+    available_memory : int
+        The available memory on the system.
+    average_add_variable_call_addition : int
+        The average memory usage increase per call to add_variable.
+    add_variable_call : int
+        The number of calls to add_variable().
+    save_chunk_threshold_call_count : int
+        The threshold add_variable_call count for saving pool chunk.
+    current_pool_size : int
+        The current size of the variables pool.
+    maximum_pool_size : float
+        The maximum allowed variable pool size.
     """
 
     __instance = None
