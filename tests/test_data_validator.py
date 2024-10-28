@@ -9,6 +9,11 @@ from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
 from RUFAS.output_manager import OutputManager
 
 
+@pytest.fixture
+def output_manager() -> OutputManager:
+    return OutputManager()
+
+
 def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
     return {
         "element1": [1, 2, 3],
@@ -59,7 +64,7 @@ def test_bool_type_validator(
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=input_data_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
 
     # Act
     result = DataValidator._bool_type_validator(
@@ -171,7 +176,7 @@ def test_string_type_validator(
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=dummy_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
-    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
 
     result = DataValidator._string_type_validator(
         var_path,
@@ -851,7 +856,7 @@ def test_object_type_validator(
     # Arrange
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_validate_return)
-    mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+    mocker.patch.object(OutputManager, "add_warning")
     mock_elements_counter = mocker.MagicMock()
 
     # Act
@@ -885,7 +890,7 @@ def test_object_type_validator_key_removal(
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=data)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
     mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy path")
-    add_warning = mocker.patch("RUFAS.input_manager.om.add_warning", return_value=None)
+    add_warning = mocker.patch.object(OutputManager, "add_warning")
     mock_elements_counter = mocker.MagicMock()
     variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
     violation_msg = "Violates properties defined in metadata properties section 'properties blob'."
@@ -970,7 +975,7 @@ def test_validate_array_container_properties(
     """
 
     # Arrange
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
+    patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
 
     # Act
     result = DataValidator._validate_array_container_properties(
