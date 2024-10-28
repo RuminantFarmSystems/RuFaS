@@ -2415,7 +2415,7 @@ def test_add_variable_to_pool_nested(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool_nested)
     mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_add_variable_to_pool_nested)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
-    mocker.patch.object(OutputManager,"add_log")
+    mocker.patch.object(OutputManager, "add_log")
     patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
     mocker.patch.object(OutputManager, "add_error")
 
