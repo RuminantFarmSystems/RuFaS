@@ -130,12 +130,13 @@ class DigestiveSystem:
             statistics["phosphorus_excreted"] = phosphorus
             return statistics, excretion
         else:
+            supported_animal: list[str] = ["Calf", "HeiferI", "HeiferI", "HeiferII", "HeiferIII", "DryCow", "LacCow"]
             info_map = {
                 "class": DigestiveSystem.__name__,
                 "function": DigestiveSystem.process_digestion.__name__,
             }
             om.add_error(
                 "Unsupported animal type",
-                f"Supported animal types are cow, heifer and calf. Got {general_properties.animal_type}",
+                f"Supported animal types are {supported_animal}. Got {general_properties.animal_type}",
                 info_map,
             )
