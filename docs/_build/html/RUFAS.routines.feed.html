@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.feed package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -61,9 +59,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -74,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -111,13 +110,13 @@
 <section id="module-RUFAS.routines.feed.carbon_loss">
 <span id="rufas-routines-feed-carbon-loss-module"></span><h2>RUFAS.routines.feed.carbon_loss module<a class="headerlink" href="#module-RUFAS.routines.feed.carbon_loss" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.carbon_loss.feed_out_loss">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.carbon_loss.</span></span><span class="sig-name descname"><span class="pre">feed_out_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.carbon_loss.feed_out_loss" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.carbon_loss.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.carbon_loss.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.carbon_loss.update_all" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
-<dt>Description:</dt><dd><p>Carbon loss during feed out
+<dt>Description:</dt><dd><p>The only external function call. Runs the carbon loss sub-module
 “pseudocode_feed” F.1.3</p>
 </dd>
-<dt>Args:</dt><dd><p>storage</p>
+<dt>Args:</dt><dd><p>storage: the storage receptacle for which loss is being calculated</p>
 </dd>
 </dl>
 </dd></dl>
@@ -147,13 +146,13 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.carbon_loss.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.carbon_loss.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.carbon_loss.update_all" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.carbon_loss.feed_out_loss">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.carbon_loss.</span></span><span class="sig-name descname"><span class="pre">feed_out_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.carbon_loss.feed_out_loss" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
-<dt>Description:</dt><dd><p>The only external function call. Runs the carbon loss sub-module
+<dt>Description:</dt><dd><p>Carbon loss during feed out
 “pseudocode_feed” F.1.3</p>
 </dd>
-<dt>Args:</dt><dd><p>storage: the storage receptacle for which loss is being calculated</p>
+<dt>Args:</dt><dd><p>storage</p>
 </dd>
 </dl>
 </dd></dl>
@@ -173,20 +172,64 @@
 </section>
 <section id="module-RUFAS.routines.feed.feed">
 <span id="rufas-routines-feed-feed-module"></span><h2>RUFAS.routines.feed.feed module<a class="headerlink" href="#module-RUFAS.routines.feed.feed" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.daily_feed_routine">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed.</span></span><span class="sig-name descname"><span class="pre">daily_feed_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.daily_feed_routine" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Executes the functions that run the daily feed routines for both storage
+and feed management.</p>
+</dd>
+<dt>Args:</dt><dd><p>feed: an instance of the Feed object
+fields: an instance of the Field object (contains harvest information)
+animal_manager: an instance of the AnimalManager object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.annual_feed_routine">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed.</span></span><span class="sig-name descname"><span class="pre">annual_feed_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.annual_feed_routine" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed.</span></span><span class="sig-name descname"><span class="pre">Feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict" title="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict"><span class="pre">PurchasedFeedTypedDict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict" title="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict"><span class="pre">PurchasedFeedTypedDict</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Stores the information for the feeds managed by the farm, and the methods
+for storage.</p>
+</dd>
+<dt>Args:</dt><dd><p>data: the feed information from the input JSON file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.summarize_feed_storage">
+<span class="sig-name descname"><span class="pre">summarize_feed_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.summarize_feed_storage" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Summarize nutrients and losses over the managed storage receptacles</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.Storage">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Storage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.Storage" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.Storage.calculate_losses">
-<span class="sig-name descname"><span class="pre">calculate_losses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.Storage.calculate_losses" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.Storage.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.Storage.__init__" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
-<dt>Description:</dt><dd><p>Calculates mineral losses for the storage method once all crops are stored
-“pseudocode_feed” F.1.3</p>
+<dt>Description:</dt><dd><p>A subclass of feed storage specifying a single storage receptacle.</p>
+</dd>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>data: a dictionary containing information to define the storage</dt><dd><p>receptacle</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -217,15 +260,6 @@ the feed utilizing feed database functions</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.Storage.reset_storage">
-<span class="sig-name descname"><span class="pre">reset_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.Storage.reset_storage" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Storage class method resets receptacle to initial settings.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.Storage.store_crop">
 <span class="sig-name descname"><span class="pre">store_crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.Storage.store_crop" title="Link to this definition"></a></dt>
 <dd><dl>
@@ -242,40 +276,57 @@ crop: the crop to be stored,</p>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.add_to_available_feeds">
-<span class="sig-name descname"><span class="pre">add_to_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_grown_feeds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DM_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NDF_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.add_to_available_feeds" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.Storage.calculate_losses">
+<span class="sig-name descname"><span class="pre">calculate_losses</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.Storage.calculate_losses" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
-<dt>Description:</dt><dd><p>Appends the nutrient values of new_grown_feeds to the available_feeds
-dictionary according to their quality (if applicable). If a feed is
-not split by quality, then the values at the respective indices of
-DM_list and NDF_list are ignored.</p>
-</dd>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>new_grown_feeds: the list of feed entries to be added to</dt><dd><p>available_feeds with nutrient values based on their quality</p>
-</dd>
-<dt>DM_list: the list of dry matter percentages for each feed in</dt><dd><p>new_grown_feeds (indices match up)</p>
-</dd>
-<dt>NDF_list: the list of NDF percentages for each feed in</dt><dd><p>new_grown_feeds (indices match up)</p>
-</dd>
-</dl>
+<dt>Description:</dt><dd><p>Calculates mineral losses for the storage method once all crops are stored
+“pseudocode_feed” F.1.3</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.daily_feed_management">
-<span class="sig-name descname"><span class="pre">daily_feed_management</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.daily_feed_management" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.Storage.reset_storage">
+<span class="sig-name descname"><span class="pre">reset_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.Storage.reset_storage" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
-<dt>Description:</dt><dd><p>Executes daily routines relating to feed management, specifically a
-daily feedout process and checking for new forages that need an
-inventory plan. If the list new_forages contains a forage which
-had been harvested at least 30 days ago, forage_inv_plan will be
-called.</p>
+<dt>Description:</dt><dd><p>Storage class method resets receptacle to initial settings.</p>
 </dd>
-<dt>Args:</dt><dd><p>animal_manager: The state of the AnimalManager class object</p>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.required_inventory">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">required_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.required_inventory" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Computes the required inventory necessary across all animals for a
+given forage based on the count of the animals, the body weight,
+and inclusion percent associated with the input forage. This class
+method for the feed class updates feed class variables along with class
+variables associated with the input storage object. Each calculation
+has a reference to the respective calculation in the pseudocode</p>
+</dd>
+<dt>Args:</dt><dd><p>storage: a storage object that contains forage being assessed
+animal_manager: the class object Animal Manager which tracks
+the state of the animals</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.forage_inventory_plan">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forage_inventory_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.forage_inventory_plan" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Assess farm grown forage stocks and plan maximum intake of each
+forage to ensure there is enough forage to last a FULL YEAR.
+Forage inventory is conducted at least 1x/year after harvest and
+then at a user specified number of times. This function calculates
+those values and stores it in the input storage object. Each calculation
+has a reference to its respective calculation in the pseudocode</p>
+</dd>
+<dt>Args:</dt><dd><p>storage: the storage object containing the forage being assessed</p>
 </dd>
 </dl>
 </dd></dl>
@@ -297,17 +348,26 @@ is generated.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.forage_inventory_plan">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">forage_inventory_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.forage_inventory_plan" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.daily_feed_management">
+<span class="sig-name descname"><span class="pre">daily_feed_management</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.daily_feed_management" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
-<dt>Description:</dt><dd><p>Assess farm grown forage stocks and plan maximum intake of each
-forage to ensure there is enough forage to last a FULL YEAR.
-Forage inventory is conducted at least 1x/year after harvest and
-then at a user specified number of times. This function calculates
-those values and stores it in the input storage object. Each calculation
-has a reference to its respective calculation in the pseudocode</p>
+<dt>Description:</dt><dd><p>Executes daily routines relating to feed management, specifically a
+daily feedout process and checking for new forages that need an
+inventory plan. If the list new_forages contains a forage which
+had been harvested at least 30 days ago, forage_inv_plan will be
+called.</p>
 </dd>
-<dt>Args:</dt><dd><p>storage: the storage object containing the forage being assessed</p>
+<dt>Args:</dt><dd><p>animal_manager: The state of the AnimalManager class object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.reset_feed_data">
+<span class="sig-name descname"><span class="pre">reset_feed_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.reset_feed_data" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Resets the accumulated data so they can be interpreted as annual sums.
+Option to reset feed storage model entirely each year.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -340,53 +400,83 @@ dictionaries with feed information:
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_calf_feeds">
-<span class="sig-name descname"><span class="pre">get_calf_feeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_calf_feeds" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_quality_specific_purchased_feed_ids">
+<span class="sig-name descname"><span class="pre">get_quality_specific_purchased_feed_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_quality_specific_purchased_feed_ids" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Constructs and returns a dictionary of the purchased feed IDs based on
+whether the quality of each feed can be determined at harvest.</p>
+</dd>
+<dt>Args:</dt><dd><p>entries: the purchased feed entries</p>
+</dd>
+<dt>Returns:</dt><dd><p>a dictionary where the keys are the feed entries and the keys are
+the feed IDs that can be used to find nutrient values in
+the nutrients table</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_feed_id">
-<span class="sig-name descname"><span class="pre">get_feed_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grown_feed_entry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NDF</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_feed_id" title="Link to this definition"></a></dt>
-<dd><dl>
-<dt>Description:</dt><dd><p>First queries the database to find which nutrient must be used to find
-the quality of the feed, then uses the feed’s value for that nutrient
-to find the quality by finding which range it belongs to. Returns
-the feed ID associated with that quality.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_quality_specific_feed_costs">
+<span class="sig-name descname"><span class="pre">get_quality_specific_feed_costs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_feed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_quality_specific_feed_costs" title="Link to this definition"></a></dt>
+<dd><p>Returns an updated version of the purchased feed costs dictionary.
+A purchased feed id key will be updated if it is in the list of entries
+split by mid-maturity.
+Args:</p>
+<blockquote>
+<div><p>input_feed_ids: A list of purchased feed ids.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>A dictionary that stores key-value pairs, where the keys are
+purchased feed ids (potentially updated) and the values are feed costs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.add_to_available_feeds">
+<span class="sig-name descname"><span class="pre">add_to_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_grown_feeds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">DM_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NDF_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.add_to_available_feeds" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>Appends the nutrient values of new_grown_feeds to the available_feeds
+dictionary according to their quality (if applicable). If a feed is
+not split by quality, then the values at the respective indices of
+DM_list and NDF_list are ignored.</p>
 </dd>
 <dt>Args:</dt><dd><dl class="simple">
-<dt>grown_feed_entry: the entry of the feed that needs to be added to</dt><dd><p>available_feeds</p>
+<dt>new_grown_feeds: the list of feed entries to be added to</dt><dd><p>available_feeds with nutrient values based on their quality</p>
+</dd>
+<dt>DM_list: the list of dry matter percentages for each feed in</dt><dd><p>new_grown_feeds (indices match up)</p>
+</dd>
+<dt>NDF_list: the list of NDF percentages for each feed in</dt><dd><p>new_grown_feeds (indices match up)</p>
 </dd>
 </dl>
-<p>DM: the dry matter percentage
-NDF: the NDF percentage</p>
 </dd>
 </dl>
-<p>Returns: the feed ID corresponding to the appropriate quality of the
-grown_feed_entry according to its specific differentiating nutrient</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_feed_quality">
-<span class="sig-name descname"><span class="pre">get_feed_quality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quality_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_feed_quality" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Queries the feed database, specifically the feed_quality table, to
-find the status of the feed based on the quality id. Returns the
-status of the feed (immature, mid-maturity, mature)</p>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.update_available_feed">
+<span class="sig-name descname"><span class="pre">update_available_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.update_available_feed" title="Link to this definition"></a></dt>
+<dd><dl>
+<dt>Description:</dt><dd><p>Updates the dictionary of available feeds with a particular nutrient
+value.</p>
 </dd>
-<dt>Args:</dt><dd><p>quality_id: The unique quality id of the feed</p>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>feed_id: string - the ID of the feed to be modified (string should</dt><dd><p>end in ‘g’ if it is a grown feed</p>
 </dd>
 </dl>
-<p>Returns: a string representation of the quality status</p>
+<p>nutrient: the nutrient to be modified
+new_val: the new value of the nutrient</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_feeds_split_by_maturity">
-<span class="sig-name descname"><span class="pre">get_feeds_split_by_maturity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_feeds_split_by_maturity" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.remove_from_available_feeds">
+<span class="sig-name descname"><span class="pre">remove_from_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds_to_be_removed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.remove_from_available_feeds" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
-<dt>Description:</dt><dd><p>Returns the feed entries in the database which have different qualities
-based on nutrient values at harvest.</p>
+<dt>Description:</dt><dd><p>Removes the IDs in feeds_to_be_removed from available_feeds.</p>
 </dd>
-<dt>Returns: a set-like list (no duplicates) of the entries listed in the</dt><dd><p>table which splits feeds by quality</p>
+<dt>Args:</dt><dd><p>feeds_to_be_removed: a list of feed IDs</p>
 </dd>
 </dl>
 </dd></dl>
@@ -410,127 +500,171 @@ the values are nutrient dictionaries</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_quality_specific_feed_costs">
-<span class="sig-name descname"><span class="pre">get_quality_specific_feed_costs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_feed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_quality_specific_feed_costs" title="Link to this definition"></a></dt>
-<dd><p>Returns an updated version of the purchased feed costs dictionary.
-A purchased feed id key will be updated if it is in the list of entries
-split by mid-maturity.
-Args:</p>
-<blockquote>
-<div><p>input_feed_ids: A list of purchased feed ids.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>Returns:</dt><dd><p>A dictionary that stores key-value pairs, where the keys are
-purchased feed ids (potentially updated) and the values are feed costs.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_quality_specific_purchased_feed_ids">
-<span class="sig-name descname"><span class="pre">get_quality_specific_purchased_feed_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_quality_specific_purchased_feed_ids" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Constructs and returns a dictionary of the purchased feed IDs based on
-whether the quality of each feed can be determined at harvest.</p>
-</dd>
-<dt>Args:</dt><dd><p>entries: the purchased feed entries</p>
-</dd>
-<dt>Returns:</dt><dd><p>a dictionary where the keys are the feed entries and the keys are
-the feed IDs that can be used to find nutrient values in
-the nutrients table</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.remove_from_available_feeds">
-<span class="sig-name descname"><span class="pre">remove_from_available_feeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feeds_to_be_removed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.remove_from_available_feeds" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Removes the IDs in feeds_to_be_removed from available_feeds.</p>
-</dd>
-<dt>Args:</dt><dd><p>feeds_to_be_removed: a list of feed IDs</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.required_inventory">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">required_inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.required_inventory" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Computes the required inventory necessary across all animals for a
-given forage based on the count of the animals, the body weight,
-and inclusion percent associated with the input forage. This class
-method for the feed class updates feed class variables along with class
-variables associated with the input storage object. Each calculation
-has a reference to the respective calculation in the pseudocode</p>
-</dd>
-<dt>Args:</dt><dd><p>storage: a storage object that contains forage being assessed
-animal_manager: the class object Animal Manager which tracks
-the state of the animals</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.reset_feed_data">
-<span class="sig-name descname"><span class="pre">reset_feed_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.reset_feed_data" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Resets the accumulated data so they can be interpreted as annual sums.
-Option to reset feed storage model entirely each year.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.summarize_feed_storage">
-<span class="sig-name descname"><span class="pre">summarize_feed_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.summarize_feed_storage" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Summarize nutrients and losses over the managed storage receptacles</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.update_available_feed">
-<span class="sig-name descname"><span class="pre">update_available_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nutrient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.update_available_feed" title="Link to this definition"></a></dt>
-<dd><dl>
-<dt>Description:</dt><dd><p>Updates the dictionary of available feeds with a particular nutrient
-value.</p>
-</dd>
-<dt>Args:</dt><dd><dl class="simple">
-<dt>feed_id: string - the ID of the feed to be modified (string should</dt><dd><p>end in ‘g’ if it is a grown feed</p>
-</dd>
-</dl>
-<p>nutrient: the nutrient to be modified
-new_val: the new value of the nutrient</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.annual_feed_routine">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed.</span></span><span class="sig-name descname"><span class="pre">annual_feed_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.annual_feed_routine" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed.get_calf_feeds">
+<span class="sig-name descname"><span class="pre">get_calf_feeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed.get_calf_feeds" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.daily_feed_routine">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed.</span></span><span class="sig-name descname"><span class="pre">daily_feed_routine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_manager</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.feed.daily_feed_routine" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>Executes the functions that run the daily feed routines for both storage
-and feed management.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed._pack_into_dict">
+<span class="sig-name descname"><span class="pre">_pack_into_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed._pack_into_dict" title="Link to this definition"></a></dt>
+<dd><p>Pack the provided variable names and values into a dictionary.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>var_names<span class="classifier">List[str]</span></dt><dd><p>List of keys for the resulting dictionary.</p>
 </dd>
-<dt>Args:</dt><dd><p>feed: an instance of the Feed object
-fields: an instance of the Field object (contains harvest information)
-animal_manager: an instance of the AnimalManager object</p>
+<dt>var_values<span class="classifier">List[Any]</span></dt><dd><p>Corresponding values for the keys specified in <cite>var_names</cite>.</p>
 </dd>
 </dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Dict[str, Any]</dt><dd><p>Dictionary constructed from the provided variable names and values.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the lengths of <cite>var_names</cite> and <cite>var_values</cite> are not the same.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>Ensure that both <cite>var_names</cite> and <cite>var_values</cite> have the same length.
+Each name in <cite>var_names</cite> will be paired with its corresponding value from <cite>var_values</cite>.</p>
+</section>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h3>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">_pack_into_dict</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="go">{&#39;a&#39;: 1, &#39;b&#39;: 2}</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed.Feed._retrieve_data">
+<span class="sig-name descname"><span class="pre">_retrieve_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_col</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.feed.feed.Feed._retrieve_data" title="Link to this definition"></a></dt>
+<dd><blockquote>
+<div><p>This function retrieves and filters the desired data, pack each “row” into a dictionary object, and returns a
+list of desired rows</p>
+<dl class="simple">
+<dt>data_source<span class="classifier">str</span></dt><dd><p>Path to retrieve the desired data from IM.</p>
+</dd>
+<dt>var_names<span class="classifier">List[str] = None</span></dt><dd><p>A list of desired variables (columns) to retrieve.
+If omitted, all existing columns are returned.</p>
+</dd>
+<dt>unique_value: bool = False</dt><dd><p>If True, returns only unique values. Default is False.</p>
+</dd>
+<dt>identifier: str = None</dt><dd><p>Column name used for filtering based on <cite>desired_rows</cite>.
+Both <cite>identifier</cite> and <cite>desired_rows</cite> must be provided for filtering.</p>
+</dd>
+<dt>desired_rows: List[Any] = None</dt><dd><p>Desired row values for filtering. Rows with these values in the <cite>identifier</cite> column are returned.</p>
+</dd>
+<dt>compare_val: int = None</dt><dd><p>Baseline value for comparison. Used with <cite>low_col</cite> and <cite>high_col</cite> to filter rows. The “compare_val” should
+fall in the range of [low_col_value, high_col_value], otherwise the current row will be ignored.</p>
+</dd>
+<dt>low_col: str = None</dt><dd><p>Column indicating the lower bound for comparison with <cite>compare_val</cite>.</p>
+</dd>
+<dt>high_col: str = None</dt><dd><p>Column indicating the upper bound for comparison with <cite>compare_val</cite>.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>List[Dict[str, Any]]</dt><dd><p>Returns a list of dictionaries, each dictionary corresponds to a row in the csv file.</p>
+</dd>
+</dl>
+</div></blockquote>
+<ol class="arabic simple">
+<li><p>Retrieve specific columns:</p></li>
+</ol>
+<blockquote>
+<div><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_data</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;NASEM_Comp&quot;</span><span class="p">,</span> <span class="n">var_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rufas_id&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="s2">&quot;feed_type&quot;</span><span class="p">])</span>
+<span class="go">Returns rows from the data source &quot;NASEM_Comp&quot; with columns &quot;rufas_id&quot;, &quot;Name&quot;, and &quot;feed_type&quot; packed into</span>
+<span class="go">dictionaries.</span>
+</pre></div>
+</div>
+<p>2. Filter by specific rows based on an identifier:
+&gt;&gt;&gt; self._retrieve_data(data_source=”NASEM_Comp”, identifier=”rufas_id”, desired_rows=[1, 2, 157])
+Returns rows where the “rufas_id” column has values 1, 2 or 157.</p>
+<p>3. Use a value for range comparison:
+&gt;&gt;&gt; self._retrieve_data(data_source=”NASEM_Comp”, compare_val=5, low_col=”lower_limit”, high_col=”limit”)
+Returns rows where the “compare_val” of 5 lies between the values in columns “lower_limit” and “limit”.</p>
+<p>4. Retrieve unique values from specified columns:
+&gt;&gt;&gt; self._retrieve_data(data_source=”NASEM_Comp”, var_names=[“rufas_id”, “Name”], unique_value=True)
+Returns unique rows (based on “rufas_id” and “Name” columns) from the data source “NASEM_Comp”.</p>
+<p>5. No filters or specific columns, retrieve all data:
+&gt;&gt;&gt; self._retrieve_data(data_source=”NASEM_Comp”)
+Returns all rows from the data source “NASEM_Comp” with all columns packed into dictionaries.</p>
+<p>6. Filtering with range comparison and specific desired rows:
+&gt;&gt;&gt; self._retrieve_data(data_source=”NASEM_Comp”, identifier=”feed_type”, desired_rows=[“Conc”],
+compare_val=10, low_col=”lower_limit”, high_col=”limit”)</p>
+<p>Returns rows where the “feed_type” column has values “Conc” and where the value 10 lies between the values in
+columns “lower_limit” and “limit”.</p>
+</div></blockquote>
+</dd></dl>
+
 </dd></dl>
 
 </section>
 <section id="module-RUFAS.routines.feed.feed_typed_dicts">
 <span id="rufas-routines-feed-feed-typed-dicts-module"></span><h2>RUFAS.routines.feed.feed_typed_dicts module<a class="headerlink" href="#module-RUFAS.routines.feed.feed_typed_dicts" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed_typed_dicts.</span></span><span class="sig-name descname"><span class="pre">StorageOption</span></span><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<p>Lists all the expected keys and their value types present in the configuration
+data dictionary for different storage options. Whenever an unexpected key or
+an invalid value type is used, the editor should flag with a warning.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.storage_type">
+<span class="sig-name descname"><span class="pre">storage_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.storage_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.moisture">
+<span class="sig-name descname"><span class="pre">moisture</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.moisture" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.additive">
+<span class="sig-name descname"><span class="pre">additive</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.additive" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.packing_density">
+<span class="sig-name descname"><span class="pre">packing_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.packing_density" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.inoculation">
+<span class="sig-name descname"><span class="pre">inoculation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.inoculation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.bunk_type">
+<span class="sig-name descname"><span class="pre">bunk_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.bunk_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.ventilation">
+<span class="sig-name descname"><span class="pre">ventilation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.ventilation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.removal_rate">
+<span class="sig-name descname"><span class="pre">removal_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.removal_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.initial_dry_matter">
+<span class="sig-name descname"><span class="pre">initial_dry_matter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.initial_dry_matter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed_typed_dicts.</span></span><span class="sig-name descname"><span class="pre">PurchasedFeedTypedDict</span></span><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict" title="Link to this definition"></a></dt>
@@ -539,28 +673,8 @@ animal_manager: an instance of the AnimalManager object</p>
 purchased_feed.json or the like. Whenever an unexpected key or
 an invalid value type is used, the editor should flag with a warning.</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.calf_feeds">
-<span class="sig-name descname"><span class="pre">calf_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.calf_feeds" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.close_up_feeds">
-<span class="sig-name descname"><span class="pre">close_up_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.close_up_feeds" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.farm_grown_feeds">
-<span class="sig-name descname"><span class="pre">farm_grown_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.farm_grown_feeds" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feed_database">
 <span class="sig-name descname"><span class="pre">feed_database</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feed_database" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feed_quality_table">
-<span class="sig-name descname"><span class="pre">feed_quality_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.feed_quality_table" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -569,18 +683,28 @@ an invalid value type is used, the editor should flag with a warning.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.nutrient_table">
+<span class="sig-name descname"><span class="pre">nutrient_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.nutrient_table" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.calf_feeds">
+<span class="sig-name descname"><span class="pre">calf_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.calf_feeds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.growing_feeds">
 <span class="sig-name descname"><span class="pre">growing_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.growing_feeds" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.lac_cow_feeds">
-<span class="sig-name descname"><span class="pre">lac_cow_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.lac_cow_feeds" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.close_up_feeds">
+<span class="sig-name descname"><span class="pre">close_up_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.close_up_feeds" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.nutrient_table">
-<span class="sig-name descname"><span class="pre">nutrient_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.nutrient_table" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.lac_cow_feeds">
+<span class="sig-name descname"><span class="pre">lac_cow_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.lac_cow_feeds" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -591,6 +715,11 @@ an invalid value type is used, the editor should flag with a warning.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds_costs">
 <span class="sig-name descname"><span class="pre">purchased_feeds_costs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.purchased_feeds_costs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.farm_grown_feeds">
+<span class="sig-name descname"><span class="pre">farm_grown_feeds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.PurchasedFeedTypedDict.farm_grown_feeds" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -605,63 +734,21 @@ an invalid value type is used, the editor should flag with a warning.</p>
 
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.feed_typed_dicts.</span></span><span class="sig-name descname"><span class="pre">StorageOption</span></span><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
-<p>Lists all the expected keys and their value types present in the configuration
-data dictionary for different storage options. Whenever an unexpected key or
-an invalid value type is used, the editor should flag with a warning.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.additive">
-<span class="sig-name descname"><span class="pre">additive</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.additive" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.bunk_type">
-<span class="sig-name descname"><span class="pre">bunk_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.bunk_type" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.initial_dry_matter">
-<span class="sig-name descname"><span class="pre">initial_dry_matter</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.initial_dry_matter" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.inoculation">
-<span class="sig-name descname"><span class="pre">inoculation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.inoculation" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.moisture">
-<span class="sig-name descname"><span class="pre">moisture</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.moisture" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.packing_density">
-<span class="sig-name descname"><span class="pre">packing_density</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.packing_density" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.removal_rate">
-<span class="sig-name descname"><span class="pre">removal_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.removal_rate" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.storage_type">
-<span class="sig-name descname"><span class="pre">storage_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.storage_type" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.feed_typed_dicts.StorageOption.ventilation">
-<span class="sig-name descname"><span class="pre">ventilation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#RUFAS.routines.feed.feed_typed_dicts.StorageOption.ventilation" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </section>
 <section id="module-RUFAS.routines.feed.nitrogen_loss">
 <span id="rufas-routines-feed-nitrogen-loss-module"></span><h2>RUFAS.routines.feed.nitrogen_loss module<a class="headerlink" href="#module-RUFAS.routines.feed.nitrogen_loss" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="RUFAS.routines.feed.nitrogen_loss.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.nitrogen_loss.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.nitrogen_loss.update_all" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Description:</dt><dd><p>The only external function call. Runs the nitrogen loss sub-module
+“pseudocode_feed” F.1.3</p>
+</dd>
+<dt>Args:</dt><dd><p>storage: the storage receptacle for which loss is being calculated</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="RUFAS.routines.feed.nitrogen_loss.CP_loss">
 <span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.nitrogen_loss.</span></span><span class="sig-name descname"><span class="pre">CP_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.nitrogen_loss.CP_loss" title="Link to this definition"></a></dt>
@@ -698,30 +785,18 @@ an invalid value type is used, the editor should flag with a warning.</p>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.nitrogen_loss.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.nitrogen_loss.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.nitrogen_loss.update_all" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>Description:</dt><dd><p>The only external function call. Runs the nitrogen loss sub-module
-“pseudocode_feed” F.1.3</p>
-</dd>
-<dt>Args:</dt><dd><p>storage: the storage receptacle for which loss is being calculated</p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="module-RUFAS.routines.feed.protein_degradation">
 <span id="rufas-routines-feed-protein-degradation-module"></span><h2>RUFAS.routines.feed.protein_degradation module<a class="headerlink" href="#module-RUFAS.routines.feed.protein_degradation" title="Link to this heading"></a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.protein_degradation.degrade_protein">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.protein_degradation.</span></span><span class="sig-name descname"><span class="pre">degrade_protein</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.protein_degradation.degrade_protein" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.protein_degradation.update_all">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.protein_degradation.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.protein_degradation.update_all" title="Link to this definition"></a></dt>
 <dd><p>Description:</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="RUFAS.routines.feed.protein_degradation.update_all">
-<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.protein_degradation.</span></span><span class="sig-name descname"><span class="pre">update_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.protein_degradation.update_all" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="RUFAS.routines.feed.protein_degradation.degrade_protein">
+<span class="sig-prename descclassname"><span class="pre">RUFAS.routines.feed.protein_degradation.</span></span><span class="sig-name descname"><span class="pre">degrade_protein</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.feed.protein_degradation.degrade_protein" title="Link to this definition"></a></dt>
 <dd><p>Description:</p>
 </dd></dl>
 
