@@ -67,7 +67,7 @@ class ManureExcretionCalculator:
         non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
         manure_nitrogen = (
-            112.55 * dry_matter_intake * (crude_protein_concentration / 100)
+            112.55 * dry_matter_intake * (crude_protein_concentration * GeneralConstants.PERCENTAGE_TO_FRACTION)
         ) * GeneralConstants.GRAMS_TO_KG
 
         urine_nitrogen = 0.45 * manure_nitrogen
@@ -189,7 +189,7 @@ class ManureExcretionCalculator:
             + 0.83
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
             * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-            / GeneralConstants.FRACTION_TO_PERCENTAGE
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
         fecal_nitrogen = (
@@ -197,7 +197,7 @@ class ManureExcretionCalculator:
             + 0.317
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
             * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-            / GeneralConstants.FRACTION_TO_PERCENTAGE
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
@@ -210,7 +210,7 @@ class ManureExcretionCalculator:
 
         potassium = (
             dry_matter_intake
-            * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
+            * (potassium_concentration * GeneralConstants.PERCENTAGE_TO_FRACTION)
             * GeneralConstants.KG_TO_GRAMS
         )
 
@@ -289,7 +289,7 @@ class ManureExcretionCalculator:
         Returns
         -------
         float
-        Total amount of phosphorus excreted by the given animal (g).
+            Total amount of phosphorus excreted by the given animal (g).
 
         AnimalManureExcretions
             A dictionary that contains the manure excretion values as specified
@@ -414,7 +414,7 @@ class ManureExcretionCalculator:
             + 0.654
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
             * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-            / GeneralConstants.FRACTION_TO_PERCENTAGE
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
@@ -447,7 +447,7 @@ class ManureExcretionCalculator:
         manure_total_ammoniacal_nitrogen = urine_nitrogen
 
         potassium = (
-            7.21 * dry_matter_intake + 15944 * potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE - 164.5
+            7.21 * dry_matter_intake + 15944 * potassium_concentration * GeneralConstants.PERCENTAGE_TO_FRACTION - 164.5
         )
 
         phosphorus_excretion_values = ManureExcretionCalculator._calculate_phosphorus_excretion_values(
@@ -567,7 +567,7 @@ class ManureExcretionCalculator:
         organic_matter_intake = (
             dry_matter_intake
             * (GeneralConstants.FRACTION_TO_PERCENTAGE - ash_concentration)
-            / GeneralConstants.FRACTION_TO_PERCENTAGE
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         )
 
         total_volatile_solids = (
@@ -599,7 +599,7 @@ class ManureExcretionCalculator:
             + 0.317
             * (dry_matter_intake * GeneralConstants.KG_TO_GRAMS)
             * (crude_protein_concentration * GeneralConstants.PROTEIN_TO_NITROGEN)
-            / GeneralConstants.FRACTION_TO_PERCENTAGE
+            * GeneralConstants.PERCENTAGE_TO_FRACTION
         ) * GeneralConstants.GRAMS_TO_KG
 
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
@@ -612,7 +612,7 @@ class ManureExcretionCalculator:
 
         potassium = (
             dry_matter_intake
-            * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
+            * (potassium_concentration * GeneralConstants.PERCENTAGE_TO_FRACTION)
             * GeneralConstants.KG_TO_GRAMS
         )
 
