@@ -68,7 +68,9 @@ def test_setup_string_schema(
     mocker: MockerFixture, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
     """Tests that setup string schema correctly handles a valid string property."""
-    mocked_get_options = mocker.patch.object(DataCollectionAppUpdater, "_get_list_of_options", return_value=["one", "two"])
+    mocked_get_options = mocker.patch.object(
+        DataCollectionAppUpdater, "_get_list_of_options", return_value=["one", "two"]
+    )
 
     actual = DataCollectionAppUpdater.setup_string_schema(title, properties)
 
@@ -381,7 +383,7 @@ def test_setup_array_schema(
                     "default": "HO",
                     "pattern": "^(HO|JE)$",
                     "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein "
-                                   "or Jersey)",
+                    "or Jersey)",
                 },
             },
             {
@@ -408,7 +410,7 @@ def test_setup_array_schema(
                             "grid_columns": 12,
                             "inputAttributes": {"class": "text-primary form-control"},
                             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd "
-                                        "(Holstein or Jersey)",
+                            "(Holstein or Jersey)",
                         },
                         "default": "HO",
                         "enum": ["HO", "JE"],
@@ -475,7 +477,8 @@ def test_generate_schema(mocker: MockerFixture) -> None:
     assert patch_json_dump.call_count == 1
 
     patch_object_schema_setup = mocker.patch(
-        "RUFAS.data_collection_app_updater.DataCollectionAppUpdater.setup_object_schema", side_effect=ValueError("Oh no!")
+        "RUFAS.data_collection_app_updater.DataCollectionAppUpdater.setup_object_schema",
+        side_effect=ValueError("Oh no!"),
     )
 
     data_collection_app_updater.generate_schemas(None, None)
