@@ -50,10 +50,13 @@ class EntericMethaneCalculator:
         float
             Amount of methane emission for heifer (g/day).
 
+        References
+        ----------
+        IPCC tier 2 calculation: [A.3B.C.2]
+
         """
         methane_emission = 0.0
         if methane_model:
-            # Default: IPCC Tier 2
             crude_protein_concentration = nutrient_concentrations["CP"]
             ethyl_ester_concentration = nutrient_concentrations["EE"]
             neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
@@ -69,7 +72,7 @@ class EntericMethaneCalculator:
                 + 0.522 * ethyl_ester_concentration
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
-            )  # [A.3B.C.2]
+            )
             methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565  # [A.3B.C.3]
 
         return methane_emission
@@ -197,6 +200,14 @@ class EntericMethaneCalculator:
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
+        References
+        ----------
+        Mutian calculation: [A.3E.C.1]
+        Mills calculation: [A.3E.C.2]
+        IPCC calculation: [A.3B.C.2]
+        gross energy concentration calculation: Moraes et al. 2014
+        Methane emission calculation: [A.3B.C.3]
+
         """
         dry_matter_intake = nutrient_amounts["dm"]
         ash_concentration = nutrient_concentrations["ash"]
@@ -206,7 +217,7 @@ class EntericMethaneCalculator:
         ethyl_ester_concentration = nutrient_concentrations["EE"]
         starch_concentration = nutrient_concentrations["starch"]
         methane_emission = 0.0
-        if methane_model == "Mutian":  # [A.3E.C.1]
+        if methane_model == "Mutian":
             methane_emission = (
                 -126
                 + 11.3 * dry_matter_intake
@@ -215,15 +226,14 @@ class EntericMethaneCalculator:
                 + 0.148 * body_weight
             )
 
-        elif methane_model == "Mills":  # [A.3E.C.2]
+        elif methane_model == "Mills":
             starch_to_acid_detergent_fiber_concentration_ratio = (
                 -0.0011 * starch_concentration / acid_detergent_fiber_concentrations
             )
             temp = -(starch_to_acid_detergent_fiber_concentration_ratio + 0.0045) * metabolizable_energy_intake * 4.184
             methane_emission = 45.98 * (1 - exp(temp)) / 0.05565
 
-        elif methane_model == "IPCC":  # IPCC
-            # Calculating gross energy concentration (Moraes et al. 2014)
+        elif methane_model == "IPCC":
             soluble_residue = (
                 GeneralConstants.FRACTION_TO_PERCENTAGE
                 - ash_concentration
@@ -236,8 +246,8 @@ class EntericMethaneCalculator:
                 + 0.522 * ethyl_ester_concentration
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
-            )  # [A.3B.C.2]
-            methane_emission = 0.065 * gross_energy_concentration * dry_matter_intake / 0.05565  # [A.3B.C.3]
+            )
+            methane_emission = 0.065 * gross_energy_concentration * dry_matter_intake / 0.05565
 
         return methane_emission
 
@@ -272,6 +282,11 @@ class EntericMethaneCalculator:
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
+        References
+        ----------
+        Mills calculation: [A.3E.C.2]
+        IPCC tier2 calculation: [A.3B.C.2]
+
         """
         dry_matter_intake = nutrient_amounts["dm"]
         ash_concentration = nutrient_concentrations["ash"]
@@ -287,7 +302,6 @@ class EntericMethaneCalculator:
             - ethyl_ester_concentration
         )
         if methane_model == "Mills":
-            # Methane model = 'Mills' [A.3E.C.2]
             methane_emission = (
                 45.98
                 - 45.98
@@ -298,13 +312,12 @@ class EntericMethaneCalculator:
                 )
             ) / 0.05565
         else:
-            # Default: IPCC Tier 2
             gross_energy_concentration = (
                 0.263 * crude_protein_concentration
                 + 0.522 * ethyl_ester_concentration
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
-            )  # [A.3B.C.2]
+            )
             methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565  # [A.3B.C.3]
 
         return methane_emission
