@@ -47,10 +47,11 @@ class AnimalBase:
                         args.wean_weight: the wean weight of the animal
                         args.mature_body_weight: the mature body weight of the animal
                         args.events: events of the animal
+                        args.net_merit: The net merit value that represents the animal's genetic value in US Dollars.
         """
         self.id = args["id"]
         self.breed = args["breed"]
-        self.birth_date = args["birth_date"]
+        self.birth_date: str = args["birth_date"]
         self.days_born = args["days_born"]
         self.semen_used = self.config["semen_type"]
         self.culled = False
@@ -94,6 +95,7 @@ class AnimalBase:
             valine=0.0,
         )
         self.sold_at_day: int | None = None
+        self.net_merit: float = args.get("net_merit", 0.0)
         if "body_weight_history" in args:
             self.body_weight_history = args["body_weight_history"]
             self.pen_history = args["pen_history"]
