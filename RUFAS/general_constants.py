@@ -30,7 +30,7 @@ class GeneralConstants:
     """
 
     # Hardware related
-    BYTES_PER_GB = 1024 ** 3
+    BYTES_PER_GB = 1024**3
 
     # Length-related
     MM_TO_M = 0.001
