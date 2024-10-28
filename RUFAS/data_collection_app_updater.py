@@ -48,10 +48,7 @@ class DataCollectionAppUpdater:
             default location.
 
         """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.generate_schemas.__name__
-        }
+        info_map = {"class": self.__class__.__name__, "function": self.generate_schemas.__name__}
 
         path_to_properties = path_to_properties if path_to_properties else DEFAULT_PROPERTIES_PATH
 
@@ -109,12 +106,7 @@ class DataCollectionAppUpdater:
         schema = {
             "title": title,
             "type": "number",
-            "options": {
-                "grid_columns": 12,
-                "inputAttributes": {
-                    "class": "text-primary form-control"
-                }
-            }
+            "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
         }
         minimum = input_properties.get("minimum")
         maximum = input_properties.get("maximum")
@@ -154,12 +146,7 @@ class DataCollectionAppUpdater:
             "title": title,
             "type": "boolean",
             "format": "checkbox",
-            "options": {
-                "grid_columns": 12,
-                "inputAttributes": {
-                    "class": "text-primary form-control"
-                }
-            }
+            "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
         }
         default = input_properties.get("default")
         description = input_properties.get("description")
@@ -192,12 +179,7 @@ class DataCollectionAppUpdater:
         schema = {
             "title": title,
             "type": "string",
-            "options": {
-                "grid_columns": 12,
-                "inputAttributes": {
-                    "class": "text-primary form-control"
-                }
-            }
+            "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
         }
         default = input_properties.get("default")
         pattern = input_properties.get("pattern")
@@ -213,12 +195,12 @@ class DataCollectionAppUpdater:
             except ValueError as e:
                 info_map = {
                     "class": DataCollectionAppUpdater.__name__,
-                    "function": DataCollectionAppUpdater.setup_string_schema.__name__
+                    "function": DataCollectionAppUpdater.setup_string_schema.__name__,
                 }
                 om.add_error(
                     "Schema generation for string input encountered error",
                     f"Variable {title=} had error: {str(e)}",
-                    info_map
+                    info_map,
                 )
                 return schema
             schema["enum"] = enum
@@ -283,11 +265,7 @@ class DataCollectionAppUpdater:
             "title": title,
             "type": "array",
             "format": "grid",
-            "options": {
-                "inputAttributes": {
-                    "class": "text-primary form-control"
-                }
-            }
+            "options": {"inputAttributes": {"class": "text-primary form-control"}},
         }
         default = input_properties.get("default")
         description = input_properties.get("description")
@@ -323,12 +301,7 @@ class DataCollectionAppUpdater:
             Dictionary containing the input schema for this variable.
 
         """
-        schema = {
-            "title": title,
-            "type": "object",
-            "format": "grid",
-            "properties": {}
-        }
+        schema = {"title": title, "type": "object", "format": "grid", "properties": {}}
         default = input_properties.get("default")
         description = input_properties.get("description")
 
@@ -355,5 +328,5 @@ DATA_TYPE_TO_SCHEMA_SETUP_MAP: dict[str, Callable[[str, dict[str, Any]], dict[st
     "bool": DataCollectionAppUpdater.setup_bool_schema,
     "string": DataCollectionAppUpdater.setup_string_schema,
     "array": DataCollectionAppUpdater.setup_array_schema,
-    "object": DataCollectionAppUpdater.setup_object_schema
+    "object": DataCollectionAppUpdater.setup_object_schema,
 }
