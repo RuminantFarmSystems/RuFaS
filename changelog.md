@@ -36,9 +36,9 @@ v0.9.2
 - [1985](https://github.com/RuminantFarmSystems/MASM/pull/1985) - [minor change] [TaskManager] extracts all the input data values (for all input variables from JSON input files) for each task and combines them into a single CSV file for side-by-side comparison.
 - [2029](https://github.com/RuminantFarmSystems/MASM/pull/2029) - [minor change] [EEE] Adding tests for emission.py (2/2)
 - [2031](https://github.com/RuminantFarmSystems/MASM/pull/2031) - [minor change] [Formatting] Changes all relative import statements that import from higher-level modules to be absolute import statements.
+- [2033](https://github.com/RuminantFarmSystems/MASM/pull/2033) - [minor change] [InputManager] Consolidate methods for adding data to the Input Manager at runtime.
 - [2039](https://github.com/RuminantFarmSystems/MASM/pull/2039) - [minor change] [Animal][Testing] Renames AnimalNutrients to Nutrients and adds full unit testing coverage for this class.
 - [2014](https://github.com/RuminantFarmSystems/MASM/pull/2014) - [minor change] [Feed Storage] Fixes the Feed Storage mass degradation routines to properly account for mass and moisture loss, and updates E2E test suite to test these changes.
-
 
 ### v0.9.2
 
@@ -60,4 +60,3 @@ v0.9.2
 - [2001](https://github.com/RuminantFarmSystems/MASM/pull/2001) - [minor change] [E2E Testing] Changes E2ETestResultsComparer so that it constructs file paths properly on Windows machines.
 - [2010](https://github.com/RuminantFarmSystems/MASM/pull/2010) - [minor change] Updates liquid manure nitrogen input source used to calculate N2O emissions for manure storages.
 - [2002](https://github.com/RuminantFarmSystems/MASM/pull/2002) - [minor change] [Manure] Adds a method to determine the ambient inside barn temperature based on the outdoor air temperature for use in calculations of emissions associated with Manure Handlers.
-- [2009](https://github.com/RuminantFarmSystems/MASM/pull/2009) - [minor change] [Time][Feed Storage] Modifies the init of Time so that a time object can be created without needing config from IM. This in turn allows us to avoid deep copies used for time management.
