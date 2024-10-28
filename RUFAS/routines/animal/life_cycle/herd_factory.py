@@ -409,7 +409,7 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data(time)
 
         self.post_animal_population = self._random_sample_with_replacement()
-        self.im.add_dict_variable_to_pool(
+        self.im.add_variable_to_pool(
             variable_name="runtime_animal_population",
             data=self.post_animal_population.__repr__(),
             properties_blob_key="animal_population_properties",
