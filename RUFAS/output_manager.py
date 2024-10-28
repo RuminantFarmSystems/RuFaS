@@ -342,43 +342,6 @@ class OutputManager(object):
         self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
         self.saved_pool_chunks_num += 1
 
-    # def _load_and_filter_saved_pools(self, filters_dir_path: Path) -> None:
-    #     all_filters = self._load_all_filters(filters_dir_path)
-    #     list_of_dumped_files = self._sort_saved_chunk_files()
-
-    #     filtered_pool: dict[str, OutputManager.pool_element_type] = {}
-    #     for file in list_of_dumped_files:
-    #         self.load_variables_pool_from_file(file)
-    #         temp_filtered_pool: dict[str, OutputManager.pool_element_type] = {}
-    #         for filter_content in all_filters:
-    #             current_filter_result = self.filter_variables_pool(filter_content, False)
-    #             temp_filtered_pool = self._extend_variable_pool(temp_filtered_pool, current_filter_result)
-    #         filtered_pool = self._extend_variable_pool(filtered_pool, temp_filtered_pool)
-    #         self.variables_pool = {}
-
-    #     self.variables_pool = filtered_pool
-
-    def _load_all_filters(self, filters_dir_path: Path) -> list[dict[str, str | bool]]:
-        filter_list: list[dict[str, str | bool]] = []
-        filter_files_list = self._list_filter_files_in_dir(filters_dir_path)
-        for filter_file in filter_files_list:
-            filter_file_path = filters_dir_path / filter_file
-            filter_list += self._load_filter_file_content(filter_file_path)
-        return filter_list
-
-    def _extend_variable_pool(
-        self,
-        original_pool: dict[str, OutputManager.pool_element_type],
-        additional_pool: dict[str, OutputManager.pool_element_type],
-    ) -> dict[str, OutputManager.pool_element_type]:
-        for key, value in additional_pool.items():
-            if key in original_pool.keys():
-                original_pool[key]["info_maps"].extend(value["info_maps"])
-                original_pool[key]["values"].extend(value["values"])
-            else:
-                original_pool[key] = value
-        return original_pool
-
     def _stringify_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
         """
         Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
@@ -1078,7 +1041,7 @@ class OutputManager(object):
             raise
 
     def filter_variables_pool(
-        self, filter_content: Dict[str, Any], apply_slicing: bool = True
+        self, filter_content: Dict[str, Any],
     ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on options specified in filter_content.
@@ -1144,13 +1107,12 @@ class OutputManager(object):
                 error_msg = f"Unable to pad data for variables gathered for {filter_name=}."
                 self.add_error(error_title, error_msg, info_map)
 
-        if apply_slicing:
-            slice_start: int = filter_content.get("slice_start", 0)
-            slice_end: int | None = filter_content.get("slice_end")
-            for key in results.keys():
-                if "info_maps" in results[key].keys():
-                    results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
-                results[key]["values"] = results[key]["values"][slice_start:slice_end]
+        slice_start: int = filter_content.get("slice_start", 0)
+        slice_end: int | None = filter_content.get("slice_end")
+        for key in results.keys():
+            if "info_maps" in results[key].keys():
+                results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
+            results[key]["values"] = results[key]["values"][slice_start:slice_end]
 
         return results
 
@@ -1239,8 +1201,8 @@ class OutputManager(object):
         return list_of_dumped_files
 
     def load_saved_pools(
-        self, list_of_dumped_files: List[Path]
-    ) -> Dict[str, OutputManager.pool_element_type]:
+        self
+    ) -> None:
         """
         Filters saved pools of data by applying specific filter criteria.
 
@@ -1249,28 +1211,14 @@ class OutputManager(object):
         aggregated into a single dictionary,
         combining entries under the same key by extending lists of info_maps and values.
 
-        Parameters
-        ----------
-        filter_content : (Dict[str, Any])
-            A dictionary specifying the criteria used to filter the variables pools.
-
-        list_of_dumped_files: List[Path]
-            A list containing all chunks of the output variable pool to be filtered.
-
-        Returns
-        -------
-        Dict[str, OutputManager.pool_element_type]:
-            A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
-            under the saved_pool_chunks_path directory.
-
         Notes
         -----
         This function has a side effect that modifies the variable_pool of the OutputManager
         """
         filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+        list_of_dumped_files = self._sort_saved_chunk_files()
         for file in list_of_dumped_files:
             self.load_variables_pool_from_file(file)
-            # temp_filtered_pool = self.filter_variables_pool(filter_content)
             for key, value in self.variables_pool.items():
                 if key in filtered_pool.keys():
                     filtered_pool[key]["info_maps"].extend(value["info_maps"])

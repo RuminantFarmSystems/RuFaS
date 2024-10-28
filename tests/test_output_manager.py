@@ -1104,7 +1104,7 @@ def output_manager_original_method_states(
         "_stringify_units": mock_output_manager._stringify_units,
         "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
         "_sort_saved_chunk_files": mock_output_manager._sort_saved_chunk_files,
-        "filter_saved_pools": mock_output_manager.filter_saved_pools,
+        "load_saved_pools": mock_output_manager.load_saved_pools,
         "flush_pools": mock_output_manager.flush_pools,
         "set_exclude_info_maps_flag": mock_output_manager.set_exclude_info_maps_flag,
         "setup_pool_overflow_control": mock_output_manager.setup_pool_overflow_control,
@@ -2073,7 +2073,7 @@ def test_save_results(
     mock_output_manager.chunkification = chunkification
     mock_save_current_variable_pool = mocker.patch.object(mock_output_manager, "_save_current_variable_pool")
     mock_sort_saved_chunk_files = mocker.patch.object(mock_output_manager, "_sort_saved_chunk_files")
-    mock_filter_saved_pools = mocker.patch.object(mock_output_manager, "filter_saved_pools", return_value={})
+    mock_load_saved_pools = mocker.patch.object(mock_output_manager, "load_saved_pools", return_value={})
 
     # Act
     mock_output_manager.save_results(
@@ -2107,8 +2107,7 @@ def test_save_results(
         )
         if chunkification:
             mock_save_current_variable_pool.assert_called_once()
-            mock_sort_saved_chunk_files.assert_called()
-            mock_filter_saved_pools.assert_called()
+            mock_load_saved_pools.assert_called()
 
 
 @pytest.mark.parametrize(
@@ -2968,51 +2967,40 @@ def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> N
     ]
 
 
-def test_filter_saved_pools(
+def test_load_saved_pools(
     mock_output_manager: OutputManager,
-    tmpdir,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     expected = {
-        "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}, {}, {}, {}]},
+        "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}]},
         "b": {"values": ["a", "b", "c", "d", "e", "f"], "info_maps": [{}, {}, {}, {}, {}, {}]},
         "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
         "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
     }
-
-    mocker.patch.object(
-        mock_output_manager,
-        "filter_variables_pool",
-        side_effect=[
-            {
-                "a": {"values": [0, 1, 2], "info_maps": [{}, {}, {}]},
-                "b": {"values": ["a", "b", "c"], "info_maps": [{}, {}, {}]},
-                "c": {"values": [True, True, True], "info_maps": [{}, {}, {}]},
-            },
-            {
-                "a": {"values": [3, 4, 5], "info_maps": [{}, {}, {}]},
-                "b": {"values": ["d", "e", "f"], "info_maps": [{}, {}, {}]},
-                "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
-            },
-            {"a": {"values": [6, 7, 8], "info_maps": [{}, {}, {}]}},
-            expected,
-        ],
-    )
-
+    sorted_files = ["file1.json", "file2.json"]
+    mocker.patch.object(mock_output_manager, '_sort_saved_chunk_files', return_value=sorted_files)
     mocker.patch.object(mock_output_manager, "load_variables_pool_from_file")
 
-    list_of_dumped_files = [
-        tmpdir.join("saved_pool_1_dummy_timestamp.json").write("File 1 content"),
-        tmpdir.join("saved_pool_0_dummy_timestamp.json").write("File 0 content"),
-        tmpdir.join("saved_pool_3_dummy_timestamp.json").write("File 3 content"),
-    ]
+    mock_pools = {
+        "file1.json": {
+            "a": {"info_maps": [{}, {}], "values": [0, 1]},
+            "b": {"info_maps": [{}, {}], "values": ["a", "b"]},
+            "c": {"info_maps": [{}], "values": [True]},
+        },
+        "file2.json": {
+            "a": {"info_maps": [{}, {}, {}, {}], "values": [2, 3, 4, 5, 6, 7, 8]},
+            "b": {"info_maps": [{}, {}, {}, {}], "values": ["c", "d", "e", "f"]},
+            "c": {"info_maps": [{}, {}], "values": [True, True]},
+            "d": {"info_maps": [{}, {}, {}], "values": [1.1, 2.2, 3.3]},
+        }
+    }
 
-    result = mock_output_manager.filter_saved_pools(
-        filter_content={"dummy": "filter"}, list_of_dumped_files=list_of_dumped_files
-    )
+    load_mock = mocker.patch.object(mock_output_manager, 'load_variables_pool_from_file')
+    load_mock.side_effect = lambda file: setattr(mock_output_manager, 'variables_pool', mock_pools[file])
 
-    assert result == expected
+    mock_output_manager.load_saved_pools()
+
+    assert mock_output_manager.variables_pool == expected
 
 
 def test_run_startup_sequence_clear_output_directory(

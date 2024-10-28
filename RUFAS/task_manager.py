@@ -587,6 +587,7 @@ class TaskManager:
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts(task_id)
+        input_manager.flush_pool()
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
