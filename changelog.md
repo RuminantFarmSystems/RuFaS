@@ -32,6 +32,7 @@ v0.9.2
 - [2017](https://github.com/RuminantFarmSystems/MASM/pull/2017) - [minor change] [Animal] Deduplicates references to lactation parameters in the `LactationCurve` submodule and reorganizes structure to be consistent with other animal submodules.
 - [1985](https://github.com/RuminantFarmSystems/MASM/pull/1985) - [minor change] [TaskManager] extracts all the input data values (for all input variables from JSON input files) for each task and combines them into a single CSV file for side-by-side comparison.
 - [2031](https://github.com/RuminantFarmSystems/MASM/pull/2031) - [minor change] [Formatting] Changes all relative import statements that import from higher-level modules to be absolute import statements.
+- [1887](https://github.com/RuminantFarmSystems/MASM/pull/1887) - [minor change] [Animal Module] Adds error in cases where calf birth weights are negative.
 
 ### v0.9.2
 
