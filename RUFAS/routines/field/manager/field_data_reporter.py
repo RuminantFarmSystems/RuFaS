@@ -968,12 +968,12 @@ class FieldDataReporter:
             self.om.add_variable(
                 "annual_decomposed_grazing_manure",
                 field.soil.data.grazing_manure.annual_decomposed_manure,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
             self.om.add_variable(
                 "annual_decomposed_machine_manure",
                 field.soil.data.machine_manure.annual_decomposed_manure,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
             )
 
             # ----------------------------adding layer data
