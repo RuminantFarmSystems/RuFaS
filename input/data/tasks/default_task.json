@@ -7,32 +7,6 @@
       "output_prefix": "default",
       "log_verbosity": "errors",
       "random_seed": 42
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "max_memory",
-      "log_verbosity": "errors",
-      "random_seed": 42,
-      "chunkification": true,
-      "maximum_memory_usage": 800000000
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "call_count_thresh",
-      "log_verbosity": "errors",
-      "random_seed": 42,
-      "chunkification": true,
-      "save_chunk_threshold_call_count": 1000000
-    },
-    {
-      "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "chunkification_no_frills",
-      "log_verbosity": "errors",
-      "random_seed": 42,
-      "chunkification": true
     }
   ]
 }
