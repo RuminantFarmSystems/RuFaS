@@ -39,40 +39,39 @@ class ManureExcretionCalculator:
             A dictionary that contains the manure excretion values as specified
                 in the AnimalManureExcretions class definition.
 
+        References
+        ----------
+        Calf feces and urine excreted amount calculation: [A.3A.A.1]
+        Total urine calculation: [A.3A.A.2]
+        Calf dry material excretion amount calculation: [A.3A.A.3]
+        Total volatile solids calculation: [A.3A.A.4]
+        Degradable volatile solids calculation: [A.3A.A.5]
+        Non-degradable volatile solids calculation: [A.3A.A.6]
+        Calf nitrogen excretion amount calculation: [A.3A.B.1]
+        Calf urine nitrogen excretion amount calculation: [A.3A.B.2]
+
         """
         dry_matter_intake = nutrient_amounts["dm"]
         crude_protein_concentration = nutrient_concentrations["CP"]
 
-        # Manure excretion
-        # Amount of feces and urine excreted daily by the calf, kg [A.3A.A.1]
         total_manure_excreted = 3.45 * dry_matter_intake
 
-        # Total urine, kg [A.3A.A.2]
         urine = 2.0
 
-        # Total solids excretion
-        # Amount of dry material excreted by the calf, kg [A.3A.A.3]
         total_solids = 0.393 * dry_matter_intake
 
-        # Total volatile solids, kg/day [A.3A.A.4]
         total_volatile_solids = 0.0023 * body_weight
 
-        # Degradable volatile solids, kg/day [A.3A.A.5]
         degradable_volatile_solids = 0.9 * total_volatile_solids
 
-        # Non-degradable volatile solids, kg/day [A.3A.A.6]
         non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-        # Nitrogen excretion
-        # Amount of nitrogen excreted by the calf, kg [A.3A.B.1]
         manure_nitrogen = (
             112.55 * dry_matter_intake * (crude_protein_concentration / 100)
         ) * GeneralConstants.GRAMS_TO_KG
 
-        # Amount of urine nitrogen excreted by a calf, kg [A.3A.B.2]
         urine_nitrogen = 0.45 * manure_nitrogen
 
-        # Total ammoniacal N in manure, kg
         manure_total_ammoniacal_nitrogen = urine_nitrogen
 
         phosphorus_excretion_values = ManureExcretionCalculator._calculate_phosphorus_excretion_values(
@@ -149,6 +148,22 @@ class ManureExcretionCalculator:
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
+        References
+        ----------
+        Dietary percentage of soluble residues calculation: [A.3B.C.2]
+        Total urine calculation: [A.3B.A.1]
+        Growing heifer feces and urine excretion amount calculation: [A.3B.A.2]
+        Growing heifer dry material excretion amount calculation: [A.3F.A.3]
+        Total volatile solids calculation: [A.3B.A.3]
+        Degradable volatile solids calculation: [A.3A.A.5]
+        Non-degradable volatile solids calculations: [A.3A.A.6]
+        Nitrogen in liquid and solid manure calculation: [A.3B.B.1]
+        Nitrogen excretion in feces calculation: [A.3B.B.2]
+        Nitrogen excretion in urine calculation: [A.3B.B.3]
+        Urinary N concentration calculation: [A.3G.B.1]
+        Nitrogen concentration in urinary urea calculation: [A.3G.B.2]
+        Potassium excretion amount calculation: [A.3B.B.4]
+
         """
         # TODO: Same TODOs as in dry_cow_manure_excretion.py - GitHub Issue #1219
         nutrient_amounts = nutrient_amount
@@ -157,30 +172,18 @@ class ManureExcretionCalculator:
         crude_protein_concentration = nutrient_concentrations["CP"]
         potassium_concentration = nutrient_concentrations["potassium"]
 
-        # Soluble residue
-        # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
-
-        # Total urine, kg [A.3B.A.1]
         urine = 9.0
 
-        # Manure excretion
-        # Amount of feces and urine excreted daily by the growing heifer, kg [A.3B.A.2]
         total_manure_excreted = 4.158 * dry_matter_intake - 0.0246 * body_weight
 
-        # Total solids excretion
-        # Amount of dry material excreted by the growing heifer, kg [A.3F.A.3]
         total_solids = 0.178 * dry_matter_intake + 2.733
 
-        # Total volatile solids, kg [A.3B.A.3]
         total_volatile_solids = 0.0073 * body_weight
 
-        # Degradable volatile solids, kg [A.3A.A.5]
         degradable_volatile_solids = 0.9 * total_volatile_solids
 
-        # Non-degradable volatile solids, kg [A.3A.A.6]
         non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-        # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
         manure_nitrogen = (
             15.1
             + 0.83
@@ -189,7 +192,6 @@ class ManureExcretionCalculator:
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
-        # Nitrogen excretion in feces, kg [A.3B.B.2]
         fecal_nitrogen = (
             0.345
             + 0.317
@@ -198,18 +200,14 @@ class ManureExcretionCalculator:
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
-        # Nitrogen excretion in urine, kg [A.3B.B.3]
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
-        # Urinary N concentration, g N/kg [A.3G.B.1]
         urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
-        # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+
         urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-        # Total ammoniacal nitrogen in the manure slurry, kg
         manure_total_ammoniacal_nitrogen = urine_nitrogen
 
-        # Amount of potassium excreted, g [A.3B.B.4]
         potassium = (
             dry_matter_intake
             * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
@@ -366,6 +364,23 @@ class ManureExcretionCalculator:
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
+        References
+        ----------
+        Fecal water calculation: [A.3E.A.1]
+        Total solids calculation: [A.3E.A.2]
+        Total urine calculation: [A.3E.A.3]
+        Lactating cow feces and urine excretion amount calculation: [A.3E.A.4]
+        Total manure nitrogen calculation: [A.3E.B.1]
+        Fecal nitrogen calculation: [A.3B.B.2]
+        Urine nitrogen calculation: [A.3E.B.3]
+        Organic matter intake calculation: [A.2.A.3]
+        Degradable volatile solids calculation: [A.3E.A.5]
+        Total volatile solids calculation: [A.3E.A.6]
+        Non-degradable volatile solids calculation: [A.3A.A.6]
+        Urinary N concentration calculation: [A.3G.B.1]
+        Nitrogen concentration in urinary urea calculation: [A.3G.B.2]
+        Potassium excretion amount: [A.3E.B.3]
+
         """
         dry_matter_intake = nutrient_amounts["dm"]
         ash_diet_content = nutrient_amounts["ash"]
@@ -375,7 +390,6 @@ class ManureExcretionCalculator:
         neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
         potassium_concentration = nutrient_concentrations["potassium"]
 
-        # Fecal water, kg [A.3E.A.1]
         fecal_water = (
             1.987 * dry_matter_intake
             + 0.348 * acid_detergent_fiber_concentrations
@@ -384,8 +398,6 @@ class ManureExcretionCalculator:
             - 0.0057 * days_in_milk
         )
 
-        # Total Solids, kg [A.3E.A.2]
-        # The amount of fecal solids is assumed to be equivalent to the amount of total solids
         fecal_solids = (
             -0.576
             + 0.370 * dry_matter_intake
@@ -393,14 +405,10 @@ class ManureExcretionCalculator:
             + 0.059 * acid_detergent_fiber_concentrations
         )
 
-        # Total urine, kg [A.3E.A.3]
         urine = -7.742 + 0.388 * dry_matter_intake + 0.726 * crude_protein_concentration + 2.066 * milk_protein
 
-        # Manure excretion
-        # Amount of feces and urine excreted daily by the growing heifer, kg [A.3E.A.4]
         total_manure_excreted = fecal_water + fecal_solids + urine
 
-        # Total manure nitrogen, kg [A.3E.B.1]
         manure_nitrogen = (
             20.3
             + 0.654
@@ -409,17 +417,13 @@ class ManureExcretionCalculator:
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
-        # Fecal nitrogen, kg [A.3B.B.2]
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_LACT)
         fecal_nitrogen = (-18.5 + 10.1 * dry_matter_intake) * GeneralConstants.GRAMS_TO_KG
 
-        # Urine nitrogen, kg [A.3E.B.3]
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
-        # Organic matter intake, kg [A.2.A.3]
         organic_matter_intake = dry_matter_intake - ash_diet_content
 
-        # Degradable volatile solids, kg [A.3E.A.5]
         degradable_volatile_solids = (
             -1.017
             + 0.364 * organic_matter_intake
@@ -427,7 +431,6 @@ class ManureExcretionCalculator:
             - 0.023 * crude_protein_concentration
         )
 
-        # Total volatile solids, kg [A.3E.A.6]
         total_volatile_solids = (
             -1.201
             + 0.402 * organic_matter_intake
@@ -435,18 +438,14 @@ class ManureExcretionCalculator:
             - 0.024 * crude_protein_concentration
         )
 
-        # Non-degradable volatile solids, kg [A.3A.A.6]
         non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-        # Urinary N concentration, g N/kg [A.3G.B.1]
         urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
-        # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+
         urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-        # Total ammoniacal nitrogen in the manure slurry, kg
         manure_total_ammoniacal_nitrogen = urine_nitrogen
 
-        # Amount of potassium excreted, g [A.3E.B.3]
         potassium = (
             7.21 * dry_matter_intake + 15944 * potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE - 164.5
         )
@@ -526,6 +525,22 @@ class ManureExcretionCalculator:
         The dry matter ("dm") unit is kg per animal. Crude protein ("CP"), ADF, NDF, lignin, ash, phosphorus, potassium,
         and nitrogen ("N") are all percentages of dry matter.
 
+        References
+        ----------
+        Total urine calculation: [A.3F.A.1]
+        Dry cow feces and urine excretion amount calculation: [A.3F.A.2]
+        Dry cow dry material excretion calculation: [A.3F.A.3]
+        Organic matter intake calculation: [A.2.A.3]
+        Total volatile solids calculation: [A.3E.A.6]
+        Degradable volatile solids calculation: [A.3E.A.5]
+        Non-degradable volatile solids calculation: [A.3A.A.6]
+        Nitrogen in liquid and solid manure calculation: [A.3B.B.1]
+        Nitrogen excretion in feces calculation: [A.3B.B.2]
+        Nitrogen excretion in urine calculation: [A.3B.B.3]
+        Urinary N concentration calculation: [A.3G.B.1]
+        Nitrogen concentration in urinary urea calculation: [A.3G.B.2]
+        Potassium excretion amount calculation: [A.3B.B.4]
+
         """
         # TODO: Add TypedDicts for ration_formulation and available feeds - GitHub Issue #1218
         # TODO: Pass in available feeds directly instead of a Feed object - GitHub Issue #1218
@@ -535,18 +550,10 @@ class ManureExcretionCalculator:
         potassium_concentration = nutrient_concentrations["potassium"]
         ash_concentration = nutrient_concentrations["ash"]
         neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
-        # Soluble residue
-        # Dietary percentage of soluble residues, % DM, in the note of [A.3B.C.2]
-        # TODO: Further calculations to account for entire diet:- GitHub Issue #1218
-        # DMI: dry matter intake, kg
-        # DM: dietary dry matter, % of diet
-        # CP: dietary crude protein, % of DM
 
-        # Total urine, kg [A.3F.A.1]
+        # TODO: Further calculations to account for entire diet:- GitHub Issue #1218
         urine = 15.4
 
-        # Manure excretion
-        # Amount of feces and urine excreted daily by the dry cow, kg [A.3F.A.2]
         total_manure_excreted = (
             0.00711 * body_weight
             + 0.324 * crude_protein_concentration
@@ -554,11 +561,8 @@ class ManureExcretionCalculator:
             + 8.05
         )
 
-        # Total solids excretion
-        # Amount of dry material excreted by the dry cow, kg [A.3F.A.3]
         total_solids = 0.178 * dry_matter_intake + 2.733
 
-        # Organic matter intake, kg [A.2.A.3]
         dry_matter_intake = max(dry_matter_intake, AnimalModuleConstants.MINIMUM_DMI_DRY)
         organic_matter_intake = (
             dry_matter_intake
@@ -566,7 +570,6 @@ class ManureExcretionCalculator:
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         )
 
-        # Total volatile solids, kg [A.3E.A.6]
         total_volatile_solids = (
             -1.201
             + 0.402 * organic_matter_intake
@@ -574,7 +577,6 @@ class ManureExcretionCalculator:
             - 0.024 * crude_protein_concentration
         )
 
-        # Degradable volatile solids, kg [A.3E.A.5]
         degradable_volatile_solids = (
             -1.017
             + 0.364 * organic_matter_intake
@@ -582,10 +584,8 @@ class ManureExcretionCalculator:
             - 0.023 * crude_protein_concentration
         )
 
-        # Non-degradable volatile solids, kg [A.3A.A.6]
         non_degradable_volatile_solids = total_volatile_solids - degradable_volatile_solids
 
-        # Nitrogen in liquid and solid manure, kg [A.3B.B.1]
         manure_nitrogen = (
             15.1
             + 0.83
@@ -594,7 +594,6 @@ class ManureExcretionCalculator:
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
-        # Nitrogen excretion in feces, kg [A.3B.B.2]
         fecal_nitrogen = (
             0.345
             + 0.317
@@ -603,18 +602,14 @@ class ManureExcretionCalculator:
             / GeneralConstants.FRACTION_TO_PERCENTAGE
         ) * GeneralConstants.GRAMS_TO_KG
 
-        # Nitrogen excretion in urine, kg [A.3B.B.3]
         urine_nitrogen = manure_nitrogen - fecal_nitrogen
 
-        # Urinary N concentration, g N/kg [A.3G.B.1]
         urinary_nitrogen_concentration = (urine_nitrogen * GeneralConstants.KG_TO_GRAMS) / urine
-        # Nitrogen concentration in urinary urea, g urea-N/L [A.3G.B.2]
+
         urine_urea_nitrogen_concentration = -1.16 + 0.86 * urinary_nitrogen_concentration
 
-        # Total ammoniacal nitrogen in the manure slurry, kg
         manure_total_ammoniacal_nitrogen = urine_nitrogen
 
-        # Amount of potassium excreted, g [A.3B.B.4]
         potassium = (
             dry_matter_intake
             * (potassium_concentration / GeneralConstants.FRACTION_TO_PERCENTAGE)
@@ -692,8 +687,16 @@ class ManureExcretionCalculator:
         float
             Fraction of phosphorus in the manure, unitless.
 
+        References
+        ----------
+        P fraction of manure calculation: [A.3.A.1]
+        Inorganic water extractable P fraction: [A.3.A.2]
+        Organic water extractable P fraction: [A.3.A.3]
+        P in milk per animal amount calculation: [A.3E.B.1]
+        Manure P excretion for manure module input calculation: [A.3.B.2]
+        P amount excreted by an animal calculation: [A.3.B.3]
+
         """
-        # P fraction of manure (A.3.A.1)
         if total_manure_excreted > 0:
             manure_phosphorus_fraction = (fecal_phosphorus + urine_phosphorus_required) / (
                 total_manure_excreted * GeneralConstants.KG_TO_GRAMS
@@ -701,21 +704,14 @@ class ManureExcretionCalculator:
         else:
             manure_phosphorus_fraction = 0.0
 
-        # Water extractable Inorganic P (WIP) fraction - fraction of manure
-        # compromised of inorganic water extractable P [A.3.A.2]
         inorganic_phosphorus_fraction = 0.50 * manure_phosphorus_fraction
 
-        # Water extractable Organic P (WOP) fraction - fraction of maure
-        # comprised of organic water extractable P [A.3.A.3]
         organic_phosphorus_fraction = 0.05 * manure_phosphorus_fraction
 
-        # amount of P in milk per animal (g) [A.3E.B.1]
         phosphorus_in_milk = 0.0009 * daily_milk_production * GeneralConstants.KG_TO_GRAMS
 
-        # manure P excretion for manure module input (g) [A.3.B.2]
         manure_phosphorus_excreted = fecal_phosphorus + urine_phosphorus_required
 
-        # amount of P excreted by an animal (g) [A.3.B.3]
         total_phosphorus_excreted = phosphorus_in_milk + fecal_phosphorus + urine_phosphorus_required
 
         return (
