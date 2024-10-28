@@ -1116,7 +1116,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
 
     # Arrange
     output_manager = OutputManager()
-    path = "dummy_path"
+    path = Path("dummy_path")
     patch_create_dir = mocker.patch.object(output_manager, "create_directory")
     patch_for_dump_errors = mocker.patch.object(output_manager, "dump_errors")
     patch_for_dump_warnings = mocker.patch.object(output_manager, "dump_warnings")
@@ -1125,7 +1125,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     patch_for_report_variables_usage_counts = mocker.patch.object(output_manager, "report_variables_usage_counts")
 
     # Act
-    output_manager.dump_all_nondata_pools(Path(path), False, "verbose")
+    output_manager.dump_all_nondata_pools(path, False, "verbose")
 
     # Assert
     patch_create_dir.assert_called_once_with(path)
@@ -3174,6 +3174,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     mock_output_manager.saved_pool_chunks_path = Path("")
     mock_output_manager.save_chunk_threshold_call_count = None
     mock_output_manager.maximum_pool_size = 0
+    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
 
     mock_output_manager.create_directory = MagicMock()
     mock_output_manager.add_log = MagicMock()
@@ -3282,6 +3283,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
     mock_output_manager.saved_pool_chunks_path = Path("")
     mock_output_manager.save_chunk_threshold_call_count = None
     mock_output_manager.maximum_pool_size = 0
+    mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
 
     mock_output_manager.create_directory = MagicMock()
     mock_output_manager.add_log = MagicMock()

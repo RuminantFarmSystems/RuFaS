@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import psutil
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.units import MeasurementUnits
@@ -209,7 +210,7 @@ class OutputManager(object):
         self.chunkification = True
 
         self.available_memory = psutil.virtual_memory().available
-        available_memory_gb = self.available_memory / (1024**3)
+        available_memory_gb = self.available_memory / GeneralConstants.BYTES_PER_GB
 
         self.saved_pool_chunks_path = Path.joinpath(
             output_dir, f"saved_pool/{self.__metadata_prefix}_{Utility.get_timestamp(include_millis=True)}"
@@ -232,7 +233,8 @@ class OutputManager(object):
             self.maximum_pool_size = max_memory_usage
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         else:
-            self.maximum_pool_size = (max_memory_usage_percent / 100) * self.available_memory
+            self.maximum_pool_size = ((max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION)
+                                      * self.available_memory)
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         self.add_log(
             "Pool Overflow Control Setup",
