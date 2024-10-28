@@ -1294,7 +1294,7 @@ class InputManager:
         """
         properties_index = name.find("_properties") + len("_properties")
         properties_group = name[:properties_index]
-        name = name[properties_index + 1:]
+        name = name[properties_index + 1 :]
         return {
             "properties_group": properties_group,
             "name": name,
