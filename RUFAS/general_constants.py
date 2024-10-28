@@ -29,6 +29,9 @@ class GeneralConstants:
 
     """
 
+    # Hardware related
+    BYTES_PER_GB = 1024 ** 3
+
     # Length-related
     MM_TO_M = 0.001
     CM_TO_MM = 10.0
@@ -75,6 +78,7 @@ class GeneralConstants:
     HECTARES_TO_SQUARE_MILLIMETERS = 10_000_000_000
 
     CONSTANTS_TO_UNITS = {
+        "BYTES_PER_GB": MeasurementUnits.BYTES,
         "MM_TO_M": MeasurementUnits.METERS_PER_MILLIMETER,
         "CM_TO_MM": MeasurementUnits.MILLIMETERS_PER_CENTIMETER,
         "MM_TO_CM": MeasurementUnits.CENTIMETERS_PER_MILLIMETER,
