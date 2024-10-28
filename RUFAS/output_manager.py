@@ -1041,7 +1041,8 @@ class OutputManager(object):
             raise
 
     def filter_variables_pool(
-        self, filter_content: Dict[str, Any],
+        self,
+        filter_content: Dict[str, Any],
     ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on options specified in filter_content.
@@ -1200,9 +1201,7 @@ class OutputManager(object):
         list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
         return list_of_dumped_files
 
-    def load_saved_pools(
-        self
-    ) -> None:
+    def load_saved_pools(self) -> None:
         """
         Filters saved pools of data by applying specific filter criteria.
 

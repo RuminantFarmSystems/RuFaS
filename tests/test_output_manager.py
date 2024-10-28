@@ -2978,7 +2978,7 @@ def test_load_saved_pools(
         "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
     }
     sorted_files = ["file1.json", "file2.json"]
-    mocker.patch.object(mock_output_manager, '_sort_saved_chunk_files', return_value=sorted_files)
+    mocker.patch.object(mock_output_manager, "_sort_saved_chunk_files", return_value=sorted_files)
     mocker.patch.object(mock_output_manager, "load_variables_pool_from_file")
 
     mock_pools = {
@@ -2992,11 +2992,11 @@ def test_load_saved_pools(
             "b": {"info_maps": [{}, {}, {}, {}], "values": ["c", "d", "e", "f"]},
             "c": {"info_maps": [{}, {}], "values": [True, True]},
             "d": {"info_maps": [{}, {}, {}], "values": [1.1, 2.2, 3.3]},
-        }
+        },
     }
 
-    load_mock = mocker.patch.object(mock_output_manager, 'load_variables_pool_from_file')
-    load_mock.side_effect = lambda file: setattr(mock_output_manager, 'variables_pool', mock_pools[file])
+    load_mock = mocker.patch.object(mock_output_manager, "load_variables_pool_from_file")
+    load_mock.side_effect = lambda file: setattr(mock_output_manager, "variables_pool", mock_pools[file])
 
     mock_output_manager.load_saved_pools()
 
