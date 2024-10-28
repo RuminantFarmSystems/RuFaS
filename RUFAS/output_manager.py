@@ -155,7 +155,7 @@ class OutputManager(object):
             self.add_variable_call = 0
             self.save_chunk_threshold_call_count: int = 0
             self.current_pool_size: int = 0
-            self.maximum_pool_size: int = np.inf
+            self.maximum_pool_size: float = np.inf
 
             self.add_log(
                 "init_log",
