@@ -1,18 +1,20 @@
 from dataclasses import dataclass
 
-from RUFAS.routines.animal.animal_types import AnimalType
-
 
 @dataclass
 class NutrientProperties:
-    """Dataclass representing the phosphorus status of the animal."""
+    """
+    Dataclass representing the phosphorus status of the animal.
 
-    animal_type: AnimalType
-    body_weight: float
-    mature_body_weight: float
-    daily_growth: float
-    days_in_preg: int
-    milking: bool
+    Attributes
+    ----------
+    fecal_phosphorus : float
+        Amount of fecal phosphorus excreted by the current animal, g.
+    urine_phosphorus_required : float
+        Amount of phosphorus required for urine production, g.
+
+    """
+
     estimated_daily_milk_produced: float
     phosphorus_excess_in_diet: float
     phosphorus_intake: float
@@ -24,3 +26,5 @@ class NutrientProperties:
     ration_phosphorus_concentration: float
     phosphorus_for_gestation: float
     phosphorus_for_gestation_required_for_calf: float
+    fecal_phosphorus: float
+    urine_phosphorus_required: float
