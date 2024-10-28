@@ -305,6 +305,7 @@ def test_handle_post_processing(
         "suppress_log_files": suppress_logs,
     }
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
+    mock_flush_pool = mocker.patch.object(mock_input_manager, "flush_pool", return_value=None)
     mock_dump_data_logs = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
     task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
@@ -318,6 +319,8 @@ def test_handle_post_processing(
     else:
         mock_dump_data_logs.assert_not_called()
         mock_output_manager.dump_all_nondata_pools.assert_not_called()
+
+    mock_flush_pool.assert_called_once()
 
 
 def test_handle_post_processing_export_input_tocsv(
