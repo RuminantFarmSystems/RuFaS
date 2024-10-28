@@ -160,7 +160,7 @@
         },
         "maximum_memory_usage_percent": {
           "type": "number",
-          "description": "The maximum percentage of memory use.",
+          "description": "The maximum percentage of memory use. If save_chunk_threshold_call_count is provided, then that is what is used to determine when to chunk, otherwise it is maximum memory usage, otherwise it is max memory usage percent.",
           "default": 80,
           "minimum": 1,
           "maximum": 100
