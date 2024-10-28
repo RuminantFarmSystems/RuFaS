@@ -1294,7 +1294,7 @@ class InputManager:
         """
         properties_index = name.find("_properties") + len("_properties")
         properties_group = name[:properties_index]
-        name = name[properties_index + 1 :]
+        name = name[properties_index + 1:]
         return {
             "properties_group": properties_group,
             "name": name,
@@ -1369,3 +1369,43 @@ class InputManager:
                 info_map,
             )
             raise
+
+    def export_pool_to_csv(self, output_prefix: str, output_path: Path) -> None:
+        """
+        Flatten the interested input data and export the variables with their values into a CSV.
+
+        Parameters
+        ----------
+        output_prefix: str
+            The output prefix for the current task.
+        output_path: Path
+            The folder to save the output CSV.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.export_pool_to_csv.__name__,
+        }
+
+        result_df = pd.DataFrame(columns=["property_group", "variable_name", f"{output_prefix}_value"])
+        for property_group in self.csv_report_generation_list:
+            if property_group == "animal_population":
+                continue
+            result = Utility.flatten_dictionary(self.pool[property_group])
+            for key, value in result.items():
+                result_df.loc[len(result_df)] = [property_group, key, value]
+
+        try:
+            self.om.create_directory(output_path)
+            output_file = output_path / f"{output_prefix}.csv"
+            result_df.to_csv(output_file, index=False)
+            self.om.add_log("Save input data CSV success.", f"Successfully saved to {output_path}.", info_map)
+
+        except FileNotFoundError as fnfe:
+            self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {fnfe}.", info_map)
+            raise fnfe
+        except PermissionError as pe:
+            self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {pe}.", info_map)
+            raise pe
+        except OSError as e:
+            self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
+            raise e
