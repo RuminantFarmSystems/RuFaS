@@ -245,11 +245,15 @@ def test_daily_routine_error(
     mock_general_properties.animal_type = mock_animal
     mock_add_error = mocker.patch.object(om, "add_error")
 
-    DigestiveSystem.process_digestion(
-        mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
-    )
-
-    mock_add_error.assert_called_once()
+    try:
+        DigestiveSystem.process_digestion(
+            mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
+        )
+        assert False
+    except TypeError as e:
+        mock_add_error.assert_called_once()
+        assert e.args[0] == "Unsupported animal types"
+        assert True
 
 
 def test_initialize_animal_methane_variables(mocker: MockerFixture) -> None:

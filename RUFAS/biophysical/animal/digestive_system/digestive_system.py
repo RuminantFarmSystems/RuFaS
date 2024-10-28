@@ -140,3 +140,4 @@ class DigestiveSystem:
                 f"Supported animal types are {supported_animal}. Got {general_properties.animal_type}",
                 info_map,
             )
+            raise TypeError("Unsupported animal types")
