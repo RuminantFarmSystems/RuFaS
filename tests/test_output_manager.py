@@ -12,7 +12,7 @@ import pytest
 from freezegun import freeze_time
 from mock import mock_open, patch
 from mock.mock import MagicMock, call
-from pytest import raises
+from pytest import CaptureFixture, TempPathFactory, raises
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.output_manager import LogVerbosity, OutputManager
@@ -337,7 +337,7 @@ def test_dict_to_file_csv(
     open_mock = mock_open()
 
     with patch("builtins.open", open_mock):
-        mock_output_manager._dict_to_file_csv(data, "test")
+        mock_output_manager._dict_to_file_csv(data, Path("test"))
 
     if should_write:
         open_mock.assert_any_call("test", "w", encoding="utf-8", errors="strict", newline="")
@@ -360,7 +360,7 @@ def test_dict_to_file_json(mock_output_manager: OutputManager) -> None:
 
     open_mock = mock_open()
     with patch("builtins.open", open_mock):
-        mock_output_manager.dict_to_file_json(data, "test")
+        mock_output_manager.dict_to_file_json(data, Path("test"))
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
     assert written_data == json.dumps({**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data}, indent=2)
@@ -379,7 +379,7 @@ def test_dict_to_file_json_minify_output(mock_output_manager: OutputManager) -> 
 
     open_mock = mock_open()
     with patch("builtins.open", open_mock):
-        mock_output_manager.dict_to_file_json(data, "test", minify_output_file=True)
+        mock_output_manager.dict_to_file_json(data, Path("test"), minify_output_file=True)
 
     written_data = "".join(call[1][0] for call in open_mock().write.mock_calls)
     assert written_data == json.dumps({**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data}, separators=(",", ":"))
@@ -393,7 +393,7 @@ def test_dict_to_file_json_exception(mock_output_manager: OutputManager) -> None
 
     with patch("builtins.open", open_mock):
         with raises(Exception):
-            mock_output_manager.dict_to_file_json(data, "test")
+            mock_output_manager.dict_to_file_json(data, Path("test"))
 
 
 def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
@@ -404,7 +404,7 @@ def test_dict_to_file_csv_exception(mock_output_manager: OutputManager) -> None:
 
     with patch("builtins.open", open_mock):
         with raises(Exception):
-            mock_output_manager._dict_to_file_csv(data, "test")
+            mock_output_manager._dict_to_file_csv(data, Path("test"))
 
 
 def test_generate_key(mocker: MockerFixture) -> None:
@@ -459,7 +459,7 @@ def test_add_error(
     name = "dummy_name"
     message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
-    info_map = {}
+    info_map: dict[str, str] = {}
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
@@ -498,7 +498,7 @@ def test_add_warning(
     name = "dummy_name"
     message = "dummy_value"
     timestamp = "18-Jan-2023_Wed_22-38-14.123456"
-    info_map = {}
+    info_map: dict[str, str] = {}
     metadata_prefix = "dummy_prefix"
     mock_output_manager._generate_key = MagicMock(return_value=key)
     mock_output_manager._add_to_pool = MagicMock()
@@ -1027,7 +1027,7 @@ def test_output_manager_singleton(mocker: MockerFixture) -> None:
         (LogVerbosity.LOGS, "\33[92m"),
     ],
 )
-def test_handle_log_output(capsys, log_level: LogVerbosity, color_code: str) -> None:
+def test_handle_log_output(capsys: CaptureFixture[str], log_level: LogVerbosity, color_code: str) -> None:
     name = "dummy name"
     msg = "dummy message"
     info_map = {"timestamp": "dummy_timestamp"}
@@ -1125,7 +1125,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     patch_for_report_variables_usage_counts = mocker.patch.object(output_manager, "report_variables_usage_counts")
 
     # Act
-    output_manager.dump_all_nondata_pools(path, False, "verbose")
+    output_manager.dump_all_nondata_pools(Path(path), False, "verbose")
 
     # Assert
     patch_create_dir.assert_called_once_with(path)
@@ -1136,7 +1136,7 @@ def test_dump_all_nondata_pools(mocker: MockerFixture) -> None:
     patch_for_report_variables_usage_counts.assert_called_once_with(path)
 
     # Act
-    output_manager.dump_all_nondata_pools(path, True, "verbose")
+    output_manager.dump_all_nondata_pools(Path(path), True, "verbose")
 
     # Assert
     assert patch_create_dir.call_count == 2
@@ -1166,6 +1166,7 @@ def test_generate_file_name(mocker: MockerFixture) -> None:
 def test_dump_logs(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
+    mocker: MockerFixture,
 ) -> None:
     """Test case for function dump_logs in output_manager.py"""
     mock_output_manager.generate_file_name = MagicMock(return_value="dummy_name")
@@ -1460,7 +1461,7 @@ def test_dump_variable_names_and_contexts_no_values(
 def test_list_to_file_txt(
     mock_output_manager: OutputManager,
     output_manager_original_method_states: Dict[str, Callable],
-    tmpdir,
+    tmpdir: TempPathFactory,
 ) -> None:
     """Test case for function _list_to_file_text in output_manager.py"""
     dummy_file_path = tmpdir.join("dummy_file.txt")
