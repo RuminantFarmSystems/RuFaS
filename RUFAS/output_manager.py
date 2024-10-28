@@ -342,21 +342,21 @@ class OutputManager(object):
         self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
         self.saved_pool_chunks_num += 1
 
-    def _load_and_filter_saved_pools(self, filters_dir_path: Path) -> None:
-        all_filters = self._load_all_filters(filters_dir_path)
-        list_of_dumped_files = self._sort_saved_chunk_files()
+    # def _load_and_filter_saved_pools(self, filters_dir_path: Path) -> None:
+    #     all_filters = self._load_all_filters(filters_dir_path)
+    #     list_of_dumped_files = self._sort_saved_chunk_files()
 
-        filtered_pool: dict[str, OutputManager.pool_element_type] = {}
-        for file in list_of_dumped_files:
-            self.load_variables_pool_from_file(file)
-            temp_filtered_pool: dict[str, OutputManager.pool_element_type] = {}
-            for filter_content in all_filters:
-                current_filter_result = self.filter_variables_pool(filter_content, False)
-                temp_filtered_pool = self._extend_variable_pool(temp_filtered_pool, current_filter_result)
-            filtered_pool = self._extend_variable_pool(filtered_pool, temp_filtered_pool)
-            self.variables_pool = {}
+    #     filtered_pool: dict[str, OutputManager.pool_element_type] = {}
+    #     for file in list_of_dumped_files:
+    #         self.load_variables_pool_from_file(file)
+    #         temp_filtered_pool: dict[str, OutputManager.pool_element_type] = {}
+    #         for filter_content in all_filters:
+    #             current_filter_result = self.filter_variables_pool(filter_content, False)
+    #             temp_filtered_pool = self._extend_variable_pool(temp_filtered_pool, current_filter_result)
+    #         filtered_pool = self._extend_variable_pool(filtered_pool, temp_filtered_pool)
+    #         self.variables_pool = {}
 
-        self.variables_pool = filtered_pool
+    #     self.variables_pool = filtered_pool
 
     def _load_all_filters(self, filters_dir_path: Path) -> list[dict[str, str | bool]]:
         filter_list: list[dict[str, str | bool]] = []
@@ -364,7 +364,6 @@ class OutputManager(object):
         for filter_file in filter_files_list:
             filter_file_path = filters_dir_path / filter_file
             filter_list += self._load_filter_file_content(filter_file_path)
-        print(filter_list)
         return filter_list
 
     def _extend_variable_pool(
@@ -1239,8 +1238,8 @@ class OutputManager(object):
         list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
         return list_of_dumped_files
 
-    def filter_saved_pools(
-        self, filter_content: Dict[str, Any], list_of_dumped_files: List[Path]
+    def load_saved_pools(
+        self, list_of_dumped_files: List[Path]
     ) -> Dict[str, OutputManager.pool_element_type]:
         """
         Filters saved pools of data by applying specific filter criteria.
@@ -1271,8 +1270,8 @@ class OutputManager(object):
         filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
         for file in list_of_dumped_files:
             self.load_variables_pool_from_file(file)
-            temp_filtered_pool = self.filter_variables_pool(filter_content)
-            for key, value in temp_filtered_pool.items():
+            # temp_filtered_pool = self.filter_variables_pool(filter_content)
+            for key, value in self.variables_pool.items():
                 if key in filtered_pool.keys():
                     filtered_pool[key]["info_maps"].extend(value["info_maps"])
                     filtered_pool[key]["values"].extend(value["values"])
@@ -1281,7 +1280,6 @@ class OutputManager(object):
             self.variables_pool = {}
 
         self.variables_pool = filtered_pool
-        return self.filter_variables_pool(filter_content, True)
 
     def save_results(  # noqa: C901
         self,
@@ -1331,7 +1329,7 @@ class OutputManager(object):
         report_generator = ReportGenerator(self.time)
         if self.chunkification:
             self._save_current_variable_pool()
-            self._load_and_filter_saved_pools(filters_dir_path)
+            self.load_saved_pools()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = filters_dir_path / filter_file
