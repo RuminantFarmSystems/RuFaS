@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Type
-from unittest.mock import ANY
+from unittest.mock import ANY, call
 
 import pandas as pd
 import pytest
@@ -10,6 +10,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.input_manager import InputManager
 from RUFAS.data_validator import DataValidator, Modifiability, ElementsCounter, ElementState
+from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 
@@ -304,8 +305,8 @@ def test_populate_pool_valid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: True)
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(OutputManager, "add_log")
+    mocker.patch.object(OutputManager, "add_warning")
 
     # Act
     result = input_manager._populate_pool(eager_termination=True)
@@ -334,8 +335,8 @@ def test_populate_pool_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(OutputManager, "add_log")
+    mocker.patch.object(OutputManager, "add_warning")
     elements_counter = ElementsCounter()
     elements_counter.increment(ElementState.INVALID)
     mocker.patch.object(input_manager, "elements_counter", elements_counter)
@@ -365,8 +366,8 @@ def test_populate_pool_partial_invalid(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=[True, False, True, False])
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(OutputManager, "add_log")
+    mocker.patch.object(OutputManager, "add_warning")
 
     # Act
     result = input_manager._populate_pool(eager_termination=False)
@@ -400,8 +401,8 @@ def test_populate_pool_eager_termination(
         input_manager, "_load_data_from_csv", side_effect=lambda _: {"element3": "value3", "element4": "value4"}
     )
     mocker.patch.object(DataValidator, "validate_data_by_type", side_effect=lambda *args, **kwargs: False)
-    mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_log")
+    mocker.patch.object(OutputManager, "add_log")
+    mocker.patch.object(OutputManager, "add_warning")
 
     # Act
     result = input_manager._populate_pool(eager_termination=True)
@@ -1284,8 +1285,8 @@ def test_add_variable_to_pool_valid(
     patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", wraps=input_manager._prepare_data)
 
     expected_add_warning_count = 1 if starting_im_pool else 0
-    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
-    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
+    patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
+    patch_for_add_error = mocker.patch.object(OutputManager, "add_error")
 
     # Act
     result = input_manager._add_variable_to_pool(
@@ -1415,8 +1416,8 @@ def test_add_variable_to_pool_invalid(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool)
     mocker.patch.object(input_manager, "_InputManager__pool", starting_im_pool)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=False)
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    patch_for_add_error = mocker.patch("RUFAS.input_manager.om.add_error")
+    patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
+    patch_for_add_error = mocker.patch.object(OutputManager, "add_error")
     mock_elements_counter = mocker.MagicMock()
     mock_elements_counter.invalid_elements = 1
     mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
@@ -1551,8 +1552,8 @@ def test_add_variable_to_pool_eager_termination(
     mock_elements_counter = mocker.MagicMock()
     mock_elements_counter.invalid_elements = 1
     mocker.patch("RUFAS.input_manager.ElementsCounter", return_value=mock_elements_counter)
-    patch_for_add_warning = mocker.patch.object(input_manager.om, "add_warning")
-    patch_for_add_error = mocker.patch.object(input_manager.om, "add_error")
+    patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
+    patch_for_add_error = mocker.patch.object(OutputManager, "add_error")
 
     # Act
     with pytest.raises(ValueError):
@@ -2414,9 +2415,9 @@ def test_add_variable_to_pool_nested(
     mocker.patch.object(input_manager, "_InputManager__metadata", mock_metadata_for_add_variable_to_pool_nested)
     mocker.patch.object(input_manager, "_InputManager__pool", mock_pool_for_add_variable_to_pool_nested)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
-    mocker.patch("RUFAS.input_manager.om.add_log")
-    patch_for_add_warning = mocker.patch("RUFAS.input_manager.om.add_warning")
-    mocker.patch("RUFAS.input_manager.om.add_error")
+    mocker.patch.object(OutputManager,"add_log")
+    patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
+    mocker.patch.object(OutputManager, "add_error")
 
     if (not is_modifiable_during_runtime) and eager_termination:
         with pytest.raises(PermissionError):
