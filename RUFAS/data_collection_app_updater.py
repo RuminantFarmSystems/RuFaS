@@ -129,7 +129,7 @@ class DataCollectionAppUpdater:
         localized_schema_paths = [str(path).replace("DataCollectionApp", ".") for path in schema_paths]
 
         schema_script_tags = "\n".join(
-            [f"    <script src=\"{schema_path}\"></script>" for schema_path in localized_schema_paths]
+            [f'    <script src="{schema_path}"></script>' for schema_path in localized_schema_paths]
         )
 
         with open(TEMPLATE_PATH, "r", encoding="utf-8") as template_file:
@@ -139,7 +139,7 @@ class DataCollectionAppUpdater:
 
         pattern_to_remove = r"\./schema/|\.js"
         schema_names = [re.sub(pattern_to_remove, "", name) for name in localized_schema_paths]
-        list_of_schema = f"\"anyOf\": {schema_names}".replace("'", "")
+        list_of_schema = f'"anyOf": {schema_names}'.replace("'", "")
         rewritten_index = index_with_script_tags.replace(AVAILABLE_SCHEMAS_LIST_PLACEHOLDER, list_of_schema)
 
         with open(INDEX_PATH, "w", encoding="utf-8") as index:
