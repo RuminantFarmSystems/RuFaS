@@ -84,7 +84,7 @@
       "breed": {
         "type": "string",
         "default": "HO",
-        "pattern": "(HO|JE)",
+        "pattern": "^(HO|JE)$",
         "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
       },
       "parity_fractions": {
@@ -3807,7 +3807,7 @@
       "description": "The general type or category of the feed (group).",
       "properties": {
         "type": "string",
-        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)$"
       }
     },
     "units": {
@@ -3815,7 +3815,7 @@
       "description": "The unit of measurement used for the feed.",
       "properties": {
         "type": "string",
-        "pattern": "(kg)"
+        "pattern": "^(kg)$"
       }
     }
   },
@@ -5073,7 +5073,7 @@
         "manure_cover": {
           "type": "string",
           "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|crust|no cover|cover and flare|N/A)",
+          "pattern": "^(cover|crust|no cover|cover and flare|N/A)$",
           "default": "no cover"
         },
         "hydraulic_retention_time": {
@@ -5521,7 +5521,7 @@
       "description": "The categorical size of the tractor",
       "properties": {
         "type": "string",
-        "pattern": "(small|medium|large)",
+        "pattern": "^(small|medium|large)$",
         "default": "medium"
       }
     },
