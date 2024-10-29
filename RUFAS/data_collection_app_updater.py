@@ -9,6 +9,19 @@ from RUFAS.util import Utility
 
 SCHEMA_DIRECTORY_PATH: Path = Path("").joinpath("DataCollectionApp", "dummy_schema")
 
+PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
+    "animal_properties",
+    "config_properties",
+    "crop_schedule_properties",
+    "feed_properties",
+    "fertilizer_schedule_properties",
+    "field_properties",
+    "manure_management_properties",
+    "manure_schedule_properties",
+    "tillage_schedule_properties",
+    "tractor_dataset_properties",
+]
+
 
 class DataCollectionAppUpdater:
     """
@@ -54,6 +67,19 @@ class DataCollectionAppUpdater:
         """
         Updates schemas for collection of RuFaS inputs in the Data Collection App.
         """
+        schema_paths = self._rewrite_schemas()
+        print(schema_paths)
+
+    def _rewrite_schemas(self) -> list[Path]:
+        """
+        Rewrites schemas in the Data Collection App using the input properties found in the Input Manager.
+
+        Returns
+        -------
+        list[str]
+            List of file names of the rewritten schema.
+
+        """
         info_map = {"class": self.__class__.__name__, "function": self.update_data_collection_app.__name__}
 
         self.om.add_log("Schema generation starting", "Creating new schemas from metadata properties.", info_map)
@@ -62,25 +88,33 @@ class DataCollectionAppUpdater:
 
         properties: dict[str, Any] = self.im.meta_data["properties"]
 
+        schema_paths = []
         for key in properties.keys():
+            if key not in PROPERTIES_TO_CREATE_SCHEMA_FOR:
+                continue
+
             try:
                 new_schema = self.setup_object_schema(key, properties[key])
             except Exception as e:
-                error_title = "Schema generator raised exception"
-                error_message = f"Key: '{key}' raised exception: {str(e)}"
-                self.om.add_error(error_title, error_message, info_map)
+                self.om.add_error(
+                    "Data Collection App Updater raised exception", f"Key: '{key}' raised exception: {str(e)}", info_map
+                )
                 continue
 
             schema_name = key.replace("properties", "schema")
-            new_schema_file_name = f"{schema_name}.json"
+            new_schema_file_name = f"{schema_name}.js"
             new_schema_file_path = Path.joinpath(SCHEMA_DIRECTORY_PATH, new_schema_file_name)
+            schema_paths.append(new_schema_file_path)
 
             log_title = "Schema generator writing new schema"
             log_message = f"Writing new schema in {new_schema_file_path}"
             self.om.add_log(log_title, log_message, info_map)
 
+            schema_body = json.dumps(new_schema, indent=2)
             with open(new_schema_file_path, "w") as outfile:
-                json.dump(new_schema, outfile, indent=2)
+                outfile.write(f"{schema_name} = {schema_body}")
+
+        return schema_paths
 
     def setup_number_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
