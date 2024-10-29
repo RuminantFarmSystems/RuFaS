@@ -7,12 +7,19 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
+"""Directory path for writing updated schema."""
 SCHEMA_DIRECTORY_PATH: Path = Path("").joinpath("DataCollectionApp", "schema")
 
+"""Path to the home page of the Data Collection App."""
 INDEX_PATH: Path = Path("").joinpath("DataCollectionApp", "index.html")
 
+"""Path to the template for regenerating the Data Collection App's home page."""
 TEMPLATE_PATH: Path = Path("").joinpath("DataCollectionApp", "template")
 
+"""
+Metadata properties for which the Data Collection App will generate schema.
+If a property is not listed, its schema will not be generated.
+"""
 PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
     "animal_properties",
     "config_properties",
@@ -26,8 +33,11 @@ PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
     "tractor_dataset_properties",
 ]
 
+"""Placeholder for inserting schema import scripts in index.html."""
+
 SCHEMA_SCRIPT_TAG_PLACEHOLDER = "    <!-- Spot where schema import scripts go -->"
 
+"""Placeholder for listing newly available schemas in the rewritten index.html."""
 AVAILABLE_SCHEMAS_LIST_PLACEHOLDER = "// Spot where list of available schema go"
 
 
@@ -38,37 +48,29 @@ class DataCollectionAppUpdater:
 
     Attributes
     ----------
-    im : InputManager
+    _im : InputManager
         Instance of the Input Manager.
-    om : OutputManager
+    _om : OutputManager
         Instance of the Output Manager.
+    _type_to_schema_map : dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]]
+        Maps types in the metadata properties to methods used to generate schema for those types.
 
     Methods
     -------
-    generate_schemas(path_to_properties, path_to_schemas)
-        Manages the I/0 and subroutines of creating new schemas.
-    setup_number_schema(title, input_properties)
-        Creates the JSON editor schema for a 'number' type.
-    setup_bool_schema(title, input_properties)
-        Creates the JSON editor schema for a 'bool' type.
-    setup_string_schema(title, input_properties)
-        Creates the JSON editor schema for a 'string' type.
-    setup_array_schema(title, input_properties)
-        Creates the JSON editor schema for an 'array' type.
-    setup_object_schema(title, input_properties)
-        Creates the JSON editor schema for an 'object' type.
+    update_data_collection_app
+        Orchestrates updates to the schemas and index page of the Data Collection App.
 
     """
 
     def __init__(self):
-        self.im = InputManager()
-        self.om = OutputManager()
-        self.type_to_schema_map: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
-            "number": self.setup_number_schema,
-            "bool": self.setup_bool_schema,
-            "string": self.setup_string_schema,
-            "array": self.setup_array_schema,
-            "object": self.setup_object_schema,
+        self._im = InputManager()
+        self._om = OutputManager()
+        self._type_to_schema_map: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
+            "number": self._create_number_schema,
+            "bool": self._create_bool_schema,
+            "string": self._create_string_schema,
+            "array": self._create_array_schema,
+            "object": self._create_object_schema,
         }
 
     def update_data_collection_app(self) -> None:
@@ -76,7 +78,7 @@ class DataCollectionAppUpdater:
         Updates schemas for collection of RuFaS inputs in the Data Collection App.
         """
         schema_paths = self._rewrite_schemas()
-        self._rewrite_index(schema_paths)
+        self._rewrite_index_page(schema_paths)
 
     def _rewrite_schemas(self) -> list[Path]:
         """
@@ -90,11 +92,11 @@ class DataCollectionAppUpdater:
         """
         info_map = {"class": self.__class__.__name__, "function": self.update_data_collection_app.__name__}
 
-        self.om.add_log("Schema generation starting", "Creating new schemas from metadata properties.", info_map)
+        self._om.add_log("Schema generation starting", "Creating new schemas from metadata properties.", info_map)
 
         Utility.empty_dir(SCHEMA_DIRECTORY_PATH)
 
-        properties: dict[str, Any] = self.im.meta_data["properties"]
+        properties: dict[str, Any] = self._im.meta_data["properties"]
 
         schema_paths = []
         for key in properties.keys():
@@ -102,9 +104,9 @@ class DataCollectionAppUpdater:
                 continue
 
             try:
-                new_schema = self.setup_object_schema(key, properties[key])
+                new_schema = self._create_object_schema(key, properties[key])
             except Exception as e:
-                self.om.add_error(
+                self._om.add_error(
                     "Data Collection App Updater raised exception", f"Key: '{key}' raised exception: {str(e)}", info_map
                 )
                 continue
@@ -116,7 +118,7 @@ class DataCollectionAppUpdater:
 
             log_title = "Schema generator writing new schema"
             log_message = f"Writing new schema in {new_schema_file_path}"
-            self.om.add_log(log_title, log_message, info_map)
+            self._om.add_log(log_title, log_message, info_map)
 
             schema_body = json.dumps(new_schema, indent=4)
             with open(new_schema_file_path, "w") as outfile:
@@ -124,8 +126,16 @@ class DataCollectionAppUpdater:
 
         return schema_paths
 
-    def _rewrite_index(self, schema_paths: list[Path]) -> None:
-        """Rewrites the index.html page of the Data Collection App to use the newly written schema."""
+    def _rewrite_index_page(self, schema_paths: list[Path]) -> None:
+        """
+        Rewrites the index.html page of the Data Collection App to use the newly written schema.
+
+        Parameters
+        ----------
+        schema_paths : list[Path]
+            List of path instances which will be used to link the index page to the input schemas.
+
+        """
         localized_schema_paths = [str(path).replace("DataCollectionApp", ".") for path in schema_paths]
 
         schema_script_tags = "\n".join(
@@ -145,7 +155,7 @@ class DataCollectionAppUpdater:
         with open(INDEX_PATH, "w", encoding="utf-8") as index:
             index.write(rewritten_index)
 
-    def setup_number_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_number_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a numerical input.
 
@@ -183,7 +193,7 @@ class DataCollectionAppUpdater:
 
         return schema
 
-    def setup_bool_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_bool_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a boolean input.
 
@@ -216,7 +226,7 @@ class DataCollectionAppUpdater:
 
         return schema
 
-    def setup_string_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_string_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a string input.
 
@@ -250,8 +260,8 @@ class DataCollectionAppUpdater:
             try:
                 enum = self._get_list_of_options(pattern)
             except ValueError:
-                info_map = {"class": self.__class__.__name__, "function": self.setup_string_schema.__name__}
-                self.om.add_warning(
+                info_map = {"class": self.__class__.__name__, "function": self._create_string_schema.__name__}
+                self._om.add_warning(
                     "Could not generate list of valid input options for a string input",
                     f"Variable {title=} will not have drop-down options for Data Collection App users to pick from.",
                     info_map,
@@ -297,7 +307,7 @@ class DataCollectionAppUpdater:
         split_list = unsplit_list.split("|")
         return split_list
 
-    def setup_array_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_array_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for an array input.
 
@@ -329,14 +339,14 @@ class DataCollectionAppUpdater:
             schema["options"]["infoText"] = description
 
         element_properties = input_properties["properties"]
-        element_schema_creator = self.type_to_schema_map[element_properties["type"]]
+        element_schema_creator = self._type_to_schema_map[element_properties["type"]]
         element_title = title + "_element"
         element_property_dictionary = element_schema_creator(element_title, element_properties)
         schema["items"] = element_property_dictionary
 
         return schema
 
-    def setup_object_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_object_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for an object input.
 
@@ -368,7 +378,7 @@ class DataCollectionAppUpdater:
 
         for key in keys:
             sub_property = input_properties[key]
-            schema_setup_method = self.type_to_schema_map[sub_property["type"]]
+            schema_setup_method = self._type_to_schema_map[sub_property["type"]]
             sub_property_schema = schema_setup_method(key, sub_property)
             schema["properties"][key] = sub_property_schema
 
