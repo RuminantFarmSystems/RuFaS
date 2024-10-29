@@ -8,7 +8,6 @@ from typing import Any, Callable, Dict, List, Tuple
 
 import numpy
 from SALib.sample import ff as fractional_factorial_sampler
-from SALib.sample import saltelli as saltelli_sampler
 from SALib.sample import sobol as sobol_sampler
 from SALib.sample import morris as morris_sampler
 
@@ -273,12 +272,6 @@ class TaskManager:
         if multi_run_args["sampler"] == "fractional_factorial":
             sampled_values = fractional_factorial_sampler.sample(
                 parsed_SA_input_variables, seed=multi_run_args["random_seed"]
-            )
-        elif multi_run_args["sampler"] == "saltelli":
-            sampled_values = saltelli_sampler.sample(
-                parsed_SA_input_variables,
-                multi_run_args["sampler_n"],
-                skip_values=multi_run_args["skip_values"],
             )
         elif multi_run_args["sampler"] == "sobol":
             sampled_values = sobol_sampler.sample(
