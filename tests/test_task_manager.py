@@ -899,7 +899,6 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "output_prefix": "Task 2",
                 "log_verbosity": "errors",
                 "sampler": "fractional_factorial",
-                "random_seed": 42,
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
                 "skip_values": 0,
@@ -991,8 +990,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "task_type": "SENSITIVITY_ANALYSIS",
                 "output_prefix": "Task 3",
                 "log_verbosity": "errors",
-                "sampler": "sobol",
-                "random_seed": 42,
+                "sampler": "saltelli",
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
                 "skip_values": 0,
@@ -1144,8 +1142,8 @@ def test_expand_sensitivity_analysis_args(
     mock_output_manager: Generator[Any, Any, Any],
     task_manager: TaskManager,
 ) -> None:
-    """Unit test for TaskManager._expand_sensitivity_analysis_args() with fractional_factorial, saltelli, sobol, and
-    morris as samplers."""
+    """Unit test for TaskManager._expand_sensitivity_analysis_args() with fractional_factorial and saltelli methods
+    as samplers."""
     result = task_manager._expand_sensitivity_analysis_args(multi_run_args)
 
     expected_output = [
@@ -1154,7 +1152,6 @@ def test_expand_sensitivity_analysis_args(
             "output_prefix": expected_output_prefixes[i],
             "log_verbosity": "errors",
             "sampler": multi_run_args["sampler"],
-            "random_seed": 42,
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
             "skip_values": 0,
@@ -1297,7 +1294,7 @@ def test_expand_sensitivity_analysis_args_invalid_sampler(
                     "suppress_log_files": False,
                     "output_pool_path": Path("."),
                     "multi_run_counts": 4,
-                    "sampler": "sobol",
+                    "sampler": "saltelli",
                     "skip_values": 0,
                     "sampler_n": 2,
                     "SA_load_balancing_start": 0,
@@ -1327,7 +1324,7 @@ def test_expand_sensitivity_analysis_args_invalid_sampler(
                     "suppress_log_files": False,
                     "output_pool_path": Path("."),
                     "multi_run_counts": 4,
-                    "sampler": "sobol",
+                    "sampler": "saltelli",
                     "skip_values": 0,
                     "sampler_n": 2,
                     "SA_load_balancing_start": 0,
@@ -1439,7 +1436,7 @@ def test_run_tasks(
                     "suppress_log_files": False,
                     "output_pool_path": Path("."),
                     "multi_run_counts": 4,
-                    "sampler": "sobol",
+                    "sampler": "saltelli",
                     "skip_values": 0,
                     "sampler_n": 2,
                     "SA_load_balancing_start": 0,
