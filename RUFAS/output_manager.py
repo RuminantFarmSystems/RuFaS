@@ -1244,6 +1244,13 @@ class OutputManager(object):
                     filtered_pool[key]["values"].extend(value["values"])
                 else:
                     filtered_pool[key] = value
+            self.current_pool_size = sys.getsizeof(filtered_pool)
+            if self.current_pool_size > self.maximum_pool_size:
+                self.add_error("Variables Pool Size Exceeded",
+                               "The variables pool size has exceeded the maximum pool size. Halting the loading of"
+                               "saved pools. Results may be incomplete.",
+                               info_map={"class": self.__class__.__name__,
+                                         "function": self.load_saved_pools.__name__})
             self.variables_pool = {}
 
         self.variables_pool = filtered_pool

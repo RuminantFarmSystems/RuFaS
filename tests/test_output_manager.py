@@ -2962,9 +2962,19 @@ def test_sort_saved_chunk_files(mock_output_manager: OutputManager, tmpdir) -> N
     ]
 
 
-def test_load_saved_pools(
+@pytest.mark.parametrize(
+    "pool_size, max_pool_size, expect_error",
+    [
+        (200, 100, True),   # Case where pool size exceeds max pool size, expecting an error
+        (50, 100, False),   # Case where pool size is within max pool size, no error expected
+    ]
+)
+def test_load_saved_pools_pool_size_exceedance(
     mock_output_manager: OutputManager,
     mocker: MockerFixture,
+    pool_size: int,
+    max_pool_size: int,
+    expect_error: bool
 ) -> None:
     expected = {
         "a": {"values": [0, 1, 2, 3, 4, 5, 6, 7, 8], "info_maps": [{}, {}, {}, {}, {}, {}]},
@@ -2973,6 +2983,7 @@ def test_load_saved_pools(
         "d": {"values": [1.1, 2.2, 3.3], "info_maps": [{}, {}, {}]},
     }
     sorted_files = ["file1.json", "file2.json"]
+
     mocker.patch.object(mock_output_manager, "_sort_saved_chunk_files", return_value=sorted_files)
     mocker.patch.object(mock_output_manager, "load_variables_pool_from_file")
 
@@ -2993,9 +3004,23 @@ def test_load_saved_pools(
     load_mock = mocker.patch.object(mock_output_manager, "load_variables_pool_from_file")
     load_mock.side_effect = lambda file: setattr(mock_output_manager, "variables_pool", mock_pools[file])
 
+    mock_output_manager.maximum_pool_size = max_pool_size
+    mocker.patch("sys.getsizeof", return_value=pool_size)
+
+    add_error_mock = mocker.patch.object(mock_output_manager, "add_error")
+
     mock_output_manager.load_saved_pools()
 
     assert mock_output_manager.variables_pool == expected
+    if expect_error:
+        add_error_mock.assert_called_with(
+            "Variables Pool Size Exceeded",
+            "The variables pool size has exceeded the maximum pool size. Halting the loading of"
+            "saved pools. Results may be incomplete.",
+            info_map={"class": mock_output_manager.__class__.__name__, "function": "load_saved_pools"}
+        )
+    else:
+        add_error_mock.assert_not_called()
 
 
 def test_run_startup_sequence_clear_output_directory(
