@@ -9,6 +9,10 @@ from RUFAS.util import Utility
 
 SCHEMA_DIRECTORY_PATH: Path = Path("").joinpath("DataCollectionApp", "dummy_schema")
 
+INDEX_PATH: Path = Path("").joinpath("DataCollectionApp", "index.html")
+
+TEMPLATE_PATH: Path = Path("").joinpath("DataCollectionApp", "template")
+
 PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
     "animal_properties",
     "config_properties",
@@ -21,6 +25,8 @@ PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
     "tillage_schedule_properties",
     "tractor_dataset_properties",
 ]
+
+SCHEMA_SCRIPT_TAG_PLACEHOLDER = "    <!-- Spot where schema import scripts go -->"
 
 
 class DataCollectionAppUpdater:
@@ -68,7 +74,7 @@ class DataCollectionAppUpdater:
         Updates schemas for collection of RuFaS inputs in the Data Collection App.
         """
         schema_paths = self._rewrite_schemas()
-        print(schema_paths)
+        self._rewrite_index(schema_paths)
 
     def _rewrite_schemas(self) -> list[Path]:
         """
@@ -115,6 +121,22 @@ class DataCollectionAppUpdater:
                 outfile.write(f"{schema_name} = {schema_body}")
 
         return schema_paths
+
+    def _rewrite_index(self, schema_paths: list[Path]) -> None:
+        """Rewrites the index.html page of the Data Collection App to use the newly written schema."""
+        localized_schema_paths = [str(path).replace("DataCollectionApp", ".") for path in schema_paths]
+
+        schema_script_tags = "\n".join(
+            [f"    <script src=\"{schema_path}\"></script>" for schema_path in localized_schema_paths]
+        )
+
+        with open(TEMPLATE_PATH, 'r', encoding='utf-8') as template_file:
+            template = template_file.read()
+
+        rewritten_index = template.replace(SCHEMA_SCRIPT_TAG_PLACEHOLDER, schema_script_tags)
+
+        with open(INDEX_PATH, "w", encoding="utf-8") as index:
+            index.write(rewritten_index)
 
     def setup_number_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
