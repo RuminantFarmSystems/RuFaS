@@ -175,7 +175,7 @@
         "sampler": {
           "type": "string",
           "description": "The sampler for Sensitivity Analysis",
-          "pattern": "fractional_factorial|saltelli|sobol|morris",
+          "pattern": "fractional_factorial|sobol|morris",
           "default": "fractional_factorial"
         },
         "skip_values": {
