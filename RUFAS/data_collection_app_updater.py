@@ -186,11 +186,11 @@ class DataCollectionAppUpdater:
         if pattern is not None:
             try:
                 enum = self._get_list_of_options(pattern)
-            except ValueError as e:
+            except ValueError:
                 info_map = {"class": self.__class__.__name__, "function": self.setup_string_schema.__name__}
-                self.om.add_error(
-                    "Schema generation for string input encountered error",
-                    f"Variable {title=} had error: {str(e)}",
+                self.om.add_warning(
+                    "Could not generate list of valid input options for a string input",
+                    f"Variable {title=} will not have drop-down options for Data Collection App users to pick from.",
                     info_map,
                 )
                 return schema
