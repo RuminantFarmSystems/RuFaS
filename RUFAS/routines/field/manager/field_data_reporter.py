@@ -29,10 +29,6 @@ class FieldDataReporter:
 
     def send_daily_variables(self) -> None:
         """sends daily variables to the output manager"""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.send_daily_variables.__name__,
-        }
         for field in self.fields:
             self.send_field_daily_variables(field)
 
