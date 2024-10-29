@@ -4,9 +4,8 @@
     {
       "task_type": "DATA_COLLECTION_APP_UPDATE",
       "metadata_file_path": "input/metadata/default_metadata.json",
-      "output_prefix": "default",
-      "log_verbosity": "errors",
-      "random_seed": 42
+      "output_prefix": "DCA_Update",
+      "log_verbosity": "logs"
     }
   ]
 }
