@@ -1,0 +1,238 @@
+manure_schedule_schema = {
+    "title": "manure_schedule_properties",
+    "type": "object",
+    "format": "grid",
+    "properties": {
+        "years": {
+            "title": "years",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of years in which manure will be applied."
+            },
+            "items": {
+                "title": "years_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 1
+            }
+        },
+        "days": {
+            "title": "days",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of days on which manure will be applied."
+            },
+            "items": {
+                "title": "days_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 1,
+                "maximum": 366
+            }
+        },
+        "nitrogen_masses": {
+            "title": "nitrogen_masses",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of minimum nitrogen masses that the corresponding manure applications should contain.\nUnits: kg."
+            },
+            "items": {
+                "title": "nitrogen_masses_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 0.0
+            }
+        },
+        "phosphorus_masses": {
+            "title": "phosphorus_masses",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of minimum phosphorus masses that the corresponding manure applications should contain.\nUnits: kg."
+            },
+            "items": {
+                "title": "phosphorus_masses_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 0.0
+            }
+        },
+        "potassium_masses": {
+            "title": "potassium_masses",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of minimum potassium masses that the corresponding manure applications should contain.\nUnits: kg."
+            },
+            "items": {
+                "title": "potassium_masses_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 0.0
+            }
+        },
+        "coverage_fractions": {
+            "title": "coverage_fractions",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of fractions of how much of the field is covered by the corresponding manure application."
+            },
+            "items": {
+                "title": "coverage_fractions_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 0.01,
+                "maximum": 1.0
+            }
+        },
+        "application_depths": {
+            "title": "application_depths",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of depths at which the manure is injected into the soil.\nUnits: mm."
+            },
+            "items": {
+                "title": "application_depths_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 0.0
+            }
+        },
+        "surface_remainder_fractions": {
+            "title": "surface_remainder_fractions",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "List of fractions of manure which remain on the soil surface when applied via injection."
+            },
+            "items": {
+                "title": "surface_remainder_fractions_element",
+                "type": "number",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "minimum": 0.0,
+                "maximum": 1.0
+            }
+        },
+        "manure_types": {
+            "title": "manure_types",
+            "type": "array",
+            "format": "grid",
+            "options": {
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "The type of manure which will be requested for the application."
+            },
+            "items": {
+                "title": "manure_types_element",
+                "type": "string",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {
+                        "class": "text-primary form-control"
+                    }
+                },
+                "enum": [
+                    "liquid",
+                    "solid"
+                ],
+                "format": "select2"
+            }
+        },
+        "pattern_repeat": {
+            "title": "pattern_repeat",
+            "type": "number",
+            "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "Number of times that this manure application schedule should be repeated."
+            },
+            "minimum": 0,
+            "default": 0
+        },
+        "pattern_skip": {
+            "title": "pattern_skip",
+            "type": "number",
+            "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "Number of years to be skipped between schedule repetitions."
+            },
+            "minimum": 0,
+            "default": 0
+        }
+    }
+}
