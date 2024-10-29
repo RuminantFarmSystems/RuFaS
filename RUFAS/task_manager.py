@@ -355,13 +355,13 @@ class TaskManager:
         validation_and_comparison_handlers = {
             TaskType.INPUT_DATA_AUDIT: TaskManager._handle_input_data_audit_tasks,
             TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._handle_compare_metadata_properties_tasks,
-            TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
         }
         simulation_and_analysis_handlers = {
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
+            TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
         }
         try:
             task_type = args.get("task_type")
