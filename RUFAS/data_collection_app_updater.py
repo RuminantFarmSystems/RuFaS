@@ -8,7 +8,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 DEFAULT_PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
-DEFAULT_SCHEMA_OUTPUT_PATH: Path = Path("data_collection_app_schemas")
+SCHEMA_DIRECTORY_PATH: Path = Path("").joinpath("DataCollectionApp", "dummy_schema")
 
 
 class DataCollectionAppUpdater:
@@ -51,36 +51,17 @@ class DataCollectionAppUpdater:
             "object": self.setup_object_schema,
         }
 
-    def generate_schemas(self, path_to_properties: str | None, path_to_schema_outputs: str | None) -> None:
+    def update_schemas(self) -> None:
         """
-        Produces updated schemas for the Data Collection App.
-
-        Parameters
-        ----------
-        path_to_properties : str | None
-            Path to the metadata properties from which the schemas will be generated. If None, then a default path will
-            be used.
-        path_to_schema_outputs : str | None
-            Path to the location where the schemas should be written to. If None, then the schemas will be put in a
-            default location.
-
+        Updates schemas for collection of RuFaS inputs in the Data Collection App.
         """
-        info_map = {"class": self.__class__.__name__, "function": self.generate_schemas.__name__}
+        info_map = {"class": self.__class__.__name__, "function": self.update_schemas.__name__}
 
-        path_to_properties = path_to_properties if path_to_properties else DEFAULT_PROPERTIES_PATH
+        self.om.add_log("Schema generation starting", "Creating new schemas from metadata properties.", info_map)
 
-        log_title = "Schema generation starting"
-        log_message = f"Creating new schemas from metadata properties in '{path_to_properties}'"
-        self.om.add_log(log_title, log_message, info_map)
+        Utility.empty_dir(SCHEMA_DIRECTORY_PATH)
 
-        schema_output_path = path_to_schema_outputs if path_to_schema_outputs else DEFAULT_SCHEMA_OUTPUT_PATH
-        keep_list = [".keep"]
-        Utility.empty_dir(schema_output_path, keep_list)
-
-        with open(path_to_properties) as metadata:
-            metadata_dict = json.load(metadata)
-
-        properties = metadata_dict["properties"]
+        properties: dict[str, Any] = self.im.meta_data["properties"]
 
         for key in properties.keys():
             try:
@@ -93,7 +74,7 @@ class DataCollectionAppUpdater:
 
             schema_name = key.replace("properties", "schema")
             new_schema_file_name = f"{schema_name}.json"
-            new_schema_file_path = Path.joinpath(schema_output_path, new_schema_file_name)
+            new_schema_file_path = Path.joinpath(SCHEMA_DIRECTORY_PATH, new_schema_file_name)
 
             log_title = "Schema generator writing new schema"
             log_message = f"Writing new schema in {new_schema_file_path}"
