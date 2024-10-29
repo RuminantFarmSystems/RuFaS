@@ -2368,26 +2368,20 @@ def test_route_save_functions_graph(
         ),
     ],
 )
-def test_route_logs(
-    mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
-    log_pool,
-    expected_calls,
-):
-    mock_output_manager.add_error = MagicMock()
-    mock_output_manager.add_log = MagicMock()
-    mock_output_manager.add_warning = MagicMock()
+def test_route_logs(log_pool: dict[str, str | dict[str, str]], expected_calls: dict[str, int], mocker: MockerFixture
+                    ) -> None:
 
-    mock_output_manager._route_logs(log_pool)
+    output_manager = OutputManager()
 
-    assert mock_output_manager.add_error.call_count == expected_calls["add_error"]
-    assert mock_output_manager.add_log.call_count == expected_calls["add_log"]
-    assert mock_output_manager.add_warning.call_count == expected_calls["add_warning"]
+    mocked_add_error = mocker.patch.object(output_manager, "add_error")
+    mocked_add_log = mocker.patch.object(output_manager, "add_log")
+    mocked_add_warning = mocker.patch.object(output_manager, "add_warning")
 
-    mock_output_manager.add_log = output_manager_original_method_states["add_log"]
-    mock_output_manager.add_warning = output_manager_original_method_states["add_warning"]
-    mock_output_manager.add_error = output_manager_original_method_states["add_error"]
-    mock_output_manager._route_logs = output_manager_original_method_states["_route_logs"]
+    output_manager._route_logs(log_pool)
+
+    assert mocked_add_error.call_count == expected_calls["add_error"]
+    assert mocked_add_log.call_count == expected_calls["add_log"]
+    assert mocked_add_warning.call_count == expected_calls["add_warning"]
 
 
 def test_load_variables_pool_from_file_valid_path(
