@@ -97,10 +97,7 @@
             "items": {
                 "type": "object",
                 "title": "Data Entry",
-                "anyOf": [animal_schema, feeds_schema, manure_inputs_schema, crop_rotation_schema,
-                    fertilizer_schema, field_manure_schema, field_tillage_schema, soil_inputs_schema,
-                    field_management_schema, general_simulation_inputs_schema
-                ]
+                // Spot where list of available schema go
             }
         }
         var data = {}
