@@ -7,7 +7,6 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
-DEFAULT_PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
 SCHEMA_DIRECTORY_PATH: Path = Path("").joinpath("DataCollectionApp", "dummy_schema")
 
 
@@ -51,11 +50,11 @@ class DataCollectionAppUpdater:
             "object": self.setup_object_schema,
         }
 
-    def update_schemas(self) -> None:
+    def update_data_collection_app(self) -> None:
         """
         Updates schemas for collection of RuFaS inputs in the Data Collection App.
         """
-        info_map = {"class": self.__class__.__name__, "function": self.update_schemas.__name__}
+        info_map = {"class": self.__class__.__name__, "function": self.update_data_collection_app.__name__}
 
         self.om.add_log("Schema generation starting", "Creating new schemas from metadata properties.", info_map)
 

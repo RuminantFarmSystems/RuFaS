@@ -10,6 +10,7 @@ import numpy
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 
+from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
@@ -36,6 +37,7 @@ class TaskType(Enum):
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
+    DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
@@ -353,6 +355,7 @@ class TaskManager:
         validation_and_comparison_handlers = {
             TaskType.INPUT_DATA_AUDIT: TaskManager._handle_input_data_audit_tasks,
             TaskType.COMPARE_METADATA_PROPERTIES: TaskManager._handle_compare_metadata_properties_tasks,
+            TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
         }
         simulation_and_analysis_handlers = {
             TaskType.HERD_INITIALIZATION: TaskManager._handle_herd_init_tasks,
@@ -675,3 +678,16 @@ class TaskManager:
     ) -> None:
         """Handler for all methods related to postprocessing."""
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True, True)
+
+    @staticmethod
+    def _handle_data_collection_app_update(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+    ) -> None:
+        """Handler for all methods related to updating the Data Collection App."""
+        dca_updater = DataCollectionAppUpdater()
+
+        dca_updater.update_data_collection_app()
