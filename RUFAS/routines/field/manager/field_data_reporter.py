@@ -2,6 +2,7 @@ from typing import List
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.units import MeasurementUnits
 
 
@@ -864,292 +865,647 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
                 )
 
-    def send_soil_daily_variable(self):
+    def send_soil_layer_daily_variables(self, layer: LayerData, index: int, name: str) -> None:
+        """Sends soil layer related daily variables."""
+        info_map = {"class": self.__class__.__name__, "function": self.send_soil_layer_daily_variables.__name__,
+                    "suffix": "field='" + name + "',layer='" + str(index) + "'"}
+        self.om.add_variable(
+            "temperature",
+            layer.temperature,
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
+        )
+        self.om.add_variable(
+            "percolated_water",
+            layer.percolated_water,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "water_content",
+            layer.water_content,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "water_factor", layer.water_factor, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+        )
+        self.om.add_variable(
+            "evaporated_water_content",
+            layer.evaporated_water_content,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "plant_metabolic_active_carbon_usage",
+            layer.plant_metabolic_active_carbon_usage,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_metabolic_active_carbon_loss",
+            layer.plant_metabolic_active_carbon_loss,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_metabolic_active_carbon_remaining",
+            layer.plant_metabolic_active_carbon_remaining,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_structural_active_carbon_usage",
+            layer.plant_structural_active_carbon_usage,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "metabolic_litter_amount",
+            layer.metabolic_litter_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "structural_litter_amount",
+            layer.structural_litter_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_structural_active_carbon_remaining",
+            layer.plant_structural_active_carbon_remaining,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_structural_slow_carbon_usage",
+            layer.plant_structural_slow_carbon_usage,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_structural_slow_carbon_loss",
+            layer.plant_structural_slow_carbon_loss,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_structural_slow_carbon_remaining",
+            layer.plant_structural_slow_carbon_remaining,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_metabolic_active_carbon_usage",
+            layer.soil_metabolic_active_carbon_usage,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_metabolic_active_carbon_loss",
+            layer.soil_metabolic_active_carbon_loss,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_metabolic_active_carbon_remaining",
+            layer.soil_metabolic_active_carbon_remaining,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_structural_active_carbon_usage",
+            layer.soil_structural_active_carbon_usage,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_structural_active_carbon_loss",
+            layer.soil_structural_active_carbon_loss,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_structural_active_carbon_remaining",
+            layer.soil_structural_active_carbon_remaining,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_structural_slow_carbon_usage",
+            layer.soil_structural_slow_carbon_usage,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_structural_slow_carbon_loss",
+            layer.soil_structural_slow_carbon_loss,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_structural_slow_carbon_remaining",
+            layer.soil_structural_slow_carbon_remaining,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_carbon_decomposition_amount",
+            layer.active_carbon_decomposition_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_carbon_amount",
+            layer.active_carbon_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "slow_carbon_amount",
+            layer.slow_carbon_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "passive_carbon_amount",
+            layer.passive_carbon_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "slow_carbon_decomposition_amount",
+            layer.slow_carbon_decomposition_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "passive_carbon_decomposition_amount",
+            layer.passive_carbon_decomposition_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_carbon_to_slow_amount",
+            layer.active_carbon_to_slow_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_carbon_to_slow_loss",
+            layer.active_carbon_to_slow_loss,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_carbon_to_passive_amount",
+            layer.active_carbon_to_passive_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "slow_to_active_carbon_amount",
+            layer.slow_to_active_carbon_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "slow_carbon_co2_lost_amount",
+            layer.slow_carbon_co2_lost_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "passive_to_active_carbon_amount",
+            layer.passive_to_active_carbon_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "passive_carbon_co2_lost_amount",
+            layer.passive_carbon_co2_lost_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_active_decompose_carbon",
+            layer.plant_active_decompose_carbon,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_active_decompose_carbon",
+            layer.soil_active_decompose_carbon,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "soil_overall_carbon_fraction",
+            layer.soil_overall_carbon_fraction,
+            dict(info_map, **{"units": MeasurementUnits.FRACTION}),
+        )
+        self.om.add_variable(
+            "total_soil_carbon_amount",
+            layer.total_soil_carbon_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "carbon_emissions",
+            layer.total_soil_carbon_amount,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "mean_phosphorus_sorption_parameter",
+            layer.mean_phosphorus_sorption_parameter,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+        )
+        self.om.add_variable(
+            "labile_inorganic_phosphorus_content",
+            layer.labile_inorganic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_inorganic_phosphorus_content",
+            layer.active_inorganic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "stable_inorganic_phosphorus_content",
+            layer.stable_inorganic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "fresh_organic_phosphorus_content",
+            layer.fresh_organic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_inorganic_unbalanced_counter",
+            layer.active_inorganic_unbalanced_counter,
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
+        )
+        self.om.add_variable(
+            "labile_inorganic_unbalanced_counter",
+            layer.labile_inorganic_unbalanced_counter,
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
+        )
+        self.om.add_variable(
+            "percolated_phosphorus",
+            layer.percolated_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "nitrate_content",
+            layer.nitrate_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "ammonium_content",
+            layer.ammonium_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_organic_nitrogen_content",
+            layer.active_organic_nitrogen_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "stable_organic_nitrogen_content",
+            layer.stable_organic_nitrogen_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "fresh_organic_nitrogen_content",
+            layer.fresh_organic_nitrogen_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "nitrous_oxide_emissions",
+            layer.nitrous_oxide_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "dinitrogen_emissions",
+            layer.dinitrogen_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "ammonia_emissions",
+            layer.ammonia_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "percolated_nitrates",
+            layer.percolated_nitrates,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "percolated_ammonium",
+            layer.percolated_ammonium,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "percolated_active_organic_nitrogen",
+            layer.percolated_active_organic_nitrogen,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+
+    def send_vadose_zone_layer_daily_variables(self, field: Field) -> None:
+        """Sends vadose zone layer related daily variables."""
+        info_map = {"class": self.__class__.__name__, "function": self.send_vadose_zone_layer_daily_variables.__name__,
+                    "suffix": "field='" + field.field_data.name + "',vadose_zone_layer"}
+        self.om.add_variable(
+            "active_organic_nitrogen_content",
+            field.soil.data.vadose_zone_layer.active_organic_nitrogen_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "stable_organic_nitrogen_content",
+            field.soil.data.vadose_zone_layer.stable_organic_nitrogen_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "nitrate_content",
+            field.soil.data.vadose_zone_layer.nitrate_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "fresh_organic_nitrogen_content",
+            field.soil.data.vadose_zone_layer.fresh_organic_nitrogen_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "water_content",
+            field.soil.data.vadose_zone_layer.water_content,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "labile_inorganic_phosphorus_content",
+            field.soil.data.vadose_zone_layer.labile_inorganic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "active_inorganic_phosphorus_content",
+            field.soil.data.vadose_zone_layer.active_inorganic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "stable_inorganic_phosphorus_content",
+            field.soil.data.vadose_zone_layer.stable_inorganic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "fresh_organic_phosphorus_content",
+            field.soil.data.vadose_zone_layer.fresh_organic_phosphorus_content,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "plant_residue",
+            field.soil.data.vadose_zone_layer.plant_residue,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+
+    def send_soil_daily_variables(self, field):
         """Sends soil related daily variables."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.send_soil_daily_variable.__name__,
-        }
-        for field in self.fields:
-            info_map["suffix"] = "field='" + field.field_data.name + "'"
-            self.om.add_variable(
-                "water_evaporated",
-                field.soil.data.water_evaporated,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "eroded_sediment",
-                field.soil.data.eroded_sediment,
-                dict(info_map, **{"units": MeasurementUnits.METRIC_TONS}),
-            )
-            self.om.add_variable(
-                "accumulated_runoff",
-                field.soil.data.accumulated_runoff,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "infiltrated_water",
-                field.soil.data.infiltrated_water,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "snow_content",
-                field.soil.data.snow_content,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "snow_melt",
-                field.soil.data.snow_melt_amount,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "current_day_snow_temperature",
-                field.soil.data.current_day_snow_temperature,
-                dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
-            )
-            self.om.add_variable(
-                "water_sublimated",
-                field.soil.data.water_sublimated,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "cover_type", field.soil.data.cover_type, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
-            )
-            self.om.add_variable(
-                "full_available_phosphorus_pool",
-                field.soil.data.full_available_phosphorus_pool,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "available_phosphorus_pool",
-                field.soil.data.available_phosphorus_pool,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "recalcitrant_phosphorus_pool",
-                field.soil.data.recalcitrant_phosphorus_pool,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "runoff_fertilizer_phosphorus",
-                field.soil.data.runoff_fertilizer_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            # confirm unit
-            self.om.add_variable(
-                "days_since_application",
-                field.soil.data.days_since_application,
-                dict(info_map, **{"units": MeasurementUnits.DAYS}),
-            )
-            # confirm unit
-            self.om.add_variable(
-                "rain_events_after_fertilizer_application",
-                field.soil.data.rain_events_after_fertilizer_application,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-            )
-            self.om.add_variable(
-                "machine_manure_dry_mass",
-                field.soil.data.machine_manure.manure_dry_mass,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "machine_manure_applied_mass",
-                field.soil.data.machine_manure.manure_applied_mass,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "machine_manure_field_coverage",
-                field.soil.data.machine_manure.manure_field_coverage,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-            )
-            self.om.add_variable(
-                "machine_manure_moisture_factor",
-                field.soil.data.machine_manure.manure_moisture_factor,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-            )
-            self.om.add_variable(
-                "machine_water_extractable_inorganic_phosphorus",
-                field.soil.data.machine_manure.water_extractable_inorganic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "machine_water_extractable_organic_phosphorus",
-                field.soil.data.machine_manure.water_extractable_organic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "machine_stable_inorganic_phosphorus",
-                field.soil.data.machine_manure.stable_inorganic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "machine_stable_organic_phosphorus",
-                field.soil.data.machine_manure.stable_organic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "machine_organic_phosphorus_runoff",
-                field.soil.data.machine_manure.organic_phosphorus_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "machine_inorganic_phosphorus_runoff",
-                field.soil.data.machine_manure.inorganic_phosphorus_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_manure_dry_mass",
-                field.soil.data.grazing_manure.manure_dry_mass,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_manure_applied_mass",
-                field.soil.data.grazing_manure.manure_applied_mass,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_manure_field_coverage",
-                field.soil.data.grazing_manure.manure_field_coverage,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-            )
-            self.om.add_variable(
-                "grazing_manure_moisture_factor",
-                field.soil.data.grazing_manure.manure_moisture_factor,
-                dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
-            )
-            self.om.add_variable(
-                "grazing_water_extractable_inorganic_phosphorus",
-                field.soil.data.grazing_manure.water_extractable_inorganic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_water_extractable_organic_phosphorus",
-                field.soil.data.grazing_manure.water_extractable_organic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_stable_inorganic_phosphorus",
-                field.soil.data.grazing_manure.stable_inorganic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_stable_organic_phosphorus",
-                field.soil.data.grazing_manure.stable_organic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_organic_phosphorus_runoff",
-                field.soil.data.grazing_manure.organic_phosphorus_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "grazing_inorganic_phosphorus_runoff",
-                field.soil.data.grazing_manure.inorganic_phosphorus_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "soil_phosphorus_runoff",
-                field.soil.data.soil_phosphorus_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "nitrate_runoff",
-                field.soil.data.nitrate_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "ammonium_runoff",
-                field.soil.data.ammonium_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "eroded_fresh_organic_nitrogen",
-                field.soil.data.eroded_fresh_organic_nitrogen,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "eroded_stable_organic_nitrogen",
-                field.soil.data.eroded_stable_organic_nitrogen,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "eroded_active_organic_nitrogen",
-                field.soil.data.eroded_active_organic_nitrogen,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
+        info_map = {"class": self.__class__.__name__, "function": self.send_soil_daily_variables.__name__,
+                    "suffix": "field='" + field.field_data.name + "'"}
 
-            self.om.add_variable(
-                "profile_carbon_total",
-                field.soil.data.profile_carbon_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "profile_carbon_emissions",
-                field.soil.data.profile_carbon_emissions,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "profile_nitrates_total",
-                field.soil.data.profile_nitrates_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "profile_ammonium_total",
-                field.soil.data.profile_ammonium_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "profile_active_organic_nitrogen_total",
-                field.soil.data.profile_active_organic_nitrogen_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "profile_stable_organic_nitrogen_total",
-                field.soil.data.profile_stable_organic_nitrogen_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "profile_fresh_organic_nitrogen_total",
-                field.soil.data.profile_fresh_organic_nitrogen_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
+        self.om.add_variable(
+            "water_evaporated",
+            field.soil.data.water_evaporated,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "eroded_sediment",
+            field.soil.data.eroded_sediment,
+            dict(info_map, **{"units": MeasurementUnits.METRIC_TONS}),
+        )
+        self.om.add_variable(
+            "accumulated_runoff",
+            field.soil.data.accumulated_runoff,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "infiltrated_water",
+            field.soil.data.infiltrated_water,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "snow_content",
+            field.soil.data.snow_content,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "snow_melt",
+            field.soil.data.snow_melt_amount,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "current_day_snow_temperature",
+            field.soil.data.current_day_snow_temperature,
+            dict(info_map, **{"units": MeasurementUnits.DEGREES_CELSIUS}),
+        )
+        self.om.add_variable(
+            "water_sublimated",
+            field.soil.data.water_sublimated,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "cover_type", field.soil.data.cover_type, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+        )
+        self.om.add_variable(
+            "full_available_phosphorus_pool",
+            field.soil.data.full_available_phosphorus_pool,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "available_phosphorus_pool",
+            field.soil.data.available_phosphorus_pool,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "recalcitrant_phosphorus_pool",
+            field.soil.data.recalcitrant_phosphorus_pool,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "runoff_fertilizer_phosphorus",
+            field.soil.data.runoff_fertilizer_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        # confirm unit
+        self.om.add_variable(
+            "days_since_application",
+            field.soil.data.days_since_application,
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
+        )
+        # confirm unit
+        self.om.add_variable(
+            "rain_events_after_fertilizer_application",
+            field.soil.data.rain_events_after_fertilizer_application,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+        )
+        self.om.add_variable(
+            "machine_manure_dry_mass",
+            field.soil.data.machine_manure.manure_dry_mass,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "machine_manure_applied_mass",
+            field.soil.data.machine_manure.manure_applied_mass,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "machine_manure_field_coverage",
+            field.soil.data.machine_manure.manure_field_coverage,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+        )
+        self.om.add_variable(
+            "machine_manure_moisture_factor",
+            field.soil.data.machine_manure.manure_moisture_factor,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+        )
+        self.om.add_variable(
+            "machine_water_extractable_inorganic_phosphorus",
+            field.soil.data.machine_manure.water_extractable_inorganic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "machine_water_extractable_organic_phosphorus",
+            field.soil.data.machine_manure.water_extractable_organic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "machine_stable_inorganic_phosphorus",
+            field.soil.data.machine_manure.stable_inorganic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "machine_stable_organic_phosphorus",
+            field.soil.data.machine_manure.stable_organic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "machine_organic_phosphorus_runoff",
+            field.soil.data.machine_manure.organic_phosphorus_runoff,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "machine_inorganic_phosphorus_runoff",
+            field.soil.data.machine_manure.inorganic_phosphorus_runoff,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_manure_dry_mass",
+            field.soil.data.grazing_manure.manure_dry_mass,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_manure_applied_mass",
+            field.soil.data.grazing_manure.manure_applied_mass,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_manure_field_coverage",
+            field.soil.data.grazing_manure.manure_field_coverage,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+        )
+        self.om.add_variable(
+            "grazing_manure_moisture_factor",
+            field.soil.data.grazing_manure.manure_moisture_factor,
+            dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
+        )
+        self.om.add_variable(
+            "grazing_water_extractable_inorganic_phosphorus",
+            field.soil.data.grazing_manure.water_extractable_inorganic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_water_extractable_organic_phosphorus",
+            field.soil.data.grazing_manure.water_extractable_organic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_stable_inorganic_phosphorus",
+            field.soil.data.grazing_manure.stable_inorganic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_stable_organic_phosphorus",
+            field.soil.data.grazing_manure.stable_organic_phosphorus,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_organic_phosphorus_runoff",
+            field.soil.data.grazing_manure.organic_phosphorus_runoff,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "grazing_inorganic_phosphorus_runoff",
+            field.soil.data.grazing_manure.inorganic_phosphorus_runoff,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "soil_phosphorus_runoff",
+            field.soil.data.soil_phosphorus_runoff,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "nitrate_runoff",
+            field.soil.data.nitrate_runoff,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "ammonium_runoff",
+            field.soil.data.ammonium_runoff,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "eroded_fresh_organic_nitrogen",
+            field.soil.data.eroded_fresh_organic_nitrogen,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "eroded_stable_organic_nitrogen",
+            field.soil.data.eroded_stable_organic_nitrogen,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "eroded_active_organic_nitrogen",
+            field.soil.data.eroded_active_organic_nitrogen,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
 
+        self.om.add_variable(
+            "profile_carbon_total",
+            field.soil.data.profile_carbon_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "profile_carbon_emissions",
+            field.soil.data.profile_carbon_emissions,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "profile_nitrates_total",
+            field.soil.data.profile_nitrates_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "profile_ammonium_total",
+            field.soil.data.profile_ammonium_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "profile_active_organic_nitrogen_total",
+            field.soil.data.profile_active_organic_nitrogen_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "profile_stable_organic_nitrogen_total",
+            field.soil.data.profile_stable_organic_nitrogen_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "profile_fresh_organic_nitrogen_total",
+            field.soil.data.profile_fresh_organic_nitrogen_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
 
-
-    def send_field_daily_variables(self):
+    def send_field_daily_variables(self, field):
         """Sends field related daily variables."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.send_field_daily_variables.__name__,
-        }
-        for field in self.fields:
-            info_map["suffix"] = "field='" + field.field_data.name + "'"
-            self.om.add_variable(
-                "current_residue",
-                field.field_data.current_residue,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "transpiration",
-                field.field_data.transpiration,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "max_transpiration",
-                field.field_data.max_transpiration,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "max_evapotranspiration",
-                field.field_data.max_evapotranspiration,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            # confirm unit
-            self.om.add_variable(
-                "days_into_watering_interval",
-                field.field_data.days_into_watering_interval,
-                dict(info_map, **{"units": MeasurementUnits.DAYS}),
-            )
+        info_map = {"class": self.__class__.__name__, "function": self.send_field_daily_variables.__name__,
+                    "suffix": "field='" + field.field_data.name + "'"}
+
+        self.om.add_variable(
+            "current_residue",
+            field.field_data.current_residue,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "transpiration",
+            field.field_data.transpiration,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "max_transpiration",
+            field.field_data.max_transpiration,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        self.om.add_variable(
+            "max_evapotranspiration",
+            field.field_data.max_evapotranspiration,
+            dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+        )
+        # confirm unit
+        self.om.add_variable(
+            "days_into_watering_interval",
+            field.field_data.days_into_watering_interval,
+            dict(info_map, **{"units": MeasurementUnits.DAYS}),
+        )
 
     def send_annual_variables(self) -> None:
         """Sends annual variables to the output manager."""
