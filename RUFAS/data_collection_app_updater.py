@@ -28,6 +28,8 @@ PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
 
 SCHEMA_SCRIPT_TAG_PLACEHOLDER = "    <!-- Spot where schema import scripts go -->"
 
+AVAILABLE_SCHEMAS_LIST_PLACEHOLDER = "// Spot where list of available schema go"
+
 
 class DataCollectionAppUpdater:
     """
@@ -133,7 +135,12 @@ class DataCollectionAppUpdater:
         with open(TEMPLATE_PATH, "r", encoding="utf-8") as template_file:
             template = template_file.read()
 
-        rewritten_index = template.replace(SCHEMA_SCRIPT_TAG_PLACEHOLDER, schema_script_tags)
+        index_with_script_tags = template.replace(SCHEMA_SCRIPT_TAG_PLACEHOLDER, schema_script_tags)
+
+        pattern_to_remove = r"\./schema/|\.js"
+        schema_names = [re.sub(pattern_to_remove, "", name) for name in localized_schema_paths]
+        list_of_schema = f"                \"anyOf\": {schema_names}".replace("'", "")
+        rewritten_index = index_with_script_tags.replace(AVAILABLE_SCHEMAS_LIST_PLACEHOLDER, list_of_schema)
 
         with open(INDEX_PATH, "w", encoding="utf-8") as index:
             index.write(rewritten_index)

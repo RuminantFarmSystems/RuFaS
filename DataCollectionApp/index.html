@@ -8,16 +8,16 @@
     <script src="./js/ace.js"></script>
     <script src="./js/assign.js"></script>
     <script src="./js/lz-string.min.js"></script>
-    <script src="./schema/animal.js"></script>
-    <script src="./schema/crop_rotation.js"></script>
-    <script src="./schema/feeds.js"></script>
-    <script src="./schema/field_fertilizer.js"></script>
-    <script src="./schema/field_manure.js"></script>
-    <script src="./schema/field_management.js"></script>
-    <script src="./schema/field_tillage.js"></script>
-    <script src="./schema/general_simulation_inputs.js"></script>
-    <script src="./schema/manure_inputs.js"></script>
-    <script src="./schema/soil_inputs.js"></script>
+    <script src="./schema/config_schema.js"></script>
+    <script src="./schema/animal_schema.js"></script>
+    <script src="./schema/crop_schedule_schema.js"></script>
+    <script src="./schema/fertilizer_schedule_schema.js"></script>
+    <script src="./schema/manure_schedule_schema.js"></script>
+    <script src="./schema/tillage_schedule_schema.js"></script>
+    <script src="./schema/feed_schema.js"></script>
+    <script src="./schema/manure_management_schema.js"></script>
+    <script src="./schema/field_schema.js"></script>
+    <script src="./schema/tractor_dataset_schema.js"></script>
     <link rel='stylesheet' id='theme-link'>
     <link rel='stylesheet' id='iconlib-link'>
     <style>
@@ -106,10 +106,7 @@
             "items": {
                 "type": "object",
                 "title": "Data Entry",
-                "anyOf": [animal_schema, feeds_schema, manure_inputs_schema, crop_rotation_schema,
-                    fertilizer_schema, field_manure_schema, field_tillage_schema, soil_inputs_schema,
-                    field_management_schema, general_simulation_inputs_schema
-                ]
+                                "anyOf": [config_schema, animal_schema, crop_schedule_schema, fertilizer_schedule_schema, manure_schedule_schema, tillage_schedule_schema, feed_schema, manure_management_schema, field_schema, tractor_dataset_schema]
             }
         }
         var data = {}
