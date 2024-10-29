@@ -864,8 +864,43 @@ class FieldDataReporter:
                     dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
                 )
 
+    def send_field_daily_variables(self):
+        """Sends field related daily variables."""
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_daily_variables.__name__,
+        }
+        for field in self.fields:
+            info_map["suffix"] = "field='" + field.field_data.name + "'"
+            self.om.add_variable(
+                "current_residue",
+                field.field_data.current_residue,
+                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+            )
+            self.om.add_variable(
+                "transpiration",
+                field.field_data.transpiration,
+                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+            )
+            self.om.add_variable(
+                "max_transpiration",
+                field.field_data.max_transpiration,
+                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+            )
+            self.om.add_variable(
+                "max_evapotranspiration",
+                field.field_data.max_evapotranspiration,
+                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
+            )
+            # confirm unit
+            self.om.add_variable(
+                "days_into_watering_interval",
+                field.field_data.days_into_watering_interval,
+                dict(info_map, **{"units": MeasurementUnits.DAYS}),
+            )
+
     def send_annual_variables(self) -> None:
-        """sends annual variables to the output manager"""
+        """Sends annual variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_annual_variables.__name__,
