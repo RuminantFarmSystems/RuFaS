@@ -3,19 +3,25 @@ from pathlib import Path
 from typing import Any, Callable
 import re
 
+from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
 DEFAULT_PROPERTIES_PATH: Path = Path("").joinpath("input", "metadata", "default_metadata.json")
 DEFAULT_SCHEMA_OUTPUT_PATH: Path = Path("data_collection_app_schemas")
 
-om = OutputManager()
-
 
 class DataCollectionAppUpdater:
     """
     This class provides a suite of methods for automatically updating the JSON schemas for the Data Collection App based
     on the properties contained in the metadata.
+
+    Attributes
+    ----------
+    im : InputManager
+        Instance of the Input Manager.
+    om : OutputManager
+        Instance of the Output Manager.
 
     Methods
     -------
@@ -33,6 +39,17 @@ class DataCollectionAppUpdater:
         Creates the JSON editor schema for an 'object' type.
 
     """
+
+    def __init__(self):
+        self.im = InputManager()
+        self.om = OutputManager()
+        self.type_to_schema_map: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
+            "number": self.setup_number_schema,
+            "bool": self.setup_bool_schema,
+            "string": self.setup_string_schema,
+            "array": self.setup_array_schema,
+            "object": self.setup_object_schema,
+        }
 
     def generate_schemas(self, path_to_properties: str | None, path_to_schema_outputs: str | None) -> None:
         """
@@ -54,7 +71,7 @@ class DataCollectionAppUpdater:
 
         log_title = "Schema generation starting"
         log_message = f"Creating new schemas from metadata properties in '{path_to_properties}'"
-        om.add_log(log_title, log_message, info_map)
+        self.om.add_log(log_title, log_message, info_map)
 
         schema_output_path = path_to_schema_outputs if path_to_schema_outputs else DEFAULT_SCHEMA_OUTPUT_PATH
         keep_list = [".keep"]
@@ -67,11 +84,11 @@ class DataCollectionAppUpdater:
 
         for key in properties.keys():
             try:
-                new_schema = DataCollectionAppUpdater.setup_object_schema(key, properties[key])
+                new_schema = self.setup_object_schema(key, properties[key])
             except Exception as e:
                 error_title = "Schema generator raised exception"
                 error_message = f"Key: '{key}' raised exception: {str(e)}"
-                om.add_error(error_title, error_message, info_map)
+                self.om.add_error(error_title, error_message, info_map)
                 continue
 
             schema_name = key.replace("properties", "schema")
@@ -80,13 +97,12 @@ class DataCollectionAppUpdater:
 
             log_title = "Schema generator writing new schema"
             log_message = f"Writing new schema in {new_schema_file_path}"
-            om.add_log(log_title, log_message, info_map)
+            self.om.add_log(log_title, log_message, info_map)
 
             with open(new_schema_file_path, "w") as outfile:
                 json.dump(new_schema, outfile, indent=2)
 
-    @staticmethod
-    def setup_number_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_number_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a numerical input.
 
@@ -124,8 +140,7 @@ class DataCollectionAppUpdater:
 
         return schema
 
-    @staticmethod
-    def setup_bool_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_bool_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a boolean input.
 
@@ -158,8 +173,7 @@ class DataCollectionAppUpdater:
 
         return schema
 
-    @staticmethod
-    def setup_string_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_string_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a string input.
 
@@ -191,13 +205,10 @@ class DataCollectionAppUpdater:
             schema["options"]["infoText"] = description
         if pattern is not None:
             try:
-                enum = DataCollectionAppUpdater._get_list_of_options(pattern)
+                enum = self._get_list_of_options(pattern)
             except ValueError as e:
-                info_map = {
-                    "class": DataCollectionAppUpdater.__name__,
-                    "function": DataCollectionAppUpdater.setup_string_schema.__name__,
-                }
-                om.add_error(
+                info_map = {"class": self.__class__.__name__, "function": self.setup_string_schema.__name__}
+                self.om.add_error(
                     "Schema generation for string input encountered error",
                     f"Variable {title=} had error: {str(e)}",
                     info_map,
@@ -243,8 +254,7 @@ class DataCollectionAppUpdater:
         split_list = unsplit_list.split("|")
         return split_list
 
-    @staticmethod
-    def setup_array_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_array_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for an array input.
 
@@ -276,15 +286,14 @@ class DataCollectionAppUpdater:
             schema["options"]["infoText"] = description
 
         element_properties = input_properties["properties"]
-        element_schema_creator = DATA_TYPE_TO_SCHEMA_SETUP_MAP[element_properties["type"]]
+        element_schema_creator = self.type_to_schema_map[element_properties["type"]]
         element_title = title + "_element"
         element_property_dictionary = element_schema_creator(element_title, element_properties)
         schema["items"] = element_property_dictionary
 
         return schema
 
-    @staticmethod
-    def setup_object_schema(title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def setup_object_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for an object input.
 
@@ -316,17 +325,8 @@ class DataCollectionAppUpdater:
 
         for key in keys:
             sub_property = input_properties[key]
-            schema_setup_method = DATA_TYPE_TO_SCHEMA_SETUP_MAP[sub_property["type"]]
+            schema_setup_method = self.type_to_schema_map[sub_property["type"]]
             sub_property_schema = schema_setup_method(key, sub_property)
             schema["properties"][key] = sub_property_schema
 
         return schema
-
-
-DATA_TYPE_TO_SCHEMA_SETUP_MAP: dict[str, Callable[[str, dict[str, Any]], dict[str, Any]]] = {
-    "number": DataCollectionAppUpdater.setup_number_schema,
-    "bool": DataCollectionAppUpdater.setup_bool_schema,
-    "string": DataCollectionAppUpdater.setup_string_schema,
-    "array": DataCollectionAppUpdater.setup_array_schema,
-    "object": DataCollectionAppUpdater.setup_object_schema,
-}

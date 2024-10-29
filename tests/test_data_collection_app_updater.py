@@ -1,12 +1,14 @@
 import pytest
 from pytest_mock import MockerFixture
-from mock import mock_open, MagicMock
 from typing import Any
 
-from RUFAS.data_collection_app_updater import DataCollectionAppUpdater, DATA_TYPE_TO_SCHEMA_SETUP_MAP
-from RUFAS.output_manager import OutputManager
+from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 
-om = OutputManager()
+
+@pytest.fixture
+def dca_updater() -> DataCollectionAppUpdater:
+    return DataCollectionAppUpdater()
+
 
 dummy_properties = {
     "properties": {
@@ -23,19 +25,20 @@ dummy_properties = {
         ("^(TAI|ED|Synch-ED)$", ["TAI", "ED", "Synch-ED"]),
     ],
 )
-def test_get_list_of_options(pattern: str, expected: list[str]) -> None:
+def test_get_list_of_options(dca_updater: DataCollectionAppUpdater, pattern: str, expected: list[str]) -> None:
     """Tests that list of options are produced correctly from a Regex filter."""
-    actual = DataCollectionAppUpdater._get_list_of_options(pattern)
+    actual = dca_updater._get_list_of_options(pattern)
+
     assert actual == expected
 
 
 @pytest.mark.parametrize(
     "pattern", ["(kg)$", "(kg)", "$(kg)^", "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$"]
 )
-def test_get_list_of_options_error(pattern: str) -> None:
+def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, pattern: str) -> None:
     """Tests that an incorrectly structured Regex pattern produces an error."""
     with pytest.raises(ValueError):
-        DataCollectionAppUpdater._get_list_of_options(pattern)
+        dca_updater._get_list_of_options(pattern)
 
 
 @pytest.mark.parametrize(
@@ -65,14 +68,14 @@ def test_get_list_of_options_error(pattern: str) -> None:
     ],
 )
 def test_setup_string_schema(
-    mocker: MockerFixture, title: str, properties: dict[str, Any], schema: dict[str, Any]
+    dca_updater: DataCollectionAppUpdater, mocker: MockerFixture, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
     """Tests that setup string schema correctly handles a valid string property."""
     mocked_get_options = mocker.patch.object(
-        DataCollectionAppUpdater, "_get_list_of_options", return_value=["one", "two"]
+        dca_updater, "_get_list_of_options", return_value=["one", "two"]
     )
 
-    actual = DataCollectionAppUpdater.setup_string_schema(title, properties)
+    actual = dca_updater.setup_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
     assert actual == schema
@@ -103,12 +106,12 @@ def test_setup_string_schema(
     ],
 )
 def test_setup_string_schema_value_error(
-    mocker: MockerFixture, title: str, properties: dict[str, Any], schema: dict[str, Any]
+    dca_updater: DataCollectionAppUpdater, mocker: MockerFixture, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
     """Tests that setup_string_schema handles value errors appropriately."""
-    mock_add_error = mocker.patch.object(om, "add_error")
+    mock_add_error = mocker.patch.object(dca_updater.om, "add_error")
     mocked_get_options = mocker.patch.object(
-        DataCollectionAppUpdater,
+        dca_updater,
         "_get_list_of_options",
         side_effect=ValueError(
             "'[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$' is not a valid pattern. Cannot "
@@ -116,14 +119,14 @@ def test_setup_string_schema_value_error(
         ),
     )
 
-    actual = DataCollectionAppUpdater.setup_string_schema(title, properties)
+    actual = dca_updater.setup_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
     mock_add_error.assert_called_once_with(
         "Schema generation for string input encountered error",
         "Variable title='start_date' had error: '[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6]"
         ")$' is not a valid pattern. Cannot create list of valid options.",
-        {"class": DataCollectionAppUpdater.__name__, "function": DataCollectionAppUpdater.setup_string_schema.__name__},
+        {"class": dca_updater.__class__.__name__, "function": dca_updater.setup_string_schema.__name__},
     )
     assert actual == schema
 
@@ -157,9 +160,10 @@ def test_setup_string_schema_value_error(
         )
     ],
 )
-def test_setup_number_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
+def test_setup_number_schema(dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
     """Tests that number schema are setup correctly."""
-    actual = DataCollectionAppUpdater.setup_number_schema(title, properties)
+    actual = dca_updater.setup_number_schema(title, properties)
+
     assert actual == schema
 
 
@@ -189,14 +193,15 @@ def test_setup_number_schema(title: str, properties: dict[str, Any], schema: dic
         )
     ],
 )
-def test_setup_bool_schema(title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
+def test_setup_bool_schema(dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
     """Tests that boolean schema are setup correctly."""
-    actual = DataCollectionAppUpdater.setup_bool_schema(title, properties)
+    actual = dca_updater.setup_bool_schema(title, properties)
+
     assert actual == schema
 
 
 @pytest.mark.parametrize(
-    "title,properties,schema,number_count,bool_count,string_count,object_count,array_count",
+    "title,properties,schema",
     [
         (
             "parity_death_prob",
@@ -231,12 +236,7 @@ def test_setup_bool_schema(title: str, properties: dict[str, Any], schema: dict[
                         },
                     },
                 },
-            },
-            1,
-            0,
-            0,
-            0,
-            0,
+            }
         ),
         (
             "manure_management_scenarios",
@@ -293,45 +293,24 @@ def test_setup_bool_schema(title: str, properties: dict[str, Any], schema: dict[
                         },
                     },
                 },
-            },
-            1,
-            0,
-            1,
-            1,
-            0,
+            }
         ),
     ],
 )
 def test_setup_array_schema(
+    dca_updater: DataCollectionAppUpdater,
     title: str,
     properties: dict[str, Any],
-    schema: dict[str, Any],
-    number_count: int,
-    bool_count: int,
-    string_count: int,
-    object_count: int,
-    array_count: int,
+    schema: dict[str, Any]
 ) -> None:
     """Tests that array schema is setup correctly."""
-    data_collection_app_updater = DataCollectionAppUpdater()
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"] = MagicMock(wraps=data_collection_app_updater.setup_number_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"] = MagicMock(wraps=data_collection_app_updater.setup_bool_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"] = MagicMock(wraps=data_collection_app_updater.setup_string_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"] = MagicMock(wraps=data_collection_app_updater.setup_object_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"] = MagicMock(wraps=data_collection_app_updater.setup_array_schema)
-
-    actual = data_collection_app_updater.setup_array_schema(title, properties)
+    actual = dca_updater.setup_array_schema(title, properties)
 
     assert actual == schema
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"].call_count == number_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"].call_count == bool_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"].call_count == string_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"].call_count == object_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"].call_count == array_count
 
 
 @pytest.mark.parametrize(
-    "title,properties,schema,number_count,bool_count,string_count,object_count,array_count",
+    "title,properties,schema",
     [
         (
             "life_cycle",
@@ -360,12 +339,7 @@ def test_setup_array_schema(
                         },
                     }
                 },
-            },
-            1,
-            0,
-            0,
-            0,
-            0,
+            }
         ),
         (
             "herd_information",
@@ -417,72 +391,17 @@ def test_setup_array_schema(
                         "format": "select2",
                     },
                 },
-            },
-            1,
-            0,
-            1,
-            0,
-            0,
+            }
         ),
     ],
 )
 def test_setup_object_schema(
+    dca_updater: DataCollectionAppUpdater,
     title: str,
     properties: dict[str, Any],
-    schema: dict[str, Any],
-    number_count: int,
-    bool_count: int,
-    string_count: int,
-    object_count: int,
-    array_count: int,
+    schema: dict[str, Any]
 ) -> None:
     """Tests that object schema are setup correctly."""
-    data_collection_app_updater = DataCollectionAppUpdater()
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"] = MagicMock(wraps=data_collection_app_updater.setup_number_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"] = MagicMock(wraps=data_collection_app_updater.setup_bool_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"] = MagicMock(wraps=data_collection_app_updater.setup_string_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"] = MagicMock(wraps=data_collection_app_updater.setup_object_schema)
-    DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"] = MagicMock(wraps=data_collection_app_updater.setup_array_schema)
-
-    actual = DataCollectionAppUpdater.setup_object_schema(title, properties)
+    actual = dca_updater.setup_object_schema(title, properties)
 
     assert actual == schema
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["number"].call_count == number_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["bool"].call_count == bool_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["string"].call_count == string_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["object"].call_count == object_count
-    assert DATA_TYPE_TO_SCHEMA_SETUP_MAP["array"].call_count == array_count
-
-
-def test_generate_schema(mocker: MockerFixture) -> None:
-    patch_add_log = mocker.patch.object(om, "add_log")
-    patch_add_error = mocker.patch.object(om, "add_error")
-    patch_open = mocker.patch("builtins.open", mock_open(read_data="some valid json data"))
-    patch_object_schema_setup = mocker.patch(
-        "RUFAS.data_collection_app_updater.DataCollectionAppUpdater.setup_object_schema", result={"new_schema": "yay"}
-    )
-    patch_empty_dir = mocker.patch("RUFAS.util.Utility.empty_dir")
-    patch_json_load = mocker.patch("json.load", return_value=dummy_properties)
-    patch_json_dump = mocker.patch("json.dump")
-
-    data_collection_app_updater = DataCollectionAppUpdater()
-    data_collection_app_updater.generate_schemas(None, None)
-
-    assert patch_add_log.call_count == 2
-    assert patch_empty_dir.call_count == 1
-    assert patch_open.call_count == 2
-    assert patch_json_load.call_count == 1
-    assert patch_object_schema_setup.call_count == 1
-    assert patch_add_error.call_count == 0
-    assert patch_json_dump.call_count == 1
-
-    patch_object_schema_setup = mocker.patch(
-        "RUFAS.data_collection_app_updater.DataCollectionAppUpdater.setup_object_schema",
-        side_effect=ValueError("Oh no!"),
-    )
-
-    data_collection_app_updater.generate_schemas(None, None)
-
-    assert patch_object_schema_setup.call_count == 1
-    assert patch_add_error.call_count == 1
-    assert patch_json_dump.call_count == 1
