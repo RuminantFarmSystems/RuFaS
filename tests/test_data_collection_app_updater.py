@@ -68,12 +68,14 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
     ],
 )
 def test_setup_string_schema(
-    dca_updater: DataCollectionAppUpdater, mocker: MockerFixture, title: str, properties: dict[str, Any], schema: dict[str, Any]
+    dca_updater: DataCollectionAppUpdater,
+    mocker: MockerFixture,
+    title: str,
+    properties: dict[str, Any],
+    schema: dict[str, Any],
 ) -> None:
     """Tests that setup string schema correctly handles a valid string property."""
-    mocked_get_options = mocker.patch.object(
-        dca_updater, "_get_list_of_options", return_value=["one", "two"]
-    )
+    mocked_get_options = mocker.patch.object(dca_updater, "_get_list_of_options", return_value=["one", "two"])
 
     actual = dca_updater.setup_string_schema(title, properties)
 
@@ -106,7 +108,11 @@ def test_setup_string_schema(
     ],
 )
 def test_setup_string_schema_value_error(
-    dca_updater: DataCollectionAppUpdater, mocker: MockerFixture, title: str, properties: dict[str, Any], schema: dict[str, Any]
+    dca_updater: DataCollectionAppUpdater,
+    mocker: MockerFixture,
+    title: str,
+    properties: dict[str, Any],
+    schema: dict[str, Any],
 ) -> None:
     """Tests that setup_string_schema handles value errors appropriately."""
     mock_add_error = mocker.patch.object(dca_updater.om, "add_error")
@@ -160,7 +166,9 @@ def test_setup_string_schema_value_error(
         )
     ],
 )
-def test_setup_number_schema(dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
+def test_setup_number_schema(
+    dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
+) -> None:
     """Tests that number schema are setup correctly."""
     actual = dca_updater.setup_number_schema(title, properties)
 
@@ -193,7 +201,9 @@ def test_setup_number_schema(dca_updater: DataCollectionAppUpdater, title: str, 
         )
     ],
 )
-def test_setup_bool_schema(dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]) -> None:
+def test_setup_bool_schema(
+    dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
+) -> None:
     """Tests that boolean schema are setup correctly."""
     actual = dca_updater.setup_bool_schema(title, properties)
 
@@ -236,7 +246,7 @@ def test_setup_bool_schema(dca_updater: DataCollectionAppUpdater, title: str, pr
                         },
                     },
                 },
-            }
+            },
         ),
         (
             "manure_management_scenarios",
@@ -293,15 +303,12 @@ def test_setup_bool_schema(dca_updater: DataCollectionAppUpdater, title: str, pr
                         },
                     },
                 },
-            }
+            },
         ),
     ],
 )
 def test_setup_array_schema(
-    dca_updater: DataCollectionAppUpdater,
-    title: str,
-    properties: dict[str, Any],
-    schema: dict[str, Any]
+    dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
     """Tests that array schema is setup correctly."""
     actual = dca_updater.setup_array_schema(title, properties)
@@ -339,7 +346,7 @@ def test_setup_array_schema(
                         },
                     }
                 },
-            }
+            },
         ),
         (
             "herd_information",
@@ -391,15 +398,12 @@ def test_setup_array_schema(
                         "format": "select2",
                     },
                 },
-            }
+            },
         ),
     ],
 )
 def test_setup_object_schema(
-    dca_updater: DataCollectionAppUpdater,
-    title: str,
-    properties: dict[str, Any],
-    schema: dict[str, Any]
+    dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
     """Tests that object schema are setup correctly."""
     actual = dca_updater.setup_object_schema(title, properties)
