@@ -7,7 +7,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
-SCHEMA_DIRECTORY_PATH: Path = Path("").joinpath("DataCollectionApp", "dummy_schema")
+SCHEMA_DIRECTORY_PATH: Path = Path("").joinpath("DataCollectionApp", "schema")
 
 INDEX_PATH: Path = Path("").joinpath("DataCollectionApp", "index.html")
 
@@ -116,7 +116,7 @@ class DataCollectionAppUpdater:
             log_message = f"Writing new schema in {new_schema_file_path}"
             self.om.add_log(log_title, log_message, info_map)
 
-            schema_body = json.dumps(new_schema, indent=2)
+            schema_body = json.dumps(new_schema, indent=4)
             with open(new_schema_file_path, "w") as outfile:
                 outfile.write(f"{schema_name} = {schema_body}")
 
@@ -130,7 +130,7 @@ class DataCollectionAppUpdater:
             [f"    <script src=\"{schema_path}\"></script>" for schema_path in localized_schema_paths]
         )
 
-        with open(TEMPLATE_PATH, 'r', encoding='utf-8') as template_file:
+        with open(TEMPLATE_PATH, "r", encoding="utf-8") as template_file:
             template = template_file.read()
 
         rewritten_index = template.replace(SCHEMA_SCRIPT_TAG_PLACEHOLDER, schema_script_tags)
