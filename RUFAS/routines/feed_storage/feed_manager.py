@@ -1,13 +1,13 @@
 from enum import Enum
 from typing import Dict, List
 
+from RUFAS.data_structures.harvested_crop import HarvestedCrop
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 from .baleage import Baleage
 from .enums import CropCategory, CropType
 from .grain import Dry, Grain, HighMoisture
-from .harvested_crop import HarvestedCrop
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .silage import Bag, Bunker, Pile, Silage
 from .storage import Storage
