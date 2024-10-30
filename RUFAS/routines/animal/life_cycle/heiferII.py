@@ -1453,8 +1453,10 @@ class HeiferII(HeiferI):
                 "Standard deviation too high with respect to average birth weight.",
                 info_map,
             )
-            raise ValueError("Calf birth weight standard deviation too high with respect to average birth weight,"
-                             + "results in negative birth weight!")
+            raise ValueError(
+                "Calf birth weight standard deviation too high with respect to average birth weight,"
+                + "results in negative birth weight!"
+            )
         return float(birth_weight)
 
     def _initialize_pregnancy_parameters(self) -> None:
