@@ -1,6 +1,7 @@
 from typing import List
 from unittest.mock import MagicMock, PropertyMock, patch
 
+import mock
 import pytest
 from pytest_mock import MockerFixture
 
@@ -10,6 +11,9 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
+from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil import Soil
+from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.manure.manure_manager import ManureManager
 
 
@@ -573,8 +577,6 @@ def test_send_crop_daily_variables(mocker: MockerFixture) -> None:
 
     pool = om.variables_pool
 
-    print(pool.keys())
-
     assert pool[
                "FieldDataReporter.send_crop_daily_variables.root_depth.field='f1',crop='crop 1',planted=100,1993"
            ]["values"] == [1]
@@ -590,3 +592,140 @@ def test_send_crop_daily_variables(mocker: MockerFixture) -> None:
            ]["values"] == [4]
 
     assert mock_add.call_count == 41
+
+
+def test_send_soil_layer_daily_variables(mocker: MockerFixture) -> None:
+    """Tests that layer daily variables are sent correctly."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+    field_data_1 = FieldData(name="name 1")
+
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager))
+
+    og = FieldDataReporter([field_1])
+    layer = LayerData(field_size=25, residue=1, top_depth=1, bottom_depth=2, plant_metabolic_active_carbon_usage=3,
+                      evaporated_water_content=4, temperature=5, percolated_water=6)
+
+    og.send_soil_layer_daily_variables(layer, 1, "name 1")
+
+    pool = om.variables_pool
+
+    assert pool[
+               "FieldDataReporter.send_soil_layer_daily_variables.temperature.field='name 1',layer='1'"
+           ]["values"] == [5]
+    assert pool[
+               "FieldDataReporter.send_soil_layer_daily_variables.evaporated_water_content.field='name 1',layer='1'"
+           ]["values"] == [4]
+    assert pool[
+               ("FieldDataReporter.send_soil_layer_daily_variables.plant_metabolic_active_carbon_usage.field='name 1',"
+                "layer='1'")
+           ]["values"] == [3]
+    assert pool[
+               "FieldDataReporter.send_soil_layer_daily_variables.percolated_water.field='name 1',layer='1'"
+           ]["values"] == [6]
+
+    assert mock_add.call_count == 61
+
+
+def test_send_vadose_zone_layer_daily_variables(mocker: MockerFixture) -> None:
+    """Tests that layer daily variables are sent correctly."""
+    om = OutputManager()
+    mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+    field_data_1 = FieldData(name="name 1")
+    layer = LayerData(field_size=25, residue=1, top_depth=1, bottom_depth=2,
+                      nitrate_content=1, fresh_organic_nitrogen_content=2, labile_inorganic_phosphorus_content=3,
+                      active_inorganic_phosphorus_content=4)
+    soil_data = SoilData(vadose_zone_layer=layer, field_size=6)
+    soil = Soil(soil_data=soil_data)
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager), soil=soil)
+    og = FieldDataReporter([field_1])
+
+    og.send_vadose_zone_layer_daily_variables(field_1)
+
+    pool = om.variables_pool
+
+    assert mock_add.call_count == 10
+    assert pool[
+               ("FieldDataReporter.send_vadose_zone_layer_daily_variables.nitrate_content.field='name 1',"
+                "vadose_zone_layer")
+           ]["values"] == [1]
+    assert pool[
+               ("FieldDataReporter.send_vadose_zone_layer_daily_variables.fresh_organic_nitrogen_content.field='name "
+                "1',vadose_zone_layer")
+           ]["values"] == [2]
+    assert pool[
+               ("FieldDataReporter.send_vadose_zone_layer_daily_variables.labile_inorganic_phosphorus_content.field"
+                "='name 1',vadose_zone_layer")
+           ]["values"] == [1]
+    assert pool[
+               ("FieldDataReporter.send_vadose_zone_layer_daily_variables.active_inorganic_phosphorus_content.field"
+                "='name 1',vadose_zone_layer")
+           ]["values"] == [1]
+
+
+def test_send_soil_daily_variables(mocker: MockerFixture) -> None:
+    """Tests that soil daily variables are sent correctly."""
+    om = OutputManager()
+    mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+    field_data_1 = FieldData(name="name 1")
+    layer = LayerData(field_size=25, residue=1, top_depth=1, bottom_depth=2,
+                      nitrate_content=1, fresh_organic_nitrogen_content=2, labile_inorganic_phosphorus_content=3,
+                      active_inorganic_phosphorus_content=4)
+    soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil = Soil(soil_data=soil_data)
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager), soil=soil)
+    og = FieldDataReporter([field_1])
+
+    og.send_soil_daily_variables(field_1)
+
+    pool = om.variables_pool
+
+    assert mock_add.call_count == 48
+
+    assert pool[
+               "FieldDataReporter.send_soil_daily_variables.water_evaporated.field='name 1'"
+           ]["values"] == [1]
+    assert pool[
+               "FieldDataReporter.send_soil_daily_variables.water_sublimated.field='name 1'"
+           ]["values"] == [2]
+    assert pool[
+               "FieldDataReporter.send_soil_daily_variables.cover_type.field='name 1'"
+           ]["values"] == ["a"]
+
+
+def test_send_field_daily_variables(mocker: MockerFixture) -> None:
+    """Tests that field daily variables are sent correctly."""
+    om = OutputManager()
+    mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+    field_data_1 = FieldData(name="name 1", transpiration=1, current_residue=2, max_transpiration=3,
+                             max_evapotranspiration=4, days_into_watering_interval=5)
+    layer = LayerData(field_size=25, residue=1, top_depth=1, bottom_depth=2,
+                      nitrate_content=1, fresh_organic_nitrogen_content=2, labile_inorganic_phosphorus_content=3,
+                      active_inorganic_phosphorus_content=4)
+    soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil = Soil(soil_data=soil_data)
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager), soil=soil)
+    og = FieldDataReporter([field_1])
+
+    og.send_field_daily_variables(field_1)
+
+    pool = om.variables_pool
+
+    assert pool[
+               "FieldDataReporter.send_field_daily_variables.current_residue.field='name 1'"
+           ]["values"] == [2]
+    assert pool[
+               "FieldDataReporter.send_field_daily_variables.transpiration.field='name 1'"
+           ]["values"] == [1]
+    assert pool[
+               "FieldDataReporter.send_field_daily_variables.max_transpiration.field='name 1'"
+           ]["values"] == [3]
+    assert pool[
+               "FieldDataReporter.send_field_daily_variables.max_evapotranspiration.field='name 1'"
+           ]["values"] == [4]
+    assert pool[
+               "FieldDataReporter.send_field_daily_variables.days_into_watering_interval.field='name 1'"
+           ]["values"] == [5]
