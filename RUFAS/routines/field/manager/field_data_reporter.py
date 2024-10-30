@@ -41,6 +41,16 @@ class FieldDataReporter:
             for crop in field.crops:
                 self.send_crop_daily_variables(crop, field.field_data.name)
 
+    def send_annual_variables(self) -> None:
+        """Sends annual variables to the output manager."""
+        for field in self.fields:
+            self.send_field_annual_variables(field)
+
+            self.send_soil_annual_variables(field)
+
+            for index, layer in enumerate(field.soil.data.soil_layers):
+                self.send_soil_layer_annual_variables(layer, field.field_data.name, index)
+
     def send_crop_daily_variables(self, crop: Crop, field_name: str) -> None:
         """Sends crop related daily variables."""
         info_map = {"class": self.__class__.__name__, "function": self.send_crop_daily_variables.__name__,
@@ -882,130 +892,35 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.DAYS}),
         )
 
-    def send_annual_variables(self) -> None:
-        """Sends annual variables to the output manager."""
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.send_annual_variables.__name__,
-        }
-        # adding field variable
-        for field in self.fields:
-            self.send_field_annual_variables(field)
+    def send_soil_layer_annual_variables(self, layer: LayerData, field_name: str, index: int) -> None:
+        """Sends layer related annual variables."""
+        info_map = {"class": self.__class__.__name__, "function": self.send_soil_layer_annual_variables.__name__,
+                    "suffix": "field='" + field_name + "',layer='" + str(index) + "'"}
 
-            # Adding soil data
-            water_content_change = field.soil.data.profile_soil_water_content - field.soil.data.initial_water_content
-            self.om.add_variable(
-                "annual_water_content_change",
-                water_content_change,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-
-            nitrates_content_change = field.soil.data.profile_nitrates_total - field.soil.data.initial_nitrates_total
-            self.om.add_variable(
-                "annual_nitrates_content_change",
-                nitrates_content_change,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-
-            self.om.add_variable(
-                "annual_soil_evaporation_total",
-                field.soil.data.annual_soil_evaporation_total,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
-            )
-            self.om.add_variable(
-                "annual_eroded_sediment_total",
-                field.soil.data.annual_eroded_sediment_total,
-                dict(info_map, **{"units": MeasurementUnits.METRIC_TONS}),
-            )
-            self.om.add_variable(
-                "annual_surface_runoff_total",
-                field.soil.data.annual_surface_runoff_total,
-                dict(info_map, **{"units": MeasurementUnits.MILLIMETERS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "annual_runoff_fertilizer_phosphorus",
-                field.soil.data.annual_runoff_fertilizer_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_runoff_machine_manure_inorganic_phosphorus",
-                field.soil.data.machine_manure.annual_runoff_manure_inorganic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_runoff_machine_manure_organic_phosphorus",
-                field.soil.data.machine_manure.annual_runoff_manure_organic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_runoff_grazing_manure_inorganic_phosphorus",
-                field.soil.data.grazing_manure.annual_runoff_manure_inorganic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_runoff_grazing_manure_organic_phosphorus",
-                field.soil.data.grazing_manure.annual_runoff_manure_organic_phosphorus,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_soil_phosphorus_runoff",
-                field.soil.data.annual_soil_phosphorus_runoff,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-            )
-            self.om.add_variable(
-                "annual_runoff_nitrates_total",
-                field.soil.data.annual_runoff_nitrates_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_runoff_ammonium_total",
-                field.soil.data.annual_runoff_ammonium_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_eroded_fresh_organic_nitrogen_total",
-                field.soil.data.annual_eroded_fresh_organic_nitrogen_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_eroded_stable_organic_nitrogen_total",
-                field.soil.data.annual_eroded_stable_organic_nitrogen_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-            self.om.add_variable(
-                "annual_eroded_active_organic_nitrogen_total",
-                field.soil.data.annual_eroded_active_organic_nitrogen_total,
-                dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-            )
-
-            # ----------------------------adding layer data
-            for index, layer in enumerate(field.soil.data.soil_layers):
-                info_map["suffix"] = "field='" + field.field_data.name + "',layer='" + str(index) + "'"
-
-                self.om.add_variable(
-                    "annual_nitrous_oxide_emissions_total",
-                    layer.annual_nitrous_oxide_emissions_total,
-                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-                )
-                self.om.add_variable(
-                    "annual_ammonia_emissions_total",
-                    layer.annual_ammonia_emissions_total,
-                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-                )
-                self.om.add_variable(
-                    "annual_decomposition_carbon_CO2_lost",
-                    layer.annual_decomposition_carbon_CO2_lost,
-                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-                )
-                self.om.add_variable(
-                    "annual_carbon_CO2_lost",
-                    layer.annual_carbon_CO2_lost,
-                    dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
-                )
+        self.om.add_variable(
+            "annual_nitrous_oxide_emissions_total",
+            layer.annual_nitrous_oxide_emissions_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "annual_ammonia_emissions_total",
+            layer.annual_ammonia_emissions_total,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "annual_decomposition_carbon_CO2_lost",
+            layer.annual_decomposition_carbon_CO2_lost,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
+        self.om.add_variable(
+            "annual_carbon_CO2_lost",
+            layer.annual_carbon_CO2_lost,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
+        )
 
     def send_field_annual_variables(self, field: Field) -> None:
         """Sends field related annual variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_annual_variables.__name__,
+        info_map = {"class": self.__class__.__name__, "function": self.send_field_annual_variables.__name__,
                     "suffix": "field='" + field.field_data.name + "'"}
 
         self.om.add_variable(
@@ -1016,7 +931,7 @@ class FieldDataReporter:
 
     def send_soil_annual_variables(self, field: Field) -> None:
         """Sends soil related annual variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_annual_variables.__name__,
+        info_map = {"class": self.__class__.__name__, "function": self.send_soil_annual_variables.__name__,
                     "suffix": "field='" + field.field_data.name + "'"}
         water_content_change = field.soil.data.profile_soil_water_content - field.soil.data.initial_water_content
         self.om.add_variable(
