@@ -1115,7 +1115,7 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
             [{'animal': {'herd_information': {'calf_num': 10, 'cow_num': 100},
                          'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
              {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 100},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}}, 
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
              {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 98},
                          'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
              {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 98},
