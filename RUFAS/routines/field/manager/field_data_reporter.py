@@ -53,9 +53,12 @@ class FieldDataReporter:
 
     def send_crop_daily_variables(self, crop: Crop, field_name: str) -> None:
         """Sends crop related daily variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_crop_daily_variables.__name__,
-                    "suffix": f"field='{field_name}',crop='{crop.data.name}',"
-                              f"planted={crop.data.planting_day},{crop.data.planting_year}"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_crop_daily_variables.__name__,
+            "suffix": f"field='{field_name}',crop='{crop.data.name}',"
+            f"planted={crop.data.planting_day},{crop.data.planting_year}",
+        }
         self.om.add_variable(
             "root_depth", crop.data.root_depth, dict(info_map, **{"units": MeasurementUnits.MILLIMETERS})
         )
@@ -125,12 +128,8 @@ class FieldDataReporter:
             crop.data.heat_fraction,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
-        self.om.add_variable(
-            "is_growing", crop.data.is_growing, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
-        )
-        self.om.add_variable(
-            "is_dormant", crop.data.is_dormant, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
-        )
+        self.om.add_variable("is_growing", crop.data.is_growing, dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
+        self.om.add_variable("is_dormant", crop.data.is_dormant, dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
         self.om.add_variable(
             "leaf_area_index",
             crop.data.leaf_area_index,
@@ -252,8 +251,11 @@ class FieldDataReporter:
 
     def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str) -> None:
         """Sends soil layer related daily variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_soil_layer_daily_variables.__name__,
-                    "suffix": "field='" + field_name + "',layer='" + str(index) + "'"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_soil_layer_daily_variables.__name__,
+            "suffix": "field='" + field_name + "',layer='" + str(index) + "'",
+        }
         self.om.add_variable(
             "temperature",
             layer.temperature,
@@ -269,9 +271,7 @@ class FieldDataReporter:
             layer.water_content,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
-        self.om.add_variable(
-            "water_factor", layer.water_factor, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
-        )
+        self.om.add_variable("water_factor", layer.water_factor, dict(info_map, **{"units": MeasurementUnits.UNITLESS}))
         self.om.add_variable(
             "evaporated_water_content",
             layer.evaporated_water_content,
@@ -560,8 +560,11 @@ class FieldDataReporter:
 
     def send_vadose_zone_layer_daily_variables(self, field: Field) -> None:
         """Sends vadose zone layer related daily variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_vadose_zone_layer_daily_variables.__name__,
-                    "suffix": "field='" + field.field_data.name + "',vadose_zone_layer"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_vadose_zone_layer_daily_variables.__name__,
+            "suffix": "field='" + field.field_data.name + "',vadose_zone_layer",
+        }
         self.om.add_variable(
             "active_organic_nitrogen_content",
             field.soil.data.vadose_zone_layer.active_organic_nitrogen_content,
@@ -615,8 +618,11 @@ class FieldDataReporter:
 
     def send_soil_daily_variables(self, field: Field) -> None:
         """Sends soil related daily variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_soil_daily_variables.__name__,
-                    "suffix": "field='" + field.field_data.name + "'"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_soil_daily_variables.__name__,
+            "suffix": "field='" + field.field_data.name + "'",
+        }
 
         self.om.add_variable(
             "water_evaporated",
@@ -862,8 +868,11 @@ class FieldDataReporter:
 
     def send_field_daily_variables(self, field: Field) -> None:
         """Sends field related daily variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_field_daily_variables.__name__,
-                    "suffix": "field='" + field.field_data.name + "'"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_field_daily_variables.__name__,
+            "suffix": "field='" + field.field_data.name + "'",
+        }
 
         self.om.add_variable(
             "current_residue",
