@@ -903,8 +903,11 @@ class FieldDataReporter:
 
     def send_soil_layer_annual_variables(self, layer: LayerData, field_name: str, index: int) -> None:
         """Sends layer related annual variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_soil_layer_annual_variables.__name__,
-                    "suffix": "field='" + field_name + "',layer='" + str(index) + "'"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_soil_layer_annual_variables.__name__,
+            "suffix": "field='" + field_name + "',layer='" + str(index) + "'",
+        }
 
         self.om.add_variable(
             "annual_nitrous_oxide_emissions_total",
@@ -929,8 +932,11 @@ class FieldDataReporter:
 
     def send_field_annual_variables(self, field: Field) -> None:
         """Sends field related annual variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_field_annual_variables.__name__,
-                    "suffix": "field='" + field.field_data.name + "'"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_field_annual_variables.__name__,
+            "suffix": "field='" + field.field_data.name + "'",
+        }
 
         self.om.add_variable(
             "annual_irrigation_water_use_total",
@@ -940,8 +946,11 @@ class FieldDataReporter:
 
     def send_soil_annual_variables(self, field: Field) -> None:
         """Sends soil related annual variables."""
-        info_map = {"class": self.__class__.__name__, "function": self.send_soil_annual_variables.__name__,
-                    "suffix": "field='" + field.field_data.name + "'"}
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.send_soil_annual_variables.__name__,
+            "suffix": "field='" + field.field_data.name + "'",
+        }
         water_content_change = field.soil.data.profile_soil_water_content - field.soil.data.initial_water_content
         self.om.add_variable(
             "annual_water_content_change",
