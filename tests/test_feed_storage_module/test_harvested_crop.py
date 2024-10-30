@@ -3,8 +3,8 @@ import copy
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.enums import CropCategory, CropType
+from RUFAS.data_structures.harvested_crop import HarvestedCrop
 
 from .sample_crop_data import sample_crop_data
 

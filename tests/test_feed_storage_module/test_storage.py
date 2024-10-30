@@ -6,8 +6,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.enums import CropCategory, CropType
+from RUFAS.data_structures.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.storage import Storage
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -226,7 +226,7 @@ def test_get_total_nutritive_amount(
     """Test _get_total_nutritive_amount in Storage class."""
     storage.stored = [harvested_crop] * len(percentages)
     mock_dry_matter_mass = mocker.patch(
-        "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
+        "RUFAS.data_structures.harvested_crop.HarvestedCrop.dry_matter_mass",
         new_callable=mocker.PropertyMock,
         return_value=dry_mass,
     )
@@ -266,7 +266,7 @@ def test_calculate_dry_matter_loss_to_gas(
 ) -> None:
     """Tests calculate_dry_matter_loss_to_gas in Storage."""
     mocker.patch(
-        "RUFAS.routines.feed_storage.harvested_crop.HarvestedCrop.dry_matter_mass",
+        "RUFAS.data_structures.harvested_crop.HarvestedCrop.dry_matter_mass",
         new_callable=mocker.PropertyMock,
         return_value=dry_matter,
     )
