@@ -177,6 +177,7 @@ class Modifiability(Enum):
 
 
 class DataValidator:
+    """This class is will be utilized to validate all types of data across RuFas codebase."""
 
     @staticmethod
     def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
