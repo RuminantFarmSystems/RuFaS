@@ -1,4 +1,4 @@
-from .enums import CropCategory
+from RUFAS.enums import CropCategory
 from .storage import Storage
 
 
