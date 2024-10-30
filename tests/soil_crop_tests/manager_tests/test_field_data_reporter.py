@@ -1,7 +1,6 @@
 from typing import List
 from unittest.mock import MagicMock, PropertyMock, patch
 
-import mock
 import pytest
 from pytest_mock import MockerFixture
 
@@ -713,6 +712,7 @@ def test_send_field_daily_variables(mocker: MockerFixture) -> None:
     og.send_field_daily_variables(field_1)
 
     pool = om.variables_pool
+    assert mock_add.call_count == 5
 
     assert pool[
                "FieldDataReporter.send_field_daily_variables.current_residue.field='name 1'"
@@ -729,3 +729,106 @@ def test_send_field_daily_variables(mocker: MockerFixture) -> None:
     assert pool[
                "FieldDataReporter.send_field_daily_variables.days_into_watering_interval.field='name 1'"
            ]["values"] == [5]
+
+
+def test_send_soil_layer_annual_variables(mocker: MockerFixture) -> None:
+    """Tests that soil layer annual variables are sent correctly."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+    field_data_1 = FieldData(name="name 1")
+
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager))
+
+    og = FieldDataReporter([field_1])
+    layer = LayerData(field_size=25, residue=1, top_depth=1, bottom_depth=2, annual_nitrous_oxide_emissions_total=3,
+                      annual_ammonia_emissions_total=4, annual_decomposition_carbon_CO2_lost=5,
+                      annual_carbon_CO2_lost=6)
+
+    og.send_soil_layer_annual_variables(layer, "name 1", 1)
+
+    pool = om.variables_pool
+
+    assert mock_add.call_count == 4
+
+    assert pool[
+               ("FieldDataReporter.send_soil_layer_annual_variables.annual_nitrous_oxide_emissions_total.field='name "
+                "1',"
+                "layer='1'")
+           ]["values"] == [3]
+    assert pool[
+               ("FieldDataReporter.send_soil_layer_annual_variables.annual_ammonia_emissions_total.field='name "
+                "1',"
+                "layer='1'")
+           ]["values"] == [4]
+    assert pool[
+               ("FieldDataReporter.send_soil_layer_annual_variables.annual_decomposition_carbon_CO2_lost.field='name "
+                "1',"
+                "layer='1'")
+           ]["values"] == [5]
+    assert pool[
+               ("FieldDataReporter.send_soil_layer_annual_variables.annual_carbon_CO2_lost.field='name "
+                "1',"
+                "layer='1'")
+           ]["values"] == [6]
+
+
+def test_send_field_annual_variables(mocker: MockerFixture) -> None:
+    """Tests that field annual variables are sent correctly."""
+    om = OutputManager()
+    mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+    field_data_1 = FieldData(name="name 1", annual_irrigation_water_use_total=1)
+    layer = LayerData(field_size=25, residue=1, top_depth=1, bottom_depth=2,
+                      nitrate_content=1, fresh_organic_nitrogen_content=2, labile_inorganic_phosphorus_content=3,
+                      active_inorganic_phosphorus_content=4)
+    soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
+    soil = Soil(soil_data=soil_data)
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager), soil=soil)
+    og = FieldDataReporter([field_1])
+
+    og.send_field_annual_variables(field_1)
+
+    pool = om.variables_pool
+
+    assert mock_add.call_count == 1
+    assert pool[
+               "FieldDataReporter.send_field_annual_variables.annual_irrigation_water_use_total.field='name 1'"
+           ]["values"] == [1]
+
+
+def test_send_soil_annual_variables(mocker: MockerFixture) -> None:
+    """Tests that soil annual variables are sent correctly."""
+    om = OutputManager()
+    mocker.patch.object(LayerData, "determine_soil_nutrient_area_density", return_value=1)
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+
+    mocker.patch.object(SoilData, "profile_soil_water_content", new_callable=PropertyMock, return_value=10)
+    mocker.patch.object(SoilData, "profile_nitrates_total", new_callable=PropertyMock, return_value=4)
+    field_data_1 = FieldData(name="name 1")
+    layer = LayerData(field_size=25, residue=1, top_depth=1, bottom_depth=2,
+                      nitrate_content=1, fresh_organic_nitrogen_content=2, labile_inorganic_phosphorus_content=3,
+                      active_inorganic_phosphorus_content=4)
+    soil_data = SoilData(field_size=25, vadose_zone_layer=layer, initial_water_content=1, initial_nitrates_total=2,
+                         annual_soil_evaporation_total=3, annual_eroded_sediment_total=4) # 4 for water contnet change 2 for nitrate
+    soil = Soil(soil_data=soil_data)
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager), soil=soil)
+    og = FieldDataReporter([field_1])
+
+    og.send_soil_annual_variables(field_1)
+
+    pool = om.variables_pool
+
+    assert mock_add.call_count == 16
+
+    assert pool[
+               "FieldDataReporter.send_soil_annual_variables.annual_water_content_change.field='name 1'"
+           ]["values"] == [0]
+    assert pool[
+               "FieldDataReporter.send_soil_annual_variables.annual_nitrates_content_change.field='name 1'"
+           ]["values"] == [0]
+    assert pool[
+               "FieldDataReporter.send_soil_annual_variables.annual_soil_evaporation_total.field='name 1'"
+           ]["values"] == [3]
+    assert pool[
+               "FieldDataReporter.send_soil_annual_variables.annual_eroded_sediment_total.field='name 1'"
+           ]["values"] == [4]
