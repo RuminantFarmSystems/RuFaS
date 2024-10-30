@@ -567,7 +567,6 @@ class DataValidator:
             required_object_property_keys, optional_object_property_keys, value, key_path
         )
         if not valid:
-            print(message)
             return valid, message
         return True, ""
 
