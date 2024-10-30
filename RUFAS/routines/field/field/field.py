@@ -164,7 +164,9 @@ class Field:
 
         self.manure_manager: ManureManager = manure_manager
 
-    def manage_field(self, time: Time, current_conditions: CurrentDayConditions) -> list[tuple[HarvestedCrop, StorageType]]:
+    def manage_field(
+        self, time: Time, current_conditions: CurrentDayConditions
+    ) -> list[tuple[HarvestedCrop, StorageType]]:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -200,7 +202,9 @@ class Field:
 
         self._check_crop_planting_schedule(time)
 
-        harvested_crops: list[tuple[HarvestedCrop, StorageType]] = self._check_crop_harvest_schedule(time, current_conditions)
+        harvested_crops: list[tuple[HarvestedCrop, StorageType]] = self._check_crop_harvest_schedule(
+            time, current_conditions
+        )
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
@@ -919,7 +923,9 @@ class Field:
                 event.day,
             )
 
-    def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> list[tuple[HarvestedCrop, StorageType]]:
+    def _check_crop_harvest_schedule(
+        self, time: Time, current_conditions: CurrentDayConditions
+    ) -> list[tuple[HarvestedCrop, StorageType]]:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -939,7 +945,9 @@ class Field:
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         harvested_crops = []
         for event in todays_harvest_events:
-            crops: tuple[HarvestedCrop, StorageType] = self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
+            crops: tuple[HarvestedCrop, StorageType] = self._harvest_crop(
+                event.crop_reference, event.operation, time, current_conditions
+            )
             harvested_crops.extend(crops)
 
         heat_scheduled_harvested_crops = self._harvest_heat_scheduled_crops(current_conditions.rainfall, time)

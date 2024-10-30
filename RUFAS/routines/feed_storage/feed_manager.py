@@ -84,7 +84,8 @@ class FeedManager:
         """
         compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
         is_crop_compatible_with_storage = any(
-            issubclass(STORAGE_TYPE_TO_CLASS_MAP[storage_type], storage_class) for storage_class in compatible_storage_classes
+            issubclass(STORAGE_TYPE_TO_CLASS_MAP[storage_type], storage_class)
+            for storage_class in compatible_storage_classes
         )
 
         if not is_crop_compatible_with_storage:
