@@ -1036,39 +1036,104 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "Task 3 run 15",
                 "Task 3 run 16",
             ],
-            [{'animal': {'herd_information': {'calf_num': 7, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 99}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 99}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 381}}}},
-             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 98}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}},
-             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 98}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}},
-             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}},
-             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 98}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}},
-             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}},
-             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 98}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}},
-             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}},
-             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 101}, 'animal_config':
-                         {'management_decisions': {'breeding_start_day_h': 379}}}}
-             ],
+            [
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 7, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 7, "cow_num": 99},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 7, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 7, "cow_num": 99},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 99},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 99},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 381}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 9, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 9, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 9, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 9, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 101},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 379}},
+                    }
+                },
+            ],
         ),
         (
             {
@@ -1112,22 +1177,56 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "Task 4 run 7",
                 "Task 4 run 8",
             ],
-            [{'animal': {'herd_information': {'calf_num': 10, 'cow_num': 100},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
-             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 100},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
-             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 98},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
-             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 98},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 378}}}},
-             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 102},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
-             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 102},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
-             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
-             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99},
-                         'animal_config': {'management_decisions': {'breeding_start_day_h': 378}}}}],
+            [
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 10, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 7, "cow_num": 100},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 7, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 7, "cow_num": 98},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 8, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 102},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 99},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
+                    }
+                },
+                {
+                    "animal": {
+                        "herd_information": {"calf_num": 6, "cow_num": 99},
+                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
+                    }
+                },
+            ],
         ),
     ],
 )
