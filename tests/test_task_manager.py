@@ -820,10 +820,11 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "output_prefix": "Task 2",
                 "log_verbosity": "errors",
                 "sampler": "fractional_factorial",
+                "random_seed": 42,
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
-                "saltelli_skip": 0,
-                "saltelli_number": 2,
+                "skip_values": 0,
+                "sampler_n": 2,
                 "SA_input_variables": [
                     {
                         "variable_name": "animal.herd_information.calf_num",
@@ -911,11 +912,12 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "task_type": "SENSITIVITY_ANALYSIS",
                 "output_prefix": "Task 3",
                 "log_verbosity": "errors",
-                "sampler": "saltelli_sobol",
+                "sampler": "sobol",
+                "random_seed": 42,
                 "SA_load_balancing_start": 0,
                 "SA_load_balancing_stop": 1,
-                "saltelli_skip": 0,
-                "saltelli_number": 2,
+                "skip_values": 0,
+                "sampler_n": 2,
                 "SA_input_variables": [
                     {
                         "variable_name": "animal.herd_information.calf_num",
@@ -955,104 +957,98 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
                 "Task 3 run 15",
                 "Task 3 run 16",
             ],
+            [{'animal': {'herd_information': {'calf_num': 7, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 99}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 99}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 381}}}},
+             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 98}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}},
+             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 98}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}},
+             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}},
+             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 98}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}},
+             {'animal': {'herd_information': {'calf_num': 9, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}},
+             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 98}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}},
+             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}},
+             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 101}, 'animal_config':
+                         {'management_decisions': {'breeding_start_day_h': 379}}}}
+             ],
+        ),
+        (
+            {
+                "task_type": "SENSITIVITY_ANALYSIS",
+                "output_prefix": "Task 4",
+                "log_verbosity": "errors",
+                "sampler": "morris",
+                "random_seed": 42,
+                "SA_load_balancing_start": 0,
+                "SA_load_balancing_stop": 1,
+                "skip_values": 0,
+                "sampler_n": 2,
+                "SA_input_variables": [
+                    {
+                        "variable_name": "animal.herd_information.calf_num",
+                        "lower_bound": 6,
+                        "upper_bound": 10,
+                        "data_type": "int",
+                    },
+                    {
+                        "variable_name": "animal.herd_information.cow_num",
+                        "lower_bound": 98,
+                        "upper_bound": 102,
+                        "data_type": "int",
+                    },
+                    {
+                        "variable_name": "animal.animal_config.management_decisions.breeding_start_day_h",
+                        "lower_bound": 378,
+                        "upper_bound": 382,
+                        "data_type": "int",
+                    },
+                ],
+            },
             [
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 6, "cow_num": 98},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 378}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
-                {
-                    "animal": {
-                        "herd_information": {"calf_num": 8, "cow_num": 100},
-                        "animal_config": {"management_decisions": {"breeding_start_day_h": 380}},
-                    }
-                },
+                "Task 4 run 1",
+                "Task 4 run 2",
+                "Task 4 run 3",
+                "Task 4 run 4",
+                "Task 4 run 5",
+                "Task 4 run 6",
+                "Task 4 run 7",
+                "Task 4 run 8",
             ],
+            [{'animal': {'herd_information': {'calf_num': 10, 'cow_num': 100},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
+             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 100},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
+             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 98},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
+             {'animal': {'herd_information': {'calf_num': 7, 'cow_num': 98},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 378}}}},
+             {'animal': {'herd_information': {'calf_num': 8, 'cow_num': 102},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
+             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 102},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
+             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 380}}}},
+             {'animal': {'herd_information': {'calf_num': 6, 'cow_num': 99},
+                         'animal_config': {'management_decisions': {'breeding_start_day_h': 378}}}}],
         ),
     ],
 )
@@ -1063,20 +1059,20 @@ def test_expand_sensitivity_analysis_args(
     mock_output_manager: Generator[Any, Any, Any],
     task_manager: TaskManager,
 ) -> None:
-    """Unit test for TaskManager._expand_sensitivity_analysis_args() with fractional_factorial and saltelli_sobol as
-    samplers."""
+    """Unit test for TaskManager._expand_sensitivity_analysis_args() with fractional_factorial and sobol methods
+    as samplers."""
     result = task_manager._expand_sensitivity_analysis_args(multi_run_args)
-
     expected_output = [
         {
             "task_type": TaskType.SIMULATION_SINGLE_RUN,
             "output_prefix": expected_output_prefixes[i],
             "log_verbosity": "errors",
             "sampler": multi_run_args["sampler"],
+            "random_seed": 42,
             "SA_load_balancing_start": 0,
             "SA_load_balancing_stop": 1,
-            "saltelli_skip": 0,
-            "saltelli_number": 2,
+            "skip_values": 0,
+            "sampler_n": 2,
             "SA_input_variables": [
                 {
                     "variable_name": "animal.herd_information.calf_num",
@@ -1215,9 +1211,9 @@ def test_expand_sensitivity_analysis_args_invalid_sampler(
                     "suppress_log_files": False,
                     "output_pool_path": Path("."),
                     "multi_run_counts": 4,
-                    "sampler": "saltelli_sobol",
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
+                    "sampler": "sobol",
+                    "skip_values": 0,
+                    "sampler_n": 2,
                     "SA_load_balancing_start": 0,
                     "SA_load_balancing_stop": 1,
                     "input_patch": None,
@@ -1245,9 +1241,9 @@ def test_expand_sensitivity_analysis_args_invalid_sampler(
                     "suppress_log_files": False,
                     "output_pool_path": Path("."),
                     "multi_run_counts": 4,
-                    "sampler": "saltelli_sobol",
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
+                    "sampler": "sobol",
+                    "skip_values": 0,
+                    "sampler_n": 2,
                     "SA_load_balancing_start": 0,
                     "SA_load_balancing_stop": 1,
                     "input_patch": None,
@@ -1272,6 +1268,7 @@ def test_expand_sensitivity_analysis_args_invalid_sampler(
                     "output_prefix": "Task 5",
                     "log_verbosity": "errors",
                     "sampler": "fractional_factorial",
+                    "random_seed": 42,
                     "SA_load_balancing_start": 0,
                     "SA_load_balancing_stop": 1,
                     "SA_input_variables": [
@@ -1356,9 +1353,9 @@ def test_run_tasks(
                     "suppress_log_files": False,
                     "output_pool_path": Path("."),
                     "multi_run_counts": 4,
-                    "sampler": "saltelli_sobol",
-                    "saltelli_skip": 0,
-                    "saltelli_number": 2,
+                    "sampler": "sobol",
+                    "skip_values": 0,
+                    "sampler_n": 2,
                     "SA_load_balancing_start": 0,
                     "SA_load_balancing_stop": 1,
                     "input_patch": None,
@@ -1377,6 +1374,7 @@ def test_run_tasks(
                     "output_prefix": "Task 1",
                     "log_verbosity": "errors",
                     "sampler": "fractional_factorial",
+                    "random_seed": 42,
                     "SA_load_balancing_start": 0,
                     "SA_load_balancing_stop": 1,
                     "SA_input_variables": [
