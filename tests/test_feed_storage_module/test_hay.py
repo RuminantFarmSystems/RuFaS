@@ -2,8 +2,8 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.enums import CropCategory, CropType
+from RUFAS.data_structures.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.hay import (
     FINAL_MOISTURE_PERCENTAGE,
     INITIAL_LOSS_PERIOD,
