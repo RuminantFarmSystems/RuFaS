@@ -1,8 +1,8 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.enums import CropCategory, CropType
-from RUFAS.routines.feed_storage.feed_manager import FeedManager, StorageType
+from RUFAS.enums import CropCategory, CropType, StorageType
+from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.grain import Dry
 from RUFAS.data_structures.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.silage import Pile

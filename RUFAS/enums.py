@@ -107,3 +107,20 @@ class CropType(Enum):
     FINE_FESCUE = "Fine Fescue"
     TALL_FESCUE = "Tall Fescue"
     MEADOW_FESCUE = "Meadow Fescue"
+
+
+class StorageType(Enum):
+    """
+    Maps each storage type to its respective class.
+    """
+
+    PROTECTED_INDOORS = "Protected Indoors"
+    PROTECTED_WRAPPED = "Protected Wrapped"
+    PROTECTED_TARPED = "Protected Tarped"
+    UNPROTECTED = "Unprotected"
+    BALEAGE = "Baleage"
+    DRY = "Dry"
+    HIGH_MOISTURE = "High Moisture"
+    BUNKER = "Bunker"
+    PILE = "Pile"
+    BAG = "Bag"
