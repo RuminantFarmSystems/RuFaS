@@ -6,7 +6,7 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 from .baleage import Baleage
-from .enums import CropCategory, CropType
+from RUFAS.enums import CropCategory, CropType
 from .grain import Dry, Grain, HighMoisture
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .silage import Bag, Bunker, Pile, Silage

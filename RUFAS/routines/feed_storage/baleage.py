@@ -1,7 +1,7 @@
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
-from .enums import CropCategory
+from RUFAS.enums import CropCategory
 from .storage import Storage
 
 

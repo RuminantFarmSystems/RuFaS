@@ -8,7 +8,7 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
-from .enums import CropCategory, CropType
+from RUFAS.enums import CropCategory, CropType
 
 """
 These constants define the upper and lower bounds of temperatures that allow fermentation (in degrees C), the upper and

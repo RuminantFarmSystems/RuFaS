@@ -7,7 +7,7 @@ from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
-from .enums import CropCategory
+from RUFAS.enums import CropCategory
 from .storage import Storage
 
 """Fraction of effluent that is dry matter by mass."""
