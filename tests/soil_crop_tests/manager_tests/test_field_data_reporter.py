@@ -2,6 +2,7 @@ from typing import List
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
@@ -39,6 +40,7 @@ def test_send_daily_variables(
     field_2.crops.append(crop_2)
 
     og = FieldDataReporter([field_1, field_2])
+
     for i in range(3):
         field_1.soil.data.accumulated_runoff = runoff_values[i]
         field_2.soil.data.accumulated_runoff = runoff_values[i]
@@ -54,7 +56,6 @@ def test_send_daily_variables(
             crop._data.root_depth = root_depths[index]
         og.send_daily_variables()
     pool = om.variables_pool
-    print(pool.keys())
 
     assert len(pool["FieldDataReporter.send_field_daily_variables.current_residue.field='name 1'"]["info_maps"]) == 3
     assert pool["FieldDataReporter.send_field_daily_variables.current_residue.field='name 1'"]["values"] == [
@@ -553,3 +554,39 @@ def test_send_annual_variables(
                ("FieldDataReporter.send_soil_layer_annual_variables.annual_nitrous_oxide_emissions_total.field='name "
                 "2',layer='3'")
            ]["values"] == [1.31, 1.31, 1.31]
+
+
+def test_send_crop_daily_variables(mocker: MockerFixture) -> None:
+    """Checks that crop daily variables were sent correctly."""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_variable", side_effect=om.add_variable)
+    field_data_1 = FieldData(name="name 1")
+    crop_data = CropData(name="crop 1", planting_day=100, planting_year=1993, root_depth=1, biomass=2, usable_light=3,
+                         biomass_growth_max=4)
+    crop = Crop(crop_data)
+
+    field_1 = Field(field_data=field_data_1, manure_manager=MagicMock(ManureManager))
+
+    og = FieldDataReporter([field_1])
+
+    og.send_crop_daily_variables(crop, "f1")
+
+    pool = om.variables_pool
+
+    print(pool.keys())
+
+    assert pool[
+               "FieldDataReporter.send_crop_daily_variables.root_depth.field='f1',crop='crop 1',planted=100,1993"
+           ]["values"] == [1]
+    assert pool[
+               "FieldDataReporter.send_crop_daily_variables.biomass.field='f1',crop='crop 1',planted=100,1993"
+           ]["values"] == [2]
+    assert pool[
+               "FieldDataReporter.send_crop_daily_variables.usable_light.field='f1',crop='crop 1',planted=100,1993"
+           ]["values"] == [3]
+    assert pool[
+               ("FieldDataReporter.send_crop_daily_variables.biomass_growth_max.field='f1',crop='crop 1',planted=100,"
+                "1993")
+           ]["values"] == [4]
+
+    assert mock_add.call_count == 41
