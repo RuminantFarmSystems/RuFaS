@@ -203,6 +203,19 @@ class OutputManager(object):
         max_memory_usage: int | None = None,
         save_chunk_threshold_call_count: int | None = None,
     ) -> None:
+        """Sets up the mechanism by which chunkification of the output variable pool is controlled.
+
+        Parameters
+        ----------
+        output_dir : Path
+            The path to the output directory where chunks will be saved.
+        max_memory_usage_percent : int
+            The setting for the maximum output variable pool size as a percentage of the available memory.
+        max_memory_usage : int | None, optional
+            The setting for the maximum output variable pool size in bytes.
+        save_chunk_threshold_call_count : int | None, optional
+            The setting for the threshold add_variable_call count for saving pool chunk.
+        """
         info_map = {
             "class": self.__class__.__name__,
             "function": self.setup_pool_overflow_control.__name__,
@@ -1071,8 +1084,6 @@ class OutputManager(object):
         ----------
         filter_content : Dict[str, Any]
             A dictionary that contains filtering options.
-        apply_slicing: bool
-            Flag to indicate if slicing should be applied, default to True.
 
         Returns
         -------
