@@ -47,19 +47,21 @@ def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: Output
     pool = output_manager.variables_pool
 
     assert pool["FieldDataReporter.send_crop_daily_variables.root_depth.field='f1',crop='crop 1',planted=100,1993"][
-               "values"
-           ] == [1]
+        "values"
+    ] == [1]
     assert pool["FieldDataReporter.send_crop_daily_variables.biomass.field='f1',crop='crop 1',planted=100,1993"][
-               "values"
-           ] == [2]
+        "values"
+    ] == [2]
     assert pool["FieldDataReporter.send_crop_daily_variables.usable_light.field='f1',crop='crop 1',planted=100,1993"][
-               "values"
-           ] == [3]
+        "values"
+    ] == [3]
     assert pool[
-               (
-                   "FieldDataReporter.send_crop_daily_variables.biomass_growth_max.field='f1',crop='crop 1',"
-                   "planted=100," "1993")
-           ]["values"] == [4]
+        (
+            "FieldDataReporter.send_crop_daily_variables.biomass_growth_max.field='f1',crop='crop 1',"
+            "planted=100,"
+            "1993"
+        )
+    ]["values"] == [4]
 
     assert mock_add.call_count == 41
 
@@ -92,17 +94,17 @@ def test_send_soil_layer_daily_variables(mocker: MockerFixture, output_manager: 
         5
     ]
     assert pool["FieldDataReporter.send_soil_layer_daily_variables.evaporated_water_content.field='name 1',layer='1'"][
-               "values"
-           ] == [4]
+        "values"
+    ] == [4]
     assert pool[
-               (
-                   "FieldDataReporter.send_soil_layer_daily_variables.plant_metabolic_active_carbon_usage.field='name 1',"
-                   "layer='1'"
-               )
-           ]["values"] == [3]
+        (
+            "FieldDataReporter.send_soil_layer_daily_variables.plant_metabolic_active_carbon_usage.field='name 1',"
+            "layer='1'"
+        )
+    ]["values"] == [3]
     assert pool["FieldDataReporter.send_soil_layer_daily_variables.percolated_water.field='name 1',layer='1'"][
-               "values"
-           ] == [6]
+        "values"
+    ] == [6]
 
     assert mock_add.call_count == 61
 
@@ -134,27 +136,26 @@ def test_send_vadose_zone_layer_daily_variables(mocker: MockerFixture, output_ma
 
     assert mock_add.call_count == 10
     assert pool[
-               (
-                   "FieldDataReporter.send_vadose_zone_layer_daily_variables.nitrate_content.field='name 1'," "vadose_zone_layer")
-           ]["values"] == [1]
+        ("FieldDataReporter.send_vadose_zone_layer_daily_variables.nitrate_content.field='name 1'," "vadose_zone_layer")
+    ]["values"] == [1]
     assert pool[
-               (
-                   "FieldDataReporter.send_vadose_zone_layer_daily_variables.fresh_organic_nitrogen_content.field='name "
-                   "1',vadose_zone_layer"
-               )
-           ]["values"] == [2]
+        (
+            "FieldDataReporter.send_vadose_zone_layer_daily_variables.fresh_organic_nitrogen_content.field='name "
+            "1',vadose_zone_layer"
+        )
+    ]["values"] == [2]
     assert pool[
-               (
-                   "FieldDataReporter.send_vadose_zone_layer_daily_variables.labile_inorganic_phosphorus_content.field"
-                   "='name 1',vadose_zone_layer"
-               )
-           ]["values"] == [1]
+        (
+            "FieldDataReporter.send_vadose_zone_layer_daily_variables.labile_inorganic_phosphorus_content.field"
+            "='name 1',vadose_zone_layer"
+        )
+    ]["values"] == [1]
     assert pool[
-               (
-                   "FieldDataReporter.send_vadose_zone_layer_daily_variables.active_inorganic_phosphorus_content.field"
-                   "='name 1',vadose_zone_layer"
-               )
-           ]["values"] == [1]
+        (
+            "FieldDataReporter.send_vadose_zone_layer_daily_variables.active_inorganic_phosphorus_content.field"
+            "='name 1',vadose_zone_layer"
+        )
+    ]["values"] == [1]
 
 
 def test_send_soil_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
@@ -227,8 +228,8 @@ def test_send_field_daily_variables(mocker: MockerFixture, output_manager: Outpu
     assert pool["FieldDataReporter.send_field_daily_variables.max_transpiration.field='name 1'"]["values"] == [3]
     assert pool["FieldDataReporter.send_field_daily_variables.max_evapotranspiration.field='name 1'"]["values"] == [4]
     assert pool["FieldDataReporter.send_field_daily_variables.days_into_watering_interval.field='name 1'"][
-               "values"
-           ] == [5]
+        "values"
+    ] == [5]
 
 
 def test_send_soil_layer_annual_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
@@ -257,30 +258,29 @@ def test_send_soil_layer_annual_variables(mocker: MockerFixture, output_manager:
     assert mock_add.call_count == 4
 
     assert pool[
-               (
-                   "FieldDataReporter.send_soil_layer_annual_variables.annual_nitrous_oxide_emissions_total.field='name "
-                   "1',"
-                   "layer='1'"
-               )
-           ]["values"] == [3]
+        (
+            "FieldDataReporter.send_soil_layer_annual_variables.annual_nitrous_oxide_emissions_total.field='name "
+            "1',"
+            "layer='1'"
+        )
+    ]["values"] == [3]
     assert pool[
-               (
-                   "FieldDataReporter.send_soil_layer_annual_variables.annual_ammonia_emissions_total.field='name "
-                   "1',"
-                   "layer='1'"
-               )
-           ]["values"] == [4]
+        (
+            "FieldDataReporter.send_soil_layer_annual_variables.annual_ammonia_emissions_total.field='name "
+            "1',"
+            "layer='1'"
+        )
+    ]["values"] == [4]
     assert pool[
-               (
-                   "FieldDataReporter.send_soil_layer_annual_variables.annual_decomposition_carbon_CO2_lost.field='name "
-                   "1',"
-                   "layer='1'"
-               )
-           ]["values"] == [5]
+        (
+            "FieldDataReporter.send_soil_layer_annual_variables.annual_decomposition_carbon_CO2_lost.field='name "
+            "1',"
+            "layer='1'"
+        )
+    ]["values"] == [5]
     assert pool[
-               (
-                   "FieldDataReporter.send_soil_layer_annual_variables.annual_carbon_CO2_lost.field='name " "1'," "layer='1'")
-           ]["values"] == [6]
+        ("FieldDataReporter.send_soil_layer_annual_variables.annual_carbon_CO2_lost.field='name " "1'," "layer='1'")
+    ]["values"] == [6]
 
 
 def test_send_field_annual_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
@@ -309,8 +309,8 @@ def test_send_field_annual_variables(mocker: MockerFixture, output_manager: Outp
 
     assert mock_add.call_count == 1
     assert pool["FieldDataReporter.send_field_annual_variables.annual_irrigation_water_use_total.field='name 1'"][
-               "values"
-           ] == [2]
+        "values"
+    ] == [2]
 
 
 def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
@@ -351,23 +351,20 @@ def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: Outpu
     assert mock_add.call_count == 16
 
     assert pool["FieldDataReporter.send_soil_annual_variables.annual_water_content_change.field='name 1'"][
-               "values"
-           ] == [0]
+        "values"
+    ] == [0]
     assert pool["FieldDataReporter.send_soil_annual_variables.annual_nitrates_content_change.field='name 1'"][
-               "values"
-           ] == [0]
+        "values"
+    ] == [0]
     assert pool["FieldDataReporter.send_soil_annual_variables.annual_soil_evaporation_total.field='name 1'"][
-               "values"
-           ] == [3]
+        "values"
+    ] == [3]
     assert pool["FieldDataReporter.send_soil_annual_variables.annual_eroded_sediment_total.field='name 1'"][
-               "values"
-           ] == [4]
+        "values"
+    ] == [4]
 
 
-def test_send_daily_variables(
-    mocker: MockerFixture,
-    output_manager: OutputManager
-) -> None:
+def test_send_daily_variables(mocker: MockerFixture, output_manager: OutputManager) -> None:
     """Tests that daily variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name="name 1")
     field_data_2 = FieldData(name="name 2")
@@ -387,8 +384,7 @@ def test_send_daily_variables(
 
     mock_send_field_daily = mocker.patch.object(og, "send_field_daily_variables")
     mock_send_soil_daily_variables = mocker.patch.object(og, "send_soil_daily_variables")
-    mock_send_vadose_zone_layer_daily_variables = mocker.patch.object(og,
-                                                                      "send_vadose_zone_layer_daily_variables")
+    mock_send_vadose_zone_layer_daily_variables = mocker.patch.object(og, "send_vadose_zone_layer_daily_variables")
     mock_send_soil_layer_daily_variables = mocker.patch.object(og, "send_soil_layer_daily_variables")
     mock_send_crop_daily_variables = mocker.patch.object(og, "send_crop_daily_variables")
 
@@ -399,11 +395,9 @@ def test_send_daily_variables(
     mock_send_vadose_zone_layer_daily_variables.assert_has_calls([call(field_1), call(field_2)])
 
     assert mock_send_soil_layer_daily_variables.call_count == 8
-    mock_send_crop_daily_variables.assert_has_calls([call(crop_1, "name 1"),
-                                                     call(crop_2, "name 1"),
-                                                     call(crop_1, "name 2"),
-                                                     call(crop_2, "name 2")
-                                                     ])
+    mock_send_crop_daily_variables.assert_has_calls(
+        [call(crop_1, "name 1"), call(crop_2, "name 1"), call(crop_1, "name 2"), call(crop_2, "name 2")]
+    )
 
 
 @pytest.mark.parametrize(
@@ -427,7 +421,7 @@ def test_send_annual_variables(
     initial_water_content: List[float],
     initial_nitrates_total: List[float],
     mocker: MockerFixture,
-    output_manager: OutputManager
+    output_manager: OutputManager,
 ) -> None:
     """Tests that annual variables were sent correctly through OutputManager"""
     field_data_1 = FieldData(name="name 1")
