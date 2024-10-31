@@ -3,8 +3,8 @@ from math import exp
 from typing import Any, Dict, List, Optional, Tuple
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvCropStorageType
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
@@ -92,13 +92,12 @@ class Field:
         List of all manure applications that will be applied to this field
     manure_manager: ManureManager
         Manure Manager instance from which manure is requested for application to the field.
-    feed_manager: FeedManager
-        FeedManager instance which receives harvested crops.
 
     Methods
     -------
-    manage_field(time, current_conditions: CurrentDayConditions) -> None:
+    manage_field(time, current_conditions: CurrentDayConditions) -> list[HarvCropStorageType]:
         Main Field routine, runs all subroutines routines based on current attribute configuration.
+
     """
 
     def __init__(
@@ -113,8 +112,7 @@ class Field:
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
         manure_events: Optional[List[ManureEvent]] = None,
         manure_manager: Optional[ManureManager] = None,
-        feed_manager: Optional[FeedManager] = None,
-    ):
+    ) -> None:
         # field-wide attributes
         self.om = OutputManager()
         self.field_data = field_data or FieldData()
@@ -165,17 +163,7 @@ class Field:
 
         self.manure_manager: ManureManager = manure_manager
 
-        if feed_manager is None:
-            self.om.add_error(
-                "field_initialization_error",
-                f"Attempted initialization of Field {self.field_data.name=} with no Feed Manager, initializing a "
-                f"FeedManager to use.",
-                info_map,
-            )
-
-        self.feed_manager: FeedManager = feed_manager or FeedManager()
-
-    def manage_field(self, time: Time, current_conditions: CurrentDayConditions) -> None:
+    def manage_field(self, time: Time, current_conditions: CurrentDayConditions) -> list[HarvCropStorageType]:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -211,10 +199,12 @@ class Field:
 
         self._check_crop_planting_schedule(time)
 
-        self._check_crop_harvest_schedule(time, current_conditions)
+        harvested_crops: list[HarvCropStorageType] = self._check_crop_harvest_schedule(time, current_conditions)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
+
+        return harvested_crops
 
     # <editor-fold desc="--- Soil Management Methods ---">
     def _execute_fertilizer_application(
@@ -928,7 +918,9 @@ class Field:
                 event.day,
             )
 
-    def _check_crop_harvest_schedule(self, time: Time, current_conditions: CurrentDayConditions) -> None:
+    def _check_crop_harvest_schedule(
+        self, time: Time, current_conditions: CurrentDayConditions
+    ) -> list[HarvCropStorageType]:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -939,6 +931,11 @@ class Field:
         current_conditions : CurrentDayConditions
             CurrentDayConditions object containing the current weather conditions of the simulated day.
 
+        Returns
+        -------
+        list[HarvCropStorageType]
+            Harvested crops and the storages where they will be placed.
+
         Notes
         -----
         This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It calls the method that
@@ -946,12 +943,19 @@ class Field:
 
         """
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
+        harvested_crops = []
         for event in todays_harvest_events:
-            self._harvest_crop(event.crop_reference, event.operation, time, current_conditions)
+            crops: list[HarvCropStorageType] = self._harvest_crop(
+                event.crop_reference, event.operation, time, current_conditions
+            )
+            harvested_crops.extend(crops)
 
-        self._harvest_heat_scheduled_crops(current_conditions.rainfall, time)
+        heat_scheduled_harvested_crops = self._harvest_heat_scheduled_crops(current_conditions.rainfall, time)
 
-    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> None:
+        harvested_crops.extend(heat_scheduled_harvested_crops)
+        return harvested_crops
+
+    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> list[HarvCropStorageType]:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
@@ -961,22 +965,30 @@ class Field:
         rainfall : float
             Amount of rainfall on the current day (mm).
 
+        Returns
+        -------
+        list[HarvCropStorageType]
+            Harvested crops and the storage types that they will be placed in.
+
         References
         ----------
         SWAT Theoretical documentation section 5:1.1.1 (Heat Scheduling)
 
         """
+        harvested_crops = []
         for crop in self.crops:
             if crop.should_harvest_based_on_heat():
-                crop.manage_crop_harvest(
+                harvested_crop: HarvCropStorageType = crop.manage_crop_harvest(
                     HarvestOperation.HARVEST_ONLY,
                     self.field_data.name,
                     self.field_data.field_size,
                     time,
                     self.soil.data,
-                    self.feed_manager,
                 )
                 self.soil.carbon_cycling.residue_partition.add_residue_to_pools(rainfall)
+                if harvested_crop:
+                    harvested_crops.append(harvested_crop)
+        return harvested_crops
 
     @staticmethod
     def _filter_events(
@@ -1105,7 +1117,7 @@ class Field:
         harvest_operation: HarvestOperation,
         time: Time,
         current_conditions: CurrentDayConditions,
-    ) -> None:
+    ) -> list[HarvCropStorageType]:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -1119,6 +1131,11 @@ class Field:
             Object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             Object containing the conditions of the current simulated day.
+
+        Returns
+        -------
+        list[HarvCropStorageType]
+            Harvested crops and the storages into which they will be placed.
 
         Notes
         -----
@@ -1151,16 +1168,19 @@ class Field:
                 info_map,
             )
 
+        harvested_crops = []
         for crop in crops_to_be_harvested:
-            crop.manage_crop_harvest(
+            harvested_crop: HarvCropStorageType = crop.manage_crop_harvest(
                 harvest_operation,
                 self.field_data.name,
                 self.field_data.field_size,
                 time,
                 self.soil.data,
-                self.feed_manager,
             )
             self.soil.carbon_cycling.residue_partition.add_residue_to_pools(current_conditions.rainfall)
+            if harvested_crop:
+                harvested_crops.append(harvested_crop)
+        return harvested_crops
 
     def _remove_dead_crops(self) -> None:
         """
