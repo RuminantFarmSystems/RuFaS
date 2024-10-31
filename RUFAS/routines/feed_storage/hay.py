@@ -1,10 +1,9 @@
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.harvested_crop import HarvestedCrop
+from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
-from RUFAS.enums import CropCategory
 from .storage import Storage
 
 """

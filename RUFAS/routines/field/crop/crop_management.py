@@ -2,8 +2,7 @@ from math import exp
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.harvested_crop import HarvestedCrop
-from RUFAS.enums import StorageType
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvCropStorageType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
@@ -47,7 +46,7 @@ class CropManagement:
         field_size: float,
         time: Time,
         soil_data: SoilData,
-    ) -> tuple[HarvestedCrop, StorageType] | None:
+    ) -> HarvCropStorageType | None:
         """
         Executes the harvest operation passed on the crop that contains this module.
 
@@ -242,7 +241,7 @@ class CropManagement:
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _store_harvested_crop(self, time: Time, field_size: float) -> tuple[HarvestedCrop, StorageType]:
+    def _store_harvested_crop(self, time: Time, field_size: float) -> HarvCropStorageType:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 

@@ -3,8 +3,7 @@ from math import exp
 from typing import Any, Dict, List, Optional, Tuple
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.harvested_crop import HarvestedCrop
-from RUFAS.enums import StorageType
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvCropStorageType
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -166,7 +165,7 @@ class Field:
 
     def manage_field(
         self, time: Time, current_conditions: CurrentDayConditions
-    ) -> list[tuple[HarvestedCrop, StorageType]]:
+    ) -> list[HarvCropStorageType]:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -202,7 +201,7 @@ class Field:
 
         self._check_crop_planting_schedule(time)
 
-        harvested_crops: list[tuple[HarvestedCrop, StorageType]] = self._check_crop_harvest_schedule(
+        harvested_crops: list[HarvCropStorageType] = self._check_crop_harvest_schedule(
             time, current_conditions
         )
 
@@ -925,7 +924,7 @@ class Field:
 
     def _check_crop_harvest_schedule(
         self, time: Time, current_conditions: CurrentDayConditions
-    ) -> list[tuple[HarvestedCrop, StorageType]]:
+    ) -> list[HarvCropStorageType]:
         """
         Checks for all crops for potential harvests that may happen on the current day.
 
@@ -945,7 +944,7 @@ class Field:
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         harvested_crops = []
         for event in todays_harvest_events:
-            crops: tuple[HarvestedCrop, StorageType] = self._harvest_crop(
+            crops: HarvCropStorageType = self._harvest_crop(
                 event.crop_reference, event.operation, time, current_conditions
             )
             harvested_crops.extend(crops)
@@ -955,7 +954,7 @@ class Field:
         harvested_crops.extend(heat_scheduled_harvested_crops)
         return harvested_crops
 
-    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> list[tuple[HarvestedCrop, StorageType]]:
+    def _harvest_heat_scheduled_crops(self, rainfall: float, time: Time) -> list[HarvCropStorageType]:
         """
         Checks if any of the active plants in the field are harvested based on their heat schedule, and if so harvests
         them if they meet the heat threshold.
@@ -973,7 +972,7 @@ class Field:
         harvested_crops = []
         for crop in self.crops:
             if crop.should_harvest_based_on_heat():
-                harvested_crop: tuple[HarvestedCrop, StorageType] = crop.manage_crop_harvest(
+                harvested_crop: HarvCropStorageType = crop.manage_crop_harvest(
                     HarvestOperation.HARVEST_ONLY,
                     self.field_data.name,
                     self.field_data.field_size,
@@ -1112,7 +1111,7 @@ class Field:
         harvest_operation: HarvestOperation,
         time: Time,
         current_conditions: CurrentDayConditions,
-    ) -> list[tuple[HarvestedCrop, StorageType]]:
+    ) -> list[HarvCropStorageType]:
         """
         Performs the specified crop operation on the specified crop.
 
@@ -1160,7 +1159,7 @@ class Field:
 
         harvested_crops = []
         for crop in crops_to_be_harvested:
-            harvested_crop: tuple[HarvestedCrop, StorageType] = crop.manage_crop_harvest(
+            harvested_crop: HarvCropStorageType = crop.manage_crop_harvest(
                 harvest_operation,
                 self.field_data.name,
                 self.field_data.field_size,

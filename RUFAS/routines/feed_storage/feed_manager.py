@@ -1,11 +1,10 @@
 from typing import Dict, List
 
-from RUFAS.data_structures.harvested_crop import HarvestedCrop
+from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, CropType, HarvestedCrop, StorageType
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 from .baleage import Baleage
-from RUFAS.enums import CropCategory, CropType, StorageType
 from .grain import Dry, Grain, HighMoisture
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .silage import Bag, Bunker, Pile, Silage

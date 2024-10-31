@@ -1,8 +1,107 @@
 from dataclasses import dataclass, field
+from enum import Enum
 
-from RUFAS.enums import CropCategory, CropType
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
+
+
+class CropCategory(Enum):
+    """
+    Enum for Crop Categories.
+
+    Attributes
+    ----------
+    SMALL_GRAIN : str
+        Represents small grain crops.
+    CORN : str
+        Represents corn crops.
+    SOY : str
+        Represents soy crops.
+    GRASS : str
+        Represents grass crops.
+    ALFALFA : str
+        Represents alfalfa crops.
+
+    """
+
+    SMALL_GRAIN = "Small grain"
+    CORN = "Corn"
+    SOY = "Soy"
+    GRASS = "Grass"
+    ALFALFA = "Alfalfa"
+
+
+class CropType(Enum):
+    """
+    Enum for subdivisions of Crop Categories.
+
+    Attributes
+    ----------
+    WHEAT : str
+        Represents a type of Small Grain.
+    RYE : str
+        Represents a type of Small Grain.
+    OAT : str
+        Represents a type of Small Grain.
+    RICE : str
+        Represents a type of Small Grain.
+    HIGH_MOISTURE : str
+        Represents a type of Corn.
+    SILAGE : str
+        Represents a type of Corn.
+    WHOLE_PLANT : str
+        Represents a type of Corn.
+    GRAIN : str
+        Represents a type of Corn or Soy.
+    FORAGE : str
+        Represents a type of Soy.
+    ALFALFA : str
+        Represents a type of Alfalfa.
+    RYEGRASS : str
+        Represents a type of Grass.
+    ORCHARDGRASS : str
+        Represents a type of Grass.
+    FINE_FESCUE : str
+        Represents a type of Grass.
+    TALL_FESCUE : str
+        Represents a type of Grass.
+    MEADOW_FESCUE : str
+        Represents a type of Grass.
+
+    """
+
+    WHEAT = "Wheat"
+    RYE = "Rye"
+    OAT = "Oat"
+    RICE = "Rice"
+    HIGH_MOISTURE = "High-moisture"
+    SILAGE = "Silage"
+    WHOLE_PLANT = "Whole-plant"
+    GRAIN = "Grain"
+    FORAGE = "Forage"
+    ALFALFA = "Alfalfa"
+    RYEGRASS = "Ryegrass"
+    ORCHARDGRASS = "Orchardgrass"
+    FINE_FESCUE = "Fine Fescue"
+    TALL_FESCUE = "Tall Fescue"
+    MEADOW_FESCUE = "Meadow Fescue"
+
+
+class StorageType(Enum):
+    """
+    Maps each storage type to its respective class.
+    """
+
+    PROTECTED_INDOORS = "Protected Indoors"
+    PROTECTED_WRAPPED = "Protected Wrapped"
+    PROTECTED_TARPED = "Protected Tarped"
+    UNPROTECTED = "Unprotected"
+    BALEAGE = "Baleage"
+    DRY = "Dry"
+    HIGH_MOISTURE = "High Moisture"
+    BUNKER = "Bunker"
+    PILE = "Pile"
+    BAG = "Bag"
 
 
 """This is the dry matter fraction above which an ensiled crop will not experience any effluent loss."""
@@ -203,3 +302,6 @@ class HarvestedCrop:
             104 * moisture_frac**2.18 * self.bale_density**0.5 + 5.72 * moisture_frac**1.23 * self.bale_density**0.94
         )
         return heat
+
+
+HarvCropStorageType = tuple[HarvestedCrop, StorageType]
