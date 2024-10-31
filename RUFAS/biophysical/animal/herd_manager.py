@@ -139,7 +139,7 @@ class HerdManager:
                 cow.daily_routines(time)
         pass
 
-    #-------------------------#
+    # -------------------------#
     def init_pens(self, all_pen_data: list, manure_management_scenarios: dict[str, Any]) -> None:
         """
         Populates the list of pens with the information from the input json file.
@@ -238,5 +238,3 @@ class HerdManager:
 
         pen.ration = ration_per_pen
         pen.ration_per_animal = ration_per_animal
-
-

@@ -131,6 +131,7 @@ def animal_list(mocker: MockerFixture) -> List[Calf | Cow | HeiferI | HeiferII |
         "presynch_method": "Presynch",
         "resynch_method": "PGFatPD",
         "tai_method_c": "OvSynch 56",
+        "net_merit": 0.0,
     }
     calf = Calf(args)
     calf.id = 1

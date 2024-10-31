@@ -1,28 +1,26 @@
-from __future__ import annotations
-
 import math
 
+from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.animal_nutrients_daily_update.animal_phosphorus_status import AnimalPhosphorusStatus
-from RUFAS.routines.animal.animal_types import AnimalType
-from RUFAS.routines.animal.general_properties import GeneralProperties
 
 CALVES_AND_HEIFERS = [AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]
 HEIFERS_AND_COWS = [AnimalType.DRY_COW, AnimalType.LAC_COW, AnimalType.HEIFER_II, AnimalType.HEIFER_II]
 
 
-class AnimalPhosphorus:
+class Nutrients:
 
     @staticmethod
     def perform_daily_phosphorus_update(
-        animal_status: AnimalPhosphorusStatus, general_properties: GeneralProperties
-    ) -> AnimalPhosphorusStatus:
+        animal_status: NutrientProperties, general_properties: GeneralProperties
+    ) -> NutrientProperties:
         """Manages animal's daily phosphorus update."""
-        dry_matter_intake = AnimalPhosphorus._get_dry_matter_intake()
-        phosphorus_status = AnimalPhosphorus._calculate_phosphorus_requirements(
+        dry_matter_intake = Nutrients._get_dry_matter_intake()
+        phosphorus_status = Nutrients._calculate_phosphorus_requirements(
             general_properties, animal_status, dry_matter_intake
         )
-        phosphorus_status = AnimalPhosphorus._calculate_total_animal_phosphorus(phosphorus_status)
+        phosphorus_status = Nutrients._calculate_total_animal_phosphorus(phosphorus_status)
 
         return phosphorus_status
 
@@ -34,7 +32,7 @@ class AnimalPhosphorus:
         return 0.0
 
     @staticmethod
-    def _calculate_total_animal_phosphorus(phosphorus_status: AnimalPhosphorusStatus) -> AnimalPhosphorusStatus:
+    def _calculate_total_animal_phosphorus(phosphorus_status: NutrientProperties) -> NutrientProperties:
         """Calculates the total phosphorus for the animal.
 
         References
@@ -76,23 +74,23 @@ class AnimalPhosphorus:
 
     @staticmethod
     def _calculate_phosphorus_requirements(
-        general_properties: GeneralProperties, phosphorus_status: AnimalPhosphorusStatus, dry_matter_intake: float
-    ) -> AnimalPhosphorusStatus:
+        general_properties: GeneralProperties, phosphorus_status: NutrientProperties, dry_matter_intake: float
+    ) -> NutrientProperties:
         """Calculates animal's phosophorus requirements"""
-        phosphorus_status.phosphorus_endogenous_loss = AnimalPhosphorus._calculate_phosphorus_endogenous_loss(
-            general_properties, phosphorus_status, dry_matter_intake
+        phosphorus_status.phosphorus_endogenous_loss = Nutrients._calculate_phosphorus_endogenous_loss(
+            general_properties, dry_matter_intake
         )
         urine_production_phosphorus = 0.000002 * general_properties.body_weight * GeneralConstants.KG_TO_GRAMS
-        phosphorus_status.phosphorus_for_growth = AnimalPhosphorus._calculate_phosphorus_for_growth(general_properties)
-        phosphorus_status.phosphorus_for_gestation = AnimalPhosphorus._calculate_gestational_phosphorus(
+        phosphorus_status.phosphorus_for_growth = Nutrients._calculate_phosphorus_for_growth(general_properties)
+        phosphorus_status.phosphorus_for_gestation = Nutrients._calculate_gestational_phosphorus(
             general_properties
         )
         phosphorus_status.phosphorus_for_gestation_required_for_calf += phosphorus_status.phosphorus_for_gestation
-        milk_phosphorus = AnimalPhosphorus._calculate_milk_phosphorus(general_properties)
-        absorbed_phosphorus = AnimalPhosphorus._calculate_absorbed_phosphorus(
+        milk_phosphorus = Nutrients._calculate_milk_phosphorus(general_properties)
+        absorbed_phosphorus = Nutrients._calculate_absorbed_phosphorus(
             general_properties, phosphorus_status, milk_phosphorus, urine_production_phosphorus
         )
-        phosphorus_status.phosphorus_requirement = AnimalPhosphorus._calculate_animal_phosphorus_requirement(
+        phosphorus_status.phosphorus_requirement = Nutrients._calculate_animal_phosphorus_requirement(
             general_properties, phosphorus_status, absorbed_phosphorus
         )
 
@@ -100,7 +98,7 @@ class AnimalPhosphorus:
 
     @staticmethod
     def _calculate_phosphorus_endogenous_loss(
-        general_properties: GeneralProperties, phosphorus_status: AnimalPhosphorusStatus, dry_matter_intake: float
+        general_properties: GeneralProperties, dry_matter_intake: float
     ) -> float:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
@@ -108,7 +106,7 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A-D.E.1, A.1EF.E.1.
         """
-        if AnimalPhosphorus._is_calf_or_heifer(general_properties.animal_type):
+        if not Nutrients._is_cow(general_properties.animal_type):
             return 0.0008 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
         else:
             return 0.001 * dry_matter_intake * GeneralConstants.KG_TO_GRAMS
@@ -122,7 +120,7 @@ class AnimalPhosphorus:
         RuFaS Phosphorus Animal Module documentation section A.1A-F.E.3.
         """
         if (
-            AnimalPhosphorus._is_calf_or_heifer(general_properties.animal_type)
+            not Nutrients._is_cow(general_properties.animal_type)
             or general_properties.body_weight < general_properties.mature_body_weight
         ):
             return (
@@ -162,15 +160,15 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation section A.1E.E.5.
         """
-        if general_properties.milking:
-            return 0.0009 * general_properties.estimated_daily_milk_produced * GeneralConstants.KG_TO_GRAMS
+        if general_properties.is_milking:
+            return 0.0009 * general_properties.daily_milk_produced * GeneralConstants.KG_TO_GRAMS
         else:
             return 0.0
 
     @staticmethod
     def _calculate_absorbed_phosphorus(
         general_properties: GeneralProperties,
-        phosphorus_status: AnimalPhosphorusStatus,
+        phosphorus_status: NutrientProperties,
         milk_phosphorus: float,
         urine_production_phosphorus: float,
     ) -> float:
@@ -204,7 +202,7 @@ class AnimalPhosphorus:
 
     @staticmethod
     def _calculate_animal_phosphorus_requirement(
-        general_properties: GeneralProperties, phosphorus_status: AnimalPhosphorusStatus, absorbed_phosphorus: float
+        general_properties: GeneralProperties, phosphorus_status: NutrientProperties, absorbed_phosphorus: float
     ) -> float:
         """Calculates an animal's phosphorus requirement by animal type.
 
@@ -212,7 +210,7 @@ class AnimalPhosphorus:
         ----------
         RuFaS Phosphorus Animal Module documentation sections A.1A.E.7, A.1B-D.E.7, A.1EF.E.7.
         """
-        if general_properties.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW] and general_properties.milking:
+        if general_properties.animal_type in [AnimalType.DRY_COW, AnimalType.LAC_COW] and general_properties.is_milking:
             return absorbed_phosphorus / (
                 1.86696
                 - 5.01238 * phosphorus_status.ration_phosphorus_concentration
@@ -224,5 +222,6 @@ class AnimalPhosphorus:
             return absorbed_phosphorus / 0.664
 
     @staticmethod
-    def _is_calf_or_heifer(animal_type: AnimalType) -> bool:
-        return animal_type in CALVES_AND_HEIFERS
+    def _is_cow(animal_type: AnimalType) -> bool:
+        """Identifies that the animal is either AnimalType.LAC_COW or AnimalType.DRY_COW."""
+        return animal_type not in CALVES_AND_HEIFERS

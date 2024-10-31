@@ -3,21 +3,23 @@ from RUFAS.enums import AnimalCombination
 
 
 class Pen:
-    def __init__(self,
-                 pen_id: int,
-                 pen_name: str,
-                 vertical_dist_to_milking_parlor: float,
-                 horizontal_dist_to_milking_parlor: float,
-                 number_of_stalls: int,
-                 housing_type: str,
-                 bedding_type: str,
-                 pen_type: str,
-                 manure_handling: str,
-                 manure_separator: str,
-                 manure_separator_after_digestion: str,
-                 manure_storage: str,
-                 animal_combination: AnimalCombination,
-                 max_stocking_density: float) -> None:
+    def __init__(
+        self,
+        pen_id: int,
+        pen_name: str,
+        vertical_dist_to_milking_parlor: float,
+        horizontal_dist_to_milking_parlor: float,
+        number_of_stalls: int,
+        housing_type: str,
+        bedding_type: str,
+        pen_type: str,
+        manure_handling: str,
+        manure_separator: str,
+        manure_separator_after_digestion: str,
+        manure_storage: str,
+        animal_combination: AnimalCombination,
+        max_stocking_density: float,
+    ) -> None:
         self.pen_statistics = PenStatistics()
         self.id = pen_id
         self.max_stocking_density = max_stocking_density

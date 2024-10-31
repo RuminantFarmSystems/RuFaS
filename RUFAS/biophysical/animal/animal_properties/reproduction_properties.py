@@ -55,4 +55,3 @@ class ReproductionProperties:
     body_weight_at_calving: float
 
     repro_state_manager: ReproStateManager
-
