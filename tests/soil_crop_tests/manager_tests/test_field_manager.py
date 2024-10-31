@@ -48,9 +48,7 @@ def input_manager_original_method_states(
 def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) -> None:
     """Tests that FieldManager init method runs correctly."""
     mocked_manure_manager = mocker.MagicMock(ManureManager)
-    expected_field_setup_calls = [
-        call(field_name, mocked_manure_manager) for field_name in field_blob_names
-    ]
+    expected_field_setup_calls = [call(field_name, mocked_manure_manager) for field_name in field_blob_names]
     data_keys_by_properties = mocker.patch(
         "RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_blob_names
     )

@@ -49,14 +49,9 @@ def mock_field_data() -> FieldData:
 
 @pytest.mark.parametrize(
     "manure_manager,should_fail,error_count",
-    [
-        (MagicMock(ManureManager), False, 0),
-        (None, True, 1)
-    ],
+    [(MagicMock(ManureManager), False, 0), (None, True, 1)],
 )
-def test_init(
-    manure_manager: ManureManager, should_fail: bool, error_count: int, mocker: MockerFixture
-) -> None:
+def test_init(manure_manager: ManureManager, should_fail: bool, error_count: int, mocker: MockerFixture) -> None:
     """Tests that Field initialization fails when passed invalid parameters."""
     add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
