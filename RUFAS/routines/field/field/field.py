@@ -95,7 +95,7 @@ class Field:
 
     Methods
     -------
-    manage_field(time, current_conditions: CurrentDayConditions) -> list[tuple[HarvestedCrop, StorageType]]:
+    manage_field(time, current_conditions: CurrentDayConditions) -> list[HarvCropStorageType]:
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
     """
@@ -935,6 +935,11 @@ class Field:
         current_conditions : CurrentDayConditions
             CurrentDayConditions object containing the current weather conditions of the simulated day.
 
+        Returns
+        -------
+        list[HarvCropStorageType]
+            Harvested crops and the storages where they will be placed.
+
         Notes
         -----
         This method checks for scheduled harvests, i.e. checks all the remaining HarvestEvents. It calls the method that
@@ -944,7 +949,7 @@ class Field:
         self.harvest_events, todays_harvest_events = self._filter_events(self.harvest_events, time)
         harvested_crops = []
         for event in todays_harvest_events:
-            crops: HarvCropStorageType = self._harvest_crop(
+            crops: list[HarvCropStorageType] = self._harvest_crop(
                 event.crop_reference, event.operation, time, current_conditions
             )
             harvested_crops.extend(crops)
@@ -963,6 +968,11 @@ class Field:
         ----------
         rainfall : float
             Amount of rainfall on the current day (mm).
+
+        Returns
+        -------
+        list[HarvCropStorageType]
+            Harvested crops and the storage types that they will be placed in.
 
         References
         ----------
@@ -1125,6 +1135,11 @@ class Field:
             Object containing the current day and year of the simulation.
         current_conditions : CurrentDayConditions
             Object containing the conditions of the current simulated day.
+
+        Returns
+        -------
+        list[HarvCropStorageType]
+            Harvested crops and the storages into which they will be placed.
 
         Notes
         -----

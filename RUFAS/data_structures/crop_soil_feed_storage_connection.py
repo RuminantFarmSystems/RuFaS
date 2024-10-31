@@ -304,4 +304,5 @@ class HarvestedCrop:
         return heat
 
 
+"""Type alias that is used throughout the Crop module when sending information back to Simulation Engine."""
 HarvCropStorageType = tuple[HarvestedCrop, StorageType]

@@ -221,6 +221,11 @@ class Crop:
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
 
+        Returns
+        -------
+        HarvCropStorageType | None
+            Harvested Crop and the type of storage it will go in if the crop harvest produced a yield, otherwise None.
+
         """
         return self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data)
 

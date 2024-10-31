@@ -68,6 +68,11 @@ class FieldManager:
         time: Time
             Object containing the current year and day of the simulation.
 
+        Returns
+        -------
+        list[HarvCropStorageType]
+            Crops that were harvested on the current day, paired with the storage types into which they will be placed.
+
         Notes
         -----
         Because different fields can have different latitudes, the day length has to be recalculated for each field.

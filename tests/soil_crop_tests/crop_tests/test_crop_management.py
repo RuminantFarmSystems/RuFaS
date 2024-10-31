@@ -182,7 +182,6 @@ def test_manage_harvest(
     actual = crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data)
 
     harvest_index.assert_called_once()
-    # Method specific (one for each op type)
     if harvest_op == HarvestOperation.HARVEST_KILL:
         cut_crop.assert_called_once()
         kill.assert_called_once()
