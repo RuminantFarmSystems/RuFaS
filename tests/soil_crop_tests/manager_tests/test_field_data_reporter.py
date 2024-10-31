@@ -1,5 +1,5 @@
 from typing import List
-from unittest.mock import PropertyMock, create_autospec, call
+from unittest.mock import PropertyMock, call
 
 import pytest
 from pytest_mock import MockerFixture
@@ -57,7 +57,8 @@ def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: Output
            ] == [3]
     assert pool[
                (
-                   "FieldDataReporter.send_crop_daily_variables.biomass_growth_max.field='f1',crop='crop 1',planted=100," "1993")
+                   "FieldDataReporter.send_crop_daily_variables.biomass_growth_max.field='f1',crop='crop 1',"
+                   "planted=100," "1993")
            ]["values"] == [4]
 
     assert mock_add.call_count == 41
