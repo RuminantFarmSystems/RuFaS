@@ -353,8 +353,7 @@ class OutputManager(object):
                 and self.add_variable_call % self.save_chunk_threshold_call_count == 0
             )
             is_pool_size_at_maximum_capacity = (
-                self.save_chunk_threshold_call_count == 0
-                and self.current_pool_size >= self.maximum_pool_size
+                self.save_chunk_threshold_call_count == 0 and self.current_pool_size >= self.maximum_pool_size
             )
             if is_save_chunk_threshold_reached or is_pool_size_at_maximum_capacity:
                 self._save_current_variable_pool()
