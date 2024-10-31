@@ -1,10 +1,9 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.enums import CropCategory, CropType, StorageType
+from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, CropType, HarvestedCrop, StorageType
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.grain import Dry
-from RUFAS.data_structures.harvested_crop import HarvestedCrop
 from RUFAS.routines.feed_storage.silage import Pile
 
 from .sample_crop_data import sample_crop_data, sample_crop_data_no_mass

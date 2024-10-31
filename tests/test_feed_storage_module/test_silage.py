@@ -4,8 +4,7 @@ from unittest.mock import call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.enums import CropCategory, CropType
-from RUFAS.data_structures.harvested_crop import HarvestedCrop
+from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 from RUFAS.routines.feed_storage.silage import Bag, Bunker, Pile, Silage
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
