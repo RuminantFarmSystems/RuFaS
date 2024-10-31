@@ -41,7 +41,7 @@ def input_manager_original_method_states(
     """Fixture to store original methods of InputManager"""
     return {
         "get_data": mock_input_manager.get_data,
-        "add_variable_to_pool": mock_input_manager.add_variable_to_pool,
+        "add_runtime_variable_to_pool": mock_input_manager.add_runtime_variable_to_pool,
     }
 
 
