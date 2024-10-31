@@ -242,9 +242,7 @@ def test_manage_crop_harvest(mocker: MockerFixture) -> None:
 
     crop.manage_crop_harvest(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data)
 
-    manage_harvest_mock.assert_called_once_with(
-        mock_harvest_op, field_name, field_size, mock_time, mock_soil_data
-    )
+    manage_harvest_mock.assert_called_once_with(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data)
 
 
 def test_set_maximum_transpiration(mocker: MockerFixture) -> None:

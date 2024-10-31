@@ -114,7 +114,8 @@ def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -
     mock_pen_manure_data = [mocker.MagicMock(autospec=PenManureData)]
     mocker.patch.object(simulation_engine.animal_manager, "collect_pen_manure_data", return_value=mock_pen_manure_data)
     mock_harvested_crops = [
-        (crop_1 := mocker.MagicMock(), StorageType.BAG), (crop_2 := mocker.MagicMock(), StorageType.BALEAGE)
+        (crop_1 := mocker.MagicMock(), StorageType.BAG),
+        (crop_2 := mocker.MagicMock(), StorageType.BALEAGE),
     ]
     mocker.patch.object(simulation_engine.field_manager, "daily_update_routine", return_value=mock_harvested_crops)
     patch_receive_crop = mocker.patch.object(simulation_engine.feed_manager, "receive_crop")

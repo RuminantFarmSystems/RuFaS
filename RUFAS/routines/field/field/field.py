@@ -163,9 +163,7 @@ class Field:
 
         self.manure_manager: ManureManager = manure_manager
 
-    def manage_field(
-        self, time: Time, current_conditions: CurrentDayConditions
-    ) -> list[HarvCropStorageType]:
+    def manage_field(self, time: Time, current_conditions: CurrentDayConditions) -> list[HarvCropStorageType]:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -201,9 +199,7 @@ class Field:
 
         self._check_crop_planting_schedule(time)
 
-        harvested_crops: list[HarvCropStorageType] = self._check_crop_harvest_schedule(
-            time, current_conditions
-        )
+        harvested_crops: list[HarvCropStorageType] = self._check_crop_harvest_schedule(time, current_conditions)
 
         self._remove_dead_crops()
         self._reset_crop_field_coverage_fractions()
