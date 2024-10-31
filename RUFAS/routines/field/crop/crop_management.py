@@ -263,11 +263,13 @@ class CropManagement:
         It is assumed that the wet yield is recorded in kg / ha for crops, but stored in the FeedManager as kg.
 
         """
+        harvest_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
+        storage_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         harvested_crop = HarvestedCrop(
             category=self.data.crop_category,
             type=self.data.crop_type,
-            harvest_time=time,
-            storage_time=time,
+            harvest_time=harvest_time,
+            storage_time=storage_time,
             fresh_mass=self.data.wet_yield_collected * field_size,
             dry_matter_percentage=self.data.dry_matter_percentage,
             dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
