@@ -1755,7 +1755,7 @@ class InputManager:
             )
         self.__pool[variable_name] = validated_data
 
-    def add_dict_variable_to_pool(
+    def add_runtime_variable_to_pool(
         self,
         variable_name: str,
         data: Dict[str, Any],
@@ -1795,7 +1795,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.add_dict_variable_to_pool.__name__,
+            "function": self.add_runtime_variable_to_pool.__name__,
         }
         if not (isinstance(data, Dict)):
             self.om.add_error(
@@ -1805,75 +1805,6 @@ class InputManager:
                 info_map,
             )
             raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
-
-        metadata_properties_exist = self._metadata_properties_exist(
-            variable_name=variable_name, properties_blob_key=properties_blob_key
-        )
-
-        if metadata_properties_exist:
-            add_variable_success = self._add_variable_to_pool(
-                variable_name=variable_name,
-                input_data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=eager_termination,
-            )
-            return add_variable_success
-        else:
-            return False
-
-    def add_tabular_variable_to_pool(
-        self,
-        variable_name: str,
-        data: Dict[str, List[Any]] | List[Any],
-        properties_blob_key: str,
-        eager_termination: bool,
-    ) -> bool:
-        """
-        Adds a tabular variable to the InputManager's pool after validating it against metadata.
-
-        Notes
-        -----
-        This function takes in a variable along with its name and a key to access its validation metadata.
-        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
-
-        Parameters
-        ----------
-        variable_name: str
-            The name of the variable to be added.
-        data : Dict[str, List[Any]] | List[Any]
-            The data of the tabular variable, structured as a dictionary of lists or a list.
-        properties_blob_key : str
-            A key used to locate the metadata for validation of the variable.
-        eager_termination : bool
-            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
-            If False, the function returns False.
-
-        Returns
-        -------
-        bool
-            True if the variable is successfully validated and added to the pool.
-            False if the variable is invalid and not added to the pool.
-
-        Raises
-        -------
-        TypeError
-            If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.add_tabular_variable_to_pool.__name__,
-        }
-        if not (isinstance(data, Dict) or isinstance(data, List)):
-            self.om.add_error(
-                "Incorrect variable type",
-                f"Variable {variable_name} has type {type(data)}, does not match "
-                f"the expected type of `Dict[str, List[Any]] | List[Any]`.",
-                info_map,
-            )
-            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, List[Any]] | List[Any]`.")
-
-        data = {variable_name: data} if isinstance(data, List) else data
 
         metadata_properties_exist = self._metadata_properties_exist(
             variable_name=variable_name, properties_blob_key=properties_blob_key
@@ -2394,7 +2325,7 @@ class InputManager:
         """
         properties_index = name.find("_properties") + len("_properties")
         properties_group = name[:properties_index]
-        name = name[properties_index + 1 :]
+        name = name[properties_index + 1:]
         return {
             "properties_group": properties_group,
             "name": name,
