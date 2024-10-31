@@ -71,7 +71,7 @@ class CropManagement:
         crop = None
         if harvest_op in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
-            crop = self._store_harvested_crop(time, field_size)
+            crop = self._get_harvested_crop(time, field_size)
 
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
@@ -241,7 +241,7 @@ class CropManagement:
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _store_harvested_crop(self, time: Time, field_size: float) -> HarvCropStorageType:
+    def _get_harvested_crop(self, time: Time, field_size: float) -> HarvCropStorageType:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 
