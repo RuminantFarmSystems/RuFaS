@@ -11,7 +11,9 @@ from typing import Any, Counter, Dict, List, TextIO, Tuple, Union
 
 import numpy as np
 import pandas as pd
+import psutil
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.units import MeasurementUnits
@@ -111,7 +113,24 @@ class OutputManager(object):
     is_first_post_processing : bool, default True
         True if post-processing (i.e. filtering and saving variables) has not occurred yet. This variable is used during
         end-to-end testing to manage which filters are used during different post-processing runs.
-
+    chunkification : bool
+        Set to True to enable chunkification of the output variable pool.
+    saved_pool_chunks_num : int
+        The number of saved pool chunks.
+    saved_pool_chunks_path : Path | None
+        The path to the directory where saved pool chunks are stored.
+    available_memory : int
+        The available memory on the system.
+    average_add_variable_call_addition : int
+        The average memory usage increase per call to add_variable.
+    add_variable_call : int
+        The number of calls to add_variable().
+    save_chunk_threshold_call_count : int
+        The threshold add_variable_call count for saving pool chunk.
+    current_pool_size : int
+        The current size of the variables pool.
+    maximum_pool_size : float
+        The maximum allowed variable pool size.
     """
 
     __instance = None
@@ -149,6 +168,13 @@ class OutputManager(object):
             self.saved_pool_chunks_num: int = 0
             self.saved_pool_chunks_path: Path | None = None
 
+            self.available_memory: int = 0
+            self.average_add_variable_call_addition: int = 118
+            self.add_variable_call = 0
+            self.save_chunk_threshold_call_count: int = 0
+            self.current_pool_size: int = 0
+            self.maximum_pool_size: float = np.inf
+
             self.add_log(
                 "init_log",
                 "Output Manager instantiated.",
@@ -169,6 +195,66 @@ class OutputManager(object):
             return self.__end_to_end_testing_filter_prefixes
         else:
             return self.__supported_filter_types_prefixes
+
+    def setup_pool_overflow_control(
+        self,
+        output_dir: Path,
+        max_memory_usage_percent: int,
+        max_memory_usage: int | None = None,
+        save_chunk_threshold_call_count: int | None = None,
+    ) -> None:
+        """Sets up the mechanism by which chunkification of the output variable pool is controlled.
+
+        Parameters
+        ----------
+        output_dir : Path
+            The path to the output directory where chunks will be saved.
+        max_memory_usage_percent : int
+            The setting for the maximum output variable pool size as a percentage of the available memory.
+        max_memory_usage : int | None, optional
+            The setting for the maximum output variable pool size in bytes.
+        save_chunk_threshold_call_count : int | None, optional
+            The setting for the threshold add_variable_call count for saving pool chunk.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.setup_pool_overflow_control.__name__,
+        }
+        self.chunkification = True
+
+        self.available_memory = psutil.virtual_memory().available
+        available_memory_gb = self.available_memory / GeneralConstants.BYTES_PER_GB
+
+        self.saved_pool_chunks_path = Path.joinpath(
+            output_dir, f"saved_pool/{self.__metadata_prefix}_{Utility.get_timestamp(include_millis=True)}"
+        )
+        self.create_directory(self.saved_pool_chunks_path)
+
+        log_message = (
+            f"Created {self.saved_pool_chunks_path} for saved pools during simulation.\n"
+            f"Current system available memory: {available_memory_gb:.2f} GB = "
+            f"{self.available_memory} Bytes.\n"
+        )
+
+        if save_chunk_threshold_call_count > 0:
+            self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
+            log_message += (
+                "The threshold add_variable_call count for saving pool chunk is set to "
+                f"{self.save_chunk_threshold_call_count}"
+            )
+        elif max_memory_usage:
+            self.maximum_pool_size = max_memory_usage
+            log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
+        else:
+            self.maximum_pool_size = (
+                max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
+            ) * self.available_memory
+            log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
+        self.add_log(
+            "Pool Overflow Control Setup",
+            log_message,
+            info_map,
+        )
 
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
@@ -247,6 +333,7 @@ class OutputManager(object):
             for that variable.
 
         """
+        self.add_variable_call += 1
         units = info_map.get("units")
         if units is None:
             raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
@@ -259,6 +346,14 @@ class OutputManager(object):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
 
+        if self.chunkification:
+            self.current_pool_size += self.average_add_variable_call_addition
+            if (
+                self.save_chunk_threshold_call_count > 0
+                and self.add_variable_call % self.save_chunk_threshold_call_count == 0
+            ) or (self.save_chunk_threshold_call_count == 0 and self.current_pool_size >= self.maximum_pool_size):
+                self._save_current_variable_pool()
+
     def _save_current_variable_pool(self) -> None:
         """
         Save the current variable pool into JSON file. Flush the variable pool and reset the pool size.
@@ -268,7 +363,6 @@ class OutputManager(object):
             "function": self._save_current_variable_pool.__name__,
         }
 
-        self.create_directory(self.saved_pool_chunks_path)
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
         self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=True)
@@ -979,7 +1073,10 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
+    def filter_variables_pool(
+        self,
+        filter_content: Dict[str, Any],
+    ) -> Dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on options specified in filter_content.
 
@@ -1135,43 +1232,33 @@ class OutputManager(object):
         list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
         return list_of_dumped_files
 
-    def filter_saved_pools(
-        self, filter_content: Dict[str, Any], list_of_dumped_files: List[Path]
-    ) -> Dict[str, OutputManager.pool_element_type]:
+    def load_saved_pools(self) -> None:
         """
         Filters saved pools of data by applying specific filter criteria.
 
-        This method iterates over JSON files in the saved pool directory. It then loads each file and applies the
-        filter by calling the `filter_variables_pool()` method. The results are aggregated into a single dictionary,
+        This method iterates over JSON files in the saved pool directory. It then loads each file as the OutputManager
+        variable pool and applies the filter by calling the `filter_variables_pool()` method. The results are
+        aggregated into a single dictionary,
         combining entries under the same key by extending lists of info_maps and values.
 
-        Parameters
-        ----------
-        filter_content : (Dict[str, Any])
-            A dictionary specifying the criteria used to filter the variables pools.
-
-        list_of_dumped_files: List[Path]
-            A list containing all chunks of the output variable pool to be filtered.
-
-        Returns
-        -------
-        Dict[str, OutputManager.pool_element_type]:
-            A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
-            under the saved_pool_chunks_path directory.
+        Notes
+        -----
+        This function has a side effect that modifies the variable_pool of the OutputManager
         """
         filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+        list_of_dumped_files = self._sort_saved_chunk_files()
         for file in list_of_dumped_files:
             self.load_variables_pool_from_file(file)
-            temp_filtered_pool = self.filter_variables_pool(filter_content)
-            for key, value in temp_filtered_pool.items():
+            for key, value in self.variables_pool.items():
                 if key in filtered_pool.keys():
                     filtered_pool[key]["info_maps"].extend(value["info_maps"])
                     filtered_pool[key]["values"].extend(value["values"])
                 else:
                     filtered_pool[key] = value
+            self.current_pool_size = sys.getsizeof(filtered_pool)
             self.variables_pool = {}
 
-        return filtered_pool
+        self.variables_pool = filtered_pool
 
     def save_results(  # noqa: C901
         self,
@@ -1221,6 +1308,7 @@ class OutputManager(object):
         report_generator = ReportGenerator(self.time)
         if self.chunkification:
             self._save_current_variable_pool()
+            self.load_saved_pools()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = filters_dir_path / filter_file
@@ -1248,11 +1336,7 @@ class OutputManager(object):
 
                 filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = (
-                        self.filter_saved_pools(filter_content, self._sort_saved_chunk_files())
-                        if self.chunkification
-                        else self.filter_variables_pool(filter_content)
-                    )
+                    filtered_pool = self.filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1760,6 +1844,10 @@ class OutputManager(object):
         exclude_info_maps: bool,
         output_directory: Path,
         clear_output_directory: bool,
+        chunkification: bool,
+        max_memory_usage_percent: int,
+        max_memory_usage: int,
+        save_chunk_threshold_call_count: int,
         variables_file_path: Path,
         output_prefix: str,
         version_number: str,
@@ -1775,4 +1863,9 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+
+        if chunkification:
+            self.setup_pool_overflow_control(
+                output_directory, max_memory_usage_percent, max_memory_usage, save_chunk_threshold_call_count
+            )
         self.is_end_to_end_testing_run = is_end_to_end_testing_run
