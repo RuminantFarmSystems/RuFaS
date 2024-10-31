@@ -1776,7 +1776,8 @@ def test_initialize_herd_init_herd_true_save_animals_true(
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
     mock_input_manager.add_runtime_variable_to_pool = input_manager_original_method_states[
-        "add_runtime_variable_to_pool"]
+        "add_runtime_variable_to_pool"
+    ]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
 
 
@@ -1844,7 +1845,9 @@ def test_initialize_herd_init_herd_true_save_animals_false(
     )
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
-    mock_input_manager.add_runtime_variable_to_pool = input_manager_original_method_states["add_runtime_variable_to_pool"]
+    mock_input_manager.add_runtime_variable_to_pool = input_manager_original_method_states[
+        "add_runtime_variable_to_pool"
+    ]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
 
 
@@ -1912,5 +1915,7 @@ def test_initialize_herd_init_herd_false(
     )
 
     mock_input_manager.get_data = input_manager_original_method_states["get_data"]
-    mock_input_manager.add_runtime_variable_to_pool = input_manager_original_method_states["add_runtime_variable_to_pool"]
+    mock_input_manager.add_runtime_variable_to_pool = input_manager_original_method_states[
+        "add_runtime_variable_to_pool"
+    ]
     mock_output_manager.dict_to_file_json = output_manager_original_method_states["dict_to_file_json"]
