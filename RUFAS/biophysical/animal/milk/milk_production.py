@@ -62,6 +62,9 @@ class MilkProduction:
             Milking and general properties of the animal after milk production-related updates for the current day.
 
         """
+        working_general_properties: GeneralProperties
+        working_general_properties["day_in_milk"] = 10
+
         if not general_properties.is_milking:
             milking_properties = MilkProduction._update_milking_history(milking_properties, general_properties, time)
             return milking_properties, general_properties
