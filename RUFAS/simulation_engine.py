@@ -132,7 +132,9 @@ class SimulationEngine:
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
-        self.field_manager.daily_update_routine(self.weather, self.time)
+        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time)
+        for crop in harvested_crops:
+            self.feed_manager.receive_crop(*crop)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
         self.time.record_time()
@@ -205,7 +207,7 @@ class SimulationEngine:
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
 
-        self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
+        self.field_manager = FieldManager(manure_manager=self.manure_manager)
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
         if self.is_end_to_end_test_run:

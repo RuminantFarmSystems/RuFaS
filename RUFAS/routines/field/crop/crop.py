@@ -4,7 +4,7 @@ from copy import copy
 from typing import Any, Optional
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvCropStorageType
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -205,8 +205,7 @@ class Crop:
         field_size: float,
         time: Time,
         soil_data: SoilData,
-        feed_manager: FeedManager,
-    ) -> None:
+    ) -> HarvCropStorageType | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
 
         Parameters
@@ -221,10 +220,14 @@ class Crop:
             Time instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
-        feed_manager : FeedManager
-            Instance of the FeedManager that receives harvested crops.
+
+        Returns
+        -------
+        HarvCropStorageType | None
+            Harvested Crop and the type of storage it will go in if the crop harvest produced a yield, otherwise None.
+
         """
-        self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
+        return self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data)
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Wrapper method for setting the max transpiration for a crop."""
