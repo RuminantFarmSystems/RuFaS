@@ -1763,7 +1763,7 @@ class InputManager:
         eager_termination: bool,
     ) -> bool:
         """
-        Adds a dictionary variable to the InputManager's pool after validating it against metadata.
+        Adds a variable to the InputManager's pool after validating it against metadata.
 
         Notes
         -----
