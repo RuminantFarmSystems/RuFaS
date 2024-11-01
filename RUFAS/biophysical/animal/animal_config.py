@@ -6,6 +6,7 @@ class AnimalConfig:
     heifer_breed_start_day: int  # previously breeding_start_day_h
     heifer_prefresh_day: int  # previously prefresh_day
     heifer_reproduction_cull_day: int  # previously heifer_repro_cull_time
+    do_not_breed_time: int
 
     semen_type: str
     average_gestation_length: int
@@ -17,7 +18,6 @@ class AnimalConfig:
     heifer_estrus_conception_rate: float
     heifer_reproduction_sub_program_conception_rate: float
     heifer_reproduction_sub_program_estrus_detection_rate: float
-
 
     cow_reproduction_program: str
     cow_estrus_conception_rate: float
@@ -84,6 +84,7 @@ class AnimalConfig:
         cls.heifer_breed_start_day = animal_config_data["management_decisions"]["breeding_start_day_h"]
         cls.heifer_prefresh_day = animal_config_data["farm_level"]["repro"]["prefresh_day"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
+        cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]

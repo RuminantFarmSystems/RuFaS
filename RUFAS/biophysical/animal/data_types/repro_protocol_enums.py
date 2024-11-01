@@ -18,6 +18,7 @@ class HeiferReproductionProtocol(Enum):
     TAI = "TAI"
     SynchED = "SynchED"
 
+
 class HeiferTAISubProtocol(Enum):
     """
     This enum class lists the options for different heifer reproduction sub-protocols for the TAI program.
@@ -33,6 +34,7 @@ class HeiferTAISubProtocol(Enum):
     TAI_5dCGP = "5dCGP"
     SynchED_CP = "CP"
     SynchED_2P = "2P"
+
 
 class HeiferSynchEDSubProtocol(Enum):
     """
@@ -130,6 +132,7 @@ class CowReSynchSubProtocol(Enum):
     Resynch_TAIbeforePD = "TAIbeforePD"
     Resynch_TAIafterPD = "TAIafterPD"
     Resynch_PGFatPD = "PGFatPD"
+
 
 
 
