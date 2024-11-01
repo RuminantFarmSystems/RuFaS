@@ -102,22 +102,16 @@ class DataCollectionAppUpdater:
             if key not in PROPERTIES_TO_CREATE_SCHEMA_FOR:
                 continue
 
-            try:
-                new_schema = self._create_object_schema(key, properties[key])
-            except Exception as e:
-                self._om.add_error(
-                    "Data Collection App Updater raised exception", f"Key: '{key}' raised exception: {str(e)}", info_map
-                )
-                continue
+            new_schema = self._create_object_schema(key, properties[key])
 
             schema_name = key.replace("properties", "schema")
             new_schema_file_name = f"{schema_name}.js"
             new_schema_file_path = Path.joinpath(SCHEMA_DIRECTORY_PATH, new_schema_file_name)
             schema_paths.append(new_schema_file_path)
 
-            log_title = "Schema generator writing new schema"
-            log_message = f"Writing new schema in {new_schema_file_path}"
-            self._om.add_log(log_title, log_message, info_map)
+            self._om.add_log(
+                "Schema generator writing new schema", f"Writing new schema in {new_schema_file_path}", info_map
+            )
 
             schema_body = json.dumps(new_schema, indent=4)
             with open(new_schema_file_path, "w") as outfile:

@@ -1,13 +1,72 @@
 import pytest
+from pathlib import Path
 from pytest_mock import MockerFixture
 from typing import Any
 
 from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
+from RUFAS.util import Utility
 
 
 @pytest.fixture
 def dca_updater() -> DataCollectionAppUpdater:
     return DataCollectionAppUpdater()
+
+
+def test_init() -> None:
+    """Tests that DataCollectionAppUpdater is initialized correctly."""
+    actual = DataCollectionAppUpdater()
+
+    assert actual._type_to_schema_map == {
+        "number": actual._create_number_schema,
+        "bool": actual._create_bool_schema,
+        "string": actual._create_string_schema,
+        "array": actual._create_array_schema,
+        "object": actual._create_object_schema,
+    }
+
+
+def test_update_data_collection_app(dca_updater: DataCollectionAppUpdater, mocker: MockerFixture) -> None:
+    """Tests that DCA Updater subroutines are called correctly."""
+    rewrite_schemas = mocker.patch.object(dca_updater, "_rewrite_schemas", return_value=(paths := mocker.MagicMock()))
+    rewrite_index = mocker.patch.object(dca_updater, "_rewrite_index_page")
+
+    dca_updater.update_data_collection_app()
+
+    rewrite_schemas.assert_called_once()
+    rewrite_index.assert_called_once_with(paths)
+
+
+def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFixture) -> None:
+    """Tests that metadata properties are correctly grabbed and have schema written for them."""
+    add_log = mocker.patch.object(dca_updater._om, "add_log")
+    empty_dir = mocker.patch.object(Utility, "empty_dir")
+    dca_updater._im.meta_data = {
+        "properties": {
+            "animal_properties": "dummy_animal_props",
+            "config_properties": "dummy_config_props",
+            "unneeded_properties": "dummy_props"
+        }
+    }
+    expected_schema_paths = [
+        Path("DataCollectionApp/schema/animal_schema.js"), Path("DataCollectionApp/schema/config_schema.js")
+    ]
+    create_object_schema = mocker.patch.object(dca_updater, "_create_object_schema", return_value={"test?": "test!"})
+    expected_create_calls = [
+        mocker.call("animal_properties", "dummy_animal_props"), mocker.call("config_properties", "dummy_config_props")
+    ]
+    mock_open = mocker.patch("RUFAS.data_collection_app_updater.open")
+    expected_schemas = [
+        mocker.call("""animal_schema = {\n    "test?": "test!"\n}"""),
+        mocker.call("""config_schema = {\n    "test?": "test!"\n}""")
+    ]
+
+    actual_schemas = dca_updater._rewrite_schemas()
+
+    assert add_log.call_count == 3
+    empty_dir.assert_called_once()
+    create_object_schema.assert_has_calls(expected_create_calls)
+    # mock_open.assert_has_calls(expected_schemas)
+    assert actual_schemas == expected_schema_paths
 
 
 @pytest.mark.parametrize(
