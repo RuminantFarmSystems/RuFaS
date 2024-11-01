@@ -10,13 +10,6 @@ def dca_updater() -> DataCollectionAppUpdater:
     return DataCollectionAppUpdater()
 
 
-dummy_properties = {
-    "properties": {
-        "dummy_one": {},
-    }
-}
-
-
 @pytest.mark.parametrize(
     "pattern,expected",
     [
@@ -67,17 +60,17 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
         )
     ],
 )
-def test_setup_string_schema(
+def test_create_string_schema(
     dca_updater: DataCollectionAppUpdater,
     mocker: MockerFixture,
     title: str,
     properties: dict[str, Any],
     schema: dict[str, Any],
 ) -> None:
-    """Tests that setup string schema correctly handles a valid string property."""
+    """Tests that created string schema correctly handles a valid string property."""
     mocked_get_options = mocker.patch.object(dca_updater, "_get_list_of_options", return_value=["one", "two"])
 
-    actual = dca_updater.setup_string_schema(title, properties)
+    actual = dca_updater._create_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
     assert actual == schema
@@ -107,15 +100,15 @@ def test_setup_string_schema(
         )
     ],
 )
-def test_setup_string_schema_value_error(
+def test_create_string_schema_value_error(
     dca_updater: DataCollectionAppUpdater,
     mocker: MockerFixture,
     title: str,
     properties: dict[str, Any],
     schema: dict[str, Any],
 ) -> None:
-    """Tests that setup_string_schema handles value errors appropriately."""
-    mock_add_error = mocker.patch.object(dca_updater.om, "add_error")
+    """Tests that create_string_schema handles value errors appropriately."""
+    mock_add_warning = mocker.patch.object(dca_updater._om, "add_warning")
     mocked_get_options = mocker.patch.object(
         dca_updater,
         "_get_list_of_options",
@@ -125,14 +118,13 @@ def test_setup_string_schema_value_error(
         ),
     )
 
-    actual = dca_updater.setup_string_schema(title, properties)
+    actual = dca_updater._create_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
-    mock_add_error.assert_called_once_with(
-        "Schema generation for string input encountered error",
-        "Variable title='start_date' had error: '[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6]"
-        ")$' is not a valid pattern. Cannot create list of valid options.",
-        {"class": dca_updater.__class__.__name__, "function": dca_updater.setup_string_schema.__name__},
+    mock_add_warning.assert_called_once_with(
+        "Could not generate list of valid input options for a string input",
+        "Variable title='start_date' will not have drop-down options for Data Collection App users to pick from.",
+        {"class": dca_updater.__class__.__name__, "function": dca_updater._create_string_schema.__name__},
     )
     assert actual == schema
 
@@ -166,11 +158,11 @@ def test_setup_string_schema_value_error(
         )
     ],
 )
-def test_setup_number_schema(
+def test_create_number_schema(
     dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
-    """Tests that number schema are setup correctly."""
-    actual = dca_updater.setup_number_schema(title, properties)
+    """Tests that number schema are created correctly."""
+    actual = dca_updater._create_number_schema(title, properties)
 
     assert actual == schema
 
@@ -201,11 +193,11 @@ def test_setup_number_schema(
         )
     ],
 )
-def test_setup_bool_schema(
+def test_create_bool_schema(
     dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
-    """Tests that boolean schema are setup correctly."""
-    actual = dca_updater.setup_bool_schema(title, properties)
+    """Tests that boolean schema are created correctly."""
+    actual = dca_updater._create_bool_schema(title, properties)
 
     assert actual == schema
 
@@ -307,11 +299,11 @@ def test_setup_bool_schema(
         ),
     ],
 )
-def test_setup_array_schema(
+def test_create_array_schema(
     dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
-    """Tests that array schema is setup correctly."""
-    actual = dca_updater.setup_array_schema(title, properties)
+    """Tests that array schema is created correctly."""
+    actual = dca_updater._create_array_schema(title, properties)
 
     assert actual == schema
 
@@ -402,10 +394,10 @@ def test_setup_array_schema(
         ),
     ],
 )
-def test_setup_object_schema(
+def test_create_object_schema(
     dca_updater: DataCollectionAppUpdater, title: str, properties: dict[str, Any], schema: dict[str, Any]
 ) -> None:
-    """Tests that object schema are setup correctly."""
-    actual = dca_updater.setup_object_schema(title, properties)
+    """Tests that object schema are created correctly."""
+    actual = dca_updater._create_object_schema(title, properties)
 
     assert actual == schema
