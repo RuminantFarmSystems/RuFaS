@@ -501,7 +501,7 @@ class TaskManager:
         E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
-            args, input_manager, output_manager, task_id, produce_graphics, save_results=True
+            args, input_manager, output_manager, task_id, produce_graphics, save_results=True,
         )
 
     @staticmethod
@@ -543,6 +543,7 @@ class TaskManager:
         save_results: bool = False,
         load_pool_from_file: bool = False,
         export_input_data_to_csv: bool = False,
+        should_flush_im_pool: bool = True,
     ) -> None:
         """
         Handles post-processing tasks based on specified arguments.
@@ -565,6 +566,8 @@ class TaskManager:
             Whether to load data pool from file.
         export_input_data_to_csv: bool
             Whether to export the input data to a CSV file.
+        should_flush_im_pool: bool
+            Whether to flush the input manager pool.
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -587,7 +590,8 @@ class TaskManager:
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts(task_id)
-        input_manager.flush_pool()
+        if should_flush_im_pool:
+            input_manager.flush_pool()
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
@@ -674,7 +678,9 @@ class TaskManager:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
         TaskManager.handle_single_simulation_run(args, output_manager)
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
+        TaskManager.handle_post_processing(args=args, input_manager=input_manager, output_manager=output_manager,
+                                           task_id=task_id, produce_graphics=produce_graphics, save_results=True,
+                                           should_flush_im_pool=False,)
 
     @staticmethod
     def _handle_postprocessing_tasks(
