@@ -902,7 +902,7 @@ class FieldDataReporter:
         )
 
     def send_soil_layer_annual_variables(self, layer: LayerData, field_name: str, index: int) -> None:
-        """Sends layer related annual variables."""
+        """Sends layer related annual variables to output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_soil_layer_annual_variables.__name__,
