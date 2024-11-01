@@ -559,7 +559,7 @@ class FieldDataReporter:
         )
 
     def send_vadose_zone_layer_daily_variables(self, field: Field) -> None:
-        """Sends vadose zone layer related daily variables."""
+        """Sends vadose zone layer related daily variables to output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_vadose_zone_layer_daily_variables.__name__,
