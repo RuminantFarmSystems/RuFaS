@@ -102,6 +102,10 @@ class TaskManager:
             exclude_info_maps,
             output_directory,
             clear_output_directory,
+            False,
+            0,
+            0,
+            0,
             Path(""),
             "Task Manager",
             RUFAS_VERSION,
@@ -151,7 +155,7 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
@@ -310,11 +314,11 @@ class TaskManager:
         return single_run_args
 
     def _run_tasks(
-        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
+        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int, workers: int
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
-            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=workers
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -340,7 +344,9 @@ class TaskManager:
         handler(args, input_manager, output_manager, task_id, produce_graphics)
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> str | None:
+    def task(
+        args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None
+    ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -366,8 +372,12 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
-                Path(""),
+                Path("output/"),
                 False,
+                args["chunkification"],
+                int(args["maximum_memory_usage_percent"] / workers),
+                int(args["maximum_memory_usage"] / workers),
+                args["save_chunk_threshold_call_count"],
                 Path(""),
                 args["output_prefix"],
                 RUFAS_VERSION,
@@ -491,7 +501,7 @@ class TaskManager:
         E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
-            args, input_manager, output_manager, task_id, produce_graphics, save_results=True
+            args, input_manager, output_manager, task_id, produce_graphics, save_results=True,
         )
 
     @staticmethod
@@ -533,6 +543,7 @@ class TaskManager:
         save_results: bool = False,
         load_pool_from_file: bool = False,
         export_input_data_to_csv: bool = False,
+        should_flush_im_pool: bool = True,
     ) -> None:
         """
         Handles post-processing tasks based on specified arguments.
@@ -555,6 +566,8 @@ class TaskManager:
             Whether to load data pool from file.
         export_input_data_to_csv: bool
             Whether to export the input data to a CSV file.
+        should_flush_im_pool: bool
+            Whether to flush the input manager pool.
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -577,6 +590,8 @@ class TaskManager:
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts(task_id)
+        if should_flush_im_pool:
+            input_manager.flush_pool()
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
@@ -663,7 +678,9 @@ class TaskManager:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
         TaskManager.handle_single_simulation_run(args, output_manager)
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
+        TaskManager.handle_post_processing(args=args, input_manager=input_manager, output_manager=output_manager,
+                                           task_id=task_id, produce_graphics=produce_graphics, save_results=True,
+                                           should_flush_im_pool=False,)
 
     @staticmethod
     def _handle_postprocessing_tasks(
