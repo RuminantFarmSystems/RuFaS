@@ -154,13 +154,13 @@ class DataCollectionAppUpdater:
         with open(INDEX_PATH, "w", encoding="utf-8") as index:
             index.write(rewritten_index)
 
-    def _create_number_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_number_schema(self, var_name: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a numerical input.
 
         Parameters
         ----------
-        title : str
+        var_name : str
             The name of the variable for which this schema is being created.
         input_properties : dict[str, Any]
             The properties of the input variable.
@@ -171,6 +171,7 @@ class DataCollectionAppUpdater:
             Dictionary containing the input schema for this variable.
 
         """
+        title = self._parse_variable_name_into_title(var_name)
         schema = {
             "title": title,
             "type": "number",
@@ -192,13 +193,13 @@ class DataCollectionAppUpdater:
 
         return schema
 
-    def _create_bool_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_bool_schema(self, var_name: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a boolean input.
 
         Parameters
         ----------
-        title : str
+        var_name : str
             The name of the variable for which this schema is being created.
         input_properties : dict[str, Any]
             The properties of the input variable.
@@ -209,6 +210,7 @@ class DataCollectionAppUpdater:
             Dictionary containing the input schema for this variable.
 
         """
+        title = self._parse_variable_name_into_title(var_name)
         schema = {
             "title": title,
             "type": "boolean",
@@ -225,13 +227,13 @@ class DataCollectionAppUpdater:
 
         return schema
 
-    def _create_string_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_string_schema(self, var_name: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for a string input.
 
         Parameters
         ----------
-        title : str
+        var_name : str
             The name of the variable for which this schema is being created.
         input_properties : dict[str, Any]
             The properties of the input variable.
@@ -242,6 +244,7 @@ class DataCollectionAppUpdater:
             Dictionary containing the input schema for this variable.
 
         """
+        title = self._parse_variable_name_into_title(var_name)
         schema = {
             "title": title,
             "type": "string",
@@ -262,7 +265,7 @@ class DataCollectionAppUpdater:
                 info_map = {"class": self.__class__.__name__, "function": self._create_string_schema.__name__}
                 self._om.add_warning(
                     "Could not generate list of valid input options for a string input",
-                    f"Variable {title=} will not have drop-down options for Data Collection App users to pick from.",
+                    f"Variable {var_name} will not have drop-down options for Data Collection App users to pick from.",
                     info_map,
                 )
                 return schema
@@ -306,13 +309,13 @@ class DataCollectionAppUpdater:
         split_list = unsplit_list.split("|")
         return split_list
 
-    def _create_array_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_array_schema(self, var_name: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for an array input.
 
         Parameters
         ----------
-        title : str
+        var_name : str
             The name of the variable for which this schema is being created.
         input_properties : dict[str, Any]
             The properties of the input variable.
@@ -323,6 +326,7 @@ class DataCollectionAppUpdater:
             Dictionary containing the input schema for this variable.
 
         """
+        title = self._parse_variable_name_into_title(var_name)
         schema = {
             "title": title,
             "type": "array",
@@ -339,19 +343,19 @@ class DataCollectionAppUpdater:
 
         element_properties = input_properties["properties"]
         element_schema_creator = self._type_to_schema_map[element_properties["type"]]
-        element_title = title + "_element"
-        element_property_dictionary = element_schema_creator(element_title, element_properties)
+        element_name = var_name + "_element"
+        element_property_dictionary = element_schema_creator(element_name, element_properties)
         schema["items"] = element_property_dictionary
 
         return schema
 
-    def _create_object_schema(self, title: str, input_properties: dict[str, Any]) -> dict[str, Any]:
+    def _create_object_schema(self, var_name: str, input_properties: dict[str, Any]) -> dict[str, Any]:
         """
         Creates an input schema for an object input.
 
         Parameters
         ----------
-        title : str
+        var_name : str
             The name of the variable for which this schema is being created.
         input_properties : dict[str, Any]
             The properties of the input variable.
@@ -362,6 +366,7 @@ class DataCollectionAppUpdater:
             Dictionary containing the input schema for this variable.
 
         """
+        title = self._parse_variable_name_into_title(var_name)
         schema = {"title": title, "type": "object", "format": "grid", "properties": {}}
         default = input_properties.get("default")
         description = input_properties.get("description")
@@ -382,3 +387,22 @@ class DataCollectionAppUpdater:
             schema["properties"][key] = sub_property_schema
 
         return schema
+
+    def _parse_variable_name_into_title(self, variable_name: str) -> str:
+        """
+        Converts a variable name written all or partially in snake case to a more readable name.
+
+        Parameters
+        ----------
+        variable_name : str
+            The variable name to be converted into a more readable title.
+
+        Returns
+        -------
+        str
+            The variable name with spaces between all words and the first letter of each word capitalized.
+
+        """
+        words = re.split(r'[_\s]+', variable_name)
+        capitalized_words = [word.capitalize() for word in words]
+        return ' '.join(capitalized_words)

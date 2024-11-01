@@ -46,7 +46,7 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
                 "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)$",
             },
             {
-                "title": "feed_type",
+                "title": "Feed Type",
                 "type": "string",
                 "enum": ["one", "two"],
                 "format": "select2",
@@ -88,7 +88,7 @@ def test_create_string_schema(
                 "default": "2009:1",
             },
             {
-                "title": "start_date",
+                "title": "Start Date",
                 "type": "string",
                 "default": "2009:1",
                 "options": {
@@ -123,7 +123,7 @@ def test_create_string_schema_value_error(
     assert mocked_get_options.call_count == 1
     mock_add_warning.assert_called_once_with(
         "Could not generate list of valid input options for a string input",
-        "Variable title='start_date' will not have drop-down options for Data Collection App users to pick from.",
+        "Variable start_date will not have drop-down options for Data Collection App users to pick from.",
         {"class": dca_updater.__class__.__name__, "function": dca_updater._create_string_schema.__name__},
     )
     assert actual == schema
@@ -142,7 +142,7 @@ def test_create_string_schema_value_error(
                 "default": 0,
             },
             {
-                "title": "pattern_repeat",
+                "title": "Pattern Repeat",
                 "type": "number",
                 "minimum": 0,
                 "maximum": 1_000_000,
@@ -178,7 +178,7 @@ def test_create_number_schema(
                 "default": True,
             },
             {
-                "title": "ventilation",
+                "title": "Ventilation",
                 "type": "boolean",
                 "default": True,
                 "format": "checkbox",
@@ -218,7 +218,7 @@ def test_create_bool_schema(
                 },
             },
             {
-                "title": "parity_death_prob",
+                "title": "Parity Death Prob",
                 "type": "array",
                 "format": "grid",
                 "options": {
@@ -226,7 +226,7 @@ def test_create_bool_schema(
                     "inputAttributes": {"class": "text-primary form-control"},
                 },
                 "items": {
-                    "title": "parity_death_prob_element",
+                    "title": "Parity Death Prob Element",
                     "type": "number",
                     "minimum": 0,
                     "maximum": 1,
@@ -260,7 +260,7 @@ def test_create_bool_schema(
                 },
             },
             {
-                "title": "manure_management_scenarios",
+                "title": "Manure Management Scenarios",
                 "type": "array",
                 "format": "grid",
                 "options": {
@@ -268,12 +268,12 @@ def test_create_bool_schema(
                     "infoText": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
                 },
                 "items": {
-                    "title": "manure_management_scenarios_element",
+                    "title": "Manure Management Scenarios Element",
                     "type": "object",
                     "format": "grid",
                     "properties": {
                         "scenario_id": {
-                            "title": "scenario_id",
+                            "title": "Scenario Id",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -283,7 +283,7 @@ def test_create_bool_schema(
                             "minimum": 0,
                         },
                         "bedding_type": {
-                            "title": "bedding_type",
+                            "title": "Bedding Type",
                             "type": "string",
                             "options": {
                                 "grid_columns": 12,
@@ -319,13 +319,13 @@ def test_create_array_schema(
                 "still_birth_rate": {"type": "number", "description": "Stillbirth rate", "minimum": 0, "maximum": 1},
             },
             {
-                "title": "life_cycle",
+                "title": "Life Cycle",
                 "type": "object",
                 "format": "grid",
                 "options": {"infoText": ""},
                 "properties": {
                     "still_birth_rate": {
-                        "title": "still_birth_rate",
+                        "title": "Still Birth Rate",
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1,
@@ -360,13 +360,13 @@ def test_create_array_schema(
                 },
             },
             {
-                "title": "herd_information",
+                "title": "Herd Information",
                 "type": "object",
                 "format": "grid",
                 "options": {"infoText": "Herd Demographics"},
                 "properties": {
                     "calf_num": {
-                        "title": "calf_num",
+                        "title": "Calf Num",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -377,7 +377,7 @@ def test_create_array_schema(
                         "default": 8,
                     },
                     "breed": {
-                        "title": "breed",
+                        "title": "Breed",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -401,3 +401,20 @@ def test_create_object_schema(
     actual = dca_updater._create_object_schema(title, properties)
 
     assert actual == schema
+
+
+@pytest.mark.parametrize(
+    "name,expected",
+    [
+        ("snake_case", "Snake Case"),
+        ("simple", "Simple"),
+        ("tricky Name", "Tricky Name"),
+        ("Trickier_Name", "Trickier Name"),
+        ("Trickiest name", "Trickiest Name")
+    ]
+)
+def test_parse_variable_name_into_title(dca_updater: DataCollectionAppUpdater, name: str, expected: str) -> None:
+    """Tests that names partially or all in snake case are converted into more readable names."""
+    actual = dca_updater._parse_variable_name_into_title(name)
+
+    assert actual == expected
