@@ -491,7 +491,9 @@ class TaskManager:
 
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
 
-        TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
+        TaskManager._handle_simulation_engine_run_tasks(args=args, input_manager=input_manager,
+                                                        output_manager=output_manager, task_id=task_id,
+                                                        produce_graphics=produce_graphics, should_flush_im_pool=False,)
 
         output_manager.add_log("End-to-end testing", "Completed simulation for end-to-end testing", info_map)
 
@@ -677,21 +679,16 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_graphics: bool,
+        should_flush_im_pool: bool = True,
     ) -> None:
         """Handler for all methods related to simulation run."""
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
         TaskManager.handle_single_simulation_run(args, output_manager)
-        TaskManager.handle_post_processing(
-            args=args,
-            input_manager=input_manager,
-            output_manager=output_manager,
-            task_id=task_id,
-            produce_graphics=produce_graphics,
-            save_results=True,
-            should_flush_im_pool=False,
-        )
+        TaskManager.handle_post_processing(args=args, input_manager=input_manager, output_manager=output_manager,
+                                           task_id=task_id, produce_graphics=produce_graphics, save_results=True,
+                                           should_flush_im_pool=should_flush_im_pool)
 
     @staticmethod
     def _handle_postprocessing_tasks(
