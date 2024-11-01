@@ -803,7 +803,13 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool, 
 
     mock_handle_single_simulation_run.assert_called_once_with(args, mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(
-        args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        produce_graphics=produce_graphics,
+        save_results=True,
+        should_flush_im_pool=False
     )
 
 
