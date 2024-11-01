@@ -28,7 +28,7 @@ class FieldDataReporter:
         self.fields = fields
 
     def send_daily_variables(self) -> None:
-        """sends daily variables to the output manager"""
+        """Sends daily variables of soil and crop module to the output manager"""
         for field in self.fields:
             self.send_field_daily_variables(field)
 
@@ -42,7 +42,7 @@ class FieldDataReporter:
                 self.send_crop_daily_variables(crop, field.field_data.name)
 
     def send_annual_variables(self) -> None:
-        """Sends annual variables to the output manager."""
+        """Sends annual variables of soil and crop to the output manager."""
         for field in self.fields:
             self.send_field_annual_variables(field)
 
@@ -52,7 +52,7 @@ class FieldDataReporter:
                 self.send_soil_layer_annual_variables(layer, field.field_data.name, index)
 
     def send_crop_daily_variables(self, crop: Crop, field_name: str | None) -> None:
-        """Sends crop related daily variables."""
+        """Sends crop related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_crop_daily_variables.__name__,
@@ -250,7 +250,7 @@ class FieldDataReporter:
         )
 
     def send_soil_layer_daily_variables(self, layer: LayerData, index: int, field_name: str | None) -> None:
-        """Sends soil layer related daily variables."""
+        """Sends soil layer related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_soil_layer_daily_variables.__name__,
@@ -867,7 +867,7 @@ class FieldDataReporter:
         )
 
     def send_field_daily_variables(self, field: Field) -> None:
-        """Sends field related daily variables."""
+        """Sends field related daily variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_field_daily_variables.__name__,
@@ -902,7 +902,7 @@ class FieldDataReporter:
         )
 
     def send_soil_layer_annual_variables(self, layer: LayerData, field_name: str | None, index: int) -> None:
-        """Sends layer related annual variables."""
+        """Sends layer related annual variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_soil_layer_annual_variables.__name__,
@@ -931,7 +931,7 @@ class FieldDataReporter:
         )
 
     def send_field_annual_variables(self, field: Field) -> None:
-        """Sends field related annual variables."""
+        """Sends field related annual variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_field_annual_variables.__name__,
@@ -945,7 +945,7 @@ class FieldDataReporter:
         )
 
     def send_soil_annual_variables(self, field: Field) -> None:
-        """Sends soil related annual variables."""
+        """Sends soil related annual variables to the output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_soil_annual_variables.__name__,
