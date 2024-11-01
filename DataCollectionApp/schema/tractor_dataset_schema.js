@@ -1,10 +1,10 @@
 tractor_dataset_schema = {
-    "title": "tractor_dataset_properties",
+    "title": "Tractor Dataset Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "ID": {
-            "title": "ID",
+            "title": "Id",
             "type": "array",
             "format": "grid",
             "options": {
@@ -14,7 +14,7 @@ tractor_dataset_schema = {
                 "infoText": "Unique integer identifier for the data entry"
             },
             "items": {
-                "title": "ID_element",
+                "title": "Id Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -25,7 +25,7 @@ tractor_dataset_schema = {
             }
         },
         "Crop Type or Tillage Implement": {
-            "title": "Crop Type or Tillage Implement",
+            "title": "Crop Type Or Tillage Implement",
             "type": "array",
             "format": "grid",
             "options": {
@@ -35,7 +35,7 @@ tractor_dataset_schema = {
                 "infoText": "No description available"
             },
             "items": {
-                "title": "Crop Type or Tillage Implement_element",
+                "title": "Crop Type Or Tillage Implement Element",
                 "type": "string",
                 "options": {
                     "grid_columns": 12,
@@ -57,7 +57,7 @@ tractor_dataset_schema = {
                 "infoText": "The categorical size of the tractor"
             },
             "items": {
-                "title": "Tractor Size_element",
+                "title": "Tractor Size Element",
                 "type": "string",
                 "options": {
                     "grid_columns": 12,
@@ -85,7 +85,7 @@ tractor_dataset_schema = {
                 "infoText": "No description available"
             },
             "items": {
-                "title": "Operation_element",
+                "title": "Operation Element",
                 "type": "string",
                 "options": {
                     "grid_columns": 12,
@@ -106,7 +106,7 @@ tractor_dataset_schema = {
                 "infoText": "How deep in the soil the implement goes"
             },
             "items": {
-                "title": "Depth_element",
+                "title": "Depth Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -130,7 +130,7 @@ tractor_dataset_schema = {
                 "infoText": "The implement that is attached to the tractor"
             },
             "items": {
-                "title": "Tractor Implement_element",
+                "title": "Tractor Implement Element",
                 "type": "string",
                 "options": {
                     "grid_columns": 12,
@@ -151,7 +151,7 @@ tractor_dataset_schema = {
                 "infoText": "Parameter A as described in the scientific references"
             },
             "items": {
-                "title": "Tractor A (unitless)_element",
+                "title": "Tractor A (unitless) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -173,7 +173,7 @@ tractor_dataset_schema = {
                 "infoText": "Parameter B as described in the scientific references"
             },
             "items": {
-                "title": "Tractor B (unitless)_element",
+                "title": "Tractor B (unitless) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -195,7 +195,7 @@ tractor_dataset_schema = {
                 "infoText": "Parameter C as described in the scientific references"
             },
             "items": {
-                "title": "Tractor C (unitless)_element",
+                "title": "Tractor C (unitless) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -217,7 +217,7 @@ tractor_dataset_schema = {
                 "infoText": "The width of the implement in meters"
             },
             "items": {
-                "title": "Tractor Implement Width (m)_element",
+                "title": "Tractor Implement Width (m) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -240,7 +240,7 @@ tractor_dataset_schema = {
                 "infoText": "The mass of the implement in kg"
             },
             "items": {
-                "title": "Tractor Implement Mass (kg)_element",
+                "title": "Tractor Implement Mass (kg) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -263,7 +263,7 @@ tractor_dataset_schema = {
                 "infoText": "Parameter E as described in the scientific references"
             },
             "items": {
-                "title": "Tractor E (unitless)_element",
+                "title": "Tractor E (unitless) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -285,7 +285,7 @@ tractor_dataset_schema = {
                 "infoText": "Parameter F as described in the scientific references"
             },
             "items": {
-                "title": "Tractor F (unitless)_element",
+                "title": "Tractor F (unitless) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -307,7 +307,7 @@ tractor_dataset_schema = {
                 "infoText": "Parameter G as described in the scientific references"
             },
             "items": {
-                "title": "Tractor G (unitless)_element",
+                "title": "Tractor G (unitless) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -319,7 +319,7 @@ tractor_dataset_schema = {
             }
         },
         "is depth relevant": {
-            "title": "is depth relevant",
+            "title": "Is Depth Relevant",
             "type": "array",
             "format": "grid",
             "options": {
@@ -329,7 +329,7 @@ tractor_dataset_schema = {
                 "infoText": "true if depth is relevant for attachment operation, otherwise false"
             },
             "items": {
-                "title": "is depth relevant_element",
+                "title": "Is Depth Relevant Element",
                 "type": "boolean",
                 "format": "checkbox",
                 "options": {
@@ -341,7 +341,7 @@ tractor_dataset_schema = {
             }
         },
         "Max Throughput (tons dm/hour)": {
-            "title": "Max Throughput (tons dm/hour)",
+            "title": "Max Throughput (tons Dm/hour)",
             "type": "array",
             "format": "grid",
             "options": {
@@ -351,7 +351,7 @@ tractor_dataset_schema = {
                 "infoText": "The maximum throughput of the implement (tons dm/hour)"
             },
             "items": {
-                "title": "Max Throughput (tons dm/hour)_element",
+                "title": "Max Throughput (tons Dm/hour) Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,

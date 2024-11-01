@@ -1,10 +1,10 @@
 fertilizer_schedule_schema = {
-    "title": "fertilizer_schedule_properties",
+    "title": "Fertilizer Schedule Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "available_fertilizer_mixes": {
-            "title": "available_fertilizer_mixes",
+            "title": "Available Fertilizer Mixes",
             "type": "array",
             "format": "grid",
             "options": {
@@ -14,12 +14,12 @@ fertilizer_schedule_schema = {
                 "infoText": "All the available fertilizer mixes that are available besides the default ones."
             },
             "items": {
-                "title": "available_fertilizer_mixes_element",
+                "title": "Available Fertilizer Mixes Element",
                 "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
-                        "title": "name",
+                        "title": "Name",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -75,7 +75,7 @@ fertilizer_schedule_schema = {
             }
         },
         "mix_names": {
-            "title": "mix_names",
+            "title": "Mix Names",
             "type": "array",
             "format": "grid",
             "options": {
@@ -85,7 +85,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of the mix names that will be used for the corresponding fertilizer application."
             },
             "items": {
-                "title": "mix_names_element",
+                "title": "Mix Names Element",
                 "type": "string",
                 "options": {
                     "grid_columns": 12,
@@ -96,7 +96,7 @@ fertilizer_schedule_schema = {
             }
         },
         "years": {
-            "title": "years",
+            "title": "Years",
             "type": "array",
             "format": "grid",
             "options": {
@@ -106,7 +106,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of years in which fertilizer will be applied."
             },
             "items": {
-                "title": "years_element",
+                "title": "Years Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -118,7 +118,7 @@ fertilizer_schedule_schema = {
             }
         },
         "days": {
-            "title": "days",
+            "title": "Days",
             "type": "array",
             "format": "grid",
             "options": {
@@ -128,7 +128,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of days on which fertilizer will be applied."
             },
             "items": {
-                "title": "days_element",
+                "title": "Days Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -141,7 +141,7 @@ fertilizer_schedule_schema = {
             }
         },
         "nitrogen_masses": {
-            "title": "nitrogen_masses",
+            "title": "Nitrogen Masses",
             "type": "array",
             "format": "grid",
             "options": {
@@ -151,7 +151,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of minimum nitrogen masses that the corresponding fertilizer applications should contain.\nUnits: kg."
             },
             "items": {
-                "title": "nitrogen_masses_element",
+                "title": "Nitrogen Masses Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -163,7 +163,7 @@ fertilizer_schedule_schema = {
             }
         },
         "phosphorus_masses": {
-            "title": "phosphorus_masses",
+            "title": "Phosphorus Masses",
             "type": "array",
             "format": "grid",
             "options": {
@@ -173,7 +173,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of minimum phosphorus masses that the corresponding fertilizer applications should contain.\nUnits: kg."
             },
             "items": {
-                "title": "phosphorus_masses_element",
+                "title": "Phosphorus Masses Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -185,7 +185,7 @@ fertilizer_schedule_schema = {
             }
         },
         "potassium_masses": {
-            "title": "potassium_masses",
+            "title": "Potassium Masses",
             "type": "array",
             "format": "grid",
             "options": {
@@ -195,7 +195,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of minimum potassium masses that the corresponding fertilizer applications should contain.\nUnits: kg."
             },
             "items": {
-                "title": "potassium_masses_element",
+                "title": "Potassium Masses Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -207,7 +207,7 @@ fertilizer_schedule_schema = {
             }
         },
         "application_depths": {
-            "title": "application_depths",
+            "title": "Application Depths",
             "type": "array",
             "format": "grid",
             "options": {
@@ -217,7 +217,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of depths at which the fertilizer is injected into the soil.\nUnits: mm."
             },
             "items": {
-                "title": "application_depths_element",
+                "title": "Application Depths Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -229,7 +229,7 @@ fertilizer_schedule_schema = {
             }
         },
         "surface_remainder_fractions": {
-            "title": "surface_remainder_fractions",
+            "title": "Surface Remainder Fractions",
             "type": "array",
             "format": "grid",
             "options": {
@@ -239,7 +239,7 @@ fertilizer_schedule_schema = {
                 "infoText": "List of fractions of fertilizer which remain on the soil surface when applied via injection."
             },
             "items": {
-                "title": "surface_remainder_fractions_element",
+                "title": "Surface Remainder Fractions Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -252,7 +252,7 @@ fertilizer_schedule_schema = {
             }
         },
         "pattern_repeat": {
-            "title": "pattern_repeat",
+            "title": "Pattern Repeat",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -265,7 +265,7 @@ fertilizer_schedule_schema = {
             "default": 0
         },
         "pattern_skip": {
-            "title": "pattern_skip",
+            "title": "Pattern Skip",
             "type": "number",
             "options": {
                 "grid_columns": 12,

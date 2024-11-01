@@ -1,10 +1,10 @@
 field_schema = {
-    "title": "field_properties",
+    "title": "Field Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "soil_specification": {
-            "title": "soil_specification",
+            "title": "Soil Specification",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -15,7 +15,7 @@ field_schema = {
             }
         },
         "crop_specification": {
-            "title": "crop_specification",
+            "title": "Crop Specification",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -26,7 +26,7 @@ field_schema = {
             }
         },
         "fertilizer_management_specification": {
-            "title": "fertilizer_management_specification",
+            "title": "Fertilizer Management Specification",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -37,7 +37,7 @@ field_schema = {
             }
         },
         "manure_management_specification": {
-            "title": "manure_management_specification",
+            "title": "Manure Management Specification",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -48,7 +48,7 @@ field_schema = {
             }
         },
         "tillage_management_specification": {
-            "title": "tillage_management_specification",
+            "title": "Tillage Management Specification",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -59,7 +59,7 @@ field_schema = {
             }
         },
         "field_size": {
-            "title": "field_size",
+            "title": "Field Size",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -71,7 +71,7 @@ field_schema = {
             "minimum": 0.0
         },
         "absolute_latitude": {
-            "title": "absolute_latitude",
+            "title": "Absolute Latitude",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -85,7 +85,7 @@ field_schema = {
             "default": 43.5
         },
         "longitude": {
-            "title": "longitude",
+            "title": "Longitude",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -99,7 +99,7 @@ field_schema = {
             "default": -89.4
         },
         "minimum_daylength": {
-            "title": "minimum_daylength",
+            "title": "Minimum Daylength",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -113,7 +113,7 @@ field_schema = {
             "default": 9.0
         },
         "seasonal_high_water_table": {
-            "title": "seasonal_high_water_table",
+            "title": "Seasonal High Water Table",
             "type": "boolean",
             "format": "checkbox",
             "options": {
@@ -126,7 +126,7 @@ field_schema = {
             "default": false
         },
         "watering_amount_in_liters": {
-            "title": "watering_amount_in_liters",
+            "title": "Watering Amount In Liters",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -139,7 +139,7 @@ field_schema = {
             "default": 0.0
         },
         "watering_interval": {
-            "title": "watering_interval",
+            "title": "Watering Interval",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -152,7 +152,7 @@ field_schema = {
             "default": 0
         },
         "supplement_manure_nutrient_deficiencies": {
-            "title": "supplement_manure_nutrient_deficiencies",
+            "title": "Supplement Manure Nutrient Deficiencies",
             "type": "boolean",
             "format": "checkbox",
             "options": {
@@ -165,7 +165,7 @@ field_schema = {
             "default": false
         },
         "simulate_water_stress": {
-            "title": "simulate_water_stress",
+            "title": "Simulate Water Stress",
             "type": "boolean",
             "format": "checkbox",
             "options": {
@@ -178,7 +178,7 @@ field_schema = {
             "default": true
         },
         "simulate_temp_stress": {
-            "title": "simulate_temp_stress",
+            "title": "Simulate Temp Stress",
             "type": "boolean",
             "format": "checkbox",
             "options": {
@@ -191,7 +191,7 @@ field_schema = {
             "default": true
         },
         "simulate_nitrogen_stress": {
-            "title": "simulate_nitrogen_stress",
+            "title": "Simulate Nitrogen Stress",
             "type": "boolean",
             "format": "checkbox",
             "options": {
@@ -204,7 +204,7 @@ field_schema = {
             "default": true
         },
         "simulate_phosphorus_stress": {
-            "title": "simulate_phosphorus_stress",
+            "title": "Simulate Phosphorus Stress",
             "type": "boolean",
             "format": "checkbox",
             "options": {

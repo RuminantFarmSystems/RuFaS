@@ -1,15 +1,15 @@
 animal_schema = {
-    "title": "animal_properties",
+    "title": "Animal Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "herd_information": {
-            "title": "herd_information",
+            "title": "Herd Information",
             "type": "object",
             "format": "grid",
             "properties": {
                 "calf_num": {
-                    "title": "calf_num",
+                    "title": "Calf Num",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -22,7 +22,7 @@ animal_schema = {
                     "default": 8
                 },
                 "heiferI_num": {
-                    "title": "heiferI_num",
+                    "title": "Heiferi Num",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -35,7 +35,7 @@ animal_schema = {
                     "default": 44
                 },
                 "heiferII_num": {
-                    "title": "heiferII_num",
+                    "title": "Heiferii Num",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -48,7 +48,7 @@ animal_schema = {
                     "default": 38
                 },
                 "heiferIII_num_springers": {
-                    "title": "heiferIII_num_springers",
+                    "title": "Heiferiii Num Springers",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -61,7 +61,7 @@ animal_schema = {
                     "default": 5
                 },
                 "cow_num": {
-                    "title": "cow_num",
+                    "title": "Cow Num",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -74,7 +74,7 @@ animal_schema = {
                     "default": 100
                 },
                 "replace_num": {
-                    "title": "replace_num",
+                    "title": "Replace Num",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -87,7 +87,7 @@ animal_schema = {
                     "default": 5000
                 },
                 "herd_num": {
-                    "title": "herd_num",
+                    "title": "Herd Num",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -100,7 +100,7 @@ animal_schema = {
                     "default": 100
                 },
                 "breed": {
-                    "title": "breed",
+                    "title": "Breed",
                     "type": "string",
                     "options": {
                         "grid_columns": 12,
@@ -117,7 +117,7 @@ animal_schema = {
                     "format": "select2"
                 },
                 "parity_fractions": {
-                    "title": "parity_fractions",
+                    "title": "Parity Fractions",
                     "type": "object",
                     "format": "grid",
                     "properties": {
@@ -166,7 +166,7 @@ animal_schema = {
                     }
                 },
                 "annual_milk_yield": {
-                    "title": "annual_milk_yield",
+                    "title": "Annual Milk Yield",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -183,12 +183,12 @@ animal_schema = {
             }
         },
         "herd_initialization": {
-            "title": "herd_initialization",
+            "title": "Herd Initialization",
             "type": "object",
             "format": "grid",
             "properties": {
                 "initial_animal_num": {
-                    "title": "initial_animal_num",
+                    "title": "Initial Animal Num",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -201,7 +201,7 @@ animal_schema = {
                     "default": 10000
                 },
                 "simulation_days": {
-                    "title": "simulation_days",
+                    "title": "Simulation Days",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -219,17 +219,17 @@ animal_schema = {
             }
         },
         "animal_config": {
-            "title": "animal_config",
+            "title": "Animal Config",
             "type": "object",
             "format": "grid",
             "properties": {
                 "management_decisions": {
-                    "title": "management_decisions",
+                    "title": "Management Decisions",
                     "type": "object",
                     "format": "grid",
                     "properties": {
                         "breeding_start_day_h": {
-                            "title": "breeding_start_day_h",
+                            "title": "Breeding Start Day H",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -242,7 +242,7 @@ animal_schema = {
                             "default": 380
                         },
                         "heifer_repro_method": {
-                            "title": "heifer_repro_method",
+                            "title": "Heifer Repro Method",
                             "type": "string",
                             "options": {
                                 "grid_columns": 12,
@@ -260,7 +260,7 @@ animal_schema = {
                             "format": "select2"
                         },
                         "cow_repro_method": {
-                            "title": "cow_repro_method",
+                            "title": "Cow Repro Method",
                             "type": "string",
                             "options": {
                                 "grid_columns": 12,
@@ -278,7 +278,7 @@ animal_schema = {
                             "format": "select2"
                         },
                         "semen_type": {
-                            "title": "semen_type",
+                            "title": "Semen Type",
                             "type": "string",
                             "options": {
                                 "grid_columns": 12,
@@ -295,7 +295,7 @@ animal_schema = {
                             "format": "select2"
                         },
                         "days_in_preg_when_dry": {
-                            "title": "days_in_preg_when_dry",
+                            "title": "Days In Preg When Dry",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -308,7 +308,7 @@ animal_schema = {
                             "default": 218
                         },
                         "heifer_repro_cull_time": {
-                            "title": "heifer_repro_cull_time",
+                            "title": "Heifer Repro Cull Time",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -321,7 +321,7 @@ animal_schema = {
                             "default": 500
                         },
                         "do_not_breed_time": {
-                            "title": "do_not_breed_time",
+                            "title": "Do Not Breed Time",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -334,7 +334,7 @@ animal_schema = {
                             "default": 185
                         },
                         "cull_milk_production": {
-                            "title": "cull_milk_production",
+                            "title": "Cull Milk Production",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -347,7 +347,7 @@ animal_schema = {
                             "default": 30
                         },
                         "cow_times_milked_per_day": {
-                            "title": "cow_times_milked_per_day",
+                            "title": "Cow Times Milked Per Day",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -360,7 +360,7 @@ animal_schema = {
                             "default": 3
                         },
                         "milk_fat_percent": {
-                            "title": "milk_fat_percent",
+                            "title": "Milk Fat Percent",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -373,7 +373,7 @@ animal_schema = {
                             "default": 3.5
                         },
                         "milk_protein_percent": {
-                            "title": "milk_protein_percent",
+                            "title": "Milk Protein Percent",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -391,17 +391,17 @@ animal_schema = {
                     }
                 },
                 "farm_level": {
-                    "title": "farm_level",
+                    "title": "Farm Level",
                     "type": "object",
                     "format": "grid",
                     "properties": {
                         "calf": {
-                            "title": "calf",
+                            "title": "Calf",
                             "type": "object",
                             "format": "grid",
                             "properties": {
                                 "male_calf_rate_sexed_semen": {
-                                    "title": "male_calf_rate_sexed_semen",
+                                    "title": "Male Calf Rate Sexed Semen",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -415,7 +415,7 @@ animal_schema = {
                                     "default": 0.1
                                 },
                                 "male_calf_rate_conventional_semen": {
-                                    "title": "male_calf_rate_conventional_semen",
+                                    "title": "Male Calf Rate Conventional Semen",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -429,7 +429,7 @@ animal_schema = {
                                     "default": 0.53
                                 },
                                 "keep_female_calf_rate": {
-                                    "title": "keep_female_calf_rate",
+                                    "title": "Keep Female Calf Rate",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -443,7 +443,7 @@ animal_schema = {
                                     "default": 1
                                 },
                                 "wean_day": {
-                                    "title": "wean_day",
+                                    "title": "Wean Day",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -456,7 +456,7 @@ animal_schema = {
                                     "default": 60
                                 },
                                 "wean_length": {
-                                    "title": "wean_length",
+                                    "title": "Wean Length",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -469,7 +469,7 @@ animal_schema = {
                                     "default": 7
                                 },
                                 "milk_type": {
-                                    "title": "milk_type",
+                                    "title": "Milk Type",
                                     "type": "string",
                                     "options": {
                                         "grid_columns": 12,
@@ -491,12 +491,12 @@ animal_schema = {
                             }
                         },
                         "repro": {
-                            "title": "repro",
+                            "title": "Repro",
                             "type": "object",
                             "format": "grid",
                             "properties": {
                                 "voluntary_waiting_period": {
-                                    "title": "voluntary_waiting_period",
+                                    "title": "Voluntary Waiting Period",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -509,7 +509,7 @@ animal_schema = {
                                     "default": 50
                                 },
                                 "conception_rate_decrease": {
-                                    "title": "conception_rate_decrease",
+                                    "title": "Conception Rate Decrease",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -523,7 +523,7 @@ animal_schema = {
                                     "default": 0.026
                                 },
                                 "decrease_conception_rate_in_rebreeding": {
-                                    "title": "decrease_conception_rate_in_rebreeding",
+                                    "title": "Decrease Conception Rate In Rebreeding",
                                     "type": "boolean",
                                     "format": "checkbox",
                                     "options": {
@@ -536,7 +536,7 @@ animal_schema = {
                                     "default": false
                                 },
                                 "decrease_conception_rate_by_parity": {
-                                    "title": "decrease_conception_rate_by_parity",
+                                    "title": "Decrease Conception Rate By Parity",
                                     "type": "boolean",
                                     "format": "checkbox",
                                     "options": {
@@ -549,7 +549,7 @@ animal_schema = {
                                     "default": false
                                 },
                                 "avg_gestation_len": {
-                                    "title": "avg_gestation_len",
+                                    "title": "Avg Gestation Len",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -562,7 +562,7 @@ animal_schema = {
                                     "default": 278
                                 },
                                 "std_gestation_len": {
-                                    "title": "std_gestation_len",
+                                    "title": "Std Gestation Len",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -575,7 +575,7 @@ animal_schema = {
                                     "default": 6
                                 },
                                 "prefresh_day": {
-                                    "title": "prefresh_day",
+                                    "title": "Prefresh Day",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -588,7 +588,7 @@ animal_schema = {
                                     "default": 30
                                 },
                                 "calving_interval": {
-                                    "title": "calving_interval",
+                                    "title": "Calving Interval",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -601,12 +601,12 @@ animal_schema = {
                                     "default": 400
                                 },
                                 "heifers": {
-                                    "title": "heifers",
+                                    "title": "Heifers",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "estrus_detection_rate": {
-                                            "title": "estrus_detection_rate",
+                                            "title": "Estrus Detection Rate",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -620,7 +620,7 @@ animal_schema = {
                                             "default": 0.6
                                         },
                                         "estrus_conception_rate": {
-                                            "title": "estrus_conception_rate",
+                                            "title": "Estrus Conception Rate",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -634,7 +634,7 @@ animal_schema = {
                                             "default": 0.9
                                         },
                                         "repro_sub_protocol": {
-                                            "title": "repro_sub_protocol",
+                                            "title": "Repro Sub Protocol",
                                             "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
@@ -654,12 +654,12 @@ animal_schema = {
                                             "format": "select2"
                                         },
                                         "repro_sub_properties": {
-                                            "title": "repro_sub_properties",
+                                            "title": "Repro Sub Properties",
                                             "type": "object",
                                             "format": "grid",
                                             "properties": {
                                                 "conception_rate": {
-                                                    "title": "conception_rate",
+                                                    "title": "Conception Rate",
                                                     "type": "number",
                                                     "options": {
                                                         "grid_columns": 12,
@@ -673,7 +673,7 @@ animal_schema = {
                                                     "default": 0.6
                                                 },
                                                 "estrus_detection_rate": {
-                                                    "title": "estrus_detection_rate",
+                                                    "title": "Estrus Detection Rate",
                                                     "type": "number",
                                                     "options": {
                                                         "grid_columns": 12,
@@ -694,12 +694,12 @@ animal_schema = {
                                     }
                                 },
                                 "cows": {
-                                    "title": "cows",
+                                    "title": "Cows",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "estrus_detection_rate": {
-                                            "title": "estrus_detection_rate",
+                                            "title": "Estrus Detection Rate",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -713,7 +713,7 @@ animal_schema = {
                                             "default": 0.6
                                         },
                                         "ED_conception_rate": {
-                                            "title": "ED_conception_rate",
+                                            "title": "Ed Conception Rate",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -727,7 +727,7 @@ animal_schema = {
                                             "default": 0.6
                                         },
                                         "presynch_program": {
-                                            "title": "presynch_program",
+                                            "title": "Presynch Program",
                                             "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
@@ -746,7 +746,7 @@ animal_schema = {
                                             "format": "select2"
                                         },
                                         "presynch_program_start_day": {
-                                            "title": "presynch_program_start_day",
+                                            "title": "Presynch Program Start Day",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -759,7 +759,7 @@ animal_schema = {
                                             "default": 50
                                         },
                                         "ovsynch_program": {
-                                            "title": "ovsynch_program",
+                                            "title": "Ovsynch Program",
                                             "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
@@ -779,7 +779,7 @@ animal_schema = {
                                             "format": "select2"
                                         },
                                         "ovsynch_program_start_day": {
-                                            "title": "ovsynch_program_start_day",
+                                            "title": "Ovsynch Program Start Day",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -792,7 +792,7 @@ animal_schema = {
                                             "default": 70
                                         },
                                         "ovsynch_program_conception_rate": {
-                                            "title": "ovsynch_program_conception_rate",
+                                            "title": "Ovsynch Program Conception Rate",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -806,7 +806,7 @@ animal_schema = {
                                             "default": 0.6
                                         },
                                         "resynch_program": {
-                                            "title": "resynch_program",
+                                            "title": "Resynch Program",
                                             "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
@@ -832,12 +832,12 @@ animal_schema = {
                             }
                         },
                         "bodyweight": {
-                            "title": "bodyweight",
+                            "title": "Bodyweight",
                             "type": "object",
                             "format": "grid",
                             "properties": {
                                 "birth_weight_avg_ho": {
-                                    "title": "birth_weight_avg_ho",
+                                    "title": "Birth Weight Avg Ho",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -850,7 +850,7 @@ animal_schema = {
                                     "default": 42.9
                                 },
                                 "birth_weight_std_ho": {
-                                    "title": "birth_weight_std_ho",
+                                    "title": "Birth Weight Std Ho",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -863,7 +863,7 @@ animal_schema = {
                                     "default": 6
                                 },
                                 "birth_weight_avg_je": {
-                                    "title": "birth_weight_avg_je",
+                                    "title": "Birth Weight Avg Je",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -876,7 +876,7 @@ animal_schema = {
                                     "default": 25.2
                                 },
                                 "birth_weight_std_je": {
-                                    "title": "birth_weight_std_je",
+                                    "title": "Birth Weight Std Je",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -889,7 +889,7 @@ animal_schema = {
                                     "default": 4.4
                                 },
                                 "target_heifer_preg_day": {
-                                    "title": "target_heifer_preg_day",
+                                    "title": "Target Heifer Preg Day",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -902,7 +902,7 @@ animal_schema = {
                                     "default": 420
                                 },
                                 "mature_body_weight_avg": {
-                                    "title": "mature_body_weight_avg",
+                                    "title": "Mature Body Weight Avg",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -915,7 +915,7 @@ animal_schema = {
                                     "default": 740.1
                                 },
                                 "mature_body_weight_std": {
-                                    "title": "mature_body_weight_std",
+                                    "title": "Mature Body Weight Std",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -938,17 +938,17 @@ animal_schema = {
                     }
                 },
                 "from_literature": {
-                    "title": "from_literature",
+                    "title": "From Literature",
                     "type": "object",
                     "format": "grid",
                     "properties": {
                         "repro": {
-                            "title": "repro",
+                            "title": "Repro",
                             "type": "object",
                             "format": "grid",
                             "properties": {
                                 "preg_check_day_1": {
-                                    "title": "preg_check_day_1",
+                                    "title": "Preg Check Day 1",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -961,7 +961,7 @@ animal_schema = {
                                     "default": 32
                                 },
                                 "preg_loss_rate_1": {
-                                    "title": "preg_loss_rate_1",
+                                    "title": "Preg Loss Rate 1",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -975,7 +975,7 @@ animal_schema = {
                                     "default": 0.02
                                 },
                                 "preg_check_day_2": {
-                                    "title": "preg_check_day_2",
+                                    "title": "Preg Check Day 2",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -988,7 +988,7 @@ animal_schema = {
                                     "default": 60
                                 },
                                 "preg_loss_rate_2": {
-                                    "title": "preg_loss_rate_2",
+                                    "title": "Preg Loss Rate 2",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1002,7 +1002,7 @@ animal_schema = {
                                     "default": 0.096
                                 },
                                 "preg_check_day_3": {
-                                    "title": "preg_check_day_3",
+                                    "title": "Preg Check Day 3",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1015,7 +1015,7 @@ animal_schema = {
                                     "default": 200
                                 },
                                 "preg_loss_rate_3": {
-                                    "title": "preg_loss_rate_3",
+                                    "title": "Preg Loss Rate 3",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1029,7 +1029,7 @@ animal_schema = {
                                     "default": 0.017
                                 },
                                 "avg_estrus_cycle_return": {
-                                    "title": "avg_estrus_cycle_return",
+                                    "title": "Avg Estrus Cycle Return",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1042,7 +1042,7 @@ animal_schema = {
                                     "default": 23
                                 },
                                 "std_estrus_cycle_return": {
-                                    "title": "std_estrus_cycle_return",
+                                    "title": "Std Estrus Cycle Return",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1055,7 +1055,7 @@ animal_schema = {
                                     "default": 6
                                 },
                                 "avg_estrus_cycle_heifer": {
-                                    "title": "avg_estrus_cycle_heifer",
+                                    "title": "Avg Estrus Cycle Heifer",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1068,7 +1068,7 @@ animal_schema = {
                                     "default": 21
                                 },
                                 "std_estrus_cycle_heifer": {
-                                    "title": "std_estrus_cycle_heifer",
+                                    "title": "Std Estrus Cycle Heifer",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1081,7 +1081,7 @@ animal_schema = {
                                     "default": 2.5
                                 },
                                 "avg_estrus_cycle_cow": {
-                                    "title": "avg_estrus_cycle_cow",
+                                    "title": "Avg Estrus Cycle Cow",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1094,7 +1094,7 @@ animal_schema = {
                                     "default": 21
                                 },
                                 "std_estrus_cycle_cow": {
-                                    "title": "std_estrus_cycle_cow",
+                                    "title": "Std Estrus Cycle Cow",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1107,7 +1107,7 @@ animal_schema = {
                                     "default": 4
                                 },
                                 "avg_estrus_cycle_after_pgf": {
-                                    "title": "avg_estrus_cycle_after_pgf",
+                                    "title": "Avg Estrus Cycle After Pgf",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1120,7 +1120,7 @@ animal_schema = {
                                     "default": 5
                                 },
                                 "std_estrus_cycle_after_pgf": {
-                                    "title": "std_estrus_cycle_after_pgf",
+                                    "title": "Std Estrus Cycle After Pgf",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1138,12 +1138,12 @@ animal_schema = {
                             }
                         },
                         "culling": {
-                            "title": "culling",
+                            "title": "Culling",
                             "type": "object",
                             "format": "grid",
                             "properties": {
                                 "cull_day_count": {
-                                    "title": "cull_day_count",
+                                    "title": "Cull Day Count",
                                     "type": "array",
                                     "format": "grid",
                                     "options": {
@@ -1153,7 +1153,7 @@ animal_schema = {
                                         "infoText": "Culling day count"
                                     },
                                     "items": {
-                                        "title": "cull_day_count_element",
+                                        "title": "Cull Day Count Element",
                                         "type": "number",
                                         "options": {
                                             "grid_columns": 12,
@@ -1165,12 +1165,12 @@ animal_schema = {
                                     }
                                 },
                                 "feet_leg_cull": {
-                                    "title": "feet_leg_cull",
+                                    "title": "Feet Leg Cull",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
-                                            "title": "probability",
+                                            "title": "Probability",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -1183,7 +1183,7 @@ animal_schema = {
                                             "maximum": 1
                                         },
                                         "cull_day_prob": {
-                                            "title": "cull_day_prob",
+                                            "title": "Cull Day Prob",
                                             "type": "array",
                                             "format": "grid",
                                             "options": {
@@ -1193,7 +1193,7 @@ animal_schema = {
                                                 "infoText": "Culling probability on the cull day for feet-and-leg-related health issues."
                                             },
                                             "items": {
-                                                "title": "cull_day_prob_element",
+                                                "title": "Cull Day Prob Element",
                                                 "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
@@ -1211,12 +1211,12 @@ animal_schema = {
                                     }
                                 },
                                 "injury_cull": {
-                                    "title": "injury_cull",
+                                    "title": "Injury Cull",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
-                                            "title": "probability",
+                                            "title": "Probability",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -1229,7 +1229,7 @@ animal_schema = {
                                             "maximum": 1
                                         },
                                         "cull_day_prob": {
-                                            "title": "cull_day_prob",
+                                            "title": "Cull Day Prob",
                                             "type": "array",
                                             "format": "grid",
                                             "options": {
@@ -1239,7 +1239,7 @@ animal_schema = {
                                                 "infoText": "Culling probability on the cull day for injury-related health issues."
                                             },
                                             "items": {
-                                                "title": "cull_day_prob_element",
+                                                "title": "Cull Day Prob Element",
                                                 "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
@@ -1257,12 +1257,12 @@ animal_schema = {
                                     }
                                 },
                                 "mastitis_cull": {
-                                    "title": "mastitis_cull",
+                                    "title": "Mastitis Cull",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
-                                            "title": "probability",
+                                            "title": "Probability",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -1275,7 +1275,7 @@ animal_schema = {
                                             "maximum": 1
                                         },
                                         "cull_day_prob": {
-                                            "title": "cull_day_prob",
+                                            "title": "Cull Day Prob",
                                             "type": "array",
                                             "format": "grid",
                                             "options": {
@@ -1285,7 +1285,7 @@ animal_schema = {
                                                 "infoText": "Culling probability on the cull day for mastitis-related health issues."
                                             },
                                             "items": {
-                                                "title": "cull_day_prob_element",
+                                                "title": "Cull Day Prob Element",
                                                 "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
@@ -1303,12 +1303,12 @@ animal_schema = {
                                     }
                                 },
                                 "disease_cull": {
-                                    "title": "disease_cull",
+                                    "title": "Disease Cull",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
-                                            "title": "probability",
+                                            "title": "Probability",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -1321,7 +1321,7 @@ animal_schema = {
                                             "maximum": 1
                                         },
                                         "cull_day_prob": {
-                                            "title": "cull_day_prob",
+                                            "title": "Cull Day Prob",
                                             "type": "array",
                                             "format": "grid",
                                             "options": {
@@ -1331,7 +1331,7 @@ animal_schema = {
                                                 "infoText": "Culling probability on the cull day for disease-related health issues."
                                             },
                                             "items": {
-                                                "title": "cull_day_prob_element",
+                                                "title": "Cull Day Prob Element",
                                                 "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
@@ -1349,12 +1349,12 @@ animal_schema = {
                                     }
                                 },
                                 "udder_cull": {
-                                    "title": "udder_cull",
+                                    "title": "Udder Cull",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
-                                            "title": "probability",
+                                            "title": "Probability",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -1367,7 +1367,7 @@ animal_schema = {
                                             "maximum": 1
                                         },
                                         "cull_day_prob": {
-                                            "title": "cull_day_prob",
+                                            "title": "Cull Day Prob",
                                             "type": "array",
                                             "format": "grid",
                                             "options": {
@@ -1377,7 +1377,7 @@ animal_schema = {
                                                 "infoText": "Culling probability on the cull day for udder-related health issues."
                                             },
                                             "items": {
-                                                "title": "cull_day_prob_element",
+                                                "title": "Cull Day Prob Element",
                                                 "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
@@ -1395,12 +1395,12 @@ animal_schema = {
                                     }
                                 },
                                 "unknown_cull": {
-                                    "title": "unknown_cull",
+                                    "title": "Unknown Cull",
                                     "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
-                                            "title": "probability",
+                                            "title": "Probability",
                                             "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
@@ -1413,7 +1413,7 @@ animal_schema = {
                                             "maximum": 1
                                         },
                                         "cull_day_prob": {
-                                            "title": "cull_day_prob",
+                                            "title": "Cull Day Prob",
                                             "type": "array",
                                             "format": "grid",
                                             "options": {
@@ -1423,7 +1423,7 @@ animal_schema = {
                                                 "infoText": "Culling probability on the cull day for unknown health issues."
                                             },
                                             "items": {
-                                                "title": "cull_day_prob_element",
+                                                "title": "Cull Day Prob Element",
                                                 "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
@@ -1441,7 +1441,7 @@ animal_schema = {
                                     }
                                 },
                                 "parity_death_prob": {
-                                    "title": "parity_death_prob",
+                                    "title": "Parity Death Prob",
                                     "type": "array",
                                     "format": "grid",
                                     "options": {
@@ -1451,7 +1451,7 @@ animal_schema = {
                                         "infoText": "Death Probability, by Parity"
                                     },
                                     "items": {
-                                        "title": "parity_death_prob_element",
+                                        "title": "Parity Death Prob Element",
                                         "type": "number",
                                         "options": {
                                             "grid_columns": 12,
@@ -1465,7 +1465,7 @@ animal_schema = {
                                     }
                                 },
                                 "parity_cull_prob": {
-                                    "title": "parity_cull_prob",
+                                    "title": "Parity Cull Prob",
                                     "type": "array",
                                     "format": "grid",
                                     "options": {
@@ -1475,7 +1475,7 @@ animal_schema = {
                                         "infoText": "Cull Probability, by Parity"
                                     },
                                     "items": {
-                                        "title": "parity_cull_prob_element",
+                                        "title": "Parity Cull Prob Element",
                                         "type": "number",
                                         "options": {
                                             "grid_columns": 12,
@@ -1489,7 +1489,7 @@ animal_schema = {
                                     }
                                 },
                                 "death_day_prob": {
-                                    "title": "death_day_prob",
+                                    "title": "Death Day Prob",
                                     "type": "array",
                                     "format": "grid",
                                     "options": {
@@ -1499,7 +1499,7 @@ animal_schema = {
                                         "infoText": "Culling probability for death"
                                     },
                                     "items": {
-                                        "title": "death_day_prob_element",
+                                        "title": "Death Day Prob Element",
                                         "type": "number",
                                         "options": {
                                             "grid_columns": 12,
@@ -1517,12 +1517,12 @@ animal_schema = {
                             }
                         },
                         "life_cycle": {
-                            "title": "life_cycle",
+                            "title": "Life Cycle",
                             "type": "object",
                             "format": "grid",
                             "properties": {
                                 "still_birth_rate": {
-                                    "title": "still_birth_rate",
+                                    "title": "Still Birth Rate",
                                     "type": "number",
                                     "options": {
                                         "grid_columns": 12,
@@ -1551,12 +1551,12 @@ animal_schema = {
             }
         },
         "methane_mitigation": {
-            "title": "methane_mitigation",
+            "title": "Methane Mitigation",
             "type": "object",
             "format": "grid",
             "properties": {
                 "methane_mitigation_method": {
-                    "title": "methane_mitigation_method",
+                    "title": "Methane Mitigation Method",
                     "type": "string",
                     "options": {
                         "grid_columns": 12,
@@ -1576,7 +1576,7 @@ animal_schema = {
                     "format": "select2"
                 },
                 "methane_mitigation_additive_amount": {
-                    "title": "methane_mitigation_additive_amount",
+                    "title": "Methane Mitigation Additive Amount",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -1587,7 +1587,7 @@ animal_schema = {
                     "default": 0
                 },
                 "3-NOP_additive_amount": {
-                    "title": "3-NOP_additive_amount",
+                    "title": "3-nop Additive Amount",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -1601,7 +1601,7 @@ animal_schema = {
                     "default": 70
                 },
                 "monensin_additive_amount": {
-                    "title": "monensin_additive_amount",
+                    "title": "Monensin Additive Amount",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -1615,7 +1615,7 @@ animal_schema = {
                     "default": 24
                 },
                 "essential_oils_additive_amount": {
-                    "title": "essential_oils_additive_amount",
+                    "title": "Essential Oils Additive Amount",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -1629,7 +1629,7 @@ animal_schema = {
                     "default": 0
                 },
                 "seaweed_additive_amount": {
-                    "title": "seaweed_additive_amount",
+                    "title": "Seaweed Additive Amount",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -1648,7 +1648,7 @@ animal_schema = {
             }
         },
         "housing": {
-            "title": "housing",
+            "title": "Housing",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -1666,7 +1666,7 @@ animal_schema = {
             "format": "select2"
         },
         "pasture_concentrate": {
-            "title": "pasture_concentrate",
+            "title": "Pasture Concentrate",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -1679,7 +1679,7 @@ animal_schema = {
             "default": 0
         },
         "methane_model": {
-            "title": "methane_model",
+            "title": "Methane Model",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -1697,12 +1697,12 @@ animal_schema = {
             "format": "select2"
         },
         "ration": {
-            "title": "ration",
+            "title": "Ration",
             "type": "object",
             "format": "grid",
             "properties": {
                 "user_input": {
-                    "title": "user_input",
+                    "title": "User Input",
                     "type": "boolean",
                     "format": "checkbox",
                     "options": {
@@ -1715,7 +1715,7 @@ animal_schema = {
                     "default": false
                 },
                 "formulation_interval": {
-                    "title": "formulation_interval",
+                    "title": "Formulation Interval",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -1728,7 +1728,7 @@ animal_schema = {
                     "default": 30
                 },
                 "phosphorus_requirement_buffer": {
-                    "title": "phosphorus_requirement_buffer",
+                    "title": "Phosphorus Requirement Buffer",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -1746,7 +1746,7 @@ animal_schema = {
             }
         },
         "pen_information": {
-            "title": "pen_information",
+            "title": "Pen Information",
             "type": "array",
             "format": "grid",
             "options": {
@@ -1756,12 +1756,12 @@ animal_schema = {
                 "infoText": "Pen Information"
             },
             "items": {
-                "title": "pen_information_element",
+                "title": "Pen Information Element",
                 "type": "object",
                 "format": "grid",
                 "properties": {
                     "id": {
-                        "title": "id",
+                        "title": "Id",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -1772,7 +1772,7 @@ animal_schema = {
                         }
                     },
                     "pen_name": {
-                        "title": "pen_name",
+                        "title": "Pen Name",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -1783,7 +1783,7 @@ animal_schema = {
                         }
                     },
                     "animal_combination": {
-                        "title": "animal_combination",
+                        "title": "Animal Combination",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -1801,7 +1801,7 @@ animal_schema = {
                         "format": "select2"
                     },
                     "vertical_dist_to_milking_parlor": {
-                        "title": "vertical_dist_to_milking_parlor",
+                        "title": "Vertical Dist To Milking Parlor",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -1814,7 +1814,7 @@ animal_schema = {
                         "default": 0.1
                     },
                     "horizontal_dist_to_milking_parlor": {
-                        "title": "horizontal_dist_to_milking_parlor",
+                        "title": "Horizontal Dist To Milking Parlor",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -1827,7 +1827,7 @@ animal_schema = {
                         "default": 10
                     },
                     "number_of_stalls": {
-                        "title": "number_of_stalls",
+                        "title": "Number Of Stalls",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -1840,7 +1840,7 @@ animal_schema = {
                         "default": 1000
                     },
                     "housing_type": {
-                        "title": "housing_type",
+                        "title": "Housing Type",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -1856,7 +1856,7 @@ animal_schema = {
                         "format": "select2"
                     },
                     "pen_type": {
-                        "title": "pen_type",
+                        "title": "Pen Type",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -1875,7 +1875,7 @@ animal_schema = {
                         "format": "select2"
                     },
                     "max_stocking_density": {
-                        "title": "max_stocking_density",
+                        "title": "Max Stocking Density",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -1889,7 +1889,7 @@ animal_schema = {
                         "default": 1.2
                     },
                     "manure_management_scenario_id": {
-                        "title": "manure_management_scenario_id",
+                        "title": "Manure Management Scenario Id",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,

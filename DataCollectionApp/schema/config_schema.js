@@ -1,10 +1,10 @@
 config_schema = {
-    "title": "config_properties",
+    "title": "Config Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "start_date": {
-            "title": "start_date",
+            "title": "Start Date",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -16,7 +16,7 @@ config_schema = {
             "default": "2009:1"
         },
         "end_date": {
-            "title": "end_date",
+            "title": "End Date",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -28,7 +28,7 @@ config_schema = {
             "default": "2009:100"
         },
         "simulate_animals": {
-            "title": "simulate_animals",
+            "title": "Simulate Animals",
             "type": "boolean",
             "format": "checkbox",
             "options": {
@@ -41,7 +41,7 @@ config_schema = {
             "default": true
         },
         "nutrient_standard": {
-            "title": "nutrient_standard",
+            "title": "Nutrient Standard",
             "type": "string",
             "options": {
                 "grid_columns": 12,
@@ -58,7 +58,7 @@ config_schema = {
             "format": "select2"
         },
         "FIPS_county_code": {
-            "title": "FIPS_county_code",
+            "title": "Fips County Code",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -71,7 +71,7 @@ config_schema = {
             "maximum": 56045
         },
         "include_detailed_values": {
-            "title": "include_detailed_values",
+            "title": "Include Detailed Values",
             "type": "boolean",
             "format": "checkbox",
             "options": {

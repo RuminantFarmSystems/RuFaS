@@ -1,10 +1,10 @@
 crop_schedule_schema = {
-    "title": "crop_schedule_properties",
+    "title": "Crop Schedule Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "crop_schedules": {
-            "title": "crop_schedules",
+            "title": "Crop Schedules",
             "type": "array",
             "format": "grid",
             "options": {
@@ -14,12 +14,12 @@ crop_schedule_schema = {
                 "infoText": "Array of all crop schedules to be executed over the run of the simulation."
             },
             "items": {
-                "title": "crop_schedules_element",
+                "title": "Crop Schedules Element",
                 "type": "object",
                 "format": "grid",
                 "properties": {
                     "crop_species": {
-                        "title": "crop_species",
+                        "title": "Crop Species",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -55,7 +55,7 @@ crop_schedule_schema = {
                         "format": "select2"
                     },
                     "harvest_days": {
-                        "title": "harvest_days",
+                        "title": "Harvest Days",
                         "type": "array",
                         "format": "grid",
                         "options": {
@@ -65,7 +65,7 @@ crop_schedule_schema = {
                             "infoText": "Julian day(s) of year to harvest"
                         },
                         "items": {
-                            "title": "harvest_days_element",
+                            "title": "Harvest Days Element",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -79,7 +79,7 @@ crop_schedule_schema = {
                         }
                     },
                     "harvest_years": {
-                        "title": "harvest_years",
+                        "title": "Harvest Years",
                         "type": "array",
                         "format": "grid",
                         "options": {
@@ -89,7 +89,7 @@ crop_schedule_schema = {
                             "infoText": "Calendar years in which the harvesting occurs"
                         },
                         "items": {
-                            "title": "harvest_years_element",
+                            "title": "Harvest Years Element",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -101,7 +101,7 @@ crop_schedule_schema = {
                         }
                     },
                     "harvest_operations": {
-                        "title": "harvest_operations",
+                        "title": "Harvest Operations",
                         "type": "array",
                         "format": "grid",
                         "options": {
@@ -111,7 +111,7 @@ crop_schedule_schema = {
                             "infoText": "Operation(s) with which this crop will be harvested."
                         },
                         "items": {
-                            "title": "harvest_operations_element",
+                            "title": "Harvest Operations Element",
                             "type": "string",
                             "options": {
                                 "grid_columns": 12,
@@ -129,7 +129,7 @@ crop_schedule_schema = {
                         }
                     },
                     "harvest_type": {
-                        "title": "harvest_type",
+                        "title": "Harvest Type",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -146,7 +146,7 @@ crop_schedule_schema = {
                         "format": "select2"
                     },
                     "planting_days": {
-                        "title": "planting_days",
+                        "title": "Planting Days",
                         "type": "array",
                         "format": "grid",
                         "options": {
@@ -156,7 +156,7 @@ crop_schedule_schema = {
                             "infoText": "Julian day(s) of year to plant"
                         },
                         "items": {
-                            "title": "planting_days_element",
+                            "title": "Planting Days Element",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -169,7 +169,7 @@ crop_schedule_schema = {
                         }
                     },
                     "planting_years": {
-                        "title": "planting_years",
+                        "title": "Planting Years",
                         "type": "array",
                         "format": "grid",
                         "options": {
@@ -179,7 +179,7 @@ crop_schedule_schema = {
                             "infoText": "Calendar years in which the planting occurs"
                         },
                         "items": {
-                            "title": "planting_years_element",
+                            "title": "Planting Years Element",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
@@ -191,7 +191,7 @@ crop_schedule_schema = {
                         }
                     },
                     "pattern_repeat": {
-                        "title": "pattern_repeat",
+                        "title": "Pattern Repeat",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -204,7 +204,7 @@ crop_schedule_schema = {
                         "default": 0
                     },
                     "planting_skip": {
-                        "title": "planting_skip",
+                        "title": "Planting Skip",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -217,7 +217,7 @@ crop_schedule_schema = {
                         "default": 0
                     },
                     "harvesting_skip": {
-                        "title": "harvesting_skip",
+                        "title": "Harvesting Skip",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,

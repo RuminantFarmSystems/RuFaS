@@ -1,10 +1,10 @@
 manure_schedule_schema = {
-    "title": "manure_schedule_properties",
+    "title": "Manure Schedule Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "years": {
-            "title": "years",
+            "title": "Years",
             "type": "array",
             "format": "grid",
             "options": {
@@ -14,7 +14,7 @@ manure_schedule_schema = {
                 "infoText": "List of years in which manure will be applied."
             },
             "items": {
-                "title": "years_element",
+                "title": "Years Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -26,7 +26,7 @@ manure_schedule_schema = {
             }
         },
         "days": {
-            "title": "days",
+            "title": "Days",
             "type": "array",
             "format": "grid",
             "options": {
@@ -36,7 +36,7 @@ manure_schedule_schema = {
                 "infoText": "List of days on which manure will be applied."
             },
             "items": {
-                "title": "days_element",
+                "title": "Days Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -49,7 +49,7 @@ manure_schedule_schema = {
             }
         },
         "nitrogen_masses": {
-            "title": "nitrogen_masses",
+            "title": "Nitrogen Masses",
             "type": "array",
             "format": "grid",
             "options": {
@@ -59,7 +59,7 @@ manure_schedule_schema = {
                 "infoText": "List of minimum nitrogen masses that the corresponding manure applications should contain.\nUnits: kg."
             },
             "items": {
-                "title": "nitrogen_masses_element",
+                "title": "Nitrogen Masses Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -71,7 +71,7 @@ manure_schedule_schema = {
             }
         },
         "phosphorus_masses": {
-            "title": "phosphorus_masses",
+            "title": "Phosphorus Masses",
             "type": "array",
             "format": "grid",
             "options": {
@@ -81,7 +81,7 @@ manure_schedule_schema = {
                 "infoText": "List of minimum phosphorus masses that the corresponding manure applications should contain.\nUnits: kg."
             },
             "items": {
-                "title": "phosphorus_masses_element",
+                "title": "Phosphorus Masses Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -93,7 +93,7 @@ manure_schedule_schema = {
             }
         },
         "potassium_masses": {
-            "title": "potassium_masses",
+            "title": "Potassium Masses",
             "type": "array",
             "format": "grid",
             "options": {
@@ -103,7 +103,7 @@ manure_schedule_schema = {
                 "infoText": "List of minimum potassium masses that the corresponding manure applications should contain.\nUnits: kg."
             },
             "items": {
-                "title": "potassium_masses_element",
+                "title": "Potassium Masses Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -115,7 +115,7 @@ manure_schedule_schema = {
             }
         },
         "coverage_fractions": {
-            "title": "coverage_fractions",
+            "title": "Coverage Fractions",
             "type": "array",
             "format": "grid",
             "options": {
@@ -125,7 +125,7 @@ manure_schedule_schema = {
                 "infoText": "List of fractions of how much of the field is covered by the corresponding manure application."
             },
             "items": {
-                "title": "coverage_fractions_element",
+                "title": "Coverage Fractions Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -138,7 +138,7 @@ manure_schedule_schema = {
             }
         },
         "application_depths": {
-            "title": "application_depths",
+            "title": "Application Depths",
             "type": "array",
             "format": "grid",
             "options": {
@@ -148,7 +148,7 @@ manure_schedule_schema = {
                 "infoText": "List of depths at which the manure is injected into the soil.\nUnits: mm."
             },
             "items": {
-                "title": "application_depths_element",
+                "title": "Application Depths Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -160,7 +160,7 @@ manure_schedule_schema = {
             }
         },
         "surface_remainder_fractions": {
-            "title": "surface_remainder_fractions",
+            "title": "Surface Remainder Fractions",
             "type": "array",
             "format": "grid",
             "options": {
@@ -170,7 +170,7 @@ manure_schedule_schema = {
                 "infoText": "List of fractions of manure which remain on the soil surface when applied via injection."
             },
             "items": {
-                "title": "surface_remainder_fractions_element",
+                "title": "Surface Remainder Fractions Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -183,7 +183,7 @@ manure_schedule_schema = {
             }
         },
         "manure_types": {
-            "title": "manure_types",
+            "title": "Manure Types",
             "type": "array",
             "format": "grid",
             "options": {
@@ -193,7 +193,7 @@ manure_schedule_schema = {
                 "infoText": "The type of manure which will be requested for the application."
             },
             "items": {
-                "title": "manure_types_element",
+                "title": "Manure Types Element",
                 "type": "string",
                 "options": {
                     "grid_columns": 12,
@@ -209,7 +209,7 @@ manure_schedule_schema = {
             }
         },
         "pattern_repeat": {
-            "title": "pattern_repeat",
+            "title": "Pattern Repeat",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -222,7 +222,7 @@ manure_schedule_schema = {
             "default": 0
         },
         "pattern_skip": {
-            "title": "pattern_skip",
+            "title": "Pattern Skip",
             "type": "number",
             "options": {
                 "grid_columns": 12,

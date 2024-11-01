@@ -1,10 +1,10 @@
 tillage_schedule_schema = {
-    "title": "tillage_schedule_properties",
+    "title": "Tillage Schedule Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "years": {
-            "title": "years",
+            "title": "Years",
             "type": "array",
             "format": "grid",
             "options": {
@@ -14,7 +14,7 @@ tillage_schedule_schema = {
                 "infoText": "List of years in which tillage will occur."
             },
             "items": {
-                "title": "years_element",
+                "title": "Years Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -26,7 +26,7 @@ tillage_schedule_schema = {
             }
         },
         "days": {
-            "title": "days",
+            "title": "Days",
             "type": "array",
             "format": "grid",
             "options": {
@@ -36,7 +36,7 @@ tillage_schedule_schema = {
                 "infoText": "List of days on which tilling will occur."
             },
             "items": {
-                "title": "days_element",
+                "title": "Days Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -49,7 +49,7 @@ tillage_schedule_schema = {
             }
         },
         "tillage_depths": {
-            "title": "tillage_depths",
+            "title": "Tillage Depths",
             "type": "array",
             "format": "grid",
             "options": {
@@ -59,7 +59,7 @@ tillage_schedule_schema = {
                 "infoText": "List of depths that the corresponding tillage applications reach.\nUnits: mm."
             },
             "items": {
-                "title": "tillage_depths_element",
+                "title": "Tillage Depths Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -71,7 +71,7 @@ tillage_schedule_schema = {
             }
         },
         "incorporation_fractions": {
-            "title": "incorporation_fractions",
+            "title": "Incorporation Fractions",
             "type": "array",
             "format": "grid",
             "options": {
@@ -81,7 +81,7 @@ tillage_schedule_schema = {
                 "infoText": "List of fractions of surface pools that get incorporated into the soil during applications."
             },
             "items": {
-                "title": "incorporation_fractions_element",
+                "title": "Incorporation Fractions Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -94,7 +94,7 @@ tillage_schedule_schema = {
             }
         },
         "mixing_fractions": {
-            "title": "mixing_fractions",
+            "title": "Mixing Fractions",
             "type": "array",
             "format": "grid",
             "options": {
@@ -104,7 +104,7 @@ tillage_schedule_schema = {
                 "infoText": "List of fractions of soil layer pools that are available to mix into other soil layers."
             },
             "items": {
-                "title": "mixing_fractions_element",
+                "title": "Mixing Fractions Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -117,7 +117,7 @@ tillage_schedule_schema = {
             }
         },
         "implements": {
-            "title": "implements",
+            "title": "Implements",
             "type": "array",
             "format": "grid",
             "options": {
@@ -127,7 +127,7 @@ tillage_schedule_schema = {
                 "infoText": "List of tillage implements which will be used to execute the tillage operations."
             },
             "items": {
-                "title": "implements_element",
+                "title": "Implements Element",
                 "type": "string",
                 "options": {
                     "grid_columns": 12,
@@ -147,7 +147,7 @@ tillage_schedule_schema = {
             }
         },
         "pattern_repeat": {
-            "title": "pattern_repeat",
+            "title": "Pattern Repeat",
             "type": "number",
             "options": {
                 "grid_columns": 12,
@@ -160,7 +160,7 @@ tillage_schedule_schema = {
             "default": 0
         },
         "pattern_skip": {
-            "title": "pattern_skip",
+            "title": "Pattern Skip",
             "type": "number",
             "options": {
                 "grid_columns": 12,

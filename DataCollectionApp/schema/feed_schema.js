@@ -1,10 +1,10 @@
 feed_schema = {
-    "title": "feed_properties",
+    "title": "Feed Properties",
     "type": "object",
     "format": "grid",
     "properties": {
         "calf_feeds": {
-            "title": "calf_feeds",
+            "title": "Calf Feeds",
             "type": "array",
             "format": "grid",
             "options": {
@@ -14,7 +14,7 @@ feed_schema = {
                 "infoText": "Calf Feeds (raised off farm - 24 hrs of age)."
             },
             "items": {
-                "title": "calf_feeds_element",
+                "title": "Calf Feeds Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -28,7 +28,7 @@ feed_schema = {
             }
         },
         "growing_feeds": {
-            "title": "growing_feeds",
+            "title": "Growing Feeds",
             "type": "array",
             "format": "grid",
             "options": {
@@ -38,7 +38,7 @@ feed_schema = {
                 "infoText": "Growing Feeds (HeiferI and HeiferII - return at 20 months) -- HeiferI is the number of youngstock post-weaning and before breeding. Heifer II is the number of heifers eligible for breeding and in early pregnancy."
             },
             "items": {
-                "title": "growing_feeds_element",
+                "title": "Growing Feeds Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -51,7 +51,7 @@ feed_schema = {
             }
         },
         "close_up_feeds": {
-            "title": "close_up_feeds",
+            "title": "Close Up Feeds",
             "type": "array",
             "format": "grid",
             "options": {
@@ -61,7 +61,7 @@ feed_schema = {
                 "infoText": "Close Up Feeds (HeiferIII and Dry Cows) -- HeiferIII is the number of close-up heifers and Dry Cows are non-lactating cows."
             },
             "items": {
-                "title": "close_up_feeds_element",
+                "title": "Close Up Feeds Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -74,7 +74,7 @@ feed_schema = {
             }
         },
         "lac_cow_feeds": {
-            "title": "lac_cow_feeds",
+            "title": "Lac Cow Feeds",
             "type": "array",
             "format": "grid",
             "options": {
@@ -84,7 +84,7 @@ feed_schema = {
                 "infoText": "Lactating Cow Feeds"
             },
             "items": {
-                "title": "lac_cow_feeds_element",
+                "title": "Lac Cow Feeds Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -97,7 +97,7 @@ feed_schema = {
             }
         },
         "purchased_feeds": {
-            "title": "purchased_feeds",
+            "title": "Purchased Feeds",
             "type": "array",
             "format": "grid",
             "options": {
@@ -107,12 +107,12 @@ feed_schema = {
                 "infoText": "Purchased Feeds."
             },
             "items": {
-                "title": "purchased_feeds_element",
+                "title": "Purchased Feeds Element",
                 "type": "object",
                 "format": "grid",
                 "properties": {
                     "purchased_feed": {
-                        "title": "purchased_feed",
+                        "title": "Purchased Feed",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -125,7 +125,7 @@ feed_schema = {
                         "maximum": 306
                     },
                     "purchased_feed_cost": {
-                        "title": "purchased_feed_cost",
+                        "title": "Purchased Feed Cost",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -140,7 +140,7 @@ feed_schema = {
             }
         },
         "farm_grown_feeds": {
-            "title": "farm_grown_feeds",
+            "title": "Farm Grown Feeds",
             "type": "array",
             "format": "grid",
             "options": {
@@ -150,7 +150,7 @@ feed_schema = {
                 "infoText": "Farm-Grown Feeds"
             },
             "items": {
-                "title": "farm_grown_feeds_element",
+                "title": "Farm Grown Feeds Element",
                 "type": "number",
                 "options": {
                     "grid_columns": 12,
@@ -163,7 +163,7 @@ feed_schema = {
             }
         },
         "storage_options": {
-            "title": "storage_options",
+            "title": "Storage Options",
             "type": "array",
             "format": "grid",
             "options": {
@@ -173,12 +173,12 @@ feed_schema = {
                 "infoText": "Storage Options."
             },
             "items": {
-                "title": "storage_options_element",
+                "title": "Storage Options Element",
                 "type": "object",
                 "format": "grid",
                 "properties": {
                     "storage_type": {
-                        "title": "storage_type",
+                        "title": "Storage Type",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -205,7 +205,7 @@ feed_schema = {
                         "format": "select2"
                     },
                     "moisture": {
-                        "title": "moisture",
+                        "title": "Moisture",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -226,7 +226,7 @@ feed_schema = {
                         "format": "select2"
                     },
                     "additive": {
-                        "title": "additive",
+                        "title": "Additive",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -244,7 +244,7 @@ feed_schema = {
                         "format": "select2"
                     },
                     "packing_density": {
-                        "title": "packing_density",
+                        "title": "Packing Density",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -258,7 +258,7 @@ feed_schema = {
                         "default": 200
                     },
                     "inoculation": {
-                        "title": "inoculation",
+                        "title": "Inoculation",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -276,7 +276,7 @@ feed_schema = {
                         "format": "select2"
                     },
                     "bunk_type": {
-                        "title": "bunk_type",
+                        "title": "Bunk Type",
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
@@ -292,7 +292,7 @@ feed_schema = {
                         "format": "select2"
                     },
                     "ventilation": {
-                        "title": "ventilation",
+                        "title": "Ventilation",
                         "type": "boolean",
                         "format": "checkbox",
                         "options": {
@@ -305,7 +305,7 @@ feed_schema = {
                         "default": true
                     },
                     "removal_rate": {
-                        "title": "removal_rate",
+                        "title": "Removal Rate",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -319,7 +319,7 @@ feed_schema = {
                         "default": 0.5
                     },
                     "initial_dry_matter": {
-                        "title": "initial_dry_matter",
+                        "title": "Initial Dry Matter",
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
@@ -336,12 +336,12 @@ feed_schema = {
             }
         },
         "user_defined_ration_percentages": {
-            "title": "user_defined_ration_percentages",
+            "title": "User Defined Ration Percentages",
             "type": "object",
             "format": "grid",
             "properties": {
                 "calf": {
-                    "title": "calf",
+                    "title": "Calf",
                     "type": "array",
                     "format": "grid",
                     "options": {
@@ -351,12 +351,12 @@ feed_schema = {
                         "infoText": "Calf Feeds."
                     },
                     "items": {
-                        "title": "calf_element",
+                        "title": "Calf Element",
                         "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
-                                "title": "feed_type",
+                                "title": "Feed Type",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -370,7 +370,7 @@ feed_schema = {
                                 "default": 155
                             },
                             "ration_percentage": {
-                                "title": "ration_percentage",
+                                "title": "Ration Percentage",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -386,7 +386,7 @@ feed_schema = {
                     }
                 },
                 "growing": {
-                    "title": "growing",
+                    "title": "Growing",
                     "type": "array",
                     "format": "grid",
                     "options": {
@@ -396,12 +396,12 @@ feed_schema = {
                         "infoText": "Growing Heifers Feeds."
                     },
                     "items": {
-                        "title": "growing_element",
+                        "title": "Growing Element",
                         "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
-                                "title": "feed_type",
+                                "title": "Feed Type",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -415,7 +415,7 @@ feed_schema = {
                                 "default": 1
                             },
                             "ration_percentage": {
-                                "title": "ration_percentage",
+                                "title": "Ration Percentage",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -431,7 +431,7 @@ feed_schema = {
                     }
                 },
                 "close_up": {
-                    "title": "close_up",
+                    "title": "Close Up",
                     "type": "array",
                     "format": "grid",
                     "options": {
@@ -441,12 +441,12 @@ feed_schema = {
                         "infoText": "Close UP Feeds."
                     },
                     "items": {
-                        "title": "close_up_element",
+                        "title": "Close Up Element",
                         "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
-                                "title": "feed_type",
+                                "title": "Feed Type",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -460,7 +460,7 @@ feed_schema = {
                                 "default": 1
                             },
                             "ration_percentage": {
-                                "title": "ration_percentage",
+                                "title": "Ration Percentage",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -476,7 +476,7 @@ feed_schema = {
                     }
                 },
                 "lac_cow": {
-                    "title": "lac_cow",
+                    "title": "Lac Cow",
                     "type": "array",
                     "format": "grid",
                     "options": {
@@ -486,12 +486,12 @@ feed_schema = {
                         "infoText": "Lactating Cow Feeds."
                     },
                     "items": {
-                        "title": "lac_cow_element",
+                        "title": "Lac Cow Element",
                         "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
-                                "title": "feed_type",
+                                "title": "Feed Type",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -505,7 +505,7 @@ feed_schema = {
                                 "default": 1
                             },
                             "ration_percentage": {
-                                "title": "ration_percentage",
+                                "title": "Ration Percentage",
                                 "type": "number",
                                 "options": {
                                     "grid_columns": 12,
@@ -521,7 +521,7 @@ feed_schema = {
                     }
                 },
                 "tolerance": {
-                    "title": "tolerance",
+                    "title": "Tolerance",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
@@ -534,7 +534,7 @@ feed_schema = {
                     "maximum": 1
                 },
                 "milk_reduction_maximum": {
-                    "title": "milk_reduction_maximum",
+                    "title": "Milk Reduction Maximum",
                     "type": "number",
                     "options": {
                         "grid_columns": 12,
