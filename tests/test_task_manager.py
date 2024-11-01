@@ -376,9 +376,14 @@ def test_handle_end_to_end_testing(
 
     task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", False)
 
-    sim_engine_run_tasks.assert_called_once_with(args=args, input_manager=mock_input_manager,
-                                                 output_manager=mock_output_manager, task_id="test_task",
-                                                 produce_graphics=False, should_flush_im_pool=False)
+    sim_engine_run_tasks.assert_called_once_with(
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id="test_task",
+        produce_graphics=False,
+        should_flush_im_pool=False,
+    )
     compare_outputs.assert_called_once_with(args["json_output_directory"])
     assert add_log.call_count == 2
     assert post_processing.call_count == 1
