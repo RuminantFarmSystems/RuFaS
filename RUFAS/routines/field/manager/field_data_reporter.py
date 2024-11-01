@@ -52,7 +52,7 @@ class FieldDataReporter:
                 self.send_soil_layer_annual_variables(layer, field.field_data.name, index)
 
     def send_crop_daily_variables(self, crop: Crop, field_name: str) -> None:
-        """Sends crop related daily variables."""
+        """Sends crop related daily variables to output manager."""
         info_map = {
             "class": self.__class__.__name__,
             "function": self.send_crop_daily_variables.__name__,
