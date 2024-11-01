@@ -501,7 +501,12 @@ class TaskManager:
         E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
-            args, input_manager, output_manager, task_id, produce_graphics, save_results=True,
+            args,
+            input_manager,
+            output_manager,
+            task_id,
+            produce_graphics,
+            save_results=True,
         )
 
     @staticmethod
@@ -678,9 +683,15 @@ class TaskManager:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
         TaskManager.handle_single_simulation_run(args, output_manager)
-        TaskManager.handle_post_processing(args=args, input_manager=input_manager, output_manager=output_manager,
-                                           task_id=task_id, produce_graphics=produce_graphics, save_results=True,
-                                           should_flush_im_pool=False,)
+        TaskManager.handle_post_processing(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            produce_graphics=produce_graphics,
+            save_results=True,
+            should_flush_im_pool=False,
+        )
 
     @staticmethod
     def _handle_postprocessing_tasks(
