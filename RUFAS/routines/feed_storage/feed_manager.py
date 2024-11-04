@@ -11,7 +11,7 @@ from .silage import Bag, Bunker, Pile, Silage
 from .storage import Storage
 
 # Defines the compatilibty between Crop Categories and Storage Types.
-CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
+CROP_TO_STORAGE_MAPPING: Dict[CropCategory, type[List[Storage]]] = {
     CropCategory.ALFALFA: [Hay, Silage, Baleage],
     CropCategory.CORN: [Grain, Silage],
     CropCategory.GRASS: [Hay, Silage, Baleage],
