@@ -1,6 +1,6 @@
 from typing import Dict, List, Tuple
 
-from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvCropStorageType
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
@@ -56,7 +56,7 @@ class FieldManager:
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
-    def daily_update_routine(self, weather: Weather, time: Time) -> list[HarvCropStorageType]:
+    def daily_update_routine(self, weather: Weather, time: Time) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
@@ -70,7 +70,7 @@ class FieldManager:
 
         Returns
         -------
-        list[HarvCropStorageType]
+        list[HarvestedCropStorageType]
             Crops that were harvested on the current day, paired with the storage types into which they will be placed.
 
         Notes
@@ -78,7 +78,7 @@ class FieldManager:
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
-        harvested_crops: list[HarvCropStorageType] = []
+        harvested_crops: list[HarvestedCropStorageType] = []
         for field in self.fields:
             current_conditions = weather.get_current_day_conditions(time, field.field_data.absolute_latitude)
             info_map = {
