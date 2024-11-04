@@ -1578,7 +1578,7 @@ def test_add_variable_to_pool_eager_termination(
         ("var1", {}, "key1"),
         ("var2", {"a": 1}, "key2"),
         ("var3", {"a": "A", "b": 2, "c": True}, "key3"),
-        ("var4", {"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [0.0, 1.1, 2.2]}, "key4")
+        ("var4", {"a": [1, 2, 3], "b": ["a", "b", "c"], "c": [0.0, 1.1, 2.2]}, "key4"),
     ],
 )
 def test_add_runtime_variable_to_pool(
