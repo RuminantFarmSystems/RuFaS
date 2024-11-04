@@ -65,6 +65,16 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
     assert mock_open.call_count == 2
 
 
+def test_rewrite_index_page(dca_updater: DataCollectionAppUpdater, mocker: MockerFixture) -> None:
+    """Tests that the index page of the Data Collection App is properly rewritten."""
+    schema_paths = [Path("dummy_one"), Path("dummy_two")]
+    mock_open = mocker.patch("RUFAS.data_collection_app_updater.open")
+
+    dca_updater._rewrite_index_page(schema_paths)
+
+    assert mock_open.call_count == 2
+
+
 @pytest.mark.parametrize(
     "pattern,expected",
     [
