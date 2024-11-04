@@ -397,6 +397,6 @@ class DataCollectionAppUpdater:
             The variable name with spaces between all words and the first letter of each word capitalized.
 
         """
-        words = re.split(r'[_\s]+', variable_name)
+        words = re.split(r"[_\s]+", variable_name)
         capitalized_words = [word.capitalize() for word in words]
-        return ' '.join(capitalized_words)
+        return " ".join(capitalized_words)

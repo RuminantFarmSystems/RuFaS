@@ -44,15 +44,17 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
         "properties": {
             "animal_properties": "dummy_animal_props",
             "config_properties": "dummy_config_props",
-            "unneeded_properties": "dummy_props"
+            "unneeded_properties": "dummy_props",
         }
     }
     expected_schema_paths = [
-        Path("DataCollectionApp/schema/animal_schema.js"), Path("DataCollectionApp/schema/config_schema.js")
+        Path("DataCollectionApp/schema/animal_schema.js"),
+        Path("DataCollectionApp/schema/config_schema.js"),
     ]
     create_object_schema = mocker.patch.object(dca_updater, "_create_object_schema", return_value={"test?": "test!"})
     expected_create_calls = [
-        mocker.call("animal_properties", "dummy_animal_props"), mocker.call("config_properties", "dummy_config_props")
+        mocker.call("animal_properties", "dummy_animal_props"),
+        mocker.call("config_properties", "dummy_config_props"),
     ]
     mock_open = mocker.patch("RUFAS.data_collection_app_updater.open")
 
@@ -475,8 +477,8 @@ def test_create_object_schema(
         ("simple", "Simple"),
         ("tricky Name", "Tricky Name"),
         ("Trickier_Name", "Trickier Name"),
-        ("Trickiest name", "Trickiest Name")
-    ]
+        ("Trickiest name", "Trickiest Name"),
+    ],
 )
 def test_parse_variable_name_into_title(dca_updater: DataCollectionAppUpdater, name: str, expected: str) -> None:
     """Tests that names partially or all in snake case are converted into more readable names."""
