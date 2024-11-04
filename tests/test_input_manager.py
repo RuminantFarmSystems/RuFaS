@@ -61,7 +61,6 @@ def input_manager_original_method_states(
         "_parse_metadata_properties": mock_input_manager._parse_metadata_properties,
         "_check_property_type_primitive": mock_input_manager._check_property_type_primitive,
         "_create_record": mock_input_manager._create_record,
-        "_extract_input_data_by_key_list": mock_input_manager._extract_input_data_by_key_list,
         "add_runtime_variable_to_pool": mock_input_manager.add_runtime_variable_to_pool,
     }
 
