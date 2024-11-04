@@ -26,6 +26,54 @@ COW_REPRODUCTION_SUB_PROTOCOLS = Union[CowPreSynchSubProtocol, CowTAISubProtocol
 
 
 class Reproduction:
+    """
+    Manages the reproduction protocol for heifers and cows, including artificial insemination (AI), hormone
+    delivery, pregnancy checks, estrus detection, and pregnancy management.
+
+    Parameters
+    ----------
+    heifer_reproduction_program : HeiferReproductionProtocol, optional
+        The reproduction program for heifers, by default None.
+    heifer_reproduction_sub_program : HEIFER_REPRODUCTION_SUB_PROTOCOLS, optional
+        The sub-program for heifer reproduction, by default None.
+    cow_reproduction_program : CowReproductionProtocol, optional
+        The reproduction program for cows, by default None.
+    ai_day : int, optional
+        The day of artificial insemination, by default 0.
+    estrus_day : int, optional
+        The day estrus is expected, by default 0.
+    abortion_day : int, optional
+        The day of abortion, by default 0.
+    breeding_to_preg_time : int, optional
+        Time taken from breeding to pregnancy, by default 0.
+    conception_rate : float, optional
+        Conception rate of the animal, by default 0.0.
+    cow_TAI_conception_rate : float, optional
+        Timed artificial insemination (TAI) conception rate for cows, by default 0.0.
+    num_conception_rate_decreases : int, optional
+        Number of times the conception rate decreases, by default 0.
+    hormone_schedule : dict[int, dict[str, Any]], optional
+        The hormone schedule for the reproduction protocol, by default None.
+    gestation_length : int, optional
+        Length of the gestation period, by default 0.
+    conceptus_weight : float, optional
+        Weight of the conceptus, by default 0.0.
+    calf_birth_weight : float, optional
+        Birth weight of the calf, by default 0.0.
+    calves : int, optional
+        Number of calves, by default 0.
+    p_gest_for_calf : float, optional
+        Probability of gestation resulting in a calf, by default 0.0.
+    calving_interval : int, optional
+        Interval between calvings, by default 0.
+    calving_interval_history : list[int], optional
+        History of calving intervals, by default None.
+    body_weight_at_calving : float, optional
+        Body weight of the animal at calving, by default 0.0.
+    do_not_breed : bool, optional
+        Flag indicating if the animal should not breed, by default False.
+    """
+
     do_not_breed: bool
 
     heifer_reproduction_program: HeiferReproductionProtocol
@@ -116,6 +164,21 @@ class Reproduction:
     def reproduction_update(self,
                             reproduction_inputs: ReproductionInputs,
                             time: Time) -> ReproductionOutputs:
+        """
+        Update the reproduction status of the animal.
+
+        Parameters
+        ----------
+        reproduction_inputs : ReproductionInputs
+            The inputs for the reproduction protocol.
+        time : Time
+            The current time in the simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs for the animal.
+        """
         reproduction_outputs = ReproductionOutputs(
             *asdict(reproduction_inputs)
         )
@@ -134,6 +197,21 @@ class Reproduction:
     def heiferII_reproduction_update(self,
                                      reproduction_outputs: ReproductionOutputs,
                                      time: Time) -> ReproductionOutputs:
+        """
+        Update reproduction status specifically for heifers (Type II) based on the protocol.
+
+        Parameters
+        ----------
+        reproduction_outputs : ReproductionOutputs
+            Current reproduction outputs.
+        time : Time
+            The current time in the simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs for the heifer.
+        """
         if self.heifer_reproduction_program != AnimalConfig.heifer_reproduction_program and \
                 reproduction_outputs.days_born <= AnimalConfig.heifer_breed_start_day:
             reproduction_outputs.events.add_event(
@@ -163,6 +241,21 @@ class Reproduction:
         return reproduction_outputs
 
     def cow_reproduction_update(self, reproduction_outputs: ReproductionOutputs, time: Time) -> ReproductionOutputs:
+        """
+        Update reproduction status for cows based on the protocol.
+
+        Parameters
+        ----------
+        reproduction_outputs : ReproductionOutputs
+            Current reproduction outputs.
+        time : Time
+            The current time in the simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs for the cow.
+        """
         if reproduction_outputs.is_pregnant and \
                 reproduction_outputs.days_in_pregnancy == self.gestation_length:
             # how to signal a newborn
@@ -232,7 +325,7 @@ class Reproduction:
                 reproduction_outputs = self.execute_cow_tai_protocol(reproduction_outputs, time.simulation_day)
 
             if reproduction_outputs.days_born == self.ai_day:
-                reproduction_outputs = self._calculate_conception_rate_on_ai_day(reproduction_outputs)
+                self._calculate_conception_rate_on_ai_day()
                 self.repro_state_manager.enter(ReproStateEnum.AFTER_AI)
                 reproduction_outputs.events.add_event(
                     reproduction_outputs.days_born,
@@ -246,6 +339,21 @@ class Reproduction:
             return reproduction_outputs
 
     def cow_give_birth(self, reproduction_outputs: ReproductionOutputs, time: Time) -> ReproductionOutputs:
+        """
+        Handle the birth of a calf, resetting reproduction states and updating outputs.
+
+        Parameters
+        ----------
+        reproduction_outputs : ReproductionOutputs
+            Current reproduction outputs.
+        time : Time
+            The current time in the simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after birth.
+        """
         self.repro_state_manager.reset()
         self.calves += 1
         reproduction_outputs.days_in_milking = 1
@@ -294,6 +402,19 @@ class Reproduction:
         return reproduction_outputs
 
     def determine_future_death_date(self, reproduction_outputs: ReproductionOutputs) -> int:
+        """
+        Determine the future death date of the animal based on its parity.
+
+        Parameters
+        ----------
+        reproduction_outputs : ReproductionOutputs
+            The current reproduction outputs.
+
+        Returns
+        -------
+        int
+            Calculated future death date in simulation days.
+        """
         if self.calves >= 4:
             death_rate = AnimalConfig.parity_death_probability[3]
         else:
@@ -320,10 +441,17 @@ class Reproduction:
 
     def determine_future_cull_date(self, reproduction_outputs: ReproductionOutputs) -> tuple[int, str]:
         """
-        Update cows culled for health problem, first cull or not in this parity
-        will be determined with parity specific culling rate, then a cull reason
-        will be determined by random draw. Then a cull day will be identified by
-        reverse a distribution for cases of this reason.
+        Determine the future cull date and reason for the animal based on parity-specific probabilities.
+
+        Parameters
+        ----------
+        reproduction_outputs : ReproductionOutputs
+            The current reproduction outputs.
+
+        Returns
+        -------
+        tuple[int, str]
+            Future cull date in simulation days and reason for culling.
         """
         cull_reason = ""
         future_cull_date = int(math.inf)
@@ -380,19 +508,21 @@ class Reproduction:
             simulation_day: int,
             repro_program: HeiferReproductionProtocol) -> ReproductionOutputs:
         """
-        Set the reproduction program for the cow if her current program does not match the user-defined program.
-
-        Notes
-        -----
-        When a cow entering the herd through initialization, her reproduction program may not match the user-defined
-        program. This method can be used to correct that.
+        Set the reproduction program for a heifer if it does not match the current program.
 
         Parameters
         ----------
+        reproduction_outputs : ReproductionOutputs
+            The current reproduction outputs.
         simulation_day : int
-            The current day of the entire simulation.
-        repro_program : str
-            The reproduction program to set for the cow.
+            The current day in the simulation.
+        repro_program : HeiferReproductionProtocol
+            The desired reproduction program for the heifer.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs for the heifer.
         """
 
         if repro_program not in [
@@ -421,19 +551,21 @@ class Reproduction:
             simulation_day: int,
             repro_program: CowReproductionProtocol) -> ReproductionOutputs:
         """
-        Set the reproduction program for the cow if her current program does not match the user-defined program.
-
-        Notes
-        -----
-        When a cow entering the herd through initialization, her reproduction program may not match the user-defined
-        program. This method can be used to correct that.
+        Set the reproduction program for a cow if it does not match the current program.
 
         Parameters
         ----------
+        reproduction_outputs : ReproductionOutputs
+            The current reproduction outputs.
         simulation_day : int
-            The current day of the entire simulation.
-        repro_program : str
-            The reproduction program to set for the cow.
+            The current day in the simulation.
+        repro_program : CowReproductionProtocol
+            The desired reproduction program for the cow.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs for the cow.
         """
 
         if repro_program not in [
@@ -472,21 +604,22 @@ class Reproduction:
         Parameters
         ----------
         start_day : int
-            The start day plus the estrus cycle length is the day of the next estrus.
+            The day to begin the estrus cycle calculation.
         simulation_day : int
-            The current day of the entire simulation.
+            The current simulation day.
         estrus_note : str
-            A note that describes the reason for simulating estrus.
+            Note explaining the reason for estrus simulation.
         avg_estrus_cycle : float
-            The average estrus cycle length.
+            Average length of the estrus cycle.
         std_estrus_cycle : float
-            The standard deviation of the estrus cycle length.
-        max_cycle_length : float
-            The maximum estrus cycle length.
+            Standard deviation of the estrus cycle length.
+        max_cycle_length : float, optional
+            Maximum allowable length for the estrus cycle, by default inf.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after estrus simulation.
         """
 
         estrus_cycle = truncnorm.rvs(-animal_constants.STDI, animal_constants.STDI, avg_estrus_cycle, std_estrus_cycle)
@@ -501,12 +634,12 @@ class Reproduction:
     # move to util
     def _compare_randomized_rate_less_than(self, reference_rate: float) -> bool:
         """
-        Compare a randomized rate to a reference rate.
+        Compare a random rate to a reference rate to determine if an event occurs.
 
         Parameters
         ----------
         reference_rate : float
-            The reference rate to compare to.
+            Reference rate for comparison.
 
         Returns
         -------
@@ -518,19 +651,17 @@ class Reproduction:
 
     def _detect_estrus(self, detection_rate: float) -> bool:
         """
-        Determine if estrus was detected.
-
-        Estrus is detected if a randomized rate is less than the estrus detection rate.
+        Determine if estrus is detected based on a randomized comparison with a detection rate.
 
         Parameters
         ----------
         detection_rate : float
-            The reference estrus detection rate to compare to.
+            The reference detection rate for estrus.
 
         Returns
         -------
         bool
-            True if estrus was detected, False otherwise.
+            True if estrus is detected, False otherwise.
         """
 
         return self._compare_randomized_rate_less_than(detection_rate)
@@ -541,25 +672,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Execute the ED protocol.
-
-        Notes
-        -----
-        The two main differences between how estrus detection is handled in the ED protocol and the
-        SynchED protocol are:
-        1. The estrus detection rate and conception rate are different.
-        2. Here, when estrus is not detected, another estrus is simulated. In the SynchED protocol,
-              when estrus is not detected, TAI will be performed next.
-
+        Execute the estrus detection (ED) protocol for heifers.
 
         Parameters
         ----------
         simulation_day : int
-            The current day of the entire simulation.
+            The current simulation day.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after applying the ED protocol.
         """
 
         if not reproduction_outputs.is_pregnant:
@@ -583,15 +706,17 @@ class Reproduction:
             reproduction_outputs: ReproductionOutputs,
             simulation_day: int) -> ReproductionOutputs:
         """
-        Perform a typical estrus detection used in the ED protocol.
+        Perform general estrus detection, using specific functions for detected and non-detected cases.
 
         Parameters
         ----------
         simulation_day : int
+            The current simulation day.
 
         Returns
         -------
-
+        ReproductionOutputs
+            Updated reproduction outputs after estrus detection.
         """
         reproduction_outputs = self._handle_estrus_detection(
             reproduction_outputs,
@@ -609,21 +734,21 @@ class Reproduction:
             on_estrus_not_detected: Callable[[ReproductionOutputs, int], ReproductionOutputs],
     ) -> ReproductionOutputs:
         """
-        A skeletal method for handling estrus detection that needs to be provided with the
-        appropriate functions to call when estrus is detected and when estrus is not detected.
+        Handle estrus detection and call specific functions when detected and not detected.
 
         Parameters
         ----------
         simulation_day : int
-            The current day of the entire simulation.
-        on_estrus_detected : Callable[[int], None]
-            A function to call when estrus is detected.
-        on_estrus_not_detected : Callable[[int], None]
-            A function to call when estrus is not detected.
+            The current simulation day.
+        on_estrus_detected : Callable
+            Function to call if estrus is detected.
+        on_estrus_not_detected : Callable
+            Function to call if estrus is not detected.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after handling estrus detection.
         """
         estrus_detection_rate = AnimalConfig.heifer_estrus_detection_rate \
             if reproduction_outputs.animal_type == AnimalType.HEIFER_II else AnimalConfig.cow_estrus_detection_rate
@@ -658,16 +783,17 @@ class Reproduction:
             reproduction_outputs: ReproductionOutputs,
             simulation_day: int) -> ReproductionOutputs:
         """
-        Perform the typical actions associated with estrus detection as used in the ED protocol.
+        Perform actions associated with estrus detection in the ED protocol.
 
         Parameters
         ----------
         simulation_day : int
-            The current day of the entire simulation.
+            The current simulation day.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after estrus detection.
         """
 
         self.conception_rate = AnimalConfig.heifer_estrus_conception_rate
@@ -684,16 +810,17 @@ class Reproduction:
             reproduction_outputs: ReproductionOutputs,
             simulation_day: int) -> ReproductionOutputs:
         """
-        Perform the typical actions associated with estrus not being detected as used in the ED protocol.
+        Perform actions when estrus is not detected in the ED protocol.
 
         Parameters
         ----------
         simulation_day : int
-            The current day of the entire simulation.
+            The current simulation day.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after estrus non-detection.
         """
 
         reproduction_outputs = self._simulate_estrus(
@@ -714,20 +841,21 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Deliver hormones to the heifer.
+        Deliver hormones to the heifer on the specified day.
 
         Parameters
         ----------
         hormones : list[str]
-            A list of hormones to deliver. Supported options: 'GnRH', 'PGF', 'CIDR'.
+            List of hormones to deliver. Options: 'GnRH', 'PGF', 'CIDR'.
         delivery_day : int
-            The day of the heifer's life when the hormones were delivered.
+            Day to deliver the hormones.
         simulation_day : int
-            The current day of the entire simulation.
+            The current simulation day.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after hormone delivery.
         """
 
         for hormone in hormones:
@@ -757,18 +885,19 @@ class Reproduction:
             schedule: dict[int, dict]
     ) -> ReproductionOutputs:
         """
-        Execute a hormone delivery schedule.
+        Execute hormone delivery schedule on the specified days.
 
         Parameters
         ----------
         simulation_day : int
-            The current day of the entire simulation.
+            The current simulation day.
         schedule : dict[int, dict]
-            A dictionary of days and actions to perform on those days.
+            Dictionary of days and actions for hormone delivery.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after executing hormone schedule.
         """
 
         actions = schedule.get(reproduction_outputs.days_born)
@@ -805,7 +934,7 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Execute the timed artificial insemination (TAI) protocol.
+        Execute the Timed Artificial Insemination (TAI) protocol for heifers.
 
         Parameters
         ----------
@@ -814,7 +943,8 @@ class Reproduction:
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after applying the TAI protocol.
         """
         self.heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program if \
             self.heifer_reproduction_program == AnimalConfig.heifer_reproduction_program else \
@@ -843,19 +973,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Execute the SynchED protocol.
-
-        This method may be called every day after the heifer enters the breeding phase. However,
-        only on certain days will the heifer receive hormone injections or be checked for estrus.
+        Execute the SynchED protocol for heifers.
 
         Parameters
         ----------
-        sim_day : int
+        simulation_day : int
             The current day of the entire simulation.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after applying the SynchED protocol.
         """
 
         if reproduction_outputs.days_born == AnimalConfig.heifer_breed_start_day:
@@ -884,26 +1012,17 @@ class Reproduction:
             start_from: int,
     ) -> ReproductionOutputs:
         """
-        Set up the hormone delivery schedule for the heifer. Used in TAI and SynchED protocols.
+        Set up the hormone delivery schedule for heifers or cows.
 
         Parameters
         ----------
-        animal_category : Literal['heifers', 'cows']
-            The animal category to use. Either 'heifers' or 'cows'.
-        repro_sub_protocol : str
-            The reproduction sub protocol to use.
         start_from : int
-            The day of the heifer's life when the hormone delivery schedule starts.
+            The start day for the hormone delivery schedule.
 
         Returns
         -------
-        None
-
-        Raises
-        ------
-        Exception
-            If there is no hormone delivery schedule for the animal category.
-
+        ReproductionOutputs
+            Updated reproduction outputs with hormone schedule set.
         """
         if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
             self.hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
@@ -928,19 +1047,18 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle hormone delivery and set the estrus day for the heifers in the SynchED program.
+       Deliver hormones and set the estrus day for heifers in the SynchED protocol.
 
-        Estrus day is calculated and set after the last hormone delivery.
+       Parameters
+       ----------
+       simulation_day : int
+           The current day of the entire simulation.
 
-        Parameters
-        ----------
-        sim_day : int
-            The current day of the entire simulation.
-
-        Returns
-        -------
-        None
-        """
+       Returns
+       -------
+       ReproductionOutputs
+           Updated reproduction outputs after hormone delivery and estrus day setting.
+       """
 
         if self.hormone_schedule:
             reproduction_outputs = self._execute_hormone_delivery_schedule(
@@ -967,18 +1085,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle estrus detection in the heifers in the SynchED program.
-
-        If estrus is detected, AI day is set to the next day.
+        Handle estrus detection for heifers in the SynchED program.
 
         Parameters
         ----------
-        sim_day : int
+        simulation_day : int
             The current day of the entire simulation.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after estrus detection.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -1017,16 +1134,22 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle the scenario where estrus is not detected in the heifers in the SynchED program.
+        Handle the case where estrus is not detected for heifers in the SynchED program.
+
+        If estrus is not detected, this method updates the reproduction program and sets up
+        the next steps according to the fallback protocol.
 
         Parameters
         ----------
-        sim_day : int
+        reproduction_outputs : ReproductionOutputs
+            The current reproduction outputs for the heifer.
+        simulation_day : int
             The current day of the entire simulation.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after handling non-detection of estrus in the SynchED program.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -1075,18 +1198,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Open heifer after abortion or pregnancy loss.
-
-        Notes
-        -----
-        Regardless of the reproduction program used for the first breeding, the rebreeding
-        program is estrus detection (ED). The new estrus day will be the abortion day plus
-        the estrus cycle length.
+        Handle the status of an open heifer (post-abortion or pregnancy loss).
 
         Parameters
         ----------
-        sim_day : int
+        simulation_day : int
             The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after handling an open heifer.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -1120,7 +1242,7 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Perform artificial insemination on the heifer.
+        Perform artificial insemination (AI) on the heifer.
 
         Parameters
         ----------
@@ -1129,7 +1251,8 @@ class Reproduction:
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after performing AI.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -1170,22 +1293,12 @@ class Reproduction:
             reproduction_outputs: ReproductionOutputs
     ) -> ReproductionOutputs:
         """
-        Increment the performed AI counts across all heifers.
-
-        Notes
-        -----
-        The following counts are incremented:
-        - num_ai_performed: the total number of AIs performed
-        - num_ai_performed_in_ED: the number of AIs performed in the ED protocol
-        - num_ai_performed_in_TAI: the number of AIs performed in the TAI protocol
-        - num_ai_performed_in_SynchED: the number of AIs performed in the SynchED protocol
-
-        Note that a heifer can go through multiple breeding programs in its lifetime. For example,
-        a heifer can be bred using the TAI protocol, then open, then bred using the ED protocol.
+        Increment the AI counts for heifers.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs with incremented AI counts.
         """
 
         reproduction_outputs.herd_level_statistics.num_ai_performed += 1
@@ -1202,20 +1315,12 @@ class Reproduction:
             reproduction_outputs: ReproductionOutputs
     ) -> ReproductionOutputs:
         """
-        Increment the successful conception counts across all heifers.
-
-        The following counts are incremented:
-        - num_successful_conceptions: the total number of successful conceptions
-        - num_successful_conceptions_in_ED: the number of successful conceptions in the ED protocol
-        - num_successful_conceptions_in_TAI: the number of successful conceptions in the TAI protocol
-        - num_successful_conceptions_in_SynchED: the number of successful conceptions in the SynchED protocol
-
-        Note that a heifer can go through multiple breeding programs in its lifetime. For example,
-        a heifer can be bred using the TAI protocol, then open, then bred using the ED protocol.
+        Increment the counts of successful conceptions for heifers.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs with incremented conception counts.
         """
         reproduction_outputs.herd_level_statistics.num_successful_conceptions += 1
         reproduction_outputs.herd_level_statistics.num_successful_conceptions_in_ED += 1 if \
@@ -1232,16 +1337,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle a successful conception in the heifer by logging the event and initializing pregnancy parameters.
+        Handle a successful conception event for a heifer.
 
         Parameters
         ----------
-        sim_day : int
+        simulation_day : int
             The current day of the entire simulation.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after successful conception.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -1257,7 +1363,7 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle a failed conception in the heifer by logging the event and simulating estrus.
+        Handle a failed conception event for a heifer.
 
         Parameters
         ----------
@@ -1266,7 +1372,8 @@ class Reproduction:
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after failed conception.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -1303,13 +1410,12 @@ class Reproduction:
 
     def _calculate_gestation_length(self) -> int:
         """
-        Calculate the gestation length of the heifer (days).
+        Calculate the gestation length for the heifer.
 
         Returns
         -------
         int
-            The gestation length of the heifer (days).
-
+            Gestation length in days.
         """
         return int(
             truncnorm.rvs(
@@ -1322,18 +1428,17 @@ class Reproduction:
 
     def _calculate_calf_birth_weight(self, breed: Breed) -> float:
         """
-        Calculate the birth weight of the calf.
+        Calculate the birth weight of the calf based on the breed.
 
         Parameters
         ----------
-        breed : Literal['HO', 'JE']
+        breed : Breed
             The breed of the heifer.
 
         Returns
         -------
         float
-            The birth weight of the calf.
-
+            The calculated birth weight of the calf.
         """
         average_birth_weight_by_breed = {
             "HO": AnimalConfig.birth_weight_avg_ho,
@@ -1353,11 +1458,12 @@ class Reproduction:
 
     def _initialize_pregnancy_parameters(self, reproduction_outputs: ReproductionOutputs) -> ReproductionOutputs:
         """
-        Initialize the pregnancy parameters for the heifer.
+        Initialize parameters related to pregnancy for the heifer.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs with pregnancy parameters initialized.
         """
 
         reproduction_outputs.days_in_preg = 1
@@ -1374,7 +1480,7 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Update the pregnancy status of the heifer.
+        Update the pregnancy status for a heifer.
 
         Parameters
         ----------
@@ -1383,7 +1489,8 @@ class Reproduction:
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after pregnancy update.
         """
         pregnancy_check_configs: list[PregnancyCheckConfig] = [
             {
@@ -1418,18 +1525,19 @@ class Reproduction:
             pregnancy_check_config: PregnancyCheckConfig,
             simulation_day: int) -> ReproductionOutputs:
         """
-        Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.
+        Handle pregnancy checks for heifers and take appropriate actions based on results.
 
         Parameters
         ----------
-        preg_check_config : dict[str, str | int | float]
-            A dictionary of pregnancy check configuration values.
-        sim_day : int
+        pregnancy_check_config : PregnancyCheckConfig
+            Configuration settings for pregnancy check.
+        simulation_day : int
             The current day of the entire simulation.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after pregnancy check.
         """
 
         reproduction_outputs.animal_level_statistics.pregnancy_diagnoses += 1
@@ -1462,22 +1570,25 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.
+        Handle a pregnancy check for cows and update the state based on the outcome.
 
-        Notes
-        -----
-        If the cow is not pregnant at the start of the method or loses the pregnancy after,
-        she will essentially go through the steps as specified in the open() method.
-
-        When the TAIbeforePD resynch protocol is used, the TAI program instituted prior to the
-        first pregnancy check will be discontinued if the cow remains pregnant.
+        Depending on the pregnancy check results, this method updates the cow's reproduction
+        state, either confirming pregnancy or reassigning her to the open state and initiating
+        appropriate rebreeding actions if pregnancy is lost.
 
         Parameters
         ----------
-        preg_check_config : dict[str, str | int | float]
-            A dictionary of pregnancy check configuration values.
-        sim_day : int
+        reproduction_outputs : ReproductionOutputs
+            The current reproduction outputs for the cow.
+        pregnancy_check_config : PregnancyCheckConfig
+            Configuration settings specific to the pregnancy check being performed.
+        simulation_day : int
             The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after performing the pregnancy check.
         """
 
         reproduction_outputs.animal_level_statistics.pregnancy_diagnoses += 1
@@ -1518,18 +1629,19 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Terminate the pregnancy by logging the event and resetting the pregnancy parameters.
+        Terminate pregnancy and reset related parameters if pregnancy is lost.
 
         Parameters
         ----------
         preg_loss_const : str
-            The description of the pregnancy loss event.
-        sim_day : int
+            Description of pregnancy loss event.
+        simulation_day : int
             The current day of the entire simulation.
 
         Returns
         -------
-        None
+        ReproductionOutputs
+            Updated reproduction outputs after terminating pregnancy.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -1549,6 +1661,13 @@ class Reproduction:
         return reproduction_outputs
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
+        """
+        Adjust conception rate on the AI day based on breeding history and parity.
+
+        Returns
+        -------
+        None
+        """
         if AnimalConfig.should_decrease_conception_rate_in_rebreeding:
             self.conception_rate -= self.num_conception_rate_decreases * \
                                     AnimalConfig.conception_rate_decrease
@@ -1565,17 +1684,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Execute the estrus detection protocol. This method is used in the ED and ED-TAI protocols.
-
-        Notes
-        -----
-        When the number of days in milk is less than the voluntary waiting period, the cow is in the fresh state.
-        After the voluntary waiting period, depending on the current state of the cow, different actions are taken.
+        Execute the estrus detection (ED) protocol for cows.
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after applying the ED protocol for cows.
         """
 
         if 1 <= reproduction_outputs.days_in_milking <= AnimalConfig.voluntary_waiting_period:
@@ -1650,12 +1769,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Repeat the estrus simulation before the voluntary waiting period.
+        Repeat estrus simulation for cows before the voluntary waiting period (VWP).
 
         Parameters
         ----------
         simulation_day : int
-            The current simulation day.
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after estrus simulation.
         """
 
         if self.repro_state_manager.is_in_empty_state() or \
@@ -1697,12 +1821,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle the estrus detected event.
+        Set up the AI day for cows when estrus is detected.
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs with AI day set after estrus detection.
         """
         if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
             reproduction_outputs = self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
@@ -1732,12 +1861,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Handle the estrus not detected event.
+        Simulate a full estrus cycle when estrus is not detected.
 
         Parameters
         ----------
         simulation_day : int
-            The current simulation day.
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs with estrus cycle simulation.
         """
 
         self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE, keep_existing=True)
@@ -1762,19 +1896,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Simulate another estrus cycle before the OvSynch program in the ED-TAI protocol.
-
-        Notes
-        -----
-        This method is called when the estrus is not detected on an estrus day during the period
-        between the voluntary waiting period and the start of the OvSynch program. It will schedule
-        the next estrus day and if this day is beyond the OvSynch program start day, the estrus
-        detection process will be canceled and the cow will enter the OvSynch program.
+        Simulate an estrus cycle before the OvSynch program in the ED-TAI protocol.
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs with estrus cycle simulation before OvSynch.
         """
 
         self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
@@ -1800,22 +1932,19 @@ class Reproduction:
             schedule: dict[int, dict]
     ) -> ReproductionOutputs:
         """
-        Execute a hormone delivery schedule for cows.
-
-        Notes
-        -----
-        This method overrides the similar method in the HeiferII class. In addition to the actions performed by the
-        version in the HeiferII class, this method can also perform the following actions:
-        - set the presynch end day
-        - set the TAI start day
-        - set the TAI end day
+        Execute hormone delivery schedule for cows.
 
         Parameters
         ----------
-        sim_day : int
+        simulation_day : int
             The current day of the entire simulation.
         schedule : dict[int, dict]
-            A dictionary of days and actions to perform on those days.
+            Dictionary specifying days and actions for hormone delivery.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after hormone delivery.
         """
 
         reproduction_outputs = self._execute_hormone_delivery_schedule(reproduction_outputs, simulation_day, schedule)
@@ -1851,13 +1980,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Execute the TAI protocol by setting up and executing hormone delivery schedules for
-        the presynch and ovsynch programs.
+        Execute the TAI protocol for cows, setting up hormone delivery schedules for presynch and ovsynch programs.
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after applying the TAI protocol for cows.
         """
 
         if AnimalConfig.cow_presynch_method == "None":
@@ -1911,12 +2044,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Set up a presynch program on the presynch start day if it does not exist.
+        Set up the presynch program for cows on the start day if applicable.
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after setting up presynch program.
         """
         (
             should_set_up_hormone_delivery_for_presynch,
@@ -1938,12 +2076,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Enter the fresh state if the cow is in no repro state initially.
+        Enter the fresh state for cows if the current reproduction state is empty.
 
         Parameters
         ----------
         simulation_day : int
-            The current simulation day.
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs with fresh state set.
         """
 
         if self.repro_state_manager.is_in_empty_state() or \
@@ -1964,12 +2107,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Set up an OvSynch program on the OvSynch start day if it does not exist.
+        Set up an OvSynch program for cows on the OvSynch start day if applicable.
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after setting up OvSynch program.
         """
         (
             should_set_up_hormone_delivery_for_ovsynch,
@@ -1990,12 +2138,17 @@ class Reproduction:
             self, reproduction_outputs: ReproductionOutputs,
             simulation_day: int) -> tuple[bool, ReproductionOutputs]:
         """
-        Check if the cow should set up hormone delivery for a presynch program.
+        Determine if hormone delivery should be set up for presynch based on current status.
+
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the entire simulation.
 
         Returns
         -------
-        bool
-            True if the cow should set up hormone delivery for a presynch program, False otherwise.
+        tuple[bool, ReproductionOutputs]
+            Boolean indicating if setup is needed, and updated reproduction outputs.
         """
 
         if self.cow_reproduction_program != CowReproductionProtocol.TAI.value:
@@ -2043,23 +2196,17 @@ class Reproduction:
             simulation_day: int
     ) -> tuple[bool, ReproductionOutputs]:
         """
-        Check if the cow should set up hormone delivery for timed artificial insemination.
+        Determine if hormone delivery should be set up for OvSynch based on current status.
 
-        Notes
-        -----
-        If the number of days in milk is equal to the OvSynch program start day and the cow is in
-        the fresh state or has just gone through a presynch program, then the cow should be scheduled
-        for an OvSynch program.
-
-        If the OvSynch program start day happens before the last day of the presynch program, then
-        the start day of the OvSynch program will be adjusted to be the last day of the presynch program.
-        In other words, if both presynch and OvSynch programs are scheduled, then their schedules
-        cannot be overlapped.
+        Parameters
+        ----------
+        simulation_day : int
+            The current day of the entire simulation.
 
         Returns
         -------
-        bool
-            True if the cow should set up a hormone delivery schedule for an OvSynch program, False otherwise.
+        tuple[bool, ReproductionOutputs]
+            Boolean indicating if setup is needed, and updated reproduction outputs.
         """
 
         if self.hormone_schedule:
@@ -2109,7 +2256,12 @@ class Reproduction:
 
     def _increment_cow_ai_counts(self, reproduction_outputs: ReproductionOutputs) -> ReproductionOutputs:
         """
-        Increment the performed AI counts across all cows.
+        Increment AI counts for cows.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs with incremented AI counts for cows.
         """
 
         reproduction_outputs.herd_level_statistics.num_ai_performed += 1
@@ -2117,7 +2269,12 @@ class Reproduction:
 
     def _increment_successful_cow_conceptions(self, reproduction_outputs: ReproductionOutputs) -> ReproductionOutputs:
         """
-        Increment the successful conception counts across all heifers.
+        Increment successful conception counts for cows.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs with incremented conception counts.
         """
 
         reproduction_outputs.herd_level_statistics.num_successful_conceptions += 1
@@ -2129,23 +2286,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Execute the ED-TAI protocol by checking the days in milk and taking the appropriate actions.
-
-        Notes
-        -----
-        The following actions are taken:
-        - If the days in milk is between 1 and the program start day, no actions will be taken.
-
-        - If the days in milk is between the program start day and the TAI program start day, the cow
-        will be monitored for estrus daily during this period.
-
-        - If the days in milk is greater than or equal to the TAI program start day, the cow will be
-        scheduled for a TAI program if estrus has not been detected before the TAI start day.
+        Execute the ED-TAI protocol for cows, monitoring days in milk and scheduling AI or estrus detection.
 
         Parameters
         ----------
         simulation_day : int
-            The current simulation day.
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after applying the ED-TAI protocol.
         """
 
         if 1 <= reproduction_outputs.days_in_milking <= AnimalConfig.voluntary_waiting_period:
@@ -2189,13 +2340,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Redirect the cow to enter an OvSynch program when estrus has not been detected between the
-        voluntary waiting period and the OvSynch program start day.
+        Redirect cow to OvSynch if estrus was not detected before the OvSynch start day.
 
         Parameters
         ----------
         simulation_day : int
-            The current simulation day.
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs with OvSynch state set.
         """
 
         if self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
@@ -2241,19 +2396,19 @@ class Reproduction:
     def _decrease_conception_rate_by_parity(
             self, calves: int, conception_rate: float) -> float:
         """
-        Adjust conception rate based on the parity of the cow.
+        Adjust conception rate based on cow parity.
 
         Parameters
         ----------
         calves : int
             The number of calves the cow has had.
         conception_rate : float
-            The conception rate to adjust.
+            Current conception rate to adjust.
 
         Returns
         -------
         float
-            The adjusted conception rate.
+            Adjusted conception rate.
         """
 
         if calves <= 1:
@@ -2268,23 +2423,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Set the gestation length, calf birth weight, and calving to pregnancy time and
-        schedule a TAI program in advance if the resynch protocol is TAIbeforePD.
-
-        Notes
-        -----
-        When a successful conception occurs, the following variables are set:
-        - days_in_preg: Initialized to 1.
-        - gestation_length: Calculated using the '_calculate_gestation_length' method.
-        - calf_birth_weight: Calculated using the '_calculate_calf_birth_weight' method.
-        - calving_to_preg_time: Calculated as the difference between the current simulation day and the
-            most recent birth event.
-        - If the resynch protocol is TAIbeforePD, an OvSynch program will be scheduled in advance.
+        Handle successful conception for cows, setting pregnancy parameters and scheduling resynch as needed.
 
         Parameters
         ----------
-        sim_day : int
-            The current simulation day.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after successful conception.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -2338,21 +2487,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Manage different scenarios that the cow's repro states can be in when a failed conception occurs.
-
-        Notes
-        -----
-        If the repro program is ED or ED-TAI, after a failed conception, the cow will be
-        scheduled for a full estrus cycle.
-        If the repro program is TAI and the resynch protocol is TAIbeforePD, the cow will be
-        scheduled for an OvSynch program in advance.
-        If the repro program is ED-TAI and the resynch protocol is TAIAfterPD, the cow will also
-        be scheduled for an OvSynch program in advance, while monitoring for estrus at the same time.
+        Handle failed conception for cows, scheduling appropriate repro actions based on protocol.
 
         Parameters
         ----------
         simulation_day : int
-            The current simulation day.
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after failed conception.
         """
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -2418,19 +2563,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Perform a pregnancy check if the current day is a designated pregnancy check day.
-
-        Notes
-        -----
-        The method uses a list of dictionaries, each representing a specific pregnancy check configuration.
-        The method iterates through each configuration, checking if the current simulation day
-        matches a scheduled pregnancy check day. If so, it calls the '_handle_preg_check' method
-        with the specific configuration and the current simulation day.
+        Update pregnancy status for cows, performing checks on designated pregnancy check days.
 
         Parameters
         ----------
-        sim_day : int
-            The current day of the simulation.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after pregnancy update.
         """
 
         if reproduction_outputs.is_pregnant:
@@ -2470,20 +2613,16 @@ class Reproduction:
 
     def _check_do_not_breed_flag(self, simulation_day: int, reproduction_outputs: ReproductionOutputs) -> None:
         """
-        Check if the cow should still be in the breeding stage and mark her as do-not-breed if necessary.
-
-        Notes
-        -----
-        If the cow still cannot get pregnant after the do-not-breed time has passed, she will be
-        marked as do-not-breed.
-
-        Important caveat: If even a cow is already pregnant, we cannot mark her as do-not-breed
-        yet because she may still lose the pregnancy.
+        Check if cow should be marked as do-not-breed if not pregnant beyond breeding window.
 
         Parameters
         ----------
-        sim_day : int
-            The current day of the simulation.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        None
         """
 
         if not reproduction_outputs.is_pregnant and \
@@ -2503,23 +2642,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Manage and set up the different states an open cow can be in during rebreeding depending on
-        the current repro protocol and the resynch program.
-
-        Notes
-        -----
-        If the current protocol is ED, this method will simulate another full estrus cycle.
-        In the TAI and ED-TAI protocols, if the resynch method is TAIafterPD, the cow will
-        go through an OvSynch program next. If the resynch method is TAIbeforePD, the cow will
-        essentially go through an OvSynch program also but with some extra considerations for her
-        current state in the estrus detection process. If the resynch method is PGFatPD,
-        the cow will get a PGF injection, then go through a short estrus cycle, and may need to go
-        through an OvSynch program next.
+        Handle an open cow's status, determining next steps based on reproduction protocol and resynch program.
 
         Parameters
         ----------
-        sim_day : int
+        simulation_day : int
             The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs for open cow.
         """
 
         self.num_conception_rate_decreases += 1
@@ -2570,20 +2703,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Perform a PGF injection for an open cow in the PGFatPD resynch protocol and simulate a short estrus cycle.
-
-        Notes
-        -----
-        For simplicity, an open cow in the PGFatPD resynch protocol will get a PGF injection if any of
-        the three pregnancy checks fails, without distinguishing between the first and the other two
-        pregnancy checks. How the short estrus cycle following the PGF injection is handled is specified
-        in the execute_ed_protocol() method. Basically, if estrus is detected, an AI will be performed
-        on the next day. If estrus is not detected, a TAI program will be initiated.
+        Deliver a PGF injection and simulate a short estrus cycle for an open cow in the PGFatPD protocol.
 
         Parameters
         ----------
         simulation_day : int
-            The current day of the simulation.
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after applying PGF injection and scheduling estrus.
         """
 
         single_pgf_injection_schedule = {reproduction_outputs.days_born: {"deliver_hormones": ["PGF"]}}
@@ -2616,25 +2746,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Redirect an open cow in the TAIbeforePD resynch protocol to an OvSynch program after the second or third
-        pregnancy check failed and stop any pre-existing estrus detection.
-
-        Notes
-        -----
-        When the user selects the TAIbeforePD resynch protocol, an OvSynch program will have already been initiated
-        prior to the first pregnancy check regardless of the outcome of conception result after performing an AI.
-        If the first pregnancy check fails, that OvSynch program set up in advance will be continued.
-        On the other hand, if the second or third pregnancy check fails, there was no OvSynch program
-        set up in advance, so this method will redirect the cow into an OvSynch program.
-
-        After an AI, a cow in the TAIbeforePD resynch protocol will also be waiting for estrus
-        to occur. This method will stop such estrus monitoring if it is still ongoing
-        because the cow has already reached the first pregnancy check day.
+        Redirect an open cow in the TAIbeforePD protocol to the OvSynch program and stop estrus detection.
 
         Parameters
         ----------
-        sim_day : int
-            The current day of the simulation.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs for an open cow with OvSynch program set.
         """
 
         if self.repro_state_manager.is_in_empty_state():
@@ -2662,14 +2784,19 @@ class Reproduction:
             days_before_first_preg_check: int = animal_constants.DAYS_BEFORE_FIRST_PREG_CHECK_TO_START_TAI,
     ) -> ReproductionOutputs:
         """
-        Schedule an OvSynch program in advance for the TAIbeforePD resynch protocol after performing an AI.
+        Schedule an OvSynch program in advance for cows in the TAIbeforePD resynch protocol.
 
         Parameters
         ----------
         simulation_day : int
             The current day of the entire simulation.
-        days_before_first_preg_check : int, optional, default=const.DAYS_BEFORE_FIRST_PREG_CHECK_TO_START_TAI
-            The number of days before the first pregnancy check to schedule the OvSynch program.
+        days_before_first_preg_check : int, optional
+            Days before the first pregnancy check to start the OvSynch program, default value from constants.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after scheduling OvSynch program.
         """
 
         hormone_schedule_start_day = reproduction_outputs.days_born + AnimalConfig.first_pregnancy_check_day - \
@@ -2689,20 +2816,17 @@ class Reproduction:
             simulation_day: int
     ) -> ReproductionOutputs:
         """
-        Exit the scheduled OvSynch program early in TAIbeforePD resynch protocol when
-        the first pregnancy check is successful or estrus has been detected.
-
-        Notes
-        -----
-        When the user selects the TAIbeforePD resynch protocol, an OvSynch program will be initiated prior to the first
-        pregnancy check regardless of the outcome of conception result after performing an AI.
-        If the first pregnancy check is successful or estrus has been detected before the first pregnancy check,
-        the ongoing OvSynch program should be discontinued.
+        Exit the OvSynch program early in the TAIbeforePD protocol when a pregnancy check is passed or estrus is detected.
 
         Parameters
         ----------
-        sim_day : int
-            The current day of the simulation.
+        simulation_day : int
+            The current day of the entire simulation.
+
+        Returns
+        -------
+        ReproductionOutputs
+            Updated reproduction outputs after exiting the OvSynch program.
         """
 
         self.repro_state_manager.exit(ReproStateEnum.IN_OVSYNCH)
