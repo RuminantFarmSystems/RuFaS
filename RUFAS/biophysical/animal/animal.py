@@ -1,3 +1,6 @@
+import math
+from enum import Enum
+
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_growth.animal_growth import AnimalGrowth
 from RUFAS.biophysical.animal.animal_nutrients.animal_phosphorus import AnimalNutrient
@@ -9,6 +12,7 @@ from RUFAS.biophysical.animal.animal_properties.general_properties import Genera
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
 from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproProtocolEnum
@@ -18,18 +22,64 @@ from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.time import Time
 
 
+class Breed(Enum):
+    """Enum indicating the breed of the animal."""
+
+    HO = "Holstein"
+    JE = "Jersey"
+
+
+class Sex(Enum):
+    """Enum indicating the sex of the animal."""
+
+    MALE = "male"
+    FEMALE = "female"
+
+
 class Animal:
+    animal_type: AnimalType
+    birth_date: str
+    birth_weight: float
+    body_weight: float
+    breed: Breed
+    sex: Sex
+    id: int
+    mature_body_weight: float
+    nutrients: dict[str, float]
+    nutrient_concentrations: dict[str, float]
+    culled: bool = False
+    dead: bool = False
+    daily_growth: float = 0.0
+    days_born: int = 0
+    days_in_pregnancy: int = 0
+    events: AnimalEvents = AnimalEvents()
+    days_in_milking: int = 0
+    dry_off_day_of_pregnancy: int = 0
+    daily_milk_produced: float = 0.0
+    future_cull_date: int = int(math.inf)
+    cull_reason: str = ""
+    future_death_date: int = int(math.inf)
+    ration_formulation = {"objective": 0.00}
+    sold: bool = False
+    sold_at_day: int = int(math.inf)
+    wean_weight: float = 0.0
+    metabolizable_energy_intake: float = 0.0
+
+
     def __init__(self, args: AnimalBaseInitArgsTypedDict) -> None:
         self.id = 0
         self.last_visited: int = 0
 
-        self.general_properties: GeneralProperties = GeneralProperties(
-            id=args.get("id"),
-            breed=args.get("breed"),
-            birth_date=args.get("birth_date"),
-            days_born=args.get("days_born"),
-            birth_weight=args.get("birth_weight"),
-        )
+        animal_type: AnimalType
+        birth_date: str
+        birth_weight: float
+        body_weight: float
+        breed: Breed
+        sex: Sex
+        mature_body_weight: float
+        nutrients: dict[str, float]
+        nutrient_concentrations: dict[str, float]
+
         self.growth_properties: AnimalGrowthProperties = AnimalGrowthProperties()
         self.health_properties: AnimalHealthProperties = AnimalHealthProperties()
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
@@ -38,12 +88,22 @@ class Animal:
         self.nutrient_properties: NutrientProperties = NutrientProperties()
         self.reproduction_properties: ReproductionProperties = ReproductionProperties()
 
+    @property
+    def is_milking(self) -> bool:
+        """True if the animal is currently lactating, else False."""
+        return self.days_in_milking > 0
+
+    @property
+    def is_pregnant(self) -> bool:
+        """True if the animal is currently pregnant, else False."""
+        return self.days_in_pregnancy > 0
+
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:
         LactationCurve.set_lactation_parameters(time)
 
     def daily_routines(self, time: Time) -> None:
-        self.general_properties.days_born += 1
+        self.days_born += 1
 
         AnimalNutrient.perform_daily_phosphorus_update(self.nutrient_properties, self.general_properties)
         # DigestiveSystem

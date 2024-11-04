@@ -1,20 +1,20 @@
 import math
+from dataclasses import asdict
 from random import random
-from typing import Callable, Literal, Union, Any
+from typing import Callable, Union, Any
 
 from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_properties.animal_statistics import AnimalStatistics
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
-from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
+from RUFAS.biophysical.animal.animal import Breed
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.preg_check_config import PregCheckConfig
+from RUFAS.biophysical.animal.data_types.preg_check_config import PregnancyCheckConfig
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
     CowReproductionProtocol, ReproStateEnum, CowTAISubProtocol, CowPreSynchSubProtocol, CowReSynchSubProtocol, \
     HeiferTAISubProtocol, HeiferSynchEDSubProtocol
 from RUFAS.biophysical.animal.data_types.reproduction_inputs import ReproductionInputs
+from RUFAS.biophysical.animal.data_types.reproduction_outputs import ReproductionOutputs
 
 from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import HormoneDeliverySchedule
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
@@ -40,7 +40,7 @@ class Reproduction:
     breeding_to_preg_time: int
 
     conception_rate: float
-    cow_TAI_conception_rate: float
+    TAI_conception_rate: float
 
     num_conception_rate_decreases: int
 
@@ -64,7 +64,6 @@ class Reproduction:
             heifer_reproduction_program: HeiferReproductionProtocol = None,
             heifer_reproduction_sub_program: HEIFER_REPRODUCTION_SUB_PROTOCOLS = None,
             cow_reproduction_program: CowReproductionProtocol = None,
-            cow_reproduction_sub_program: COW_REPRODUCTION_SUB_PROTOCOLS = None,
             ai_day: int = 0,
             estrus_day: int = 0,
             abortion_day: int = 0,
@@ -101,7 +100,7 @@ class Reproduction:
         self.body_weight_at_calving = body_weight_at_calving if body_weight_at_calving else 0.0
 
         self.conception_rate = conception_rate if conception_rate else 0.0
-        self.cow_TAI_conception_rate = cow_TAI_conception_rate if cow_TAI_conception_rate else 0.0
+        self.TAI_conception_rate = cow_TAI_conception_rate if cow_TAI_conception_rate else 0.0
         self.num_conception_rate_decreases = num_conception_rate_decreases if num_conception_rate_decreases else 0
 
         self.calves = calves if calves else 0
@@ -116,32 +115,29 @@ class Reproduction:
 
     def reproduction_update(self,
                             reproduction_inputs: ReproductionInputs,
-                            general_properties: GeneralProperties,
-                            animal_statistics: AnimalStatistics,
-                            time: Time) -> tuple[
-        GeneralProperties, AnimalStatistics
-    ]:
-        if general_properties.animal_type == AnimalType.HEIFER_II:
-            general_properties, animal_statistics = self.heiferII_reproduction_update(
-                general_properties, animal_statistics, time
+                            time: Time) -> ReproductionOutputs:
+        reproduction_outputs = ReproductionOutputs(
+            *asdict(reproduction_inputs)
+        )
+
+        if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
+            reproduction_outputs = self.heiferII_reproduction_update(
+                reproduction_outputs, time
             )
         else:
-            general_properties, animal_statistics = self.cow_reproduction_update(
-                general_properties, animal_statistics, time
+            reproduction_outputs = self.cow_reproduction_update(
+                reproduction_outputs, time
             )
 
-        return general_properties, animal_statistics
+        return reproduction_outputs
 
     def heiferII_reproduction_update(self,
-                                     general_properties: GeneralProperties,
-                                     animal_statistics: AnimalStatistics,
-                                     time: Time) -> tuple[
-        GeneralProperties, AnimalStatistics
-    ]:
+                                     reproduction_outputs: ReproductionOutputs,
+                                     time: Time) -> ReproductionOutputs:
         if self.heifer_reproduction_program != AnimalConfig.heifer_reproduction_program and \
-                general_properties.days_born <= AnimalConfig.heifer_breed_start_day:
-            general_properties.events.add_event(
-                general_properties.days_born,
+                reproduction_outputs.days_born <= AnimalConfig.heifer_breed_start_day:
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 time.simulation_day,
                 f"{animal_constants.SETTING_REPRO_PROGRAM_NOTE} from "
                 f"{self.heifer_reproduction_program} "
@@ -149,57 +145,29 @@ class Reproduction:
             )
             self.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
 
-        elif general_properties.days_born >= AnimalConfig.heifer_breed_start_day:
+        elif reproduction_outputs.days_born >= AnimalConfig.heifer_breed_start_day:
             if self.heifer_reproduction_program == HeiferReproductionProtocol.ED.value:
-                (
-                    general_properties,
-                    reproduction_properties,
-                    animal_statistics
-                ) = self.execute_heifer_ed_protocol(
-                    general_properties, animal_statistics, time.simulation_day
-                )
+                reproduction_outputs = self.execute_heifer_ed_protocol(reproduction_outputs, time.simulation_day)
             elif self.heifer_reproduction_program == HeiferReproductionProtocol.TAI.value:
-                (
-                    general_properties,
-                    reproduction_properties,
-                    animal_statistics
-                ) = self.execute_heifer_tai_protocol(
-                    general_properties, animal_statistics, time.simulation_day)
+                reproduction_outputs = self.execute_heifer_tai_protocol(reproduction_outputs, time.simulation_day)
             elif self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED.value:
-                (
-                    general_properties,
-                    reproduction_properties,
-                    animal_statistics
-                ) = self.execute_heifer_synch_ed_protocol(
-                    general_properties, animal_statistics, time.simulation_day
-                )
+                reproduction_outputs = self.execute_heifer_synch_ed_protocol(reproduction_outputs, time.simulation_day)
             else:
                 raise ValueError(f"Invalid heifer repro program: {self.heifer_reproduction_program}")
 
-            if general_properties.days_born == self.ai_day:
-                general_properties, reproduction_properties, animal_statistics = self._perform_ai(
-                    general_properties, reproduction_properties, animal_statistics, time.simulation_day
-                )
-            elif general_properties.is_pregnant:
-                general_properties.days_in_preg += 1
-                general_properties, reproduction_properties, animal_statistics = self.heifer_pregnancy_update(
-                    general_properties, reproduction_properties, animal_statistics, time.simulation_day
-                )
-        return general_properties, animal_statistics
+            if reproduction_outputs.days_born == self.ai_day:
+                reproduction_outputs = self._perform_ai(reproduction_outputs, time.simulation_day)
+            elif reproduction_outputs.is_pregnant:
+                reproduction_outputs.days_in_pregnancy += 1
+                reproduction_outputs = self.heifer_pregnancy_update(reproduction_outputs, time.simulation_day)
+        return reproduction_outputs
 
-    def cow_reproduction_update(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            time: Time) -> tuple[
-        GeneralProperties, ReproductionProperties, AnimalStatistics
-    ]:
-        if general_properties.is_pregnant and \
-                general_properties.days_in_preg == self.gestation_length:
+    def cow_reproduction_update(self, reproduction_outputs: ReproductionOutputs, time: Time) -> ReproductionOutputs:
+        if reproduction_outputs.is_pregnant and \
+                reproduction_outputs.days_in_pregnancy == self.gestation_length:
             # how to signal a newborn
-            general_properties, reproduction_properties = self.cow_give_birth(general_properties,
-                                                                              reproduction_properties,
-                                                                              time)
+            reproduction_outputs = self.cow_give_birth(reproduction_outputs, time)
+
         if not self.do_not_breed:
             if self.cow_reproduction_program not in [
                 CowReproductionProtocol.ED.value,
@@ -209,40 +177,40 @@ class Reproduction:
                 raise ValueError(f"Invalid cow repro program: {self.cow_reproduction_program}")
 
             if self.cow_reproduction_program != AnimalConfig.cow_reproduction_program:
-                general_properties, reproduction_properties = self._set_cow_reproduction_program(
-                    general_properties, reproduction_properties, time.simulation_day,
+                reproduction_outputs = self._set_cow_reproduction_program(
+                    reproduction_outputs,
+                    time.simulation_day,
                     CowReproductionProtocol(AnimalConfig.cow_reproduction_program)
                 )
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     time.simulation_day,
-                    f"Pre-existing days in milk: {general_properties.days_in_milk}",
+                    f"Pre-existing days in milk: {reproduction_outputs.days_in_milking}",
                 )
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     time.simulation_day,
-                    f"Pre-existing days in preg: {general_properties.days_in_preg}",
+                    f"Pre-existing days in preg: {reproduction_outputs.days_in_pregnancy}",
                 )
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     time.simulation_day,
                     f"Pre-existing AI day: {self.ai_day}")
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     time.simulation_day,
                     f"Pre-existing estrus day: {self.estrus_day}",
                 )
-                if not general_properties.is_pregnant:
+                if not reproduction_outputs.is_pregnant:
                     self.repro_state_manager.enter(ReproStateEnum.ENTER_HERD_FROM_INIT)
-                    general_properties.events.add_event(
-                        general_properties.days_born,
+                    reproduction_outputs.events.add_event(
+                        reproduction_outputs.days_born,
                         time.simulation_day,
                         f"Current repro state(s): {self.repro_state_manager}",
                     )
 
             if self.cow_reproduction_program == CowReproductionProtocol.ED_TAI:
-                general_properties, reproduction_properties = self.execute_cow_ed_tai_protocol(
-                    general_properties, reproduction_properties, time.simulation_day)
+                reproduction_outputs = self.execute_cow_ed_tai_protocol(reproduction_outputs, time.simulation_day)
             if self.cow_reproduction_program == CowReproductionProtocol.ED or \
                     self.repro_state_manager.is_in_any(
                         {
@@ -251,8 +219,7 @@ class Reproduction:
                             ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH,
                         }
                     ):
-                general_properties, reproduction_properties, animal_statistics = self.execute_cow_ed_protocol(
-                    general_properties, reproduction_properties, animal_statistics, time.simulation_day)
+                reproduction_outputs = self.execute_cow_ed_protocol(reproduction_outputs, time.simulation_day)
 
             if self.cow_reproduction_program == CowReproductionProtocol.TAI or \
                     self.repro_state_manager.is_in_any(
@@ -262,56 +229,51 @@ class Reproduction:
                             ReproStateEnum.IN_OVSYNCH,
                         }
                     ):
-                general_properties, reproduction_properties, animal_statistics = self.execute_cow_tai_protocol(
-                    general_properties, reproduction_properties, animal_statistics, time.simulation_day)
+                reproduction_outputs = self.execute_cow_tai_protocol(reproduction_outputs, time.simulation_day)
 
-            if general_properties.days_born == self.ai_day:
-                reproduction_properties = self._calculate_conception_rate_on_ai_day(reproduction_properties)
+            if reproduction_outputs.days_born == self.ai_day:
+                reproduction_outputs = self._calculate_conception_rate_on_ai_day(reproduction_outputs)
                 self.repro_state_manager.enter(ReproStateEnum.AFTER_AI)
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     time.simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
-                general_properties, reproduction_properties, animal_statistics = self._perform_ai(
-                    general_properties, reproduction_properties, animal_statistics, time.simulation_day)
-            general_properties, reproduction_properties, animal_statistics = self.cow_pregnancy_update(
-                general_properties, reproduction_properties, animal_statistics, time.simulation_day
-            )
+                reproduction_outputs = self._perform_ai(reproduction_outputs, time.simulation_day)
 
-            return general_properties, reproduction_properties, animal_statistics
+            reproduction_outputs = self.cow_pregnancy_update(reproduction_outputs, time.simulation_day)
 
-    def cow_give_birth(
-            self, general_properties: GeneralProperties, reproduction_properties: ReproductionProperties,
-            time: Time) -> tuple[GeneralProperties, ReproductionProperties]:
+            return reproduction_outputs
+
+    def cow_give_birth(self, reproduction_outputs: ReproductionOutputs, time: Time) -> ReproductionOutputs:
         self.repro_state_manager.reset()
         self.calves += 1
-        general_properties.days_in_milk = 1
-        general_properties.days_in_preg = 0
+        reproduction_outputs.days_in_milking = 1
+        reproduction_outputs.days_in_pregnancy = 0
         self.gestation_length = 0
 
         if self.calves >= 2:
-            self.calving_interval = general_properties.days_born - \
-                                    general_properties.events.get_most_recent_date(
+            self.calving_interval = reproduction_outputs.days_born - \
+                                    reproduction_outputs.events.get_most_recent_date(
                                         animal_constants.NEW_BIRTH)
             self.calving_interval_history.append(self.calving_interval)
 
-        self.body_weight_at_calving = general_properties.body_weight
+        self.body_weight_at_calving = reproduction_outputs.body_weight
 
-        general_properties.events.add_event(general_properties.days_born, time.simulation_day,
+        reproduction_outputs.events.add_event(reproduction_outputs.days_born, time.simulation_day,
                                             animal_constants.NEW_BIRTH)
-        general_properties.events.add_event(
-            general_properties.days_born, time.simulation_day,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born, time.simulation_day,
             f"{animal_constants.NUM_CALVES_BORN_NOTE}: {self.calves}")
 
-        general_properties.future_cull_date, general_properties.cull_reason = self.determine_future_cull_date(
-            general_properties, reproduction_properties)
-        general_properties.future_death_date = self.determine_future_death_date(general_properties,
-                                                                                reproduction_properties)
+        reproduction_outputs.future_cull_date, reproduction_outputs.cull_reason = self.determine_future_cull_date(
+            reproduction_outputs)
+        reproduction_outputs.future_death_date = self.determine_future_death_date(reproduction_outputs)
 
         if self.cow_reproduction_program != AnimalConfig.cow_reproduction_program:
-            general_properties, reproduction_properties = self._set_cow_reproduction_program(
-                general_properties, reproduction_properties, time.simulation_day,
+            reproduction_outputs = self._set_cow_reproduction_program(
+                reproduction_outputs,
+                time.simulation_day,
                 CowReproductionProtocol(AnimalConfig.cow_reproduction_program)
             )
             self.repro_state_manager.reset()
@@ -320,21 +282,18 @@ class Reproduction:
             CowReproductionProtocol.ED.value,
             CowReproductionProtocol.ED_TAI.value,
         ]:
-            general_properties, reproduction_properties = self._simulate_estrus(
-                general_properties,
-                reproduction_properties,
-                general_properties.days_born,
+            reproduction_outputs = self._simulate_estrus(
+                reproduction_outputs,
+                reproduction_outputs.days_born,
                 time.simulation_day,
                 f"{animal_constants.ESTRUS_AFTER_CALVING_NOTE}: {animal_constants.ESTRUS_DAY_SCHEDULED_NOTE}",
                 AnimalConfig.average_estrus_cycle_return,
                 AnimalConfig.std_estrus_cycle_return,
             )
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
-    def determine_future_death_date(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties) -> int:
+    def determine_future_death_date(self, reproduction_outputs: ReproductionOutputs) -> int:
         if self.calves >= 4:
             death_rate = AnimalConfig.parity_death_probability[3]
         else:
@@ -355,13 +314,11 @@ class Reproduction:
                     death_time_upper_limit = AnimalConfig.death_day_probability[i + 1]
             n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
             return round(
-                death_time_lower_limit + n * (death_date_random - death_lower_limit) + general_properties.days_born
+                death_time_lower_limit + n * (death_date_random - death_lower_limit) + reproduction_outputs.days_born
             )
         return int(math.inf)
 
-    def determine_future_cull_date(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties) -> tuple[int, str]:
+    def determine_future_cull_date(self, reproduction_outputs: ReproductionOutputs) -> tuple[int, str]:
         """
         Update cows culled for health problem, first cull or not in this parity
         will be determined with parity specific culling rate, then a cull reason
@@ -412,18 +369,16 @@ class Reproduction:
                     cull_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
             x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
             future_cull_date = round(
-                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + general_properties.days_born
+                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + reproduction_outputs.days_born
             )
 
         return future_cull_date, cull_reason
 
     def _set_heifer_reproduction_program(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
+            self,
+            reproduction_outputs: ReproductionOutputs,
             simulation_day: int,
-            repro_program: HeiferReproductionProtocol) -> tuple[
-        GeneralProperties, ReproductionProperties
-    ]:
+            repro_program: HeiferReproductionProtocol) -> ReproductionOutputs:
         """
         Set the reproduction program for the cow if her current program does not match the user-defined program.
 
@@ -448,24 +403,23 @@ class Reproduction:
             raise ValueError(f"Invalid repro program: {repro_program}")
 
         if self.heifer_reproduction_program == repro_program:
-            return general_properties, reproduction_properties
+            return reproduction_outputs
 
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.SETTING_REPRO_PROGRAM_NOTE} from {self.heifer_reproduction_program} "
             f"to {repro_program}",
         )
         self.heifer_reproduction_program = repro_program
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _set_cow_reproduction_program(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties, simulation_day: int,
-            repro_program: CowReproductionProtocol) -> tuple[
-        GeneralProperties, ReproductionProperties
-    ]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int,
+            repro_program: CowReproductionProtocol) -> ReproductionOutputs:
         """
         Set the reproduction program for the cow if her current program does not match the user-defined program.
 
@@ -490,29 +444,28 @@ class Reproduction:
             raise ValueError(f"Invalid repro program: {repro_program}")
 
         if self.cow_reproduction_program == repro_program:
-            return general_properties, reproduction_properties
+            return reproduction_outputs
 
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.SETTING_REPRO_PROGRAM_NOTE} from {self.cow_reproduction_program} "
             f"to {repro_program}",
         )
         self.cow_reproduction_program = repro_program
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _simulate_estrus(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
+            reproduction_outputs: ReproductionOutputs,
             start_day: int,
             simulation_day: int,
             estrus_note: str,
             avg_estrus_cycle: float,
             std_estrus_cycle: float,
             max_cycle_length: float = math.inf,
-    ) -> tuple[GeneralProperties, ReproductionProperties]:
+    ) -> ReproductionOutputs:
         """
         Calculate and set the next estrus day for the animal.
 
@@ -540,13 +493,13 @@ class Reproduction:
         if abs(estrus_cycle) >= max_cycle_length:
             estrus_cycle = max_cycle_length - 1
         self.estrus_day = int(start_day + abs(estrus_cycle))
-        general_properties.events.add_event(general_properties.days_born,
+        reproduction_outputs.events.add_event(reproduction_outputs.days_born,
                                             simulation_day,
                                             f"{estrus_note} on day {self.estrus_day}")
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
-    def _compare_randomized_rate_less_than(
-            self, reference_rate: float) -> bool:
+    # move to util
+    def _compare_randomized_rate_less_than(self, reference_rate: float) -> bool:
         """
         Compare a randomized rate to a reference rate.
 
@@ -563,8 +516,7 @@ class Reproduction:
 
         return random() < reference_rate
 
-    def _detect_estrus(
-            self, detection_rate: float) -> bool:
+    def _detect_estrus(self, detection_rate: float) -> bool:
         """
         Determine if estrus was detected.
 
@@ -585,11 +537,9 @@ class Reproduction:
 
     def execute_heifer_ed_protocol(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
+            reproduction_outputs: ReproductionOutputs,
             simulation_day: int
-    ) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+    ) -> ReproductionOutputs:
         """
         Execute the ED protocol.
 
@@ -612,36 +562,26 @@ class Reproduction:
         None
         """
 
-        if not general_properties.is_pregnant:
-            animal_statistics.ED_days += 1
-        if general_properties.days_born == AnimalConfig.heifer_breed_start_day:
-            general_properties, reproduction_properties = self._simulate_estrus(
-                general_properties,
-                reproduction_properties,
+        if not reproduction_outputs.is_pregnant:
+            reproduction_outputs.animal_level_statistics.ED_days += 1
+        if reproduction_outputs.days_born == AnimalConfig.heifer_breed_start_day:
+            reproduction_outputs = self._simulate_estrus(
+                reproduction_outputs,
                 AnimalConfig.heifer_breed_start_day,
                 simulation_day,
                 animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                 AnimalConfig.average_estrus_cycle_heifer,
                 AnimalConfig.std_estrus_cycle_heifer,
             )
-        elif general_properties.days_born == self.estrus_day:
-            (
-                general_properties,
-                reproduction_properties,
-                animal_statistics
-            ) = self._handle_generic_estrus_detection(
-                general_properties, reproduction_properties, animal_statistics, simulation_day
-            )
+        elif reproduction_outputs.days_born == self.estrus_day:
+            reproduction_outputs = self._handle_generic_estrus_detection(reproduction_outputs, simulation_day)
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _handle_generic_estrus_detection(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int
-    ) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int) -> ReproductionOutputs:
         """
         Perform a typical estrus detection used in the ED protocol.
 
@@ -653,25 +593,21 @@ class Reproduction:
         -------
 
         """
-        general_properties, reproduction_properties, animal_statistics = self._handle_estrus_detection(
-            general_properties,
-            reproduction_properties,
-            animal_statistics,
+        reproduction_outputs = self._handle_estrus_detection(
+            reproduction_outputs,
             simulation_day,
             on_estrus_detected=self._handle_estrus_detected,
             on_estrus_not_detected=self._handle_estrus_not_detected,
         )
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _handle_estrus_detection(
             self,
-            general_properties: GeneralProperties, reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics, simulation_day: int,
-            on_estrus_detected: Callable[[GeneralProperties, ReproductionProperties, int],
-                                         tuple[GeneralProperties, ReproductionProperties]],
-            on_estrus_not_detected: Callable[[GeneralProperties, ReproductionProperties, int], tuple[
-                GeneralProperties, ReproductionProperties]],
-    ) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int,
+            on_estrus_detected: Callable[[ReproductionOutputs, int], ReproductionOutputs],
+            on_estrus_not_detected: Callable[[ReproductionOutputs, int], ReproductionOutputs],
+    ) -> ReproductionOutputs:
         """
         A skeletal method for handling estrus detection that needs to be provided with the
         appropriate functions to call when estrus is detected and when estrus is not detected.
@@ -690,40 +626,37 @@ class Reproduction:
         None
         """
         estrus_detection_rate = AnimalConfig.heifer_estrus_detection_rate \
-            if general_properties.animal_type == AnimalType.HEIFER_II else AnimalConfig.cow_estrus_detection_rate
-        general_properties.events.add_event(
-            general_properties.days_born,
+            if reproduction_outputs.animal_type == AnimalType.HEIFER_II else AnimalConfig.cow_estrus_detection_rate
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.ESTRUS_OCCURRED_NOTE,
         )
         is_estrus_detected = self._detect_estrus(estrus_detection_rate)
-        animal_statistics.estrus_count += 1
+        reproduction_outputs.animal_level_statistics.estrus_count += 1
         if is_estrus_detected:
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"{animal_constants.ESTRUS_DETECTED_NOTE}, "
                 f"with estrus detection rate at {estrus_detection_rate}",
             )
-            general_properties, reproduction_properties = on_estrus_detected(
-                general_properties, reproduction_properties, simulation_day)
+            reproduction_outputs = on_estrus_detected(reproduction_outputs, simulation_day)
         else:
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"{animal_constants.ESTRUS_NOT_DETECTED_NOTE}, "
                 f"with estrus detection rate at {estrus_detection_rate}",
             )
-            general_properties, reproduction_properties = on_estrus_not_detected(
-                general_properties, reproduction_properties, simulation_day)
+            reproduction_outputs = on_estrus_not_detected(reproduction_outputs, simulation_day)
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _handle_estrus_detected(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int) -> ReproductionOutputs:
         """
         Perform the typical actions associated with estrus detection as used in the ED protocol.
 
@@ -738,19 +671,18 @@ class Reproduction:
         """
 
         self.conception_rate = AnimalConfig.heifer_estrus_conception_rate
-        self.ai_day = general_properties.days_born + 1
-        general_properties.events.add_event(
-            general_properties.days_born,
+        self.ai_day = reproduction_outputs.days_born + 1
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}",
         )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _handle_estrus_not_detected(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int) -> ReproductionOutputs:
         """
         Perform the typical actions associated with estrus not being detected as used in the ED protocol.
 
@@ -764,22 +696,23 @@ class Reproduction:
         None
         """
 
-        general_properties, reproduction_properties = self._simulate_estrus(
-            general_properties,
-            reproduction_properties,
-            general_properties.days_born,
+        reproduction_outputs = self._simulate_estrus(
+            reproduction_outputs,
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
             AnimalConfig.average_estrus_cycle_heifer,
             AnimalConfig.std_estrus_cycle_heifer,
         )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _deliver_hormones(
-            self, general_properties: GeneralProperties, animal_statistics: AnimalStatistics,
-            hormones: list[str], delivery_day: int, simulation_day: int) -> tuple[
-        GeneralProperties, AnimalStatistics
-    ]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            hormones: list[str],
+            delivery_day: int,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Deliver hormones to the heifer.
 
@@ -799,31 +732,30 @@ class Reproduction:
 
         for hormone in hormones:
             if hormone == "GnRH":
-                animal_statistics.GnRH_injections += 1
+                reproduction_outputs.animal_level_statistics.GnRH_injections += 1
                 event = animal_constants.INJECT_GNRH
             elif hormone == "PGF":
-                animal_statistics.PGF_injections += 1
+                reproduction_outputs.animal_level_statistics.PGF_injections += 1
                 event = animal_constants.INJECT_PGF
             elif hormone == "CIDR":
-                animal_statistics.CIDR_injections += 1
+                reproduction_outputs.animal_level_statistics.CIDR_injections += 1
                 event = animal_constants.INJECT_CIDR
             else:
                 raise ValueError(f"Invalid hormone: {hormone}")
 
-            general_properties.events.add_event(
+            reproduction_outputs.events.add_event(
                 delivery_day,
                 simulation_day,
                 event,
             )
-        return general_properties, animal_statistics
+        return reproduction_outputs
 
     def _execute_hormone_delivery_schedule(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
+            reproduction_outputs: ReproductionOutputs,
             simulation_day: int,
-            schedule: dict[int, dict]) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            schedule: dict[int, dict]
+    ) -> ReproductionOutputs:
         """
         Execute a hormone delivery schedule.
 
@@ -839,37 +771,39 @@ class Reproduction:
         None
         """
 
-        actions = schedule.get(general_properties.days_born)
+        actions = schedule.get(reproduction_outputs.days_born)
         if actions is not None:
             if actions.get("deliver_hormones") is not None:
-                general_properties, animal_statistics = self._deliver_hormones(
-                    general_properties, animal_statistics, actions["deliver_hormones"], general_properties.days_born,
-                    simulation_day)
+                reproduction_outputs = self._deliver_hormones(
+                    reproduction_outputs,
+                    actions["deliver_hormones"],
+                    reproduction_outputs.days_born,
+                    simulation_day
+                )
                 del actions["deliver_hormones"]
 
             if actions.get("set_ai_day", False):
-                self.ai_day = general_properties.days_born
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                self.ai_day = reproduction_outputs.days_born
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"{animal_constants.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}",
                 )
                 del actions["set_ai_day"]
 
             if actions.get("set_conception_rate", False):
-                self.conception_rate = self.cow_TAI_conception_rate
+                self.conception_rate = self.TAI_conception_rate
                 del actions["set_conception_rate"]
 
             if not actions:
-                del schedule[general_properties.days_born]
-        return general_properties, reproduction_properties, animal_statistics
+                del schedule[reproduction_outputs.days_born]
+        return reproduction_outputs
 
     def execute_heifer_tai_protocol(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Execute the timed artificial insemination (TAI) protocol.
 
@@ -886,33 +820,28 @@ class Reproduction:
             self.heifer_reproduction_program == AnimalConfig.heifer_reproduction_program else \
             InternalReproSettings.HEIFER_REPRO_PROTOCOLS[self.heifer_reproduction_program.value][
                 "default_sub_protocol"]
-        if general_properties.days_born == AnimalConfig.heifer_breed_start_day:
-            reproduction_properties = self._set_up_hormone_schedule(
-                general_properties,
-                reproduction_properties,
-                general_properties.days_born,
-            )
-            self.TAI_conception_rate = \
-                AnimalConfig.heifer_reproduction_sub_program_conception_rate if \
+        if reproduction_outputs.days_born == AnimalConfig.heifer_breed_start_day:
+            reproduction_outputs = self._set_up_hormone_schedule(reproduction_outputs, reproduction_outputs.days_born)
+
+            self.TAI_conception_rate = AnimalConfig.heifer_reproduction_sub_program_conception_rate if \
                     AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.TAI.value \
                     else InternalReproSettings.HEIFER_REPRO_PROTOCOLS[HeiferReproductionProtocol.TAI.value][
                     "default_sub_properties"]["conception_rate"]
 
         if self.hormone_schedule:
-            (
-                general_properties, reproduction_properties, animal_statistics
-            ) = self._execute_hormone_delivery_schedule(
-                general_properties, reproduction_properties, animal_statistics, simulation_day,
-                self.hormone_schedule)
+            reproduction_outputs = self._execute_hormone_delivery_schedule(
+                reproduction_outputs,
+                simulation_day,
+                self.hormone_schedule
+            )
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def execute_heifer_synch_ed_protocol(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Execute the SynchED protocol.
 
@@ -929,40 +858,31 @@ class Reproduction:
         None
         """
 
-        if general_properties.days_born == AnimalConfig.heifer_breed_start_day:
+        if reproduction_outputs.days_born == AnimalConfig.heifer_breed_start_day:
             self.heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program if \
                 self.heifer_reproduction_program == AnimalConfig.heifer_reproduction_program else \
                 InternalReproSettings.HEIFER_REPRO_PROTOCOLS[self.heifer_reproduction_program.value][
                     "default_sub_protocol"]
-            reproduction_properties = self._set_up_hormone_schedule(
-                general_properties,
-                reproduction_properties,
-                general_properties.days_born,
+            reproduction_outputs = self._set_up_hormone_schedule(
+                reproduction_outputs,
+                reproduction_outputs.days_born,
             )
 
-        (
-            general_properties,
-            reproduction_properties,
-            animal_statistics
-        ) = self._handle_synch_ed_hormone_delivery_and_set_estrus_day(
-            general_properties, reproduction_properties, animal_statistics, simulation_day
+        reproduction_outputs = self._handle_synch_ed_hormone_delivery_and_set_estrus_day(
+            reproduction_outputs,
+            simulation_day
         )
 
-        if general_properties.days_born == self.estrus_day:
-            (
-                general_properties, reproduction_properties, animal_statistics
-            ) = self._handle_synch_ed_estrus_detection(
-                general_properties, reproduction_properties, animal_statistics, simulation_day
-            )
+        if reproduction_outputs.days_born == self.estrus_day:
+            reproduction_outputs = self._handle_synch_ed_estrus_detection(reproduction_outputs, simulation_day)
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _set_up_hormone_schedule(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
+            reproduction_outputs: ReproductionOutputs,
             start_from: int,
-    ) -> ReproductionProperties:
+    ) -> ReproductionOutputs:
         """
         Set up the hormone delivery schedule for the heifer. Used in TAI and SynchED protocols.
 
@@ -985,12 +905,12 @@ class Reproduction:
             If there is no hormone delivery schedule for the animal category.
 
         """
-        if general_properties.animal_type == AnimalType.HEIFER_II:
+        if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
             self.hormone_schedule = HormoneDeliverySchedule.get_adjusted_schedule(
                 "heifers", self.heifer_reproduction_sub_program.value, start_from
             )
             if self.hormone_schedule is None:
-                raise Exception(f"No hormone delivery schedule for {general_properties.animal_type} - "
+                raise Exception(f"No hormone delivery schedule for {reproduction_outputs.animal_type} - "
                                 f"{self.heifer_reproduction_sub_program}")
 
         else:
@@ -998,16 +918,15 @@ class Reproduction:
                 "cows", self.cow_reproduction_sub_program.value, start_from
             )
             if self.hormone_schedule is None:
-                raise Exception(f"No hormone delivery schedule for {general_properties.animal_type} - "
+                raise Exception(f"No hormone delivery schedule for {reproduction_outputs.animal_type} - "
                                 f"{self.cow_reproduction_sub_program}")
-        return reproduction_properties
+        return reproduction_outputs
 
     def _handle_synch_ed_hormone_delivery_and_set_estrus_day(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle hormone delivery and set the estrus day for the heifers in the SynchED program.
 
@@ -1024,16 +943,15 @@ class Reproduction:
         """
 
         if self.hormone_schedule:
-            (
-                general_properties, reproduction_properties, animal_statistics
-            ) = self._execute_hormone_delivery_schedule(
-                general_properties, reproduction_properties, animal_statistics, simulation_day,
-                self.hormone_schedule)
+            reproduction_outputs = self._execute_hormone_delivery_schedule(
+                reproduction_outputs,
+                simulation_day,
+                self.hormone_schedule
+            )
             if not self.hormone_schedule:
-                general_properties, reproduction_properties = self._simulate_estrus(
-                    general_properties,
-                    reproduction_properties,
-                    general_properties.days_born,
+                reproduction_outputs = self._simulate_estrus(
+                    reproduction_outputs,
+                    reproduction_outputs.days_born,
                     simulation_day,
                     animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                     AnimalConfig.average_estrus_cycle_after_pgf,
@@ -1041,14 +959,13 @@ class Reproduction:
                     max_cycle_length=14
                 )
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _handle_synch_ed_estrus_detection(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle estrus detection in the heifers in the SynchED program.
 
@@ -1063,8 +980,8 @@ class Reproduction:
         -------
         None
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.ESTRUS_OCCURRED_NOTE,
         )
@@ -1075,34 +992,30 @@ class Reproduction:
         is_estrus_detected = self._detect_estrus(synch_ed_estrus_detection_rate)
 
         if is_estrus_detected:
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.ESTRUS_DETECTED_NOTE,
             )
             self.conception_rate = AnimalConfig.heifer_reproduction_sub_program_conception_rate
-            self.ai_day = general_properties.days_born + 1
-            general_properties.events.add_event(
-                general_properties.days_born,
+            self.ai_day = reproduction_outputs.days_born + 1
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"{animal_constants.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}",
             )
         else:
-            (
-                general_properties,
-                reproduction_properties,
-                animal_statistics
-            ) = self._handle_estrus_not_detected_in_synch_ed(
-                general_properties, reproduction_properties, animal_statistics, simulation_day
+            reproduction_outputs = self._handle_estrus_not_detected_in_synch_ed(
+                reproduction_outputs,
+                simulation_day
             )
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _handle_estrus_not_detected_in_synch_ed(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle the scenario where estrus is not detected in the heifers in the SynchED program.
 
@@ -1115,13 +1028,13 @@ class Reproduction:
         -------
         None
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.ESTRUS_NOT_DETECTED_NOTE,
         )
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.TAI_AFTER_ESTRUS_NOT_DETECTED_IN_SYNCH_ED_NOTE,
         )
@@ -1134,8 +1047,8 @@ class Reproduction:
             heifer_repro_sub_protocol]["when_estrus_not_detected"]
 
         if self.heifer_reproduction_program.value != internal_fallback_protocol['repro_protocol']:
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"{animal_constants.SETTING_REPRO_PROGRAM_NOTE} from "
                 f"{self.heifer_reproduction_program} to "
@@ -1143,27 +1056,24 @@ class Reproduction:
             )
             self.heifer_reproduction_program = internal_fallback_protocol["repro_protocol"]
 
-        reproduction_properties = self._set_up_hormone_schedule(
-            general_properties,
-            reproduction_properties,
-            general_properties.days_born,
-        )
+        reproduction_outputs = self._set_up_hormone_schedule(reproduction_outputs, reproduction_outputs.days_born)
+
         self.TAI_conception_rate = internal_fallback_protocol["repro_sub_properties"][
             "conception_rate"]
 
-        (
-            general_properties, reproduction_properties, animal_statistics
-        ) = self._execute_hormone_delivery_schedule(
-            general_properties, reproduction_properties, animal_statistics, simulation_day,
-            self.hormone_schedule)
+        reproduction_outputs = self._execute_hormone_delivery_schedule(
+            reproduction_outputs,
+            simulation_day,
+            self.hormone_schedule
+        )
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def open_heifer(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Open heifer after abortion or pregnancy loss.
 
@@ -1178,14 +1088,14 @@ class Reproduction:
         sim_day : int
             The current day of the entire simulation.
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.REBREEDING_NOTE,
         )
         if self.heifer_reproduction_program != HeiferReproductionProtocol.ED:
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"{animal_constants.SETTING_REPRO_PROGRAM_NOTE} from "
                 f"{self.heifer_reproduction_program} to "
@@ -1193,9 +1103,8 @@ class Reproduction:
             )
             self.heifer_reproduction_program = HeiferReproductionProtocol.ED
 
-        general_properties, reproduction_properties = self._simulate_estrus(
-            general_properties,
-            reproduction_properties,
+        reproduction_outputs = self._simulate_estrus(
+            reproduction_outputs,
             self.abortion_day,
             simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
@@ -1203,14 +1112,13 @@ class Reproduction:
             AnimalConfig.std_estrus_cycle_heifer,
         )
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _perform_ai(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Perform artificial insemination on the heifer.
 
@@ -1223,51 +1131,44 @@ class Reproduction:
         -------
         None
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.AI_PERFORMED_NOTE,
         )
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.INSEMINATED_W_BASE + AnimalConfig.semen_type,
         )
-        animal_statistics.semen_num += 1
-        animal_statistics.AI_times += 1
+        reproduction_outputs.animal_level_statistics.semen_number += 1
+        reproduction_outputs.animal_level_statistics.AI_times += 1
 
-        if general_properties.animal_type == AnimalType.HEIFER_II:
-            animal_statistics = self._increment_heifer_ai_counts(reproduction_properties, animal_statistics)
+        if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
+            reproduction_outputs = self._increment_heifer_ai_counts(reproduction_outputs)
         else:
-            animal_statistics = self._increment_cow_ai_counts(animal_statistics)
+            reproduction_outputs = self._increment_cow_ai_counts(reproduction_outputs)
 
         conception_successful = self._compare_randomized_rate_less_than(self.conception_rate)
         if conception_successful:
-            if general_properties.animal_type == AnimalType.HEIFER_II:
-                general_properties, reproduction_properties = self._handle_successful_heifer_conception(
-                    general_properties, reproduction_properties, simulation_day)
-                animal_statistics = self._increment_successful_heifer_conceptions(
-                    reproduction_properties, animal_statistics)
+            if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
+                reproduction_outputs = self._handle_successful_heifer_conception(reproduction_outputs, simulation_day)
+                reproduction_outputs = self._increment_successful_heifer_conceptions(reproduction_outputs)
             else:
-                general_properties, reproduction_properties = self._handle_successful_cow_conception(
-                    general_properties, reproduction_properties, simulation_day)
-                animal_statistics = self._increment_successful_cow_conceptions(
-                    reproduction_properties, animal_statistics)
+                reproduction_outputs = self._handle_successful_cow_conception(reproduction_outputs, simulation_day)
+                reproduction_outputs = self._increment_successful_cow_conceptions(reproduction_outputs)
         else:
-            if general_properties.animal_type == AnimalType.HEIFER_II:
-                general_properties, reproduction_properties = self._handle_failed_heifer_conception(
-                    general_properties, reproduction_properties, simulation_day
-                )
+            if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
+                reproduction_outputs = self._handle_failed_heifer_conception(reproduction_outputs, simulation_day)
             else:
-                general_properties, reproduction_properties = self._handle_failed_cow_conception(
-                    general_properties, reproduction_properties, simulation_day
-                )
+                reproduction_outputs = self._handle_failed_cow_conception(reproduction_outputs, simulation_day)
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _increment_heifer_ai_counts(
-            self, reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics) -> AnimalStatistics:
+            self,
+            reproduction_outputs: ReproductionOutputs
+    ) -> ReproductionOutputs:
         """
         Increment the performed AI counts across all heifers.
 
@@ -1287,18 +1188,19 @@ class Reproduction:
         None
         """
 
-        animal_statistics.num_ai_performed += 1
-        animal_statistics.num_ai_performed_in_ED += 1 if \
+        reproduction_outputs.herd_level_statistics.num_ai_performed += 1
+        reproduction_outputs.herd_level_statistics.num_ai_performed_in_ED += 1 if \
             self.heifer_reproduction_program == HeiferReproductionProtocol.ED else 0
-        animal_statistics.num_ai_performed_in_TAI += 1 if \
+        reproduction_outputs.herd_level_statistics.num_ai_performed_in_TAI += 1 if \
             self.heifer_reproduction_program == HeiferReproductionProtocol.TAI else 0
-        animal_statistics.num_ai_performed_in_SynchED += 1 if \
+        reproduction_outputs.herd_level_statistics.num_ai_performed_in_SynchED += 1 if \
             self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED else 0
-        return animal_statistics
+        return reproduction_outputs
 
     def _increment_successful_heifer_conceptions(
-            self, reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics) -> AnimalStatistics:
+            self,
+            reproduction_outputs: ReproductionOutputs
+    ) -> ReproductionOutputs:
         """
         Increment the successful conception counts across all heifers.
 
@@ -1315,19 +1217,20 @@ class Reproduction:
         -------
         None
         """
-        animal_statistics.num_successful_conceptions += 1
-        animal_statistics.num_successful_conceptions_in_ED += 1 if \
+        reproduction_outputs.herd_level_statistics.num_successful_conceptions += 1
+        reproduction_outputs.herd_level_statistics.num_successful_conceptions_in_ED += 1 if \
             self.heifer_reproduction_program == HeiferReproductionProtocol.ED else 0
-        animal_statistics.num_successful_conceptions_in_TAI += 1 if \
+        reproduction_outputs.herd_level_statistics.num_successful_conceptions_in_TAI += 1 if \
             self.heifer_reproduction_program == HeiferReproductionProtocol.TAI else 0
-        animal_statistics.num_successful_conceptions_in_SynchED += 1 if \
+        reproduction_outputs.herd_level_statistics.num_successful_conceptions_in_SynchED += 1 if \
             self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED else 0
-        return animal_statistics
+        return reproduction_outputs
 
     def _handle_successful_heifer_conception(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle a successful conception in the heifer by logging the event and initializing pregnancy parameters.
 
@@ -1340,19 +1243,19 @@ class Reproduction:
         -------
         None
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.HEIFER_PREG,
         )
-        general_properties, reproduction_properties = self._initialize_pregnancy_parameters(
-            general_properties, reproduction_properties)
-        return general_properties, reproduction_properties
+        reproduction_outputs = self._initialize_pregnancy_parameters(reproduction_outputs)
+        return reproduction_outputs
 
     def _handle_failed_heifer_conception(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle a failed conception in the heifer by logging the event and simulating estrus.
 
@@ -1365,36 +1268,40 @@ class Reproduction:
         -------
         None
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.HEIFER_NOT_PREG,
         )
-        if general_properties.animal_type == AnimalType.HEIFER_II:
-            general_properties, reproduction_properties = self._set_heifer_reproduction_program(
-                general_properties, reproduction_properties, simulation_day, HeiferReproductionProtocol.ED)
+        if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
+            reproduction_outputs = self._set_heifer_reproduction_program(
+                reproduction_outputs,
+                simulation_day,
+                HeiferReproductionProtocol.ED
+            )
         else:
-            general_properties, reproduction_properties = self._set_cow_reproduction_program(
-                general_properties, reproduction_properties, simulation_day, CowReproductionProtocol.ED)
+            reproduction_outputs = self._set_cow_reproduction_program(
+                reproduction_outputs,
+                simulation_day,
+                CowReproductionProtocol.ED
+            )
 
         average_estrus_cycle = AnimalConfig.average_estrus_cycle_heifer if \
-            general_properties.animal_type == AnimalType.HEIFER_II else AnimalConfig.average_estrus_cycle_cow
+            reproduction_outputs.animal_type == AnimalType.HEIFER_II else AnimalConfig.average_estrus_cycle_cow
         std_estrus_cycle = AnimalConfig.std_estrus_cycle_heifer if \
-            general_properties.animal_type == AnimalType.HEIFER_II else AnimalConfig.std_estrus_cycle_cow
+            reproduction_outputs.animal_type == AnimalType.HEIFER_II else AnimalConfig.std_estrus_cycle_cow
 
-        general_properties, reproduction_properties = self._simulate_estrus(
-            general_properties,
-            reproduction_properties,
-            general_properties.days_born,
+        reproduction_outputs = self._simulate_estrus(
+            reproduction_outputs,
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
             average_estrus_cycle,
             std_estrus_cycle,
         )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
-    def _calculate_gestation_length(
-            self, ) -> int:
+    def _calculate_gestation_length(self) -> int:
         """
         Calculate the gestation length of the heifer (days).
 
@@ -1413,8 +1320,7 @@ class Reproduction:
             )
         )
 
-    def _calculate_calf_birth_weight(
-            self, breed: Literal["HO", "JE"]) -> float:
+    def _calculate_calf_birth_weight(self, breed: Breed) -> float:
         """
         Calculate the birth weight of the calf.
 
@@ -1445,10 +1351,7 @@ class Reproduction:
         )
         return float(birth_weight)
 
-    def _initialize_pregnancy_parameters(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties
-    ) -> tuple[GeneralProperties, ReproductionProperties]:
+    def _initialize_pregnancy_parameters(self, reproduction_outputs: ReproductionOutputs) -> ReproductionOutputs:
         """
         Initialize the pregnancy parameters for the heifer.
 
@@ -1457,23 +1360,19 @@ class Reproduction:
         None
         """
 
-        general_properties.days_in_preg = 1
+        reproduction_outputs.days_in_preg = 1
         self.abortion_day = 0
-        self.breeding_to_preg_time = general_properties.days_born - \
-                                     AnimalConfig.heifer_breed_start_day
+        self.breeding_to_preg_time = reproduction_outputs.days_born - AnimalConfig.heifer_breed_start_day
         self.gestation_length = self._calculate_gestation_length()
-        self.calf_birth_weight = self._calculate_calf_birth_weight(
-            general_properties.breed.value)
+        self.calf_birth_weight = self._calculate_calf_birth_weight(reproduction_outputs.breed.value)
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def heifer_pregnancy_update(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[
-        GeneralProperties, ReproductionProperties, AnimalStatistics
-    ]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Update the pregnancy status of the heifer.
 
@@ -1486,7 +1385,7 @@ class Reproduction:
         -------
         None
         """
-        preg_check_configs: list[PregCheckConfig] = [
+        pregnancy_check_configs: list[PregnancyCheckConfig] = [
             {
                 "day": AnimalConfig.first_pregnancy_check_day,
                 "loss_rate": AnimalConfig.first_pregnancy_check_loss_rate,
@@ -1508,22 +1407,16 @@ class Reproduction:
             },
         ]
 
-        for preg_check_config in preg_check_configs:
-            if general_properties.days_born == self.ai_day + preg_check_config["day"]:
-                (
-                    general_properties, reproduction_properties, animal_statistics
-                ) = self._handle_heifer_pregnancy_check(
-                    general_properties, reproduction_properties, animal_statistics, preg_check_config, simulation_day)
-        return general_properties, reproduction_properties, animal_statistics
+        for pregnancy_check_config in pregnancy_check_configs:
+            if reproduction_outputs.days_born == self.ai_day + pregnancy_check_config["day"]:
+                reproduction_outputs = self._handle_heifer_pregnancy_check(
+                    reproduction_outputs, pregnancy_check_config, simulation_day)
+        return reproduction_outputs
 
     def _handle_heifer_pregnancy_check(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            preg_check_config: PregCheckConfig,
-            simulation_day: int) -> tuple[
-        GeneralProperties, ReproductionProperties, AnimalStatistics
-    ]:
+            self, reproduction_outputs: ReproductionOutputs,
+            pregnancy_check_config: PregnancyCheckConfig,
+            simulation_day: int) -> ReproductionOutputs:
         """
         Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.
 
@@ -1539,38 +1432,35 @@ class Reproduction:
         None
         """
 
-        animal_statistics.preg_diagnoses += 1
-        if general_properties.is_pregnant:
-            if self._compare_randomized_rate_less_than(preg_check_config["loss_rate"]):
-                general_properties, reproduction_properties, animal_statistics = self._terminate_pregnancy(
-                    general_properties, reproduction_properties, animal_statistics,
-                    preg_check_config["on_preg_loss"], simulation_day)
-            else:
-                general_properties.events.add_event(
-                    general_properties.days_born,
-                    simulation_day,
-                    preg_check_config["on_preg"],
+        reproduction_outputs.animal_level_statistics.pregnancy_diagnoses += 1
+        if reproduction_outputs.is_pregnant:
+            if self._compare_randomized_rate_less_than(pregnancy_check_config["loss_rate"]):
+                reproduction_outputs = self._terminate_pregnancy(
+                    reproduction_outputs,
+                    pregnancy_check_config["on_preg_loss"],
+                    simulation_day
                 )
-        elif "on_not_preg" in preg_check_config:
-            general_properties.events.add_event(
-                general_properties.days_born,
+            else:
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
+                    simulation_day,
+                    pregnancy_check_config["on_preg"],
+                )
+        elif "on_not_preg" in pregnancy_check_config:
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
-                preg_check_config["on_not_preg"],
+                pregnancy_check_config["on_not_preg"],
             )
-            self.abortion_day = general_properties.days_born
-            general_properties, reproduction_properties = self.open_heifer(
-                general_properties, reproduction_properties, simulation_day
-            )
-        return general_properties, reproduction_properties, animal_statistics
+            self.abortion_day = reproduction_outputs.days_born
+            reproduction_outputs = self.open_heifer(reproduction_outputs, simulation_day)
+        return reproduction_outputs
 
     def _handle_cow_pregnancy_check(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            preg_check_config: PregCheckConfig,
-            simulation_day: int) -> tuple[
-        GeneralProperties, ReproductionProperties, AnimalStatistics
-    ]:
+            self, reproduction_outputs: ReproductionOutputs,
+            pregnancy_check_config: PregnancyCheckConfig,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle a pregnancy check by logging the event and terminating the pregnancy if necessary.
 
@@ -1590,44 +1480,43 @@ class Reproduction:
             The current day of the entire simulation.
         """
 
-        animal_statistics.preg_diagnoses += 1
-        if general_properties.is_pregnant:
-            if self._compare_randomized_rate_less_than(preg_check_config["loss_rate"]):
+        reproduction_outputs.animal_level_statistics.pregnancy_diagnoses += 1
+        if reproduction_outputs.is_pregnant:
+            if self._compare_randomized_rate_less_than(pregnancy_check_config["loss_rate"]):
                 self.repro_state_manager.exit(ReproStateEnum.PREGNANT)
-                general_properties, reproduction_properties, animal_statistics = self._terminate_pregnancy(
-                    general_properties, reproduction_properties, animal_statistics,
-                    preg_check_config["on_preg_loss"], simulation_day)
+                reproduction_outputs = self._terminate_pregnancy(
+                    reproduction_outputs,
+                    pregnancy_check_config["on_preg_loss"],
+                    simulation_day
+                )
             else:
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
-                    preg_check_config["on_preg"],
+                    pregnancy_check_config["on_preg"],
                 )
                 if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
                     (
-                        general_properties,
-                        reproduction_properties
+                        reproduction_outputs
                     ) = self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
-                        general_properties, reproduction_properties, simulation_day
+                        reproduction_outputs,
+                        simulation_day
                     )
-        elif "on_not_preg" in preg_check_config:  # Due to failed conception
-            general_properties.events.add_event(
-                general_properties.days_born,
+        elif "on_not_preg" in pregnancy_check_config:  # Due to failed conception
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
-                preg_check_config["on_not_preg"],
+                pregnancy_check_config["on_not_preg"],
             )
-            self.abortion_day = general_properties.days_born
-            general_properties, reproduction_properties, animal_statistics = self.open_cow(
-                general_properties, reproduction_properties, animal_statistics, simulation_day
-            )
-        return general_properties, reproduction_properties, animal_statistics
+            self.abortion_day = reproduction_outputs.days_born
+            reproduction_outputs = self.open_cow(reproduction_outputs, simulation_day)
+        return reproduction_outputs
 
     def _terminate_pregnancy(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
+            self, reproduction_outputs: ReproductionOutputs,
             preg_loss_const: str,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Terminate the pregnancy by logging the event and resetting the pregnancy parameters.
 
@@ -1642,30 +1531,24 @@ class Reproduction:
         -------
         None
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             preg_loss_const,
         )
-        self.abortion_day = general_properties.days_born
-        general_properties.days_in_preg = 0
-        if general_properties.animal_type == AnimalType.HEIFER_II:
-            general_properties, reproduction_properties = self.open_heifer(
-                general_properties, reproduction_properties, simulation_day
-            )
+        self.abortion_day = reproduction_outputs.days_born
+        reproduction_outputs.days_in_preg = 0
+        if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
+            reproduction_outputs = self.open_heifer(reproduction_outputs, simulation_day)
         else:
-            general_properties, reproduction_properties, animal_statistics = self.open_cow(
-                general_properties, reproduction_properties, animal_statistics, simulation_day
-            )
-        general_properties.body_weight -= self.conceptus_weight
+            reproduction_outputs = self.open_cow(reproduction_outputs, simulation_day)
+        reproduction_outputs.body_weight -= self.conceptus_weight
         self.conceptus_weight = 0
         self.calf_birth_weight = 0
         self.p_gest_for_calf = 0
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
-    def _calculate_conception_rate_on_ai_day(
-            self, reproduction_properties: ReproductionProperties, ) -> \
-            ReproductionProperties:
+    def _calculate_conception_rate_on_ai_day(self) -> None:
         if AnimalConfig.should_decrease_conception_rate_in_rebreeding:
             self.conception_rate -= self.num_conception_rate_decreases * \
                                     AnimalConfig.conception_rate_decrease
@@ -1675,14 +1558,12 @@ class Reproduction:
                 self.calves, self.conception_rate)
 
         self.conception_rate = max(0.0, self.conception_rate)
-        return reproduction_properties
 
     def execute_cow_ed_protocol(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Execute the estrus detection protocol. This method is used in the ED and ED-TAI protocols.
 
@@ -1697,21 +1578,18 @@ class Reproduction:
             The current simulation day.
         """
 
-        if 1 <= general_properties.days_in_milk <= AnimalConfig.voluntary_waiting_period:
-            general_properties, reproduction_properties = self._repeat_estrus_simulation_before_vwp(
-                general_properties, reproduction_properties, simulation_day
-            )
+        if 1 <= reproduction_outputs.days_in_milking <= AnimalConfig.voluntary_waiting_period:
+            reproduction_outputs = self._repeat_estrus_simulation_before_vwp(reproduction_outputs, simulation_day)
 
-        elif general_properties.days_in_milk > AnimalConfig.voluntary_waiting_period:
+        elif reproduction_outputs.days_in_milking > AnimalConfig.voluntary_waiting_period:
             # For cows entering the herd but no estrus day has been set
             if (
                     self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
-                    and general_properties.days_born > self.estrus_day
+                    and reproduction_outputs.days_born > self.estrus_day
             ):
-                general_properties, reproduction_properties = self._simulate_estrus(
-                    general_properties,
-                    reproduction_properties,
-                    general_properties.days_born,
+                reproduction_outputs = self._simulate_estrus(
+                    reproduction_outputs,
+                    reproduction_outputs.days_born,
                     simulation_day,
                     animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                     AnimalConfig.average_estrus_cycle_cow,
@@ -1721,46 +1599,34 @@ class Reproduction:
             if self.repro_state_manager.is_in_any({ReproStateEnum.FRESH,
                                                    ReproStateEnum.ENTER_HERD_FROM_INIT}):
                 self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
 
-            if general_properties.days_born == self.estrus_day:
+            if reproduction_outputs.days_born == self.estrus_day:
                 # Used in PGFatPD resynch program
                 if self.repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE):
                     self.repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
-                    (
-                        general_properties,
-                        reproduction_properties,
-                        animal_statistics
-                    ) = self._handle_estrus_detection(
-                        general_properties,
-                        reproduction_properties,
-                        animal_statistics,
+                    reproduction_outputs, = self._handle_estrus_detection(
+                        reproduction_outputs,
                         simulation_day,
                         on_estrus_detected=self._setup_ai_day_after_estrus_detected,
-                        on_estrus_not_detected=lambda general_properties, reproduction_properties, _:
+                        on_estrus_not_detected=lambda reproduction_outputs, _:
                         self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH),
                     )
                     if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-                        general_properties.events.add_event(
-                            general_properties.days_born,
+                        reproduction_outputs.events.add_event(
+                            reproduction_outputs.days_born,
                             simulation_day,
                             f"Current repro state(s): {self.repro_state_manager}",
                         )
 
-                elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
+                elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_qCYCLE):
                     self.repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-                    (
-                        general_properties,
-                        reproduction_properties,
-                        animal_statistics
-                    ) = self._handle_estrus_detection(
-                        general_properties,
-                        reproduction_properties,
-                        animal_statistics,
+                    reproduction_outputs = self._handle_estrus_detection(
+                        reproduction_outputs,
                         simulation_day,
                         on_estrus_detected=self._setup_ai_day_after_estrus_detected,
                         on_estrus_not_detected=self._simulate_full_estrus_cycle,
@@ -1771,24 +1637,18 @@ class Reproduction:
                         ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
                     self.repro_state_manager.exit(
                         ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
-                    (
-                        general_properties,
-                        reproduction_properties,
-                        animal_statistics
-                    ) = self._handle_estrus_detection(
-                        general_properties,
-                        reproduction_properties,
-                        animal_statistics,
+                    reproduction_outputs = self._handle_estrus_detection(
+                        reproduction_outputs,
                         simulation_day,
                         on_estrus_detected=self._setup_ai_day_after_estrus_detected,
                         on_estrus_not_detected=self._simulate_full_estrus_cycle_before_ovsynch,
                     )
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _repeat_estrus_simulation_before_vwp(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            self, reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Repeat the estrus simulation before the voluntary waiting period.
 
@@ -1801,43 +1661,41 @@ class Reproduction:
         if self.repro_state_manager.is_in_empty_state() or \
                 self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
-        if general_properties.days_born == self.estrus_day:
-            general_properties.events.add_event(
-                general_properties.days_born,
+        if reproduction_outputs.days_born == self.estrus_day:
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.ESTRUS_BEFORE_VOLUNTARY_WAITING_PERIOD_NOTE,
             )
-            general_properties, reproduction_properties = self._simulate_estrus(
-                general_properties,
-                reproduction_properties,
-                general_properties.days_born,
+            reproduction_outputs = self._simulate_estrus(
+                reproduction_outputs,
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                 AnimalConfig.average_estrus_cycle_cow,
                 AnimalConfig.std_estrus_cycle_cow,
             )
-        elif general_properties.days_born > self.estrus_day:
-            general_properties, reproduction_properties = self._simulate_estrus(
-                general_properties,
-                reproduction_properties,
-                general_properties.days_born,
+        elif reproduction_outputs.days_born > self.estrus_day:
+            reproduction_outputs = self._simulate_estrus(
+                reproduction_outputs,
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                 AnimalConfig.average_estrus_cycle_cow,
                 AnimalConfig.std_estrus_cycle_cow,
             )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _setup_ai_day_after_estrus_detected(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle the estrus detected event.
 
@@ -1847,36 +1705,32 @@ class Reproduction:
             The current simulation day.
         """
         if self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH):
-            (
-                general_properties,
-                reproduction_properties
-            ) = self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
-                general_properties,
-                reproduction_properties,
+            reproduction_outputs = self._exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
+                reproduction_outputs,
                 simulation_day
             )
 
         self.repro_state_manager.enter(ReproStateEnum.ESTRUS_DETECTED)
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"Current repro state(s): {self.repro_state_manager}",
         )
         self.conception_rate = AnimalConfig.cow_estrus_conception_rate
-        self.ai_day = general_properties.days_born + 1
-        general_properties.events.add_event(
-            general_properties.days_born,
+        self.ai_day = reproduction_outputs.days_born + 1
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.AI_DAY_SCHEDULED_NOTE} on day {self.ai_day}",
         )
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _simulate_full_estrus_cycle(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Handle the estrus not detected event.
 
@@ -1887,27 +1741,26 @@ class Reproduction:
         """
 
         self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE, keep_existing=True)
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"Current repro state(s): {self.repro_state_manager}",
         )
         self._simulate_estrus(
-            general_properties,
-            reproduction_properties,
-            general_properties.days_born,
+            reproduction_outputs,
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
             AnimalConfig.average_estrus_cycle_cow,
             AnimalConfig.std_estrus_cycle_cow,
         )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _simulate_full_estrus_cycle_before_ovsynch(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Simulate another estrus cycle before the OvSynch program in the ED-TAI protocol.
 
@@ -1925,29 +1778,27 @@ class Reproduction:
         """
 
         self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"Current repro state(s): {self.repro_state_manager}",
         )
         self._simulate_estrus(
-            general_properties,
-            reproduction_properties,
-            general_properties.days_born,
+            reproduction_outputs,
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
             AnimalConfig.average_estrus_cycle_cow,
             AnimalConfig.std_estrus_cycle_cow,
         )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _execute_cow_hormone_delivery_schedule(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
+            reproduction_outputs: ReproductionOutputs,
             simulation_day: int,
-            schedule: dict[int, dict]) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            schedule: dict[int, dict]
+    ) -> ReproductionOutputs:
         """
         Execute a hormone delivery schedule for cows.
 
@@ -1967,17 +1818,13 @@ class Reproduction:
             A dictionary of days and actions to perform on those days.
         """
 
-        (
-            general_properties, reproduction_properties, animal_statistics
-        ) = self._execute_hormone_delivery_schedule(
-            general_properties, reproduction_properties, animal_statistics, simulation_day, schedule
-        )
+        reproduction_outputs = self._execute_hormone_delivery_schedule(reproduction_outputs, simulation_day, schedule)
 
-        actions = schedule.get(general_properties.days_born)
+        actions = schedule.get(reproduction_outputs.days_born)
         if actions is not None:
             if actions.get("set_presynch_end", False):
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"{animal_constants.PRESYNCH_PERIOD_END}: {AnimalConfig.cow_presynch_method}",
                 )
@@ -1986,8 +1833,8 @@ class Reproduction:
                 del actions["set_presynch_end"]
 
             if actions.get("set_ovsynch_end", False):
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"{animal_constants.OVSYNCH_PERIOD_END_NOTE}: {AnimalConfig.cow_ovsynch_method}",
                 )
@@ -1995,15 +1842,14 @@ class Reproduction:
                 del actions["set_ovsynch_end"]
 
             if not actions:
-                del schedule[general_properties.days_born]
-        return general_properties, reproduction_properties, animal_statistics
+                del schedule[reproduction_outputs.days_born]
+        return reproduction_outputs
 
     def execute_cow_tai_protocol(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Execute the TAI protocol by setting up and executing hormone delivery schedules for
         the presynch and ovsynch programs.
@@ -2015,57 +1861,55 @@ class Reproduction:
         """
 
         if AnimalConfig.cow_presynch_method == "None":
-            if 1 <= general_properties.days_in_milk < AnimalConfig.ovsynch_program_start_day:
-                general_properties, reproduction_properties = self._enter_fresh_state_if_in_empty_state(
-                    general_properties, reproduction_properties, simulation_day
+            if 1 <= reproduction_outputs.days_in_milking < AnimalConfig.ovsynch_program_start_day:
+                reproduction_outputs = self._enter_fresh_state_if_in_empty_state(
+                    reproduction_outputs,
+                    simulation_day
                 )
-            elif general_properties.days_in_milk >= AnimalConfig.ovsynch_program_start_day:
-                general_properties, reproduction_properties = self._setup_ovsynch_on_ovsynch_start_day_if_valid(
-                    general_properties, reproduction_properties, simulation_day)
+            elif reproduction_outputs.days_in_milking >= AnimalConfig.ovsynch_program_start_day:
+                reproduction_outputs = self._setup_ovsynch_on_ovsynch_start_day_if_valid(
+                    reproduction_outputs,
+                    simulation_day
+                )
             if self.hormone_schedule:
-                (
-                    general_properties,
-                    reproduction_properties,
-                    animal_statistics
-                ) = self._execute_cow_hormone_delivery_schedule(
-                    general_properties, reproduction_properties, animal_statistics, simulation_day,
-                    self.hormone_schedule)
-            return general_properties, reproduction_properties, animal_statistics
+                reproduction_outputs = self._execute_cow_hormone_delivery_schedule(
+                    reproduction_outputs,
+                    simulation_day,
+                    self.hormone_schedule
+                )
+            return reproduction_outputs
 
-        if 1 <= general_properties.days_in_milk < AnimalConfig.presynch_program_start_day:
-            general_properties, reproduction_properties = self._enter_fresh_state_if_in_empty_state(
-                general_properties, reproduction_properties, simulation_day
-            )
-        elif general_properties.days_in_milk >= AnimalConfig.presynch_program_start_day:
-            general_properties, reproduction_properties = self._setup_presynch_on_presynch_start_day_if_valid(
-                general_properties, reproduction_properties, simulation_day
+        if 1 <= reproduction_outputs.days_in_milking < AnimalConfig.presynch_program_start_day:
+            reproduction_outputs = self._enter_fresh_state_if_in_empty_state(reproduction_outputs, simulation_day)
+        elif reproduction_outputs.days_in_milking >= AnimalConfig.presynch_program_start_day:
+            reproduction_outputs = self._setup_presynch_on_presynch_start_day_if_valid(
+                reproduction_outputs,
+                simulation_day
             )
             if self.hormone_schedule:
-                (
-                    general_properties,
-                    reproduction_properties,
-                    animal_statistics
-                ) = self._execute_cow_hormone_delivery_schedule(
-                    general_properties, reproduction_properties, animal_statistics, simulation_day,
-                    self.hormone_schedule)
-            general_properties, reproduction_properties = self._setup_ovsynch_on_ovsynch_start_day_if_valid(
-                general_properties, reproduction_properties, simulation_day)
+                reproduction_outputs = self._execute_cow_hormone_delivery_schedule(
+                    reproduction_outputs,
+                    simulation_day,
+                    self.hormone_schedule
+                )
+            reproduction_outputs = self._setup_ovsynch_on_ovsynch_start_day_if_valid(
+                reproduction_outputs,
+                simulation_day
+            )
         if self.hormone_schedule:
-            (
-                general_properties,
-                reproduction_properties,
-                animal_statistics
-            ) = self._execute_cow_hormone_delivery_schedule(
-                general_properties, reproduction_properties, animal_statistics, simulation_day,
-                self.hormone_schedule)
+            reproduction_outputs = self._execute_cow_hormone_delivery_schedule(
+                reproduction_outputs,
+                simulation_day,
+                self.hormone_schedule
+            )
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _setup_presynch_on_presynch_start_day_if_valid(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Set up a presynch program on the presynch start day if it does not exist.
 
@@ -2076,25 +1920,23 @@ class Reproduction:
         """
         (
             should_set_up_hormone_delivery_for_presynch,
-            general_properties
-        ) = self._should_set_up_hormone_delivery_for_presynch(
-            general_properties, reproduction_properties, simulation_day)
+            reproduction_outputs
+        ) = self._should_set_up_hormone_delivery_for_presynch(reproduction_outputs, simulation_day)
 
         if should_set_up_hormone_delivery_for_presynch:
-            self._set_up_hormone_schedule(general_properties, reproduction_properties,
-                                          general_properties.days_born)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            self._set_up_hormone_schedule(reproduction_outputs, reproduction_outputs.days_born)
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"{animal_constants.PRESYNCH_PERIOD_START}: {AnimalConfig.cow_presynch_method}",
             )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _enter_fresh_state_if_in_empty_state(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Enter the fresh state if the cow is in no repro state initially.
 
@@ -2109,18 +1951,18 @@ class Reproduction:
                     ReproStateEnum.ENTER_HERD_FROM_INIT
                 ):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _setup_ovsynch_on_ovsynch_start_day_if_valid(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Set up an OvSynch program on the OvSynch start day if it does not exist.
 
@@ -2131,26 +1973,22 @@ class Reproduction:
         """
         (
             should_set_up_hormone_delivery_for_ovsynch,
-            general_properties
-        ) = self._should_set_up_hormone_delivery_for_ovsynch(
-            general_properties, reproduction_properties, simulation_day
-        )
+            reproduction_outputs
+        ) = self._should_set_up_hormone_delivery_for_ovsynch(reproduction_outputs, simulation_day)
 
         if should_set_up_hormone_delivery_for_ovsynch:
-            reproduction_properties = self._set_up_hormone_schedule(
-                general_properties, reproduction_properties, general_properties.days_born)
-            self.cow_TAI_conception_rate = AnimalConfig.ovsynch_program_conception_rate
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs = self._set_up_hormone_schedule(reproduction_outputs, reproduction_outputs.days_born)
+            self.TAI_conception_rate = AnimalConfig.ovsynch_program_conception_rate
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"{animal_constants.OVSYNCH_PERIOD_START_NOTE}: {AnimalConfig.cow_ovsynch_method}",
             )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _should_set_up_hormone_delivery_for_presynch(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[bool, GeneralProperties]:
+            self, reproduction_outputs: ReproductionOutputs,
+            simulation_day: int) -> tuple[bool, ReproductionOutputs]:
         """
         Check if the cow should set up hormone delivery for a presynch program.
 
@@ -2161,49 +1999,49 @@ class Reproduction:
         """
 
         if self.cow_reproduction_program != CowReproductionProtocol.TAI.value:
-            return False, general_properties
+            return False, reproduction_outputs
 
         if AnimalConfig.cow_presynch_method not in [
             CowPreSynchSubProtocol.Presynch_PreSynch.value,
             CowPreSynchSubProtocol.Presynch_DoubleOvSynch.value,
             CowPreSynchSubProtocol.Presynch_G6G.value,
         ]:
-            return False, general_properties
+            return False, reproduction_outputs
 
         if self.hormone_schedule:
-            return False, general_properties
+            return False, reproduction_outputs
 
-        if general_properties.days_in_milk == AnimalConfig.presynch_program_start_day and \
+        if reproduction_outputs.days_in_milking == AnimalConfig.presynch_program_start_day and \
                 self.repro_state_manager.is_in_any(
                     {ReproStateEnum.FRESH, ReproStateEnum.ENTER_HERD_FROM_INIT}
                 ):
             self.repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
-            return True, general_properties
+            return True, reproduction_outputs
 
-        if general_properties.days_in_milk > AnimalConfig.presynch_program_start_day and \
+        if reproduction_outputs.days_in_milking > AnimalConfig.presynch_program_start_day and \
                 self.repro_state_manager.is_in(
                     ReproStateEnum.ENTER_HERD_FROM_INIT
                 ):
             self.repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
-            return True, general_properties
+            return True, reproduction_outputs
 
-        return self.repro_state_manager.is_in(ReproStateEnum.IN_PRESYNCH), general_properties
+        return self.repro_state_manager.is_in(ReproStateEnum.IN_PRESYNCH), reproduction_outputs
 
     def _should_set_up_hormone_delivery_for_ovsynch(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[bool, GeneralProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> tuple[bool, ReproductionOutputs]:
         """
         Check if the cow should set up hormone delivery for timed artificial insemination.
 
@@ -2225,7 +2063,7 @@ class Reproduction:
         """
 
         if self.hormone_schedule:
-            return False, general_properties
+            return False, reproduction_outputs
 
         if AnimalConfig.cow_ovsynch_method not in [
             CowTAISubProtocol.TAI_OvSynch_48.value,
@@ -2233,12 +2071,12 @@ class Reproduction:
             CowTAISubProtocol.TAI_CoSynch_72.value,
             CowTAISubProtocol.TAI_5d_CoSynch.value,
         ]:
-            return False, general_properties
+            return False, reproduction_outputs
 
         if self.repro_state_manager.is_in(ReproStateEnum.IN_PRESYNCH):
-            return False, general_properties
+            return False, reproduction_outputs
 
-        if general_properties.days_in_milk == AnimalConfig.ovsynch_program_start_day:
+        if reproduction_outputs.days_in_milking == AnimalConfig.ovsynch_program_start_day:
             if self.repro_state_manager.is_in_empty_state() or \
                     self.repro_state_manager.is_in_any(
                         {
@@ -2248,49 +2086,48 @@ class Reproduction:
                         }
                     ):
                 self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
-                return True, general_properties
+                return True, reproduction_outputs
 
-        if general_properties.days_in_milk > AnimalConfig.ovsynch_program_start_day:
+        if reproduction_outputs.days_in_milking > AnimalConfig.ovsynch_program_start_day:
             if self.repro_state_manager.is_in_any(
                     {ReproStateEnum.HAS_DONE_PRESYNCH, ReproStateEnum.ENTER_HERD_FROM_INIT}
             ):
                 self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
-                return True, general_properties
+                return True, reproduction_outputs
 
-        return self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH), general_properties
+        return self.repro_state_manager.is_in(ReproStateEnum.IN_OVSYNCH), reproduction_outputs
 
-    def _increment_cow_ai_counts(
-            self, animal_statistics: AnimalStatistics) -> AnimalStatistics:
+    def _increment_cow_ai_counts(self, reproduction_outputs: ReproductionOutputs) -> ReproductionOutputs:
         """
         Increment the performed AI counts across all cows.
         """
 
-        animal_statistics.num_ai_performed += 1
-        return animal_statistics
+        reproduction_outputs.herd_level_statistics.num_ai_performed += 1
+        return reproduction_outputs
 
-    def _increment_successful_cow_conceptions(
-            self, animal_statistics: AnimalStatistics) -> AnimalStatistics:
+    def _increment_successful_cow_conceptions(self, reproduction_outputs: ReproductionOutputs) -> ReproductionOutputs:
         """
         Increment the successful conception counts across all heifers.
         """
 
-        animal_statistics.num_successful_conceptions += 1
-        return animal_statistics
+        reproduction_outputs.herd_level_statistics.num_successful_conceptions += 1
+        return reproduction_outputs
 
     def execute_cow_ed_tai_protocol(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Execute the ED-TAI protocol by checking the days in milk and taking the appropriate actions.
 
@@ -2311,21 +2148,18 @@ class Reproduction:
             The current simulation day.
         """
 
-        if 1 <= general_properties.days_in_milk <= AnimalConfig.voluntary_waiting_period:
-            general_properties, reproduction_properties = self._repeat_estrus_simulation_before_vwp(
-                general_properties, reproduction_properties, simulation_day
-            )
+        if 1 <= reproduction_outputs.days_in_milking <= AnimalConfig.voluntary_waiting_period:
+            reproduction_outputs = self._repeat_estrus_simulation_before_vwp(reproduction_outputs, simulation_day)
 
-        elif AnimalConfig.voluntary_waiting_period < general_properties.days_in_milk < \
+        elif AnimalConfig.voluntary_waiting_period < reproduction_outputs.days_in_milking < \
                 AnimalConfig.ovsynch_program_start_day:
             if (
                     self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT)
-                    and general_properties.days_born > self.estrus_day
+                    and reproduction_outputs.days_born > self.estrus_day
             ):
-                general_properties, reproduction_properties = self._simulate_estrus(
-                    general_properties,
-                    reproduction_properties,
-                    general_properties.days_born,
+                reproduction_outputs = self._simulate_estrus(
+                    reproduction_outputs,
+                    reproduction_outputs.days_born,
                     simulation_day,
                     animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                     AnimalConfig.average_estrus_cycle_cow,
@@ -2335,27 +2169,25 @@ class Reproduction:
             if self.repro_state_manager.is_in_any({ReproStateEnum.FRESH,
                                                    ReproStateEnum.ENTER_HERD_FROM_INIT}):
                 self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH)
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
 
-        elif general_properties.days_in_milk >= AnimalConfig.ovsynch_program_start_day:
-            (
-                general_properties,
-                reproduction_properties
-            ) = self._handle_estrus_not_detected_before_ovsynch_start_day(
-                general_properties, reproduction_properties, simulation_day)
+        elif reproduction_outputs.days_in_milking >= AnimalConfig.ovsynch_program_start_day:
+            reproduction_outputs = self._handle_estrus_not_detected_before_ovsynch_start_day(
+                reproduction_outputs,
+                simulation_day
+            )
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _handle_estrus_not_detected_before_ovsynch_start_day(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[
-        GeneralProperties, ReproductionProperties
-    ]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Redirect the cow to enter an OvSynch program when estrus has not been detected between the
         voluntary waiting period and the OvSynch program start day.
@@ -2368,43 +2200,43 @@ class Reproduction:
 
         if self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
             self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
 
         elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE_BEFORE_OVSYNCH):
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.ESTRUS_NOT_DETECTED_BETWEEN_VWP_AND_OVSYNCH_START_DAY_NOTE,
             )
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.CANCEL_ESTRUS_DETECTION_NOTE
             )
             self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
 
         elif self.repro_state_manager.is_in(ReproStateEnum.FRESH):  # When no ED is instituted
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.NO_ED_INSTITUTED_BEFORE_OVSYNCH_IN_ED_TAI_NOTE,
             )
             self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _decrease_conception_rate_by_parity(
             self, calves: int, conception_rate: float) -> float:
@@ -2432,11 +2264,9 @@ class Reproduction:
             return conception_rate - 0.1
 
     def _handle_successful_cow_conception(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[
-        GeneralProperties, ReproductionProperties
-    ]:
+            self, reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Set the gestation length, calf birth weight, and calving to pregnancy time and
         schedule a TAI program in advance if the resynch protocol is TAIbeforePD.
@@ -2456,54 +2286,57 @@ class Reproduction:
         sim_day : int
             The current simulation day.
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.SUCCESSFUL_CONCEPTION}, "
             f"with conception rate at {self.conception_rate}",
         )
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.COW_PREG,
         )
 
-        general_properties.days_in_preg = 1
+        reproduction_outputs.days_in_preg = 1
         self.repro_state_manager.enter(ReproStateEnum.PREGNANT)
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"Current repro state(s): {self.repro_state_manager}",
         )
 
         self.gestation_length = self._calculate_gestation_length()
         self.calf_birth_weight = self._calculate_calf_birth_weight(
-            general_properties.breed.value)
+            reproduction_outputs.breed.value)
 
         if self.calves > 0:
-            last_time_given_birth = general_properties.events.get_most_recent_date(animal_constants.NEW_BIRTH)
-            self.calving_to_preg_time = general_properties.days_born - last_time_given_birth
+            last_time_given_birth = reproduction_outputs.events.get_most_recent_date(animal_constants.NEW_BIRTH)
+            reproduction_outputs.animal_level_statistics.calving_to_pregnancy_time = reproduction_outputs.days_born - \
+                                                                                     last_time_given_birth
 
         if self.cow_reproduction_program in [
             CowReproductionProtocol.TAI.value,
             CowReproductionProtocol.ED_TAI.value,
         ]:
             if AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIbeforePD.value:
-                general_properties, reproduction_properties = self._schedule_ovsynch_program_in_advance(
-                    general_properties, reproduction_properties, simulation_day
+                reproduction_outputs = self._schedule_ovsynch_program_in_advance(
+                    reproduction_outputs,
+                    simulation_day
                 )
                 self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH, keep_existing=True)
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _handle_failed_cow_conception(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Manage different scenarios that the cow's repro states can be in when a failed conception occurs.
 
@@ -2521,14 +2354,14 @@ class Reproduction:
         simulation_day : int
             The current simulation day.
         """
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.FAILED_CONCEPTION}, " f"with conception rate at "
             f"{self.conception_rate}",
         )
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.COW_NOT_PREG,
         )
@@ -2538,15 +2371,14 @@ class Reproduction:
             CowReproductionProtocol.ED_TAI.value,
         ]:
             self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
-            general_properties, reproduction_properties = self._simulate_estrus(
-                general_properties,
-                reproduction_properties,
-                general_properties.days_born,
+            reproduction_outputs = self._simulate_estrus(
+                reproduction_outputs,
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                 AnimalConfig.average_estrus_cycle_cow,
@@ -2558,36 +2390,33 @@ class Reproduction:
             CowReproductionProtocol.ED_TAI.value,
         ]:
             if AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIbeforePD.value:
-                general_properties, reproduction_properties = self._schedule_ovsynch_program_in_advance(
-                    general_properties,
-                    reproduction_properties,
-                    simulation_day,
+                reproduction_outputs = self._schedule_ovsynch_program_in_advance(
+                    reproduction_outputs,
+                    simulation_day
                 )
 
                 if self.cow_reproduction_program == CowReproductionProtocol.ED_TAI:
                     # We want to keep the ED protocol running at the same time as the OvSynch program.
                     self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH, keep_existing=True)
-                    general_properties.events.add_event(
-                        general_properties.days_born,
+                    reproduction_outputs.events.add_event(
+                        reproduction_outputs.days_born,
                         simulation_day,
                         f"Current repro state(s): {self.repro_state_manager}",
                     )
                 elif self.cow_reproduction_program == CowReproductionProtocol.TAI:
                     self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-                    general_properties.events.add_event(
-                        general_properties.days_born,
+                    reproduction_outputs.events.add_event(
+                        reproduction_outputs.days_born,
                         simulation_day,
                         f"Current repro state(s): {self.repro_state_manager}",
                     )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def cow_pregnancy_update(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[
-        GeneralProperties, ReproductionProperties, AnimalStatistics
-    ]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Perform a pregnancy check if the current day is a designated pregnancy check day.
 
@@ -2604,10 +2433,10 @@ class Reproduction:
             The current day of the simulation.
         """
 
-        if general_properties.is_pregnant:
-            general_properties.days_in_preg += 1
+        if reproduction_outputs.is_pregnant:
+            reproduction_outputs.days_in_pregnancy += 1
 
-        preg_check_configs: list[PregCheckConfig] = [
+        pregnancy_check_configs: list[PregnancyCheckConfig] = [
             {
                 "day": AnimalConfig.first_pregnancy_check_day,
                 "loss_rate": AnimalConfig.first_pregnancy_check_loss_rate,
@@ -2629,21 +2458,17 @@ class Reproduction:
             },
         ]
 
-        for preg_check_config in preg_check_configs:
-            if general_properties.days_born == self.ai_day + preg_check_config["day"]:
-                (general_properties,
-                 reproduction_properties,
-                 animal_statistics
-                 ) = self._handle_cow_pregnancy_check(
-                    general_properties,
-                    reproduction_properties,
-                    animal_statistics,
-                    preg_check_config,
-                    simulation_day)
+        for pregnancy_check_config in pregnancy_check_configs:
+            if reproduction_outputs.days_born == self.ai_day + pregnancy_check_config["day"]:
+                reproduction_outputs = self._handle_cow_pregnancy_check(
+                    reproduction_outputs,
+                    pregnancy_check_config,
+                    simulation_day
+                )
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
-    def _check_do_not_breed_flag(self, sim_day: int) -> None:
+    def _check_do_not_breed_flag(self, simulation_day: int, reproduction_outputs: ReproductionOutputs) -> None:
         """
         Check if the cow should still be in the breeding stage and mark her as do-not-breed if necessary.
 
@@ -2661,20 +2486,22 @@ class Reproduction:
             The current day of the simulation.
         """
 
-        if not self.is_pregnant and self.days_in_milk > AnimalConfig.do_not_breed_time:
+        if not reproduction_outputs.is_pregnant and \
+                reproduction_outputs.days_in_milking > AnimalConfig.do_not_breed_time:
             if not self.do_not_breed:
-                self.log_event(
-                    self.days_born,
-                    sim_day,
-                    f"{animal_constants.DO_NOT_BREED}, days in milk: {self.days_in_milk}, not pregnant",
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
+                    simulation_day,
+                    f"{animal_constants.DO_NOT_BREED}, days in milk: {reproduction_outputs.days_in_milking}, "
+                    f"not pregnant",
                 )
                 self.do_not_breed = True
 
     def open_cow(
-            self, general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            self,
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Manage and set up the different states an open cow can be in during rebreeding depending on
         the current repro protocol and the resynch program.
@@ -2698,60 +2525,50 @@ class Reproduction:
         self.num_conception_rate_decreases += 1
 
         if self.cow_reproduction_program == CowReproductionProtocol.ED:
-            if general_properties.days_born > self.estrus_day:  # No estrus day scheduled yet
+            if reproduction_outputs.days_born > self.estrus_day:  # No estrus day scheduled yet
                 self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
                     f"Current repro state(s): {self.repro_state_manager}",
                 )
-                general_properties.events.add_event(
-                    general_properties.days_born,
+                reproduction_outputs.events.add_event(
+                    reproduction_outputs.days_born,
                     simulation_day,
-                    f"days in milk: {general_properties.days_in_milk}",
+                    f"days in milk: {reproduction_outputs.days_in_milking}",
                 )
-                general_properties, reproduction_properties = self._simulate_estrus(
-                    general_properties,
-                    reproduction_properties,
-                    general_properties.days_born,
+                reproduction_outputs = self._simulate_estrus(
+                    reproduction_outputs,
+                    reproduction_outputs.days_born,
                     simulation_day,
                     animal_constants.ESTRUS_DAY_SCHEDULED_NOTE,
                     AnimalConfig.average_estrus_cycle_cow,
                     AnimalConfig.std_estrus_cycle_cow,
                 )
-            return general_properties, reproduction_properties, animal_statistics
+            return reproduction_outputs
 
         # For both TAI and ED-TAI protocols
         if AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIafterPD:
             self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
 
         elif AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIbeforePD:
-            general_properties, reproduction_properties = self._handle_open_cow_in_tai_before_pd_resynch(
-                general_properties, reproduction_properties, simulation_day
-            )
+            reproduction_outputs = self._handle_open_cow_in_tai_before_pd_resynch(reproduction_outputs,simulation_day)
 
         elif AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_PGFatPD:
-            (
-                general_properties,
-                reproduction_properties,
-                animal_statistics
-            ) = self._handle_open_cow_in_pgf_at_pd_resynch(
-                general_properties, reproduction_properties, animal_statistics, simulation_day
-            )
+            reproduction_outputs = self._handle_open_cow_in_pgf_at_pd_resynch(reproduction_outputs, simulation_day)
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _handle_open_cow_in_pgf_at_pd_resynch(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            animal_statistics: AnimalStatistics,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties, AnimalStatistics]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Perform a PGF injection for an open cow in the PGFatPD resynch protocol and simulate a short estrus cycle.
 
@@ -2769,28 +2586,21 @@ class Reproduction:
             The current day of the simulation.
         """
 
-        single_pgf_injection_schedule = {general_properties.days_born: {"deliver_hormones": ["PGF"]}}
-        (
-            general_properties,
-            reproduction_properties,
-            animal_statistics
-        ) = self._execute_cow_hormone_delivery_schedule(
-            general_properties,
-            reproduction_properties,
-            animal_statistics,
+        single_pgf_injection_schedule = {reproduction_outputs.days_born: {"deliver_hormones": ["PGF"]}}
+        reproduction_outputs = self._execute_cow_hormone_delivery_schedule(
+            reproduction_outputs,
             simulation_day,
             single_pgf_injection_schedule
         )
         self.repro_state_manager.enter(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"Current repro state(s): {self.repro_state_manager}",
         )
-        general_properties, reproduction_properties = self._simulate_estrus(
-            general_properties,
-            reproduction_properties,
-            general_properties.days_born,
+        reproduction_outputs = self._simulate_estrus(
+            reproduction_outputs,
+            reproduction_outputs.days_born,
             simulation_day,
             animal_constants.SIMULATE_ESTRUS_AFTER_PGF_NOTE,
             AnimalConfig.average_estrus_cycle_after_pgf,
@@ -2798,13 +2608,13 @@ class Reproduction:
             max_cycle_length=animal_constants.MAX_ESTRUS_CYCLE_LENGTH_PGF_AT_PREG_CHECK,
         )
 
-        return general_properties, reproduction_properties, animal_statistics
+        return reproduction_outputs
 
     def _handle_open_cow_in_tai_before_pd_resynch(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Redirect an open cow in the TAIbeforePD resynch protocol to an OvSynch program after the second or third
         pregnancy check failed and stop any pre-existing estrus detection.
@@ -2829,29 +2639,28 @@ class Reproduction:
 
         if self.repro_state_manager.is_in_empty_state():
             self.repro_state_manager.enter(ReproStateEnum.IN_OVSYNCH)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 f"Current repro state(s): {self.repro_state_manager}",
             )
 
         if self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
             self.repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
-            general_properties.events.add_event(
-                general_properties.days_born,
+            reproduction_outputs.events.add_event(
+                reproduction_outputs.days_born,
                 simulation_day,
                 animal_constants.CANCEL_ESTRUS_DETECTION_NOTE,
             )
 
-        return general_properties, reproduction_properties
+        return reproduction_outputs
 
     def _schedule_ovsynch_program_in_advance(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
+            reproduction_outputs: ReproductionOutputs,
             simulation_day: int,
             days_before_first_preg_check: int = animal_constants.DAYS_BEFORE_FIRST_PREG_CHECK_TO_START_TAI,
-    ) -> tuple[GeneralProperties, ReproductionProperties]:
+    ) -> ReproductionOutputs:
         """
         Schedule an OvSynch program in advance for the TAIbeforePD resynch protocol after performing an AI.
 
@@ -2863,24 +2672,22 @@ class Reproduction:
             The number of days before the first pregnancy check to schedule the OvSynch program.
         """
 
-        hormone_schedule_start_day = general_properties.days_born + AnimalConfig.first_pregnancy_check_day - \
+        hormone_schedule_start_day = reproduction_outputs.days_born + AnimalConfig.first_pregnancy_check_day - \
                                      days_before_first_preg_check
-        reproduction_properties = self._set_up_hormone_schedule(
-            general_properties, reproduction_properties, hormone_schedule_start_day)
+        reproduction_outputs = self._set_up_hormone_schedule(reproduction_outputs, hormone_schedule_start_day)
         self.TAI_conception_rate = AnimalConfig.ovsynch_program_conception_rate
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.SETTING_UP_OVSYNCH_PROGRAM_IN_ADVANCE_NOTE}: {AnimalConfig.cow_ovsynch_method}",
         )
 
-        return general_properties, reproduction_properties
-
+        return reproduction_outputs
     def _exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
             self,
-            general_properties: GeneralProperties,
-            reproduction_properties: ReproductionProperties,
-            simulation_day: int) -> tuple[GeneralProperties, ReproductionProperties]:
+            reproduction_outputs: ReproductionOutputs,
+            simulation_day: int
+    ) -> ReproductionOutputs:
         """
         Exit the scheduled OvSynch program early in TAIbeforePD resynch protocol when
         the first pregnancy check is successful or estrus has been detected.
@@ -2900,10 +2707,10 @@ class Reproduction:
 
         self.repro_state_manager.exit(ReproStateEnum.IN_OVSYNCH)
         self.hormone_schedule = {}
-        general_properties.events.add_event(
-            general_properties.days_born,
+        reproduction_outputs.events.add_event(
+            reproduction_outputs.days_born,
             simulation_day,
             f"{animal_constants.DISCONTINUE_OVSYNCH_PROGRAM_IN_TAI_BEFORE_PD_NOTE}:"
             f" {AnimalConfig.cow_ovsynch_method}",
         )
-        return general_properties, reproduction_properties
+        return reproduction_outputs
