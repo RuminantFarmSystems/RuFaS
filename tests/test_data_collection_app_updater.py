@@ -55,18 +55,14 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
         mocker.call("animal_properties", "dummy_animal_props"), mocker.call("config_properties", "dummy_config_props")
     ]
     mock_open = mocker.patch("RUFAS.data_collection_app_updater.open")
-    expected_schemas = [
-        mocker.call("""animal_schema = {\n    "test?": "test!"\n}"""),
-        mocker.call("""config_schema = {\n    "test?": "test!"\n}""")
-    ]
 
     actual_schemas = dca_updater._rewrite_schemas()
 
     assert add_log.call_count == 3
     empty_dir.assert_called_once()
     create_object_schema.assert_has_calls(expected_create_calls)
-    # mock_open.assert_has_calls(expected_schemas)
     assert actual_schemas == expected_schema_paths
+    assert mock_open.call_count == 2
 
 
 @pytest.mark.parametrize(
