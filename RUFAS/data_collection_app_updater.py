@@ -166,7 +166,7 @@ class DataCollectionAppUpdater:
 
         """
         title = self._parse_variable_name_into_title(var_name)
-        schema = {
+        schema: dict[str, Any] = {
             "title": title,
             "type": "number",
             "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
@@ -182,7 +182,7 @@ class DataCollectionAppUpdater:
             schema["maximum"] = maximum
         if default is not None:
             schema["default"] = default
-        if description:
+        if description is not None:
             schema["options"]["infoText"] = description
 
         return schema
@@ -205,7 +205,7 @@ class DataCollectionAppUpdater:
 
         """
         title = self._parse_variable_name_into_title(var_name)
-        schema = {
+        schema: dict[str, Any] = {
             "title": title,
             "type": "boolean",
             "format": "checkbox",
@@ -239,7 +239,7 @@ class DataCollectionAppUpdater:
 
         """
         title = self._parse_variable_name_into_title(var_name)
-        schema = {
+        schema: dict[str, Any] = {
             "title": title,
             "type": "string",
             "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
@@ -321,7 +321,7 @@ class DataCollectionAppUpdater:
 
         """
         title = self._parse_variable_name_into_title(var_name)
-        schema = {
+        schema: dict[str, Any] = {
             "title": title,
             "type": "array",
             "format": "grid",
@@ -361,7 +361,7 @@ class DataCollectionAppUpdater:
 
         """
         title = self._parse_variable_name_into_title(var_name)
-        schema = {"title": title, "type": "object", "format": "grid", "properties": {}}
+        schema: dict[str, Any] = {"title": title, "type": "object", "format": "grid", "properties": {}}
         default = input_properties.get("default")
         description = input_properties.get("description")
 
