@@ -190,7 +190,7 @@ class Field:
         # --- Soil Management---
         self._check_fertilizer_application_schedule(time)
 
-        self._check_manure_application_schedule(time)
+        # self._check_manure_application_schedule(time)
 
         self._check_tillage_schedule(time)
 
@@ -561,18 +561,18 @@ class Field:
             "suffix": f"field='{self.field_data.name}'",
             "date": {"year": year, "day": day},
         }
-        if requested_nitrogen == requested_phosphorus == 0.0:
-            log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
-            self.om.add_log("manure_application_log", log_message, info_map)
-            return
+        # if requested_nitrogen == requested_phosphorus == 0.0:
+        #     log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
+        #     self.om.add_log("manure_application_log", log_message, info_map)
+        #     return
 
-        nutrient_request = NutrientRequest(
-            nitrogen=requested_nitrogen,
-            phosphorus=requested_phosphorus,
-            manure_type=requested_manure_type,
-        )
+        # nutrient_request = NutrientRequest(
+        #     nitrogen=requested_nitrogen,
+        #     phosphorus=requested_phosphorus,
+        #     manure_type=requested_manure_type,
+        # )
 
-        manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
+        # manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
             self._add_manure_water(manure_supplied, requested_manure_type)
@@ -900,7 +900,7 @@ class Field:
                 time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time: Time) -> None:
+    def _check_manure_application_schedule(self, time: Time) -> dict[str, list[NutrientRequest | None]]:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -911,17 +911,54 @@ class Field:
 
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
+        manure_requests: dict[str, list[NutrientRequest | None]] = {}
+        manure_requests[self.field_data.name] = []
         for event in todays_manure_events:
-            self._execute_manure_application(
-                event.nitrogen_mass,
-                event.phosphorus_mass,
-                event.manure_type,
-                event.field_coverage,
-                event.application_depth,
-                event.surface_remainder_fraction,
-                event.year,
-                event.day,
-            )
+            manure_request = self._create_manure_request(event)
+            manure_requests[self.field_data.name].append(manure_request)
+            # self._execute_manure_application(
+            #     event.nitrogen_mass,
+            #     event.phosphorus_mass,
+            #     event.manure_type,
+            #     event.field_coverage,
+            #     event.application_depth,
+            #     event.surface_remainder_fraction,
+            #     event.year,
+            #     event.day,
+            # )
+        return manure_requests
+
+    def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
+        """
+        Creates a NutrientRequest object from the attributes of a ManureEvent.
+
+        Parameters
+        ----------
+        event : ManureEvent
+            ManureEvent object containing the attributes needed to create a NutrientRequest.
+
+        Returns
+        -------
+        NutrientRequest
+            Object containing the nutrient requests of the manure event.
+
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._create_manure_application.__name__,
+            "suffix": f"field='{self.field_data.name}'",
+            "date": {"year": event.year, "day": event.day},
+        }
+        if event.requested_nitrogen == event.requested_phosphorus == 0.0:
+            log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
+            self.om.add_log("manure_application_log", log_message, info_map)
+            return self.field_data.name, None
+
+        return self.field_data.name, NutrientRequest(
+            nitrogen=event.requested_nitrogen,
+            phosphorus=event.requested_phosphorus,
+            manure_type=event.requested_manure_type,
+        )
 
     def _check_crop_harvest_schedule(
         self, time: Time, current_conditions: CurrentDayConditions

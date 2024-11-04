@@ -463,3 +463,17 @@ class FieldManager:
 
         layer = LayerData(**config_dictionary)
         return layer
+
+    def check_manure_schedules(self) -> list[NutrientRequest]:
+        """
+        Checks list of ManureEvents, sends all that occur today to another method to be executed.
+
+        Parameters
+        ----------
+        time : Time
+            Object containing the current year and day of the simulation.
+
+        """
+        for field in self.fields:
+            manure_requests = field._check_manure_application_schedule()
+            
