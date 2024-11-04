@@ -177,7 +177,7 @@ class Field:
         Returns
         -------
         list[HarvestedCropStorageType]
-            List of crops that have been harvested from the field and storage types they will go into.    
+            List of crops that have been harvested from the field and storage types they will go into.
 
         Notes
         -----
