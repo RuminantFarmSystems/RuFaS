@@ -3,6 +3,7 @@ from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_structures.crop_soil_feed_storage_connection import StorageType
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.EEE.EEE_manager import EEEManager
@@ -112,7 +113,12 @@ def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -
     simulation_engine.animal_manager.all_pens = mocker.MagicMock()
     mock_pen_manure_data = [mocker.MagicMock(autospec=PenManureData)]
     mocker.patch.object(simulation_engine.animal_manager, "collect_pen_manure_data", return_value=mock_pen_manure_data)
-
+    mock_harvested_crops = [
+        (crop_1 := mocker.MagicMock(), StorageType.BAG),
+        (crop_2 := mocker.MagicMock(), StorageType.BALEAGE),
+    ]
+    mocker.patch.object(simulation_engine.field_manager, "daily_update_routine", return_value=mock_harvested_crops)
+    patch_receive_crop = mocker.patch.object(simulation_engine.feed_manager, "receive_crop")
     patch_for_daily_feed_routine = mocker.patch("RUFAS.simulation_engine.routines.daily_feed_routine")
     patch_for_advance_time = mocker.patch.object(simulation_engine, "_advance_time")
 
@@ -136,6 +142,9 @@ def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -
     )
     simulation_engine.field_manager.daily_update_routine.assert_called_once_with(
         simulation_engine.weather, simulation_engine.time
+    )
+    patch_receive_crop.assert_has_calls(
+        [mocker.call(crop_1, StorageType.BAG), mocker.call(crop_2, StorageType.BALEAGE)]
     )
     patch_for_daily_feed_routine.assert_called_once_with(
         simulation_engine.feed,
@@ -207,7 +216,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_manure_manager.assert_called_once_with(
         mock_pen_manure_data, mock_weather, mock_time, {"manure_management_scenarios": {}}, True
     )
-    patch_for_field_manager.assert_called_once_with(manure_manager=mock_manure_manager, feed_manager=mock_feed_manager)
+    patch_for_field_manager.assert_called_once_with(manure_manager=mock_manure_manager)
     patch_for_feed_manager.assert_called_once()
     mock_feed_manager.setup_stored_feeds.assert_not_called()
 
