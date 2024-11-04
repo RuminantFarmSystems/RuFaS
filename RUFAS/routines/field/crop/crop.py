@@ -4,7 +4,7 @@ from copy import copy
 from typing import Any, Optional
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvCropStorageType
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -205,7 +205,7 @@ class Crop:
         field_size: float,
         time: Time,
         soil_data: SoilData,
-    ) -> HarvCropStorageType | None:
+    ) -> HarvestedCropStorageType | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
 
         Parameters
@@ -223,7 +223,7 @@ class Crop:
 
         Returns
         -------
-        HarvCropStorageType | None
+        HarvestedCropStorageType | None
             Harvested Crop and the type of storage it will go in if the crop harvest produced a yield, otherwise None.
 
         """

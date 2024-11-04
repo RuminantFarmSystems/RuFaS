@@ -21,7 +21,7 @@ CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
 
 
 # Maps each storage type to its respective class.
-STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, Storage] = {
+STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
     StorageType.PROTECTED_INDOORS: ProtectedIndoors,
     StorageType.PROTECTED_WRAPPED: ProtectedWrapped,
     StorageType.PROTECTED_TARPED: ProtectedTarped,

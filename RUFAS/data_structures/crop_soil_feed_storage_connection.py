@@ -304,5 +304,9 @@ class HarvestedCrop:
         return heat
 
 
-"""Type alias that is used throughout the Crop module when sending information back to Simulation Engine."""
-HarvCropStorageType = tuple[HarvestedCrop, StorageType]
+"""
+Type alias that is used throughout the Crop module when sending information back to Simulation Engine. The HarvestedCrop
+contains the mass and nutritional information that was harvested, and StorageType indicates how the harvested yield will
+be stored by the Feed Manager.
+"""
+HarvestedCropStorageType = tuple[HarvestedCrop, StorageType]

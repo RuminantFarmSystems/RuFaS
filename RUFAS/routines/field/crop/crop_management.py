@@ -2,7 +2,7 @@ from math import exp
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvCropStorageType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
@@ -46,7 +46,7 @@ class CropManagement:
         field_size: float,
         time: Time,
         soil_data: SoilData,
-    ) -> HarvCropStorageType | None:
+    ) -> HarvestedCropStorageType | None:
         """
         Executes the harvest operation passed on the crop that contains this module.
 
@@ -64,6 +64,12 @@ class CropManagement:
             The object tracking the attributes of the soil profile.
         feed_manager : FeedManager
             Instance of the FeedManager that receives harvested crops.
+
+        Returns
+        -------
+        HarvestedCropStorageType | None
+            The mass and nutrional information associated with the harvest's yield, or None if the harvest produced no
+            yield.
 
         """
         self.determine_harvest_index()
@@ -241,7 +247,7 @@ class CropManagement:
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _get_harvested_crop(self, time: Time, field_size: float) -> HarvCropStorageType:
+    def _get_harvested_crop(self, time: Time, field_size: float) -> HarvestedCropStorageType:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 
