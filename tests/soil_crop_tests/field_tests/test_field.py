@@ -8,7 +8,6 @@ from pytest_mock import MockerFixture
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.EEE.enums import TillageImplement
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -41,11 +40,6 @@ def mock_time() -> Time:
 
 
 @pytest.fixture
-def mock_feed_manager() -> FeedManager:
-    return FeedManager()
-
-
-@pytest.fixture
 def mock_field_data() -> FieldData:
     return FieldData(
         name="test_field_data",
@@ -54,26 +48,20 @@ def mock_field_data() -> FieldData:
 
 
 @pytest.mark.parametrize(
-    "manure_manager,feed_manager,should_fail,error_count",
-    [
-        (MagicMock(ManureManager), MagicMock(FeedManager), False, 0),
-        (None, MagicMock(FeedManager), True, 1),
-        (MagicMock(ManureManager), None, False, 1),
-    ],
+    "manure_manager,should_fail,error_count",
+    [(MagicMock(ManureManager), False, 0), (None, True, 1)],
 )
-def test_init(
-    manure_manager: ManureManager, feed_manager: FeedManager, should_fail: bool, error_count: int, mocker: MockerFixture
-) -> None:
+def test_init(manure_manager: ManureManager, should_fail: bool, error_count: int, mocker: MockerFixture) -> None:
     """Tests that Field initialization fails when passed invalid parameters."""
     add_error = mocker.patch.object(OutputManager, "add_error")
     if should_fail:
         with pytest.raises(ValueError, match="Manure supplier cannot be None."):
-            field = Field(manure_manager=manure_manager, feed_manager=feed_manager)
+            field = Field(manure_manager=manure_manager)
             add_error = mocker.patch.object(field.om, "add_error")
             assert add_error.call_count == error_count
 
     else:
-        Field(manure_manager=manure_manager, feed_manager=feed_manager)
+        Field(manure_manager=manure_manager)
         assert True
 
 
@@ -371,6 +359,7 @@ def test_check_manure_application_schedule(
     ],
 )
 def test_check_crop_harvest_schedule(
+    mocker: MockerFixture,
     year: int,
     day: int,
     all_harvest_events: List[HarvestEvent],
@@ -384,8 +373,12 @@ def test_check_crop_harvest_schedule(
     setattr(mocked_time, "day", day)
     mock_conditions = MagicMock(CurrentDayConditions)
     remaining_harvest_events = [events for events in all_harvest_events if events not in current_harvest_events]
-    field._filter_events = MagicMock(return_value=(remaining_harvest_events, current_harvest_events))
-    field._harvest_crop = MagicMock()
+    filter_events = mocker.patch.object(
+        field, "_filter_events", return_value=(remaining_harvest_events, current_harvest_events)
+    )
+    harvest_crop = mocker.patch.object(
+        field, "_harvest_crop", return_value=[mocker.MagicMock()] * len(current_harvest_events)
+    )
     field._harvest_heat_scheduled_crops = MagicMock()
 
     harvest_crop_calls = []
@@ -395,8 +388,8 @@ def test_check_crop_harvest_schedule(
 
     field._check_crop_harvest_schedule(mocked_time, mock_conditions)
 
-    field._filter_events.assert_called_once_with(all_harvest_events, mocked_time)
-    field._harvest_crop.assert_has_calls(harvest_crop_calls)
+    filter_events.assert_called_once_with(all_harvest_events, mocked_time)
+    harvest_crop.assert_has_calls(harvest_crop_calls)
     field._harvest_heat_scheduled_crops.assert_called_once()
 
 
@@ -411,7 +404,6 @@ def test_check_crop_harvest_schedule(
 )
 def test_harvest_heat_scheduled_crops(
     mock_time: Time,
-    mock_feed_manager: FeedManager,
     mock_field_data: FieldData,
     crop_num: int,
     should_harvest_results: List[bool],
@@ -428,7 +420,6 @@ def test_harvest_heat_scheduled_crops(
 
     field = Field(
         manure_manager=MagicMock(ManureManager),
-        feed_manager=mock_feed_manager,
         field_data=mock_field_data,
     )
     field.crops = crops
@@ -448,7 +439,6 @@ def test_harvest_heat_scheduled_crops(
                 mock_field_data.field_size,
                 mock_time,
                 field.soil.data,
-                mock_feed_manager,
             )
             actual_harvest_count += 1
         else:
@@ -751,7 +741,6 @@ def test_plant_crop_error(
 )
 def test_harvest_crop(
     mock_time: Time,
-    mock_feed_manager: FeedManager,
     mock_field_data: FieldData,
     crop_reference: str,
     harvest_op: HarvestOperation,
@@ -766,7 +755,6 @@ def test_harvest_crop(
     field = Field(
         field_data=mock_field_data,
         manure_manager=MagicMock(ManureManager),
-        feed_manager=mock_feed_manager,
     )
     field.crops = [harvest_crop, other_crop_1, other_crop_2]
     for crop in field.crops:
@@ -791,7 +779,6 @@ def test_harvest_crop(
                 mock_field_data.field_size,
                 mock_time,
                 field.soil.data,
-                mock_feed_manager,
             )
     assert add_residue.call_count == 1
 
@@ -805,7 +792,6 @@ def test_harvest_crop(
 )
 def test_harvest_crop_warnings(
     mock_time: Time,
-    mock_feed_manager: FeedManager,
     mock_field_data: FieldData,
     crops: List[Crop],
     expected_message: str,
@@ -825,7 +811,6 @@ def test_harvest_crop_warnings(
         field = Field(
             manure_manager=MagicMock(ManureManager),
             field_data=mock_field_data,
-            feed_manager=mock_feed_manager,
         )
         field.crops = crops
         mocked_timestamp.return_value = timestamp
@@ -846,7 +831,6 @@ def test_harvest_crop_warnings(
                 mock_field_data.field_size,
                 mock_time,
                 field.soil.data,
-                mock_feed_manager,
             )
         assert add_residue.call_count == len(crops)
         actual = field.om.warnings_pool[f"Field._harvest_crop.harvest_warning.field='{mock_field_data.name}'"]
