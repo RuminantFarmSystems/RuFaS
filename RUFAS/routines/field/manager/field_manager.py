@@ -14,6 +14,7 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -464,7 +465,7 @@ class FieldManager:
         layer = LayerData(**config_dictionary)
         return layer
 
-    def check_manure_schedules(self) -> list[NutrientRequest]:
+    def check_manure_schedules(self, field: Field, time: Time) -> list[NutrientRequest]:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -474,6 +475,5 @@ class FieldManager:
             Object containing the current year and day of the simulation.
 
         """
-        for field in self.fields:
-            manure_requests = field._check_manure_application_schedule()
+        manure_requests = field._check_manure_application_schedule(time)
             
