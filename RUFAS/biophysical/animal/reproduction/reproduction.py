@@ -7,6 +7,7 @@ from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.preg_check_config import PregnancyCheckConfig
@@ -185,7 +186,9 @@ class Reproduction:
         reproduction_outputs = ReproductionOutputs(
             **asdict(reproduction_inputs),
             animal_level_statistics=AnimalReproductionStatistics(),
-            herd_level_statistics=HerdReproductionStatistics()
+            herd_level_statistics=HerdReproductionStatistics(),
+            new_calf_born=False,
+            newborn_calf_config={}
         )
 
         if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
@@ -263,8 +266,22 @@ class Reproduction:
         """
         if reproduction_outputs.is_pregnant and \
                 reproduction_outputs.days_in_pregnancy == self.gestation_length:
-            # how to signal a newborn
             reproduction_outputs = self.cow_give_birth(reproduction_outputs, time)
+
+            reproduction_outputs.new_calf_born = True
+
+            animal_genetics = AnimalGenetics()
+            calf_net_merit = animal_genetics.assign_net_merit_value_to_newborn_calf(
+                time, reproduction_outputs.breed, reproduction_outputs.net_merit
+            )
+            reproduction_outputs.newborn_calf_config = {
+                "breed": reproduction_outputs.breed,
+                "birth_date": time.simulation_day,
+                "days_born": 0,
+                "p_init": reproduction_outputs.phosphorus_for_gestation_required_for_calf,
+                "birth_weight": self.calf_birth_weight,
+                "net_merit": calf_net_merit,
+            }
 
         if not self.do_not_breed:
             if self.cow_reproduction_program not in [
@@ -340,6 +357,8 @@ class Reproduction:
                 reproduction_outputs = self._perform_ai(reproduction_outputs, time.simulation_day)
 
             reproduction_outputs = self.cow_pregnancy_update(reproduction_outputs, time.simulation_day)
+
+        reproduction_outputs = self._check_do_not_breed_flag(time.simulation_day, reproduction_outputs)
 
         return reproduction_outputs
 
@@ -2616,7 +2635,11 @@ class Reproduction:
 
         return reproduction_outputs
 
-    def _check_do_not_breed_flag(self, simulation_day: int, reproduction_outputs: ReproductionOutputs) -> None:
+    def _check_do_not_breed_flag(
+            self,
+            simulation_day: int,
+            reproduction_outputs: ReproductionOutputs
+    ) -> ReproductionOutputs:
         """
         Check if cow should be marked as do-not-breed if not pregnant beyond breeding window.
 
@@ -2640,6 +2663,7 @@ class Reproduction:
                     f"not pregnant",
                 )
                 self.do_not_breed = True
+        return reproduction_outputs
 
     def open_cow(
             self,

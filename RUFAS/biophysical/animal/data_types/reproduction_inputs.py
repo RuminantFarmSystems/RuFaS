@@ -17,6 +17,8 @@ class ReproductionInputs:
     events: AnimalEvents
     future_cull_date: int
     future_death_date: int
+    net_merit: float
+    phosphorus_for_gestation_required_for_calf: float
 
     @property
     def is_pregnant(self) -> bool:

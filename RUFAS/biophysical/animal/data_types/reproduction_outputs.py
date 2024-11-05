@@ -93,9 +93,14 @@ class ReproductionOutputs:
     events: AnimalEvents
     future_cull_date: int
     future_death_date: int
+    net_merit: float
+    phosphorus_for_gestation_required_for_calf: float
 
     animal_level_statistics: AnimalReproductionStatistics
     herd_level_statistics: HerdReproductionStatistics
+
+    newborn_calf_config: dict
+    new_calf_born: bool = False
 
     @property
     def is_pregnant(self) -> bool:
