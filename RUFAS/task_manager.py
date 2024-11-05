@@ -656,10 +656,16 @@ class TaskManager:
         should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to metadata property comparison."""
-        TaskManager.handle_input_data_audit(args=args, input_manager=input_manager, output_manager=output_manager,
-                                            eager_termination=False)
-        TaskManager.handle_post_processing(args=args, input_manager=input_manager, output_manager=output_manager,
-                                           task_id=task_id, should_flush_im_pool=should_flush_im_pool)
+        TaskManager.handle_input_data_audit(
+            args=args, input_manager=input_manager, output_manager=output_manager, eager_termination=False
+        )
+        TaskManager.handle_post_processing(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            should_flush_im_pool=should_flush_im_pool,
+        )
 
     @staticmethod
     def _handle_compare_metadata_properties_tasks(
@@ -687,8 +693,13 @@ class TaskManager:
         """Handler for all methods related to herd initialization."""
         args["init_herd"] = True
         TaskManager.handle_herd_initializaition(args=args, output_manager=output_manager)
-        TaskManager.handle_post_processing(args=args, input_manager=input_manager, output_manager=output_manager,
-                                           task_id=task_id, should_flush_im_pool=should_flush_im_pool)
+        TaskManager.handle_post_processing(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            should_flush_im_pool=should_flush_im_pool,
+        )
 
     @staticmethod
     def _handle_simulation_engine_run_tasks(
@@ -724,6 +735,11 @@ class TaskManager:
         should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to postprocessing."""
-        TaskManager.handle_post_processing(args=args, input_manager=input_manager, output_manager=output_manager,
-                                           task_id=task_id, should_flush_im_pool=should_flush_im_pool,
-                                           produce_graphics=produce_graphics)
+        TaskManager.handle_post_processing(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            should_flush_im_pool=should_flush_im_pool,
+            produce_graphics=produce_graphics,
+        )

@@ -802,8 +802,11 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     )
     mock_handle_herd_initializaition.assert_called_once_with(args=args, output_manager=mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(
-        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id=task_id,
-        should_flush_im_pool=should_flush_im_pool
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        should_flush_im_pool=should_flush_im_pool,
     )
 
 
@@ -877,8 +880,12 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
         args, mock_input_manager, mock_output_manager, task_id, produce_graphics, should_flush_im_pool
     )
     mock_handle_post_processing.assert_called_once_with(
-        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id=task_id,
-        should_flush_im_pool=True, produce_graphics=produce_graphics
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        should_flush_im_pool=True,
+        produce_graphics=produce_graphics,
     )
 
 
@@ -1591,12 +1598,21 @@ def test_input_data_audit_tasks(mocker: MockerFixture) -> None:
     should_flush_im_pool = True
 
     TaskManager._handle_input_data_audit_tasks(
-        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id=task_id,
-        produce_grahics=produce_graphic, should_flush_im_pool=should_flush_im_pool
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        produce_grahics=produce_graphic,
+        should_flush_im_pool=should_flush_im_pool,
     )
 
-    mock_handle_input_data_audit.assert_called_once_with(args=args, input_manager=mock_input_manager,
-                                                         output_manager=mock_output_manager, eager_termination=False)
-    mock_handle_post_processing.assert_called_once_with(args=args, input_manager=mock_input_manager,
-                                                        output_manager=mock_output_manager, task_id=task_id,
-                                                        should_flush_im_pool=True)
+    mock_handle_input_data_audit.assert_called_once_with(
+        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, eager_termination=False
+    )
+    mock_handle_post_processing.assert_called_once_with(
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        should_flush_im_pool=True,
+    )
