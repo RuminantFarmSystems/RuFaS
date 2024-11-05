@@ -1,4 +1,5 @@
 import datetime
+import enum
 import os
 import re
 import shutil
@@ -329,6 +330,9 @@ class Utility:
         # If the object is a primitive type, return it directly
         if isinstance(obj, (int, float, str, bool, type(None))):
             return obj
+
+        if isinstance(obj, enum.Enum):
+            return obj.value
 
         if depth == max_depth:
             return cls._get_str(obj)

@@ -102,6 +102,10 @@ class TaskManager:
             exclude_info_maps,
             output_directory,
             clear_output_directory,
+            False,
+            0,
+            0,
+            0,
             Path(""),
             "Task Manager",
             RUFAS_VERSION,
@@ -126,6 +130,7 @@ class TaskManager:
                 self.input_manager,
                 self.output_manager,
                 "TASK_MANAGER",
+                False,
             )
             raise Exception("Task Manager's input data is invalid.")
         task_config: dict[str, Any] = self.input_manager.get_data("tasks")
@@ -151,13 +156,13 @@ class TaskManager:
         )
         for i in range(len(runnable_args)):
             runnable_args[i]["task_id"] = f"{i + 1}/{len(runnable_args)}"
-        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit)
+        self._run_tasks(runnable_args, produce_graphics, metadata_depth_limit, workers)
 
         export_input_data_to_csv: bool = task_config.get("export_input_data_to_csv", False)
         input_data_csv_export_path: str = task_config.get("input_data_csv_export_path", "")
         input_data_csv_import_path: str = task_config.get("input_data_csv_import_path", "")
         TaskManager.handle_post_processing(
-            args={
+            {
                 "exclude_info_maps": exclude_info_maps,
                 "variable_name_style": "verbose",
                 "logs_directory": logs_directory,
@@ -165,10 +170,11 @@ class TaskManager:
                 "input_data_csv_export_path": Path(input_data_csv_export_path),
                 "input_data_csv_import_path": Path(input_data_csv_import_path),
             },
-            input_manager=self.input_manager,
-            output_manager=self.output_manager,
-            task_id="TASK_MANAGER",
-            export_input_data_to_csv=export_input_data_to_csv,
+            self.input_manager,
+            self.output_manager,
+            "TASK_MANAGER",
+            False,
+            export_input_data_to_csv,
         )
 
     def _parse_input_tasks(self) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
@@ -310,11 +316,11 @@ class TaskManager:
         return single_run_args
 
     def _run_tasks(
-        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
+        self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int, workers: int
     ) -> None:
         """Runs the tasks based on the provided arguments."""
         task_with_args = partial(
-            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
+            self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit, workers=workers
         )
         results = self.pool.imap(task_with_args, single_run_args)
         failed = []
@@ -335,12 +341,15 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_graphics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Wrapper function to call the function map with each of its arguments."""
-        handler(args, input_manager, output_manager, task_id, produce_graphics)
+        handler(args, input_manager, output_manager, task_id, produce_graphics, should_flush_im_pool)
 
     @staticmethod
-    def task(args: Dict[str, Any], produce_graphics: bool, metadata_depth_limit: int | None) -> str | None:
+    def task(
+        args: Dict[str, Any], produce_graphics: bool, workers: int, metadata_depth_limit: int | None
+    ) -> str | None:
         """Executes a single task with specified arguments."""
         info_map = {
             "class": TaskManager.__name__,
@@ -366,8 +375,12 @@ class TaskManager:
             output_manager.run_startup_sequence(
                 LogVerbosity(args["log_verbosity"]),
                 args["exclude_info_maps"],
-                Path(""),
+                Path("output/"),
                 False,
+                args["chunkification"],
+                int(args["maximum_memory_usage_percent"] / workers),
+                int(args["maximum_memory_usage"] / workers),
+                args["save_chunk_threshold_call_count"],
                 Path(""),
                 args["output_prefix"],
                 RUFAS_VERSION,
@@ -385,6 +398,7 @@ class TaskManager:
                     output_manager=output_manager,
                     task_id=task_id,
                     produce_graphics=produce_graphics,
+                    should_flush_im_pool=True,
                 )
                 return
 
@@ -396,7 +410,7 @@ class TaskManager:
                     f"Data not valid for {args['output_prefix']}, task not run",
                     info_map,
                 )
-                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+                TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, False)
                 return
 
             TaskManager.set_random_seed(args["random_seed"], output_manager)
@@ -410,6 +424,7 @@ class TaskManager:
                     output_manager=output_manager,
                     task_id=task_id,
                     produce_graphics=produce_graphics,
+                    should_flush_im_pool=True,
                 )
                 return
 
@@ -470,6 +485,7 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: str,
         produce_graphics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Runs end-to-end testing routine."""
         info_map = {
@@ -481,7 +497,14 @@ class TaskManager:
 
         output_manager.add_log("End-to-end testing", "Starting simulation for end-to-end testing.", info_map)
 
-        TaskManager._handle_simulation_engine_run_tasks(args, input_manager, output_manager, task_id, produce_graphics)
+        TaskManager._handle_simulation_engine_run_tasks(
+            args=args,
+            input_manager=input_manager,
+            output_manager=output_manager,
+            task_id=task_id,
+            produce_graphics=produce_graphics,
+            should_flush_im_pool=False,
+        )
 
         output_manager.add_log("End-to-end testing", "Completed simulation for end-to-end testing", info_map)
 
@@ -491,7 +514,13 @@ class TaskManager:
         E2ETestResultsComparer.compare_actual_and_expected_test_results(args["json_output_directory"])
 
         TaskManager.handle_post_processing(
-            args, input_manager, output_manager, task_id, produce_graphics, save_results=True
+            args,
+            input_manager,
+            output_manager,
+            task_id,
+            True,
+            produce_graphics,
+            True,
         )
 
     @staticmethod
@@ -529,6 +558,7 @@ class TaskManager:
         input_manager: InputManager,
         output_manager: OutputManager,
         task_id: str,
+        should_flush_im_pool: bool,
         produce_graphics: bool = False,
         save_results: bool = False,
         load_pool_from_file: bool = False,
@@ -555,6 +585,8 @@ class TaskManager:
             Whether to load data pool from file.
         export_input_data_to_csv: bool
             Whether to export the input data to a CSV file.
+        should_flush_im_pool: bool
+            Whether to flush the input manager pool.
         """
         info_map = {
             "class": TaskManager.__name__,
@@ -577,6 +609,8 @@ class TaskManager:
             output_manager.set_metadata_prefix("reload")
 
         output_manager.print_errors_warnings_logs_counts(task_id)
+        if should_flush_im_pool:
+            input_manager.flush_pool()
         if save_results:
             output_manager.save_results(
                 args["filters_directory"],
@@ -619,10 +653,11 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_grahics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to metadata property comparison."""
         TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, True)
 
     @staticmethod
     def _handle_compare_metadata_properties_tasks(
@@ -631,6 +666,7 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_grahics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to metadata property comparison."""
         input_manager.compare_metadata_properties(
@@ -644,11 +680,12 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_grahics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to herd initialization."""
         args["init_herd"] = True
         TaskManager.handle_herd_initializaition(args, output_manager)
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, True)
 
     @staticmethod
     def _handle_simulation_engine_run_tasks(
@@ -657,13 +694,22 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_graphics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to simulation run."""
         if args["input_patch"]:
             Utility.deep_merge(input_manager.pool, args["input_patch"])
 
         TaskManager.handle_single_simulation_run(args, output_manager)
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True)
+        TaskManager.handle_post_processing(
+            args,
+            input_manager,
+            output_manager,
+            task_id,
+            should_flush_im_pool,
+            produce_graphics,
+            True,
+        )
 
     @staticmethod
     def _handle_postprocessing_tasks(
@@ -672,6 +718,7 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_graphics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to postprocessing."""
-        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, produce_graphics, True, True)
+        TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, True, produce_graphics)
