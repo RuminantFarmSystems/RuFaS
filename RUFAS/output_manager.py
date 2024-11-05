@@ -121,7 +121,7 @@ class OutputManager(object):
         The path to the directory where saved pool chunks are stored.
     available_memory : int
         The available memory on the system.
-    average_add_variable_call_addition : int
+    average_add_variable_call_addition : int, default 118
         The average memory usage increase per call to add_variable.
     add_variable_call : int
         The number of calls to add_variable().

@@ -307,7 +307,8 @@ def test_handle_post_processing(
     mock_input_manager = mocker.MagicMock(auto_spec=InputManager)
     mock_flush_pool = mocker.patch.object(mock_input_manager, "flush_pool", return_value=None)
     mock_dump_data_logs = mocker.patch.object(mock_input_manager, "dump_get_data_logs", return_value=None)
-    task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1")
+    task_manager.handle_post_processing(args=args, input_manager=mock_input_manager, output_manager=mock_output_manager,
+                                        task_id="1/1", should_flush_im_pool=True)
     mocker.patch("RUFAS.task_manager.InputManager", return_value=mock_input_manager)
 
     mocker.patch.object(mock_output_manager, "dict_to_file_json", return_value=None)
@@ -351,7 +352,8 @@ def test_handle_post_processing_export_input_tocsv(
         "input_data_csv_import_path": Path("/fake/saved_input"),
     }
     task_manager.handle_post_processing(
-        args, mock_input_manager, mock_output_manager, "1/1", export_input_data_to_csv=True
+        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id="1/1",
+        should_flush_im_pool=False, export_input_data_to_csv=True
     )
 
     Utility.combine_saved_input_csv.assert_called_once_with(
@@ -413,7 +415,8 @@ def test_handle_post_processing_load_pool(
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
     }
-    task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1", load_pool_from_file=True)
+    task_manager.handle_post_processing(args=args, input_manager=mock_input_manager, output_manager=mock_output_manager,
+                                        task_id="1/1", should_flush_im_pool=False, load_pool_from_file=True)
 
     mock_output_manager.flush_pools.assert_called_once()
     mock_output_manager.load_variables_pool_from_file.assert_called_once_with(args["output_pool_path"])
@@ -444,7 +447,8 @@ def test_handle_post_processing_save_result(
         "logs_directory": Path("/fake/logs"),
         "suppress_log_files": True,
     }
-    task_manager.handle_post_processing(args, mock_input_manager, mock_output_manager, "1/1", save_results=True)
+    task_manager.handle_post_processing(args=args, input_manager=mock_input_manager, output_manager=mock_output_manager,
+                                        task_id="1/1", should_flush_im_pool=False, save_results=True)
 
     mock_output_manager.save_results.assert_called_once_with(
         args["filters_directory"],
@@ -765,6 +769,7 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
+    should_flush_im_pool = True
     mock_handle_herd_initializaition = mocker.patch.object(
         TaskManager, "handle_herd_initializaition", return_value=None
     )
@@ -772,7 +777,9 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
 
     TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
     mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
-    mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
+    mock_handle_post_processing.assert_called_once_with(args=args, input_manager=mock_input_manager,
+                                                        output_manager=mock_output_manager, task_id=task_id,
+                                                        should_flush_im_pool=should_flush_im_pool)
 
 
 @pytest.mark.parametrize("input_patch,produce_graphics", [(True, True), (False, True), (False, False), (True, False)])
@@ -801,7 +808,8 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool, 
     mock_deep_merge = mocker.patch.object(Utility, "deep_merge", return_value=None)
 
     TaskManager._handle_simulation_engine_run_tasks(
-        args, mock_input_manager, mock_output_manager, task_id, produce_graphics
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphics,
+        should_flush_im_pool=True
     )
     if input_patch:
         mock_deep_merge.assert_called_once_with(mock_input_manager.pool, args["input_patch"])
@@ -814,9 +822,9 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool, 
         input_manager=mock_input_manager,
         output_manager=mock_output_manager,
         task_id=task_id,
+        should_flush_im_pool=True,
         produce_graphics=produce_graphics,
         save_results=True,
-        should_flush_im_pool=True,
     )
 
 
@@ -842,7 +850,8 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
 
     TaskManager._handle_postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics)
     mock_handle_post_processing.assert_called_once_with(
-        args, mock_input_manager, mock_output_manager, task_id, produce_graphics, True, True
+        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id=task_id,
+        should_flush_im_pool=True, produce_graphics=produce_graphics,
     )
 
 
@@ -1554,4 +1563,6 @@ def test_input_data_audit_tasks(mocker: MockerFixture) -> None:
     TaskManager._handle_input_data_audit_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
 
     mock_handle_input_data_audit.assert_called_once_with(args, mock_input_manager, mock_output_manager, False)
-    mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
+    mock_handle_post_processing.assert_called_once_with(args=args, input_manager=mock_input_manager,
+                                                        output_manager=mock_output_manager, task_id=task_id,
+                                                        should_flush_im_pool=True)
