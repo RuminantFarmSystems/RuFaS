@@ -2,11 +2,11 @@ import re
 from datetime import date
 from typing import Any, Literal
 
-from ...input_manager import InputManager
-from ...output_manager import OutputManager
-from ...time import Time
-from ...units import MeasurementUnits
-from ..field.crop.crop_enum import CropSpecies
+from RUFAS.input_manager import InputManager
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 CROP_SPECIES_TO_PURCHASED_FEED_ID = {
     CropSpecies.ALFALFA_HAY: ["100", "103", "106", "107", "108"],
@@ -282,7 +282,19 @@ class EmissionsEstimator:
     ) -> dict[str, float]:
         """Grabs the appropriate list of emissions for purchased feeds for the location of the simulation."""
         county_codes = feed_emissions_data["county_code"]
-        emissions_index = county_codes.index(county_code)
+        try:
+            emissions_index = county_codes.index(county_code)
+        except ValueError as e:
+            info_map = {
+                "class": self.__class__.__name__,
+                "function": self._get_feed_emissions_data.__name__,
+            }
+            self.om.add_error(
+                "Invalid country code access.",
+                f"Emission data have county codes {county_codes}," f"Tried to get data with county code: {county_code}",
+                info_map,
+            )
+            raise e
 
         feed_keys = [key for key in feed_emissions_data.keys() if key != "county_code"]
         feed_emissions_dict = {key: feed_emissions_data[key][emissions_index] for key in feed_keys}
@@ -312,7 +324,9 @@ class EmissionsEstimator:
 
         aggregated_manure_requests = self._aggregate_data(manure_requests, all_fields, ["nitrogen", "phosphorus"])
 
-        grouped_soil_characteristics: dict[str, float] = self._collect_target_soil_characteristics(grouped_feeds.keys())
+        grouped_soil_characteristics: dict[str, dict[str, Any]] = self._collect_target_soil_characteristics(
+            list(grouped_feeds.keys())
+        )
 
         crops_with_emissions = []
         for field in grouped_feeds.keys():
@@ -474,6 +488,7 @@ class EmissionsEstimator:
             crop["manure_nitrogen_requested"] = manure_requests["nitrogen"] * fraction_of_total_mass_grown
 
         filtered_fertilizers = [fert for fert in fertilizer_applications_data if fert["field_name"] == field_name]
+
         for fertilizer_application in filtered_fertilizers:
             fertilizer_application_date = Time.convert_year_jday_to_date(
                 fertilizer_application["year"], fertilizer_application["day"]
@@ -598,14 +613,16 @@ class EmissionsEstimator:
         Returns True if fertilizer was applied, False otherwise.
         """
         for index, crop in enumerate(sorted_crops):
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
+            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             next_crop_exists = index + 1 < len(sorted_crops)
+
             if next_crop_exists:
                 next_crop = sorted_crops[index + 1]
                 next_crop_planting_date = Time.convert_year_jday_to_date(
                     next_crop["planting_year"], next_crop["planting_day"]
-                )
+                ).date()
                 if crop_harvest_date < fertilizer_application_date < next_crop_planting_date:
+
                     next_crop["nitrogen_fertilizer_used"] += fertilizer_application["nitrogen"]
                     next_crop["nitrogen_fertilizer_embedded_CO2_emissions"] += (
                         fertilizer_application["nitrogen"] * EMBEDDED_NITROGEN_FERTILIZER_EMISSIONS_FACTOR
@@ -641,9 +658,8 @@ class EmissionsEstimator:
         applied_crops = []
 
         for crop in sorted_crops:
-            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"])
-            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"])
-
+            crop_planting_date = Time.convert_year_jday_to_date(crop["planting_year"], crop["planting_day"]).date()
+            crop_harvest_date = Time.convert_year_jday_to_date(crop["harvest_year"], crop["harvest_day"]).date()
             if crop_planting_date <= fertilizer_application_date < crop_harvest_date:
                 applied_crops.append(crop)
         return applied_crops
