@@ -653,6 +653,7 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_grahics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to metadata property comparison."""
         TaskManager.handle_input_data_audit(args, input_manager, output_manager, False)
@@ -665,6 +666,7 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_grahics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to metadata property comparison."""
         input_manager.compare_metadata_properties(
@@ -678,6 +680,7 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_grahics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to herd initialization."""
         args["init_herd"] = True
@@ -715,6 +718,7 @@ class TaskManager:
         output_manager: OutputManager,
         task_id: Any,
         produce_graphics: bool,
+        should_flush_im_pool: bool,
     ) -> None:
         """Handler for all methods related to postprocessing."""
         TaskManager.handle_post_processing(args, input_manager, output_manager, task_id, True, produce_graphics)

@@ -736,13 +736,14 @@ def test_compare_metadata_properties_tasks(mocker: MockerFixture) -> None:
     mock_output_manager = MagicMock(name="OutputManager")
     produce_graphic = False
     task_id = 6
+    should_flush_im_pool = True
 
     mock_compare_metadata_properties = mocker.patch.object(
         mock_input_manager, "compare_metadata_properties", return_value=None
     )
 
     TaskManager._handle_compare_metadata_properties_tasks(
-        args, mock_input_manager, mock_output_manager, task_id, produce_graphic
+        args, mock_input_manager, mock_output_manager, task_id, produce_graphic, should_flush_im_pool
     )
 
     mock_compare_metadata_properties.assert_called_once_with(
@@ -775,7 +776,8 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     )
     mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
 
-    TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
+    TaskManager._handle_herd_init_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic,
+                                        should_flush_im_pool)
     mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id,
                                                         should_flush_im_pool)
@@ -844,12 +846,14 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
     task_id = 5
     mock_input_manager = MagicMock(name="InputManager")
     mock_output_manager = MagicMock(name="OutputManager")
+    should_flush_im_pool = True
 
     mock_handle_post_processing = mocker.patch.object(TaskManager, "handle_post_processing", return_value=None)
 
-    TaskManager._handle_postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics)
+    TaskManager._handle_postprocessing_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphics,
+                                             should_flush_im_pool)
     mock_handle_post_processing.assert_called_once_with(
-        args, mock_input_manager, mock_output_manager, task_id, True, produce_graphics,
+        args, mock_input_manager, mock_output_manager, task_id, True, produce_graphics
     )
 
 
@@ -1559,8 +1563,10 @@ def test_input_data_audit_tasks(mocker: MockerFixture) -> None:
 
     mock_output_manager = mocker.MagicMock(auto_spec=OutputManager)
     produce_graphic = False
+    should_flush_im_pool = True
 
-    TaskManager._handle_input_data_audit_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic)
+    TaskManager._handle_input_data_audit_tasks(args, mock_input_manager, mock_output_manager, task_id, produce_graphic,
+                                               should_flush_im_pool)
 
     mock_handle_input_data_audit.assert_called_once_with(args, mock_input_manager, mock_output_manager, False)
     mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id, True)
