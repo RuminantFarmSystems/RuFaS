@@ -7,14 +7,15 @@ from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal import Breed
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.preg_check_config import PregnancyCheckConfig
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
     CowReproductionProtocol, ReproStateEnum, CowTAISubProtocol, CowPreSynchSubProtocol, CowReSynchSubProtocol, \
     HeiferTAISubProtocol, HeiferSynchEDSubProtocol
 from RUFAS.biophysical.animal.data_types.reproduction_inputs import ReproductionInputs
-from RUFAS.biophysical.animal.data_types.reproduction_outputs import ReproductionOutputs
+from RUFAS.biophysical.animal.data_types.reproduction_outputs import ReproductionOutputs, AnimalReproductionStatistics, \
+    HerdReproductionStatistics
 
 from RUFAS.biophysical.animal.reproduction.hormone_delivery_schedule import HormoneDeliverySchedule
 from RUFAS.biophysical.animal.reproduction.repro_protocol_misc import InternalReproSettings
@@ -130,11 +131,11 @@ class Reproduction:
             body_weight_at_calving: float = 0.0,
             do_not_breed: bool = None,
     ) -> None:
-        self.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program \
+        self.heifer_reproduction_program = HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program) \
             if heifer_reproduction_program is None else heifer_reproduction_program
         self.heifer_reproduction_sub_program = AnimalConfig.heifer_reproduction_sub_program \
             if heifer_reproduction_sub_program is None else heifer_reproduction_sub_program
-        self.cow_reproduction_program = AnimalConfig.cow_reproduction_program \
+        self.cow_reproduction_program = CowReproductionProtocol(AnimalConfig.cow_reproduction_program) \
             if cow_reproduction_program is None else cow_reproduction_program
 
         self.ai_day = ai_day if ai_day else 0
@@ -161,6 +162,8 @@ class Reproduction:
 
         self.do_not_breed = False if do_not_breed is None else do_not_breed
 
+        self.repro_state_manager = ReproStateManager()
+
     def reproduction_update(self,
                             reproduction_inputs: ReproductionInputs,
                             time: Time) -> ReproductionOutputs:
@@ -180,7 +183,9 @@ class Reproduction:
             Updated reproduction outputs for the animal.
         """
         reproduction_outputs = ReproductionOutputs(
-            *asdict(reproduction_inputs)
+            **asdict(reproduction_inputs),
+            animal_level_statistics=AnimalReproductionStatistics(),
+            herd_level_statistics=HerdReproductionStatistics()
         )
 
         if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
@@ -212,7 +217,7 @@ class Reproduction:
         ReproductionOutputs
             Updated reproduction outputs for the heifer.
         """
-        if self.heifer_reproduction_program != AnimalConfig.heifer_reproduction_program and \
+        if self.heifer_reproduction_program.value != AnimalConfig.heifer_reproduction_program and \
                 reproduction_outputs.days_born <= AnimalConfig.heifer_breed_start_day:
             reproduction_outputs.events.add_event(
                 reproduction_outputs.days_born,
@@ -221,14 +226,14 @@ class Reproduction:
                 f"{self.heifer_reproduction_program} "
                 f"to {AnimalConfig.heifer_reproduction_program}",
             )
-            self.heifer_reproduction_program = AnimalConfig.heifer_reproduction_program
+            self.heifer_reproduction_program = HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program)
 
-        elif reproduction_outputs.days_born >= AnimalConfig.heifer_breed_start_day:
-            if self.heifer_reproduction_program == HeiferReproductionProtocol.ED.value:
+        if reproduction_outputs.days_born >= AnimalConfig.heifer_breed_start_day:
+            if self.heifer_reproduction_program == HeiferReproductionProtocol.ED:
                 reproduction_outputs = self.execute_heifer_ed_protocol(reproduction_outputs, time.simulation_day)
-            elif self.heifer_reproduction_program == HeiferReproductionProtocol.TAI.value:
+            elif self.heifer_reproduction_program == HeiferReproductionProtocol.TAI:
                 reproduction_outputs = self.execute_heifer_tai_protocol(reproduction_outputs, time.simulation_day)
-            elif self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED.value:
+            elif self.heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
                 reproduction_outputs = self.execute_heifer_synch_ed_protocol(reproduction_outputs, time.simulation_day)
             else:
                 raise ValueError(f"Invalid heifer repro program: {self.heifer_reproduction_program}")
@@ -263,13 +268,13 @@ class Reproduction:
 
         if not self.do_not_breed:
             if self.cow_reproduction_program not in [
-                CowReproductionProtocol.ED.value,
-                CowReproductionProtocol.TAI.value,
-                CowReproductionProtocol.ED_TAI.value,
+                CowReproductionProtocol.ED,
+                CowReproductionProtocol.TAI,
+                CowReproductionProtocol.ED_TAI,
             ]:
                 raise ValueError(f"Invalid cow repro program: {self.cow_reproduction_program}")
 
-            if self.cow_reproduction_program != AnimalConfig.cow_reproduction_program:
+            if self.cow_reproduction_program != CowReproductionProtocol(AnimalConfig.cow_reproduction_program):
                 reproduction_outputs = self._set_cow_reproduction_program(
                     reproduction_outputs,
                     time.simulation_day,
@@ -304,7 +309,7 @@ class Reproduction:
 
             if self.cow_reproduction_program == CowReproductionProtocol.ED_TAI:
                 reproduction_outputs = self.execute_cow_ed_tai_protocol(reproduction_outputs, time.simulation_day)
-            if self.cow_reproduction_program == CowReproductionProtocol.ED or \
+            elif self.cow_reproduction_program == CowReproductionProtocol.ED or \
                     self.repro_state_manager.is_in_any(
                         {
                             ReproStateEnum.WAITING_FULL_ED_CYCLE,
@@ -314,7 +319,7 @@ class Reproduction:
                     ):
                 reproduction_outputs = self.execute_cow_ed_protocol(reproduction_outputs, time.simulation_day)
 
-            if self.cow_reproduction_program == CowReproductionProtocol.TAI or \
+            elif self.cow_reproduction_program == CowReproductionProtocol.TAI or \
                     self.repro_state_manager.is_in_any(
                         {
                             ReproStateEnum.IN_PRESYNCH,
@@ -336,7 +341,7 @@ class Reproduction:
 
             reproduction_outputs = self.cow_pregnancy_update(reproduction_outputs, time.simulation_day)
 
-            return reproduction_outputs
+        return reproduction_outputs
 
     def cow_give_birth(self, reproduction_outputs: ReproductionOutputs, time: Time) -> ReproductionOutputs:
         """
@@ -569,9 +574,9 @@ class Reproduction:
         """
 
         if repro_program not in [
-            CowReproductionProtocol.ED.value,
-            CowReproductionProtocol.TAI.value,
-            CowReproductionProtocol.ED_TAI.value
+            CowReproductionProtocol.ED,
+            CowReproductionProtocol.TAI,
+            CowReproductionProtocol.ED_TAI
         ]:
             raise ValueError(f"Invalid repro program: {repro_program}")
 

@@ -3,7 +3,8 @@ from __future__ import annotations
 import copy
 from typing import Literal
 
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import CowReproProtocolEnum, HeiferReproProtocolEnum
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferTAISubProtocol, HeiferSynchEDSubProtocol, \
+    CowTAISubProtocol, CowPreSynchSubProtocol
 
 
 class HormoneDeliverySchedule:
@@ -40,47 +41,47 @@ class HormoneDeliverySchedule:
     """
 
     HEIFER_REPRO_PROTOCOLS = {
-        HeiferReproProtocolEnum.TAI_5dCG2P.value: {
+        HeiferTAISubProtocol.TAI_5dCG2P.value: {
             0: {"deliver_hormones": ["CIDR"]},
             5: {"deliver_hormones": ["PGF"]},
             6: {"deliver_hormones": ["PGF"]},
             8: {"deliver_hormones": ["GnRH"]},
             9: {"set_ai_day": True, "set_conception_rate": True},
         },
-        HeiferReproProtocolEnum.TAI_5dCGP.value: {
+        HeiferTAISubProtocol.TAI_5dCGP.value: {
             0: {"deliver_hormones": ["CIDR"]},
             5: {"deliver_hormones": ["PGF"]},
             8: {"deliver_hormones": ["GnRH"]},
             9: {"set_ai_day": True, "set_conception_rate": True},
         },
-        HeiferReproProtocolEnum.SynchED_2P.value: {
+        HeiferSynchEDSubProtocol.SynchED_2P.value: {
             0: {"deliver_hormones": ["PGF"]},
             14: {"deliver_hormones": ["PGF"]},
         },
-        HeiferReproProtocolEnum.SynchED_CP.value: {
+        HeiferSynchEDSubProtocol.SynchED_CP.value: {
             0: {"deliver_hormones": ["CIDR"]},
             7: {"deliver_hormones": ["PGF"]},
         },
     }
 
     COW_REPRO_PROTOCOLS = {
-        CowReproProtocolEnum.Presynch_PreSynch.value: {
+        CowPreSynchSubProtocol.Presynch_PreSynch.value: {
             0: {"deliver_hormones": ["PGF"]},
             14: {"deliver_hormones": ["PGF"]},
             25: {"set_presynch_end": True},
         },
-        CowReproProtocolEnum.Presynch_DoubleOvSynch.value: {
+        CowPreSynchSubProtocol.Presynch_DoubleOvSynch.value: {
             0: {"deliver_hormones": ["GnRH"]},
             7: {"deliver_hormones": ["PGF"]},
             10: {"deliver_hormones": ["GnRH"]},
             16: {"set_presynch_end": True},
         },
-        CowReproProtocolEnum.Presynch_G6G.value: {
+        CowPreSynchSubProtocol.Presynch_G6G.value: {
             0: {"deliver_hormones": ["PGF"]},
             2: {"deliver_hormones": ["GnRH"]},
             8: {"set_presynch_end": True},
         },
-        CowReproProtocolEnum.TAI_OvSynch_48.value: {
+        CowTAISubProtocol.TAI_OvSynch_48.value: {
             0: {"deliver_hormones": ["GnRH"]},
             7: {"deliver_hormones": ["PGF"]},
             9: {"deliver_hormones": ["GnRH"]},
@@ -90,7 +91,7 @@ class HormoneDeliverySchedule:
                 "set_ovsynch_end": True,
             },
         },
-        CowReproProtocolEnum.TAI_OvSynch_56.value: {
+        CowTAISubProtocol.TAI_OvSynch_56.value: {
             0: {"deliver_hormones": ["GnRH"]},
             7: {"deliver_hormones": ["PGF"]},
             9: {"deliver_hormones": ["GnRH"]},
@@ -100,7 +101,7 @@ class HormoneDeliverySchedule:
                 "set_ovsynch_end": True,
             },
         },
-        CowReproProtocolEnum.TAI_CoSynch_72.value: {
+        CowTAISubProtocol.TAI_CoSynch_72.value: {
             0: {"deliver_hormones": ["GnRH"]},
             7: {"deliver_hormones": ["PGF"]},
             10: {
@@ -110,7 +111,7 @@ class HormoneDeliverySchedule:
                 "set_ovsynch_end": True,
             },
         },
-        CowReproProtocolEnum.TAI_5d_CoSynch.value: {
+        CowTAISubProtocol.TAI_5d_CoSynch.value: {
             0: {"deliver_hormones": ["GnRH"]},
             5: {"deliver_hormones": ["PGF"]},
             6: {"deliver_hormones": ["PGF"]},

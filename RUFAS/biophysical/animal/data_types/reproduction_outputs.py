@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from RUFAS.biophysical.animal.animal_properties.general_properties import Breed
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
@@ -94,8 +94,8 @@ class ReproductionOutputs:
     future_cull_date: int
     future_death_date: int
 
-    animal_level_statistics: AnimalReproductionStatistics = AnimalReproductionStatistics()
-    herd_level_statistics: HerdReproductionStatistics = HerdReproductionStatistics()
+    animal_level_statistics: AnimalReproductionStatistics
+    herd_level_statistics: HerdReproductionStatistics
 
     @property
     def is_pregnant(self) -> bool:

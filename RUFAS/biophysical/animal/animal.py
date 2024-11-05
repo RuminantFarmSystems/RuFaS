@@ -1,39 +1,20 @@
-import math
-from enum import Enum
+import sys
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.animal_growth.animal_growth import AnimalGrowth
-from RUFAS.biophysical.animal.animal_nutrients.animal_phosphorus import AnimalNutrient
-from RUFAS.biophysical.animal.animal_properties.animal_growth_properties import AnimalGrowthProperties
-from RUFAS.biophysical.animal.animal_properties.animal_health_properties import AnimalHealthProperties
-from RUFAS.biophysical.animal.animal_properties.animal_statistics import AnimalStatistics
-from RUFAS.biophysical.animal.animal_properties.digestive_system_properties import DigestiveSystemProperties
-from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex
+from RUFAS.biophysical.animal.growth.growth import Growth
+from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
 from RUFAS.biophysical.animal.animal_properties.reproduction_properties import ReproductionProperties
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproProtocolEnum
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.time import Time
-
-
-class Breed(Enum):
-    """Enum indicating the breed of the animal."""
-
-    HO = "Holstein"
-    JE = "Jersey"
-
-
-class Sex(Enum):
-    """Enum indicating the sex of the animal."""
-
-    MALE = "male"
-    FEMALE = "female"
 
 
 class Animal:
@@ -56,12 +37,12 @@ class Animal:
     days_in_milking: int = 0
     dry_off_day_of_pregnancy: int = 0
     daily_milk_produced: float = 0.0
-    future_cull_date: int = int(math.inf)
+    future_cull_date: int = sys.maxsize
     cull_reason: str = ""
-    future_death_date: int = int(math.inf)
+    future_death_date: int = sys.maxsize
     ration_formulation = {"objective": 0.00}
     sold: bool = False
-    sold_at_day: int = int(math.inf)
+    sold_at_day: int = sys.maxsize
     wean_weight: float = 0.0
     metabolizable_energy_intake: float = 0.0
 

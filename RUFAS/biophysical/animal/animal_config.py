@@ -2,78 +2,84 @@ from RUFAS.input_manager import InputManager
 
 
 class AnimalConfig:
-    wean_day: int
-    heifer_breed_start_day: int  # previously breeding_start_day_h
-    heifer_prefresh_day: int  # previously prefresh_day
-    heifer_reproduction_cull_day: int  # previously heifer_repro_cull_time
-    do_not_breed_time: int
+    wean_day: int = 60
+    heifer_breed_start_day: int = 380  # previously breeding_start_day_h
+    heifer_prefresh_day: int = 21 # previously prefresh_day
+    heifer_reproduction_cull_day: int = 500 # previously heifer_repro_cull_time
+    do_not_breed_time: int = 185
 
-    semen_type: str
-    average_gestation_length: int
-    std_gestation_length: float
+    semen_type: str = "conventional"
+    average_gestation_length: int = 276
+    std_gestation_length: float = 6
 
-    heifer_reproduction_program: str
-    heifer_reproduction_sub_program: str
-    heifer_estrus_detection_rate: float
-    heifer_estrus_conception_rate: float
-    heifer_reproduction_sub_program_conception_rate: float
-    heifer_reproduction_sub_program_estrus_detection_rate: float
+    heifer_reproduction_program: str = "ED"
+    heifer_reproduction_sub_program: str = "5dCG2P"
+    heifer_estrus_detection_rate: float = 0.9
+    heifer_estrus_conception_rate: float = 0.6
+    heifer_reproduction_sub_program_conception_rate: float = 0.6
+    heifer_reproduction_sub_program_estrus_detection_rate: float = 0.9
 
-    cow_reproduction_program: str
-    cow_estrus_conception_rate: float
-    cow_presynch_method: str
-    cow_tai_method: str
-    cow_ovsynch_method: str
-    cow_resynch_method: str
-    cow_estrus_detection_rate: float
-    ovsynch_program_start_day: int
-    ovsynch_program_conception_rate: float
-    presynch_program_start_day: int
+    cow_reproduction_program: str = "ED-TAI"
+    cow_estrus_conception_rate: float = 0.6
+    cow_presynch_method: str = "Double OvSynch"
+    cow_tai_method: str = "OvSynch 56"
+    cow_ovsynch_method: str = "OvSynch 56"
+    cow_resynch_method: str = "TAIafterPD"
+    cow_estrus_detection_rate: float = 0.5
+    ovsynch_program_start_day: int = 64
+    ovsynch_program_conception_rate: float = 0.6
+    presynch_program_start_day: int = 50
 
-    voluntary_waiting_period: int
+    voluntary_waiting_period: int = 50
 
-    birth_weight_avg_ho: float
-    birth_weight_std_ho: float
-    birth_weight_avg_je: float
-    birth_weight_std_je: float
+    birth_weight_avg_ho: float = 43.9
+    birth_weight_std_ho: float = 1
+    birth_weight_avg_je: float = 27.2
+    birth_weight_std_je: float = 1
 
-    conception_rate_decrease: float
-    should_decrease_conception_rate_in_rebreeding: bool
-    should_decrease_conception_rate_by_parity: bool
+    conception_rate_decrease: float = 0.026
+    should_decrease_conception_rate_in_rebreeding: bool = False
+    should_decrease_conception_rate_by_parity: bool = False
 
-    average_estrus_cycle_return: int
-    std_estrus_cycle_return: float
-    average_estrus_cycle_heifer: int
-    std_estrus_cycle_heifer: float
-    average_estrus_cycle_cow: int
-    std_estrus_cycle_cow: float
-    average_estrus_cycle_after_pgf: int
-    std_estrus_cycle_after_pgf: float
+    average_estrus_cycle_return: int = 23
+    std_estrus_cycle_return: float = 6
+    average_estrus_cycle_heifer: int = 21
+    std_estrus_cycle_heifer: float = 2.5
+    average_estrus_cycle_cow: int = 21
+    std_estrus_cycle_cow: float = 4
+    average_estrus_cycle_after_pgf: int = 5
+    std_estrus_cycle_after_pgf: float = 2
 
-    first_pregnancy_check_day: int
-    first_pregnancy_check_loss_rate: float
-    second_pregnancy_check_day: int
-    second_pregnancy_check_loss_rate: float
-    third_pregnancy_check_day: int
-    third_pregnancy_check_loss_rate: float
+    first_pregnancy_check_day: int = 32
+    first_pregnancy_check_loss_rate: float = 0.02
+    second_pregnancy_check_day: int = 60
+    second_pregnancy_check_loss_rate: float = 0.096
+    third_pregnancy_check_day: int = 200
+    third_pregnancy_check_loss_rate: float = 0.017
 
-    parity_death_probability: list[float]
-    death_day_probability: list[float]
+    parity_death_probability: list[float] = [0.039, 0.056, 0.085, 0.117]
+    death_day_probability: list[float] = [0, 0.18, 0.32, 0.42, 0.48, 0.54, 0.60, 0.65, 0.70, 0.77, 0.83, 0.89, 0.95, 1]
 
-    parity_cull_probability: list[float]
-    cull_day_count: list[int]
-    feet_leg_cull_probability: float
-    feet_leg_cull_day_probability: list[float]
-    injury_cull_probability: float
-    injury_cull_day_probability: list[float]
-    mastitis_cull_probability: float
-    mastitis_cull_day_probability: list[float]
-    disease_cull_probability: float
-    disease_cull_day_probability: list[float]
-    udder_cull_probability: float
-    udder_cull_day_probability: list[float]
-    unknown_cull_probability: float
-    unknown_cull_day_probability: list[float]
+    parity_cull_probability: list[float] = [0.169, 0.233, 0.301, 0.408]
+    cull_day_count: list[int] = [0, 5, 15, 45, 90, 135, 180, 225, 270, 330, 380, 430, 480, 530]
+    feet_leg_cull_probability: float = 0.1633
+    feet_leg_cull_day_probability: list[float] = [0, 0.03, 0.08, 0.16, 0.25, 0.36, 0.48, 0.59, 0.69, 0.78, 0.85, 0.90,
+                                                  0.95, 1]
+    injury_cull_probability: float = 0.2883
+    injury_cull_day_probability: list[float] = [0, 0.08, 0.18, 0.28, 0.38, 0.47, 0.56, 0.64, 0.71, 0.78, 0.85, 0.90,
+                                                0.95, 1]
+    mastitis_cull_probability: float = 0.2439
+    mastitis_cull_day_probability: list[float] = [0, 0.06, 0.12, 0.19, 0.30, 0.43, 0.56, 0.68, 0.78, 0.85, 0.90, 0.94,
+                                                  0.97, 1]
+    disease_cull_probability: float = 0.1391
+    disease_cull_day_probability: list[float] = [0, 0.04, 0.12, 0.24, 0.34, 0.42, 0.50, 0.57, 0.64, 0.72, 0.81, 0.89,
+                                                 0.95, 1]
+    udder_cull_probability: float = 0.0645
+    udder_cull_day_probability: list[float] = [0, 0.12, 0.24, 0.33, 0.41, 0.48, 0.55, 0.62, 0.68, 0.76, 0.82, 0.89,
+                                               0.95, 1]
+    unknown_cull_probability: float = 0.1009
+    unknown_cull_day_probability: list[float] = [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84,
+                                                 0.92, 1]
 
     @classmethod
     def initialize_animal_config(cls) -> None:
