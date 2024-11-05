@@ -121,19 +121,19 @@ def test_task_manager_start(
     )
 
     mock_output_manager.run_startup_sequence.assert_called_once_with(
-        verbosity,
-        exclude_info_maps,
-        Path("output/directory"),
-        clear_output_directory,
-        False,
-        0,
-        0,
-        0,
-        Path(""),
-        "Task Manager",
-        RUFAS_VERSION,
-        "TASK MANAGER",
-        False,
+        verbosity=verbosity,
+        exclude_info_maps=exclude_info_maps,
+        output_directory=Path("output/directory"),
+        clear_output_directory=clear_output_directory,
+        chunkification=False,
+        max_memory_usage_percent=0,
+        max_memory_usage=0,
+        save_chunk_threshold_call_count=0,
+        variables_file_path=Path(""),
+        output_prefix="Task Manager",
+        version_number=RUFAS_VERSION,
+        task_id="TASK MANAGER",
+        is_end_to_end_testing_run=False,
     )
 
     info_map = {
@@ -385,15 +385,15 @@ def test_handle_end_to_end_testing(
     mock_input_manager = mocker.MagicMock()
     add_log = mocker.patch.object(mock_output_manager, "add_log")
 
-    task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", False, True)
+    task_manager._handle_end_to_end_testing(args, mock_input_manager, mock_output_manager, "test_task", True, True)
 
     sim_engine_run_tasks.assert_called_once_with(
         args=args,
         input_manager=mock_input_manager,
         output_manager=mock_output_manager,
         task_id="test_task",
-        produce_graphics=False,
-        should_flush_im_pool=False,
+        produce_graphics=True,
+        should_flush_im_pool=True,
     )
     compare_outputs.assert_called_once_with(args["json_output_directory"])
     assert add_log.call_count == 2
@@ -619,19 +619,19 @@ def test_task_invalid_data(mocker: MockerFixture, mock_output_manager: Generator
 
     mock_om_init.assert_called_once()
     mock_output_manager.run_startup_sequence.assert_called_once_with(
-        LogVerbosity.LOGS,
-        args["exclude_info_maps"],
-        Path("output/"),
-        False,
-        False,
-        0,
-        0,
-        0,
-        Path(""),
-        args["output_prefix"],
-        RUFAS_VERSION,
-        args["task_id"],
-        False,
+        verbosity=LogVerbosity.LOGS,
+        exclude_info_maps=args["exclude_info_maps"],
+        output_directory=Path("output/"),
+        clear_output_directory=False,
+        chunkification=False,
+        max_memory_usage_percent=0,
+        max_memory_usage=0,
+        save_chunk_threshold_call_count=0,
+        variables_file_path=Path(""),
+        output_prefix=args["output_prefix"],
+        version_number=RUFAS_VERSION,
+        task_id=args["task_id"],
+        is_end_to_end_testing_run=False,
     )
     mock_im_init.assert_called_once_with(10)
     mock_handler.assert_not_called()
@@ -800,9 +800,10 @@ def test_herd_init_tasks(mocker: MockerFixture) -> None:
     TaskManager._handle_herd_init_tasks(
         args, mock_input_manager, mock_output_manager, task_id, produce_graphic, should_flush_im_pool
     )
-    mock_handle_herd_initializaition.assert_called_once_with(args, mock_output_manager)
+    mock_handle_herd_initializaition.assert_called_once_with(args=args, output_manager=mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(
-        args, mock_input_manager, mock_output_manager, task_id, should_flush_im_pool
+        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id=task_id,
+        should_flush_im_pool=should_flush_im_pool
     )
 
 
@@ -841,13 +842,13 @@ def test_simulation_engine_run_tasks(input_patch: bool, produce_graphics: bool, 
 
     mock_handle_single_simulation_run.assert_called_once_with(args, mock_output_manager)
     mock_handle_post_processing.assert_called_once_with(
-        args,
-        mock_input_manager,
-        mock_output_manager,
-        task_id,
-        True,
-        produce_graphics,
-        True,
+        args=args,
+        input_manager=mock_input_manager,
+        output_manager=mock_output_manager,
+        task_id=task_id,
+        should_flush_im_pool=True,
+        produce_graphics=produce_graphics,
+        save_results=True,
     )
 
 
@@ -876,7 +877,8 @@ def test_postprocessing_tasks(produce_graphics: bool, mocker: MockerFixture) -> 
         args, mock_input_manager, mock_output_manager, task_id, produce_graphics, should_flush_im_pool
     )
     mock_handle_post_processing.assert_called_once_with(
-        args, mock_input_manager, mock_output_manager, task_id, True, produce_graphics
+        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id=task_id,
+        should_flush_im_pool=True, produce_graphics=produce_graphics
     )
 
 
@@ -1589,8 +1591,12 @@ def test_input_data_audit_tasks(mocker: MockerFixture) -> None:
     should_flush_im_pool = True
 
     TaskManager._handle_input_data_audit_tasks(
-        args, mock_input_manager, mock_output_manager, task_id, produce_graphic, should_flush_im_pool
+        args=args, input_manager=mock_input_manager, output_manager=mock_output_manager, task_id=task_id,
+        produce_grahics=produce_graphic, should_flush_im_pool=should_flush_im_pool
     )
 
-    mock_handle_input_data_audit.assert_called_once_with(args, mock_input_manager, mock_output_manager, False)
-    mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id, True)
+    mock_handle_input_data_audit.assert_called_once_with(args=args, input_manager=mock_input_manager,
+                                                         output_manager=mock_output_manager, eager_termination=False)
+    mock_handle_post_processing.assert_called_once_with(args=args, input_manager=mock_input_manager,
+                                                        output_manager=mock_output_manager, task_id=task_id,
+                                                        should_flush_im_pool=True)
