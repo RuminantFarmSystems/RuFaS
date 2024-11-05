@@ -29,7 +29,7 @@ class GeneralConstants:
 
     """
 
-    # Hardware related
+    # Memory related
     BYTES_PER_GB = 1024**3
 
     # Length-related
