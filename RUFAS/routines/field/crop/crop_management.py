@@ -2,9 +2,8 @@ from math import exp
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.soil.layer_data import LayerData
@@ -47,8 +46,7 @@ class CropManagement:
         field_size: float,
         time: Time,
         soil_data: SoilData,
-        feed_manager: FeedManager,
-    ) -> None:
+    ) -> HarvestedCropStorageType | None:
         """
         Executes the harvest operation passed on the crop that contains this module.
 
@@ -67,18 +65,27 @@ class CropManagement:
         feed_manager : FeedManager
             Instance of the FeedManager that receives harvested crops.
 
+        Returns
+        -------
+        HarvestedCropStorageType | None
+            The mass and nutrional information associated with the harvest's yield, or None if the harvest produced no
+            yield.
+
         """
         self.determine_harvest_index()
 
+        crop = None
         if harvest_op in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
-            self._store_harvested_crop(time, field_size, feed_manager)
+            crop = self._get_harvested_crop(time, field_size)
 
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
 
         self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
         self._transfer_residue(soil_data, not self.data.is_alive)
+
+        return crop
 
     # ---- Sub Methods ----
     def kill(self) -> None:
@@ -240,7 +247,7 @@ class CropManagement:
             self.data.above_ground_biomass = 0.0
             self.data.root_fraction = 1.0
 
-    def _store_harvested_crop(self, time: Time, field_size: float, feed_manager: FeedManager) -> None:
+    def _get_harvested_crop(self, time: Time, field_size: float) -> HarvestedCropStorageType:
         """
         Compiles the details of a harvest of this crop into a HarvestedCrop instance and passes it to the Feed Manager.
 
@@ -282,7 +289,7 @@ class CropManagement:
             lignin=self.data.lignin_dry_matter_percentage,
             ash=self.data.ash,
         )
-        feed_manager.receive_crop(harvested_crop, self.data.storage_type)
+        return (harvested_crop, self.data.storage_type)
 
     def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """
