@@ -1519,3 +1519,16 @@ def test_input_data_audit_tasks(mocker: MockerFixture) -> None:
 
     mock_handle_input_data_audit.assert_called_once_with(args, mock_input_manager, mock_output_manager, False)
     mock_handle_post_processing.assert_called_once_with(args, mock_input_manager, mock_output_manager, task_id)
+
+
+def test_handle_data_collection_app_update(mocker: MockerFixture, task_manager: TaskManager) -> None:
+    """Tests that the DataCollectionAppUpdater is initialized and called correctly."""
+    mock_init = mocker.patch("RUFAS.data_collection_app_updater.DataCollectionAppUpdater.__init__", return_value=None)
+    mock_update = mocker.patch(
+        "RUFAS.data_collection_app_updater.DataCollectionAppUpdater.update_data_collection_app", return_value=None
+    )
+
+    task_manager._handle_data_collection_app_update({}, mocker.MagicMock(), mocker.MagicMock(), "test", False)
+
+    mock_init.assert_called_once()
+    mock_update.assert_called_once()
