@@ -1,18 +1,9 @@
 {
-  "name": "e2e_feed_storage",
+  "name": "e2e_crop_and_soil",
   "filters": [
-    "Weather.*",
-    "Time.*",
-    "ProtectedIndoors.*",
-    "ProtectedWrapped.*",
-    "ProtectedTarped.*",
-    "Unprotected.*",
-    "Baleage.*",
-    "Dry.*",
-    "HighMoisture.*",
-    "Bunker.*",
-    "Pile.*",
-    "Bag.*"
+    "FieldDataReporter.*",
+    "harvest_yield",
+    "daylength"
   ],
   "expected_results": {}
 }
