@@ -1,3 +1,6 @@
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
+    CowReproductionProtocol, CowPreSynchSubProtocol, CowTAISubProtocol, CowReSynchSubProtocol, HeiferTAISubProtocol, \
+    HeiferSynchEDSubProtocol
 from RUFAS.input_manager import InputManager
 
 
@@ -12,19 +15,19 @@ class AnimalConfig:
     average_gestation_length: int = 276
     std_gestation_length: float = 6
 
-    heifer_reproduction_program: str = "ED"
-    heifer_reproduction_sub_program: str = "5dCG2P"
+    heifer_reproduction_program: HeiferReproductionProtocol = HeiferReproductionProtocol("ED")
+    heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol = HeiferTAISubProtocol("5dCG2P")
     heifer_estrus_detection_rate: float = 0.9
     heifer_estrus_conception_rate: float = 0.6
     heifer_reproduction_sub_program_conception_rate: float = 0.6
     heifer_reproduction_sub_program_estrus_detection_rate: float = 0.9
 
-    cow_reproduction_program: str = "ED-TAI"
+    cow_reproduction_program: CowReproductionProtocol = CowReproductionProtocol("ED-TAI")
     cow_estrus_conception_rate: float = 0.6
-    cow_presynch_method: str = "Double OvSynch"
-    cow_tai_method: str = "OvSynch 56"
-    cow_ovsynch_method: str = "OvSynch 56"
-    cow_resynch_method: str = "TAIafterPD"
+    cow_presynch_method: CowPreSynchSubProtocol = CowPreSynchSubProtocol("Double OvSynch")
+    cow_tai_method: CowTAISubProtocol = CowTAISubProtocol("OvSynch 56")
+    cow_ovsynch_method: CowTAISubProtocol = CowTAISubProtocol("OvSynch 56")
+    cow_resynch_method: CowReSynchSubProtocol = CowReSynchSubProtocol("TAIafterPD")
     cow_estrus_detection_rate: float = 0.5
     ovsynch_program_start_day: int = 64
     ovsynch_program_conception_rate: float = 0.6
@@ -96,8 +99,16 @@ class AnimalConfig:
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]
         cls.std_gestation_length = animal_config_data["farm_level"]["repro"]["std_gestation_len"]
 
-        cls.heifer_reproduction_program = animal_config_data["management_decisions"]["heifer_repro_method"]
-        cls.heifer_reproduction_sub_program = animal_config_data["farm_level"]["repro"]["heifers"]["repro_sub_protocol"]
+        cls.heifer_reproduction_program = HeiferReproductionProtocol(
+            animal_config_data["management_decisions"]["heifer_repro_method"])
+        if cls.heifer_reproduction_program == HeiferReproductionProtocol.TAI:
+            cls.heifer_reproduction_sub_program = HeiferTAISubProtocol(
+                animal_config_data["farm_level"]["repro"]["heifers"]["repro_sub_protocol"])
+        elif cls.heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
+            cls.heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(
+                animal_config_data["farm_level"]["repro"]["heifers"]["repro_sub_protocol"])
+        else:
+            cls.heifer_reproduction_sub_program = HeiferTAISubProtocol("5dCG2P")
         cls.heifer_estrus_detection_rate = animal_config_data["farm_level"]["repro"]["heifers"]["estrus_detection_rate"]
         cls.heifer_estrus_conception_rate = animal_config_data["farm_level"]["repro"]["heifers"][
             "estrus_conception_rate"]
@@ -106,13 +117,18 @@ class AnimalConfig:
         cls.heifer_reproduction_sub_program_estrus_detection_rate = animal_config_data["farm_level"]["repro"][
             "heifers"]["repro_sub_properties"]["estrus_detection_rate"]
 
-        cls.cow_reproduction_program = animal_config_data["management_decisions"]["cow_repro_method"]
+        cls.cow_reproduction_program = CowReproductionProtocol(
+            animal_config_data["management_decisions"]["cow_repro_method"])
         cls.cow_estrus_detection_rate = animal_config_data["farm_level"]["repro"]["cows"]["estrus_detection_rate"]
         cls.cow_estrus_conception_rate = animal_config_data["farm_level"]["repro"]["cows"]["ED_conception_rate"]
-        cls.cow_presynch_method = animal_config_data["farm_level"]["repro"]["cows"]["presynch_program"]
-        cls.cow_tai_method = animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"]
-        cls.cow_ovsynch_method = animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"]
-        cls.cow_resynch_method = animal_config_data["farm_level"]["repro"]["cows"]["resynch_program"]
+        cls.cow_presynch_method = CowPreSynchSubProtocol(
+            animal_config_data["farm_level"]["repro"]["cows"]["presynch_program"])
+        cls.cow_tai_method = CowTAISubProtocol(
+            animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"])
+        cls.cow_ovsynch_method = CowTAISubProtocol(
+            animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program"])
+        cls.cow_resynch_method = CowReSynchSubProtocol(
+            animal_config_data["farm_level"]["repro"]["cows"]["resynch_program"])
         cls.ovsynch_program_start_day = animal_config_data["farm_level"]["repro"]["cows"]["ovsynch_program_start_day"]
         cls.ovsynch_program_conception_rate = animal_config_data["farm_level"]["repro"]["cows"][
             "ovsynch_program_conception_rate"]

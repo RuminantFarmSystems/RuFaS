@@ -1,4 +1,5 @@
 import math
+import sys
 from dataclasses import asdict
 from random import random
 from typing import Callable, Union, Any
@@ -64,8 +65,6 @@ class Reproduction:
         Birth weight of the calf, by default 0.0.
     calves : int, optional
         Number of calves, by default 0.
-    p_gest_for_calf : float, optional
-        Probability of gestation resulting in a calf, by default 0.0.
     calving_interval : int, optional
         Interval between calvings, by default 0.
     calving_interval_history : list[int], optional
@@ -100,7 +99,6 @@ class Reproduction:
     conceptus_weight: float
     calf_birth_weight: float
     calves: int
-    p_gest_for_calf: float
 
     calving_interval: int
     calving_interval_history: list[int]
@@ -126,7 +124,6 @@ class Reproduction:
             conceptus_weight: float = 0.0,
             calf_birth_weight: float = 0.0,
             calves: int = 0,
-            p_gest_for_calf: float = 0.0,
             calving_interval: int = 0,
             calving_interval_history: list[int] = None,
             body_weight_at_calving: float = 0.0,
@@ -154,7 +151,6 @@ class Reproduction:
         self.num_conception_rate_decreases = num_conception_rate_decreases if num_conception_rate_decreases else 0
 
         self.calves = calves if calves else 0
-        self.p_gest_for_calf = p_gest_for_calf if p_gest_for_calf else 0.0
         self.calving_interval = calving_interval if calving_interval else 0
 
         self.calving_interval_history = calving_interval_history if calving_interval_history else []
@@ -220,7 +216,7 @@ class Reproduction:
         ReproductionOutputs
             Updated reproduction outputs for the heifer.
         """
-        if self.heifer_reproduction_program.value != AnimalConfig.heifer_reproduction_program and \
+        if self.heifer_reproduction_program != AnimalConfig.heifer_reproduction_program and \
                 reproduction_outputs.days_born <= AnimalConfig.heifer_breed_start_day:
             reproduction_outputs.events.add_event(
                 reproduction_outputs.days_born,
@@ -282,7 +278,6 @@ class Reproduction:
                 "birth_weight": self.calf_birth_weight,
                 "net_merit": calf_net_merit,
             }
-
         if not self.do_not_breed:
             if self.cow_reproduction_program not in [
                 CowReproductionProtocol.ED,
@@ -393,7 +388,7 @@ class Reproduction:
         self.body_weight_at_calving = reproduction_outputs.body_weight
 
         reproduction_outputs.events.add_event(reproduction_outputs.days_born, time.simulation_day,
-                                            animal_constants.NEW_BIRTH)
+                                              animal_constants.NEW_BIRTH)
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born, time.simulation_day,
             f"{animal_constants.NUM_CALVES_BORN_NOTE}: {self.calves}")
@@ -411,8 +406,8 @@ class Reproduction:
             self.repro_state_manager.reset()
 
         if self.cow_reproduction_program in [
-            CowReproductionProtocol.ED.value,
-            CowReproductionProtocol.ED_TAI.value,
+            CowReproductionProtocol.ED,
+            CowReproductionProtocol.ED_TAI,
         ]:
             reproduction_outputs = self._simulate_estrus(
                 reproduction_outputs,
@@ -458,10 +453,13 @@ class Reproduction:
                     death_time_lower_limit = AnimalConfig.death_day_probability[i]
                     death_time_upper_limit = AnimalConfig.death_day_probability[i + 1]
             n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
+            print(round(
+                death_time_lower_limit + n * (death_date_random - death_lower_limit) + reproduction_outputs.days_born
+            ))
             return round(
                 death_time_lower_limit + n * (death_date_random - death_lower_limit) + reproduction_outputs.days_born
             )
-        return int(math.inf)
+        return sys.maxsize
 
     def determine_future_cull_date(self, reproduction_outputs: ReproductionOutputs) -> tuple[int, str]:
         """
@@ -550,9 +548,9 @@ class Reproduction:
         """
 
         if repro_program not in [
-            HeiferReproductionProtocol.ED.value,
-            HeiferReproductionProtocol.TAI.value,
-            HeiferReproductionProtocol.SynchED.value
+            HeiferReproductionProtocol.ED,
+            HeiferReproductionProtocol.TAI,
+            HeiferReproductionProtocol.SynchED
         ]:
             raise ValueError(f"Invalid repro program: {repro_program}")
 
@@ -978,7 +976,7 @@ class Reproduction:
             reproduction_outputs = self._set_up_hormone_schedule(reproduction_outputs, reproduction_outputs.days_born)
 
             self.TAI_conception_rate = AnimalConfig.heifer_reproduction_sub_program_conception_rate if \
-                    AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.TAI.value \
+                    AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.TAI \
                     else InternalReproSettings.HEIFER_REPRO_PROTOCOLS[HeiferReproductionProtocol.TAI.value][
                     "default_sub_properties"]["conception_rate"]
 
@@ -1127,7 +1125,7 @@ class Reproduction:
             animal_constants.ESTRUS_OCCURRED_NOTE,
         )
         synch_ed_estrus_detection_rate = AnimalConfig.heifer_reproduction_sub_program_estrus_detection_rate if \
-            AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.SynchED.value else \
+            AnimalConfig.heifer_reproduction_program == HeiferReproductionProtocol.SynchED else \
             InternalReproSettings.HEIFER_REPRO_PROTOCOLS[HeiferReproductionProtocol.SynchED.value][
                 "default_sub_properties"]["estrus_detection_rate"]
         is_estrus_detected = self._detect_estrus(synch_ed_estrus_detection_rate)
@@ -1188,8 +1186,7 @@ class Reproduction:
         heifer_repro_sub_protocol = self.heifer_reproduction_sub_program \
             if self.heifer_reproduction_sub_program == AnimalConfig.heifer_reproduction_sub_program \
             else InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
-            self.heifer_reproduction_sub_program.value]["default_sub_protocol"]
-
+            self.heifer_reproduction_program.value]["default_sub_protocol"]
         internal_fallback_protocol = InternalReproSettings.HEIFER_REPRO_PROTOCOLS[
             heifer_repro_sub_protocol]["when_estrus_not_detected"]
 
@@ -1201,7 +1198,7 @@ class Reproduction:
                 f"{self.heifer_reproduction_program} to "
                 f"{internal_fallback_protocol['repro_protocol']}",
             )
-            self.heifer_reproduction_program = internal_fallback_protocol["repro_protocol"]
+            self.heifer_reproduction_program = HeiferReproductionProtocol(internal_fallback_protocol["repro_protocol"])
 
         reproduction_outputs = self._set_up_hormone_schedule(reproduction_outputs, reproduction_outputs.days_born)
 
@@ -1465,12 +1462,12 @@ class Reproduction:
             The calculated birth weight of the calf.
         """
         average_birth_weight_by_breed = {
-            "HO": AnimalConfig.birth_weight_avg_ho,
-            "JE": AnimalConfig.birth_weight_avg_je,
+            Breed.HO: AnimalConfig.birth_weight_avg_ho,
+            Breed.JE: AnimalConfig.birth_weight_avg_je,
         }
         std_birth_weight_by_breed = {
-            "HO": AnimalConfig.birth_weight_std_ho,
-            "JE": AnimalConfig.birth_weight_std_je,
+            Breed.HO: AnimalConfig.birth_weight_std_ho,
+            Breed.JE: AnimalConfig.birth_weight_std_je,
         }
         birth_weight = truncnorm.rvs(
             -animal_constants.STDI,
@@ -1490,11 +1487,11 @@ class Reproduction:
             Updated reproduction outputs with pregnancy parameters initialized.
         """
 
-        reproduction_outputs.days_in_preg = 1
+        reproduction_outputs.days_in_pregnancy = 1
         self.abortion_day = 0
         self.breeding_to_preg_time = reproduction_outputs.days_born - AnimalConfig.heifer_breed_start_day
         self.gestation_length = self._calculate_gestation_length()
-        self.calf_birth_weight = self._calculate_calf_birth_weight(reproduction_outputs.breed.value)
+        self.calf_birth_weight = self._calculate_calf_birth_weight(reproduction_outputs.breed)
 
         return reproduction_outputs
 
@@ -1673,7 +1670,7 @@ class Reproduction:
             preg_loss_const,
         )
         self.abortion_day = reproduction_outputs.days_born
-        reproduction_outputs.days_in_preg = 0
+        reproduction_outputs.days_in_pregnancy = 0
         if reproduction_outputs.animal_type == AnimalType.HEIFER_II:
             reproduction_outputs = self.open_heifer(reproduction_outputs, simulation_day)
         else:
@@ -1681,7 +1678,7 @@ class Reproduction:
         reproduction_outputs.body_weight -= self.conceptus_weight
         self.conceptus_weight = 0
         self.calf_birth_weight = 0
-        self.p_gest_for_calf = 0
+        reproduction_outputs.phosphorus_for_gestation_required_for_calf = 0
         return reproduction_outputs
 
     def _calculate_conception_rate_on_ai_day(self) -> None:
@@ -1752,7 +1749,7 @@ class Reproduction:
                 # Used in PGFatPD resynch program
                 if self.repro_state_manager.is_in(ReproStateEnum.WAITING_SHORT_ED_CYCLE):
                     self.repro_state_manager.exit(ReproStateEnum.WAITING_SHORT_ED_CYCLE)
-                    reproduction_outputs, = self._handle_estrus_detection(
+                    reproduction_outputs = self._handle_estrus_detection(
                         reproduction_outputs,
                         simulation_day,
                         on_estrus_detected=self._setup_ai_day_after_estrus_detected,
@@ -1766,7 +1763,7 @@ class Reproduction:
                             f"Current repro state(s): {self.repro_state_manager}",
                         )
 
-                elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_qCYCLE):
+                elif self.repro_state_manager.is_in(ReproStateEnum.WAITING_FULL_ED_CYCLE):
                     self.repro_state_manager.exit(ReproStateEnum.WAITING_FULL_ED_CYCLE)
                     reproduction_outputs = self._handle_estrus_detection(
                         reproduction_outputs,
@@ -1805,7 +1802,6 @@ class Reproduction:
         ReproductionOutputs
             Updated reproduction outputs after estrus simulation.
         """
-
         if self.repro_state_manager.is_in_empty_state() or \
                 self.repro_state_manager.is_in(ReproStateEnum.ENTER_HERD_FROM_INIT):
             self.repro_state_manager.enter(ReproStateEnum.FRESH)
@@ -2175,13 +2171,13 @@ class Reproduction:
             Boolean indicating if setup is needed, and updated reproduction outputs.
         """
 
-        if self.cow_reproduction_program != CowReproductionProtocol.TAI.value:
+        if self.cow_reproduction_program != CowReproductionProtocol.TAI:
             return False, reproduction_outputs
 
         if AnimalConfig.cow_presynch_method not in [
-            CowPreSynchSubProtocol.Presynch_PreSynch.value,
-            CowPreSynchSubProtocol.Presynch_DoubleOvSynch.value,
-            CowPreSynchSubProtocol.Presynch_G6G.value,
+            CowPreSynchSubProtocol.Presynch_PreSynch,
+            CowPreSynchSubProtocol.Presynch_DoubleOvSynch,
+            CowPreSynchSubProtocol.Presynch_G6G,
         ]:
             return False, reproduction_outputs
 
@@ -2201,8 +2197,8 @@ class Reproduction:
             return True, reproduction_outputs
 
         if reproduction_outputs.days_in_milking > AnimalConfig.presynch_program_start_day and \
-                self.repro_state_manager.is_in(
-                    ReproStateEnum.ENTER_HERD_FROM_INIT
+                self.repro_state_manager.is_in_any(
+                    {ReproStateEnum.ENTER_HERD_FROM_INIT}
                 ):
             self.repro_state_manager.enter(ReproStateEnum.IN_PRESYNCH)
             reproduction_outputs.events.add_event(
@@ -2235,12 +2231,11 @@ class Reproduction:
 
         if self.hormone_schedule:
             return False, reproduction_outputs
-
         if AnimalConfig.cow_ovsynch_method not in [
-            CowTAISubProtocol.TAI_OvSynch_48.value,
-            CowTAISubProtocol.TAI_OvSynch_56.value,
-            CowTAISubProtocol.TAI_CoSynch_72.value,
-            CowTAISubProtocol.TAI_5d_CoSynch.value,
+            CowTAISubProtocol.TAI_OvSynch_48,
+            CowTAISubProtocol.TAI_OvSynch_56,
+            CowTAISubProtocol.TAI_CoSynch_72,
+            CowTAISubProtocol.TAI_5d_CoSynch,
         ]:
             return False, reproduction_outputs
 
@@ -2471,7 +2466,7 @@ class Reproduction:
             animal_constants.COW_PREG,
         )
 
-        reproduction_outputs.days_in_preg = 1
+        reproduction_outputs.days_in_pregnancy = 1
         self.repro_state_manager.enter(ReproStateEnum.PREGNANT)
         reproduction_outputs.events.add_event(
             reproduction_outputs.days_born,
@@ -2481,18 +2476,20 @@ class Reproduction:
 
         self.gestation_length = self._calculate_gestation_length()
         self.calf_birth_weight = self._calculate_calf_birth_weight(
-            reproduction_outputs.breed.value)
+            reproduction_outputs.breed)
 
         if self.calves > 0:
             last_time_given_birth = reproduction_outputs.events.get_most_recent_date(animal_constants.NEW_BIRTH)
             reproduction_outputs.animal_level_statistics.calving_to_pregnancy_time = reproduction_outputs.days_born - \
                                                                                      last_time_given_birth
-
+        print(0)
         if self.cow_reproduction_program in [
-            CowReproductionProtocol.TAI.value,
-            CowReproductionProtocol.ED_TAI.value,
+            CowReproductionProtocol.TAI,
+            CowReproductionProtocol.ED_TAI,
         ]:
-            if AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIbeforePD.value:
+            print(1)
+            if AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIbeforePD:
+                print(2)
                 reproduction_outputs = self._schedule_ovsynch_program_in_advance(
                     reproduction_outputs,
                     simulation_day
@@ -2536,8 +2533,8 @@ class Reproduction:
         )
 
         if self.cow_reproduction_program in [
-            CowReproductionProtocol.ED.value,
-            CowReproductionProtocol.ED_TAI.value,
+            CowReproductionProtocol.ED,
+            CowReproductionProtocol.ED_TAI,
         ]:
             self.repro_state_manager.enter(ReproStateEnum.WAITING_FULL_ED_CYCLE)
             reproduction_outputs.events.add_event(
@@ -2555,10 +2552,10 @@ class Reproduction:
             )
 
         if self.cow_reproduction_program in [
-            CowReproductionProtocol.TAI.value,
-            CowReproductionProtocol.ED_TAI.value,
+            CowReproductionProtocol.TAI,
+            CowReproductionProtocol.ED_TAI,
         ]:
-            if AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIbeforePD.value:
+            if AnimalConfig.cow_resynch_method == CowReSynchSubProtocol.Resynch_TAIbeforePD:
                 reproduction_outputs = self._schedule_ovsynch_program_in_advance(
                     reproduction_outputs,
                     simulation_day
@@ -2839,6 +2836,7 @@ class Reproduction:
         )
 
         return reproduction_outputs
+
     def _exit_ovsynch_program_early_when_first_preg_check_passed_or_estrus_detected(
             self,
             reproduction_outputs: ReproductionOutputs,
