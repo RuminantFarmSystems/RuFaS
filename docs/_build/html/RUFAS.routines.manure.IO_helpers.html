@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,23 +8,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RUFAS.routines.manure.IO_helpers package &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="RUFAS.routines.manure.beddings package" href="RUFAS.routines.manure.beddings.html" />
-    <link rel="prev" title="RUFAS.routines.manure package" href="RUFAS.routines.manure.html" /> 
+    <link rel="next" title="RUFAS.routines.manure.manure_handlers package" href="RUFAS.routines.manure.manure_handlers.html" />
+    <link rel="prev" title="RUFAS.routines.manure.gas_emissions package" href="RUFAS.routines.manure.gas_emissions.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -53,7 +51,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.config">RUFAS.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-config-module">RUFAS.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.current_day_conditions">RUFAS.current_day_conditions module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.errors">RUFAS.errors module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.general_constants">RUFAS.general_constants module</a></li>
@@ -61,9 +59,9 @@
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.input_manager">RUFAS.input_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.output_manager">RUFAS.output_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.report_generator">RUFAS.report_generator module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.scenario_manager">RUFAS.scenario_manager module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-scenario-manager-module">RUFAS.scenario_manager module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.simulation_engine">RUFAS.simulation_engine module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.state">RUFAS.state module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="RUFAS.html#rufas-state-module">RUFAS.state module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.time">RUFAS.time module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.util">RUFAS.util module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="RUFAS.html#module-RUFAS.weather">RUFAS.weather module</a></li>
@@ -74,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a></li>
 </ul>
 
         </div>
@@ -113,91 +112,231 @@
 <span id="rufas-routines-manure-io-helpers-manure-manager-config-handler-module"></span><h2>RUFAS.routines.manure.IO_helpers.manure_manager_config_handler module<a class="headerlink" href="#module-RUFAS.routines.manure.IO_helpers.manure_manager_config_handler" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.</span></span><span class="sig-name descname"><span class="pre">ManureManagerConfigHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_manager_config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.</span></span><span class="sig-name descname"><span class="pre">ManureManagerConfigHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_manager_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class that manages the custom manure manager configs.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_bedding_config">
-<span class="sig-name descname"><span class="pre">get_custom_bedding_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_bedding_config" title="Link to this definition"></a></dt>
-<dd><p>Returns the custom bedding config for the given bedding type name, or None if no custom config exists.</p>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_manager_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initializes the ManureManagerConfigHandler class.</p>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>bedding_type_name<span class="classifier">str</span></dt><dd><p>The name of the bedding type for which to get the custom config.</p>
+<dt>manure_manager_config<span class="classifier">dict[str, Any]</span></dt><dd><p>The manure manager config dictionary that contains all the manure manager config information.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_bedding_config">
+<span class="sig-name descname"><span class="pre">get_bedding_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_bedding_config" title="Link to this definition"></a></dt>
+<dd><p>Returns the bedding config for the given bedding type name.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bedding_name<span class="classifier">str</span></dt><dd><p>The name of the bedding configuration for which to get the config.</p>
 </dd>
 </dl>
 </section>
 <section id="returns">
 <h3>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Optional[BeddingConfig]</dt><dd><p>The custom bedding config for the given bedding type name, or None if no custom config exists.</p>
+<dt>BeddingConfig</dt><dd><p>The bedding config associated with the given bedding name.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_handler_config">
-<span class="sig-name descname"><span class="pre">get_custom_manure_handler_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_handler_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_handler_config" title="Link to this definition"></a></dt>
-<dd><p>Returns the custom manure handler config for the given manure handler type name, or None if no custom
-config exists.</p>
-<section id="id1">
-<h3>Parameters<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>manure_handler_type_name<span class="classifier">str</span></dt><dd><p>The name of the manure handler type for which to get the custom config.</p>
-</dd>
-</dl>
-</section>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_manure_handler_config">
+<span class="sig-name descname"><span class="pre">get_manure_handler_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_handler_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_manure_handler_config" title="Link to this definition"></a></dt>
+<dd><p>Returns the manure handler config for the given manure handler type name.</p>
 <section id="id2">
-<h3>Returns<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<h3>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Optional[ManureHandlerConfig]</dt><dd><p>The custom manure handler config for the given manure handler type name, or None if no custom config exists.</p>
+<dt>manure_handler_type_name<span class="classifier">str</span></dt><dd><p>The name of the manure handler type for which to get the config.</p>
 </dd>
 </dl>
 </section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_separator_config">
-<span class="sig-name descname"><span class="pre">get_custom_manure_separator_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_separator_config" title="Link to this definition"></a></dt>
-<dd><p>Returns the custom manure separator config for the given manure separator type name, or None if no custom
-config exists.</p>
 <section id="id3">
-<h3>Parameters<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<h3>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>manure_separator_type_name<span class="classifier">str</span></dt><dd><p>The name of the manure separator type for which to get the custom config.</p>
+<dt>ManureHandlerConfig</dt><dd><p>The manure handler config for the given manure handler type name.</p>
 </dd>
 </dl>
 </section>
-<section id="id4">
-<h3>Returns<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
+<section id="raises">
+<h3>Raises<a class="headerlink" href="#raises" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Optional[ManureSeparatorConfig]</dt><dd><p>The custom manure separator config for the given manure separator type name, or None if no custom config
-exists.</p>
+<dt>KeyError</dt><dd><p>If the name of the manure handler type is not present in the available manure handler configs.</p>
 </dd>
 </dl>
 </section>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_treatment_config">
-<span class="sig-name descname"><span class="pre">get_custom_manure_treatment_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_treatment_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_custom_manure_treatment_config" title="Link to this definition"></a></dt>
-<dd><p>Returns the custom manure treatment config for the given manure treatment type name, or None if no custom
-config exists.</p>
-<section id="id5">
-<h3>Parameters<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_manure_separator_config">
+<span class="sig-name descname"><span class="pre">get_manure_separator_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_manure_separator_config" title="Link to this definition"></a></dt>
+<dd><p>Returns the config for the given manure separator name, or None if no separation is to occur.</p>
+<section id="id4">
+<h3>Parameters<a class="headerlink" href="#id4" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>manure_treatment_type_name<span class="classifier">str</span></dt><dd><p>The name of the manure treatment type for which to get the custom config.</p>
+<dt>manure_separator_name<span class="classifier">str</span></dt><dd><p>The name of the manure separator type for which to get the config.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h3>Returns<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Optional[ManureSeparatorConfig]</dt><dd><p>The manure separator config for the given manure separator type name, or None if the requested config is
+“none”.</p>
 </dd>
 </dl>
 </section>
 <section id="id6">
-<h3>Returns<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
+<h3>Raises<a class="headerlink" href="#id6" title="Link to this heading"></a></h3>
 <dl class="simple">
-<dt>Optional[ManureTreatmentConfig]</dt><dd><p>The custom manure treatment config for the given manure treatment type name, or None if no custom config
-exists.</p>
+<dt>KeyError</dt><dd><p>If the specified manure separator config name is not present and is not “none”.</p>
 </dd>
 </dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_manure_treatment_config">
+<span class="sig-name descname"><span class="pre">get_manure_treatment_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_treatment_type_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler.get_manure_treatment_config" title="Link to this definition"></a></dt>
+<dd><p>Returns the manure treatment config for the given manure treatment type name.</p>
+<section id="id7">
+<h3>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_treatment_type_name<span class="classifier">str</span></dt><dd><p>The name of the manure treatment type for which to get the config.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h3>Returns<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ManureTreatmentConfig</dt><dd><p>The manure treatment config for the given manure treatment type name.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h3>Raises<a class="headerlink" href="#id9" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>KeyError</dt><dd><p>If the specified manure treatment config name is not present in the available manure treatment configs.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_bedding_configs">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_process_bedding_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bedding_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.beddings.html#RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig" title="RUFAS.routines.manure.beddings.bedding_classes.BeddingConfig"><span class="pre">BeddingConfig</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_bedding_configs" title="Link to this definition"></a></dt>
+<dd><p>Creates a mapping of bedding configs to be used when setting up manure beddings.</p>
+<section id="id10">
+<h3>Parameters<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>bedding_configs<span class="classifier">List[Dict]</span></dt><dd><p>A list of dictionaries containing the bedding config information.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h3>Returns<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Dict[str, BeddingConfig]</dt><dd><p>A dictionary of bedding config objects, with the key being the bedding name.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_manure_handler_configs">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_process_manure_handler_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_handler_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_handlers.html#RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig" title="RUFAS.routines.manure.manure_handlers.manure_handler_classes.ManureHandlerConfig"><span class="pre">ManureHandlerConfig</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_manure_handler_configs" title="Link to this definition"></a></dt>
+<dd><p>Returns a dictionary of manure handler config objects, with the key being the name of the manure handler
+configuration option.</p>
+<section id="id12">
+<h3>Parameters<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_handler_configs<span class="classifier">List[Dict]</span></dt><dd><p>A list of dictionaries containing the manure handler config information.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h3>Returns<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Dict[str, ManureHandlerConfig]</dt><dd><p>A dictionary of manure handler config objects, with the key being the manure handler type.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h3>Raises<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there are multiple configurations for one configuration name.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_manure_separator_configs">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_process_manure_separator_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_separator_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_separators.html#RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig" title="RUFAS.routines.manure.manure_separators.manure_separator_classes.ManureSeparatorConfig"><span class="pre">ManureSeparatorConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_manure_separator_configs" title="Link to this definition"></a></dt>
+<dd><p>Returns a dictionary of manure separator config objects, with the key being the name of the separator config.</p>
+<section id="id15">
+<h3>Parameters<a class="headerlink" href="#id15" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_separator_configs<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>A list of dictionaries containing the manure separator config information.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h3>Returns<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>Dict[ManureSeparatorType, ManureSeparatorConfig | None]</dt><dd><p>A dictionary of manure separator config objects, with the key being the manure separator type.</p>
+</dd>
+</dl>
+</section>
+<section id="id17">
+<h3>Raises<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there are multiple configurations for one configuration name.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_manure_treatment_configs">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_process_manure_treatment_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manure_treatment_configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="RUFAS.routines.manure.manure_treatments.html#RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig" title="RUFAS.routines.manure.manure_treatments.manure_treatment_configs.ManureTreatmentConfig"><span class="pre">ManureTreatmentConfig</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_manager_config_handler.ManureManagerConfigHandler._process_manure_treatment_configs" title="Link to this definition"></a></dt>
+<dd><p>Returns a dictionary of manure treatment config objects, with the key being the manure treatment type.</p>
+<section id="id18">
+<h3>Parameters<a class="headerlink" href="#id18" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>manure_treatment_configs<span class="classifier">list[dict[str, Any]]</span></dt><dd><p>A list of dictionaries containing the manure treatment config information.</p>
+</dd>
+</dl>
+</section>
+<section id="id19">
+<h3>Returns<a class="headerlink" href="#id19" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>dict[str, Union[ManureTreatmentConfig, Tuple[ManureTreatmentConfig, ManureTreatmentConfig]]]</dt><dd><p>A dictionary of manure treatment config objects, with the key being the manure treatment type.</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h3>Raises<a class="headerlink" href="#id20" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If there are multiple configurations for one configuration name.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h3>
+<p>There are two cases which require a combination of anaerobic digestion and anaerobic lagoon - anaerobic
+digestion and lagoon, and anaerobic digestion and lagoon with separation. In these cases, we return a tuple of
+two manure treatment configs, the first being the config for the digester and the second being the config for
+the lagoon. If a config is not provided for either the digester or the lagoon, then the simulation will crash if
+the user specified one of the digestion-lagoon combinations to be used.</p>
 </section>
 </dd></dl>
 
@@ -217,12 +356,17 @@ exists.</p>
 <dt>_om<span class="classifier">OutputManager</span></dt><dd><p>An instance of the OutputManager to manage output-related operations.</p>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.ManureModuleOutputManagerHelper._om">
+<span class="sig-name descname"><span class="pre">_om</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;RUFAS.output_manager.OutputManager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.ManureModuleOutputManagerHelper._om" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.ManureModuleOutputManagerHelper.add_dataclass_object">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_dataclass_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataclass_object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dataclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.ManureModuleOutputManagerHelper.add_dataclass_object" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_dataclass_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataclass_object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dataclass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info_maps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#RUFAS.routines.manure.IO_helpers.manure_module_output_manager_helper.ManureModuleOutputManagerHelper.add_dataclass_object" title="Link to this definition"></a></dt>
 <dd><p>Add the fields of a dataclass object to the output manager.</p>
-<section id="id7">
-<h4>Parameters<a class="headerlink" href="#id7" title="Link to this heading"></a></h4>
+<section id="id21">
+<h4>Parameters<a class="headerlink" href="#id21" title="Link to this heading"></a></h4>
 <dl class="simple">
 <dt>dataclass_object<span class="classifier">dataclass</span></dt><dd><p>The dataclass object whose fields are to be added.</p>
 </dd>
@@ -247,8 +391,8 @@ exists.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="RUFAS.routines.manure.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="RUFAS.routines.manure.beddings.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.beddings package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="RUFAS.routines.manure.gas_emissions.html" class="btn btn-neutral float-left" title="RUFAS.routines.manure.gas_emissions package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="RUFAS.routines.manure.manure_handlers.html" class="btn btn-neutral float-right" title="RUFAS.routines.manure.manure_handlers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
