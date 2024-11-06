@@ -48,7 +48,7 @@ def filter_variables(var_list, exclude_list):
 
 
 
-report_paths = get_file_paths("C:/Users/kfr3/OneDrive - Cornell University/RuFaS/Pilot Testing/Pilot Results/Sept2024/reports/pilotfarms_no_crops reports/*.csv")
+report_paths = get_file_paths("C:/Users/Kristan.Reed/OneDrive - USDA/Documents/RuFaS/Pilot Results/October2024/*.csv")
 
 variables_to_exclude = ["DMI by feed", "Feed emissions by feed", "LUC emissions by feed", "Storage ammonia by pen",
                         "Manure nitrous oxide (storage) by pen", "Storage ammonia by pen"]
@@ -57,7 +57,7 @@ results = get_pilot_data(report_paths, variables_to_exclude)
 summary = get_summary_by_scen(results)
 
 ## save summary file as a csv
-csv_file_path = "C:/Users/kfr3/OneDrive - Cornell University/RuFaS/Pilot Testing/Pilot Results/Sept2024/pilot_summary_results.csv"
+csv_file_path = "C:/Users/Kristan.Reed/OneDrive - USDA/Documents/RuFaS/Pilot Results/October2024/pilot_summary_results.csv"
 summary.to_csv(csv_file_path, index=False)
 
 ## Plot summary results
