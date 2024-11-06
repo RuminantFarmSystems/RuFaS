@@ -1061,7 +1061,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_animal_events.__name__,
         }
         for animal in animals:
@@ -1078,7 +1078,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_heiferIIs_conception_rate.__name__,
         }
         om.add_variable(
@@ -1172,7 +1172,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_cows_conception_rate.__name__,
         }
         om.add_variable(
