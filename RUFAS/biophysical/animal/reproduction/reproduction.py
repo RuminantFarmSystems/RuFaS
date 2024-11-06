@@ -453,9 +453,6 @@ class Reproduction:
                     death_time_lower_limit = AnimalConfig.death_day_probability[i]
                     death_time_upper_limit = AnimalConfig.death_day_probability[i + 1]
             n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
-            print(round(
-                death_time_lower_limit + n * (death_date_random - death_lower_limit) + reproduction_outputs.days_born
-            ))
             return round(
                 death_time_lower_limit + n * (death_date_random - death_lower_limit) + reproduction_outputs.days_born
             )
