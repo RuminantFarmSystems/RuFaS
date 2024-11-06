@@ -465,7 +465,7 @@ def test_determine_assimilated_surface_manure(
 )
 def test_daily_manure_update(rain: float, area: float, mean_temp: float, mocker: MockerFixture) -> None:
     """Tests that the main manure update method correctly calls all subroutines."""
-    pool = ManurePool()
+    pool = ManurePool(stable_organic_phosphorus=4)
 
     mock_determine_temperature_factor = mocker.patch.object(pool, "_determine_temperature_factor", return_value=0.1)
     mock_determine_decomposed_surface_manure = mocker.patch.object(
@@ -483,7 +483,7 @@ def test_daily_manure_update(rain: float, area: float, mean_temp: float, mocker:
     )
 
     mineralized_surface_phosphorus_calls = [
-        call(0, 0.01, 0.1, 0),
+        call(4, 0.01, 0.1, 0),
         call(0, 0.0025, 0.1, 0),
         call(0, 0.1, 0.1, 0),
     ]
@@ -506,6 +506,7 @@ def test_daily_manure_update(rain: float, area: float, mean_temp: float, mocker:
     assert pool.stable_inorganic_phosphorus == 0
     assert pool.water_extractable_organic_phosphorus == 1
     assert pool.water_extractable_inorganic_phosphorus == 11
+    assert pool.annual_decomposed_manure == 12
 
     assert observed == 16
 
