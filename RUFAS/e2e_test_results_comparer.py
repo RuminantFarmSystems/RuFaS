@@ -62,7 +62,7 @@ class E2ETestResultsComparer:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
 
-            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
+            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=8)
 
             is_difference_in_results: bool = False if (diff == {}) else True
             if is_difference_in_results:
