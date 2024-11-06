@@ -1,0 +1,430 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feed Storage Scientific Documentation &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Crop yields" href="yields.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">GitHub</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="crop_and_soil.html">Crop and Soil Scientific Documentation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Feed Storage Scientific Documentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mass-loss">1 Mass Loss</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#grain">1.1 Grain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hay">1.2 Hay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#silage-and-baleage">1.3 Silage and Baleage</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#nutrient-loss">2 Nutrient Loss</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#nutrient-loss-in-hay">2.1 Nutrient Loss in Hay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nutrient-loss-in-silage-and-baleage">2.2 Nutrient Loss in Silage and Baleage</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="scientific_documentation.html">Scientific Documentation</a></li>
+      <li class="breadcrumb-item active">Feed Storage Scientific Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/feed_storage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="feed-storage-scientific-documentation">
+<h1>Feed Storage Scientific Documentation<a class="headerlink" href="#feed-storage-scientific-documentation" title="Link to this heading"></a></h1>
+<p>This document details how stored feeds lose dry matter and nutrients.</p>
+<section id="mass-loss">
+<h2>1 Mass Loss<a class="headerlink" href="#mass-loss" title="Link to this heading"></a></h2>
+<section id="grain">
+<h3>1.1 Grain<a class="headerlink" href="#grain" title="Link to this heading"></a></h3>
+<p>The two types of grain simulated in RuFaS are dry and high-moisture.</p>
+<p>The cumulative amount of dry matter lost from dry grain is calculated
+with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{gaseous} = M_i \cdot 0.01 \tag{1.1.1}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(L_{gaseous}\)</span> is the total amount of dry matter lost as gas
+(kg) and <span class="math notranslate nohighlight">\(M_i\)</span> is the mass of dry matter at the time of storage
+(kg).</p>
+<p>The cumulative amount of dry matter lost from high-moisture grain is
+calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{gaseous} = M_i \cdot 0.05 \tag{1.1.2}\]</div>
+<p>Where <span class="math notranslate nohighlight">\({L}_{gaseous}\)</span> is the total amount of dry matter lost as
+gas (kg) and <span class="math notranslate nohighlight">\(M_i\)</span> is the mass of dry matter at the time of
+storage (kg).</p>
+</section>
+<section id="hay">
+<h3>1.2 Hay<a class="headerlink" href="#hay" title="Link to this heading"></a></h3>
+<p>Four types of hay are simulated by RuFaS: protected-indoor,
+protected-wrapped, protected-tarped, and unprotected-outdoor. The
+cumulative amount of gaseous dry matter loss that has happened since hay
+storage is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{gaseous} = L_{base} + L_{additional} \tag{1.2.1}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(L_{base}\)</span> is the total amount of gaseous dry matter loss
+from hay after storage (kg) and <span class="math notranslate nohighlight">\(L_{additional}\)</span> is the total
+amount of additional dry matter loss from hay due to weather and storage
+conditions (kg).</p>
+<p><span class="math notranslate nohighlight">\(L_{base}\)</span> is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{base} = L_{first 30 days} + L_{post 30 days} \tag{1.2.2}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(L_{first 30 days}\)</span> is the total amount of gaseous dry
+matter loss that occurred in the first 30 days of storage (kg), and
+<span class="math notranslate nohighlight">\(L_{post 30 days}\)</span> is the total amount of gaseous dry matter loss
+that occurred after the first 30 days of storage (kg).</p>
+<p><span class="math notranslate nohighlight">\(L_{first 30 days}\)</span> is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{first 30 days} = \frac{Q + 2433 \cdot [moisture - \frac{MF(1 - moisture)}{1 - MF}]}{(1 - moisture)(14206 - \frac{2433 \cdot MF}{1 - MF})} \cdot \frac{min(30, d)}{30} \tag{1.2.3}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(L_{first 30 days}\)</span> is the fraction of gaseous dry matter loss
+that occurred in the hay in the first 30 days of storage (<span class="math notranslate nohighlight">\(kg\)</span>),
+<span class="math notranslate nohighlight">\(Q\)</span> is the total sensible heat generated by the hay
+(<span class="math notranslate nohighlight">\(kJ/kg\)</span>), <span class="math notranslate nohighlight">\(moisture\)</span> is the percentage of fresh mass in the
+hay that is not dry matter when the hay is stored (unitless), <span class="math notranslate nohighlight">\(MF\)</span>
+is the final moisture percentage of hay (unitless), and <span class="math notranslate nohighlight">\(d\)</span> is the
+number of days the hay has been stored for.</p>
+<p>The total sensible heat generated is generated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[Q = 104 \cdot moisture^{2.18} \cdot {b_{density}}^{0.5} + 5.72(moisture^{1.23} \cdot {b_{density}}^{0.94}) \tag{1.2.4}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(moisture\)</span> is the fraction of fresh mass in the hay that is
+not dry matter when the hay is stored (unitless) and <span class="math notranslate nohighlight">\(b_{density}\)</span>
+is the density of the hay bale when stored (<span class="math notranslate nohighlight">\(kg / m^3\)</span>).</p>
+<p><span class="math notranslate nohighlight">\(b_{density}\)</span> is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[b_{density} = 100 + 440 \cdot moisture \tag{1.2.5}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(moisture\)</span> is the fraction of fresh mass in the hay that is
+not dry matter when the hay is stored (unitless).</p>
+<p>The final moisture percentage of hay is defined as</p>
+<div class="math notranslate nohighlight">
+\[MF = 12 \tag{1.2.6}\]</div>
+<p><span class="math notranslate nohighlight">\(L_{post 30 days}\)</span> is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{post 30 days} = 0.0001 \cdot max(0, d - 30) \tag{1.2.7}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(d\)</span> is the number of days that the hay has been stored for.</p>
+<p><span class="math notranslate nohighlight">\(L_{additional}\)</span> is calculated for protected wrapped, protected
+tarped and unprotected outdoor hay with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{additional} = \sum_{i=1}^{d} l \cdot rain_i \cdot max(0.0, \frac{high_i + low_i}{2}) \cdot \frac{1}{b_{density}} \cdot {b_{size}}^3 \tag{1.2.8}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(d\)</span> is the number of days the hay has been stored for,
+<span class="math notranslate nohighlight">\(i\)</span> is the day since storage that dry matter loss is being
+calculated for, <span class="math notranslate nohighlight">\(l\)</span> is the loss coefficient (unitless),
+<span class="math notranslate nohighlight">\(rain_i\)</span> is the amount of rain on day <span class="math notranslate nohighlight">\(i\)</span> (cm),
+<span class="math notranslate nohighlight">\(high_i\)</span> is the high temperature on day <span class="math notranslate nohighlight">\(i\)</span>
+(<span class="math notranslate nohighlight">\(C^\circ\)</span>), <span class="math notranslate nohighlight">\(low_i\)</span> is the low temperature on day <span class="math notranslate nohighlight">\(i\)</span>
+(<span class="math notranslate nohighlight">\(C^\circ\)</span>), <span class="math notranslate nohighlight">\(b_{density}\)</span> is the bale density (<span class="math notranslate nohighlight">\(kg / m^3\)</span>)
+(eqn. 1.2.5), and <span class="math notranslate nohighlight">\(b_{size}\)</span> is the diameter of the hay bale
+(<span class="math notranslate nohighlight">\(m\)</span>).</p>
+<p>The loss coefficients for the different hay storages are defined in the
+table:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hay Storage Type</p></th>
+<th class="head"><p>Loss Coefficient</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Protected Wrapped</p></td>
+<td><p>0.0000216</p></td>
+</tr>
+<tr class="row-odd"><td><p>Protected Tarped</p></td>
+<td><p>0.0000108</p></td>
+</tr>
+<tr class="row-even"><td><p>Unprotected Outdoor</p></td>
+<td><p>0.00006</p></td>
+</tr>
+</tbody>
+</table>
+<p>Table: <span class="math notranslate nohighlight">\(1.2.9\)</span></p>
+<p><span class="math notranslate nohighlight">\(L_{additional}\)</span> for protected indoor hay is 0.</p>
+<p>Hayed crops will lose moisture in the first 30 days of storage if they
+have a moisture percentage greater than <span class="math notranslate nohighlight">\(MF\)</span> when they are stored.</p>
+<p>The cumulative amount of moisture (kg) that is lost from hayed and baled crop’s fresh
+mass is calculated with the following equation:</p>
+<div class="math notranslate nohighlight">
+\[M = F_i \cdot \frac{max(0.0, moisture - MF)}{100} \cdot \frac{min(30, d)}{30} \tag{1.2.9}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(F_i\)</span> is the fresh mass of the crop when it is stored (<span class="math notranslate nohighlight">\(kg\)</span>), <span class="math notranslate nohighlight">\(moisture\)</span>
+is the percentage of the fresh mass that is not dry matter when the crop is stored, and
+<span class="math notranslate nohighlight">\(d\)</span> is the number of days that the crop has been stored for.</p>
+</section>
+<section id="silage-and-baleage">
+<h3>1.3 Silage and Baleage<a class="headerlink" href="#silage-and-baleage" title="Link to this heading"></a></h3>
+<p>Both silage and baleage experience dry matter loss to fermentation.</p>
+<p>The cumulative dry matter loss to fermentation for ensiled alfalfa
+(<span class="math notranslate nohighlight">\(kg\)</span>) is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{fermentation} = \sum_{i=1}^{d} drymass_{i-1} \cdot (0.0156 - 0.0364(dryfrac_{i-1} - 0.2)) \tag{1.3.1}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(d\)</span> is the number of days the alfalfa has been ensiled for,
+<span class="math notranslate nohighlight">\(i\)</span> is the day since ensilement that dry matter loss is being
+calculated for, <span class="math notranslate nohighlight">\(drymass_{i-1}\)</span> is the dry matter mass of ensiled
+alfalfa on day <span class="math notranslate nohighlight">\(i-1\)</span>, and <span class="math notranslate nohighlight">\(dryfrac_{i-1}\)</span> is the fraction of
+ensiled alfalfa fresh mass that is dry matter on day <span class="math notranslate nohighlight">\(i-1\)</span>. When
+<span class="math notranslate nohighlight">\(i\)</span> is 1, <span class="math notranslate nohighlight">\(drymass_{i-1}\)</span> is the initial amount of ensiled
+alfalfa dry mass and <span class="math notranslate nohighlight">\(dryfrac_{i-1}\)</span> is the initial dry matter
+fraction of the ensiled alfalfa. This equation is only appropriate for
+use if <span class="math notranslate nohighlight">\(dryfrac_{i-1}\)</span> is in the range <span class="math notranslate nohighlight">\([0.2, 0.6]\)</span> and the
+average temperature on day <span class="math notranslate nohighlight">\(i\)</span> is in the range <span class="math notranslate nohighlight">\([5, 45]\)</span>
+(<span class="math notranslate nohighlight">\(C^\circ\)</span>).</p>
+<p>The cumulative dry matter loss to fermentation for ensiled corn, grass,
+and small grain (<span class="math notranslate nohighlight">\(kg\)</span>) is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[L_{fermentation} = \sum_{i=1}^{d} drymass_{i-1} \cdot (0.00864 - 0.0193(dryfrac_{i-1} - 0.15)) \tag{1.3.2}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(d\)</span> is the number of days the crop has been ensiled for,
+<span class="math notranslate nohighlight">\(i\)</span> is the day since ensilement that dry matter loss is being
+calculated for, <span class="math notranslate nohighlight">\(drymass_{i-1}\)</span> is the dry matter mass of ensiled
+crop on day <span class="math notranslate nohighlight">\(i-1\)</span>, and <span class="math notranslate nohighlight">\(dryfrac_{i-1}\)</span> is the fraction of
+the ensiled crop fresh mass that is dry matter on day <span class="math notranslate nohighlight">\(i-1\)</span>. When
+<span class="math notranslate nohighlight">\(i\)</span> is 1, <span class="math notranslate nohighlight">\(drymass_{i-1}\)</span> is the initial amount of ensiled
+crop dry mass and <span class="math notranslate nohighlight">\(dryfrac_{i-1}\)</span> is the initial dry matter
+fraction of the ensiled crop. This equation is only appropriate for use
+if <span class="math notranslate nohighlight">\(dryfrac_{i-1}\)</span> is in the range <span class="math notranslate nohighlight">\([0.15, 0.6]\)</span> and the
+average temperature on day <span class="math notranslate nohighlight">\(i\)</span> is in the range <span class="math notranslate nohighlight">\([0, 40]\)</span>
+(<span class="math notranslate nohighlight">\(C^\circ\)</span>).</p>
+<section id="effluent-loss">
+<h4>1.3.1 Effluent Loss<a class="headerlink" href="#effluent-loss" title="Link to this heading"></a></h4>
+<p>Ensiled crops lose both moisture and dry matter mass to effluent (but
+baled crops do not).</p>
+<p>If a crop is ensiled with a dry matter fraction of less than 0.3, it
+will lose dry matter and moisture to effluent.</p>
+<p>The cumulative amount of dry matter lost to effluent (<span class="math notranslate nohighlight">\(kg\)</span>) is
+calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[DL_{effluent} = dryfrac_{effluent} \cdot M_{effluent} \cdot 0.1 \cdot max(10, d) \tag{1.3.1.1}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(dryfrac_{effluent}\)</span> is the fraction of dry matter in the
+effluent that is lost, <span class="math notranslate nohighlight">\(M_{effluent}\)</span> is the estimated maximum
+effluent (<span class="math notranslate nohighlight">\(kg\)</span>), and <span class="math notranslate nohighlight">\(d\)</span> is the number of days the crop has
+been ensiled for.</p>
+<p>The cumulative amount of moisture lost to effluent (<span class="math notranslate nohighlight">\(kg\)</span>) is
+calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[ML_{effluent} = (1 - dryfrac_{effluent}) \cdot M_{effluent} \cdot 0.1 \cdot max(10, d) \tag{1.3.1.2}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(dryfrac_{effluent}\)</span> is the fraction of dry matter in the
+effluent that is lost, <span class="math notranslate nohighlight">\(M_{effluent}\)</span> is the estimated maximum
+effluent (<span class="math notranslate nohighlight">\(kg\)</span>), and <span class="math notranslate nohighlight">\(d\)</span> is the number of days the crop has
+been ensiled for.</p>
+<p>The fraction of dry matter in effluent is a constant:</p>
+<div class="math notranslate nohighlight">
+\[dryfrac_{effluent} = 0.1035 \tag{1.3.1.3}\]</div>
+<p>The estimated maximum effluent for an ensiled crop is calculated with
+the following equation:</p>
+<div class="math notranslate nohighlight">
+\[M_{effluent} = mass_{fresh} \cdot ((1 - dryfrac) - 0.7) \tag{1.3.1.4}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(mass_{fresh}\)</span> is the fresh mass of the crop when it is
+ensiled (<span class="math notranslate nohighlight">\(kg\)</span>) and <span class="math notranslate nohighlight">\(dryfrac\)</span> is the fraction of the crop’s
+fresh mass which is dry matter when it is ensiled.</p>
+</section>
+</section>
+</section>
+<section id="nutrient-loss">
+<h2>2 Nutrient Loss<a class="headerlink" href="#nutrient-loss" title="Link to this heading"></a></h2>
+<p>Nutrient loss associated with loss of dry matter from stored crops is
+calculated for hay, silage and baleage.</p>
+<p>The equation for recalculating the percentage of dry matter nurient:</p>
+<div class="math notranslate nohighlight">
+\[n_{updated} = \frac{max(0, \frac{n_{initial}}{100} - C) \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \tag{2.1}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(n_{updated}\)</span> is the percentage of the target nutrient in
+the stored crop’s dry matter mass after accounting for dry matter loss,
+<span class="math notranslate nohighlight">\(n_{initial}\)</span> is the percentage of the target nutrient in the
+stored crop’s dry matter mass before accounting for dry matter loss,
+<span class="math notranslate nohighlight">\(C\)</span> is the fractional loss coefficient specific to the nutrient
+and storage type, and <span class="math notranslate nohighlight">\(DL_{fraction}\)</span> is the fraction of dry
+matter lost.</p>
+<p><span class="math notranslate nohighlight">\(DL_{fraction}\)</span> is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[DL_{fraction} = \frac{DM_{updated}}{DM_{initial}} \tag{2.2}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(DM_{updated}\)</span> is the dry matter mass in the stored crop
+after accounting for dry matter loss (<span class="math notranslate nohighlight">\(kg\)</span>), and
+<span class="math notranslate nohighlight">\(DM_{initial}\)</span> is the amount of dry matter mass in the stored crop
+before accounting for dry matter loss (<span class="math notranslate nohighlight">\(kg\)</span>).</p>
+<section id="nutrient-loss-in-hay">
+<h3>2.1 Nutrient Loss in Hay<a class="headerlink" href="#nutrient-loss-in-hay" title="Link to this heading"></a></h3>
+<p>The following fractional loss coefficients are used in equation
+<span class="math notranslate nohighlight">\(2.1\)</span> when recalculating the nutrient percentages in hay:</p>
+<p>Unprotected Hay:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Nutrient</p></th>
+<th class="head"><p>Fractional Loss Coefficient</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Acid Detergent Fiber</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Neutral Detergent Fiber</p></td>
+<td><p>0.17</p></td>
+</tr>
+<tr class="row-even"><td><p>Crude Protein</p></td>
+<td><p>0.4</p></td>
+</tr>
+</tbody>
+</table>
+<p>Table <span class="math notranslate nohighlight">\(2.1.1\)</span></p>
+<p>Protected Indoor, Protected Wrapped, Protected Tarped Hay</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Nutrient</p></th>
+<th class="head"><p>Fractional Loss Coefficient</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Acid Detergent Fiber</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Neutral Detergent Fiber</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p>Crude Protein</p></td>
+<td><p>0.0</p></td>
+</tr>
+</tbody>
+</table>
+<p>Table <span class="math notranslate nohighlight">\(2.1.2\)</span></p>
+</section>
+<section id="nutrient-loss-in-silage-and-baleage">
+<h3>2.2 Nutrient Loss in Silage and Baleage<a class="headerlink" href="#nutrient-loss-in-silage-and-baleage" title="Link to this heading"></a></h3>
+<p>The following fractional loss coefficients are used in equation
+<span class="math notranslate nohighlight">\(2.1\)</span> when recalculating nutrient percentages in Silage and
+Baleage after losing dry matter to fermentation (i.e. after losing dry
+matter as calculated with equations <span class="math notranslate nohighlight">\(1.3.1\)</span> and <span class="math notranslate nohighlight">\(1.3.2\)</span>).</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Nutrient</p></th>
+<th class="head"><p>Fractional Loss Coefficient</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Acid Detergent Fiber</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>Neutral Detergent Fiber</p></td>
+<td><p>0.0</p></td>
+</tr>
+<tr class="row-even"><td><p>Crude Protein</p></td>
+<td><p>0.0</p></td>
+</tr>
+</tbody>
+</table>
+<p>Table <span class="math notranslate nohighlight">\(2.2.1\)</span></p>
+<section id="nutrient-loss-to-effluent">
+<h4>2.2.1 Nutrient Loss to Effluent<a class="headerlink" href="#nutrient-loss-to-effluent" title="Link to this heading"></a></h4>
+<p>When dry matter is lost to effluent from an ensiled crop, the percentages
+of crude protein and non-protein nitrogen must be recalculated for that crop.</p>
+<p>The percentage of crude protein (CP) is recalculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[CP_{updated} = \frac{CP_{initial} \cdot 0.01 - 0.3 \cdot DL_{fraction}}{1 - DL_{fraction}} \cdot 100 \tag{2.2.1.1}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(CP_{initial}\)</span> is the percentage of dry matter mass that is
+crude protein in the ensiled crop before accounting for dry matter loss
+to effluent and <span class="math notranslate nohighlight">\(DL_{fraction}\)</span> is the fraction of dry matter mass
+lost to effluent. The percentage of crude protein is lower-bounded at 0.</p>
+<p>The percentage of non-protein nitrogen (NPN) is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[NPN_{updated} = \frac{(NPN_{initial} \cdot 0.01) \cdot (CP_{initial} \cdot 0.01) - 0.3 \cdot DL_{fraction}}{(CP_{initial} \cdot 0.01) - DL_{fraction}} \cdot 100 \tag{2.2.1.2}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(NPN_{initial}\)</span> is percentage of dry matter mass that is
+non-protein nitrogen in the ensiled crop before accouting for dry matter
+loss to effluent, <span class="math notranslate nohighlight">\(CP_{initial}\)</span> is the percentage of dry matter
+mass that is crude protein before accounting for dry matter loss to
+effluent, and <span class="math notranslate nohighlight">\(DL_{fraction}\)</span> is the fraction of dry matter mass
+lost to effluent. The percentage of non-protein nitrogen is lower-bounded
+at 0.</p>
+<p><span class="math notranslate nohighlight">\(DL_{fraction}\)</span> is calculated with the equation:</p>
+<div class="math notranslate nohighlight">
+\[DL_{fraction} = \frac{DM_{lost}}{DM_{initial}} \tag{2.2.1.3}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(DM_{lost}\)</span> is the amount of dry matter mass in the
+ensiled crop after accounting for dry matter lost to effluent, and
+<span class="math notranslate nohighlight">\(DM_{initial}\)</span> is the amount of dry matter mass in the ensiled
+crop before accounting for dry matter lost to effluent.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="yields.html" class="btn btn-neutral float-left" title="Crop yields" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

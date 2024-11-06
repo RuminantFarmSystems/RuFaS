@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crop yields &mdash; Ruminant Farm Simulation (RuFaS)  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Feed Storage Scientific Documentation" href="feed_storage.html" />
+    <link rel="prev" title="Water dynamics" href="water_dynamics.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Ruminant Farm Simulation (RuFaS)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">GitHub</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="scientific_documentation.html">Scientific Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="crop_and_soil.html">Crop and Soil Scientific Documentation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="biomass_allocation.html"><strong>Biomass allocation</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="crop_yields.html"><strong>Crop Yields</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="crop.html"><strong>Crop</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="growth_constraints.html"><strong>Growth constraints</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="heat_units.html"><strong>Heat units</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="leaf_area_index.html"><strong>Leaf area index</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="nutrient_incorporation.html"><strong>Nutrient incorporation</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="root_development.html"><strong>Root development</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="water_dynamics.html"><strong>Water dynamics</strong></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#"><strong>Crop yields</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="feed_storage.html">Feed Storage Scientific Documentation</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ruminant Farm Simulation (RuFaS)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="scientific_documentation.html">Scientific Documentation</a></li>
+          <li class="breadcrumb-item"><a href="crop_and_soil.html">Crop and Soil Scientific Documentation</a></li>
+      <li class="breadcrumb-item active"><strong>Crop yields</strong></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/yields.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="crop-yields">
+<h1><strong>Crop yields</strong><a class="headerlink" href="#crop-yields" title="Link to this heading"></a></h1>
+<p>Crop yields in RuFaS are calculated by the <code class="docutils literal notranslate"><span class="pre">Yields</span></code> class. <code class="docutils literal notranslate"><span class="pre">Yields</span></code>
+contains the methods that determine the amount and composition of
+harvestable crop production.</p>
+<p>Its main method <code class="docutils literal notranslate"><span class="pre">obtain_yields()</span></code> executes all routines to determine
+crop production at the time of harvest. As such, this method is only
+called once throughout a crop’s growing season. This is typically done
+at cut/harvest time.</p>
+<p>Crop yield is a function of the <strong>harvest index</strong> parameter. The
+<strong>harvest index</strong> is the fraction of the above-ground plant dry biomass
+that is harvestable economic yield. For the majority of crops, the
+harvest index will be between 0.0 and 1.0. However, plants whose roots
+are harvested may have a harvest index greater than 1.0.</p>
+<p>The <strong>harvest index</strong> can be determined internally, where first, the
+<strong>potential harvest index</strong> method calculates the potential harvest
+index for a crop on a given day:</p>
+<div class="math notranslate nohighlight">
+\[HI_{\text{pot}} = \frac {HI_{\text{opt}}\times h_{\text{perc}}}{h_{\text{perc}} + exp(11.1 - 10\times h)}\]</div>
+<div class="math notranslate nohighlight">
+\[h_{\text{perc}} = 100\times h\]</div>
+<p>where <span class="math notranslate nohighlight">\(HI_{\text{pot}}\)</span> is the potential harvest index for a given
+day (<code class="docutils literal notranslate"><span class="pre">potential_harvest_index</span></code>), <span class="math notranslate nohighlight">\(HI_{\text{opt}}\)</span> is the
+species-specific potential harvest index for the plant at maturity under
+ideal growing conditions (<code class="docutils literal notranslate"><span class="pre">optimal_harvest_index</span></code>), <span class="math notranslate nohighlight">\(h\)</span> is the
+fraction of potential heat units accumulated by the plant on a given day
+(<code class="docutils literal notranslate"><span class="pre">heat_fraction</span></code>), and <span class="math notranslate nohighlight">\(h_{\text{perc}}\)</span> is <span class="math notranslate nohighlight">\(h\)</span> expressed
+as a percentage (<code class="docutils literal notranslate"><span class="pre">heat_percent</span></code>).</p>
+<p>Then, <strong>adjust harvest index</strong> determines the crop <strong>harvest index</strong> by
+adjusting the <strong>potential harvest index</strong> for water deficiency:</p>
+<div class="math notranslate nohighlight">
+\[HI_{\text{act}} = (HI_{\text{pot}} - HI_{\text{min}})\times \frac {W_{\text{def}}}{W_{\text{def}} + exp(6.13 - 0.883\times W_{\text{def}})} + HI_{\text{min}}\]</div>
+<div class="line-block">
+<div class="line">where <span class="math notranslate nohighlight">\(HI_{\text{act}}\)</span> is the actual harvest index for a given
+day (<code class="docutils literal notranslate"><span class="pre">harvest_index</span></code>), <span class="math notranslate nohighlight">\(HI_{\text{pot}}\)</span> is the potential
+harvest index for a given day</div>
+<div class="line">(<code class="docutils literal notranslate"><span class="pre">potential_harvest_index</span></code>), <span class="math notranslate nohighlight">\(HI_{\text{min}}\)</span> is the minimum
+harvest index allowed for the plant under drought conditions
+(<code class="docutils literal notranslate"><span class="pre">min_harvest_index</span></code>), and <span class="math notranslate nohighlight">\(W_{\text{def}}\)</span> is the water
+deficiency factor (<code class="docutils literal notranslate"><span class="pre">water_deficiency</span></code>).</div>
+</div>
+<p>Alternatively, the user can provide a <strong>target harvest index</strong> for the
+crop (<code class="docutils literal notranslate"><span class="pre">user_harvest_index</span></code>). When that occurs, the provided value is
+used in place of the <strong>harvest index</strong> (<code class="docutils literal notranslate"><span class="pre">harvest_index</span></code>) calculated
+with the previous method.</p>
+<p>Once crops reach maturity (<code class="docutils literal notranslate"><span class="pre">heat_fraction</span></code> <span class="math notranslate nohighlight">\(\geq 1.0\)</span>), the
+<strong>above-ground biomass</strong> is adjusted by the water losses due to the
+start of the dry-down process. The new above-ground biomass value is
+calculated using the pre-dry-down above-ground biomass and the dry-down
+fraction:</p>
+<div class="math notranslate nohighlight">
+\[Biom_{\text{ag, dry}} = Biom_{\text{ag}}-(Biom_{\text{ag}}\times d)\]</div>
+<p>where <span class="math notranslate nohighlight">\(Biom_{\text{ag, dry}}\)</span> is the above ground biomass after
+dry-down (<code class="docutils literal notranslate"><span class="pre">above_ground_biomass</span></code>), <span class="math notranslate nohighlight">\(Biom_{\text{ag}}\)</span> is the
+above ground biomass (<code class="docutils literal notranslate"><span class="pre">above_ground_biomass</span></code>), and <span class="math notranslate nohighlight">\(d\)</span> is the
+proportion of plant biomass that is lost to dry-down [0, 1]
+(<code class="docutils literal notranslate"><span class="pre">dry_down_fraction</span></code>)</p>
+<p><strong>Crop yield</strong> represents the biomass of the yield product and its
+calculation varies according to: * if the <strong>harvest index</strong> is less
+than or equal to 1, yield biomass is calculated as a proportion of the
+above-ground biomass using the <strong>harvest index</strong> value. * if the
+<strong>harvest index</strong> is greater than 1, it means that both above- and
+below-ground biomass are part of the product, and yield is calculated as
+a proportion of the total biomass using the <strong>harvest index</strong> value.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} Y_{\text{tot}} =
+\begin{cases}
+    Biom_{\text{ag}}\times HI_{\text{act}}         &amp; \text{if } HI_{\text{act}} \le 1 \\
+    Biom_{\text{tot}}\times HI_{\text{act}}        &amp; \text{if } HI_{\text{act}} &gt; 1 \\
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(Y_{\text{tot}}\)</span> is the total amount of the desired crop
+product (<code class="docutils literal notranslate"><span class="pre">crop_yield</span></code>), <span class="math notranslate nohighlight">\(Biom_{\text{ag}}\)</span> is the above ground
+biomass (<code class="docutils literal notranslate"><span class="pre">above_ground_biomass</span></code>), <span class="math notranslate nohighlight">\(Biom_{\text{tot}}\)</span> is the
+total plant biomass on a given day (<code class="docutils literal notranslate"><span class="pre">biomass</span></code>), and
+<span class="math notranslate nohighlight">\(HI_{\text{act}}\)</span> is the actual harvest index on the day of
+harvest (<code class="docutils literal notranslate"><span class="pre">harvest_index</span></code>).</p>
+<p>After the <strong>crop yield</strong> is calculated, it is partitioned into the
+portion that will be extracted from the field, <strong>yield collected</strong>, and
+the portion that will remain in the field, <strong>yield residue</strong>. This
+partitioning is determined by the <strong>harvest efficiency</strong>: the proportion
+of the yield that will be extracted from the field [0, 1].</p>
+<p>The <strong>extracted yield</strong> method calculates the amount of <strong>crop yield</strong>
+that will be removed from the field during harvest:</p>
+<div class="math notranslate nohighlight">
+\[Y_{\text{crop}} =
+    Y_{\text{tot}}\times H_{\text{eff}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(Y_{\text{crop}}\)</span> is the amount of the desired crop product
+removed from the field (<code class="docutils literal notranslate"><span class="pre">yield_collected</span></code>), <span class="math notranslate nohighlight">\(Y_{\text{tot}}\)</span> is
+the total amount of the desired crop product (<code class="docutils literal notranslate"><span class="pre">crop_yield</span></code>), and
+<span class="math notranslate nohighlight">\(H_{\text{eff}}\)</span> is the harvest efficiency [0, 1]
+(<code class="docutils literal notranslate"><span class="pre">harvest_efficiency</span></code>).</p>
+<p>The unharvested yield that remains in the field is calculated through
+the <strong>unextracted yield</strong> method with the following equation:</p>
+<div class="math notranslate nohighlight">
+\[Y_{\text{res}} =
+   Y_{\text{tot}}\times (1-H_{\text{eff}})\]</div>
+<p>where <span class="math notranslate nohighlight">\(Y_{\text{res}}\)</span> is the unharvested yield
+(<code class="docutils literal notranslate"><span class="pre">yield_residue</span></code>), <span class="math notranslate nohighlight">\(Y_{\text{tot}}\)</span> is the total amount of the
+desired crop product (<code class="docutils literal notranslate"><span class="pre">crop_yield</span></code>), and <span class="math notranslate nohighlight">\(H_{\text{eff}}\)</span> is the
+harvest efficiency [0, 1] (<code class="docutils literal notranslate"><span class="pre">harvest_efficiency</span></code>).</p>
+<p>Finally, the amount of nitrogen and phosphorus removed in the yield
+product is calculated through the <strong>collected nitrogen</strong> and <strong>collected
+phosphorus</strong> methods, respectively. This is done by multiplying the
+<strong>yield collected</strong> by the optimal nutrient fraction from the crop
+database. Alternatively, when the <strong>harvest index</strong> is provided by the
+user, instead of using the nitrogen and phosphorus optimal fractions,
+these values are calculated by multiplying the <strong>yield collected</strong> by
+the crop-specific expected nutrient fraction in yield:</p>
+<p>For nitrogen:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split} Y_{\text{N}} =
+\begin{cases}
+    Y_{\text{crop}} \times N_{\text{opt}}         &amp; \text{if } HI_{\text{pot}}\text { is calculated} \\
+    Y_{\text{crop}} \times N_{\text{exp}}         &amp; \text{if } HI_{\text{pot}}\text { is provided}
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(Y_{\text{N}}\)</span> is the amount of nitrogen removed in the
+yield (<code class="docutils literal notranslate"><span class="pre">collected_nitrogen</span></code>), <span class="math notranslate nohighlight">\(Y_{\text{crop, col}}\)</span> is the
+amount of the desired crop product removed from the field
+(<code class="docutils literal notranslate"><span class="pre">yield_collected</span></code>), <span class="math notranslate nohighlight">\(Y_{\text{crop}}\)</span> is the total amount of
+the desired crop product (<code class="docutils literal notranslate"><span class="pre">crop_yield</span></code>), <span class="math notranslate nohighlight">\(N_{\text{opt}}\)</span> is the
+fraction of nitrogen in the yield (<code class="docutils literal notranslate"><span class="pre">optimal_nitrogen_fraction</span></code>), and
+<span class="math notranslate nohighlight">\(N_{\text{exp}}\)</span> is the crop-specific expected fraction of
+nitrogen in yield (<code class="docutils literal notranslate"><span class="pre">yield_nitrogen_fraction</span></code>)</p>
+<p>And for phosphorus:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}Y_{\text{P}} =
+\begin{cases}
+   Y_{\text{crop}} \times P_{\text{opt}}         &amp; \text{if } HI_{\text{pot}}\text { is calculated} \\
+   Y_{\text{crop}} \times P_{\text{exp}}         &amp; \text{if } HI_{\text{pot}}\text { is provided}
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(Y_{\text{P}}\)</span> is the amount of phosphorus removed in the
+yield (<code class="docutils literal notranslate"><span class="pre">collected_phosphorus</span></code>), <span class="math notranslate nohighlight">\(Y_{\text{crop}}\)</span> is the amount
+of the desired crop product removed from the field
+(<code class="docutils literal notranslate"><span class="pre">yield_collected</span></code>), <span class="math notranslate nohighlight">\(Y_{\text{crop}}\)</span> is the total amount of
+the desired crop product (<code class="docutils literal notranslate"><span class="pre">crop_yield</span></code>), <span class="math notranslate nohighlight">\(P_{\text{opt}}\)</span> is the
+fraction of phosphorus in the yield (<code class="docutils literal notranslate"><span class="pre">optimal_phosphorus_fraction</span></code>),
+and <span class="math notranslate nohighlight">\(P_{\text{exp}}\)</span> is the crop-specific expected fraction of
+phosphorus in yield (<code class="docutils literal notranslate"><span class="pre">yield_phosphorus_fraction</span></code>)</p>
+<hr class="docutils" />
+<p><strong>References</strong>: this module is based upon the “Crop Yield” section of
+the <a class="reference external" href="https://swat.tamu.edu/media/99192/swat2009-theory.pdf">SWAT</a>
+model (5:2.4).</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="water_dynamics.html" class="btn btn-neutral float-left" title="Water dynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="feed_storage.html" class="btn btn-neutral float-right" title="Feed Storage Scientific Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, RuFaS team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
