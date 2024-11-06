@@ -12,6 +12,7 @@ from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -132,9 +133,11 @@ class SimulationEngine:
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
+        manure_applications: dict[str, NutrientRequestResults] = {}
         for field in self.field_manager.fields:
             manure_requests = self.field_manager.check_manure_schedules(field)
             manure_request_results = self.manure_manager.request_nutrients(manure_requests)
+            
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time)
         for crop in harvested_crops:
             self.feed_manager.receive_crop(*crop)
