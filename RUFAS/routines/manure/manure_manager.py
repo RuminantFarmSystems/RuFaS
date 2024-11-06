@@ -318,7 +318,7 @@ class ManureManager:
             )
         )
 
-    def request_nutrients(self, request: NutrientRequest) -> NutrientRequestResults:
+    def request_nutrients(self, requests: dict[str, NutrientRequest]) -> NutrientRequestResults:
         """
         Handle the request for specific nutrients from the crop and soil module.
         This method evaluates the nutrient request made by considering both nitrogen and phosphorus
@@ -347,10 +347,14 @@ class ManureManager:
             Returns None if the request cannot be fulfilled.
 
         """
-        if self.simulate_animals:
-            return self._manure_nutrient_manager.request_nutrients(request)
-        else:
-            return self._field_manure_supplier.request_nutrients(request)
+        nutrient_request_results: dict[str, NutrientRequestResults] = {}
+        for field, request in requests.items():
+            if self.simulate_animals:
+                result = self._manure_nutrient_manager.request_nutrients(request)
+            else:
+                result = self._field_manure_supplier.request_nutrients(request)
+            nutrient_request_results[field] = result
+        return nutrient_request_results
 
     def _pen_daily_update(self, simulation_day: int, pen: PenManureData) -> None:
         """
