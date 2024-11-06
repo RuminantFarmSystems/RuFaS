@@ -129,7 +129,7 @@ class DataCollectionAppUpdater:
             List of path instances which will be used to link the index page to the input schemas.
 
         """
-        localized_schema_paths = [str(path).replace("DataCollectionApp", ".") for path in schema_paths]
+        localized_schema_paths = [str(path.as_posix()).replace("DataCollectionApp", ".") for path in schema_paths]
 
         schema_script_tags = "\n".join(
             [f'    <script src="{schema_path}"></script>' for schema_path in localized_schema_paths]
