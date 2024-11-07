@@ -137,7 +137,7 @@ class SimulationEngine:
         manure_applications: dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]] = {}
         for field in self.field_manager.fields:
             manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
-            manure_applications.setdefault(field.field_data.name, [])
+            manure_applications[field.field_data.name] = []
             for manure_event_request in manure_events_requests:
                 event, manure_request = manure_event_request
                 manure_request_results = None
