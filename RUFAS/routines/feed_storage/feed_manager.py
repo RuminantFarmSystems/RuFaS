@@ -10,7 +10,7 @@ from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unpro
 from .silage import Bag, Bunker, Pile, Silage
 from .storage import Storage
 
-# Defines the compatilibty between Crop Categories and Storage Types.
+""""Defines the compatilibty between Crop Categories and Storage Types."""
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, type[List[Storage]]] = {
     CropCategory.ALFALFA: [Hay, Silage, Baleage],
     CropCategory.CORN: [Grain, Silage],
@@ -20,7 +20,7 @@ CROP_TO_STORAGE_MAPPING: Dict[CropCategory, type[List[Storage]]] = {
 }
 
 
-# Maps each storage type to its respective class.
+"""Maps each StorageType enum element to the associated Storage subclass."""
 STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
     StorageType.PROTECTED_INDOORS: ProtectedIndoors,
     StorageType.PROTECTED_WRAPPED: ProtectedWrapped,
