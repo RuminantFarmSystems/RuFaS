@@ -15,8 +15,8 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
-from .routines.EEE.EEE_manager import EEEManager
 
+from .routines.EEE.EEE_manager import EEEManager
 
 """
 Defines the number of days between degradations of stored homegrown feeds when running end-to-end testing.
@@ -211,4 +211,3 @@ class SimulationEngine:
         if self.is_end_to_end_test_run:
             end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
             self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)
-            self.feed_manager.process_degradations(self.weather, self.time)

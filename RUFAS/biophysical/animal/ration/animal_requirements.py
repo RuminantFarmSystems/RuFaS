@@ -1,14 +1,14 @@
 import math
-from typing import Dict, List, Callable
+from typing import Callable, Dict, List
 
 import numpy as np
 
-from RUFAS.general_constants import GeneralConstants
-from RUFAS.output_manager import OutputManager
+from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator, EssentialAminoAcidRequirements
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 
 om = OutputManager()
 

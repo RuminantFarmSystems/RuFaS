@@ -1,15 +1,16 @@
-from typing import List, Dict
 from enum import Enum
-from .harvested_crop import HarvestedCrop
-from .storage import Storage
-from .enums import CropType, CropCategory
+from typing import Dict, List
 
-from .baleage import Baleage
-from .grain import Grain, Dry, HighMoisture
-from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
-from .silage import Silage, Bag, Bunker, Pile
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+
+from .baleage import Baleage
+from .enums import CropCategory, CropType
+from .grain import Dry, Grain, HighMoisture
+from .harvested_crop import HarvestedCrop
+from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
+from .silage import Bag, Bunker, Pile, Silage
+from .storage import Storage
 
 # Defines the compatilibty between Crop Categories and Storage Types.
 CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
@@ -188,7 +189,8 @@ class FeedManager:
     def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:
         """Sets up HarvestedCrops for the Feed Manager to degrade, if running end-to-end testing."""
         reusable_values = feeds_info["reusable_values"]
-        reusable_values.update({"harvest_time": time, "storage_time": time})
+        time_copy = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
+        reusable_values.update({"harvest_time": time_copy, "storage_time": time_copy})
 
         hay_values: dict[str, str | float | CropCategory | CropType] = feeds_info[
             "hay_values"

@@ -1,18 +1,16 @@
 from math import exp
 from typing import Optional
+
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.units import MeasurementUnits
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
-from RUFAS.routines.field.crop.crop_data import (
-    CropData,
-    DEFAULT_DRY_MATTER_DIGESTIBILITY,
-)
+from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.field.soil.layer_data import LayerData
+from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.time import Time
-from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 class CropManagement:
@@ -265,11 +263,13 @@ class CropManagement:
         It is assumed that the wet yield is recorded in kg / ha for crops, but stored in the FeedManager as kg.
 
         """
+        harvest_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
+        storage_time = Time(start_date=time.start_date, end_date=time.end_date, current_date=time.current_date)
         harvested_crop = HarvestedCrop(
             category=self.data.crop_category,
             type=self.data.crop_type,
-            harvest_time=time,
-            storage_time=time,
+            harvest_time=harvest_time,
+            storage_time=storage_time,
             fresh_mass=self.data.wet_yield_collected * field_size,
             dry_matter_percentage=self.data.dry_matter_percentage,
             dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,

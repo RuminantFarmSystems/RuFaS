@@ -3,24 +3,19 @@ from __future__ import annotations
 import collections
 import math
 from random import random
-from typing import Dict, Any, TypedDict
+from typing import Any, Dict, TypedDict
 
 import numpy as np
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.routines.animal.life_cycle import animal_constants as const
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.animal.life_cycle.animal_base import AnimalBase
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.repro_protocol_enums import (
-    CowReproProtocolEnum,
-    ReproStateEnum,
-)
+from RUFAS.routines.animal.life_cycle.repro_protocol_enums import CowReproProtocolEnum, ReproStateEnum
 from RUFAS.routines.animal.life_cycle.repro_state_manager import ReproStateManager
-from RUFAS.routines.animal.manure.dry_cow_manure_excretion import (
-    manure_calculations as dry_manure_calculations,
-)
+from RUFAS.routines.animal.manure.dry_cow_manure_excretion import manure_calculations as dry_manure_calculations
 from RUFAS.routines.animal.manure.lactating_cow_manure_excretion import (
     manure_calculations as lactating_manure_calculations,
 )
@@ -217,6 +212,7 @@ class Cow(HeiferIII):
             "days_in_milk": self.days_in_milk,
             "parity": self.calves,
             "calving_interval": self.CI,
+            "net_merit": self.net_merit,
         }
 
     def get_replacement_values(self) -> Dict[str, Any]:
@@ -248,6 +244,7 @@ class Cow(HeiferIII):
             "presynch_method": self.presynch_method,
             "tai_method_c": self.tai_method_c,
             "resynch_method": self.resynch_method,
+            "net_merit": self.net_merit,
         }
 
     @property

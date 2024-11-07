@@ -1,9 +1,7 @@
 from typing import Optional
 
+from RUFAS.routines.field.crop_and_soil_constants import FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.field.crop_and_soil_constants import (
-    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
-)
 
 
 class HumusMineralization:

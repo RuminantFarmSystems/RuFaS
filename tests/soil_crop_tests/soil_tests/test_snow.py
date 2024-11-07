@@ -1,13 +1,12 @@
 import math
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.field.soil.snow import Snow
-
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.soil.snow import Snow
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.fixture

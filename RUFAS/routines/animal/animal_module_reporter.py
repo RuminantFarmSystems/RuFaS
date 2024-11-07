@@ -1,23 +1,23 @@
-from typing import Dict, List, Any, Sequence
-import numpy as np
 import sys
+from typing import Any, Dict, List, Sequence
 
-from RUFAS.time import Time
-from RUFAS.units import MeasurementUnits
+import numpy as np
+
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle import animal_constants
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.life_cycle.calf import Calf
 from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from ...data_structures.animal_manure_excretions import AnimalManureExcretions
-from ...enums import AnimalCombination
+from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.routines.animal.pen import Pen
+from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.routines.feed import Feed
-
+from RUFAS.time import Time
+from RUFAS.units import MeasurementUnits
 
 om = OutputManager()
 
@@ -1061,7 +1061,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_animal_events.__name__,
         }
         for animal in animals:
@@ -1078,7 +1078,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_heiferIIs_conception_rate.__name__,
         }
         om.add_variable(
@@ -1172,7 +1172,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_cows_conception_rate.__name__,
         }
         om.add_variable(

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import copy
-from typing import List, Dict, Union, Any, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
+from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_types import AnimalType
 from RUFAS.routines.animal.life_cycle.calf import Calf
@@ -16,9 +18,8 @@ from RUFAS.routines.animal.manure.general_manure import (
     get_default_animal_manure_excretions,
 )
 from RUFAS.routines.animal.ration.animal_requirements import AnimalRequirements
+
 from .ration.amino_acid import EssentialAminoAcidRequirements
-from ...enums import AnimalCombination
-from ...data_structures.pen_manure_data import PenManureData
 
 om = OutputManager()
 
