@@ -163,7 +163,9 @@ class Field:
 
         self.manure_manager: ManureManager = manure_manager
 
-    def manage_field(self, time: Time, current_conditions: CurrentDayConditions) -> list[HarvestedCropStorageType]:
+    def manage_field(self, time: Time, current_conditions: CurrentDayConditions,
+                     manure_applications: list[tuple[ManureEvent, NutrientRequestResults | None]]
+                     ) -> list[HarvestedCropStorageType]:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -190,7 +192,8 @@ class Field:
         # --- Soil Management---
         self._check_fertilizer_application_schedule(time)
 
-        # self._check_manure_application_schedule(time)
+        for manure_application in manure_applications:
+            self._execute_manure_application(manure_application)
 
         self._check_tillage_schedule(time)
 
@@ -511,14 +514,7 @@ class Field:
 
     def _execute_manure_application(
         self,
-        requested_nitrogen: float,
-        requested_phosphorus: float,
-        requested_manure_type: ManureType,
-        field_coverage: float,
-        application_depth: float,
-        surface_remainder_fraction: float,
-        year: int,
-        day: int,
+        manure_application: tuple[ManureEvent, NutrientRequestResults]
     ) -> None:
         """
         Builds a manure application from the requested nutrient amounts and passes that application to the
@@ -555,27 +551,16 @@ class Field:
         This behavior is regulated by the `supplement_manure_nutrient_deficiencies` attribute of the `FieldData` class.
 
         """
+        manure_event, manure_supplied = manure_application
         info_map = {
             "class": self.__class__.__name__,
             "function": self._execute_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": year, "day": day},
+            "date": {"year": manure_event.year, "day": manure_event.day},
         }
-        # if requested_nitrogen == requested_phosphorus == 0.0:
-        #     log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
-        #     self.om.add_log("manure_application_log", log_message, info_map)
-        #     return
-
-        # nutrient_request = NutrientRequest(
-        #     nitrogen=requested_nitrogen,
-        #     phosphorus=requested_phosphorus,
-        #     manure_type=requested_manure_type,
-        # )
-
-        # manure_supplied = self.manure_manager.request_nutrients(nutrient_request)
 
         if manure_supplied is not None:
-            self._add_manure_water(manure_supplied, requested_manure_type)
+            self._add_manure_water(manure_supplied, manure_event.manure_type)
 
             supplied_nitrogen = manure_supplied.nitrogen
             supplied_phosphorus = manure_supplied.phosphorus
@@ -587,29 +572,32 @@ class Field:
                 manure_supplied.nitrogen / manure_supplied.dry_matter
             ) * manure_supplied.organic_nitrogen_fraction
 
-            invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
-                application_depth > 0.0 and surface_remainder_fraction == 1.0
+            invalid_depth_and_remainder_fraction = (manure_event.application_depth == 0.0
+                                                    and manure_event.surface_remainder_fraction != 1.0) or (
+                manure_event.application_depth > 0.0 and manure_event.surface_remainder_fraction == 1.0
             )
 
             error_name = "manure_application_error"
             if invalid_depth_and_remainder_fraction:
                 self._record_nutrient_application_error(
-                    application_depth, surface_remainder_fraction, error_name, year, day
+                    manure_event.application_depth, manure_event.surface_remainder_fraction, error_name,
+                    manure_event.year, manure_event.day
                 )
-                application_depth = 0.0
+                manure_event.application_depth = 0.0
                 surface_remainder_fraction = 1.0
 
-            if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
-                self._record_nutrient_application_error(application_depth, None, error_name, year, day)
-                application_depth = self.soil.data.soil_layers[-1].bottom_depth
+            if manure_event.application_depth > self.soil.data.soil_layers[-1].bottom_depth:
+                self._record_nutrient_application_error(manure_event.application_depth, None, error_name, manure_event.year,
+                                                        manure_event.day)
+                manure_event.application_depth = self.soil.data.soil_layers[-1].bottom_depth
 
             self.manure_applicator.apply_machine_manure(
                 dry_matter_mass=manure_supplied.dry_matter,
                 dry_matter_fraction=manure_supplied.dry_matter_fraction,
                 total_phosphorus_mass=manure_supplied.phosphorus,
-                field_coverage=field_coverage,
-                application_depth=application_depth,
-                surface_remainder_fraction=surface_remainder_fraction,
+                field_coverage=manure_event.field_coverage,
+                application_depth=manure_event.application_depth,
+                surface_remainder_fraction=manure_event.surface_remainder_fraction,
                 field_size=self.field_data.field_size,
                 inorganic_nitrogen_fraction=total_inorganic_nitrogen_fraction,
                 ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
@@ -620,14 +608,14 @@ class Field:
             self._record_manure_application(
                 dry_matter_mass=manure_supplied.dry_matter,
                 dry_matter_fraction=manure_supplied.dry_matter_fraction,
-                field_coverage=field_coverage,
+                field_coverage=manure_event.field_coverage,
                 nitrogen=manure_supplied.nitrogen,
                 phosphorus=manure_supplied.phosphorus,
                 potassium=None,
-                application_depth=application_depth,
-                surface_remainder_fraction=surface_remainder_fraction,
-                year=year,
-                day=day,
+                application_depth=manure_event.application_depth,
+                surface_remainder_fraction=manure_event.surface_remainder_fraction,
+                year=manure_event.year,
+                day=manure_event.day,
                 output_name="manure_application",
             )
         else:
@@ -637,19 +625,19 @@ class Field:
         self._record_manure_application(
             dry_matter_mass=0.0,
             dry_matter_fraction=0.0,
-            field_coverage=field_coverage,
-            nitrogen=requested_nitrogen,
-            phosphorus=requested_phosphorus,
+            field_coverage=manure_event.field_coverage,
+            nitrogen=manure_event.nitrogen_mass,
+            phosphorus=manure_event.phosphorus_mass,
             potassium=None,
-            application_depth=application_depth,
-            surface_remainder_fraction=surface_remainder_fraction,
-            year=year,
-            day=day,
+            application_depth=manure_event.application_depth,
+            surface_remainder_fraction=manure_event.surface_remainder_fraction,
+            year=manure_event.year,
+            day=manure_event.day,
             output_name="manure_request",
         )
 
-        unmet_nitrogen_demand = max(0.0, requested_nitrogen - supplied_nitrogen)
-        unmet_phosphorus_demand = max(0.0, requested_phosphorus - supplied_phosphorus)
+        unmet_nitrogen_demand = max(0.0, manure_event.nitrogen_mass - supplied_nitrogen)
+        unmet_phosphorus_demand = max(0.0, manure_event.phosphorus_mass - supplied_phosphorus)
 
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
@@ -676,10 +664,10 @@ class Field:
             unmet_nitrogen_demand,
             unmet_phosphorus_demand,
             0,
-            application_depth,
-            surface_remainder_fraction,
-            year,
-            day,
+            manure_event.application_depth,
+            manure_event.surface_remainder_fraction,
+            manure_event.year,
+            manure_event.day,
         )
 
     def _record_manure_application(
@@ -900,7 +888,8 @@ class Field:
                 time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time: Time) -> dict[str, list[NutrientRequest | None]]:
+    def _check_manure_application_schedule(self, time: Time
+                                           ) -> list[tuple[ManureEvent, NutrientRequest | None]]:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -911,21 +900,10 @@ class Field:
 
         """
         self.manure_events, todays_manure_events = self._filter_events(self.manure_events, time)
-        manure_requests: dict[str, list[NutrientRequest | None]] = {}
-        manure_requests[self.field_data.name] = []
+        manure_requests: list[tuple[ManureEvent, NutrientRequest | None]] = []
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
-            manure_requests[self.field_data.name].append(manure_request)
-            # self._execute_manure_application(
-            #     event.nitrogen_mass,
-            #     event.phosphorus_mass,
-            #     event.manure_type,
-            #     event.field_coverage,
-            #     event.application_depth,
-            #     event.surface_remainder_fraction,
-            #     event.year,
-            #     event.day,
-            # )
+            manure_requests.append((event, manure_request))
         return manure_requests
 
     def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
@@ -945,19 +923,19 @@ class Field:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._create_manure_application.__name__,
+            "function": self._create_manure_request.__name__,
             "suffix": f"field='{self.field_data.name}'",
             "date": {"year": event.year, "day": event.day},
         }
-        if event.requested_nitrogen == event.requested_phosphorus == 0.0:
+        if event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             self.om.add_log("manure_application_log", log_message, info_map)
             return self.field_data.name, None
 
-        return self.field_data.name, NutrientRequest(
-            nitrogen=event.requested_nitrogen,
-            phosphorus=event.requested_phosphorus,
-            manure_type=event.requested_manure_type,
+        return NutrientRequest(
+            nitrogen=event.nitrogen_mass,
+            phosphorus=event.phosphorus_mass,
+            manure_type=event.manure_type,
         )
 
     def _check_crop_harvest_schedule(
