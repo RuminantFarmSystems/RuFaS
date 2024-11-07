@@ -6,6 +6,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
+from RUFAS.routines.field.manager.events import ManureEvent
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
@@ -15,6 +16,7 @@ from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -57,7 +59,9 @@ class FieldManager:
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
-    def daily_update_routine(self, weather: Weather, time: Time) -> list[HarvestedCropStorageType]:
+    def daily_update_routine(self, weather: Weather, time: Time,
+                             manure_applications: dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]]
+                             ) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
@@ -89,7 +93,9 @@ class FieldManager:
                 "units": MeasurementUnits.HOURS,
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
-            crops = field.manage_field(time, current_conditions=current_conditions)
+            manure_applications_for_field = manure_applications.get(field.field_data.name, [])
+            crops = field.manage_field(time, current_conditions=current_conditions,
+                                       manure_applications=manure_applications_for_field)
             harvested_crops.extend(crops)
         self.output_gatherer.send_daily_variables()
 
@@ -465,7 +471,8 @@ class FieldManager:
         layer = LayerData(**config_dictionary)
         return layer
 
-    def check_manure_schedules(self, field: Field, time: Time) -> list[NutrientRequest]:
+    def check_manure_schedules(self, field: Field, time: Time
+                               ) -> list[tuple[ManureEvent, NutrientRequest | None]]:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
@@ -476,4 +483,4 @@ class FieldManager:
 
         """
         manure_requests = field._check_manure_application_schedule(time)
-            
+        return manure_requests
