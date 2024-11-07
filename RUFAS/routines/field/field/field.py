@@ -584,11 +584,11 @@ class Field:
                     manure_event.year, manure_event.day
                 )
                 manure_event.application_depth = 0.0
-                surface_remainder_fraction = 1.0
+                manure_event.surface_remainder_fraction = 1.0
 
             if manure_event.application_depth > self.soil.data.soil_layers[-1].bottom_depth:
-                self._record_nutrient_application_error(manure_event.application_depth, None, error_name, manure_event.year,
-                                                        manure_event.day)
+                self._record_nutrient_application_error(manure_event.application_depth, None, error_name,
+                                                        manure_event.year, manure_event.day)
                 manure_event.application_depth = self.soil.data.soil_layers[-1].bottom_depth
 
             self.manure_applicator.apply_machine_manure(
