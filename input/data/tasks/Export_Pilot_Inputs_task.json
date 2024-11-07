@@ -1,0 +1,239 @@
+{
+  "parallel_workers": 4,
+  "input_data_to_csv": true,
+  "tasks": [
+     {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c1f1",
+      "metadata_file_path": "input/metadata/c1f1_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c1f2",
+      "metadata_file_path": "input/metadata/c1f2_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c1f3",
+      "metadata_file_path": "input/metadata/c1f3_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c1f4",
+      "metadata_file_path": "input/metadata/c1f4_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c1f5",
+      "metadata_file_path": "input/metadata/c1f5_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f1",
+      "metadata_file_path": "input/metadata/c2f1_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f2",
+      "metadata_file_path": "input/metadata/c2f2_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f3",
+      "metadata_file_path": "input/metadata/c2f3_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f4",
+      "metadata_file_path": "input/metadata/c2f4_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f5",
+      "metadata_file_path": "input/metadata/c2f5_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f6",
+      "metadata_file_path": "input/metadata/c2f6_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f7",
+      "metadata_file_path": "input/metadata/c2f7_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f8",
+      "metadata_file_path": "input/metadata/c2f8_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f9",
+      "metadata_file_path": "input/metadata/c2f9_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f10",
+      "metadata_file_path": "input/metadata/c2f10_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f11",
+      "metadata_file_path": "input/metadata/c2f11_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f12",
+      "metadata_file_path": "input/metadata/c2f12_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f13",
+      "metadata_file_path": "input/metadata/c2f13_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f14",
+      "metadata_file_path": "input/metadata/c2f14_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f15",
+      "metadata_file_path": "input/metadata/c2f15_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f16",
+      "metadata_file_path": "input/metadata/c2f16_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f17",
+      "metadata_file_path": "input/metadata/c2f17_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f18",
+      "metadata_file_path": "input/metadata/c2f18_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f19",
+      "metadata_file_path": "input/metadata/c2f19_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f20",
+      "metadata_file_path": "input/metadata/c2f20_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f21",
+      "metadata_file_path": "input/metadata/c2f21_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f22",
+      "metadata_file_path": "input/metadata/c2f22_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f23",
+      "metadata_file_path": "input/metadata/c2f23_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f25",
+      "metadata_file_path": "input/metadata/c2f25_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f24",
+      "metadata_file_path": "input/metadata/c2f24_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f26",
+      "metadata_file_path": "input/metadata/c2f26_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f27",
+      "metadata_file_path": "input/metadata/c2f27_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    },
+    {
+      "task_type": "INPUT_DATA_AUDIT",
+      "output_prefix": "c2f28",
+      "metadata_file_path": "input/metadata/c2f28_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0
+    }
+  ]
+}
