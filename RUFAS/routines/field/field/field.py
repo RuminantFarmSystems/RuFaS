@@ -930,7 +930,7 @@ class Field:
         if event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
             self.om.add_log("manure_application_log", log_message, info_map)
-            return self.field_data.name, None
+            return None
 
         return NutrientRequest(
             nitrogen=event.nitrogen_mass,
