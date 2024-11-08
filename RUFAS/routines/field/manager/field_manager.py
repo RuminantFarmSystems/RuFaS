@@ -88,8 +88,8 @@ class FieldManager:
                 "units": MeasurementUnits.HOURS,
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
-            crops = field.manage_field(time, current_conditions=current_conditions)
-            harvested_crops.extend(crops)
+            newly_harvested_crops = field.manage_field(time, current_conditions=current_conditions)
+            harvested_crops.extend(newly_harvested_crops)
         self.output_gatherer.send_daily_variables()
 
         return harvested_crops

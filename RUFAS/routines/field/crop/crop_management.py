@@ -74,10 +74,10 @@ class CropManagement:
         """
         self.determine_harvest_index()
 
-        crop = None
+        harvested_crop = None
         if harvest_op in (HarvestOperation.HARVEST_KILL, HarvestOperation.HARVEST_ONLY):
             self.cut_crop(collected_fraction=self.data.harvest_efficiency)
-            crop = self._get_harvested_crop(time, field_size)
+            harvested_crop = self._get_harvested_crop(time, field_size)
 
         if harvest_op in (HarvestOperation.KILL_ONLY, HarvestOperation.HARVEST_KILL):
             self.kill()
@@ -85,7 +85,7 @@ class CropManagement:
         self._record_yield(field_name, field_size, time.current_calendar_year, time.current_julian_day)
         self._transfer_residue(soil_data, not self.data.is_alive)
 
-        return crop
+        return harvested_crop
 
     # ---- Sub Methods ----
     def kill(self) -> None:
