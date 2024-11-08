@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import NamedTuple
 
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
@@ -304,9 +305,7 @@ class HarvestedCrop:
         return heat
 
 
-"""
-Type alias that is used throughout the Crop module when sending information back to Simulation Engine. The HarvestedCrop
-contains the mass and nutritional information that was harvested, and StorageType indicates how the harvested yield will
-be stored by the Feed Manager.
-"""
-HarvestedCropStorageType = tuple[HarvestedCrop, StorageType]
+class HarvestedCropStorageType(NamedTuple):
+    """Used to couple a yield collected in the Crop and Soil module with the storage type it will be put in."""
+    harvested_crop: HarvestedCrop
+    storage_type: StorageType

@@ -289,7 +289,7 @@ class CropManagement:
             lignin=self.data.lignin_dry_matter_percentage,
             ash=self.data.ash,
         )
-        return (harvested_crop, self.data.storage_type)
+        return HarvestedCropStorageType(harvested_crop, self.data.storage_type)
 
     def _record_yield(self, field_name: str, field_size: float, year: int, day: int) -> None:
         """
