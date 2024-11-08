@@ -145,7 +145,14 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def generate_daily_manure_applications(self):
+    def generate_daily_manure_applications(self) -> dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]]:
+        """Requests nutrients from the manure manager for each field in the simulation.
+
+        Returns
+        -------
+        dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]]
+            A dictionary containing the manure events and corresponding applications for each field in the simulation.
+        """
         manure_applications: dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]] = {}
         for field in self.field_manager.fields:
             manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)

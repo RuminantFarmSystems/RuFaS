@@ -117,6 +117,8 @@ def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -
         (crop_1 := mocker.MagicMock(), StorageType.BAG),
         (crop_2 := mocker.MagicMock(), StorageType.BALEAGE),
     ]
+    mock_manure_applications = mocker.MagicMock()
+    mocker.patch.object(simulation_engine, "generate_daily_manure_applications", return_value=mock_harvested_crops)
     mocker.patch.object(simulation_engine.field_manager, "daily_update_routine", return_value=mock_harvested_crops)
     patch_receive_crop = mocker.patch.object(simulation_engine.feed_manager, "receive_crop")
     patch_for_daily_feed_routine = mocker.patch("RUFAS.simulation_engine.routines.daily_feed_routine")
