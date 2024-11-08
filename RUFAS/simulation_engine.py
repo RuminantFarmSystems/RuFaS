@@ -134,6 +134,18 @@ class SimulationEngine:
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
+        manure_applications = self.generate_daily_manure_applications()
+        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
+        for crop in harvested_crops:
+            self.feed_manager.receive_crop(*crop)
+        routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
+
+        self.time.record_time()
+        self.weather.record_weather(self.time)
+
+        self._advance_time()
+
+    def generate_daily_manure_applications(self):
         manure_applications: dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]] = {}
         for field in self.field_manager.fields:
             manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
@@ -144,15 +156,7 @@ class SimulationEngine:
                 if manure_request is not None:
                     manure_request_results = self.manure_manager.request_nutrients(manure_request)
                 manure_applications[field.field_data.name].append((event, manure_request_results))
-        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
-        for crop in harvested_crops:
-            self.feed_manager.receive_crop(*crop)
-        routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
-
-        self.time.record_time()
-        self.weather.record_weather(self.time)
-
-        self._advance_time()
+        return manure_applications
 
     def _advance_time(self) -> None:
         """
