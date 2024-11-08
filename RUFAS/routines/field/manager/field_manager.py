@@ -1,12 +1,13 @@
 from typing import Dict, List, Tuple
 
 from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
+from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequest
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.routines.field.manager.events import ManureEvent
+from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
@@ -15,8 +16,8 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.data_structures.nutrient_request import NutrientRequest
+from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -472,7 +473,7 @@ class FieldManager:
         return layer
 
     def check_manure_schedules(self, field: Field, time: Time
-                               ) -> list[tuple[ManureEvent, NutrientRequest | None]]:
+                               ) -> list[ManureEventNutrientRequest]:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 

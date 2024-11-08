@@ -4,16 +4,17 @@ import time as timer
 from enum import Enum
 
 from RUFAS import routines
+from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.field.manager.events import ManureEvent
+from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -145,24 +146,27 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def generate_daily_manure_applications(self) -> dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]]:
+    def generate_daily_manure_applications(self) -> dict[str, list[ManureEventNutrientRequestResults]]:
         """Requests nutrients from the manure manager for each field in the simulation.
 
         Returns
         -------
-        dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]]
-            A dictionary containing the manure events and corresponding applications for each field in the simulation.
+        dict[str, list[ManureEventNutrientRequestResults]]
+            A dictionary containing the ManureEvents and corresponding NutrientRequestResults for each field in
+            the simulation.
         """
-        manure_applications: dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]] = {}
+        manure_applications: dict[str, list[ManureEventNutrientRequestResults]] = {}
         for field in self.field_manager.fields:
             manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
             manure_applications[field.field_data.name] = []
             for manure_event_request in manure_events_requests:
-                event, manure_request = manure_event_request
+                event = manure_event_request.event
+                manure_request = manure_event_request.nutrient_request
                 manure_request_results = None
                 if manure_request is not None:
                     manure_request_results = self.manure_manager.request_nutrients(manure_request)
-                manure_applications[field.field_data.name].append((event, manure_request_results))
+                manure_applications[field.field_data.name].append(
+                    ManureEventNutrientRequestResults(event, manure_request_results))
         return manure_applications
 
     def _advance_time(self) -> None:
