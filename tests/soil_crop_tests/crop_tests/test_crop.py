@@ -5,7 +5,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -238,15 +238,13 @@ def test_manage_crop_harvest(mocker: MockerFixture) -> None:
     field_size = 10.0  # hectares
     mock_time = mocker.Mock(spec=Time)
     mock_soil_data = mocker.Mock(spec=SoilData)
-    mock_feed_manager = mocker.Mock(spec=FeedManager)
+    mock_crop_harvest = mocker.Mock(spec=HarvestedCropStorageType)
+    manage_harvest_mock = mocker.patch.object(crop._crop_management, "manage_harvest", return_value=mock_crop_harvest)
 
-    manage_harvest_mock = mocker.patch.object(crop._crop_management, "manage_harvest")
+    actual = crop.manage_crop_harvest(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data)
 
-    crop.manage_crop_harvest(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data, mock_feed_manager)
-
-    manage_harvest_mock.assert_called_once_with(
-        mock_harvest_op, field_name, field_size, mock_time, mock_soil_data, mock_feed_manager
-    )
+    manage_harvest_mock.assert_called_once_with(mock_harvest_op, field_name, field_size, mock_time, mock_soil_data)
+    assert actual == mock_crop_harvest
 
 
 def test_set_maximum_transpiration(mocker: MockerFixture) -> None:
