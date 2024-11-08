@@ -5,8 +5,7 @@ from mock.mock import MagicMock, PropertyMock, patch
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCrop, StorageType, HarvestedCropStorageType
 from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -21,11 +20,6 @@ from RUFAS.units import MeasurementUnits
 @pytest.fixture
 def mock_time() -> Time:
     return MagicMock(auto_spec=Time)
-
-
-@pytest.fixture
-def mock_feed_manager() -> FeedManager:
-    return FeedManager()
 
 
 @pytest.fixture
@@ -155,57 +149,65 @@ def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
 
 
 @pytest.mark.parametrize(
-    "harvest_op,field_name,field_size,soil_data,killed",
+    "harvest_op,field_name,field_size,soil_data,killed,expect_harvest",
     [
-        (HarvestOperation.HARVEST_KILL, "test_1", 1.8, SoilData(field_size=1.8), True),
-        (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, SoilData(field_size=4.5), False),
-        (HarvestOperation.KILL_ONLY, "test_3", 2.2, SoilData(field_size=2.5), True),
+        (HarvestOperation.HARVEST_KILL, "test_1", 1.8, SoilData(field_size=1.8), True, True),
+        (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, SoilData(field_size=4.5), False, True),
+        (HarvestOperation.KILL_ONLY, "test_3", 2.2, SoilData(field_size=2.5), True, False),
     ],
 )
 def test_manage_harvest(
+    mocker: MockerFixture,
     mock_time: Time,
-    mock_feed_manager: FeedManager,
     harvest_op: HarvestOperation,
     field_name: str,
     field_size: float,
     soil_data: SoilData,
     killed: bool,
+    expect_harvest: bool,
 ) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
     crop = CropManagement()
     crop.data.yield_residue = 100.0
 
-    with (
-        patch.object(crop, "determine_harvest_index") as harvest_index,
-        patch.object(crop, "kill", wraps=crop.kill) as kill,
-        patch.object(crop, "cut_crop") as cut_crop,
-        patch.object(crop, "_store_harvested_crop") as store_crop,
-        patch.object(crop, "_record_yield") as record_yield,
-        patch.object(crop, "_transfer_residue") as transfer_residue,
-    ):
-        crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data, mock_feed_manager)
+    harvest_index = mocker.patch.object(crop, "determine_harvest_index")
+    kill = mocker.patch.object(crop, "kill", wraps=crop.kill)
+    cut_crop = mocker.patch.object(crop, "cut_crop")
+    get_crop = mocker.patch.object(
+        crop,
+        "_get_harvested_crop",
+        return_value=(expected_val := HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)),
+    )
+    record_yield = mocker.patch.object(crop, "_record_yield")
+    transfer_residue = mocker.patch.object(crop, "_transfer_residue")
 
-        harvest_index.assert_called_once()
-        # Method specific (one for each op type)
-        if harvest_op == HarvestOperation.HARVEST_KILL:
-            cut_crop.assert_called_once()
-            kill.assert_called_once()
-            store_crop.assert_called_once()
+    actual = crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data)
 
-        if harvest_op == HarvestOperation.HARVEST_ONLY:
-            cut_crop.assert_called_once()
-            kill.assert_not_called()
-            store_crop.assert_called_once()
+    harvest_index.assert_called_once()
+    if harvest_op == HarvestOperation.HARVEST_KILL:
+        cut_crop.assert_called_once()
+        kill.assert_called_once()
+        get_crop.assert_called_once()
 
-        if harvest_op == HarvestOperation.KILL_ONLY:
-            cut_crop.assert_not_called()
-            kill.assert_called_once()
-            store_crop.assert_not_called()
+    if harvest_op == HarvestOperation.HARVEST_ONLY:
+        cut_crop.assert_called_once()
+        kill.assert_not_called()
+        get_crop.assert_called_once()
 
-        record_yield.assert_called_once_with(
-            field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
-        )
-        transfer_residue.assert_called_once_with(soil_data, killed)
+    if harvest_op == HarvestOperation.KILL_ONLY:
+        cut_crop.assert_not_called()
+        kill.assert_called_once()
+        get_crop.assert_not_called()
+
+    record_yield.assert_called_once_with(
+        field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
+    )
+    transfer_residue.assert_called_once_with(soil_data, killed)
+
+    if expect_harvest:
+        assert actual == expected_val
+    else:
+        assert actual is None
 
 
 @pytest.mark.parametrize(
@@ -311,17 +313,11 @@ def test_recalculate_biomass_distribution(
     assert crop.root_fraction == expected_root_fraction
 
 
-@pytest.mark.skip(reason="Issue #2008")
 @pytest.mark.parametrize(
-    "field_size,wet_yield_collected,expected_fresh_mass",
-    [
-        (1.0, 2000.0, 2000.0),
-        (2.0, 1500.0, 3000.0),
-    ],
+    "field_size,wet_yield_collected,expected_fresh_mass", [(1.0, 2000.0, 2000.0), (2.0, 1500.0, 3000.0)]
 )
 def test_store_harvested_crop(
     mock_time: Time,
-    mock_feed_manager: FeedManager,
     mock_alfalfa_silage_data: AlfalfaSilage,
     field_size: float,
     wet_yield_collected: float,
@@ -348,10 +344,11 @@ def test_store_harvested_crop(
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
-    with patch.object(mock_feed_manager, "receive_crop") as receive_crop:
-        crop_management._store_harvested_crop(mock_time, field_size, mock_feed_manager)
+    actual = crop_management._get_harvested_crop(mock_time, field_size)
 
-        receive_crop.assert_called_once_with(expected_harvest_crop, mock_alfalfa_silage_data.storage_type)
+    assert actual.harvested_crop.category == mock_alfalfa_silage_data.crop_category
+    assert actual.harvested_crop.fresh_mass == expected_fresh_mass
+    assert actual.storage_type == mock_alfalfa_silage_data.storage_type
 
 
 @pytest.mark.parametrize(
