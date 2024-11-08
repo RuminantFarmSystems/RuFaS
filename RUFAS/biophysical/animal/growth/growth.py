@@ -21,27 +21,21 @@ class Growth:
 
     Attributes
     ----------
-    WEAN_DAY: int
-        Class constant that indicates the user-defined wean day for calves.
-    TARGET_HEIFER_PREGNANT_DAY: int
-        Class constant that indicates the user-defined target pregnant day for heifers.
+    daily_growth: float
+        The body weight of the animal (kg).
+    tissue_changed: float
+        Body weight change due to tissue mobilization (kg).
     """
 
-    WEAN_DAY: int
-    TARGET_HEIFER_PREGNANT_DAY: int
+    daily_growth: float = 0.0
+    tissue_changed: float = 0.0
 
-    @classmethod
-    def initialize_animal_growth_variables(cls) -> None:
-        """
-        This function retrieves the user input data from the InputManager and initializes the class constants.
-        """
-        im = InputManager()
-        animal_config: dict[str, dict[str, Any]] = im.get_data("animal.animal_config.farm_level")
-        cls.WEAN_DAY = animal_config["calf"]["wean_day"]
-        cls.TARGET_HEIFER_PREGNANT_DAY = animal_config["bodyweight"]["target_heifer_preg_day"]
+    def __init__(self, daily_growth: float = 0.0, tissue_changed: float = 0.0) -> None:
+        self.daily_growth = daily_growth if daily_growth else 0.0
+        self.tissue_changed = tissue_changed if tissue_changed else 0.0
 
-    @staticmethod
     def evaluate_body_weight_change(
+        self,
         general_properties: GeneralProperties,
         animal_growth_properties: GrowthProperties,
         reproduction_properties: ReproductionProperties,
@@ -75,21 +69,21 @@ class Growth:
         )
 
         if general_properties.animal_type == AnimalType.CALF:
-            animal_growth_properties.daily_growth = Growth.calculate_calf_body_weight_change(general_properties)
-            general_properties.body_weight += animal_growth_properties.daily_growth
+            self.daily_growth = Growth.calculate_calf_body_weight_change(general_properties)
+            general_properties.body_weight += self.daily_growth
 
         elif is_non_pregnant_heifer:
-            animal_growth_properties.daily_growth = Growth.calculate_non_pregnant_heifer_body_weight_change(
+            self.daily_growth = Growth.calculate_non_pregnant_heifer_body_weight_change(
                 general_properties
             )
-            general_properties.body_weight += animal_growth_properties.daily_growth
+            general_properties.body_weight += self.daily_growth
 
         elif is_pregnant_heifer:
             if general_properties.body_weight < general_properties.mature_body_weight:
-                (animal_growth_properties.daily_growth, reproduction_properties.conceptus_weight) = (
+                (self.daily_growth, reproduction_properties.conceptus_weight) = (
                     Growth.calculate_pregnant_heifer_body_weight_change(reproduction_properties, general_properties)
                 )
-                general_properties.body_weight += animal_growth_properties.daily_growth
+                general_properties.body_weight += self.daily_growth
             else:
                 general_properties.body_weight = general_properties.mature_body_weight
                 general_properties.events.add_event(
@@ -98,13 +92,13 @@ class Growth:
 
         elif general_properties.animal_type.is_cow:
             (
-                animal_growth_properties.daily_growth,
+                self.daily_growth,
                 reproduction_properties.conceptus_weight,
-                animal_growth_properties.tissue_changed,
+                self.tissue_changed,
             ) = Growth.calculate_cow_body_weight_change(
                 animal_growth_properties, reproduction_properties, general_properties
             )
-            general_properties.body_weight += animal_growth_properties.daily_growth
+            general_properties.body_weight += self.daily_growth
         else:
             om = OutputManager()
             om.add_error(
