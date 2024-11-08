@@ -11,6 +11,7 @@ class MeasurementUnits(Enum):
 
     ANIMALS = "animals"
     ARTIFICIAL_INSEMINATIONS = "AI"
+    BYTES = "bytes"
     CALENDAR_YEAR = "calendar year"
     CENTIMETERS = "cm"
     CENTIMETERS_PER_MILLIMETER = "cm/mm"
