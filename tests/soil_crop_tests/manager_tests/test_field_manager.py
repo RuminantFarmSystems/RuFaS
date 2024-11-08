@@ -83,11 +83,13 @@ def mock_weather(mocker: MockerFixture) -> Weather:
 @pytest.mark.parametrize(
     "fields,,expected_harvests_count",
     [
-        ([
-            Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
-            Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
-            Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager)),
-        ], 6
+        (
+            [
+                Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
+                Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
+                Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager)),
+            ],
+            6,
         ),
         ([], 0),
     ],
@@ -115,10 +117,14 @@ def test_daily_update_routine(
 
         fm.fields = fields
         for field in fields:
-            mocker.patch.object(field, "manage_field", return_value=[
-                HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
-                HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)
-            ])
+            mocker.patch.object(
+                field,
+                "manage_field",
+                return_value=[
+                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                ],
+            )
         fm.output_gatherer.send_daily_variables = MagicMock()
 
         actual = fm.daily_update_routine(weather=mock_weather, time=mocked_time)

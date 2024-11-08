@@ -174,7 +174,9 @@ def test_manage_harvest(
     kill = mocker.patch.object(crop, "kill", wraps=crop.kill)
     cut_crop = mocker.patch.object(crop, "cut_crop")
     get_crop = mocker.patch.object(
-        crop, "_get_harvested_crop", return_value=(expected_val := HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY))
+        crop,
+        "_get_harvested_crop",
+        return_value=(expected_val := HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)),
     )
     record_yield = mocker.patch.object(crop, "_record_yield")
     transfer_residue = mocker.patch.object(crop, "_transfer_residue")
