@@ -16,7 +16,6 @@ from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
 from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.data_structures.nutrient_request import NutrientRequest
 from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time

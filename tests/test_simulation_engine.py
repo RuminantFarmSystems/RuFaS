@@ -2,6 +2,7 @@ import pytest
 from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
+from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequestResults
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.crop_soil_feed_storage_connection import StorageType
 from RUFAS.output_manager import OutputManager
@@ -156,6 +157,46 @@ def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -
     simulation_engine.time.record_time.assert_called_once()
     simulation_engine.weather.record_weather.assert_called_once_with(simulation_engine.time)
     patch_for_advance_time.assert_called_once()
+
+
+def test_generate_daily_manure_applications(mocker: MockerFixture) -> None:
+    """Unit test for generate_daily_manure_applications in SimulationEngine."""
+
+    mocker.patch.object(SimulationEngine, "__init__", return_value=None)
+    simulation_engine = SimulationEngine()
+    simulation_engine.field_manager = mocker.MagicMock()
+    simulation_engine.manure_manager = mocker.MagicMock()
+    simulation_engine.time = mocker.MagicMock()
+
+    field_1 = mocker.MagicMock()
+    field_1.field_data.name = "Field 1"
+    field_2 = mocker.MagicMock()
+    field_2.field_data.name = "Field 2"
+    simulation_engine.field_manager.fields = [field_1, field_2]
+
+    manure_event_request_1 = mocker.MagicMock()
+    manure_event_request_2 = mocker.MagicMock()
+    manure_event_request_1.event = "Event 1"
+    manure_event_request_1.nutrient_request = "Nutrient Request 1"
+    manure_event_request_2.event = "Event 2"
+    manure_event_request_2.nutrient_request = None
+
+    simulation_engine.field_manager.check_manure_schedules.side_effect = [
+        [manure_event_request_1],
+        [manure_event_request_2]
+    ]
+
+    simulation_engine.manure_manager.request_nutrients.return_value = "Nutrient Result 1"
+
+    result = simulation_engine.generate_daily_manure_applications()
+
+    assert result == {
+        "Field 1": [ManureEventNutrientRequestResults("Event 1", "Nutrient Result 1")],
+        "Field 2": [ManureEventNutrientRequestResults("Event 2", None)]
+    }
+    simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_1, simulation_engine.time)
+    simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_2, simulation_engine.time)
+    simulation_engine.manure_manager.request_nutrients.assert_called_once_with("Nutrient Request 1")
 
 
 def test_initialize_simulation(mocker: MockerFixture) -> None:

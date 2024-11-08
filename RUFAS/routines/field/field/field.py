@@ -4,7 +4,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
-from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequest, ManureEventNutrientRequestResults
+from RUFAS.data_structures.crop_soil_to_manure_connection import (
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults
+)
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
