@@ -133,8 +133,8 @@ class SimulationEngine:
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
         harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time)
-        for crop in harvested_crops:
-            self.feed_manager.receive_crop(crop.harvested_crop, crop.storage_type)
+        for harvested_crop in harvested_crops:
+            self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
 
         self.time.record_time()
