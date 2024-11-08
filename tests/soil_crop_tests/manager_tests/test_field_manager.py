@@ -6,6 +6,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
@@ -80,29 +81,22 @@ def mock_weather(mocker: MockerFixture) -> Weather:
 
 
 @pytest.mark.parametrize(
-    "fields",
+    "fields,,expected_harvests_count",
     [
-        [
-            Field(
-                field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-            Field(
-                field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-            Field(
-                field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-        ],
-        [],
+        ([
+            Field(field_data=FieldData(name="field1"), manure_manager=MagicMock(ManureManager)),
+            Field(field_data=FieldData(name="field2"), manure_manager=MagicMock(ManureManager)),
+            Field(field_data=FieldData(name="field3"), manure_manager=MagicMock(ManureManager)),
+        ], 6
+        ),
+        ([], 0),
     ],
 )
 def test_daily_update_routine(
-    fields: List[Field],
     mock_weather: Weather,
     mocker: MockerFixture,
+    fields: list[Field],
+    expected_harvests_count: int,
 ) -> None:
     """Tests that the daily routines and it's methods were called and updated correctly"""
     mocked_time = MagicMock(Time)
@@ -121,14 +115,20 @@ def test_daily_update_routine(
 
         fm.fields = fields
         for field in fields:
-            field.manage_field = MagicMock()
+            mocker.patch.object(field, "manage_field", return_value=[
+                HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)
+            ])
         fm.output_gatherer.send_daily_variables = MagicMock()
-        fm.daily_update_routine(weather=mock_weather, time=mocked_time)
+
+        actual = fm.daily_update_routine(weather=mock_weather, time=mocked_time)
+
         for field in fields:
             assert field.manage_field.call_count == 1
         assert get_conditions.call_count == len(fields)
         assert fm.output_gatherer.send_daily_variables.call_count == 1
         assert mock_add_var.call_count == len(fields)
+        assert len(actual) == expected_harvests_count
 
 
 @pytest.mark.parametrize(
