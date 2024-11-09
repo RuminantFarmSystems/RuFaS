@@ -25,7 +25,6 @@ from RUFAS.data_structures.events import (
     TillageEvent,
 )
 from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.data_structures.nutrient_request import NutrientRequest
 from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
@@ -60,8 +59,6 @@ class Field:
         List of all fertilizer mixes available for application to this field.
     manure_events : List[ManureEvent], default=None
         Manure application interface.
-    manure_manager : ManureManager, default=None
-        Object that will to be used during simulation to get manure for field applications.
 
     Attributes
     ----------
@@ -91,11 +88,9 @@ class Field:
     tillage_events: List[TillageEvent]
         List of all tillage events that will occur over the run of the simulation in this field.
     manure_applicator = ManureApplication
-        List of ManureApplication objects
+        List of ManureApplication objects.
     manure_events: List[ManureEvent]
-        List of all manure applications that will be applied to this field
-    manure_manager: ManureManager
-        Manure Manager instance from which manure is requested for application to the field.
+        List of all manure applications that will be applied to this field.
 
     Methods
     -------
@@ -115,7 +110,6 @@ class Field:
         fertilizer_events: Optional[List[FertilizerEvent]] = None,
         fertilizer_mixes: Optional[Dict[str, Dict[str, float]]] = None,
         manure_events: Optional[List[ManureEvent]] = None,
-        manure_manager: Optional[ManureManager] = None,
     ) -> None:
         # field-wide attributes
         self.om = OutputManager()
@@ -150,22 +144,6 @@ class Field:
         self.manure_applicator = ManureApplication(self.soil.data)
 
         self.manure_events: list[ManureEvent] = manure_events or []
-
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": "__init__",
-        }
-
-        if manure_manager is None:
-            self.om.add_error(
-                "field_initialization_error",
-                f"Attempted initialization of Field {self.field_data.name=} with no manure supplier, failing to "
-                f"initialize.",
-                info_map,
-            )
-            raise ValueError("Manure supplier cannot be None.")
-
-        self.manure_manager: ManureManager = manure_manager
 
     def manage_field(self, time: Time, current_conditions: CurrentDayConditions,
                      manure_applications: list[ManureEventNutrientRequestResults]

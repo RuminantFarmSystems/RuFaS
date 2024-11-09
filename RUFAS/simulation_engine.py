@@ -232,7 +232,7 @@ class SimulationEngine:
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
 
-        self.field_manager = FieldManager(manure_manager=self.manure_manager)
+        self.field_manager = FieldManager()
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
         if self.is_end_to_end_test_run:

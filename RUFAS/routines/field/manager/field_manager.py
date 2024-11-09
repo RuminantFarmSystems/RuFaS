@@ -15,7 +15,6 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
@@ -29,10 +28,6 @@ class FieldManager:
     responsible for creating `Field` instances based on input data, managing these fields across the simulation
     lifecycle, and interfacing with the `SimulationEngine` to execute daily and annual routines.
 
-    Parameters
-    ----------
-    manure_manager : ManureManager
-        An instance of `ManureManager` responsible for managing manure-related activities and data across the fields.
 
     Attributes
     ----------
@@ -45,7 +40,7 @@ class FieldManager:
 
     """
 
-    def __init__(self, manure_manager: ManureManager) -> None:
+    def __init__(self) -> None:
         info_map = {"class": self.__class__.__name__, "function": "__init__"}
         self.im = InputManager()
         self.om = OutputManager()
@@ -55,7 +50,7 @@ class FieldManager:
             self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         for field in fields:
-            new_field = self._setup_field(field, manure_manager)
+            new_field = self._setup_field(field)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
@@ -111,7 +106,7 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager) -> Field:
+    def _setup_field(field_name: str) -> Field:
         """
 
         Parameters
@@ -193,7 +188,6 @@ class FieldManager:
             fertilizer_events=fertilizer_events,
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
-            manure_manager=manure_manager,
         )
 
     @staticmethod
