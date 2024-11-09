@@ -9,6 +9,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_manure_connection import (
     ManureEventNutrientRequest, ManureEventNutrientRequestResults
 )
+from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.crop.crop import Crop
@@ -387,7 +388,7 @@ def test_create_manure_request(
 
 
 @pytest.mark.parametrize(
-    "year,day,all_harvest_events,current_harvest_events",
+    "year,day,all_harvest_events,current_harvest_events,expected_harvest_count",
     [
         (
             1990,
@@ -397,6 +398,7 @@ def test_create_manure_request(
                 HarvestEvent("corn", 1990, 255, "default"),
             ],
             [HarvestEvent("cover", 1990, 240, "default")],
+            1,
         ),
         (
             1991,
@@ -406,6 +408,7 @@ def test_create_manure_request(
                 HarvestEvent("cover", 1991, 260, "default"),
             ],
             [],
+            0,
         ),
         (
             1992,
@@ -420,8 +423,9 @@ def test_create_manure_request(
                 HarvestEvent("cover_1", 1992, 230, "default"),
                 HarvestEvent("cover_2", 1992, 230, "default"),
             ],
+            3,
         ),
-        (1993, 145, [], []),
+        (1993, 145, [], [], 0),
     ],
 )
 def test_check_crop_harvest_schedule(
@@ -430,6 +434,7 @@ def test_check_crop_harvest_schedule(
     day: int,
     all_harvest_events: List[HarvestEvent],
     current_harvest_events: List[HarvestEvent],
+    expected_harvest_count: int,
 ) -> None:
     """Tests that the schedule of crop harvests is determined correctly for any given day."""
     field = Field(harvestings=all_harvest_events)
@@ -443,20 +448,21 @@ def test_check_crop_harvest_schedule(
         field, "_filter_events", return_value=(remaining_harvest_events, current_harvest_events)
     )
     harvest_crop = mocker.patch.object(
-        field, "_harvest_crop", return_value=[mocker.MagicMock()] * len(current_harvest_events)
+        field, "_harvest_crop", return_value=[HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)]
     )
-    field._harvest_heat_scheduled_crops = MagicMock()
+    harvest_heat_scheduled = mocker.patch.object(field, "_harvest_heat_scheduled_crops")
 
     harvest_crop_calls = []
     for event in current_harvest_events:
         new_call = call(event.crop_reference, event.operation, mocked_time, mock_conditions)
         harvest_crop_calls.append(new_call)
 
-    field._check_crop_harvest_schedule(mocked_time, mock_conditions)
+    actual = field._check_crop_harvest_schedule(mocked_time, mock_conditions)
 
     filter_events.assert_called_once_with(all_harvest_events, mocked_time)
     harvest_crop.assert_has_calls(harvest_crop_calls)
-    field._harvest_heat_scheduled_crops.assert_called_once()
+    assert len(actual) == expected_harvest_count
+    harvest_heat_scheduled.assert_called_once()
 
 
 @pytest.mark.parametrize(
