@@ -7,7 +7,8 @@ from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_manure_connection import (
-    ManureEventNutrientRequest, ManureEventNutrientRequestResults
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
 )
 from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.input_manager import InputManager
@@ -138,8 +139,9 @@ def test_daily_update_routine(
                 ],
             )
         fm.output_gatherer.send_daily_variables = MagicMock()
-        actual = fm.daily_update_routine(weather=mock_weather, time=mocked_time,
-                                         manure_applications=manure_applications)
+        actual = fm.daily_update_routine(
+            weather=mock_weather, time=mocked_time, manure_applications=manure_applications
+        )
 
         for field in fields:
             assert field.manage_field.call_count == 1
@@ -1415,8 +1417,9 @@ def test_crop_schedule_setup(
         ),
     ],
 )
-def test_setup_soil_layer(field_size: float, top: float, residue: float, config: dict[str, float | int],
-                          expected: LayerData) -> None:
+def test_setup_soil_layer(
+    field_size: float, top: float, residue: float, config: dict[str, float | int], expected: LayerData
+) -> None:
     """Tests that LayerData instances are configured correctly with a given specification."""
     actual = FieldManager._setup_soil_layer(field_size, top, residue, config)
     assert actual == expected
@@ -1857,7 +1860,7 @@ def test_check_manure_schedules() -> None:
     time = MagicMock(Time)
     expected_manure_requests = [
         ManureEventNutrientRequest(event=MagicMock(), nutrient_request=MagicMock()),
-        ManureEventNutrientRequest(event=MagicMock(), nutrient_request=MagicMock())
+        ManureEventNutrientRequest(event=MagicMock(), nutrient_request=MagicMock()),
     ]
     field._check_manure_application_schedule.return_value = expected_manure_requests
     field_manager = FieldManager()

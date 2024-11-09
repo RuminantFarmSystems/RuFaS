@@ -183,7 +183,7 @@ def test_generate_daily_manure_applications(mocker: MockerFixture) -> None:
 
     simulation_engine.field_manager.check_manure_schedules.side_effect = [
         [manure_event_request_1],
-        [manure_event_request_2]
+        [manure_event_request_2],
     ]
 
     simulation_engine.manure_manager.request_nutrients.return_value = "Nutrient Result 1"
@@ -192,7 +192,7 @@ def test_generate_daily_manure_applications(mocker: MockerFixture) -> None:
 
     assert result == {
         "Field 1": [ManureEventNutrientRequestResults("Event 1", "Nutrient Result 1")],
-        "Field 2": [ManureEventNutrientRequestResults("Event 2", None)]
+        "Field 2": [ManureEventNutrientRequestResults("Event 2", None)],
     }
     simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_1, simulation_engine.time)
     simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_2, simulation_engine.time)
