@@ -2,7 +2,8 @@ from typing import Dict, List, Tuple
 
 from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.data_structures.crop_soil_to_manure_connection import (
-    ManureEventNutrientRequest, ManureEventNutrientRequestResults
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
 )
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -54,9 +55,9 @@ class FieldManager:
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
-    def daily_update_routine(self, weather: Weather, time: Time,
-                             manure_applications: dict[str, list[ManureEventNutrientRequestResults]]
-                             ) -> list[HarvestedCropStorageType]:
+    def daily_update_routine(
+        self, weather: Weather, time: Time, manure_applications: dict[str, list[ManureEventNutrientRequestResults]]
+    ) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
@@ -92,8 +93,9 @@ class FieldManager:
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
             manure_applications_for_field = manure_applications.get(field.field_data.name, [])
-            newly_harvested_crops = field.manage_field(time, current_conditions=current_conditions,
-                                                       manure_applications=manure_applications_for_field)
+            newly_harvested_crops = field.manage_field(
+                time, current_conditions=current_conditions, manure_applications=manure_applications_for_field
+            )
             harvested_crops.extend(newly_harvested_crops)
         self.output_gatherer.send_daily_variables()
 
@@ -468,8 +470,7 @@ class FieldManager:
         layer = LayerData(**config_dictionary)
         return layer
 
-    def check_manure_schedules(self, field: Field, time: Time
-                               ) -> list[ManureEventNutrientRequest]:
+    def check_manure_schedules(self, field: Field, time: Time) -> list[ManureEventNutrientRequest]:
         """
         Checks list of ManureEvents, sends all that occur today to another method to be executed.
 

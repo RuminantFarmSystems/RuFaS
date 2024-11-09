@@ -164,7 +164,8 @@ class SimulationEngine:
                 if manure_request is not None:
                     manure_request_results = self.manure_manager.request_nutrients(manure_request)
                 manure_applications[field.field_data.name].append(
-                    ManureEventNutrientRequestResults(event, manure_request_results))
+                    ManureEventNutrientRequestResults(event, manure_request_results)
+                )
         return manure_applications
 
     def _advance_time(self) -> None:

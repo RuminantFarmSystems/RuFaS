@@ -7,7 +7,8 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_manure_connection import (
-    ManureEventNutrientRequest, ManureEventNutrientRequestResults
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
 )
 from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.output_manager import OutputManager
@@ -128,7 +129,7 @@ def test_manage_field() -> None:
         surface_remainder_fraction=0.2,
         year=2024,
         day=120,
-        manure_supplied="MockResults"
+        manure_supplied="MockResults",
     )
     field._check_tillage_schedule.assert_called_once_with(mocked_time)
     field._execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
@@ -294,7 +295,7 @@ def test_check_manure_application_schedule() -> None:
     manure_events = [
         ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
         ManureEvent(1992, 120, 90, 25, ManureType.SOLID, 0.9, 0.1, 0.9),
-        ManureEvent(1991, 121, 80, 30, ManureType.LIQUID, 0.85, 0.05, 0.95)
+        ManureEvent(1991, 121, 80, 30, ManureType.LIQUID, 0.85, 0.05, 0.95),
     ]
     field = Field(manure_events=manure_events)
 
@@ -330,21 +331,13 @@ def test_check_manure_application_schedule() -> None:
             25.0,
             ManureType.LIQUID,
             NutrientRequest(nitrogen=50.0, phosphorus=25.0, manure_type=ManureType.LIQUID),
-            None
+            None,
         ),
         # Case: No nutrients requested, expect None and a log message
-        (
-            0.0,
-            0.0,
-            ManureType.LIQUID,
-            None,
-            "Tried to apply manure with no nitrogen or phosphorus requested."
-        ),
-    ]
+        (0.0, 0.0, ManureType.LIQUID, None, "Tried to apply manure with no nitrogen or phosphorus requested."),
+    ],
 )
-def test_create_manure_request(
-    nitrogen_mass, phosphorus_mass, manure_type, expected_request, expected_log
-):
+def test_create_manure_request(nitrogen_mass, phosphorus_mass, manure_type, expected_request, expected_log):
     """Tests _create_manure_request for both nutrient-requested and no-nutrient cases."""
     # Arrange
     field = Field()
@@ -383,7 +376,7 @@ def test_create_manure_request(
                 "function": field._create_manure_request.__name__,
                 "suffix": f"field='{field.field_data.name}'",
                 "date": {"year": manure_event.year, "day": manure_event.day},
-            }
+            },
         )
 
 
@@ -1609,8 +1602,9 @@ def test_execute_manure_application(
 
     warn = mocker.patch.object(field.om, "add_warning")
 
-    field._execute_manure_application(nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day,
-                                      supplied_manure)
+    field._execute_manure_application(
+        nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day, supplied_manure
+    )
 
     expected_total_inorganic_fraction = 0.14  # equal to (50.0 / 250.0) * 0.7
     expected_total_organic_fraction = 0.06  # equal to (50.0 / 250.0) * 0.3
@@ -1724,9 +1718,7 @@ def test_execute_manure_application_with_invalid_args(
         dry_matter=100.0,
         dry_matter_fraction=0.66,
     )
-    field = Field(
-        field_data=FieldData(name="test", field_size=1.89)
-    )
+    field = Field(field_data=FieldData(name="test", field_size=1.89))
     field.soil.data.soil_layers[-1].bottom_depth = 950.0
     expected_total_inorganic_fraction = 0.15  # equal to (50.0 / 100.0) * 0.3
     expected_total_organic_fraction = 0.35  # equal to (50.0 / 100.0) * 0.7
@@ -1755,8 +1747,9 @@ def test_execute_manure_application_with_invalid_args(
             new_callable=MagicMock,
         ) as patched_fertilizer_applicator,
     ):
-        field._execute_manure_application(50.0, 50.0, ManureType.LIQUID, 0.8, depth, remainder, 2000, 133,
-                                          supplied_nutrients)
+        field._execute_manure_application(
+            50.0, 50.0, ManureType.LIQUID, 0.8, depth, remainder, 2000, 133, supplied_nutrients
+        )
 
         field._add_manure_water.assert_called_once_with(supplied_nutrients, ManureType.LIQUID)
         if invalid_combination:

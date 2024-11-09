@@ -6,7 +6,7 @@ from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.data_structures.crop_soil_to_manure_connection import (
     ManureEventNutrientRequest,
-    ManureEventNutrientRequestResults
+    ManureEventNutrientRequestResults,
 )
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop import Crop
@@ -145,9 +145,12 @@ class Field:
 
         self.manure_events: list[ManureEvent] = manure_events or []
 
-    def manage_field(self, time: Time, current_conditions: CurrentDayConditions,
-                     manure_applications: list[ManureEventNutrientRequestResults]
-                     ) -> list[HarvestedCropStorageType]:
+    def manage_field(
+        self,
+        time: Time,
+        current_conditions: CurrentDayConditions,
+        manure_applications: list[ManureEventNutrientRequestResults],
+    ) -> list[HarvestedCropStorageType]:
         """
         Main Field routine, runs all subroutines routines based on current attribute configuration.
 
@@ -188,7 +191,7 @@ class Field:
                 surface_remainder_fraction=manure_event.surface_remainder_fraction,
                 year=manure_event.year,
                 day=manure_event.day,
-                manure_supplied=manure_request_results
+                manure_supplied=manure_request_results,
             )
 
         self._check_tillage_schedule(time)
@@ -888,8 +891,7 @@ class Field:
                 time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time: Time
-                                           ) -> list[ManureEventNutrientRequest]:
+    def _check_manure_application_schedule(self, time: Time) -> list[ManureEventNutrientRequest]:
         """Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
         Parameters
