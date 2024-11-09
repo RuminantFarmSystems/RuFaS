@@ -4,7 +4,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequestResults
 from RUFAS.data_structures.pen_manure_data import PenManureData
-from RUFAS.data_structures.crop_soil_feed_storage_connection import StorageType
+from RUFAS.data_structures.crop_soil_feed_storage_connection import StorageType, HarvestedCropStorageType
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.EEE.EEE_manager import EEEManager
@@ -115,8 +115,8 @@ def test_daily_simulation(mocker: MockerFixture, is_end_to_end_test_run: bool) -
     mock_pen_manure_data = [mocker.MagicMock(autospec=PenManureData)]
     mocker.patch.object(simulation_engine.animal_manager, "collect_pen_manure_data", return_value=mock_pen_manure_data)
     mock_harvested_crops = [
-        (crop_1 := mocker.MagicMock(), StorageType.BAG),
-        (crop_2 := mocker.MagicMock(), StorageType.BALEAGE),
+        HarvestedCropStorageType(crop_1 := mocker.MagicMock(), StorageType.BAG),
+        HarvestedCropStorageType(crop_2 := mocker.MagicMock(), StorageType.BALEAGE),
     ]
     mock_manure_applications = mocker.MagicMock()
     mocker.patch.object(simulation_engine, "generate_daily_manure_applications", return_value=mock_manure_applications)

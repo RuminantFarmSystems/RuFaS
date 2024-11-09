@@ -141,6 +141,30 @@
           "maximum": 4294967295,
           "default": 0
         },
+        "chunkification": {
+          "type": "bool",
+          "description": "Whether to periodically save the output variable pool to a file.",
+          "default": false
+        },
+        "save_chunk_threshold_call_count": {
+          "type": "number",
+          "description": "The threshold add variable call count for saving the output variable pool chunk.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage": {
+          "type": "number",
+          "description": "The maximum memory usage in Bytes.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage_percent": {
+          "type": "number",
+          "description": "The maximum percentage of memory use. If save_chunk_threshold_call_count is provided, then that is what is used to determine when to chunk, otherwise it is maximum memory usage, otherwise it is max memory usage percent.",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100
+        },
         "multi_run_counts": {
           "type": "number",
           "description": "If task type is multi_run, indicates how many single simulations should run.",
