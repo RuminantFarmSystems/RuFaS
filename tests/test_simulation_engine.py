@@ -259,7 +259,7 @@ def test_initialize_simulation(mocker: MockerFixture) -> None:
     patch_for_manure_manager.assert_called_once_with(
         mock_pen_manure_data, mock_weather, mock_time, {"manure_management_scenarios": {}}, True
     )
-    patch_for_field_manager.assert_called_once_with(manure_manager=mock_manure_manager)
+    patch_for_field_manager.assert_called_once_with()
     patch_for_feed_manager.assert_called_once()
     mock_feed_manager.setup_stored_feeds.assert_not_called()
 
