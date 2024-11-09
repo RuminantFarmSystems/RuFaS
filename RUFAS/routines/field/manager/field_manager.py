@@ -1,13 +1,14 @@
 from typing import Dict, List, Tuple
 
 from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
-from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequest
+from RUFAS.data_structures.crop_soil_to_manure_connection import (
+    ManureEventNutrientRequest, ManureEventNutrientRequestResults
+)
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
 from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
@@ -15,7 +16,6 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -55,7 +55,7 @@ class FieldManager:
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
     def daily_update_routine(self, weather: Weather, time: Time,
-                             manure_applications: dict[str, list[tuple[ManureEvent, NutrientRequestResults | None]]]
+                             manure_applications: dict[str, list[ManureEventNutrientRequestResults]]
                              ) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
@@ -67,6 +67,9 @@ class FieldManager:
             A weather object that contains infos to be transformed to current weather
         time: Time
             Object containing the current year and day of the simulation.
+        manure_applications: dict[str, list[ManureEventNutrientRequestResults]]
+            A dictionary containing the ManureEvents and corresponding NutrientRequestResults for each field in
+            the simulation.
 
         Returns
         -------

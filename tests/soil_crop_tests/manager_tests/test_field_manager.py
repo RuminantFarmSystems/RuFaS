@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List
+from typing import Any, Callable, Dict, List
 from unittest.mock import MagicMock, call, patch
 
 import mock
@@ -6,7 +6,9 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequest
+from RUFAS.data_structures.crop_soil_to_manure_connection import (
+    ManureEventNutrientRequest, ManureEventNutrientRequestResults
+)
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field
@@ -94,9 +96,9 @@ def mock_weather(mocker: MockerFixture) -> Weather:
                 ),
             ],
             {
-                "field1": [MagicMock()],
-                "field2": [MagicMock()],
-                "field3": [MagicMock()],
+                "field1": [MagicMock(spec=ManureEventNutrientRequestResults)],
+                "field2": [MagicMock(spec=ManureEventNutrientRequestResults)],
+                "field3": [MagicMock(spec=ManureEventNutrientRequestResults)],
             },
         ),
         ([], {}),
@@ -104,7 +106,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
 )
 def test_daily_update_routine(
     fields: List[Field],
-    manure_applications: dict,
+    manure_applications: dict[str, List[ManureEventNutrientRequestResults]],
     mock_weather: Weather,
     mocker: MockerFixture,
 ) -> None:
@@ -152,7 +154,7 @@ def test_daily_update_routine(
         [],
     ],
 )
-def test_annual_update_routine(fields: List[Field]):
+def test_annual_update_routine(fields: List[Field]) -> None:
     """Tests that the annual routines and it's methods were called and updated correctly"""
     for field in fields:
         field.perform_annual_reset = MagicMock()
@@ -306,11 +308,11 @@ def test_annual_update_routine(fields: List[Field]):
     ],
 )
 def test_setup_fertilizer_schedule(
-    fertilizer_schedule_data: Dict,
-    expected_available_mixes: Dict,
+    fertilizer_schedule_data: dict[str, list[dict[str, Any]]],
+    expected_available_mixes: dict[str, dict[str, float]],
     expected_schedule: FertilizerSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that fertilizer schedules and available fertilizer mixes are correctly setup."""
     mock_input_manager.get_data = mock.MagicMock(return_value=fertilizer_schedule_data)
@@ -697,10 +699,10 @@ def test_setup_fertilizer_schedule(
     ],
 )
 def test_setup_manure_schedule(
-    manure_schedule_data: Dict,
+    manure_schedule_data: dict[str, list[int] | list[ManureType] | list[float] | int],
     expected_manure_schedule: ManureSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
     mock_input_manager.get_data = mock.MagicMock(return_value=manure_schedule_data)
@@ -1111,10 +1113,10 @@ def test_setup_manure_schedule(
     ],
 )
 def test_setup_tillage_schedule(
-    tillage_schedule_data: Dict,
+    tillage_schedule_data: dict[str, int | list[int] | list[float] | list[str]],
     expected_tillage_schedule: TillageSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
     mock_input_manager.get_data = mock.MagicMock(return_value=tillage_schedule_data)
@@ -1266,10 +1268,10 @@ def test_setup_tillage_schedule(
     ],
 )
 def test_crop_schedule_setup(
-    crop_schedule_config: Dict,
+    crop_schedule_config: list[dict[str, Any]],
     expected: List[CropSchedule],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
     mock_input_manager.get_data = mock.MagicMock(return_value=crop_schedule_config)
@@ -1401,7 +1403,8 @@ def test_crop_schedule_setup(
         ),
     ],
 )
-def test_setup_soil_layer(field_size: float, top: float, residue: float, config: Dict, expected: LayerData) -> None:
+def test_setup_soil_layer(field_size: float, top: float, residue: float, config: dict[str, float | int],
+                          expected: LayerData) -> None:
     """Tests that LayerData instances are configured correctly with a given specification."""
     actual = FieldManager._setup_soil_layer(field_size, top, residue, config)
     assert actual == expected
@@ -1429,7 +1432,7 @@ def test_setup_soil_layer(field_size: float, top: float, residue: float, config:
         },
     ],
 )
-def test_setup_soil_layer_error(config: Dict) -> None:
+def test_setup_soil_layer_error(config: dict[str, float | int]) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
     with pytest.raises(ValueError) as e:
         FieldManager._setup_soil_layer(1.0, 0.0, 0.0, config)
@@ -1638,7 +1641,7 @@ def test_setup_soil_layer_error(config: Dict) -> None:
     ],
 )
 def test_setup_soil(
-    soil_configuration: Dict,
+    soil_configuration: dict[str, float | int | list[dict[str, Any]]],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
@@ -1691,7 +1694,7 @@ def test_setup_soil(
     ],
 )
 def test_setup_soil_error(
-    soil_configuration: dict,
+    soil_configuration: dict[str, float | int] | dict[str, float | int | None],
     error_message: str,
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
@@ -1757,7 +1760,7 @@ def test_setup_soil_error(
 )
 def test_setup_field(
     field_name: str,
-    field_config: Dict,
+    field_config: dict[str, str | float | bool | int | None] | dict[str, str | float | bool | int],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
@@ -1835,7 +1838,7 @@ def test_setup_field(
         mock_input_manager.get_data = input_manager_original_method_states["get_data"]
 
 
-def test_check_manure_schedules():
+def test_check_manure_schedules() -> None:
     """Tests that check_manure_schedules calls _check_manure_application_schedule and returns the correct results."""
     # Arrange
     field = MagicMock(Field)
