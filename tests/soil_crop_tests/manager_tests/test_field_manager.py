@@ -96,7 +96,7 @@ def mock_weather(mocker: MockerFixture) -> Weather:
                     field_data=FieldData(name="field3"),
                 ),
             ],
-          6
+            6,
             {
                 "field1": [MagicMock(spec=ManureEventNutrientRequestResults)],
                 "field2": [MagicMock(spec=ManureEventNutrientRequestResults)],
@@ -107,7 +107,6 @@ def mock_weather(mocker: MockerFixture) -> Weather:
     ],
 )
 def test_daily_update_routine(
-    fields: List[Field],
     manure_applications: dict[str, List[ManureEventNutrientRequestResults]],
     mock_weather: Weather,
     mocker: MockerFixture,
@@ -139,7 +138,8 @@ def test_daily_update_routine(
                 ],
             )
         fm.output_gatherer.send_daily_variables = MagicMock()
-        actual = fm.daily_update_routine(weather=mock_weather, time=mocked_time, manure_applications=manure_applications)
+        actual = fm.daily_update_routine(weather=mock_weather, time=mocked_time,
+                                         manure_applications=manure_applications)
 
         for field in fields:
             assert field.manage_field.call_count == 1
