@@ -4,7 +4,7 @@ import pytest
 
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.manager.events import (
+from RUFAS.data_structures.events import (
     BaseFieldManagementEvent,
     FertilizerEvent,
     HarvestEvent,
