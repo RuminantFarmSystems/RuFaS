@@ -6,6 +6,11 @@
             "actual_results_path": "end-to-end-testing_saved_variables_e2e_feed_storage_"
         },
         {
+            "domain": "CropAndSoil",
+            "expected_results_path": "input/data/end_to_end_testing/e2e_json_crop_soil_filter.json",
+            "actual_results_path": "end-to-end-testing_saved_variables_e2e_crop_and_soil_"
+        },
+        {
             "domain": "Animal",
             "expected_results_path": "input/data/end_to_end_testing/e2e_json_animal_filter.json",
             "actual_results_path": "end-to-end-testing_saved_variables_e2e_animal_"
