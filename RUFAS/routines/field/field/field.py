@@ -524,8 +524,8 @@ class Field:
         manure_supplied: NutrientRequestResults | None,
     ) -> None:
         """
-        Builds a manure application from the requested nutrient amounts and passes that application to the
-        ManureApplication module.
+        Receives a manure application request result and the corresponding ManureEvent data and executes
+        the application of manure to the field.
 
         Parameters
         ----------
@@ -545,6 +545,8 @@ class Field:
             Calendar year in which this manure application occurs.
         day : int
             Julian day on which this manure application occurs.
+        manure_supplied : NutrientRequestResults
+            An object containing the manure application information.
 
         Notes
         -----
