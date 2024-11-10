@@ -118,8 +118,6 @@ class FieldManager:
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_manager : ManureManager
-            Instance of the Manure Manager that will provide manure for field applications.
 
         Returns
         -------
