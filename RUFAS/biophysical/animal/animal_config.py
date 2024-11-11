@@ -41,6 +41,8 @@ class AnimalConfig:
     birth_weight_std_ho: float = 1
     birth_weight_avg_je: float = 27.2
     birth_weight_std_je: float = 1
+    average_mature_body_weight: float = 740.1
+    std_mature_body_weight: float = 73.5
 
     conception_rate_decrease: float = 0.026
     should_decrease_conception_rate_in_rebreeding: bool = False
@@ -148,6 +150,8 @@ class AnimalConfig:
         cls.birth_weight_std_ho = animal_config_data["farm_level"]["bodyweight"]["birth_weight_std_ho"]
         cls.birth_weight_avg_je = animal_config_data["farm_level"]["bodyweight"]["birth_weight_avg_je"]
         cls.birth_weight_std_je = animal_config_data["farm_level"]["bodyweight"]["birth_weight_std_je"]
+        cls.average_mature_body_weight = animal_config_data["farm_level"]["bodyweight"]["mature_body_weight_avg"]
+        cls.std_mature_body_weight = animal_config_data["farm_level"]["bodyweight"]["mature_body_weight_std"]
 
         cls.conception_rate_decrease = animal_config_data["farm_level"]["repro"]["conception_rate_decrease"]
         cls.should_decrease_conception_rate_in_rebreeding = animal_config_data["farm_level"]["repro"][

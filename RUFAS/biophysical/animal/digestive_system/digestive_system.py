@@ -14,10 +14,7 @@ class DigestiveSystem:
     This class serves as an entry point for the animal digestive systems.
     """
 
-    def process_digestion(
-            self,
-            digestive_system_inputs: DigestiveSystemInputs,
-    ) -> DigestiveSystemOutputs:
+    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> DigestiveSystemOutputs:
         """
         Handles an animal's daily digest updates.
 

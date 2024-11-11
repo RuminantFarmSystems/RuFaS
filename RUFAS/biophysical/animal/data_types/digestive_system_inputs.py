@@ -11,13 +11,14 @@ class DigestiveSystemInputs:
     nutrient_concentrations: dict[str, float]
     days_in_milk: int
     metabolizable_energy_intake: float
-    daily_milk_produced: float
 
     fecal_phosphorus: float
     urine_phosphorus_required: float
 
+    daily_milk_produced: float
     fat_content: float
     crude_protein_content: float
+
 
     @property
     def is_milking(self) -> bool:

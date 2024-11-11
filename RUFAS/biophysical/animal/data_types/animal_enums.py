@@ -13,3 +13,12 @@ class Sex(Enum):
 
     MALE = "male"
     FEMALE = "female"
+
+
+class AnimalStatus(Enum):
+    REMAIN = "remain"
+    LIFE_STAGE_CHANGED = "life stage changed"
+    NEW_CALF_BORN = "new calf born"
+    DEAD = "dead"
+    SOLD = "sold"
+    CULLED = "culled"

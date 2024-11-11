@@ -1,9 +1,11 @@
 import numpy as np
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.growth_inputs import GrowthInputs
 from RUFAS.biophysical.animal.data_types.growth_outputs import GrowthOutputs
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.time import Time
 
 from RUFAS.biophysical.animal import animal_constants
@@ -26,12 +28,17 @@ class Growth:
 
     daily_growth: float = 0.0
     tissue_changed: float = 0.0
-    growth_outputs: GrowthOutputs
+    body_weight_history: list[BodyWeightHistory] = []
 
-    def __init__(self, daily_growth: float = 0.0, tissue_changed: float = 0.0) -> None:
+    def __init__(
+            self,
+            daily_growth: float = 0.0,
+            tissue_changed: float = 0.0,
+            body_weight_history: list[BodyWeightHistory] = None
+    ) -> None:
         self.daily_growth = daily_growth if daily_growth else 0.0
         self.tissue_changed = tissue_changed if tissue_changed else 0.0
-        self.growth_outputs = None
+        self.body_weight_history = body_weight_history if body_weight_history else []
 
     def evaluate_body_weight_change(
             self,
@@ -58,8 +65,9 @@ class Growth:
             The updated animal growth properties, reproduction properties, and the general properties of the animal
             after the growth-related routines for the current day.
         """
-        self.growth_outputs = GrowthOutputs(body_weight=growth_inputs.body_weight,
-                                            conceptus_weight=growth_inputs.conceptus_weight)
+        growth_outputs = GrowthOutputs(body_weight=growth_inputs.body_weight,
+                                        conceptus_weight=growth_inputs.conceptus_weight,
+                                        events=AnimalEvents())
 
         is_non_pregnant_heifer = not growth_inputs.is_pregnant and (
                 growth_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II)
@@ -70,31 +78,31 @@ class Growth:
 
         if growth_inputs.animal_type == AnimalType.CALF:
             self.daily_growth = self.calculate_calf_body_weight_change(growth_inputs)
-            self.growth_outputs.body_weight += self.daily_growth
+            growth_outputs.body_weight += self.daily_growth
 
         elif is_non_pregnant_heifer:
             self.daily_growth = self.calculate_non_pregnant_heifer_body_weight_change(growth_inputs)
-            self.growth_outputs.body_weight += self.daily_growth
+            growth_outputs.body_weight += self.daily_growth
 
         elif is_pregnant_heifer:
             if growth_inputs.body_weight < growth_inputs.mature_body_weight:
-                (self.daily_growth, self.growth_outputs.conceptus_weight) = (
+                (self.daily_growth, growth_outputs.conceptus_weight) = (
                     self.calculate_pregnant_heifer_body_weight_change(growth_inputs)
                 )
-                self.growth_outputs.body_weight += self.daily_growth
+                growth_outputs.body_weight += self.daily_growth
             else:
-                self.growth_outputs.body_weight = growth_inputs.mature_body_weight
-                self.growth_outputs.events.add_event(
+                growth_outputs.body_weight = growth_inputs.mature_body_weight
+                growth_outputs.events.add_event(
                     growth_inputs.days_born, time.simulation_day, animal_constants.MATURE_BODY_WEIGHT_REGULAR
                 )
 
         elif growth_inputs.animal_type.is_cow:
             (
                 self.daily_growth,
-                self.growth_outputs.conceptus_weight,
+                growth_outputs.conceptus_weight,
                 self.tissue_changed,
             ) = self.calculate_cow_body_weight_change(growth_inputs)
-            self.growth_outputs.body_weight += self.daily_growth
+            growth_outputs.body_weight += self.daily_growth
         else:
             om = OutputManager()
             om.add_error(
@@ -105,8 +113,12 @@ class Growth:
                     "function": Growth.evaluate_body_weight_change.__name__,
                 },
             )
-
-        return self.growth_outputs
+        self.body_weight_history.append(BodyWeightHistory(
+            simulation_day=time.simulation_day,
+            days_born=growth_inputs.days_born,
+            body_weight=growth_outputs.body_weight
+        ))
+        return growth_outputs
 
     def calculate_calf_body_weight_change(self, growth_inputs: GrowthInputs) -> float:
         """

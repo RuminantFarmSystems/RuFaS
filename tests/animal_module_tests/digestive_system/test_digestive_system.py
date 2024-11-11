@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.animal_properties.animal_statistics import AnimalStatistics
+from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.animal_properties.general_properties import GeneralProperties, Breed, Sex
 from RUFAS.biophysical.animal.animal_properties.milk_production_properties import MilkProductionProperties
 from RUFAS.biophysical.animal.animal_properties.nutrient_properties import NutrientProperties
