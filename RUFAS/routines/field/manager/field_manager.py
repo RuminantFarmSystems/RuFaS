@@ -1,6 +1,6 @@
 from typing import Dict, List, Tuple
 
-from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field

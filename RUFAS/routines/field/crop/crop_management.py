@@ -2,7 +2,7 @@ from math import exp
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation

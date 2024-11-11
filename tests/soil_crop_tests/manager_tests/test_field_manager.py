@@ -6,7 +6,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_feed_storage_connection import HarvestedCropStorageType, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.field.field import Field

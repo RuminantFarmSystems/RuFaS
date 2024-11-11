@@ -3,7 +3,7 @@ import copy
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, CropType, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop
 
 from .sample_crop_data import sample_crop_data
 
