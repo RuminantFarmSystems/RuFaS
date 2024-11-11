@@ -6,9 +6,11 @@ from RUFAS.input_manager import InputManager
 
 class AnimalConfig:
     wean_day: int = 60
-    heifer_breed_start_day: int = 380  # previously breeding_start_day_h
-    heifer_prefresh_day: int = 21 # previously prefresh_day
-    heifer_reproduction_cull_day: int = 500 # previously heifer_repro_cull_time
+    target_heifer_pregnant_day: int = 399
+    heifer_breed_start_day: int = 380
+    heifer_prefresh_day: int = 21
+    dry_off_day_of_pregnancy: int = 218
+    heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
 
     semen_type: str = "conventional"
@@ -39,6 +41,8 @@ class AnimalConfig:
     birth_weight_std_ho: float = 1
     birth_weight_avg_je: float = 27.2
     birth_weight_std_je: float = 1
+    average_mature_body_weight: float = 740.1
+    std_mature_body_weight: float = 73.5
 
     conception_rate_decrease: float = 0.026
     should_decrease_conception_rate_in_rebreeding: bool = False
@@ -84,14 +88,20 @@ class AnimalConfig:
     unknown_cull_day_probability: list[float] = [0, 0.05, 0.11, 0.18, 0.27, 0.37, 0.45, 0.54, 0.62, 0.70, 0.77, 0.84,
                                                  0.92, 1]
 
+    methane_model: str
+    methane_mitigation_method: str
+    methane_mitigation_additive_amount: float
+
     @classmethod
     def initialize_animal_config(cls) -> None:
         im = InputManager()
         animal_config_data = im.get_data("animal.animal_config")
 
         cls.wean_day = animal_config_data["farm_level"]["calf"]["wean_day"]
+        cls.target_heifer_pregnant_day = animal_config_data["bodyweight"]["target_heifer_preg_day"]
         cls.heifer_breed_start_day = animal_config_data["management_decisions"]["breeding_start_day_h"]
         cls.heifer_prefresh_day = animal_config_data["farm_level"]["repro"]["prefresh_day"]
+        cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
 
@@ -140,6 +150,8 @@ class AnimalConfig:
         cls.birth_weight_std_ho = animal_config_data["farm_level"]["bodyweight"]["birth_weight_std_ho"]
         cls.birth_weight_avg_je = animal_config_data["farm_level"]["bodyweight"]["birth_weight_avg_je"]
         cls.birth_weight_std_je = animal_config_data["farm_level"]["bodyweight"]["birth_weight_std_je"]
+        cls.average_mature_body_weight = animal_config_data["farm_level"]["bodyweight"]["mature_body_weight_avg"]
+        cls.std_mature_body_weight = animal_config_data["farm_level"]["bodyweight"]["mature_body_weight_std"]
 
         cls.conception_rate_decrease = animal_config_data["farm_level"]["repro"]["conception_rate_decrease"]
         cls.should_decrease_conception_rate_in_rebreeding = animal_config_data["farm_level"]["repro"][
@@ -187,3 +199,9 @@ class AnimalConfig:
         cls.unknown_cull_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"]["probability"]
         cls.unknown_cull_day_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"][
             "cull_day_prob"]
+
+        cls.methane_model = animal_config_data["methane_model"]
+        cls.methane_mitigation_method = animal_config_data["methane_mitigation"]["methane_mitigation_method"]
+        cls.methane_mitigation_additive_amount = animal_config_data["methane_mitigation"][
+            "methane_mitigation_additive_amount"
+        ]

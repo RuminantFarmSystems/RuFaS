@@ -2,6 +2,11 @@ from typing import Any, Optional
 
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.enums import AnimalCombination
@@ -10,11 +15,39 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from tests.animal_module_tests.test_pen import calf_daily_growth_values
 
 om = OutputManager()
 
 
 class HerdManager:
+    DEFAULT_NUM_STALLS_BY_COMBINATION = {
+        AnimalCombination.CALF: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CALF_PEN,
+        AnimalCombination.GROWING: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_PEN,
+        AnimalCombination.CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_CLOSE_UP_PEN,
+        AnimalCombination.LAC_COW: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_LAC_COW_PEN,
+        AnimalCombination.GROWING_AND_CLOSE_UP: AnimalModuleConstants.DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN,
+    }
+    ANIMAL_GROUPING_SCENARIO: AnimalGroupingScenario
+
+    @classmethod
+    def set_animal_grouping_scenario(cls, scenario: AnimalGroupingScenario) -> None:
+        """
+        Sets the animal grouping scenario to the given scenario.
+
+        Parameters
+        ----------
+        scenario : AnimalGroupingScenario
+                The scenario to set the animal grouping scenario to.
+
+        Returns
+        -------
+        None
+
+        """
+
+        cls.ANIMAL_GROUPING_SCENARIO = scenario
+
     def __init__(
         self,
         data: dict[str, Any],
@@ -116,28 +149,76 @@ class HerdManager:
             feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
         )
 
-    def daily_routines(self, time: Time) -> None:
+    @property
+    def animals_by_type(self) -> dict[AnimalType, list[Animal]]:
+        return {
+            AnimalType.CALF: self.calves,
+            AnimalType.HEIFER_I: self.heiferIs,
+            AnimalType.HEIFER_II: self.heiferIIs,
+            AnimalType.HEIFER_III: self.heiferIIIs,
+            AnimalType.LAC_COW: self.cows,
+            AnimalType.DRY_COW: self.cows,
+        }
+
+    def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> None:
+        current_conditions = weather.get_current_day_conditions(time)
+        current_temperature = current_conditions.mean_air_temperature
+
+        graduated_animals: list[Animal] = []
+        newborn_calves: list[Animal] = []
+        removed_animals: list[Animal] = []
+
         # calf update
         for calf in self.calves:
-            if calf.last_visited != time.simulation_day:
-                calf.daily_routines(time)
+            calf_daily_routines_output: DailyRoutinesOutput = calf.daily_routines(time)
+            if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+                graduated_animals.append(calf)
+            elif calf_daily_routines_output.animal_status in [
+                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+            ]:
+                removed_animals.append(calf)
         # heiferI update
         for heiferI in self.heiferIs:
-            if heiferI.last_visited != time.simulation_day:
-                heiferI.daily_routines(time)
+            heiferI_routines_output: DailyRoutinesOutput = heiferI.daily_routines(time)
+            if heiferI_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+                graduated_animals.append(heiferI)
+            elif heiferI_routines_output.animal_status in [
+                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+            ]:
+                removed_animals.append(heiferI)
         # heiferII update
         for heiferII in self.heiferIIs:
-            if heiferII.last_visited != time.simulation_day:
-                heiferII.daily_routines(time)
+            heiferII_routines_output: DailyRoutinesOutput = heiferII.daily_routines(time)
+            if heiferII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+                graduated_animals.append(heiferII)
+            elif heiferII_routines_output.animal_status in [
+                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+            ]:
+                removed_animals.append(heiferII)
         # heiferIII update
         for heiferIII in self.heiferIIIs:
-            if heiferIII.last_visited != time.simulation_day:
-                heiferIII.daily_routines(time)
+            heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
+            if heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
+                graduated_animals.append(heiferIII)
+            elif heiferIII_routines_output.animal_status in [
+                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+            ]:
+                removed_animals.append(heiferIII)
         # cow update
         for cow in self.cows:
-            if cow.last_visited != time.simulation_day:
-                cow.daily_routines(time)
-        pass
+            cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
+            if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
+                newborn_calf = Animal(**cow_routines_output.animal_values)
+                newborn_calves.append(newborn_calf)
+            elif cow_routines_output.animal_status in [
+                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+            ]:
+                removed_animals.append(cow)
+
+        self._handle_graduated_animals(graduated_animals, feed, current_temperature)
+        self._handle_newly_added_animals(newborn_calves, feed, current_temperature)
+        for removed_animal in removed_animals:
+            self._remove_animal_from_pen_and_id_map(removed_animal)
 
     # -------------------------#
     def init_pens(self, all_pen_data: list, manure_management_scenarios: dict[str, Any]) -> None:
@@ -238,3 +319,101 @@ class HerdManager:
 
         pen.ration = ration_per_pen
         pen.ration_per_animal = ration_per_animal
+
+    def _handle_graduated_animals(
+        self,
+        graduated_animals: list[Animal],
+        feed: Feed,
+        current_temperature: float,
+    ) -> None:
+        """
+        Finds animals that have graduated (moved from one class to another), moves them between pens,
+         and updates pen id map accordingly.
+
+        Parameters
+        ----------
+        animals_snapshot_before_update : Dict[str, set | Dict]
+            Snapshot of the animals before the update. This should be a dictionary with animal
+            class names as keys and sets of animals as values. There should also be a special key
+            'animal_combination_by_id' that maps animal IDs to their animal combinations.
+        animals_snapshot_after_update : Dict[str, set | Dict]
+            Snapshot of the animals after the update. This should be a dictionary with the same
+            structure as animals_snapshot_before_update.
+        feed : Feed
+            instance of the Feed class defined in feed.py.
+        current_temperature : float
+            The temperature on the current day.
+
+        """
+        for animal in graduated_animals:
+            self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
+
+    def _handle_newly_added_animals(
+        self,
+        new_animals: list[Animal],
+        feed: Feed,
+        current_temperature: float,
+    ) -> None:
+        """
+        For all new animals, adds animal to a pen, and updates the pen id map.
+
+        Parameters
+        ----------
+        animal : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
+            One of the possible animal types.
+        feed : Feed
+            instance of the Feed class defined in feed.py.
+        current_temperature : float
+            The temperature on the current day.
+
+        """
+        for animal in new_animals:
+            self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
+            self.animals_by_type[animal.animal_type].append(animal)
+
+    def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
+        """
+        Removes animal from its current pen, and removes it from the pen id map.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            One of the possible animal types.
+
+        """
+        pen_id = self.animal_to_pen_id_map[animal.id]
+        self.all_pens[pen_id].remove_animal(animal.id)
+        del self.animal_to_pen_id_map[animal.id]
+
+    def _add_animal_to_pen_and_id_map(
+        self,
+        animal: Animal,
+        feed: Feed,
+        current_temperature: float,
+    ) -> None:
+        """
+        Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
+
+        Parameters
+        ----------
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            One of the possible animal types.
+        feed : Feed
+            instance of the Feed class defined in feed.py.
+        current_temperature : float
+            The temperature on the current day.
+
+        """
+        animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
+        pen_with_min_stocking_density = min(
+            self.pens_by_animal_combination[animal_combination],
+            key=lambda p: p.current_stocking_density,
+        )
+        pen_with_min_stocking_density.add_animal(
+            animal,
+            self.ANIMAL_GROUPING_SCENARIO,
+            feed,
+            current_temperature,
+            self.phosphorus_concentration_by_animal_class[type(animal)],
+        )
+        self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id

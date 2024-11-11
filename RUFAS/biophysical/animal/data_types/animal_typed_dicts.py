@@ -41,6 +41,7 @@ class AnimalBaseInitArgsTypedDict(TypedDict):
 
     id: int
     breed: str
+    animal_type: str
     birth_date: str
     days_born: int
     birth_weight: float
