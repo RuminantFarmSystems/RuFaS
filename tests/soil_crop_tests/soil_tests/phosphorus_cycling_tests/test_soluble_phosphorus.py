@@ -33,7 +33,11 @@ def test_determine_phosphorus_runoff_from_top_soil(
         return_value=100,
     ) as mocked_soil_nutrient_concentration:
         expected_runoff_liters_per_ha = (
-            runoff * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS / field_size
+            runoff
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+            / field_size
         )
         expected_unadjusted_phosphorus_removed = 100 * 0.005 * expected_runoff_liters_per_ha * (1 / 1000_000)
         expected_actual_phosphorus_removed = min(phosphorus, expected_unadjusted_phosphorus_removed)
@@ -108,7 +112,12 @@ def test_determine_dissolved_reactive_phosphorus_leachate(
 def test_determine_percolated_water_volume(percolated_water: float, area: float) -> None:
     """Tests that a water amount is correctly converted to a volume."""
     observed = SolublePhosphorus._determine_percolated_water_volume(percolated_water, area)
-    expected = percolated_water * area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+    expected = (
+        percolated_water
+        * area
+        * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+        * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+    )
     assert observed == expected
 
 

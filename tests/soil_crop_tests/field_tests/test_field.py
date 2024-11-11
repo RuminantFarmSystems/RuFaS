@@ -2697,7 +2697,9 @@ def test_check_tillage_schedule(
 def test_liters_to_millimeters(liters: float, area: float) -> None:
     """Tests that the conversion from liters for evenly distributed millimeters is performed correctly."""
     actual = FieldData.convert_liters_to_millimeters(liters, area)
-    expected = (liters * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS) / (area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+    expected = (liters * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS) / (
+        area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+    )
     assert actual == expected
 
 

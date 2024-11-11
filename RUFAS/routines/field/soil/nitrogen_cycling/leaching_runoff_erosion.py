@@ -385,7 +385,9 @@ class LeachingRunoffErosion:
 
         """
         water_amount_in_liters = (
-            water_amount * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            water_amount
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
             * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
         )
 

@@ -78,7 +78,9 @@ class CarbonCycling:
         """
         for layer in self.data.soil_layers:
             soil_volume = self._determine_soil_volume(layer.layer_thickness, field_size)
-            soil_mass = self._determine_soil_mass(layer.bulk_density, soil_volume) * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS
+            soil_mass = (
+                self._determine_soil_mass(layer.bulk_density, soil_volume) * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS
+            )
             soil_active_carbon_fraction = self._determine_soil_active_carbon_fraction(
                 layer.active_carbon_amount, soil_mass, field_size
             )
@@ -137,7 +139,9 @@ class CarbonCycling:
             soil volume (cubic meters)
 
         """
-        return (layer_thickness * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS) * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        return (
+            layer_thickness * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+        ) * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
 
     @staticmethod
     def _determine_soil_mass(bulk_density: float, soil_volume: float) -> float:
