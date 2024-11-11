@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, CropType, HarvestedCrop, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, HarvestedCrop, StorageType
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 

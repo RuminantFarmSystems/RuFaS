@@ -1,7 +1,7 @@
 from typing import Optional
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, HarvestedCrop
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits

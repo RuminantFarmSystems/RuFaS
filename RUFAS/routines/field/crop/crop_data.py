@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, List, Optional
 
-from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 

@@ -3,7 +3,7 @@ from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
 from RUFAS.data_structures.pen_manure_data import PenManureData
-from RUFAS.data_structures.crop_soil_feed_storage_connection import StorageType, HarvestedCropStorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import StorageType, HarvestedCropStorageType
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines import Feed
 from RUFAS.routines.EEE.EEE_manager import EEEManager
