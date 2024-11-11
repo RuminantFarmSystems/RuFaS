@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pytest import approx, mark
 
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
+from RUFAS.data_structures.nutrient_request import NutrientRequest
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
