@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from RUFAS.data_structures.crop_soil_feed_storage_connection import CropCategory, CropType, StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
