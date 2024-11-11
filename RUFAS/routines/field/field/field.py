@@ -1,6 +1,6 @@
 import math
 from math import exp
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Sequence
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_manure_connection import (
@@ -1021,8 +1021,8 @@ class Field:
 
     @staticmethod
     def _filter_events(
-        all_events: List[BaseFieldManagementEvent], time: Time
-    ) -> Tuple[List[BaseFieldManagementEvent], List[BaseFieldManagementEvent]]:
+        all_events: Sequence[BaseFieldManagementEvent], time: Time
+    ) -> tuple[Sequence[BaseFieldManagementEvent], Sequence[BaseFieldManagementEvent]]:
         """
         Filters out all events from a list that occur on the current day, and creates a new list with all the events
         that were filtered out.
@@ -1248,7 +1248,7 @@ class Field:
     # </editor-fold>
 
     # <editor-fold desc="--- Field-level Methods ---">
-    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time) -> None:
+    def _execute_daily_processes(self, current_conditions: CurrentDayConditions, time: Time) -> None:
         """Executes all daily updates on this field's soil and crop objects.
 
         Parameters
@@ -1497,7 +1497,7 @@ class Field:
         canopy of another.
         """
         precipitation_reaching_soil = precipitation_total
-        excess_canopy_water = 0
+        excess_canopy_water = 0.0
 
         for crop in self.crops:
             precipitation_reaching_soil, excess_water = crop.handle_water_in_canopy(precipitation_reaching_soil)
@@ -1531,7 +1531,7 @@ class Field:
 
     def _determine_total_above_ground_biomass(self) -> float:
         """Calculate the total amount of above-ground biomass still on the plant(s) in the field (kg / ha)"""
-        total_above_ground_biomass = 0
+        total_above_ground_biomass = 0.0
         for crop in self.crops:
             total_above_ground_biomass += crop.data.above_ground_biomass
         return total_above_ground_biomass
