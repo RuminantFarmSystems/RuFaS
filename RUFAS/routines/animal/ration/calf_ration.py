@@ -222,13 +222,13 @@ class CalfRationManager:
         starter_id = 216
         calf_feeds = feed.calf_feeds
 
-        whole_milk_dm = calf_feeds[whole_milk_id]["DM"]
-        whole_milk_cp = calf_feeds[whole_milk_id]["CP"]
         de_key = "DE_Base" if "DE_Base" in calf_feeds[whole_milk_id].keys() else "DE"
         whole_milk_de = calf_feeds[whole_milk_id][de_key]
         milk_replacer_de = calf_feeds[milk_replacer_id][de_key]
         starter_de = calf_feeds[starter_id][de_key]
 
+        whole_milk_dm = calf_feeds[whole_milk_id]["DM"]
+        whole_milk_cp = calf_feeds[whole_milk_id]["CP"]
         # [A.1B.C.1]
         whole_milk_me = 0.96 * whole_milk_de
 
