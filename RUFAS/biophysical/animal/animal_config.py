@@ -9,6 +9,7 @@ class AnimalConfig:
     target_heifer_pregnant_day: int = 399
     heifer_breed_start_day: int = 380
     heifer_prefresh_day: int = 21
+    dry_off_day_of_pregnancy: int = 218
     heifer_reproduction_cull_day: int = 500
     do_not_breed_time: int = 185
 
@@ -98,6 +99,7 @@ class AnimalConfig:
         cls.target_heifer_pregnant_day = animal_config_data["bodyweight"]["target_heifer_preg_day"]
         cls.heifer_breed_start_day = animal_config_data["management_decisions"]["breeding_start_day_h"]
         cls.heifer_prefresh_day = animal_config_data["farm_level"]["repro"]["prefresh_day"]
+        cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
         cls.heifer_reproduction_cull_day = animal_config_data["management_decisions"]["heifer_repro_cull_time"]
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
 
