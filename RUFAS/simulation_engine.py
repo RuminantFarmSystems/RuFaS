@@ -4,6 +4,7 @@ import time as timer
 from enum import Enum
 
 from RUFAS import routines
+from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
@@ -132,7 +133,8 @@ class SimulationEngine:
         self.animal_manager.daily_updates(self.feed, self.weather, self.time)
         all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
-        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time)
+        manure_applications = self.generate_daily_manure_applications()
+        harvested_crops = self.field_manager.daily_update_routine(self.weather, self.time, manure_applications)
         for harvested_crop in harvested_crops:
             self.feed_manager.receive_crop(harvested_crop.harvested_crop, harvested_crop.storage_type)
         routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
@@ -141,6 +143,30 @@ class SimulationEngine:
         self.weather.record_weather(self.time)
 
         self._advance_time()
+
+    def generate_daily_manure_applications(self) -> dict[str, list[ManureEventNutrientRequestResults]]:
+        """Requests nutrients from the manure manager for each field in the simulation.
+
+        Returns
+        -------
+        dict[str, list[ManureEventNutrientRequestResults]]
+            A dictionary containing the ManureEvents and corresponding NutrientRequestResults for each field in
+            the simulation.
+        """
+        manure_applications: dict[str, list[ManureEventNutrientRequestResults]] = {}
+        for field in self.field_manager.fields:
+            manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
+            manure_applications[field.field_data.name] = []
+            for manure_event_request in manure_events_requests:
+                event = manure_event_request.event
+                manure_request = manure_event_request.nutrient_request
+                manure_request_results = None
+                if manure_request is not None:
+                    manure_request_results = self.manure_manager.request_nutrients(manure_request)
+                manure_applications[field.field_data.name].append(
+                    ManureEventNutrientRequestResults(event, manure_request_results)
+                )
+        return manure_applications
 
     def _advance_time(self) -> None:
         """
@@ -207,7 +233,7 @@ class SimulationEngine:
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
 
-        self.field_manager = FieldManager(manure_manager=self.manure_manager)
+        self.field_manager = FieldManager()
 
         # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
         if self.is_end_to_end_test_run:
