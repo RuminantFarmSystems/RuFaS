@@ -132,7 +132,12 @@ class SolublePhosphorus:
         APLE Theoretical eqn. [9] (used to calculate `top_layer_dissolved_reactive_phosphorus_runoff`)
 
         """
-        runoff_in_liters = runoff * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+        runoff_in_liters = (
+            runoff
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+        )
         runoff_in_liters_per_hectare = runoff_in_liters / field_size
 
         top_layer_soil_phosphorus_concentration = LayerData.determine_soil_nutrient_concentration(
@@ -250,8 +255,12 @@ class SolublePhosphorus:
             Volume of water that percolated out of the soil on the current day (L).
 
         """
-        percolated_water_in_cubic_millimeters = percolated_water * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
-        percolated_water_in_liters = percolated_water_in_cubic_millimeters * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+        percolated_water_in_cubic_millimeters = (
+            percolated_water * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+        )
+        percolated_water_in_liters = (
+            percolated_water_in_cubic_millimeters * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
+        )
         return percolated_water_in_liters
 
     @staticmethod

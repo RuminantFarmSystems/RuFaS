@@ -593,7 +593,8 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            self.layer_thickness * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            self.layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
             * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
         soil_mass_in_kg = self.bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
@@ -744,7 +745,8 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            layer_thickness * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
             * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
         soil_mass_in_kg = bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
@@ -779,7 +781,8 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            layer_thickness * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
             * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
         soil_mass_in_kg = bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters

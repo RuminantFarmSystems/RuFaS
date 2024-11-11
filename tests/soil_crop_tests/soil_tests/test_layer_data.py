@@ -412,7 +412,12 @@ def test_calculate_phosphorus_sorption_parameter(clay: float, phosphorus: float,
 def test_determine_soil_nutrient_concentration(nutrient: float, density: float, depth: float, area: float) -> None:
     """Tests that the soil nutrient concentration is calculated correctly."""
     observed = LayerData.determine_soil_nutrient_concentration(nutrient, density, depth, area)
-    total_soil_volume = depth * area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
+    total_soil_volume = (
+        depth
+        * area
+        * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+        * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
+    )
     total_soil_mass = density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
     total_nutrient_mass = nutrient * area
     expected_concentration = (total_nutrient_mass * GeneralConstants.KG_TO_MILLIGRAMS) / total_soil_mass
@@ -431,7 +436,12 @@ def test_determine_soil_nutrient_area_density(
     expected_soil_mass_kg = (
         density
         * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS
-        * (thickness * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS)
+        * (
+            thickness
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        )
     )
     expected = phosphorus * GeneralConstants.MILLIGRAMS_TO_KG * expected_soil_mass_kg * (1 / field_size)
     assert pytest.approx(observed) == expected

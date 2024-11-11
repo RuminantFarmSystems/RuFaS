@@ -14,7 +14,9 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 )
 def test_determine_soil_volume(layer_thickness: float, field_size: float) -> None:
     """Checks that soil volume was calculated correctly"""
-    expected = (layer_thickness * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS) * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
+    expected = (
+        layer_thickness * field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+    ) * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
     assert expected == CarbonCycling._determine_soil_volume(layer_thickness, field_size)
 
 
