@@ -83,25 +83,24 @@ class HerdReproductionStatistics:
 
 @dataclass
 class ReproductionOutputs:
-    animal_type: AnimalType
     body_weight: float
-    breed: Breed
     cull_reason: str
-    days_born: int
+    days_in_milk: int
     days_in_pregnancy: int
-    days_in_milking: int
     events: AnimalEvents
     future_cull_date: int
     future_death_date: int
-    net_merit: float
     phosphorus_for_gestation_required_for_calf: float
 
     animal_level_statistics: AnimalReproductionStatistics
     herd_level_statistics: HerdReproductionStatistics
 
     newborn_calf_config: dict
-    new_calf_born: bool = False
 
     @property
     def is_pregnant(self) -> bool:
         return self.days_in_pregnancy > 0
+
+    @property
+    def is_milking(self) -> bool:
+        return self.days_in_milk > 0

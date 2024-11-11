@@ -15,6 +15,8 @@ from RUFAS.biophysical.animal.data_types.growth_outputs import GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production_inputs import MilkProductionInputs
 from RUFAS.biophysical.animal.data_types.milk_production_outputs import MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.reproduction_inputs import ReproductionInputs
+from RUFAS.biophysical.animal.data_types.reproduction_outputs import ReproductionOutputs
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -41,6 +43,7 @@ class Animal:
     nutrient: dict[str, float]
     nutrient_concentrations: dict[str, float]
     culled: bool = False
+    cull_reason: str = ""
     dead: bool = False
     days_born: int = 0
     days_in_pregnancy: int = 0
@@ -76,15 +79,10 @@ class Animal:
             AnimalConfig.std_mature_body_weight,
         ))
 
-        self.general_properties: GeneralProperties = GeneralProperties(
-            id=args.get("id"),
-            breed=args.get("breed"),
-            birth_date=args.get("birth_date"),
-            days_born=args.get("days_born"),
-            birth_weight=args.get("birth_weight"),
-        )
-        self.growth_properties: AnimalGrowthProperties = AnimalGrowthProperties()
-        self.health_properties: AnimalHealthProperties = AnimalHealthProperties()
+        self.culled = False
+
+        self.animal_statistics = AnimalStatistics()
+        self.growth: Growth = Growth()
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
         self.digestive_system: DigestiveSystem = DigestiveSystem()
         self.milk_production: MilkProduction = MilkProduction()
@@ -170,6 +168,17 @@ class Animal:
         )
         reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(
             reproduction_inputs, time)
+        self.body_weight = reproduction_outputs.body_weight
+        self.events += reproduction_outputs.events
+        self.days_in_milk = reproduction_outputs.days_in_milk
+        self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+        self.nutrients.phosphorus_for_gestation_required_for_calf = (
+            reproduction_outputs.phosphorus_for_gestation_required_for_calf)
+        self.future_cull_date = reproduction_outputs.future_cull_date if reproduction_outputs.future_cull_date \
+            else self.future_cull_date
+        self.future_death_date = reproduction_outputs.future_death_date if reproduction_outputs.future_death_date \
+            else self.future_death_date
+        self.cull_reason = reproduction_outputs.cull_reason if reproduction_outputs.cull_reason else self.cull_reason
 
 
         daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update()

@@ -10,13 +10,9 @@ class ReproductionInputs:
     animal_type: AnimalType
     body_weight: float
     breed: Breed
-    cull_reason: str
     days_born: int
     days_in_pregnancy: int
-    days_in_milking: int
-    events: AnimalEvents
-    future_cull_date: int
-    future_death_date: int
+    days_in_milk: int
     net_merit: float
     phosphorus_for_gestation_required_for_calf: float
 
@@ -24,3 +20,6 @@ class ReproductionInputs:
     def is_pregnant(self) -> bool:
         return self.days_in_pregnancy > 0
 
+    @property
+    def is_milking(self) -> bool:
+        return self.days_in_milk > 0
