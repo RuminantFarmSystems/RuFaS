@@ -5,7 +5,11 @@ from mock.mock import MagicMock, PropertyMock, patch
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCrop, StorageType, HarvestedCropStorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
+    HarvestedCrop,
+    StorageType,
+    HarvestedCropStorageType,
+)
 from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
