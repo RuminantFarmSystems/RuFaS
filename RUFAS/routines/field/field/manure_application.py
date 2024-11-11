@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 
-from RUFAS.routines.field.crop_and_soil_constants import KILOGRAMS_TO_GRAMS, SQUARE_CENTIMETERS_TO_HECTARES
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -484,9 +484,9 @@ class ManureApplication:
             and Water Conservation 62:40-47.
 
         """
-        manure_applied_in_grams = total_manure_applied * KILOGRAMS_TO_GRAMS
+        manure_applied_in_grams = total_manure_applied * GeneralConstants.KG_TO_GRAMS
         field_coverage_in_square_cm = manure_applied_in_grams * (659 / 250)
-        field_coverage_in_ha = field_coverage_in_square_cm * SQUARE_CENTIMETERS_TO_HECTARES
+        field_coverage_in_ha = field_coverage_in_square_cm * GeneralConstants.SQUARE_CENTIMETERS_TO_HECTARES
         field_coverage_fraction = min(1.0, field_coverage_in_ha / field_size)
         return field_coverage_fraction
 
