@@ -303,7 +303,8 @@ def test_fix_array_type_fixable_data(
                               "info map": info_map},
                              {"warning": "Validation: data fixed",
                               "warning message":
-                                  f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to "
+                                  f"Invalid data fixed: '{element_path}' value changed from"
+                                  f" {original_invalid_value} to "
                                   f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
                                   f"'{dummy_properties_key}'.",
                               "info map": info_map}
