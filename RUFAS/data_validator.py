@@ -1,7 +1,6 @@
 import os
 import re
 from enum import Enum
-from functools import reduce
 from typing import Dict, Any, Callable, List, Union, Sequence, Tuple
 
 from RUFAS.output_manager import OutputManager
@@ -182,8 +181,7 @@ class DataValidator:
     def __init__(self):
         self.event_logs: list[dict[str, str | dict[str, str]]] = []
 
-    @staticmethod
-    def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
+    def validate_properties(self, metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
         """Iteratively traverses the metadata properties to check the max depth and routes
         properties to be validated by type.
 
@@ -215,11 +213,10 @@ class DataValidator:
             current_obj, depth, path = stack.pop()
 
             if depth > metadata_depth_limit:
-                om.add_error(
-                    "Max metadata depth exceeded.",
-                    f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}",
-                    info_map,
-                )
+                self.event_logs.append({"error": "Max metadata depth exceeded.",
+                                        "error message": f"Metadata depth exceeds maximum allowed depth"
+                                                         f" of {metadata_depth_limit} at path {path}",
+                                        "info map": info_map})
                 error_message = f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}"
                 return False, error_message
 
@@ -238,16 +235,18 @@ class DataValidator:
                                 return valid, error_message
                         else:
                             if value_type is not None:
-                                om.add_error(
-                                    "Properties value type error",
-                                    f"'type' value not in {type_to_validator_map.keys()}",
-                                    info_map,
-                                )
+                                self.event_logs.append({"error": "Properties value type error",
+                                                        "error message": f"'type' value not"
+                                                                         f" in {type_to_validator_map.keys()}",
+                                                        "info map": info_map})
                                 error_message = f"Properties 'type' value not in {list(type_to_validator_map.keys())}"
                                 return False, error_message
-
-        om.add_log("Metadata properties depth", f"Max depth of metadata properties is {current_max_depth}", info_map)
-        om.add_log("Metadata properties path", f"Deepest path of metadata properties is {deepest_path}", info_map)
+        self.event_logs.append({"log": "Metadata properties depth",
+                                "log message": f"Max depth of metadata properties is {current_max_depth}",
+                                "info map": info_map})
+        self.event_logs.append({"log": "Metadata properties path",
+                                "log message": f"Deepest path of metadata properties is {deepest_path}",
+                                "info map": info_map})
         return True, ""
 
     @staticmethod
@@ -574,9 +573,8 @@ class DataValidator:
             return valid, message
         return True, ""
 
-    @staticmethod
     def validate_metadata(
-        metadata: Dict[str, Any], valid_data_types: set[str], address_to_data: str
+        self, metadata: Dict[str, Any], valid_data_types: set[str], address_to_data: str
     ) -> Tuple[bool, str]:
         """Checks that top-level metadata has valid and required keys and values."""
         om = OutputManager()
@@ -590,36 +588,43 @@ class DataValidator:
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
-                om.add_error(
-                    "Metadata Validation", f"Missing required keys '{list(missing_keys)}' in '{key}'", info_map
-                )
+                self.event_logs.append({"error": "Metadata Validation",
+                                        "error message": f"Missing required keys '{list(missing_keys)}' in '{key}'",
+                                        "info map": info_map})
                 return False, f"Missing required keys '{list(missing_keys)}' in '{key}'"
             if invalid_keys := (data.keys() - valid_keys):
-                om.add_error("Metadata Validation", f"Invalid keys '{list(invalid_keys)}' in '{key}'", info_map)
+                self.event_logs.append({"error": "Metadata Validation",
+                                        "error message": f"Invalid keys '{list(invalid_keys)}' in '{key}'",
+                                        "info map": info_map})
                 return False, f"Invalid keys '{list(invalid_keys)}' in '{key}'"
 
             if data["type"] not in valid_data_types:
-                om.add_error(
-                    "Metadata Validation",
-                    f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}",
-                    info_map,
-                )
+                self.event_logs.append({"error": "Metadata Validation",
+                                        "error message": f"Invalid type '{data['type']}' in '{key}'. Expected"
+                                                         f" one option from {valid_data_types}",
+                                        "info map": info_map})
                 return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
 
             if not os.path.isfile(data["path"]):
-                om.add_error("Metadata Validation", f"Invalid path '{data['path']}' in '{key}'", info_map)
+                self.event_logs.append({"error": "Metadata Validation",
+                                        "error message": f"Invalid path '{data['path']}' in '{key}'",
+                                        "info map": info_map})
                 return False, f"Invalid path '{data['path']}' in '{key}'"
 
             if data["properties"] is None or data["properties"] == "":
-                om.add_error("Metadata Validation", f"Properties section empty or None in '{key}'", info_map)
+                self.event_logs.append({"error": "Metadata Validation",
+                                        "error message": f"Properties section empty or None in '{key}'",
+                                        "info map": info_map})
                 return False, f"Properties section empty or None in '{key}'"
 
-        om.add_log("Metadata Validation", "Top level metadata is valid.", info_map)
+        self.event_logs.append({"log": "Metadata Validation",
+                                "log message": "Top level metadata is valid.",
+                                "info map": info_map})
         return True, ""
 
     # Validate input by type related
-    @staticmethod
     def validate_data_by_type(
+        self,
         variable_properties: Dict[str, Any],
         variable_path: List[str | int],
         data: Dict[str, Any],
@@ -674,11 +679,11 @@ class DataValidator:
         type_to_validator_map: Dict[
             str, Callable[[List[int | str], Dict[str, Any], Dict[str, Any], bool, str, "ElementsCounter", bool], bool]
         ] = {
-            "array": DataValidator._array_type_validator,
-            "object": DataValidator._object_type_validator,
-            "string": DataValidator._string_type_validator,
-            "number": DataValidator._number_type_validator,
-            "bool": DataValidator._bool_type_validator,
+            "array": self._array_type_validator,
+            "object": self._object_type_validator,
+            "string": self._string_type_validator,
+            "number": self._number_type_validator,
+            "bool": self._bool_type_validator,
         }
 
         if data_type not in type_to_validator_map:
@@ -704,15 +709,15 @@ class DataValidator:
         if is_valid:
             elements_counter.increment(ElementState.VALID)
             return True
-        is_fixed = DataValidator._fix_data(variable_properties, variable_path, data, properties_blob_key)
+        is_fixed = self._fix_data(variable_properties, variable_path, data, properties_blob_key)
         if is_fixed:
             elements_counter.increment(ElementState.FIXED)
             return True
         elements_counter.increment(ElementState.INVALID)
         return False
 
-    @staticmethod
     def _validate_array_container_properties(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Any,
@@ -737,7 +742,6 @@ class DataValidator:
         bool
             True if the array container properties are valid, False otherwise.
         """
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._validate_array_container_properties.__name__,
@@ -747,12 +751,11 @@ class DataValidator:
         )
         variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
         if not isinstance(data, list):
-            om.add_warning(
-                "Validation: array container is not a list",
-                f"Variable: '{variable_path_str}' is not an array but has type: {type(data)}. "
-                f"{properties_violation_message}",
-                info_map,
-            )
+            self.event_logs.append({"warning": "Validation: array container is not a list",
+                                    "warning message": f"Variable: '{variable_path_str}' is not"
+                                                       f" an array but has type: {type(data)}. "
+                                                       f"{properties_violation_message}",
+                                    "info map": info_map})
             return False
 
         maximum_length = variable_properties.get("maximum_length")
@@ -760,28 +763,26 @@ class DataValidator:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(data)
             if not is_in_range:
-                om.add_warning(
-                    "Validation: array length less than minimum",
-                    f"Variable: '{variable_path_str}' has length: {len(data)}, less than minimum length: "
-                    f"{minimum_length}. {properties_violation_message}",
-                    info_map,
-                )
+                self.event_logs.append({"warning": "Validation: array length less than minimum",
+                                        "warning message": f"Variable: '{variable_path_str}' has length: {len(data)}, less than minimum length: "
+                                                           f"{minimum_length}. {properties_violation_message}",
+                                        "info map": info_map})
                 return False
 
         if maximum_length is not None:
             is_in_range = len(data) <= variable_properties["maximum_length"]
             if not is_in_range:
-                om.add_warning(
-                    "Validation: array length greater than maximum",
-                    f"Variable: '{variable_path_str}' has length: {len(data)}, greater than maximum length: "
-                    f"{maximum_length}. {properties_violation_message}",
-                    info_map,
-                )
+                self.event_logs.append({"warning": "Validation: array length greater than maximum",
+                                        "warning message": f"Variable: '{variable_path_str}' has"
+                                                           f" length: {len(data)}, greater than maximum length: "
+                                                           f"{maximum_length}. {properties_violation_message}",
+                                        "info map": info_map
+                                        })
                 return False
         return True
 
-    @staticmethod
     def _array_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -826,14 +827,14 @@ class DataValidator:
         if variable_properties.get("nullable", False) and array_value is None:
             return True
 
-        if not DataValidator._validate_array_container_properties(
+        if not self._validate_array_container_properties(
             variable_path, variable_properties, array_value, properties_blob_key
         ):
             return False
 
         is_whole_array_acceptable = True
         for index, element in enumerate(array_value):
-            is_element_acceptable = DataValidator.validate_data_by_type(
+            is_element_acceptable = self.validate_data_by_type(
                 variable_properties["properties"],
                 variable_path + [index],
                 data,
@@ -914,7 +915,7 @@ class DataValidator:
         for key in variable_properties.keys():
             if key in ["type", "description", "default"]:
                 continue
-            is_element_acceptable = DataValidator.validate_data_by_type(
+            is_element_acceptable = self.validate_data_by_type(
                 variable_properties[key],
                 variable_path + [key],
                 data,
@@ -1163,7 +1164,9 @@ class DataValidator:
             "function": DataValidator._fix_data.__name__,
         }
 
-        variable_parent = reduce(lambda d, key: d[key], element_hierarchy[:-1], data)
+        variable_parent = data
+        for key in element_hierarchy[:-1]:
+            variable_parent = variable_parent[key]
 
         element_path = ".".join([str(element) for element in element_hierarchy])
         properties_violation_message = (
