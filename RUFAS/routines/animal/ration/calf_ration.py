@@ -3,6 +3,7 @@ import math
 from typing import Any, Dict, List
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.animal.ration import user_defined_ration as udr
+from RUFAS.general_constants import GeneralConstants
 
 
 class CalfRationManager:
@@ -249,13 +250,13 @@ class CalfRationManager:
 
         # milk-based feed intake
         # [A.1B.A.1]
-        whole_milk_intake = 0.1 * calf.birth_weight * whole_milk_dm * 0.01
+        whole_milk_intake = 0.1 * calf.birth_weight * whole_milk_dm * GeneralConstants.PERCENTAGE_TO_FRACTION
         # [A.1B.A.2]
-        milk_replacer_intake = 0.1 * calf.birth_weight * 0.15 * milk_replacer_dm * 0.01
+        milk_replacer_intake = 0.1 * calf.birth_weight * milk_replacer_dm * GeneralConstants.PERCENTAGE_TO_FRACTION
 
         # starter intake
         # [A.1B.A.3]
-        if calf.body_weight <= 69.365:
+        if 50 < calf.body_weight <= 69.365:
             starter_intake = -0.24783 + 0.0049567 * calf.body_weight
         else:
             starter_intake = -6.2263 + 0.091145 * calf.body_weight
