@@ -1165,9 +1165,7 @@ def test_validate_array_container_properties(
     # Assert
     assert result == expected_result
     if expected_warning:
-        assert dv.event_logs == [{"warning": expected_warning,
-                                  "warning message": mocker.ANY,
-                                 "info map": info_map}]
+        assert dv.event_logs == [{"warning": expected_warning, "warning message": mocker.ANY, "info map": info_map}]
     else:
         assert dv.event_logs == []
 
@@ -1499,14 +1497,12 @@ def test_validate_metadata(
     if expected_exception:
         valid, message = dv.validate_metadata(metadata, {"json", "csv"}, "files")
         assert not valid
-        assert dv.event_logs == [{"error": "Metadata Validation",
-                                  "error message": mocker.ANY,
-                                  "info map": info_map}]
+        assert dv.event_logs == [{"error": "Metadata Validation", "error message": mocker.ANY, "info map": info_map}]
     else:
         dv.validate_metadata(metadata, {"json", "csv"}, "files")
-        assert dv.event_logs == [{"log": "Metadata Validation",
-                                  "log message": "Top level metadata is valid.",
-                                  "info map": info_map}]
+        assert dv.event_logs == [
+            {"log": "Metadata Validation", "log message": "Top level metadata is valid.", "info map": info_map}
+        ]
 
 
 @pytest.mark.parametrize(
@@ -1575,19 +1571,22 @@ def test_validate_properties(
         valid, exc_info = dv.validate_properties(metadata, limit)
         assert exc_info == expected_err_msg
         assert not valid
-        assert dv.event_logs == [{"error": expected_error,
-                                  "error message": mocker.ANY,
-                                  "info map": info_map}]
+        assert dv.event_logs == [{"error": expected_error, "error message": mocker.ANY, "info map": info_map}]
     else:
         valid, exc_info = dv.validate_properties(metadata, limit)
         assert valid
-        assert dv.event_logs == [{"log": "Metadata properties depth",
-                                  "log message": f"Max depth of metadata properties is {expected_depth}",
-                                  "info map": info_map},
-                                 {"log": "Metadata properties path",
-                                  "log message": f"Deepest path of metadata properties is {expected_path}",
-                                  "info map": info_map}
-                                 ]
+        assert dv.event_logs == [
+            {
+                "log": "Metadata properties depth",
+                "log message": f"Max depth of metadata properties is {expected_depth}",
+                "info map": info_map,
+            },
+            {
+                "log": "Metadata properties path",
+                "log message": f"Deepest path of metadata properties is {expected_path}",
+                "info map": info_map,
+            },
+        ]
 
 
 @pytest.mark.parametrize(
