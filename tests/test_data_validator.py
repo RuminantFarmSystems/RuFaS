@@ -363,7 +363,6 @@ def test_fix_array_type_critical_data(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
-
     dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
     element_path = ".".join([str(element) for element in dummy_element_hierarchy])
@@ -725,12 +724,25 @@ def test_fix_number_type_fixable_data(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable number-type data for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = mock_input_number_data_for_fix_data()
+    dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
+    properties_violation_message = (
+        f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
+    )
+    variable_parent = reduce(lambda d, key: d[key], dummy_element_hierarchy[:-1], dummy_input_data)
+    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
+    if type(variable_parent) is list:
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    else:
+        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator._fix_data.__name__,
+    }
 
-    add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = DataValidator._fix_data(
+    dv = DataValidator()
+
+    result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -740,7 +752,19 @@ def test_fix_number_type_fixable_data(
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
     assert variable_to_check == expected_value
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
+    assert dv.event_logs == [{"warning": "Validation: invalid data found",
+                              "warning message":
+                                  f"Variable: '{element_path}' has value:"
+                                  f" {original_invalid_value}. {properties_violation_message}",
+                              "info map": info_map},
+                             {"warning": "Validation: data fixed",
+                              "warning message":
+                                  f"Invalid data fixed: '{element_path}' value changed from"
+                                  f" {original_invalid_value} to "
+                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                                  f"'{dummy_properties_key}'.",
+                              "info map": info_map}
+                             ]
 
 
 @pytest.mark.parametrize(
@@ -796,12 +820,25 @@ def test_fix_number_type_critical_data(
     mocker: MockerFixture,
 ) -> None:
     """Unit test for critical number-type data for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = mock_input_number_data_for_fix_data()
+    dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
+    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
+    variable_parent = reduce(lambda d, key: d[key], dummy_element_hierarchy[:-1], dummy_input_data)
+    properties_violation_message = (
+        f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
+    )
+    error_message = (
+        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f", and cannot be changed to a default value. {properties_violation_message}"
+    )
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator._fix_data.__name__,
+    }
 
-    add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = DataValidator._fix_data(
+    dv = DataValidator()
+
+    result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -809,7 +846,9 @@ def test_fix_number_type_critical_data(
     )
 
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
+    assert dv.event_logs == [{"error": "Validation: invalid data not able to be fixed",
+                              "error message": error_message,
+                              "info map": info_map}]
 
 
 @pytest.mark.parametrize(
