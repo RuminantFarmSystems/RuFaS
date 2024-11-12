@@ -256,7 +256,9 @@ class CalfRationManager:
 
         # starter intake
         # [A.1B.A.3]
-        if 50 < calf.body_weight <= 69.365:
+        if calf.body_weight <=50:
+            starter_intake = 0.01
+        elif 50 < calf.body_weight <= 69.365:
             starter_intake = -0.24783 + 0.0049567 * calf.body_weight
         else:
             starter_intake = -6.2263 + 0.091145 * calf.body_weight
