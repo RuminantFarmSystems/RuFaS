@@ -98,11 +98,11 @@ def mock_weather(mocker: MockerFixture) -> Weather:
                 ),
             ],
             6,
-            {
-                "field1": [MagicMock(spec=ManureEventNutrientRequestResults)],
-                "field2": [MagicMock(spec=ManureEventNutrientRequestResults)],
-                "field3": [MagicMock(spec=ManureEventNutrientRequestResults)],
-            },
+            [
+                MagicMock(spec=ManureEventNutrientRequestResults),
+                MagicMock(spec=ManureEventNutrientRequestResults),
+                MagicMock(spec=ManureEventNutrientRequestResults),
+            ],
         ),
         ([], 0, {}),
     ],
@@ -1859,15 +1859,15 @@ def test_check_manure_schedules() -> None:
     field = MagicMock(Field)
     time = MagicMock(Time)
     expected_manure_requests = [
-        ManureEventNutrientRequest(event=MagicMock(), nutrient_request=MagicMock()),
-        ManureEventNutrientRequest(event=MagicMock(), nutrient_request=MagicMock()),
+        ManureEventNutrientRequest(field_name="field1", event=MagicMock(), nutrient_request=MagicMock()),
+        ManureEventNutrientRequest(field_name="field2", event=MagicMock(), nutrient_request=MagicMock()),
     ]
-    field._check_manure_application_schedule.return_value = expected_manure_requests
+    field.check_manure_application_schedule.return_value = expected_manure_requests
     field_manager = FieldManager()
 
     # Act
     manure_requests = field_manager.check_manure_schedules(field, time)
 
     # Assert
-    field._check_manure_application_schedule.assert_called_once_with(time)
+    field.check_manure_application_schedule.assert_called_once_with(time)
     assert manure_requests == expected_manure_requests

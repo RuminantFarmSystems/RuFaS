@@ -176,8 +176,10 @@ def test_generate_daily_manure_applications(mocker: MockerFixture) -> None:
 
     manure_event_request_1 = mocker.MagicMock()
     manure_event_request_2 = mocker.MagicMock()
+    manure_event_request_1.field_name = "Field 1"
     manure_event_request_1.event = "Event 1"
     manure_event_request_1.nutrient_request = "Nutrient Request 1"
+    manure_event_request_2.field_name = "Field 2"
     manure_event_request_2.event = "Event 2"
     manure_event_request_2.nutrient_request = None
 
@@ -190,10 +192,10 @@ def test_generate_daily_manure_applications(mocker: MockerFixture) -> None:
 
     result = simulation_engine.generate_daily_manure_applications()
 
-    assert result == {
-        "Field 1": [ManureEventNutrientRequestResults("Event 1", "Nutrient Result 1")],
-        "Field 2": [ManureEventNutrientRequestResults("Event 2", None)],
-    }
+    assert result == [
+        ManureEventNutrientRequestResults("Field 1", "Event 1", "Nutrient Result 1"),
+        ManureEventNutrientRequestResults("Field 2", "Event 2", None),
+    ]
     simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_1, simulation_engine.time)
     simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_2, simulation_engine.time)
     simulation_engine.manure_manager.request_nutrients.assert_called_once_with("Nutrient Request 1")

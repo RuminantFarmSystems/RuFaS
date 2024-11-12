@@ -153,18 +153,18 @@ class SimulationEngine:
             A dictionary containing the ManureEvents and corresponding NutrientRequestResults for each field in
             the simulation.
         """
-        manure_applications: dict[str, list[ManureEventNutrientRequestResults]] = {}
+        manure_applications: list[ManureEventNutrientRequestResults] = []
         for field in self.field_manager.fields:
             manure_events_requests = self.field_manager.check_manure_schedules(field, self.time)
-            manure_applications[field.field_data.name] = []
             for manure_event_request in manure_events_requests:
+                field_name = manure_event_request.field_name
                 event = manure_event_request.event
                 manure_request = manure_event_request.nutrient_request
                 manure_request_results = None
                 if manure_request is not None:
                     manure_request_results = self.manure_manager.request_nutrients(manure_request)
-                manure_applications[field.field_data.name].append(
-                    ManureEventNutrientRequestResults(event, manure_request_results)
+                manure_applications.append(
+                    ManureEventNutrientRequestResults(field_name, event, manure_request_results)
                 )
         return manure_applications
 

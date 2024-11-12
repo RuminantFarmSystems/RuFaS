@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pytest import approx
 
-from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
+from RUFAS.data_structures.nutrient_request import NutrientRequestResults
 
 
 def test_nutrient_request_results_default_init() -> None:
