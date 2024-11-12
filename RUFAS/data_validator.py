@@ -178,6 +178,7 @@ class Modifiability(Enum):
 
 class DataValidator:
     """This class is will be utilized to validate all types of data across RuFas codebase."""
+
     def __init__(self):
         self.event_logs: list[dict[str, str | dict[str, str]]] = []
 
@@ -1116,9 +1117,7 @@ class DataValidator:
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
             om.add_warning(warning_name, warning_message, info_map)
-            self.event_logs.append({"warning": warning_name,
-                                    "warning message": warning_message,
-                                    "info_map": info_map})
+            self.event_logs.append({"warning": warning_name, "warning message": warning_message, "info_map": info_map})
 
             return False
 

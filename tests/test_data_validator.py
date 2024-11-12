@@ -92,12 +92,16 @@ def test_bool_type_validator(
             f"Violates properties defined in metadata properties section" f" '{dummy_properties_key}'."
         )
         variable_path_str = dv.convert_variable_path_to_str(var_path)
-        assert dv.event_logs == [{"warning": "Validation: bool variable is not a bool",
-                                  "warning message": (
-                                      f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
-                                      f"'{type(input_data_value)}'. {properties_violation_message}"
-                                  ),
-                                  "info_map": info_map}]
+        assert dv.event_logs == [
+            {
+                "warning": "Validation: bool variable is not a bool",
+                "warning message": (
+                    f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
+                    f"'{type(input_data_value)}'. {properties_violation_message}"
+                ),
+                "info_map": info_map,
+            }
+        ]
     else:
         assert dv.event_logs == []
     assert result == expected_result
