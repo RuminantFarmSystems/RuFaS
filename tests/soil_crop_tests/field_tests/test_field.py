@@ -2692,9 +2692,10 @@ def test_check_tillage_schedule(
 
 
 # --- Test FieldData methods ---
-@pytest.mark.parametrize("liters,area,expected", [(100, 2.3, 0.004347826086956522),
-                                                  (356, 4.556, 0.00781387181738367),
-                                                  (60, 1.8, 0.0033333333333333335)])
+@pytest.mark.parametrize(
+    "liters,area,expected",
+    [(100, 2.3, 0.004347826086956522), (356, 4.556, 0.00781387181738367), (60, 1.8, 0.0033333333333333335)],
+)
 def test_liters_to_millimeters(liters: float, area: float, expected: float) -> None:
     """Tests that the conversion from liters for evenly distributed millimeters is performed correctly."""
     actual = FieldData.convert_liters_to_millimeters(liters, area)
