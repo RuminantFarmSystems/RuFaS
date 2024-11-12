@@ -1013,9 +1013,10 @@ def test_object_type_validator(
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_validate_return)
     mocker.patch.object(OutputManager, "add_warning")
     mock_elements_counter = mocker.MagicMock()
+    dv = DataValidator()
 
     # Act
-    result = DataValidator._object_type_validator(
+    result = dv._object_type_validator(
         variable_path,
         variable_properties,
         input_data,
@@ -1045,22 +1046,25 @@ def test_object_type_validator_key_removal(
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=data)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=True)
     mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy path")
-    add_warning = mocker.patch.object(OutputManager, "add_warning")
+
     mock_elements_counter = mocker.MagicMock()
     variable_properties: dict[str, Any] = {"key1": {}, "key2": {}}
     violation_msg = "Violates properties defined in metadata properties section 'properties blob'."
     info_map = {"class": "DataValidator", "function": "_object_type_validator"}
-    expected_add_warning_calls = [
-        mocker.call(
-            "Validation: object contains extraneous data",
-            f"Variable: 'dummy path' contains data at key '{key}' that is not specified in the metadata properties. "
-            f"{violation_msg}",
-            info_map,
-        )
+    dv = DataValidator()
+    expected_event_log = [
+        {
+            "warning": "Validation: object contains extraneous data",
+            "warning message": (
+                f"Variable: 'dummy path' contains data at key '{key}' "
+                f"that is not specified in the metadata properties. {violation_msg}"
+            ),
+            "info map": info_map,
+        }
         for key in removed_keys
     ]
 
-    result = DataValidator._object_type_validator(
+    result = dv._object_type_validator(
         ["path", "to", "var"],
         variable_properties,
         {"dummy": "data"},
@@ -1071,8 +1075,8 @@ def test_object_type_validator_key_removal(
         {"string", "number", "bool"},
     )
 
-    assert result is True
-    add_warning.assert_has_calls(expected_add_warning_calls)
+    assert result
+    assert dv.event_logs == expected_event_log
 
 
 @pytest.mark.parametrize(

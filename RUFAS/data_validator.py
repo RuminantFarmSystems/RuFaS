@@ -848,8 +848,8 @@ class DataValidator:
                 return False
         return is_whole_array_acceptable
 
-    @staticmethod
     def _object_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -890,7 +890,6 @@ class DataValidator:
         in the metadata properties.
 
         """
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._object_type_validator.__name__,
@@ -904,12 +903,11 @@ class DataValidator:
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
         if not isinstance(object_value, dict):
-            om.add_warning(
-                "Validation: object is not a dictionary",
-                f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
-                f"{properties_violation_message}",
-                info_map,
-            )
+            self.event_logs.append({"warning": "Validation: object is not a dictionary",
+                                    "warning message": f"Variable: '{variable_path_str}' is"
+                                                       f" not an object but has type: {type(object_value)}. "
+                                                       f"{properties_violation_message}",
+                                    "info map": info_map})
             return False
 
         is_whole_object_acceptable = True
@@ -932,12 +930,12 @@ class DataValidator:
 
         extraneous_keys = [key for key in object_value.keys() if key not in variable_properties.keys()]
         for key in extraneous_keys:
-            om.add_warning(
-                "Validation: object contains extraneous data",
-                f"Variable: '{variable_path_str}' contains data at key '{key}' that is not specified in the metadata "
-                f"properties. {properties_violation_message}",
-                info_map,
-            )
+            self.event_logs.append({"warning": "Validation: object contains extraneous data",
+                                    "warning message": f"Variable: '{variable_path_str}' contains "
+                                                       f"data at key '{key}' that is not specified in "
+                                                       f"the metadata"
+                                                       f" properties. {properties_violation_message}",
+                                    "info map": info_map})
             del object_value[key]
 
         return is_whole_object_acceptable
