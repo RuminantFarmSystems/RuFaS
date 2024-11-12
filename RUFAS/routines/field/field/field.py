@@ -25,8 +25,7 @@ from RUFAS.data_structures.events import (
     TillageEvent,
 )
 from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.data_structures.nutrient_request import NutrientRequest
-from RUFAS.data_structures.nutrient_request_results import NutrientRequestResults
+from RUFAS.data_structures.nutrient_request import NutrientRequest, NutrientRequestResults
 from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
@@ -893,7 +892,7 @@ class Field:
                 time.current_julian_day,
             )
 
-    def _check_manure_application_schedule(self, time: Time) -> list[ManureEventNutrientRequest]:
+    def check_manure_application_schedule(self, time: Time) -> list[ManureEventNutrientRequest]:
         """Checks list of ManureEvents, sends all that occur today to another method to be executed.
 
         Parameters
@@ -911,7 +910,7 @@ class Field:
         manure_requests: list[ManureEventNutrientRequest] = []
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
-            manure_requests.append(ManureEventNutrientRequest(event, manure_request))
+            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, event, manure_request))
         return manure_requests
 
     def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
@@ -938,7 +937,7 @@ class Field:
         }
         if event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
-            self.om.add_log("manure_application_log", log_message, info_map)
+            self.om.add_warning("Manure Application Warning", log_message, info_map)
             return None
 
         return NutrientRequest(

@@ -56,7 +56,7 @@ class FieldManager:
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
     def daily_update_routine(
-        self, weather: Weather, time: Time, manure_applications: dict[str, list[ManureEventNutrientRequestResults]]
+        self, weather: Weather, time: Time, manure_applications: list[ManureEventNutrientRequestResults]
     ) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
@@ -68,8 +68,8 @@ class FieldManager:
             A weather object that contains infos to be transformed to current weather
         time: Time
             Object containing the current year and day of the simulation.
-        manure_applications: dict[str, list[ManureEventNutrientRequestResults]]
-            A dictionary containing the ManureEvents and corresponding NutrientRequestResults for each field in
+        manure_applications: list[ManureEventNutrientRequestResults]
+            A list containing the ManureEvents and corresponding NutrientRequestResults for each field in
             the simulation.
 
         Returns
@@ -92,7 +92,9 @@ class FieldManager:
                 "units": MeasurementUnits.HOURS,
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
-            manure_applications_for_field = manure_applications.get(field.field_data.name, [])
+            manure_applications_for_field = [
+                application for application in manure_applications if application.field_name == field.field_data.name
+            ]
             newly_harvested_crops = field.manage_field(
                 time, current_conditions=current_conditions, manure_applications=manure_applications_for_field
             )
@@ -478,5 +480,5 @@ class FieldManager:
             Object containing the current year and day of the simulation.
 
         """
-        manure_requests = field._check_manure_application_schedule(time)
+        manure_requests = field.check_manure_application_schedule(time)
         return manure_requests
