@@ -63,7 +63,6 @@ def test_bool_type_validator(
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=input_data_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
-    patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
 
     dv = DataValidator()
 
