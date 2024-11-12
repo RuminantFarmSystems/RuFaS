@@ -178,6 +178,8 @@ class Modifiability(Enum):
 
 class DataValidator:
     """This class is will be utilized to validate all types of data across RuFas codebase."""
+    def __init__(self):
+        self.event_logs: list[dict[str, str | dict[str, str]]] = []
 
     @staticmethod
     def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
@@ -1077,8 +1079,8 @@ class DataValidator:
 
         return True
 
-    @staticmethod
     def _bool_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -1114,6 +1116,10 @@ class DataValidator:
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
             om.add_warning(warning_name, warning_message, info_map)
+            self.event_logs.append({"warning": warning_name,
+                                    "warning message": warning_message,
+                                    "info_map": info_map})
+
             return False
 
         return True
