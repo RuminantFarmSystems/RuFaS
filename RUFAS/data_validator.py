@@ -178,6 +178,7 @@ class Modifiability(Enum):
 
 class DataValidator:
     """This class is will be utilized to validate all types of data across RuFas codebase."""
+
     def __init__(self):
         self.event_logs: list[dict[str, str | dict[str, str]]] = []
 
@@ -941,8 +942,8 @@ class DataValidator:
 
         return is_whole_object_acceptable
 
-    @staticmethod
     def _number_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -953,7 +954,6 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates an data number element."""
-        om = OutputManager()
         data_value = DataValidator._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
@@ -979,7 +979,9 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
-            om.add_warning(warning_string, warning_message, info_map)
+            self.event_logs.append({"warning": warning_string,
+                                    "warning message": warning_message,
+                                    "info map": info_map})
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= data_value
@@ -989,17 +991,21 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: {data_value}, less than minimum value: "
                     f"{minimum_value: .2f}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append({"warning": warning_name,
+                                        "warning message": warning_message,
+                                        "info map": info_map})
                 return False
         if maximum_value is not None:
             is_in_range = data_value <= maximum_value
             if not is_in_range:
                 warning_name = "Validation: value greater than maximum"
-                warning_string = (
+                warning_message = (
                     f"Variable: '{variable_path_str}' has value: {data_value}, greater than maximum value: "
                     f"{maximum_value: .2f}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_string, info_map)
+                self.event_logs.append({"warning": warning_name,
+                                        "warning message": warning_message,
+                                        "info map": info_map})
                 return False
 
         return True
@@ -1091,7 +1097,6 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates a data bool element."""
-        om = OutputManager()
         data_value = DataValidator._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
@@ -1115,7 +1120,6 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
-            om.add_warning(warning_name, warning_message, info_map)
             self.event_logs.append({"warning": warning_name,
                                     "warning message": warning_message,
                                     "info_map": info_map})
