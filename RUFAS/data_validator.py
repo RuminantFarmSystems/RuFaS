@@ -213,10 +213,14 @@ class DataValidator:
             current_obj, depth, path = stack.pop()
 
             if depth > metadata_depth_limit:
-                self.event_logs.append({"error": "Max metadata depth exceeded.",
-                                        "error message": f"Metadata depth exceeds maximum allowed depth"
-                                                         f" of {metadata_depth_limit} at path {path}",
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {
+                        "error": "Max metadata depth exceeded.",
+                        "error message": f"Metadata depth exceeds maximum allowed depth"
+                        f" of {metadata_depth_limit} at path {path}",
+                        "info map": info_map,
+                    }
+                )
                 error_message = f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}"
                 return False, error_message
 
@@ -235,18 +239,29 @@ class DataValidator:
                                 return valid, error_message
                         else:
                             if value_type is not None:
-                                self.event_logs.append({"error": "Properties value type error",
-                                                        "error message": f"'type' value not"
-                                                                         f" in {type_to_validator_map.keys()}",
-                                                        "info map": info_map})
+                                self.event_logs.append(
+                                    {
+                                        "error": "Properties value type error",
+                                        "error message": f"'type' value not" f" in {type_to_validator_map.keys()}",
+                                        "info map": info_map,
+                                    }
+                                )
                                 error_message = f"Properties 'type' value not in {list(type_to_validator_map.keys())}"
                                 return False, error_message
-        self.event_logs.append({"log": "Metadata properties depth",
-                                "log message": f"Max depth of metadata properties is {current_max_depth}",
-                                "info map": info_map})
-        self.event_logs.append({"log": "Metadata properties path",
-                                "log message": f"Deepest path of metadata properties is {deepest_path}",
-                                "info map": info_map})
+        self.event_logs.append(
+            {
+                "log": "Metadata properties depth",
+                "log message": f"Max depth of metadata properties is {current_max_depth}",
+                "info map": info_map,
+            }
+        )
+        self.event_logs.append(
+            {
+                "log": "Metadata properties path",
+                "log message": f"Deepest path of metadata properties is {deepest_path}",
+                "info map": info_map,
+            }
+        )
         return True, ""
 
     @staticmethod
@@ -588,38 +603,58 @@ class DataValidator:
         valid_keys = required_keys | optional_keys
         for key, data in metadata_files.items():
             if missing_keys := (required_keys - data.keys()):
-                self.event_logs.append({"error": "Metadata Validation",
-                                        "error message": f"Missing required keys '{list(missing_keys)}' in '{key}'",
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {
+                        "error": "Metadata Validation",
+                        "error message": f"Missing required keys '{list(missing_keys)}' in '{key}'",
+                        "info map": info_map,
+                    }
+                )
                 return False, f"Missing required keys '{list(missing_keys)}' in '{key}'"
             if invalid_keys := (data.keys() - valid_keys):
-                self.event_logs.append({"error": "Metadata Validation",
-                                        "error message": f"Invalid keys '{list(invalid_keys)}' in '{key}'",
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {
+                        "error": "Metadata Validation",
+                        "error message": f"Invalid keys '{list(invalid_keys)}' in '{key}'",
+                        "info map": info_map,
+                    }
+                )
                 return False, f"Invalid keys '{list(invalid_keys)}' in '{key}'"
 
             if data["type"] not in valid_data_types:
-                self.event_logs.append({"error": "Metadata Validation",
-                                        "error message": f"Invalid type '{data['type']}' in '{key}'. Expected"
-                                                         f" one option from {valid_data_types}",
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {
+                        "error": "Metadata Validation",
+                        "error message": f"Invalid type '{data['type']}' in '{key}'. Expected"
+                        f" one option from {valid_data_types}",
+                        "info map": info_map,
+                    }
+                )
                 return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
 
             if not os.path.isfile(data["path"]):
-                self.event_logs.append({"error": "Metadata Validation",
-                                        "error message": f"Invalid path '{data['path']}' in '{key}'",
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {
+                        "error": "Metadata Validation",
+                        "error message": f"Invalid path '{data['path']}' in '{key}'",
+                        "info map": info_map,
+                    }
+                )
                 return False, f"Invalid path '{data['path']}' in '{key}'"
 
             if data["properties"] is None or data["properties"] == "":
-                self.event_logs.append({"error": "Metadata Validation",
-                                        "error message": f"Properties section empty or None in '{key}'",
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {
+                        "error": "Metadata Validation",
+                        "error message": f"Properties section empty or None in '{key}'",
+                        "info map": info_map,
+                    }
+                )
                 return False, f"Properties section empty or None in '{key}'"
 
-        self.event_logs.append({"log": "Metadata Validation",
-                                "log message": "Top level metadata is valid.",
-                                "info map": info_map})
+        self.event_logs.append(
+            {"log": "Metadata Validation", "log message": "Top level metadata is valid.", "info map": info_map}
+        )
         return True, ""
 
     # Validate input by type related
@@ -751,11 +786,15 @@ class DataValidator:
         )
         variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
         if not isinstance(data, list):
-            self.event_logs.append({"warning": "Validation: array container is not a list",
-                                    "warning message": f"Variable: '{variable_path_str}' is not"
-                                                       f" an array but has type: {type(data)}. "
-                                                       f"{properties_violation_message}",
-                                    "info map": info_map})
+            self.event_logs.append(
+                {
+                    "warning": "Validation: array container is not a list",
+                    "warning message": f"Variable: '{variable_path_str}' is not"
+                    f" an array but has type: {type(data)}. "
+                    f"{properties_violation_message}",
+                    "info map": info_map,
+                }
+            )
             return False
 
         maximum_length = variable_properties.get("maximum_length")
@@ -763,21 +802,28 @@ class DataValidator:
         if minimum_length is not None:
             is_in_range = variable_properties["minimum_length"] <= len(data)
             if not is_in_range:
-                self.event_logs.append({"warning": "Validation: array length less than minimum",
-                                        "warning message": f"Variable: '{variable_path_str}' has length: {len(data)}, less than minimum length: "
-                                                           f"{minimum_length}. {properties_violation_message}",
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {
+                        "warning": "Validation: array length less than minimum",
+                        "warning message": f"Variable: '{variable_path_str}' has length: {len(data)}, less than minimum length: "
+                        f"{minimum_length}. {properties_violation_message}",
+                        "info map": info_map,
+                    }
+                )
                 return False
 
         if maximum_length is not None:
             is_in_range = len(data) <= variable_properties["maximum_length"]
             if not is_in_range:
-                self.event_logs.append({"warning": "Validation: array length greater than maximum",
-                                        "warning message": f"Variable: '{variable_path_str}' has"
-                                                           f" length: {len(data)}, greater than maximum length: "
-                                                           f"{maximum_length}. {properties_violation_message}",
-                                        "info map": info_map
-                                        })
+                self.event_logs.append(
+                    {
+                        "warning": "Validation: array length greater than maximum",
+                        "warning message": f"Variable: '{variable_path_str}' has"
+                        f" length: {len(data)}, greater than maximum length: "
+                        f"{maximum_length}. {properties_violation_message}",
+                        "info map": info_map,
+                    }
+                )
                 return False
         return True
 
