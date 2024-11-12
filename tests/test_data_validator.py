@@ -54,7 +54,6 @@ def test_bool_type_validator(
     """
     Unit test for function _bool_type_validator in file input_manager.py
     """
-
     # Arrange
     var_path: list[str | int] = ["dummy_var_path"]
     variable_properties: Dict[str, Any] = dummy_variable_properties
@@ -66,8 +65,10 @@ def test_bool_type_validator(
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
     patch_for_add_warning = mocker.patch.object(OutputManager, "add_warning")
 
+    dv = DataValidator()
+
     # Act
-    result = DataValidator._bool_type_validator(
+    result = dv._bool_type_validator(
         var_path,
         variable_properties,
         dummy_input_data,
@@ -83,9 +84,22 @@ def test_bool_type_validator(
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(var_path)
     if not expected_result:
-        patch_for_add_warning.assert_called_once()
+        info_map = {
+            "class": DataValidator.__name__,
+            "function": DataValidator._bool_type_validator.__name__,
+        }
+        properties_violation_message = (
+            f"Violates properties defined in metadata properties section" f" '{dummy_properties_key}'."
+        )
+        variable_path_str = dv.convert_variable_path_to_str(var_path)
+        assert dv.event_logs == [{"warning": "Validation: bool variable is not a bool",
+                                  "warning message": (
+                                      f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
+                                      f"'{type(input_data_value)}'. {properties_violation_message}"
+                                  ),
+                                  "info_map": info_map}]
     else:
-        patch_for_add_warning.assert_not_called()
+        assert dv.event_logs == []
     assert result == expected_result
 
 
