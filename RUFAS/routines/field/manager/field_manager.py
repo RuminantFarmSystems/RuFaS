@@ -1,8 +1,8 @@
 from typing import Dict, List, Tuple
 
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
@@ -30,8 +30,6 @@ class FieldManager:
     ----------
     manure_manager : ManureManager
         An instance of `ManureManager` responsible for managing manure-related activities and data across the fields.
-    feed_manager : FeedManager
-        An instance of `FeedManager` responsible for managing feed-related activities and data across the fields.
 
     Attributes
     ----------
@@ -44,11 +42,8 @@ class FieldManager:
 
     """
 
-    def __init__(self, manure_manager: ManureManager, feed_manager: FeedManager):
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": "__init__",
-        }
+    def __init__(self, manure_manager: ManureManager) -> None:
+        info_map = {"class": self.__class__.__name__, "function": "__init__"}
         self.im = InputManager()
         self.om = OutputManager()
         self.fields: List[Field] = []
@@ -57,11 +52,11 @@ class FieldManager:
             self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         for field in fields:
-            new_field = self._setup_field(field, manure_manager, feed_manager)
+            new_field = self._setup_field(field, manure_manager)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
-    def daily_update_routine(self, weather: Weather, time: Time) -> None:
+    def daily_update_routine(self, weather: Weather, time: Time) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
@@ -73,11 +68,17 @@ class FieldManager:
         time: Time
             Object containing the current year and day of the simulation.
 
+        Returns
+        -------
+        list[HarvestedCropStorageType]
+            Crops that were harvested on the current day, paired with the storage types into which they will be placed.
+
         Notes
         -----
         Because different fields can have different latitudes, the day length has to be recalculated for each field.
 
         """
+        harvested_crops: list[HarvestedCropStorageType] = []
         for field in self.fields:
             current_conditions = weather.get_current_day_conditions(time, field.field_data.absolute_latitude)
             info_map = {
@@ -87,8 +88,11 @@ class FieldManager:
                 "units": MeasurementUnits.HOURS,
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
-            field.manage_field(time, current_conditions=current_conditions)
+            newly_harvested_crops = field.manage_field(time, current_conditions=current_conditions)
+            harvested_crops.extend(newly_harvested_crops)
         self.output_gatherer.send_daily_variables()
+
+        return harvested_crops
 
     def annual_update_routine(self) -> None:
         """
@@ -100,7 +104,7 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager, feed_manager: FeedManager) -> Field:
+    def _setup_field(field_name: str, manure_manager: ManureManager) -> Field:
         """
 
         Parameters
@@ -109,8 +113,6 @@ class FieldManager:
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
         manure_manager : ManureManager
             Instance of the Manure Manager that will provide manure for field applications.
-        feed_manager : FeedManager
-            Instance of the FeedManager class which receives and manages harvested crops.
 
         Returns
         -------
@@ -185,7 +187,6 @@ class FieldManager:
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
             manure_manager=manure_manager,
-            feed_manager=feed_manager,
         )
 
     @staticmethod
