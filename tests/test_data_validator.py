@@ -316,7 +316,7 @@ def test_fix_array_type_fixable_data(
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_result, expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_result",
     [
         (
             {
@@ -326,7 +326,6 @@ def test_fix_array_type_fixable_data(
             },
             ["element6"],
             False,
-            0,
         ),
         (
             {
@@ -336,7 +335,6 @@ def test_fix_array_type_fixable_data(
             },
             ["element7"],
             False,
-            0,
         ),
         (
             {
@@ -346,7 +344,6 @@ def test_fix_array_type_fixable_data(
             },
             ["element8"],
             False,
-            0,
         ),
         (
             {
@@ -356,7 +353,6 @@ def test_fix_array_type_fixable_data(
             },
             ["element9", "element10"],
             False,
-            0,
         ),
     ],
 )
@@ -364,17 +360,29 @@ def test_fix_array_type_critical_data(
     dummy_variable_properties: Dict[str, Any],
     dummy_element_hierarchy: List[str],
     expected_result: bool,
-    expected_warning_call_count: int,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for critical array-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
+    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
+    variable_parent = reduce(lambda d, key: d[key], dummy_element_hierarchy[:-1], dummy_input_data)
+    properties_violation_message = (
+        f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
+    )
+    error_message = (
+        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f", and cannot be changed to a default value. {properties_violation_message}"
+    )
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator._fix_data.__name__,
+    }
 
-    add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+    dv = DataValidator()
 
-    result = DataValidator._fix_data(
+    result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -382,7 +390,9 @@ def test_fix_array_type_critical_data(
     )
 
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
+    assert dv.event_logs == [{"error": "Validation: invalid data not able to be fixed",
+                              "error message": error_message,
+                              "info map": info_map}]
 
 
 def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
@@ -403,7 +413,7 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result",
     [
         (
             {
@@ -416,7 +426,6 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             ["element1"],
             "cow",
             True,
-            2,
         ),
         (
             {
@@ -428,7 +437,6 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             ["element2"],
             "",
             True,
-            2,
         ),
         (
             {
@@ -441,7 +449,6 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             ["element3"],
             "cow",
             True,
-            2,
         ),
         (
             {
@@ -454,7 +461,6 @@ def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
             ["element4", "element5"],
             "cow",
             True,
-            2,
         ),
     ],
 )
@@ -463,16 +469,28 @@ def test_fix_string_type_fixable_data(
     dummy_element_hierarchy: list[str],
     expected_value: str,
     expected_result: bool,
-    expected_warning_call_count: int,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable string-type data for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = mock_input_string_data_for_fix_data()
+    dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
+    properties_violation_message = (
+        f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
+    )
+    variable_parent = reduce(lambda d, key: d[key], dummy_element_hierarchy[:-1], dummy_input_data)
+    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
+    if type(variable_parent) is list:
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    else:
+        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator._fix_data.__name__,
+    }
 
-    add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = DataValidator._fix_data(
+    dv = DataValidator()
+
+    result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -482,7 +500,19 @@ def test_fix_string_type_fixable_data(
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
     assert variable_to_check == expected_value
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
+    assert dv.event_logs == [{"warning": "Validation: invalid data found",
+                              "warning message":
+                                  f"Variable: '{element_path}' has value:"
+                                  f" {original_invalid_value}. {properties_violation_message}",
+                              "info map": info_map},
+                             {"warning": "Validation: data fixed",
+                              "warning message":
+                                  f"Invalid data fixed: '{element_path}' value changed from"
+                                  f" {original_invalid_value} to "
+                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                                  f"'{dummy_properties_key}'.",
+                              "info map": info_map}
+                             ]
 
 
 def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
@@ -492,9 +522,22 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
     dummy_variable_properties = {"type": "number", "maximum": 4, "default": 3}
     dummy_element_hierarchy = ["element1", 4]
     dummy_properties_key = "dummy_variable_properties"
+    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
+    properties_violation_message = (
+        f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
+    )
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator._fix_data.__name__,
+    }
+    variable_parent = reduce(lambda d, key: d[key], dummy_element_hierarchy[:-1], dummy_input_data)
+    if type(variable_parent) is list:
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    else:
+        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
 
-    add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = DataValidator._fix_data(
+    dv = DataValidator()
+    result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -504,12 +547,24 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
     fixed_variable = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
 
     assert fixed_variable == 3
-    assert result is True
-    assert add_warning.call_count == 2
+    assert result
+    assert dv.event_logs == [{"warning": "Validation: invalid data found",
+                              "warning message":
+                                  f"Variable: '{element_path}' has value:"
+                                  f" {original_invalid_value}. {properties_violation_message}",
+                              "info map": info_map},
+                             {"warning": "Validation: data fixed",
+                              "warning message":
+                                  f"Invalid data fixed: '{element_path}' value changed from"
+                                  f" {original_invalid_value} to "
+                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                                  f"'{dummy_properties_key}'.",
+                              "info map": info_map}
+                             ]
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_result, expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_result",
     [
         (
             {
@@ -520,7 +575,6 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
             },
             ["element6"],
             False,
-            0,
         ),
         (
             {
@@ -531,7 +585,6 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
             },
             ["element7"],
             False,
-            0,
         ),
         (
             {
@@ -542,7 +595,6 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
             },
             ["element8"],
             False,
-            0,
         ),
         (
             {
@@ -553,7 +605,6 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
             },
             ["element9", "element10"],
             False,
-            0,
         ),
     ],
 )
@@ -561,16 +612,28 @@ def test_fix_string_type_critical_data(
     dummy_variable_properties: dict[str, Any],
     dummy_element_hierarchy: list[str],
     expected_result: bool,
-    expected_warning_call_count: int,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for critical string-type data for _fix_data function in file input_manager.py"""
-
-    dummy_input_data = mock_input_string_data_for_fix_data()
+    dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
+    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
+    variable_parent = reduce(lambda d, key: d[key], dummy_element_hierarchy[:-1], dummy_input_data)
+    properties_violation_message = (
+        f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
+    )
+    error_message = (
+        f"Variable: '{element_path}' has invalid value: {variable_parent[dummy_element_hierarchy[-1]]}"
+        f", and cannot be changed to a default value. {properties_violation_message}"
+    )
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator._fix_data.__name__,
+    }
 
-    add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
-    result = DataValidator._fix_data(
+    dv = DataValidator()
+
+    result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -578,7 +641,9 @@ def test_fix_string_type_critical_data(
     )
 
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
+    assert dv.event_logs == [{"error": "Validation: invalid data not able to be fixed",
+                              "error message": error_message,
+                              "info map": info_map}]
 
 
 def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:

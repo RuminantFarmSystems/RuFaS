@@ -1164,7 +1164,6 @@ class DataValidator:
         bool
             True if the data is fixed, False otherwise.
         """
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._fix_data.__name__,
@@ -1181,7 +1180,9 @@ class DataValidator:
                 f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
-            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
+            self.event_logs.append({"error": "Validation: invalid data not able to be fixed",
+                                    "error message": error_message,
+                                    "info map": info_map})
             return False
 
         if type(variable_parent) is list:
