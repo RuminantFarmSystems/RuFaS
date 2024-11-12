@@ -14,8 +14,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseMan
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.data_structures.nutrient_request import NutrientRequest, NutrientRequestResults
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator, ManureSeparatorFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
@@ -338,6 +337,7 @@ class ManureManager:
         ----------
         request : NutrientRequest
             The specific nutrient request, including quantities of nitrogen and phosphorus.
+
         Returns
         -------
         NutrientRequestResults | None
