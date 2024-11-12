@@ -1010,8 +1010,8 @@ class DataValidator:
 
         return True
 
-    @staticmethod
     def _string_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -1022,7 +1022,6 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates a data string element."""
-        om = OutputManager()
         data_value = DataValidator._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
@@ -1045,7 +1044,9 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
-            om.add_warning(warning_name, warning_message, info_map)
+            self.event_logs.append({"warning": warning_name,
+                                    "warning message": warning_message,
+                                    "info_map": info_map})
             return False
 
         pattern_check = variable_properties.get("pattern")
@@ -1057,7 +1058,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', does not match pattern: "
                     f"{pattern_check}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append({"warning": warning_name,
+                                        "warning message": warning_message,
+                                        "info_map": info_map})
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -1070,7 +1073,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append({"warning": warning_name,
+                                        "warning message": warning_message,
+                                        "info_map": info_map})
                 return False
         if maximum_length is not None:
             is_valid_string = len(data_value) <= variable_properties["maximum_length"]
@@ -1080,7 +1085,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', length is greater than "
                     f"maximum length: {maximum_length}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append({"warning": warning_name,
+                                        "warning message": warning_message,
+                                        "info_map": info_map})
                 return False
 
         return True

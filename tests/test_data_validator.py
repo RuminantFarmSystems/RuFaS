@@ -157,29 +157,27 @@ def test_number_type_validator(
 
 
 @pytest.mark.parametrize(
-    "dummy_value, dummy_variable_properties, expected_result, expected_warning_call_count",
+    "dummy_value, dummy_variable_properties, expected_result",
     [
-        ("cow", {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}, True, 0),
-        ("cow", {"pattern": r".{3}", "minimum_length": 1}, True, 0),
+        ("cow", {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}, True),
+        ("cow", {"pattern": r".{3}", "minimum_length": 1}, True),
         (
             "COW",
             {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5},
             False,
-            1,
         ),
-        ("cow", {"minimum_length": 1, "maximum_length": 5}, True, 0),
-        ("cow", {"minimum_length": 5}, False, 1),
-        ("cow", {"maximum_length": 1}, False, 1),
-        (None, {"pattern": r"cow", "minimum_length": 1}, False, 1),
-        (42.0, {"pattern": r"cow", "maximum_length": 3}, False, 1),
-        (None, {"nullable": True}, True, 0),
+        ("cow", {"minimum_length": 1, "maximum_length": 5}, True),
+        ("cow", {"minimum_length": 5}, False),
+        ("cow", {"maximum_length": 1}, False),
+        (None, {"pattern": r"cow", "minimum_length": 1}, False),
+        (42.0, {"pattern": r"cow", "maximum_length": 3}, False),
+        (None, {"nullable": True}, True),
     ],
 )
 def test_string_type_validator(
     dummy_value: int,
     dummy_variable_properties: Dict[str, int],
     expected_result: bool,
-    expected_warning_call_count: int,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for _string_type_validator function in file input_manager.py"""
@@ -190,9 +188,10 @@ def test_string_type_validator(
     unused_bool_input = False
     patch_extract = mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=dummy_value)
     patch_path_to_str = mocker.patch.object(DataValidator, "convert_variable_path_to_str", return_value="dummy_name")
-    add_warning = mocker.patch.object(OutputManager, "add_warning")
 
-    result = DataValidator._string_type_validator(
+    dv = DataValidator()
+
+    result = dv._string_type_validator(
         var_path,
         dummy_variable_properties,
         dummy_input_data,
@@ -207,7 +206,8 @@ def test_string_type_validator(
     if dummy_variable_properties.get("nullable", False) is False:
         patch_path_to_str.assert_called_once_with(var_path)
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
+    if not expected_result:
+        assert len(dv.event_logs) == 1
 
 
 @pytest.mark.parametrize(
