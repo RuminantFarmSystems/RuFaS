@@ -937,7 +937,6 @@ class FieldDataReporter:
             "function": self.send_field_annual_variables.__name__,
             "suffix": "field='" + field.field_data.name + "'",
         }
-
         self.om.add_variable(
             "annual_irrigation_water_use_total",
             field.field_data.annual_irrigation_water_use_total,
