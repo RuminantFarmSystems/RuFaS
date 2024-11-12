@@ -7,7 +7,6 @@ from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
-from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.crop.crop import Crop
@@ -2693,13 +2692,12 @@ def test_check_tillage_schedule(
 
 
 # --- Test FieldData methods ---
-@pytest.mark.parametrize("liters,area", [(100, 2.3), (356, 4.556), (60, 1.8)])
-def test_liters_to_millimeters(liters: float, area: float) -> None:
+@pytest.mark.parametrize("liters,area,expected", [(100, 2.3, 0.004347826086956522),
+                                                  (356, 4.556, 0.00781387181738367),
+                                                  (60, 1.8, 0.0033333333333333335)])
+def test_liters_to_millimeters(liters: float, area: float, expected: float) -> None:
     """Tests that the conversion from liters for evenly distributed millimeters is performed correctly."""
     actual = FieldData.convert_liters_to_millimeters(liters, area)
-    expected = (liters * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS) / (
-        area * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
-    )
     assert actual == expected
 
 
