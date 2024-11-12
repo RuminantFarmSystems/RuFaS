@@ -179,6 +179,9 @@ class Modifiability(Enum):
 class DataValidator:
     """This class is will be utilized to validate all types of data across RuFas codebase."""
 
+    def __init__(self):
+        self.event_logs: list[dict[str, str | dict[str, str]]] = []
+
     @staticmethod
     def validate_properties(metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
         """Iteratively traverses the metadata properties to check the max depth and routes
@@ -845,8 +848,8 @@ class DataValidator:
                 return False
         return is_whole_array_acceptable
 
-    @staticmethod
     def _object_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -887,7 +890,6 @@ class DataValidator:
         in the metadata properties.
 
         """
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._object_type_validator.__name__,
@@ -901,12 +903,11 @@ class DataValidator:
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
         if not isinstance(object_value, dict):
-            om.add_warning(
-                "Validation: object is not a dictionary",
-                f"Variable: '{variable_path_str}' is not an object but has type: {type(object_value)}. "
-                f"{properties_violation_message}",
-                info_map,
-            )
+            self.event_logs.append({"warning": "Validation: object is not a dictionary",
+                                    "warning message": f"Variable: '{variable_path_str}' is"
+                                                       f" not an object but has type: {type(object_value)}. "
+                                                       f"{properties_violation_message}",
+                                    "info map": info_map})
             return False
 
         is_whole_object_acceptable = True
@@ -929,18 +930,18 @@ class DataValidator:
 
         extraneous_keys = [key for key in object_value.keys() if key not in variable_properties.keys()]
         for key in extraneous_keys:
-            om.add_warning(
-                "Validation: object contains extraneous data",
-                f"Variable: '{variable_path_str}' contains data at key '{key}' that is not specified in the metadata "
-                f"properties. {properties_violation_message}",
-                info_map,
-            )
+            self.event_logs.append({"warning": "Validation: object contains extraneous data",
+                                    "warning message": f"Variable: '{variable_path_str}' contains "
+                                                       f"data at key '{key}' that is not specified in "
+                                                       f"the metadata"
+                                                       f" properties. {properties_violation_message}",
+                                    "info map": info_map})
             del object_value[key]
 
         return is_whole_object_acceptable
 
-    @staticmethod
     def _number_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -951,7 +952,6 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates an data number element."""
-        om = OutputManager()
         data_value = DataValidator._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
@@ -977,7 +977,9 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
-            om.add_warning(warning_string, warning_message, info_map)
+            self.event_logs.append(
+                {"warning": warning_string, "warning message": warning_message, "info map": info_map}
+            )
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= data_value
@@ -987,23 +989,27 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: {data_value}, less than minimum value: "
                     f"{minimum_value: .2f}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info map": info_map}
+                )
                 return False
         if maximum_value is not None:
             is_in_range = data_value <= maximum_value
             if not is_in_range:
                 warning_name = "Validation: value greater than maximum"
-                warning_string = (
+                warning_message = (
                     f"Variable: '{variable_path_str}' has value: {data_value}, greater than maximum value: "
                     f"{maximum_value: .2f}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_string, info_map)
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info map": info_map}
+                )
                 return False
 
         return True
 
-    @staticmethod
     def _string_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -1014,7 +1020,6 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates a data string element."""
-        om = OutputManager()
         data_value = DataValidator._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
@@ -1037,7 +1042,7 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
-            om.add_warning(warning_name, warning_message, info_map)
+            self.event_logs.append({"warning": warning_name, "warning message": warning_message, "info_map": info_map})
             return False
 
         pattern_check = variable_properties.get("pattern")
@@ -1049,7 +1054,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', does not match pattern: "
                     f"{pattern_check}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                )
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -1062,7 +1069,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                )
                 return False
         if maximum_length is not None:
             is_valid_string = len(data_value) <= variable_properties["maximum_length"]
@@ -1072,13 +1081,15 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', length is greater than "
                     f"maximum length: {maximum_length}. {properties_violation_message}"
                 )
-                om.add_warning(warning_name, warning_message, info_map)
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                )
                 return False
 
         return True
 
-    @staticmethod
     def _bool_type_validator(
+        self,
         variable_path: List[str | int],
         variable_properties: Dict[str, Any],
         data: Dict[str, Any],
@@ -1089,7 +1100,6 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates a data bool element."""
-        om = OutputManager()
         data_value = DataValidator._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
@@ -1113,13 +1123,14 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
-            om.add_warning(warning_name, warning_message, info_map)
+            self.event_logs.append({"warning": warning_name, "warning message": warning_message, "info_map": info_map})
+
             return False
 
         return True
 
-    @staticmethod
     def _fix_data(
+        self,
         variable_properties: Dict[str, Any],
         element_hierarchy: List[Union[str, int]],
         data: Dict[str, Any],
@@ -1147,7 +1158,6 @@ class DataValidator:
         bool
             True if the data is fixed, False otherwise.
         """
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._fix_data.__name__,
@@ -1164,7 +1174,13 @@ class DataValidator:
                 f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
-            om.add_error("Validation: invalid data not able to be fixed", error_message, info_map)
+            self.event_logs.append(
+                {
+                    "error": "Validation: invalid data not able to be fixed",
+                    "error message": error_message,
+                    "info map": info_map,
+                }
+            )
             return False
 
         if type(variable_parent) is list:
@@ -1175,7 +1191,9 @@ class DataValidator:
         warning_message = (
             f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
         )
-        om.add_warning("Validation: invalid data found", warning_message, info_map)
+        self.event_logs.append(
+            {"warning": "Validation: invalid data found", "warning message": warning_message, "info map": info_map}
+        )
 
         variable_parent[element_hierarchy[-1]] = variable_properties["default"]
 
@@ -1184,7 +1202,9 @@ class DataValidator:
             f"{variable_properties['default']}. Fix enabled by default value specified in "
             f"'{properties_blob_key}'."
         )
-        om.add_warning("Validation: data fixed", warning_message, info_map)
+        self.event_logs.append(
+            {"warning": "Validation: data fixed", "warning message": warning_message, "info map": info_map}
+        )
         return True
 
     @staticmethod
