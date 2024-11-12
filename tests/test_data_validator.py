@@ -211,7 +211,7 @@ def test_string_type_validator(
 
 
 @pytest.mark.parametrize(
-    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result, expected_warning_call_count",
+    "dummy_variable_properties, dummy_element_hierarchy, expected_value, expected_result",
     [
         (
             {
@@ -223,7 +223,6 @@ def test_string_type_validator(
             ["element1"],
             [1, 2, 3, 4, 5],
             True,
-            2,
         ),
         (
             {
@@ -235,7 +234,6 @@ def test_string_type_validator(
             ["element2"],
             [],
             True,
-            2,
         ),
         (
             {
@@ -247,7 +245,6 @@ def test_string_type_validator(
             ["element3"],
             [1, 2, 3, 4, 5],
             True,
-            2,
         ),
         (
             {
@@ -259,7 +256,6 @@ def test_string_type_validator(
             ["element4", "element5"],
             [1, 2, 3],
             True,
-            2,
         ),
     ],
 )
@@ -268,16 +264,29 @@ def test_fix_array_type_fixable_data(
     dummy_element_hierarchy: List[str],
     expected_value: List[Any],
     expected_result: bool,
-    expected_warning_call_count: int,
     mocker: MockerFixture,
 ) -> None:
     """Unit test for fixable array-type data for _fix_data function in file input_manager.py"""
 
     dummy_input_data = mock_input_array_data_for_fix_data()
     dummy_properties_key = "dummy_variable_properties"
-    add_warning = mocker.patch("RUFAS.output_manager.OutputManager.add_warning")
+    properties_violation_message = (
+        f"Violates properties defined in metadata properties section '{dummy_properties_key}'."
+    )
+    variable_parent = reduce(lambda d, key: d[key], dummy_element_hierarchy[:-1], dummy_input_data)
+    element_path = ".".join([str(element) for element in dummy_element_hierarchy])
+    if type(variable_parent) is list:
+        original_invalid_value = variable_parent[dummy_element_hierarchy[-1]]
+    else:
+        original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
+    info_map = {
+        "class": DataValidator.__name__,
+        "function": DataValidator._fix_data.__name__,
+    }
 
-    result = DataValidator._fix_data(
+    dv = DataValidator()
+
+    result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
         dummy_input_data,
@@ -287,7 +296,18 @@ def test_fix_array_type_fixable_data(
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
     assert variable_to_check == expected_value
     assert result == expected_result
-    assert add_warning.call_count == expected_warning_call_count
+    assert dv.event_logs == [{"warning": "Validation: invalid data found",
+                              "warning message":
+                                  f"Variable: '{element_path}' has value:"
+                                  f" {original_invalid_value}. {properties_violation_message}",
+                              "info map": info_map},
+                             {"warning": "Validation: data fixed",
+                              "warning message":
+                                  f"Invalid data fixed: '{element_path}' value changed from {original_invalid_value} to "
+                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                                  f"'{dummy_properties_key}'.",
+                              "info map": info_map}
+                             ]
 
 
 @pytest.mark.parametrize(

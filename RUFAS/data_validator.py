@@ -1135,8 +1135,8 @@ class DataValidator:
 
         return True
 
-    @staticmethod
     def _fix_data(
+        self,
         variable_properties: Dict[str, Any],
         element_hierarchy: List[Union[str, int]],
         data: Dict[str, Any],
@@ -1192,7 +1192,9 @@ class DataValidator:
         warning_message = (
             f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
         )
-        om.add_warning("Validation: invalid data found", warning_message, info_map)
+        self.event_logs.append({"warning": "Validation: invalid data found",
+                                "warning message": warning_message,
+                                "info map": info_map})
 
         variable_parent[element_hierarchy[-1]] = variable_properties["default"]
 
@@ -1201,7 +1203,9 @@ class DataValidator:
             f"{variable_properties['default']}. Fix enabled by default value specified in "
             f"'{properties_blob_key}'."
         )
-        om.add_warning("Validation: data fixed", warning_message, info_map)
+        self.event_logs.append({"warning": "Validation: data fixed",
+                                "warning message": warning_message,
+                                "info map": info_map})
         return True
 
     @staticmethod
