@@ -300,19 +300,22 @@ def test_fix_array_type_fixable_data(
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
     assert variable_to_check == expected_value
     assert result == expected_result
-    assert dv.event_logs == [{"warning": "Validation: invalid data found",
-                              "warning message":
-                                  f"Variable: '{element_path}' has value:"
-                                  f" {original_invalid_value}. {properties_violation_message}",
-                              "info map": info_map},
-                             {"warning": "Validation: data fixed",
-                              "warning message":
-                                  f"Invalid data fixed: '{element_path}' value changed from"
-                                  f" {original_invalid_value} to "
-                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-                                  f"'{dummy_properties_key}'.",
-                              "info map": info_map}
-                             ]
+    assert dv.event_logs == [
+        {
+            "warning": "Validation: invalid data found",
+            "warning message": f"Variable: '{element_path}' has value:"
+            f" {original_invalid_value}. {properties_violation_message}",
+            "info map": info_map,
+        },
+        {
+            "warning": "Validation: data fixed",
+            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            f" {original_invalid_value} to "
+            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+            f"'{dummy_properties_key}'.",
+            "info map": info_map,
+        },
+    ]
 
 
 @pytest.mark.parametrize(
@@ -389,9 +392,9 @@ def test_fix_array_type_critical_data(
     )
 
     assert result == expected_result
-    assert dv.event_logs == [{"error": "Validation: invalid data not able to be fixed",
-                              "error message": error_message,
-                              "info map": info_map}]
+    assert dv.event_logs == [
+        {"error": "Validation: invalid data not able to be fixed", "error message": error_message, "info map": info_map}
+    ]
 
 
 def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
@@ -499,19 +502,22 @@ def test_fix_string_type_fixable_data(
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
     assert variable_to_check == expected_value
     assert result == expected_result
-    assert dv.event_logs == [{"warning": "Validation: invalid data found",
-                              "warning message":
-                                  f"Variable: '{element_path}' has value:"
-                                  f" {original_invalid_value}. {properties_violation_message}",
-                              "info map": info_map},
-                             {"warning": "Validation: data fixed",
-                              "warning message":
-                                  f"Invalid data fixed: '{element_path}' value changed from"
-                                  f" {original_invalid_value} to "
-                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-                                  f"'{dummy_properties_key}'.",
-                              "info map": info_map}
-                             ]
+    assert dv.event_logs == [
+        {
+            "warning": "Validation: invalid data found",
+            "warning message": f"Variable: '{element_path}' has value:"
+            f" {original_invalid_value}. {properties_violation_message}",
+            "info map": info_map,
+        },
+        {
+            "warning": "Validation: data fixed",
+            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            f" {original_invalid_value} to "
+            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+            f"'{dummy_properties_key}'.",
+            "info map": info_map,
+        },
+    ]
 
 
 def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
@@ -547,19 +553,22 @@ def test_fix_string_type_csv_data(mocker: MockerFixture) -> None:
 
     assert fixed_variable == 3
     assert result
-    assert dv.event_logs == [{"warning": "Validation: invalid data found",
-                              "warning message":
-                                  f"Variable: '{element_path}' has value:"
-                                  f" {original_invalid_value}. {properties_violation_message}",
-                              "info map": info_map},
-                             {"warning": "Validation: data fixed",
-                              "warning message":
-                                  f"Invalid data fixed: '{element_path}' value changed from"
-                                  f" {original_invalid_value} to "
-                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-                                  f"'{dummy_properties_key}'.",
-                              "info map": info_map}
-                             ]
+    assert dv.event_logs == [
+        {
+            "warning": "Validation: invalid data found",
+            "warning message": f"Variable: '{element_path}' has value:"
+            f" {original_invalid_value}. {properties_violation_message}",
+            "info map": info_map,
+        },
+        {
+            "warning": "Validation: data fixed",
+            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            f" {original_invalid_value} to "
+            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+            f"'{dummy_properties_key}'.",
+            "info map": info_map,
+        },
+    ]
 
 
 @pytest.mark.parametrize(
@@ -640,9 +649,9 @@ def test_fix_string_type_critical_data(
     )
 
     assert result == expected_result
-    assert dv.event_logs == [{"error": "Validation: invalid data not able to be fixed",
-                              "error message": error_message,
-                              "info map": info_map}]
+    assert dv.event_logs == [
+        {"error": "Validation: invalid data not able to be fixed", "error message": error_message, "info map": info_map}
+    ]
 
 
 def mock_input_number_data_for_fix_data() -> Dict[str, Dict[str, int] | int]:
@@ -752,19 +761,22 @@ def test_fix_number_type_fixable_data(
     variable_to_check = reduce(lambda d, key: d[key], dummy_element_hierarchy, dummy_input_data)
     assert variable_to_check == expected_value
     assert result == expected_result
-    assert dv.event_logs == [{"warning": "Validation: invalid data found",
-                              "warning message":
-                                  f"Variable: '{element_path}' has value:"
-                                  f" {original_invalid_value}. {properties_violation_message}",
-                              "info map": info_map},
-                             {"warning": "Validation: data fixed",
-                              "warning message":
-                                  f"Invalid data fixed: '{element_path}' value changed from"
-                                  f" {original_invalid_value} to "
-                                  f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-                                  f"'{dummy_properties_key}'.",
-                              "info map": info_map}
-                             ]
+    assert dv.event_logs == [
+        {
+            "warning": "Validation: invalid data found",
+            "warning message": f"Variable: '{element_path}' has value:"
+            f" {original_invalid_value}. {properties_violation_message}",
+            "info map": info_map,
+        },
+        {
+            "warning": "Validation: data fixed",
+            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            f" {original_invalid_value} to "
+            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+            f"'{dummy_properties_key}'.",
+            "info map": info_map,
+        },
+    ]
 
 
 @pytest.mark.parametrize(
@@ -846,9 +858,9 @@ def test_fix_number_type_critical_data(
     )
 
     assert result == expected_result
-    assert dv.event_logs == [{"error": "Validation: invalid data not able to be fixed",
-                              "error message": error_message,
-                              "info map": info_map}]
+    assert dv.event_logs == [
+        {"error": "Validation: invalid data not able to be fixed", "error message": error_message, "info map": info_map}
+    ]
 
 
 @pytest.mark.parametrize(

@@ -979,9 +979,9 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
-            self.event_logs.append({"warning": warning_string,
-                                    "warning message": warning_message,
-                                    "info map": info_map})
+            self.event_logs.append(
+                {"warning": warning_string, "warning message": warning_message, "info map": info_map}
+            )
             return False
         if minimum_value is not None:
             is_in_range = minimum_value <= data_value
@@ -991,9 +991,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: {data_value}, less than minimum value: "
                     f"{minimum_value: .2f}. {properties_violation_message}"
                 )
-                self.event_logs.append({"warning": warning_name,
-                                        "warning message": warning_message,
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info map": info_map}
+                )
                 return False
         if maximum_value is not None:
             is_in_range = data_value <= maximum_value
@@ -1003,9 +1003,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: {data_value}, greater than maximum value: "
                     f"{maximum_value: .2f}. {properties_violation_message}"
                 )
-                self.event_logs.append({"warning": warning_name,
-                                        "warning message": warning_message,
-                                        "info map": info_map})
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info map": info_map}
+                )
                 return False
 
         return True
@@ -1044,9 +1044,7 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
-            self.event_logs.append({"warning": warning_name,
-                                    "warning message": warning_message,
-                                    "info_map": info_map})
+            self.event_logs.append({"warning": warning_name, "warning message": warning_message, "info_map": info_map})
             return False
 
         pattern_check = variable_properties.get("pattern")
@@ -1058,9 +1056,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', does not match pattern: "
                     f"{pattern_check}. {properties_violation_message}"
                 )
-                self.event_logs.append({"warning": warning_name,
-                                        "warning message": warning_message,
-                                        "info_map": info_map})
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                )
                 return False
 
         minimum_length = variable_properties.get("minimum_length")
@@ -1073,9 +1071,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', length is less than "
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
-                self.event_logs.append({"warning": warning_name,
-                                        "warning message": warning_message,
-                                        "info_map": info_map})
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                )
                 return False
         if maximum_length is not None:
             is_valid_string = len(data_value) <= variable_properties["maximum_length"]
@@ -1085,9 +1083,9 @@ class DataValidator:
                     f"Variable: '{variable_path_str}' has value: '{data_value}', length is greater than "
                     f"maximum length: {maximum_length}. {properties_violation_message}"
                 )
-                self.event_logs.append({"warning": warning_name,
-                                        "warning message": warning_message,
-                                        "info_map": info_map})
+                self.event_logs.append(
+                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                )
                 return False
 
         return True
@@ -1127,9 +1125,7 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
-            self.event_logs.append({"warning": warning_name,
-                                    "warning message": warning_message,
-                                    "info_map": info_map})
+            self.event_logs.append({"warning": warning_name, "warning message": warning_message, "info_map": info_map})
 
             return False
 
@@ -1180,9 +1176,13 @@ class DataValidator:
                 f"Variable: '{element_path}' has invalid value: {variable_parent[element_hierarchy[-1]]}"
                 f", and cannot be changed to a default value. {properties_violation_message}"
             )
-            self.event_logs.append({"error": "Validation: invalid data not able to be fixed",
-                                    "error message": error_message,
-                                    "info map": info_map})
+            self.event_logs.append(
+                {
+                    "error": "Validation: invalid data not able to be fixed",
+                    "error message": error_message,
+                    "info map": info_map,
+                }
+            )
             return False
 
         if type(variable_parent) is list:
@@ -1193,9 +1193,9 @@ class DataValidator:
         warning_message = (
             f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
         )
-        self.event_logs.append({"warning": "Validation: invalid data found",
-                                "warning message": warning_message,
-                                "info map": info_map})
+        self.event_logs.append(
+            {"warning": "Validation: invalid data found", "warning message": warning_message, "info map": info_map}
+        )
 
         variable_parent[element_hierarchy[-1]] = variable_properties["default"]
 
@@ -1204,9 +1204,9 @@ class DataValidator:
             f"{variable_properties['default']}. Fix enabled by default value specified in "
             f"'{properties_blob_key}'."
         )
-        self.event_logs.append({"warning": "Validation: data fixed",
-                                "warning message": warning_message,
-                                "info map": info_map})
+        self.event_logs.append(
+            {"warning": "Validation: data fixed", "warning message": warning_message, "info map": info_map}
+        )
         return True
 
     @staticmethod
