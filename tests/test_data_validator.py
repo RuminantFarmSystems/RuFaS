@@ -932,12 +932,13 @@ def test_extract_value_by_key_list(
     """
     Unit test for the _extract_value_by_key_list() method of the InputManager class.
     """
+    dv = DataValidator()
     # Act and assert
     if expected_exception:
         with pytest.raises(expected_exception):
-            DataValidator.extract_value_by_key_list(input_data, variable_path)
+            dv.extract_value_by_key_list(input_data, variable_path)
     else:
-        result = DataValidator.extract_value_by_key_list(input_data, variable_path)
+        result = dv.extract_value_by_key_list(input_data, variable_path)
         assert result == expected
 
 
@@ -957,9 +958,10 @@ def test_convert_variable_path_to_str(variable_path: List[Union[str, int]], expe
     """
     Unit test for the _convert_variable_path_to_str() method of the InputManager class.
     """
+    dv = DataValidator()
 
     # Act
-    result = DataValidator.convert_variable_path_to_str(variable_path)
+    result = dv.convert_variable_path_to_str(variable_path)
 
     # Assert
     assert result == expected

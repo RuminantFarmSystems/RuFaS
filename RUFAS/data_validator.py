@@ -191,7 +191,6 @@ class DataValidator:
             boolean to indicate the validation status, error message in str if there's error that should be raised by
             the caller.
         """
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator.validate_properties.__name__,
@@ -202,11 +201,11 @@ class DataValidator:
         deepest_path: list[str] = []
 
         type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], tuple[bool, str]]] = {
-            "number": DataValidator._metadata_number_validator,
-            "array": DataValidator._metadata_array_validator,
-            "bool": DataValidator._metadata_bool_validator,
-            "string": DataValidator._metadata_string_validator,
-            "object": DataValidator._metadata_object_validator,
+            "number": self._metadata_number_validator,
+            "array": self._metadata_array_validator,
+            "bool": self._metadata_bool_validator,
+            "string": self._metadata_string_validator,
+            "object": self._metadata_object_validator,
         }
 
         while stack:
@@ -307,7 +306,7 @@ class DataValidator:
         }
         required_number_property_keys = {"type"}
         optional_number_property_keys = {"description", "minimum", "maximum", "default", "nullable"}
-        valid, error_message = DataValidator._validate_metadata_properties_keys(
+        valid, error_message = self._validate_metadata_properties_keys(
             required_number_property_keys, optional_number_property_keys, value, key_path
         )
         if not valid:
@@ -393,7 +392,7 @@ class DataValidator:
         }
         required_str_property_keys = {"type"}
         optional_str_property_keys = {"description", "pattern", "default", "nullable"}
-        valid, message = DataValidator._validate_metadata_properties_keys(
+        valid, message = self._validate_metadata_properties_keys(
             required_str_property_keys, optional_str_property_keys, value, key_path
         )
         if not valid:
@@ -460,7 +459,7 @@ class DataValidator:
         }
         required_bool_property_keys = {"type"}
         optional_bool_property_keys = {"description", "default", "nullable"}
-        valid, message = DataValidator._validate_metadata_properties_keys(
+        valid, message = self._validate_metadata_properties_keys(
             required_bool_property_keys, optional_bool_property_keys, value, key_path
         )
         if not valid:
@@ -493,7 +492,7 @@ class DataValidator:
         }
         required_array_property_keys = {"type", "properties"}
         optional_array_property_keys = {"description", "minimum_length", "maximum_length", "nullable"}
-        valid, message = DataValidator._validate_metadata_properties_keys(
+        valid, message = self._validate_metadata_properties_keys(
             required_array_property_keys, optional_array_property_keys, value, key_path
         )
         if not valid:
@@ -536,7 +535,7 @@ class DataValidator:
         """Validates object type properties in metadata."""
         required_object_property_keys = {"type"}
         optional_object_property_keys = {"description"}
-        valid, message = DataValidator._validate_metadata_properties_keys(
+        valid, message = self._validate_metadata_properties_keys(
             required_object_property_keys, optional_object_property_keys, value, key_path
         )
         if not valid:
@@ -719,7 +718,7 @@ class DataValidator:
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
-        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
         if not isinstance(data, list):
             self.event_logs.append({"warning": "Validation: array container is not a list",
                                     "warning message": f"Variable: '{variable_path_str}' is not"
@@ -790,7 +789,7 @@ class DataValidator:
             True if the data element is valid or fixable, False otherwise.
         """
 
-        array_value = DataValidator._extract_data_by_key_list(
+        array_value = self._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
 
@@ -866,10 +865,10 @@ class DataValidator:
             "function": DataValidator._object_type_validator.__name__,
         }
 
-        object_value = DataValidator._extract_data_by_key_list(
+        object_value = self._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
-        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
         properties_violation_message = (
             f"Violates properties defined in metadata properties section" f" '{properties_blob_key}'."
         )
@@ -931,14 +930,14 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates an data number element."""
-        data_value = DataValidator._extract_data_by_key_list(
+        data_value = self._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
             return True
 
-        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
 
         info_map = {
             "class": DataValidator.__name__,
@@ -999,14 +998,14 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates a data string element."""
-        data_value = DataValidator._extract_data_by_key_list(
+        data_value = self._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
             return True
 
-        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._string_type_validator.__name__,
@@ -1079,14 +1078,14 @@ class DataValidator:
         fixable_data_types: set[str],
     ) -> bool:
         """Validates a data bool element."""
-        data_value = DataValidator._extract_data_by_key_list(
+        data_value = self._extract_data_by_key_list(
             data, variable_path, variable_properties, called_during_initialization
         )
 
         if variable_properties.get("nullable", False) and data_value is None:
             return True
 
-        variable_path_str = DataValidator.convert_variable_path_to_str(variable_path)
+        variable_path_str = self.convert_variable_path_to_str(variable_path)
 
         info_map = {
             "class": DataValidator.__name__,
@@ -1226,19 +1225,18 @@ class DataValidator:
         """
         result = None
         try:
-            result = DataValidator.extract_value_by_key_list(data, variable_path)
+            result = self.extract_value_by_key_list(data, variable_path)
         except KeyError:
             var_name: str = [name for name in reversed(variable_path) if type(name) is str][0]
-            DataValidator._log_missing_data(
+            self._log_missing_data(
                 variable_properties=variable_properties,
                 var_name=var_name,
                 called_during_initialization=called_during_initialization,
             )
         return result
 
-    @staticmethod
     def _log_missing_data(
-        variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -1267,32 +1265,32 @@ class DataValidator:
         om = OutputManager()
         info_map = {"class": DataValidator.__name__, "function": DataValidator._log_missing_data.__name__}
         if not called_during_initialization:
-            error_msg = (f"Key {var_name} not found in data. A value is required to update variable during runtime.",)
-            om.add_error("Missing required data", error_msg, info_map)
+            error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
+            self.event_logs.append({"error": "Missing required data",
+                                    "error message": error_msg,
+                                    "info map": info_map})
             raise KeyError(error_msg)
 
-        if DataValidator._is_data_required_upon_initialization(
+        if self._is_data_required_upon_initialization(
             variable_name=var_name, variable_properties=variable_properties
         ):
-            om.add_error(
-                "Missing required data",
-                f"Key {var_name} not found in data. Data value is required for this "
-                "variable upon program initialization.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Missing required data",
+                                    "error message": f"Key {var_name} not found in data. Data value is required for"
+                                                     f" this "
+                                                     "variable upon program initialization.",
+                                    "info map": info_map})
             raise KeyError(
                 f"Key {var_name} not found in data. Data value is required for this "
                 "variable upon program initialization."
             )
-        om.add_warning(
-            "Validation: key not found in data -- data not required upon initialization",
-            f"Key {var_name} not found in data. Data value is not required for this "
-            "variable upon program initialization, setting the variable value to None.",
-            info_map,
-        )
+        self.event_logs.append({"warning": "Validation: key not found in data -- data not required upon initialization",
+                                "warning message": f"Key {var_name} not found in data. Data value is not required for "
+                                                   f"this"
+                                                   "variable upon program initialization, setting the variable value "
+                                                   "to None.",
+                                "info map": info_map})
 
-    @staticmethod
-    def _is_data_required_upon_initialization(variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+    def _is_data_required_upon_initialization(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
         """
         Determines whether a variable requires a data value upon initialization based on its modifiability status.
 
@@ -1315,13 +1313,12 @@ class DataValidator:
             True if the variable's modifiability status necessitates a data value upon initialization,
             False otherwise.
         """
-        variable_modifiability = DataValidator._get_variable_modifiability(
+        variable_modifiability = self._get_variable_modifiability(
             variable_name=variable_name, variable_properties=variable_properties
         )
         return variable_modifiability in Modifiability.get_required_during_initialization()
 
-    @staticmethod
-    def _get_variable_modifiability(variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
+    def _get_variable_modifiability(self, variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
         """
         Determines the modifiability status of a variable based on its properties and returns the corresponding enum
         value.
@@ -1351,7 +1348,6 @@ class DataValidator:
             If 'modifiability' in `variable_properties` does not match any enum member in Modifiability. The error
             message includes the invalid modifiability value and suggests valid values.
         """
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._get_variable_modifiability.__name__,
@@ -1363,16 +1359,15 @@ class DataValidator:
         try:
             return Modifiability.__getitem__("_".join(modifiability.strip().upper().split()))
         except KeyError:
-            om.add_warning(
-                "Unknown modifiability entry",
-                f"Unknown modifiability value of {modifiability} for variable {variable_name}. Modifiability should be "
-                f"one of {Modifiability.values()}. Using the default value: {default}",
-                info_map,
-            )
+            self.event_logs.append({"warning": "Unknown modifiability entry",
+                                    "warning message": f"Unknown modifiability value of {modifiability} for variable"
+                                                       f" {variable_name}. Modifiability should be "
+                                                       f"one of {Modifiability.values()}."
+                                                       f" Using the default value: {default}",
+                                    "info map": info_map})
             return Modifiability.__getitem__("_".join(default.strip().upper().split()))
 
-    @staticmethod
-    def convert_variable_path_to_str(variable_path: List[str | int]) -> str:
+    def convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
         """
         Converts a list of keys (int or str) into a string representation of the path to a variable.
 
