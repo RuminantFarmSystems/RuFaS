@@ -12,7 +12,7 @@ from RUFAS.data_structures.events import (
     PlantingEvent,
     TillageEvent,
 )
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize(

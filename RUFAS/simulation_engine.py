@@ -4,7 +4,8 @@ import time as timer
 from enum import Enum
 
 from RUFAS import routines
-from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequestResults
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
+from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
@@ -144,14 +145,13 @@ class SimulationEngine:
 
         self._advance_time()
 
-    def generate_daily_manure_applications(self) -> dict[str, list[ManureEventNutrientRequestResults]]:
+    def generate_daily_manure_applications(self) -> list[ManureEventNutrientRequestResults]:
         """Requests nutrients from the manure manager for each field in the simulation.
 
         Returns
         -------
-        dict[str, list[ManureEventNutrientRequestResults]]
-            A dictionary containing the ManureEvents and corresponding NutrientRequestResults for each field in
-            the simulation.
+        list[ManureEventNutrientRequestResults]
+            A list containing the ManureEvents and corresponding NutrientRequestResults to be applied to fields.
         """
         manure_applications: list[ManureEventNutrientRequestResults] = []
         for field in self.field_manager.fields:

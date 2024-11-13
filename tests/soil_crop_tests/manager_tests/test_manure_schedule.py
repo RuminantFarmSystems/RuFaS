@@ -4,7 +4,7 @@ import pytest
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize(

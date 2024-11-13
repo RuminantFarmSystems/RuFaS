@@ -2,7 +2,7 @@ import pytest
 from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
-from RUFAS.data_structures.crop_soil_to_manure_connection import ManureEventNutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import StorageType, HarvestedCropStorageType
 from RUFAS.output_manager import OutputManager

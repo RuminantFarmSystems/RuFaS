@@ -1,7 +1,7 @@
-from __future__ import annotations
+from typing import NamedTuple, Optional
 from dataclasses import dataclass, fields
-
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.events import ManureEvent
+from RUFAS.data_structures.manure_types import ManureType
 import math
 
 
@@ -84,10 +84,6 @@ class NutrientRequestResults:
         """
         Validate the dataclass fields.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         ValueError
@@ -120,3 +116,19 @@ class NutrientRequestResults:
             abs_tol=1e-6,
         ):
             raise ValueError("Sum of organic and inorganic phosphorus fractions must be 1.")
+
+
+class ManureEventNutrientRequest(NamedTuple):
+    """Used to couple a manure event with a nutrient request."""
+
+    field_name: str
+    event: ManureEvent
+    nutrient_request: Optional[NutrientRequest]
+
+
+class ManureEventNutrientRequestResults(NamedTuple):
+    """Used to couple a manure event with the results of a nutrient request."""
+
+    field_name: str
+    event: ManureEvent
+    nutrient_request_results: Optional[NutrientRequestResults]

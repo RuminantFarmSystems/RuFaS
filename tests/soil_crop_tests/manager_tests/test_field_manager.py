@@ -6,7 +6,7 @@ import pytest
 from pytest_mock.plugin import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.crop_soil_to_manure_connection import (
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
 )
@@ -23,7 +23,7 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
