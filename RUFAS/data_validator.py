@@ -176,7 +176,7 @@ class Modifiability(Enum):
 class DataValidator:
     """This class is will be utilized to validate all types of data across RuFas codebase."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.event_logs: list[dict[str, str | dict[str, str]]] = []
 
     def validate_properties(self, metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
