@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Union, Optional, Type
 
 import pytest
-from mock.mock import call
+from unittest.mock import call
 from pytest_mock import MockerFixture
 
 from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
@@ -1399,7 +1399,7 @@ def test_validate_input_by_type(
 
 def test_validate_input_by_type_key_error() -> None:
     variable_properties = {"a": "b"}
-    variable_path = ["valid_key"]
+    variable_path: list[Union[str, int]] = ["valid_key"]
     properties_blob_key = "dummy_properties_blob_key"
     input_data = {"valid_key": {"another_valid_key": "value"}}
     eager_termination = False
