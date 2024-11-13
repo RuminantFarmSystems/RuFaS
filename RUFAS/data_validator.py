@@ -768,7 +768,7 @@ class DataValidator:
 
         if data_type not in type_to_validator_map:
             raise ValueError(
-                f"The metadata type of the element '{DataValidator.convert_variable_path_to_str(variable_path)}' "
+                f"The metadata type of the element '{self.convert_variable_path_to_str(variable_path)}' "
                 f"is not valid. Supported types are: {type_to_validator_map.keys()}."
             )
 
