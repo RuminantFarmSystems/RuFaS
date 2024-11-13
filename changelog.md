@@ -48,6 +48,7 @@ v0.9.2
 - [2045](https://github.com/RuminantFarmSystems/MASM/pull/2045) - [minor change] [Documentation] Regenerates the Sphinx HTML documentation.
 - [2050](https://github.com/RuminantFarmSystems/MASM/pull/2050) - [minor change] [Crop & Soil][Feed Storage] Disentangle the Crop & Soil and Feed Storage modules.
 - [2057](https://github.com/RuminantFarmSystems/MASM/pull/2057) - [minor change] [Crop & Soil][Manure] Disentangle the Crop & Soil and Manure modules.
+- [1866](https://github.com/RuminantFarmSystems/MASM/pull/1866) - [minor change] [Metadata] Adds minimums for some Animal module inputs in metadata.
 
 
 ### v0.9.2
