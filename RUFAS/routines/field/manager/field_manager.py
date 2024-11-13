@@ -1,5 +1,9 @@
 from typing import Dict, List, Tuple
 
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
+)
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -13,8 +17,7 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.manure.manure_manager import ManureManager
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
@@ -26,10 +29,6 @@ class FieldManager:
     responsible for creating `Field` instances based on input data, managing these fields across the simulation
     lifecycle, and interfacing with the `SimulationEngine` to execute daily and annual routines.
 
-    Parameters
-    ----------
-    manure_manager : ManureManager
-        An instance of `ManureManager` responsible for managing manure-related activities and data across the fields.
 
     Attributes
     ----------
@@ -42,7 +41,7 @@ class FieldManager:
 
     """
 
-    def __init__(self, manure_manager: ManureManager) -> None:
+    def __init__(self) -> None:
         info_map = {"class": self.__class__.__name__, "function": "__init__"}
         self.im = InputManager()
         self.om = OutputManager()
@@ -52,11 +51,13 @@ class FieldManager:
             self.om.add_warning("No field input files.", "No fields will be simulated.", info_map)
 
         for field in fields:
-            new_field = self._setup_field(field, manure_manager)
+            new_field = self._setup_field(field)
             self.fields.append(new_field)
         self.output_gatherer = FieldDataReporter(fields=self.fields)
 
-    def daily_update_routine(self, weather: Weather, time: Time) -> list[HarvestedCropStorageType]:
+    def daily_update_routine(
+        self, weather: Weather, time: Time, manure_applications: list[ManureEventNutrientRequestResults]
+    ) -> list[HarvestedCropStorageType]:
         """
         This method will run the daily routine in the field, which will be calling the manage field method on each
         field.
@@ -67,6 +68,9 @@ class FieldManager:
             A weather object that contains infos to be transformed to current weather
         time: Time
             Object containing the current year and day of the simulation.
+        manure_applications: list[ManureEventNutrientRequestResults]
+            A list containing the ManureEvents and corresponding NutrientRequestResults for each field in
+            the simulation.
 
         Returns
         -------
@@ -88,7 +92,12 @@ class FieldManager:
                 "units": MeasurementUnits.HOURS,
             }
             self.om.add_variable("daylength", current_conditions.daylength, info_map)
-            newly_harvested_crops = field.manage_field(time, current_conditions=current_conditions)
+            manure_applications_for_field = [
+                application for application in manure_applications if application.field_name == field.field_data.name
+            ]
+            newly_harvested_crops = field.manage_field(
+                time, current_conditions=current_conditions, manure_applications=manure_applications_for_field
+            )
             harvested_crops.extend(newly_harvested_crops)
         self.output_gatherer.send_daily_variables()
 
@@ -104,15 +113,13 @@ class FieldManager:
             field.perform_annual_reset()
 
     @staticmethod
-    def _setup_field(field_name: str, manure_manager: ManureManager) -> Field:
+    def _setup_field(field_name: str) -> Field:
         """
 
         Parameters
         ----------
         field_name : str
             The name of the blob in the metadata that contains the configuration for the field to be initialized.
-        manure_manager : ManureManager
-            Instance of the Manure Manager that will provide manure for field applications.
 
         Returns
         -------
@@ -186,7 +193,6 @@ class FieldManager:
             fertilizer_events=fertilizer_events,
             fertilizer_mixes=available_fertilizer_mixes,
             manure_events=manure_events,
-            manure_manager=manure_manager,
         )
 
     @staticmethod
@@ -463,3 +469,16 @@ class FieldManager:
 
         layer = LayerData(**config_dictionary)
         return layer
+
+    def check_manure_schedules(self, field: Field, time: Time) -> list[ManureEventNutrientRequest]:
+        """
+        Checks list of ManureEvents, sends all that occur today to another method to be executed.
+
+        Parameters
+        ----------
+        time : Time
+            Object containing the current year and day of the simulation.
+
+        """
+        manure_requests = field.check_manure_application_schedule(time)
+        return manure_requests

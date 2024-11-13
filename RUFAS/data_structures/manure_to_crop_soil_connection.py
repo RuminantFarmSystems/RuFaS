@@ -1,7 +1,49 @@
-from __future__ import annotations
-
-import math
+from typing import NamedTuple, Optional
 from dataclasses import dataclass, fields
+from RUFAS.data_structures.events import ManureEvent
+from RUFAS.data_structures.manure_types import ManureType
+import math
+
+
+@dataclass(kw_only=True, frozen=True)
+class NutrientRequest:
+    """A class that represents a request for nutrients from the crop and soil module."""
+
+    nitrogen: float = 0.0
+    """Amount of manure nitrogen requested, kg."""
+
+    phosphorus: float = 0.0
+    """Amount of manure phosphorus requested, kg."""
+
+    manure_type: ManureType
+    """The type of manure."""
+
+    def __post_init__(self) -> None:
+        """
+        Validate the dataclass fields.
+
+        Raises
+        ------
+        ValueError
+            If any field is negative.
+            If no fields are positive.
+            If the manure type provided is not a valid ManureType.
+
+        """
+        for field in fields(self):
+            value = getattr(self, field.name)
+            if field.name != "manure_type" and value < 0:
+                raise ValueError(f"Field {field.name} must be non-negative.")
+            if field.name == "manure_type" and not isinstance(value, ManureType):
+                raise ValueError(f"Field {field.name} must be an instance of ManureType.")
+
+        if any(
+            isinstance(getattr(self, field.name), (int, float)) and getattr(self, field.name) > 0.0
+            for field in fields(self)
+        ):
+            return
+        else:
+            raise ValueError("At least one nutrient must be requested and positive.")
 
 
 @dataclass(frozen=True)
@@ -42,10 +84,6 @@ class NutrientRequestResults:
         """
         Validate the dataclass fields.
 
-        Returns
-        -------
-        None
-
         Raises
         ------
         ValueError
@@ -78,3 +116,19 @@ class NutrientRequestResults:
             abs_tol=1e-6,
         ):
             raise ValueError("Sum of organic and inorganic phosphorus fractions must be 1.")
+
+
+class ManureEventNutrientRequest(NamedTuple):
+    """Used to couple a manure event with a nutrient request."""
+
+    field_name: str
+    event: ManureEvent
+    nutrient_request: Optional[NutrientRequest]
+
+
+class ManureEventNutrientRequestResults(NamedTuple):
+    """Used to couple a manure event with the results of a nutrient request."""
+
+    field_name: str
+    event: ManureEvent
+    nutrient_request_results: Optional[NutrientRequestResults]
