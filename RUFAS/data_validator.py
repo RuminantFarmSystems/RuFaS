@@ -214,7 +214,7 @@ class DataValidator:
                     {
                         "error": "Max metadata depth exceeded.",
                         "error message": f"Metadata depth exceeds maximum allowed depth"
-                        f" of {metadata_depth_limit} at path {path}",
+                                         f" of {metadata_depth_limit} at path {path}",
                         "info map": info_map,
                     }
                 )
@@ -278,8 +278,8 @@ class DataValidator:
                 {
                     "error": "Metadata Validation",
                     "error message": f"Missing required keys {sorted(missing_required_keys)} for"
-                    f" {path}. Required"
-                    f" keys are {sorted(required_properties_keys)}.",
+                                     f" {path}. Required"
+                                     f" keys are {sorted(required_properties_keys)}.",
                     "info map": info_map,
                 }
             )
@@ -309,8 +309,8 @@ class DataValidator:
                 {
                     "error": "Metadata Validation",
                     "error message": f"Invalid keys {sorted(invalid_keys)} in {property_type} for"
-                    f" {path}. Valid"
-                    f" keys are {sorted(valid_properties_keys)}.",
+                                     f" {path}. Valid"
+                                     f" keys are {sorted(valid_properties_keys)}.",
                     "info map": info_map,
                 }
             )
@@ -345,7 +345,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata default number value.",
                     "error message": f"Invalid 'default' for '{key_path}': "
-                    f"Value is not nullable and default is 'None'.",
+                                     f"Value is not nullable and default is 'None'.",
                     "info map": info_map,
                 }
             )
@@ -357,7 +357,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata default number value.",
                     "error message": f"Invalid 'default' for '{key_path}': Expected a number but "
-                    f"got {type(default)}.",
+                                     f"got {type(default)}.",
                     "info map": info_map,
                 }
             )
@@ -372,7 +372,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata number properties minimum.",
                     "error message": f"Invalid 'minimum' for '{key_path}': Expected a number but"
-                    f" got {type(minimum)}.",
+                                     f" got {type(minimum)}.",
                     "info map": info_map,
                 }
             )
@@ -384,7 +384,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata number properties maximum.",
                     "error message": f"Invalid 'maximum' for '{key_path}': Expected a number but got"
-                    f" {type(maximum)}.",
+                                     f" {type(maximum)}.",
                     "info map": info_map,
                 }
             )
@@ -396,8 +396,8 @@ class DataValidator:
                 {
                     "error": "Invalid range of acceptable numbers.",
                     "error message": f"Invalid 'range' for key '{key_path}': 'minimum' value"
-                    f" {minimum} is "
-                    f"greater than 'maximum' value {maximum}",
+                                     f" {minimum} is "
+                                     f"greater than 'maximum' value {maximum}",
                     "info map": info_map,
                 }
             )
@@ -412,7 +412,7 @@ class DataValidator:
                     {
                         "error": "Invalid metadata default.",
                         "error message": f"Invalid 'default' for '{key_path}': 'default' {default}"
-                        f" is less than 'minimum' {minimum}",
+                                         f" is less than 'minimum' {minimum}",
                         "info map": info_map,
                     }
                 )
@@ -425,7 +425,7 @@ class DataValidator:
                     {
                         "error": "Invalid metadata default.",
                         "error message": f"Invalid 'default' for '{key_path}': 'default' {default} is"
-                        f" greater than 'maximum' {maximum}",
+                                         f" greater than 'maximum' {maximum}",
                         "info map": info_map,
                     }
                 )
@@ -457,7 +457,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata default string value.",
                     "error message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
-                    f" default is 'None'",
+                                     f" default is 'None'",
                     "info map": info_map,
                 }
             )
@@ -469,7 +469,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata default string value.",
                     "error message": f"Invalid 'default' for '{key_path}': Expected a string but"
-                    f" got {type(default)}",
+                                     f" got {type(default)}",
                     "info map": info_map,
                 }
             )
@@ -482,7 +482,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata string properties pattern.",
                     "error message": f"Invalid 'pattern' for '{key_path}': Expected a string but got"
-                    f" {type(pattern)}",
+                                     f" {type(pattern)}",
                     "info map": info_map,
                 }
             )
@@ -496,8 +496,8 @@ class DataValidator:
                 {
                     "error": "Invalid metadata string properties pattern.",
                     "error message": f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}'"
-                    f" is not "
-                    "a valid regex pattern.",
+                                     f" is not "
+                                     "a valid regex pattern.",
                     "info map": info_map,
                 }
             )
@@ -511,8 +511,8 @@ class DataValidator:
                     {
                         "error": "Invalid metadata default string value.",
                         "error message": f"Invalid 'default' for '{key_path}': 'default' value"
-                        f" '{default}' does not "
-                        f"match pattern {pattern}",
+                                         f" '{default}' does not "
+                                         f"match pattern {pattern}",
                         "info map": info_map,
                     }
                 )
@@ -545,7 +545,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata default bool value.",
                     "error message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
-                    f" default is 'None'",
+                                     f" default is 'None'",
                     "info map": info_map,
                 }
             )
@@ -584,7 +584,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata default array minimum length.",
                     "error message": f"Invalid 'minimum_length' for '{key_path}': Expected a number but"
-                    f" got {type(minimum_length)}",
+                                     f" got {type(minimum_length)}",
                     "info map": info_map,
                 }
             )
@@ -597,7 +597,7 @@ class DataValidator:
                 {
                     "error": "Invalid metadata default array maximum length.",
                     "error message": f"Invalid 'maximum_length' for '{key_path}': Expected a number but"
-                    f" got {type(maximum_length)}",
+                                     f" got {type(maximum_length)}",
                     "info map": info_map,
                 }
             )
@@ -610,8 +610,8 @@ class DataValidator:
                 {
                     "error": "Invalid metadata array length range.",
                     "error message": f"Invalid length 'range' for key '{key_path}': 'minimum_length' "
-                    f"value {minimum_length} is "
-                    f"greater than 'maximum_length' value {maximum_length}",
+                                     f"value {minimum_length} is "
+                                     f"greater than 'maximum_length' value {maximum_length}",
                     "info map": info_map,
                 }
             )
@@ -671,7 +671,7 @@ class DataValidator:
                     {
                         "error": "Metadata Validation",
                         "error message": f"Invalid type '{data['type']}' in '{key}'. Expected"
-                        f" one option from {valid_data_types}",
+                                         f" one option from {valid_data_types}",
                         "info map": info_map,
                     }
                 )
@@ -756,9 +756,10 @@ class DataValidator:
             raise KeyError(f"Missing 'type' key in {variable_properties}")
         data_type = variable_properties["type"]
 
-        type_to_validator_map: Dict[
-            str, Callable[[List[int | str], Dict[str, Any], Dict[str, Any], bool, str, "ElementsCounter", bool], bool]
-        ] = {
+        type_to_validator_map: dict[str, Callable[
+            [list[int | str], dict[str, Any], dict[str, Any], bool, str, ElementsCounter, bool, set[str]],
+            bool
+        ]] = {
             "array": self._array_type_validator,
             "object": self._object_type_validator,
             "string": self._string_type_validator,
@@ -835,8 +836,8 @@ class DataValidator:
                 {
                     "warning": "Validation: array container is not a list",
                     "warning message": f"Variable: '{variable_path_str}' is not"
-                    f" an array but has type: {type(data)}. "
-                    f"{properties_violation_message}",
+                                       f" an array but has type: {type(data)}. "
+                                       f"{properties_violation_message}",
                     "info map": info_map,
                 }
             )
@@ -851,8 +852,8 @@ class DataValidator:
                     {
                         "warning": "Validation: array length less than minimum",
                         "warning message": f"Variable: '{variable_path_str}' has length: {len(data)}, "
-                        f"less than minimum length:"
-                        f"{minimum_length}. {properties_violation_message}",
+                                           f"less than minimum length:"
+                                           f"{minimum_length}. {properties_violation_message}",
                         "info map": info_map,
                     }
                 )
@@ -865,8 +866,8 @@ class DataValidator:
                     {
                         "warning": "Validation: array length greater than maximum",
                         "warning message": f"Variable: '{variable_path_str}' has"
-                        f" length: {len(data)}, greater than maximum length: "
-                        f"{maximum_length}. {properties_violation_message}",
+                                           f" length: {len(data)}, greater than maximum length: "
+                                           f"{maximum_length}. {properties_violation_message}",
                         "info map": info_map,
                     }
                 )
@@ -1000,8 +1001,8 @@ class DataValidator:
                 {
                     "warning": "Validation: object is not a dictionary",
                     "warning message": f"Variable: '{variable_path_str}' is"
-                    f" not an object but has type: {type(object_value)}. "
-                    f"{properties_violation_message}",
+                                       f" not an object but has type: {type(object_value)}. "
+                                       f"{properties_violation_message}",
                     "info map": info_map,
                 }
             )
@@ -1031,9 +1032,9 @@ class DataValidator:
                 {
                     "warning": "Validation: object contains extraneous data",
                     "warning message": f"Variable: '{variable_path_str}' contains "
-                    f"data at key '{key}' that is not specified in "
-                    f"the metadata"
-                    f" properties. {properties_violation_message}",
+                                       f"data at key '{key}' that is not specified in "
+                                       f"the metadata"
+                                       f" properties. {properties_violation_message}",
                     "info map": info_map,
                 }
             )
@@ -1396,8 +1397,8 @@ class DataValidator:
                 {
                     "error": "Missing required data",
                     "error message": f"Key {var_name} not found in data. Data value is required for"
-                    f" this "
-                    "variable upon program initialization.",
+                                     f" this "
+                                     "variable upon program initialization.",
                     "info map": info_map,
                 }
             )
@@ -1409,9 +1410,9 @@ class DataValidator:
             {
                 "warning": "Validation: key not found in data -- data not required upon initialization",
                 "warning message": f"Key {var_name} not found in data. Data value is not required for "
-                f"this"
-                "variable upon program initialization, setting the variable value "
-                "to None.",
+                                   f"this"
+                                   "variable upon program initialization, setting the variable value "
+                                   "to None.",
                 "info map": info_map,
             }
         )
@@ -1489,9 +1490,9 @@ class DataValidator:
                 {
                     "warning": "Unknown modifiability entry",
                     "warning message": f"Unknown modifiability value of {modifiability} for variable"
-                    f" {variable_name}. Modifiability should be "
-                    f"one of {Modifiability.values()}."
-                    f" Using the default value: {default}",
+                                       f" {variable_name}. Modifiability should be "
+                                       f"one of {Modifiability.values()}."
+                                       f" Using the default value: {default}",
                     "info map": info_map,
                 }
             )
