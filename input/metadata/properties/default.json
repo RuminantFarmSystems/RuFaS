@@ -401,7 +401,7 @@
             "type": "number",
             "description": "Average Holstein Birth Weight (kg/head)",
             "default": 42.9,
-            "minimum": 8
+            "minimum": 1
           },
           "birth_weight_std_ho": {
             "type": "number",
@@ -413,7 +413,7 @@
             "type": "number",
             "description": "Average Jersey Birth Weight (kg/head)",
             "default": 25.2,
-            "minimum": 8
+            "minimum": 1
           },
           "birth_weight_std_je": {
             "type": "number",
