@@ -3,8 +3,6 @@ import re
 from enum import Enum
 from typing import Dict, Any, Callable, List, Union, Sequence, Tuple
 
-from RUFAS.output_manager import OutputManager
-
 
 class ElementState(Enum):
     """
@@ -546,7 +544,6 @@ class DataValidator:
         self, metadata: Dict[str, Any], valid_data_types: set[str], address_to_data: str
     ) -> Tuple[bool, str]:
         """Checks that top-level metadata has valid and required keys and values."""
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator.validate_metadata.__name__,
@@ -733,7 +730,8 @@ class DataValidator:
             is_in_range = variable_properties["minimum_length"] <= len(data)
             if not is_in_range:
                 self.event_logs.append({"warning": "Validation: array length less than minimum",
-                                        "warning message": f"Variable: '{variable_path_str}' has length: {len(data)}, less than minimum length: "
+                                        "warning message": f"Variable: '{variable_path_str}' has length: {len(data)}, "
+                                                           f"less than minimum length:"
                                                            f"{minimum_length}. {properties_violation_message}",
                                         "info map": info_map})
                 return False
@@ -1262,7 +1260,6 @@ class DataValidator:
         data is required at this stage using '_is_data_required_upon_initialization'. If required, it logs an error and
         raises a KeyError. If not, it logs a warning.
         """
-        om = OutputManager()
         info_map = {"class": DataValidator.__name__, "function": DataValidator._log_missing_data.__name__}
         if not called_during_initialization:
             error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."

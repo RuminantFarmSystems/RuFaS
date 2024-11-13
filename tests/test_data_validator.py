@@ -5,12 +5,6 @@ from mock.mock import call
 from pytest_mock import MockerFixture
 
 from RUFAS.data_validator import DataValidator, ElementState, ElementsCounter
-from RUFAS.output_manager import OutputManager
-
-
-@pytest.fixture
-def output_manager() -> OutputManager:
-    return OutputManager()
 
 
 def mock_input_array_data_for_fix_data() -> Dict[str, Dict[str, Any] | List[Any]]:
@@ -1033,7 +1027,6 @@ def test_object_type_validator(
     # Arrange
     mocker.patch.object(DataValidator, "_extract_data_by_key_list", return_value=patch_extract_return)
     mocker.patch.object(DataValidator, "validate_data_by_type", return_value=patch_validate_return)
-    mocker.patch.object(OutputManager, "add_warning")
     mock_elements_counter = mocker.MagicMock()
     dv = DataValidator()
 
@@ -1919,7 +1912,6 @@ def test_validate_metadata_properties_keys(
     expected_message: str,
 ) -> None:
     """Test the validation of validate_metadata_properties_keys"""
-    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     dv = DataValidator()
 
     if should_raise:
