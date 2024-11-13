@@ -249,26 +249,24 @@ class DataValidator:
                                 "info map": info_map})
         return True, ""
 
-    @staticmethod
     def _validate_metadata_properties_keys(
+        self,
         required_properties_keys: set[str],
         optional_properties_keys: set[str],
         properties: dict[str, Any],
         path: list[str],
     ) -> Tuple[bool, str]:
         """Validates that keys in the metadata properties sections."""
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._validate_metadata_properties_keys.__name__,
         }
         if missing_required_keys := required_properties_keys - properties.keys():
-            om.add_error(
-                "Metadata Validation",
-                f"Missing required keys {sorted(missing_required_keys)} for {path}. Required"
-                f" keys are {sorted(required_properties_keys)}.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Metadata Validation",
+                                    "error message": f"Missing required keys {sorted(missing_required_keys)} for"
+                                                     f" {path}. Required"
+                                                     f" keys are {sorted(required_properties_keys)}.",
+                                    "info map": info_map})
             error_message = (
                 f"Missing required keys {sorted(missing_required_keys)} for {path}."
                 f" Required keys are {sorted(required_properties_keys)}."
@@ -279,22 +277,20 @@ class DataValidator:
         valid_properties_keys = required_properties_keys.union(optional_properties_keys)
         if property_type == "object":
             if not (set(properties.keys()) - valid_properties_keys):
-                om.add_error(
-                    "Metadata Validation",
-                    f"No unique keys for {path}. At least one unique key is expected.",
-                    info_map,
-                )
+                self.event_logs.append({"error": "Metadata Validation",
+                                        "error message": f"No unique keys for {path}. At least one unique key is"
+                                                         f" expected.",
+                                        "info map": info_map})
                 error_message = f"No unique keys for {path}. At least one unique key is expected."
                 return False, error_message
             return True, ""
 
         if invalid_keys := set(properties.keys()) - valid_properties_keys:
-            om.add_error(
-                "Metadata Validation",
-                f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
-                f" keys are {sorted(valid_properties_keys)}.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Metadata Validation",
+                                    "error message": f"Invalid keys {sorted(invalid_keys)} in {property_type} for"
+                                                     f" {path}. Valid"
+                                                     f" keys are {sorted(valid_properties_keys)}.",
+                                    "info map": info_map})
             error_message = (
                 f"Invalid keys {sorted(invalid_keys)} in {property_type} for {path}. Valid"
                 f" keys are {sorted(valid_properties_keys)}."
@@ -536,8 +532,7 @@ class DataValidator:
 
         return True, ""
 
-    @staticmethod
-    def _metadata_object_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates object type properties in metadata."""
         required_object_property_keys = {"type"}
         optional_object_property_keys = {"description"}

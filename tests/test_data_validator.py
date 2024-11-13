@@ -307,15 +307,15 @@ def test_fix_array_type_fixable_data(
         {
             "warning": "Validation: invalid data found",
             "warning message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                               f" {original_invalid_value}. {properties_violation_message}",
             "info map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "warning message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                               f" {original_invalid_value} to "
+                               f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                               f"'{dummy_properties_key}'.",
             "info map": info_map,
         },
     ]
@@ -515,15 +515,15 @@ def test_fix_string_type_fixable_data(
         {
             "warning": "Validation: invalid data found",
             "warning message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                               f" {original_invalid_value}. {properties_violation_message}",
             "info map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "warning message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                               f" {original_invalid_value} to "
+                               f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                               f"'{dummy_properties_key}'.",
             "info map": info_map,
         },
     ]
@@ -570,15 +570,15 @@ def test_fix_string_type_csv_data() -> None:
         {
             "warning": "Validation: invalid data found",
             "warning message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                               f" {original_invalid_value}. {properties_violation_message}",
             "info map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "warning message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                               f" {original_invalid_value} to "
+                               f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                               f"'{dummy_properties_key}'.",
             "info map": info_map,
         },
     ]
@@ -783,15 +783,15 @@ def test_fix_number_type_fixable_data(
         {
             "warning": "Validation: invalid data found",
             "warning message": f"Variable: '{element_path}' has value:"
-            f" {original_invalid_value}. {properties_violation_message}",
+                               f" {original_invalid_value}. {properties_violation_message}",
             "info map": info_map,
         },
         {
             "warning": "Validation: data fixed",
             "warning message": f"Invalid data fixed: '{element_path}' value changed from"
-            f" {original_invalid_value} to "
-            f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
-            f"'{dummy_properties_key}'.",
+                               f" {original_invalid_value} to "
+                               f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
+                               f"'{dummy_properties_key}'.",
             "info map": info_map,
         },
     ]
@@ -1167,7 +1167,7 @@ def test_validate_array_container_properties(
     if expected_warning:
         assert dv.event_logs == [{"warning": expected_warning,
                                   "warning message": mocker.ANY,
-                                 "info map": info_map}]
+                                  "info map": info_map}]
     else:
         assert dv.event_logs == []
 
@@ -1855,7 +1855,8 @@ def test_metadata_object_validator(
     )
     key_path = ["path", "cow"]
     value = {"type": "object", "description": "cow", "cow": {"data_about_cow": 17}}
-    valid, msg = DataValidator._metadata_object_validator(key_path, value)
+    dv = DataValidator()
+    valid, msg = dv._metadata_object_validator(key_path, value)
     assert valid
     mock_validate_properties_keys.assert_called_once()
 
@@ -1917,22 +1918,21 @@ def test_validate_metadata_properties_keys(
 ) -> None:
     """Test the validation of validate_metadata_properties_keys"""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
+    dv = DataValidator()
 
     if should_raise:
-        valid, msg = DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        valid, msg = dv._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
         assert not valid
-        mock_add_error.assert_called_once_with(
-            "Metadata Validation",
-            expected_message,
-            {
-                "class": "DataValidator",
-                "function": "_validate_metadata_properties_keys",
-            },
-        )
+        assert dv.event_logs == [{"error": "Metadata Validation",
+                                  "error message": expected_message,
+                                  "info map": {
+                                      "class": "DataValidator",
+                                      "function": "_validate_metadata_properties_keys",
+                                  }}]
     else:
-        valid, msg = DataValidator._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
+        valid, msg = dv._validate_metadata_properties_keys(required_keys, valid_keys, properties, path)
         assert valid
-        mock_add_error.assert_not_called()
+        assert dv.event_logs == []
 
 
 def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
