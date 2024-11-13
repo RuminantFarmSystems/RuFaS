@@ -1943,8 +1943,9 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     dummy_value = 1
     patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", return_value=dummy_value)
     patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
+    dv = DataValidator()
 
-    result = DataValidator._extract_data_by_key_list(
+    result = dv._extract_data_by_key_list(
         data=dummy_input_data,
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
@@ -1954,7 +1955,7 @@ def test_extract_input_data_by_key_list_no_error(mocker: MockerFixture) -> None:
     assert result == dummy_value
     patch_log_missing_data.assert_not_called()
 
-    result = DataValidator._extract_data_by_key_list(
+    result = dv._extract_data_by_key_list(
         data=dummy_input_data,
         variable_path=dummy_var_path,
         variable_properties=dummy_var_properties,
@@ -1989,8 +1990,9 @@ def test_extract_input_data_by_key_list_key_error(
     dummy_var_properties: Dict[str, Any] = {"pattern": r"cow", "minimum_length": 1, "maximum_length": 5}
     patch_extract = mocker.patch.object(DataValidator, "extract_value_by_key_list", side_effect=KeyError)
     patch_log_missing_data = mocker.patch.object(DataValidator, "_log_missing_data")
+    dv = DataValidator()
 
-    result = DataValidator._extract_data_by_key_list(
+    result = dv._extract_data_by_key_list(
         data=dummy_input_data,
         variable_path=var_path,
         variable_properties=dummy_var_properties,

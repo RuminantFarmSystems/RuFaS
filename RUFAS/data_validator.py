@@ -1188,8 +1188,8 @@ class DataValidator:
         )
         return True
 
-    @staticmethod
     def _extract_data_by_key_list(
+        self,
         data: List[Any] | Dict[str, Any],
         variable_path: Sequence[str | int],
         variable_properties: Dict[str, Any],
@@ -1407,8 +1407,7 @@ class DataValidator:
                 formatted_path_elems.append(f"{raw_path_elem}")
         return ".".join(formatted_path_elems)
 
-    @staticmethod
-    def extract_value_by_key_list(data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+    def extract_value_by_key_list(self, data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
