@@ -396,7 +396,7 @@ def test_fix_array_type_critical_data(
     ]
 
 
-def mock_input_string_data_for_fix_data() -> dict[str, dict[str, Any]]:
+def mock_input_string_data_for_fix_data() -> dict[str, str | dict[str, Any]]:
     return {
         "element1": "muu",
         "element2": "muumuu",
@@ -546,7 +546,7 @@ def test_fix_string_type_csv_data() -> None:
     else:
         original_invalid_value = variable_parent.get(dummy_element_hierarchy[-1])
 
-    dv = DataValidator()
+    dv: DataValidator = DataValidator()
     result = dv._fix_data(
         dummy_variable_properties,
         dummy_element_hierarchy,
@@ -1773,7 +1773,7 @@ def test_metadata_bool_validator(
     mock_validate_properties_keys = mocker.patch(
         "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys", return_value=(True, "")
     )
-    dv = DataValidator()
+    dv: DataValidator = DataValidator()
     info_map = {"class": "DataValidator", "function": "_metadata_bool_validator"}
     if should_raise:
         valid, msg = dv._metadata_bool_validator(key_path, value)
