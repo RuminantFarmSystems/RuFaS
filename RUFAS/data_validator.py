@@ -303,10 +303,8 @@ class DataValidator:
 
         return True, ""
 
-    @staticmethod
-    def _metadata_number_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates number type properties in metadata."""
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_number_validator.__name__,
@@ -324,20 +322,18 @@ class DataValidator:
         nullable = value.get("nullable", False)
 
         if default is None and not nullable:
-            om.add_error(
-                "Invalid metadata default number value.",
-                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default number value.",
+                                    "error message": f"Invalid 'default' for '{key_path}': "
+                                                     f"Value is not nullable and default is 'None'.",
+                                    "info map": info_map})
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'."
             return False, error_message
 
         if default is not None and not isinstance(default, (int, float)) and not has_no_default:
-            om.add_error(
-                "Invalid metadata default number value.",
-                f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default number value.",
+                                    "error message": f"Invalid 'default' for '{key_path}': Expected a number but "
+                                                     f"got {type(default)}.",
+                                    "info map": info_map})
             error_message = f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}."
             return False, error_message
 
@@ -345,30 +341,27 @@ class DataValidator:
         maximum = value.get("maximum")
 
         if minimum is not None and not isinstance(minimum, (int, float)):
-            om.add_error(
-                "Invalid metadata number properties minimum.",
-                f"Invalid 'minimum' for '{key_path}': Expected a number but got {type(minimum)}.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata number properties minimum.",
+                                    "error message": f"Invalid 'minimum' for '{key_path}': Expected a number but"
+                                                     f" got {type(minimum)}.",
+                                    "info map": info_map})
             error_message = f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}."
             return False, error_message
 
         if maximum is not None and not isinstance(maximum, (int, float)):
-            om.add_error(
-                "Invalid metadata number properties maximum.",
-                f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata number properties maximum.",
+                                    "error message": f"Invalid 'maximum' for '{key_path}': Expected a number but got"
+                                                     f" {type(maximum)}.",
+                                    "info map": info_map})
             error_message = f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}."
             return False, error_message
 
         if maximum is not None and minimum is not None and maximum < minimum:
-            om.add_error(
-                "Invalid range of acceptable numbers.",
-                f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
-                f"greater than 'maximum' value {maximum}",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid range of acceptable numbers.",
+                                    "error message": f"Invalid 'range' for key '{key_path}': 'minimum' value"
+                                                     f" {minimum} is "
+                                                     f"greater than 'maximum' value {maximum}",
+                                    "info map": info_map})
             error_message = (
                 f"Invalid 'range' for key '{key_path}': 'minimum' value {minimum} is "
                 f"greater than 'maximum' value {maximum}"
@@ -376,21 +369,19 @@ class DataValidator:
             return False, error_message
         if default is not None and not has_no_default:
             if minimum is not None and default < minimum:
-                om.add_error(
-                    "Invalid metadata default.",
-                    f"Invalid 'default' for '{key_path}': 'default' {default} is less than 'minimum' {minimum}",
-                    info_map,
-                )
+                self.event_logs.append({"error": "Invalid metadata default.",
+                                        "error message": f"Invalid 'default' for '{key_path}': 'default' {default}"
+                                                         f" is less than 'minimum' {minimum}",
+                                        "info map": info_map})
                 error_message = (
                     f"Invalid 'default' for '{key_path}': 'default' {default} is " f"less than 'minimum' {minimum}"
                 )
                 return False, error_message
             if maximum is not None and default > maximum:
-                om.add_error(
-                    "Invalid metadata default.",
-                    f"Invalid 'default' for '{key_path}': 'default' {default} is greater than 'maximum' {maximum}",
-                    info_map,
-                )
+                self.event_logs.append({"error": "Invalid metadata default.",
+                                        "error message": f"Invalid 'default' for '{key_path}': 'default' {default} is"
+                                                         f" greater than 'maximum' {maximum}",
+                                        "info map": info_map})
                 error_message = (
                     f"Invalid 'default' for '{key_path}': 'default' {default} is " f"greater than 'maximum' {maximum}"
                 )
@@ -398,8 +389,7 @@ class DataValidator:
 
         return True, ""
 
-    @staticmethod
-    def _metadata_string_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates string type properties in metadata."""
         om = OutputManager()
         info_map = {
@@ -417,53 +407,48 @@ class DataValidator:
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
         if default is None and not nullable:
-            om.add_error(
-                "Invalid metadata default string value.",
-                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default string value.",
+                                    "error message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
+                                                     f" default is 'None'",
+                                    "info map": info_map})
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
             return False, error_message
 
         if default is not None and not has_no_default and not isinstance(default, str):
-            om.add_error(
-                "Invalid metadata default string value.",
-                f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default string value.",
+                                    "error message": f"Invalid 'default' for '{key_path}': Expected a string but"
+                                                     f" got {type(default)}",
+                                    "info map": info_map})
             error_message = f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}"
             return False, error_message
 
         pattern = value.get("pattern")
         if pattern is not None and not isinstance(pattern, str):
-            om.add_error(
-                "Invalid metadata string properties pattern.",
-                f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata string properties pattern.",
+                                    "error message": f"Invalid 'pattern' for '{key_path}': Expected a string but got"
+                                                     f" {type(pattern)}",
+                                    "info map": info_map})
             error_message = f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}"
             return False, error_message
         try:
             if pattern is not None:
                 re.compile(pattern)
         except re.error:
-            om.add_error(
-                "Invalid metadata string properties pattern.",
-                f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern.",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata string properties pattern.",
+                                    "error message": f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}'"
+                                                     f" is not " "a valid regex pattern.",
+                                    "info map": info_map})
             error_message = (
                 f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}' is not " "a valid regex pattern."
             )
             return False, error_message
         if default != "" and default is not None and not has_no_default:
             if pattern is not None and not re.match(pattern, default):
-                om.add_error(
-                    "Invalid metadata default string value.",
-                    f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
-                    f"match pattern {pattern}",
-                    info_map,
-                )
+                self.event_logs.append({"error": "Invalid metadata default string value.",
+                                        "error message": f"Invalid 'default' for '{key_path}': 'default' value"
+                                                         f" '{default}' does not "
+                                                         f"match pattern {pattern}",
+                                        "info map": info_map})
                 error_message = (
                     f"Invalid 'default' for '{key_path}': 'default' value '{default}' does not "
                     f"match pattern {pattern}"
@@ -908,8 +893,8 @@ class DataValidator:
                 {
                     "warning": "Validation: object is not a dictionary",
                     "warning message": f"Variable: '{variable_path_str}' is"
-                    f" not an object but has type: {type(object_value)}. "
-                    f"{properties_violation_message}",
+                                       f" not an object but has type: {type(object_value)}. "
+                                       f"{properties_violation_message}",
                     "info map": info_map,
                 }
             )
@@ -939,9 +924,9 @@ class DataValidator:
                 {
                     "warning": "Validation: object contains extraneous data",
                     "warning message": f"Variable: '{variable_path_str}' contains "
-                    f"data at key '{key}' that is not specified in "
-                    f"the metadata"
-                    f" properties. {properties_violation_message}",
+                                       f"data at key '{key}' that is not specified in "
+                                       f"the metadata"
+                                       f" properties. {properties_violation_message}",
                     "info map": info_map,
                 }
             )
