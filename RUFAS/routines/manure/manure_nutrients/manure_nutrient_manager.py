@@ -4,8 +4,8 @@ import math
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
-from RUFAS.data_structures.nutrient_request import NutrientRequest, NutrientRequestResults
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_types import ManureType
 
 
 class ManureNutrientManager:

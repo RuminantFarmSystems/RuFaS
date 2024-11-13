@@ -2,7 +2,7 @@ from typing import List, Optional, Union
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.schedule import Schedule
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 
 
 class ManureSchedule(Schedule):
