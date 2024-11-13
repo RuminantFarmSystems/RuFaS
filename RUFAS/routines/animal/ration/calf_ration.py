@@ -400,7 +400,7 @@ class CalfRationManager:
         ration_per_animal: Dict[str, float | str] = {}
         total_dm = 0.0
         for key in average_calf_ration:
-            if key not in ["status", "optimize"]:
+            if key not in ["status", "objective"]:
                 total_dm += average_calf_ration[key]
         udrm = udr.UserDefinedRationManager()
         for key in udrm.calf_ration:
