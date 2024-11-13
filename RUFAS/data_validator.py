@@ -458,7 +458,6 @@ class DataValidator:
 
     def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates bool type properties in metadata."""
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_bool_validator.__name__,
@@ -490,10 +489,8 @@ class DataValidator:
 
         return True, ""
 
-    @staticmethod
-    def _metadata_array_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_array_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates array type properties in metadata."""
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_array_validator.__name__,
@@ -508,32 +505,29 @@ class DataValidator:
         minimum_length = value.get("minimum_length")
         maximum_length = value.get("maximum_length")
         if minimum_length is not None and not isinstance(minimum_length, (int, float)):
-            om.add_error(
-                "Invalid metadata default array minimum length.",
-                f"Invalid 'minimum_length' for '{key_path}': Expected a number but got {type(minimum_length)}",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default array minimum length.",
+                                    "error message": f"Invalid 'minimum_length' for '{key_path}': Expected a number but"
+                                                     f" got {type(minimum_length)}",
+                                    "info map": info_map})
             error_message = (
                 f"Invalid 'minimum_length' for '{key_path}': " f"Expected a number but got {type(minimum_length)}"
             )
             return False, error_message
         if maximum_length is not None and not isinstance(maximum_length, (int, float)):
-            om.add_error(
-                "Invalid metadata default array maximum length.",
-                f"Invalid 'maximum_length' for '{key_path}': Expected a number but got {type(maximum_length)}",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default array maximum length.",
+                                    "error message": f"Invalid 'maximum_length' for '{key_path}': Expected a number but"
+                                                     f" got {type(maximum_length)}",
+                                    "info map": info_map})
             error_message = (
                 f"Invalid 'maximum_length' for '{key_path}': " f"Expected a number but got {type(maximum_length)}"
             )
             return False, error_message
         if maximum_length is not None and minimum_length is not None and maximum_length < minimum_length:
-            om.add_error(
-                "Invalid metadata array length range.",
-                f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
-                f"greater than 'maximum_length' value {maximum_length}",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata array length range.",
+                                    "error message": f"Invalid length 'range' for key '{key_path}': 'minimum_length' "
+                                                     f"value {minimum_length} is "
+                                                     f"greater than 'maximum_length' value {maximum_length}",
+                                    "info map": info_map})
             error_message = (
                 f"Invalid length 'range' for key '{key_path}': 'minimum_length' value {minimum_length} is "
                 f"greater than 'maximum_length' value {maximum_length}"
