@@ -391,7 +391,6 @@ class DataValidator:
 
     def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates string type properties in metadata."""
-        om = OutputManager()
         info_map = {
             "class": DataValidator.__name__,
             "function": DataValidator._metadata_string_validator.__name__,
@@ -457,8 +456,7 @@ class DataValidator:
 
         return True, ""
 
-    @staticmethod
-    def _metadata_bool_validator(key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
         """Validates bool type properties in metadata."""
         om = OutputManager()
         info_map = {
@@ -476,19 +474,17 @@ class DataValidator:
         has_no_default = default == "No default"
         nullable = value.get("nullable", False)
         if default is None and not nullable:
-            om.add_error(
-                "Invalid metadata default bool value.",
-                f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default bool value.",
+                                    "error message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
+                                                     f" default is 'None'",
+                                    "info map": info_map})
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
             return False, error_message
         if default is not None and not isinstance(default, bool) and not has_no_default:
-            om.add_error(
-                "Invalid metadata default bool value.",
-                f"Invalid 'default' for '{key_path}': Expected a bool but got {type(default)}",
-                info_map,
-            )
+            self.event_logs.append({"error": "Invalid metadata default bool value.",
+                                    "error message": f"Invalid 'default' for '{key_path}': Expected a bool but got"
+                                                     f" {type(default)}",
+                                    "info map": info_map})
             error_message = f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}"
             return False, error_message
 

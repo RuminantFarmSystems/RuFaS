@@ -1775,21 +1775,20 @@ def test_metadata_bool_validator(
     should_raise: bool,
 ) -> None:
     """Tests _metadata_bool_validator() method in InputManager"""
-    mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
     mock_validate_properties_keys = mocker.patch(
         "RUFAS.data_validator.DataValidator._validate_metadata_properties_keys", return_value=(True, "")
     )
+    dv = DataValidator()
     info_map = {"class": "DataValidator", "function": "_metadata_bool_validator"}
-
     if should_raise:
-        valid, msg = DataValidator._metadata_bool_validator(key_path, value)
+        valid, msg = dv._metadata_bool_validator(key_path, value)
         assert not valid
-        assert mock_add_error.called
-        assert mock_add_error.call_args[0] == (error_title, error_msg, info_map)
+        assert dv.event_logs == [{"error": error_title,
+                                  "error message": error_msg,
+                                  "info map": info_map}]
         mock_validate_properties_keys.assert_called_once()
     else:
-        DataValidator._metadata_bool_validator(key_path, value)
-        mock_add_error.assert_not_called()
+        dv._metadata_bool_validator(key_path, value)
         mock_validate_properties_keys.assert_called_once()
 
 
