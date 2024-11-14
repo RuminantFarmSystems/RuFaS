@@ -1,7 +1,13 @@
 import os
 import re
 from enum import Enum
-from typing import Dict, Any, Callable, List, Union, Sequence, Tuple
+from typing import Dict, Any, Callable, List, Union, Sequence, Tuple, TypedDict
+
+
+class EventLog(TypedDict):
+    error: str
+    message: str
+    info_map: dict[str, Any]
 
 
 class ElementState(Enum):
@@ -177,7 +183,7 @@ class DataValidator:
     """This class is will be utilized to validate all types of data across RuFas codebase."""
 
     def __init__(self) -> None:
-        self.event_logs: list[dict[str, str | dict[str, str]]] = []
+        self.event_logs: List[EventLog] = []
 
     def validate_properties(self, metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
         """Iteratively traverses the metadata properties to check the max depth and routes
