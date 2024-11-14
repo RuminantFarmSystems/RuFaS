@@ -6,6 +6,26 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
 @dataclass
+class ReproductionInputs:
+    animal_type: AnimalType
+    body_weight: float
+    breed: Breed
+    days_born: int
+    days_in_pregnancy: int
+    days_in_milk: int
+    net_merit: float
+    phosphorus_for_gestation_required_for_calf: float
+
+    @property
+    def is_pregnant(self) -> bool:
+        return self.days_in_pregnancy > 0
+
+    @property
+    def is_milking(self) -> bool:
+        return self.days_in_milk > 0
+
+
+@dataclass
 class AnimalReproductionStatistics:
     """
     Animal-level reproduction-related statistical properties.
@@ -84,12 +104,35 @@ class HerdReproductionStatistics:
 @dataclass
 class ReproductionOutputs:
     body_weight: float
-    cull_reason: str
     days_in_milk: int
     days_in_pregnancy: int
     events: AnimalEvents
-    future_cull_date: int
-    future_death_date: int
+    phosphorus_for_gestation_required_for_calf: float
+
+    animal_level_statistics: AnimalReproductionStatistics
+    herd_level_statistics: HerdReproductionStatistics
+
+    newborn_calf_config: dict
+
+    @property
+    def is_pregnant(self) -> bool:
+        return self.days_in_pregnancy > 0
+
+    @property
+    def is_milking(self) -> bool:
+        return self.days_in_milk > 0
+
+
+@dataclass
+class ReproductionDataStream:
+    animal_type: AnimalType
+    body_weight: float
+    breed: Breed
+    days_born: int
+    days_in_pregnancy: int
+    days_in_milk: int
+    events: AnimalEvents
+    net_merit: float
     phosphorus_for_gestation_required_for_calf: float
 
     animal_level_statistics: AnimalReproductionStatistics
