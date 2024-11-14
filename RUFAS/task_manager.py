@@ -3,13 +3,20 @@ from functools import partial
 import multiprocessing
 import numpy
 from pathlib import Path
+from threading import Thread, Event
 import random
+from time import sleep
+from psutil import Process
+import os
+import docker
+from re import match
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 import traceback
 from typing import Any, Dict, List, Tuple, Callable
 
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager, LogVerbosity
 from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
@@ -22,6 +29,26 @@ RUFAS_VERSION = "0.9.2"
 """These constants define the minimum and maximum integers that can be passed to Numpy's random.seed method."""
 NUMPY_RANDOM_SEED_LOWER_BOUND = 0
 NUMPY_RANDOM_SEED_UPPER_BOUND = 2**32 - 1
+
+
+# TODO: should these values (CPU usage, system check interval, etc.) be made user inputs?
+"""Time in seconds between checking the resources used by RuFaS in a Docker container."""
+SYSTEM_CHECK_INTERVAL = 10
+
+"""Percentage threshold below which CPU usage indicates an issue in RuFaS."""
+LOW_CPU_USAGE_THRESHOLD = 10.0
+
+"""Percentage threshold below which memory usage indicates an issue in RuFaS."""
+LOW_MEMORY_USAGE_THRESHOLD = 8.0  # TODO: instead of lower memory usage threshold, would checking for static memory
+                                  #       usage be better?
+"""
+If the number of times that CPU and memory usage are below their respective thresholds reaches this number then Task
+Manager stops all simulations and raises an error.
+"""
+STALL_CONFIRMATION_THRESHOLD = 3
+
+"""Name of the environment variable that Task Manager expects to be present if running in a Docker container."""
+CONTAINER_NAME = "CONTAINER_NAME"
 
 
 class TaskType(Enum):
@@ -51,10 +78,61 @@ class TaskType(Enum):
 
 
 class TaskManager:
-    """Manager class for handling tasks related to simulations and analyses."""
+    """
+    Manager class for handling tasks related to simulations and analyses.
+
+    Attributes
+    ----------
+    output_manager : OutputManager
+        Task Manager's OutputManager instance.
+    _consecutive_low_cpu_usage_count : int, default 0
+        Number of consecutive system resource checks that CPU usage has been below threshold for.
+    _consecutive_low_memory_usage_count : int, default 0
+        Number of consecutive system resource checks that memory usage has below threshold low for.
+    _docker_container_name : str | None, default None
+        Identifier for the Docker container that in which RuFaS is running. None if RuFaS is not
+        running inside a Docker container.
+
+    """
 
     def __init__(self) -> None:
         self.output_manager = OutputManager()
+        self._consecutive_low_cpu_usage_count = 0
+        self._consecutive_low_memory_usage_count = 0
+        self._docker_container_name: str | None = None
+        self._get_container_info()
+
+    def _get_container_info(self) -> None:
+        """
+        Looks for an environment variable specifying the Docker container name that RuFaS is running in.
+        If this variable is found, the corresponding container is looked for in the Docker client. Otherwise,
+        it is assumed that RuFaS is not running in a Docker container.
+        """
+        container_name = os.getenv(CONTAINER_NAME)
+        info_map = {"class": self.__class__.__name__, "function": self._get_container_info.__name__}
+        if container_name is None:
+            self.output_manager.add_warning(
+                "Docker container name not found",
+                "Stalled simulations will not be stopped",
+                info_map
+            )
+            return
+        client = docker.from_env()
+        for container in client.containers.list():
+            env_variables = container.attrs["Config"]["Env"]
+            for var in env_variables:
+                if match(f"^{CONTAINER_NAME}=.*", var):  # TODO: handle case where multiple containers have the same name
+                    self._docker_container_name = container.attrs.get("Name")
+                    self.output_manager.add_log(
+                        f"Found Docker container with name matching environment variable '{CONTAINER_NAME}'",
+                        f"Using container with Name='{self._docker_container_name}' and {CONTAINER_NAME}='{container_name}'",
+                        {"name": self._docker_container_name, "container_name": container_name, **info_map}
+                    )
+                    return
+        err_name = f"No Docker container with name matching {CONTAINER_NAME}='{container_name}' found"
+        err_msg = "Halting simulation"
+        self.output_manager.add_error(err_name, err_msg, {"container_name": container_name, **info_map})
+        raise RuntimeError(f"{err_name}. {err_msg}")  # TODO: instead of crashing, raise error to OM and continue?
 
     def start(
         self,
@@ -295,19 +373,110 @@ class TaskManager:
         self, single_run_args: List[Dict[str, Any]], produce_graphics: bool, metadata_depth_limit: int
     ) -> None:
         """Runs the tasks based on the provided arguments."""
+        if self._docker_container_name is not None:
+            stop_event = Event()
+            monitor_thread = Thread(target=self._monitor_resources_for_stall, args=(stop_event,))
+            monitor_thread.start()
+
         task_with_args = partial(
             self.task, produce_graphics=produce_graphics, metadata_depth_limit=metadata_depth_limit
         )
-        results = self.pool.imap(task_with_args, single_run_args)
+        results = self.pool.imap_unordered(task_with_args, single_run_args)
         failed = []
-        for result in results:
-            if result is not None:
+        info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
+
+        while True:
+            if self._docker_container_name is not None and stop_event.is_set():
+                name = "All tasks stalled"
+                msg = "Task Manager halting all simulations and raising error."
+                self.output_manager.add_error(name, msg, info_map)
+                raise RuntimeError(f"{name}. {msg}")
+
+            try:
+                result = results.next(timeout=SYSTEM_CHECK_INTERVAL)
+            except multiprocessing.TimeoutError:
+                continue
+
+            if result is None:
+                break
+            else:
                 failed.append(result)
 
+        if self._docker_container_name is not None:
+            stop_event.set()
+            monitor_thread.join()
+
         if len(failed) > 0:
-            info_map = {"class": TaskManager.__name__, "function": TaskManager._run_tasks.__name__}
-            om = OutputManager()
-            om.add_error("Task(s) failed", f"Failed task(s) and output prefix are: {failed}", info_map)
+            self.output_manager.add_error("Task(s) failed", f"Failed task(s) and output prefix are: {failed}", info_map)
+
+    def _monitor_resources_for_stall(self, stop_event: Event) -> None:
+        """
+        Monitors system resources for signs of stalled processes.
+
+        Parameters
+        ----------
+        stop_event : Event
+            Event that indicates resource monitoring should stop for RuFaS, either because all simulations have finished
+            or simulations have stalled.
+
+        """
+        parent = Process()
+
+        docker_client = docker.from_env()
+        container = docker_client.containers.get(self._docker_container_name)
+
+        info_map = {"class": self.__class__.__name__, "function": self._monitor_resources_for_stall.__name__}
+        while not stop_event.is_set():
+            children = parent.children(recursive=True)
+            info_map = {"class": self.__class__.__name__, "function": self._monitor_resources_for_stall.__name__}
+            if not children:
+                self.output_manager.add_warning("No worker processes found", "Task Manager continuing operations as normal", info_map)
+                continue
+            worker_count = len(children)
+
+            container_stats = container.stats(stream=False)
+
+            cpu_usage = container_stats['cpu_stats']['cpu_usage']['total_usage']
+            system_cpu_usage = container_stats['cpu_stats']['system_cpu_usage']
+            online_cpus = container_stats['cpu_stats'].get('online_cpus', 1)  # Fallback if not provided
+
+            # Calculate CPU percentage (Docker provides raw CPU values, so calculation is needed)
+            cpu_delta = cpu_usage - container_stats['precpu_stats']['cpu_usage']['total_usage']
+            system_delta = system_cpu_usage - container_stats['precpu_stats']['system_cpu_usage']
+            cpu_usage = (cpu_delta / system_delta) * online_cpus * GeneralConstants.FRACTION_TO_PERCENTAGE if system_delta > 0 else 0.0
+
+            mem_usage = container_stats['memory_stats']['usage']
+            mem_limit = container_stats['memory_stats']['limit']
+
+            memory_usage = (mem_usage / mem_limit) * GeneralConstants.FRACTION_TO_PERCENTAGE if mem_limit > 0 else 0.0
+
+            info_map = {"cpu_usage": cpu_usage, "memory_usage": memory_usage, "worker_count": worker_count, **info_map}
+
+            name = "System resource usage"
+            msg = f"{worker_count} worker process(es), CPU usage: {cpu_usage:.2f}%, memory usage: {memory_usage:.2f}%"
+            info_map = {"cpu_usage": cpu_usage, "memory_usage": memory_usage, "worker_count": worker_count, **info_map}
+
+            self.output_manager.add_log(name, msg, info_map)
+
+            if cpu_usage < LOW_CPU_USAGE_THRESHOLD:
+                self._consecutive_low_cpu_usage_count += 1
+            else:
+                self._consecutive_low_cpu_usage_count = 0
+
+            if memory_usage < LOW_MEMORY_USAGE_THRESHOLD:
+                self._consecutive_low_memory_usage_count += 1
+            else:
+                self._consecutive_low_memory_usage_count = 0
+
+            is_cpu_usage_stalled = self._consecutive_low_cpu_usage_count >= STALL_CONFIRMATION_THRESHOLD
+            is_memory_usage_stalled = self._consecutive_low_memory_usage_count >= STALL_CONFIRMATION_THRESHOLD
+            is_stalled = is_cpu_usage_stalled and is_memory_usage_stalled
+            if is_stalled:
+                self.output_manager.add_error(name, msg, info_map)
+                stop_event.set()
+            sleep(SYSTEM_CHECK_INTERVAL)
+
+        return
 
     @staticmethod
     def call_handler(
