@@ -357,7 +357,9 @@ class OutputManager(object):
         self.add_variable_call += 1
         units = info_map.get("units")
         if units is None:
-            raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
+            raise KeyError(f"'units' was not found in info_map for call to 'add_variable()' for {name}.")
+        if isinstance(units, dict) and len(info_map.get("units")) != len(value) and value != {}:
+            raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
         key = self._generate_key(name, info_map)
