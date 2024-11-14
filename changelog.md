@@ -71,3 +71,4 @@ v0.9.2
 - [2010](https://github.com/RuminantFarmSystems/MASM/pull/2010) - [minor change] Updates liquid manure nitrogen input source used to calculate N2O emissions for manure storages.
 - [2002](https://github.com/RuminantFarmSystems/MASM/pull/2002) - [minor change] [Manure] Adds a method to determine the ambient inside barn temperature based on the outdoor air temperature for use in calculations of emissions associated with Manure Handlers.
 - [2009](https://github.com/RuminantFarmSystems/MASM/pull/2009) - [minor change] [Time][Feed Storage] Modifies the init of Time so that a time object can be created without needing config from IM. This in turn allows us to avoid deep copies used for time management.
+- [2067](https://github.com/RuminantFarmSystems/MASM/pull/2067) - [minor change] [EEE] Adds updated feeds emissions sheets, which replaces 0s with the average of neighboring FIPS codes.
