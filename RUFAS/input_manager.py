@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, List, Tuple
 import pandas as pd
 from deepdiff import DeepDiff
 
-from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability, EventLog
+from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -540,7 +540,6 @@ class InputManager:
             data_value = self.data_validator.extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
-            self._route_logs(self.data_validator.event_logs)
             return deepcopy(data_value)
         except KeyError as key_error:
             self.om.add_error("Validation: data not found", str(key_error), info_map)
@@ -1346,7 +1345,7 @@ class InputManager:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
 
-    def _route_logs(self, log_pool: List[EventLog]) -> None:
+    def _route_logs(self, log_pool: list[dict[str, str | dict[str, str]]]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
         Output Manager.
 
