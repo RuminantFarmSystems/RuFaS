@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, List, Tuple
 import pandas as pd
 from deepdiff import DeepDiff
 
-from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability
+from RUFAS.data_validator import DataValidator, ElementsCounter, Modifiability, EventLog
 from RUFAS.output_manager import OutputManager
 from RUFAS.util import Utility
 
@@ -95,6 +95,7 @@ class InputManager:
         if not valid:
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
+        self._route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: Path) -> None:
@@ -539,6 +540,7 @@ class InputManager:
             data_value = self.data_validator.extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
+            self._route_logs(self.data_validator.event_logs)
             return deepcopy(data_value)
         except KeyError as key_error:
             self.om.add_error("Validation: data not found", str(key_error), info_map)
@@ -577,6 +579,7 @@ class InputManager:
         variable_path = data_address.split(".")
         try:
             self.data_validator.extract_value_by_key_list(self.__pool, variable_path)
+            self._route_logs(self.data_validator.event_logs)
             return True
         except KeyError:
             return False
@@ -1083,6 +1086,7 @@ class InputManager:
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
             )
+            self._route_logs(self.data_validator.event_logs)
             return add_variable_success
         else:
             return False
@@ -1342,7 +1346,7 @@ class InputManager:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
 
-    def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
+    def _route_logs(self, log_pool: List[EventLog]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
         Output Manager.
 
