@@ -213,9 +213,9 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Max metadata depth exceeded.",
-                        "error message": f"Metadata depth exceeds maximum allowed depth"
+                        "message": f"Metadata depth exceeds maximum allowed depth"
                         f" of {metadata_depth_limit} at path {path}",
-                        "info map": info_map,
+                        "info_map": info_map,
                     }
                 )
                 error_message = f"Metadata depth exceeds maximum allowed depth of {metadata_depth_limit} at path {path}"
@@ -239,8 +239,8 @@ class DataValidator:
                                 self.event_logs.append(
                                     {
                                         "error": "Properties value type error",
-                                        "error message": f"'type' value not" f" in {type_to_validator_map.keys()}",
-                                        "info map": info_map,
+                                        "message": f"'type' value not" f" in {type_to_validator_map.keys()}",
+                                        "info_map": info_map,
                                     }
                                 )
                                 error_message = f"Properties 'type' value not in {list(type_to_validator_map.keys())}"
@@ -248,15 +248,15 @@ class DataValidator:
         self.event_logs.append(
             {
                 "log": "Metadata properties depth",
-                "log message": f"Max depth of metadata properties is {current_max_depth}",
-                "info map": info_map,
+                "message": f"Max depth of metadata properties is {current_max_depth}",
+                "info_map": info_map,
             }
         )
         self.event_logs.append(
             {
                 "log": "Metadata properties path",
-                "log message": f"Deepest path of metadata properties is {deepest_path}",
-                "info map": info_map,
+                "message": f"Deepest path of metadata properties is {deepest_path}",
+                "info_map": info_map,
             }
         )
         return True, ""
@@ -277,10 +277,10 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Metadata Validation",
-                    "error message": f"Missing required keys {sorted(missing_required_keys)} for"
+                    "message": f"Missing required keys {sorted(missing_required_keys)} for"
                     f" {path}. Required"
                     f" keys are {sorted(required_properties_keys)}.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = (
@@ -296,8 +296,8 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",
-                        "error message": f"No unique keys for {path}. At least one unique key is" f" expected.",
-                        "info map": info_map,
+                        "message": f"No unique keys for {path}. At least one unique key is" f" expected.",
+                        "info_map": info_map,
                     }
                 )
                 error_message = f"No unique keys for {path}. At least one unique key is expected."
@@ -308,10 +308,10 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Metadata Validation",
-                    "error message": f"Invalid keys {sorted(invalid_keys)} in {property_type} for"
+                    "message": f"Invalid keys {sorted(invalid_keys)} in {property_type} for"
                     f" {path}. Valid"
                     f" keys are {sorted(valid_properties_keys)}.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = (
@@ -344,9 +344,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default number value.",
-                    "error message": f"Invalid 'default' for '{key_path}': "
+                    "message": f"Invalid 'default' for '{key_path}': "
                     f"Value is not nullable and default is 'None'.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'."
@@ -356,9 +356,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default number value.",
-                    "error message": f"Invalid 'default' for '{key_path}': Expected a number but "
+                    "message": f"Invalid 'default' for '{key_path}': Expected a number but "
                     f"got {type(default)}.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}."
@@ -371,9 +371,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata number properties minimum.",
-                    "error message": f"Invalid 'minimum' for '{key_path}': Expected a number but"
+                    "message": f"Invalid 'minimum' for '{key_path}': Expected a number but"
                     f" got {type(minimum)}.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'minimum' for '{key_path}': " f"Expected a number but got {type(minimum)}."
@@ -383,9 +383,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata number properties maximum.",
-                    "error message": f"Invalid 'maximum' for '{key_path}': Expected a number but got"
+                    "message": f"Invalid 'maximum' for '{key_path}': Expected a number but got"
                     f" {type(maximum)}.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'maximum' for '{key_path}': Expected a number but got {type(maximum)}."
@@ -395,10 +395,10 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid range of acceptable numbers.",
-                    "error message": f"Invalid 'range' for key '{key_path}': 'minimum' value"
+                    "message": f"Invalid 'range' for key '{key_path}': 'minimum' value"
                     f" {minimum} is "
                     f"greater than 'maximum' value {maximum}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = (
@@ -411,9 +411,9 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Invalid metadata default.",
-                        "error message": f"Invalid 'default' for '{key_path}': 'default' {default}"
+                        "message": f"Invalid 'default' for '{key_path}': 'default' {default}"
                         f" is less than 'minimum' {minimum}",
-                        "info map": info_map,
+                        "info_map": info_map,
                     }
                 )
                 error_message = (
@@ -424,9 +424,9 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Invalid metadata default.",
-                        "error message": f"Invalid 'default' for '{key_path}': 'default' {default} is"
+                        "message": f"Invalid 'default' for '{key_path}': 'default' {default} is"
                         f" greater than 'maximum' {maximum}",
-                        "info map": info_map,
+                        "info_map": info_map,
                     }
                 )
                 error_message = (
@@ -456,9 +456,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default string value.",
-                    "error message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
+                    "message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
                     f" default is 'None'",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
@@ -468,9 +468,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default string value.",
-                    "error message": f"Invalid 'default' for '{key_path}': Expected a string but"
+                    "message": f"Invalid 'default' for '{key_path}': Expected a string but"
                     f" got {type(default)}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}"
@@ -481,9 +481,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata string properties pattern.",
-                    "error message": f"Invalid 'pattern' for '{key_path}': Expected a string but got"
+                    "message": f"Invalid 'pattern' for '{key_path}': Expected a string but got"
                     f" {type(pattern)}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}"
@@ -495,10 +495,10 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata string properties pattern.",
-                    "error message": f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}'"
+                    "message": f"Invalid 'pattern' for '{key_path}': 'pattern' value '{pattern}'"
                     f" is not "
                     "a valid regex pattern.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = (
@@ -510,10 +510,10 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Invalid metadata default string value.",
-                        "error message": f"Invalid 'default' for '{key_path}': 'default' value"
+                        "message": f"Invalid 'default' for '{key_path}': 'default' value"
                         f" '{default}' does not "
                         f"match pattern {pattern}",
-                        "info map": info_map,
+                        "info_map": info_map,
                     }
                 )
                 error_message = (
@@ -544,9 +544,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default bool value.",
-                    "error message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
+                    "message": f"Invalid 'default' for '{key_path}': Value is not nullable and"
                     f" default is 'None'",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'"
@@ -555,8 +555,8 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default bool value.",
-                    "error message": f"Invalid 'default' for '{key_path}': Expected a bool but got" f" {type(default)}",
-                    "info map": info_map,
+                    "message": f"Invalid 'default' for '{key_path}': Expected a bool but got" f" {type(default)}",
+                    "info_map": info_map,
                 }
             )
             error_message = f"Invalid 'default' for key {key_path}: Expected a bool but got {type(default)}"
@@ -583,9 +583,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default array minimum length.",
-                    "error message": f"Invalid 'minimum_length' for '{key_path}': Expected a number but"
+                    "message": f"Invalid 'minimum_length' for '{key_path}': Expected a number but"
                     f" got {type(minimum_length)}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = (
@@ -596,9 +596,9 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default array maximum length.",
-                    "error message": f"Invalid 'maximum_length' for '{key_path}': Expected a number but"
+                    "message": f"Invalid 'maximum_length' for '{key_path}': Expected a number but"
                     f" got {type(maximum_length)}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = (
@@ -609,10 +609,10 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata array length range.",
-                    "error message": f"Invalid length 'range' for key '{key_path}': 'minimum_length' "
+                    "message": f"Invalid length 'range' for key '{key_path}': 'minimum_length' "
                     f"value {minimum_length} is "
                     f"greater than 'maximum_length' value {maximum_length}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             error_message = (
@@ -651,8 +651,8 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",
-                        "error message": f"Missing required keys '{list(missing_keys)}' in '{key}'",
-                        "info map": info_map,
+                        "message": f"Missing required keys '{list(missing_keys)}' in '{key}'",
+                        "info_map": info_map,
                     }
                 )
                 return False, f"Missing required keys '{list(missing_keys)}' in '{key}'"
@@ -660,8 +660,8 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",
-                        "error message": f"Invalid keys '{list(invalid_keys)}' in '{key}'",
-                        "info map": info_map,
+                        "message": f"Invalid keys '{list(invalid_keys)}' in '{key}'",
+                        "info_map": info_map,
                     }
                 )
                 return False, f"Invalid keys '{list(invalid_keys)}' in '{key}'"
@@ -670,9 +670,9 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",
-                        "error message": f"Invalid type '{data['type']}' in '{key}'. Expected"
+                        "message": f"Invalid type '{data['type']}' in '{key}'. Expected"
                         f" one option from {valid_data_types}",
-                        "info map": info_map,
+                        "info_map": info_map,
                     }
                 )
                 return False, f"Invalid type '{data['type']}' in '{key}'. Expected one option from {valid_data_types}"
@@ -681,8 +681,8 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",
-                        "error message": f"Invalid path '{data['path']}' in '{key}'",
-                        "info map": info_map,
+                        "message": f"Invalid path '{data['path']}' in '{key}'",
+                        "info_map": info_map,
                     }
                 )
                 return False, f"Invalid path '{data['path']}' in '{key}'"
@@ -691,14 +691,14 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "error": "Metadata Validation",
-                        "error message": f"Properties section empty or None in '{key}'",
-                        "info map": info_map,
+                        "message": f"Properties section empty or None in '{key}'",
+                        "info_map": info_map,
                     }
                 )
                 return False, f"Properties section empty or None in '{key}'"
 
         self.event_logs.append(
-            {"log": "Metadata Validation", "log message": "Top level metadata is valid.", "info map": info_map}
+            {"log": "Metadata Validation", "message": "Top level metadata is valid.", "info_map": info_map}
         )
         return True, ""
 
@@ -837,10 +837,10 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Validation: array container is not a list",
-                    "warning message": f"Variable: '{variable_path_str}' is not"
+                    "message": f"Variable: '{variable_path_str}' is not"
                     f" an array but has type: {type(data)}. "
                     f"{properties_violation_message}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             return False
@@ -853,10 +853,10 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "warning": "Validation: array length less than minimum",
-                        "warning message": f"Variable: '{variable_path_str}' has length: {len(data)}, "
+                        "message": f"Variable: '{variable_path_str}' has length: {len(data)}, "
                         f"less than minimum length:"
                         f"{minimum_length}. {properties_violation_message}",
-                        "info map": info_map,
+                        "info_map": info_map,
                     }
                 )
                 return False
@@ -867,10 +867,10 @@ class DataValidator:
                 self.event_logs.append(
                     {
                         "warning": "Validation: array length greater than maximum",
-                        "warning message": f"Variable: '{variable_path_str}' has"
+                        "message": f"Variable: '{variable_path_str}' has"
                         f" length: {len(data)}, greater than maximum length: "
                         f"{maximum_length}. {properties_violation_message}",
-                        "info map": info_map,
+                        "info_map": info_map,
                     }
                 )
                 return False
@@ -1002,10 +1002,10 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Validation: object is not a dictionary",
-                    "warning message": f"Variable: '{variable_path_str}' is"
+                    "message": f"Variable: '{variable_path_str}' is"
                     f" not an object but has type: {type(object_value)}. "
                     f"{properties_violation_message}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             return False
@@ -1033,11 +1033,11 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Validation: object contains extraneous data",
-                    "warning message": f"Variable: '{variable_path_str}' contains "
+                    "message": f"Variable: '{variable_path_str}' contains "
                     f"data at key '{key}' that is not specified in "
                     f"the metadata"
                     f" properties. {properties_violation_message}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             del object_value[key]
@@ -1082,7 +1082,7 @@ class DataValidator:
                 f"{type(data_value)}. {properties_violation_message}"
             )
             self.event_logs.append(
-                {"warning": warning_string, "warning message": warning_message, "info map": info_map}
+                {"warning": warning_string, "message": warning_message, "info_map": info_map}
             )
             return False
         if minimum_value is not None:
@@ -1094,7 +1094,7 @@ class DataValidator:
                     f"{minimum_value: .2f}. {properties_violation_message}"
                 )
                 self.event_logs.append(
-                    {"warning": warning_name, "warning message": warning_message, "info map": info_map}
+                    {"warning": warning_name, "message": warning_message, "info_map": info_map}
                 )
                 return False
         if maximum_value is not None:
@@ -1106,7 +1106,7 @@ class DataValidator:
                     f"{maximum_value: .2f}. {properties_violation_message}"
                 )
                 self.event_logs.append(
-                    {"warning": warning_name, "warning message": warning_message, "info map": info_map}
+                    {"warning": warning_name, "message": warning_message, "info_map": info_map}
                 )
                 return False
 
@@ -1146,7 +1146,7 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: {data_value}, is type: "
                 f"{type(data_value)}. {properties_violation_message}"
             )
-            self.event_logs.append({"warning": warning_name, "warning message": warning_message, "info_map": info_map})
+            self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
             return False
 
         pattern_check = variable_properties.get("pattern")
@@ -1159,7 +1159,7 @@ class DataValidator:
                     f"{pattern_check}. {properties_violation_message}"
                 )
                 self.event_logs.append(
-                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                    {"warning": warning_name, "message": warning_message, "info_map": info_map}
                 )
                 return False
 
@@ -1174,7 +1174,7 @@ class DataValidator:
                     f"minimum length: {minimum_length}. {properties_violation_message}"
                 )
                 self.event_logs.append(
-                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                    {"warning": warning_name, "message": warning_message, "info_map": info_map}
                 )
                 return False
         if maximum_length is not None:
@@ -1186,7 +1186,7 @@ class DataValidator:
                     f"maximum length: {maximum_length}. {properties_violation_message}"
                 )
                 self.event_logs.append(
-                    {"warning": warning_name, "warning message": warning_message, "info_map": info_map}
+                    {"warning": warning_name, "message": warning_message, "info_map": info_map}
                 )
                 return False
 
@@ -1227,7 +1227,7 @@ class DataValidator:
                 f"Variable: '{variable_path_str}' has value: '{data_value}', is type: "
                 f"'{type(data_value)}'. {properties_violation_message}"
             )
-            self.event_logs.append({"warning": warning_name, "warning message": warning_message, "info_map": info_map})
+            self.event_logs.append({"warning": warning_name, "message": warning_message, "info_map": info_map})
 
             return False
 
@@ -1283,8 +1283,8 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Validation: invalid data not able to be fixed",
-                    "error message": error_message,
-                    "info map": info_map,
+                    "message": error_message,
+                    "info_map": info_map,
                 }
             )
             return False
@@ -1298,7 +1298,7 @@ class DataValidator:
             f"Variable: '{element_path}' has value: {original_invalid_value}. {properties_violation_message}"
         )
         self.event_logs.append(
-            {"warning": "Validation: invalid data found", "warning message": warning_message, "info map": info_map}
+            {"warning": "Validation: invalid data found", "message": warning_message, "info_map": info_map}
         )
 
         variable_parent[element_hierarchy[-1]] = variable_properties["default"]
@@ -1309,7 +1309,7 @@ class DataValidator:
             f"'{properties_blob_key}'."
         )
         self.event_logs.append(
-            {"warning": "Validation: data fixed", "warning message": warning_message, "info map": info_map}
+            {"warning": "Validation: data fixed", "message": warning_message, "info_map": info_map}
         )
         return True
 
@@ -1391,17 +1391,17 @@ class DataValidator:
         info_map = {"class": DataValidator.__name__, "function": DataValidator._log_missing_data.__name__}
         if not called_during_initialization:
             error_msg = f"Key {var_name} not found in data. A value is required to update variable during runtime."
-            self.event_logs.append({"error": "Missing required data", "error message": error_msg, "info map": info_map})
+            self.event_logs.append({"error": "Missing required data", "message": error_msg, "info_map": info_map})
             raise KeyError(error_msg)
 
         if self._is_data_required_upon_initialization(variable_name=var_name, variable_properties=variable_properties):
             self.event_logs.append(
                 {
                     "error": "Missing required data",
-                    "error message": f"Key {var_name} not found in data. Data value is required for"
+                    "message": f"Key {var_name} not found in data. Data value is required for"
                     f" this "
                     "variable upon program initialization.",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             raise KeyError(
@@ -1411,11 +1411,11 @@ class DataValidator:
         self.event_logs.append(
             {
                 "warning": "Validation: key not found in data -- data not required upon initialization",
-                "warning message": f"Key {var_name} not found in data. Data value is not required for "
+                "message": f"Key {var_name} not found in data. Data value is not required for "
                 f"this"
                 "variable upon program initialization, setting the variable value "
                 "to None.",
-                "info map": info_map,
+                "info_map": info_map,
             }
         )
 
@@ -1491,11 +1491,11 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "warning": "Unknown modifiability entry",
-                    "warning message": f"Unknown modifiability value of {modifiability} for variable"
+                    "message": f"Unknown modifiability value of {modifiability} for variable"
                     f" {variable_name}. Modifiability should be "
                     f"one of {Modifiability.values()}."
                     f" Using the default value: {default}",
-                    "info map": info_map,
+                    "info_map": info_map,
                 }
             )
             return Modifiability.__getitem__("_".join(default.strip().upper().split()))

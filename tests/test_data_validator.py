@@ -87,7 +87,7 @@ def test_bool_type_validator(
         assert dv.event_logs == [
             {
                 "warning": "Validation: bool variable is not a bool",
-                "warning message": (
+                "message": (
                     f"Variable: '{variable_path_str}' has value: '{input_data_value}', is type: "
                     f"'{type(input_data_value)}'. {properties_violation_message}"
                 ),
@@ -300,17 +300,17 @@ def test_fix_array_type_fixable_data(
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "warning message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
-            "info map": info_map,
+            "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
-            "info map": info_map,
+            "info_map": info_map,
         },
     ]
 
@@ -392,7 +392,7 @@ def test_fix_array_type_critical_data(
 
     assert result == expected_result
     assert dv.event_logs == [
-        {"error": "Validation: invalid data not able to be fixed", "error message": error_message, "info map": info_map}
+        {"error": "Validation: invalid data not able to be fixed", "message": error_message, "info_map": info_map}
     ]
 
 
@@ -508,17 +508,17 @@ def test_fix_string_type_fixable_data(
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "warning message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
-            "info map": info_map,
+            "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
-            "info map": info_map,
+            "info_map": info_map,
         },
     ]
 
@@ -563,17 +563,17 @@ def test_fix_string_type_csv_data() -> None:
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "warning message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
-            "info map": info_map,
+            "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
-            "info map": info_map,
+            "info_map": info_map,
         },
     ]
 
@@ -658,7 +658,7 @@ def test_fix_string_type_critical_data(
 
     assert result == expected_result
     assert dv.event_logs == [
-        {"error": "Validation: invalid data not able to be fixed", "error message": error_message, "info map": info_map}
+        {"error": "Validation: invalid data not able to be fixed", "message": error_message, "info_map": info_map}
     ]
 
 
@@ -776,17 +776,17 @@ def test_fix_number_type_fixable_data(
     assert dv.event_logs == [
         {
             "warning": "Validation: invalid data found",
-            "warning message": f"Variable: '{element_path}' has value:"
+            "message": f"Variable: '{element_path}' has value:"
             f" {original_invalid_value}. {properties_violation_message}",
-            "info map": info_map,
+            "info_map": info_map,
         },
         {
             "warning": "Validation: data fixed",
-            "warning message": f"Invalid data fixed: '{element_path}' value changed from"
+            "message": f"Invalid data fixed: '{element_path}' value changed from"
             f" {original_invalid_value} to "
             f"{dummy_variable_properties['default']}. Fix enabled by default value specified in "
             f"'{dummy_properties_key}'.",
-            "info map": info_map,
+            "info_map": info_map,
         },
     ]
 
@@ -873,7 +873,7 @@ def test_fix_number_type_critical_data(
 
     assert result == expected_result
     assert dv.event_logs == [
-        {"error": "Validation: invalid data not able to be fixed", "error message": error_message, "info map": info_map}
+        {"error": "Validation: invalid data not able to be fixed", "message": error_message, "info_map": info_map}
     ]
 
 
@@ -1070,11 +1070,11 @@ def test_object_type_validator_key_removal(
     expected_event_log = [
         {
             "warning": "Validation: object contains extraneous data",
-            "warning message": (
+            "message": (
                 f"Variable: 'dummy path' contains data at key '{key}' "
                 f"that is not specified in the metadata properties. {violation_msg}"
             ),
-            "info map": info_map,
+            "info_map": info_map,
         }
         for key in removed_keys
     ]
@@ -1160,7 +1160,7 @@ def test_validate_array_container_properties(
     # Assert
     assert result == expected_result
     if expected_warning:
-        assert dv.event_logs == [{"warning": expected_warning, "warning message": mocker.ANY, "info map": info_map}]
+        assert dv.event_logs == [{"warning": expected_warning, "message": mocker.ANY, "info_map": info_map}]
     else:
         assert dv.event_logs == []
 
@@ -1492,11 +1492,11 @@ def test_validate_metadata(
     if expected_exception:
         valid, message = dv.validate_metadata(metadata, {"json", "csv"}, "files")
         assert not valid
-        assert dv.event_logs == [{"error": "Metadata Validation", "error message": mocker.ANY, "info map": info_map}]
+        assert dv.event_logs == [{"error": "Metadata Validation", "message": mocker.ANY, "info_map": info_map}]
     else:
         dv.validate_metadata(metadata, {"json", "csv"}, "files")
         assert dv.event_logs == [
-            {"log": "Metadata Validation", "log message": "Top level metadata is valid.", "info map": info_map}
+            {"log": "Metadata Validation", "message": "Top level metadata is valid.", "info_map": info_map}
         ]
 
 
@@ -1566,20 +1566,20 @@ def test_validate_properties(
         valid, exc_info = dv.validate_properties(metadata, limit)
         assert exc_info == expected_err_msg
         assert not valid
-        assert dv.event_logs == [{"error": expected_error, "error message": mocker.ANY, "info map": info_map}]
+        assert dv.event_logs == [{"error": expected_error, "message": mocker.ANY, "info_map": info_map}]
     else:
         valid, exc_info = dv.validate_properties(metadata, limit)
         assert valid
         assert dv.event_logs == [
             {
                 "log": "Metadata properties depth",
-                "log message": f"Max depth of metadata properties is {expected_depth}",
-                "info map": info_map,
+                "message": f"Max depth of metadata properties is {expected_depth}",
+                "info_map": info_map,
             },
             {
                 "log": "Metadata properties path",
-                "log message": f"Deepest path of metadata properties is {expected_path}",
-                "info map": info_map,
+                "message": f"Deepest path of metadata properties is {expected_path}",
+                "info_map": info_map,
             },
         ]
 
@@ -1656,7 +1656,7 @@ def test_metadata_number_validator(
     if should_raise:
         valid, msg = dv._metadata_number_validator(key_path, value)
         assert not valid
-        assert dv.event_logs == [{"error": error_title, "error message": error_msg, "info map": info_map}]
+        assert dv.event_logs == [{"error": error_title, "message": error_msg, "info_map": info_map}]
         mock_validate_properties_keys.assert_called_once()
     else:
         dv._metadata_number_validator(key_path, value)
@@ -1722,7 +1722,7 @@ def test_metadata_string_validator(
     if should_raise:
         valid, msg = dv._metadata_string_validator(key_path, value)
         assert not valid
-        assert dv.event_logs == [{"error": error_title, "error message": error_msg, "info map": info_map}]
+        assert dv.event_logs == [{"error": error_title, "message": error_msg, "info_map": info_map}]
         mock_validate_properties_keys.assert_called_once()
     else:
         dv._metadata_string_validator(key_path, value)
@@ -1773,7 +1773,7 @@ def test_metadata_bool_validator(
     if should_raise:
         valid, msg = dv._metadata_bool_validator(key_path, value)
         assert not valid
-        assert dv.event_logs == [{"error": error_title, "error message": error_msg, "info map": info_map}]
+        assert dv.event_logs == [{"error": error_title, "message": error_msg, "info_map": info_map}]
         mock_validate_properties_keys.assert_called_once()
     else:
         dv._metadata_bool_validator(key_path, value)
@@ -1825,7 +1825,7 @@ def test_metadata_array_validator(
     if should_raise:
         valid, msg = dv._metadata_array_validator(key_path, value)
         assert not valid
-        assert dv.event_logs == [{"error": error_title, "error message": error_msg, "info map": info_map}]
+        assert dv.event_logs == [{"error": error_title, "message": error_msg, "info_map": info_map}]
         mock_validate_properties_keys.assert_called_once()
     else:
         dv._metadata_array_validator(key_path, value)
@@ -1911,8 +1911,8 @@ def test_validate_metadata_properties_keys(
         assert dv.event_logs == [
             {
                 "error": "Metadata Validation",
-                "error message": expected_message,
-                "info map": {
+                "message": expected_message,
+                "info_map": {
                     "class": "DataValidator",
                     "function": "_validate_metadata_properties_keys",
                 },

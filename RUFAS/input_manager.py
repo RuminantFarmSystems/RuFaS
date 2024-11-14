@@ -1341,3 +1341,36 @@ class InputManager:
         except OSError as e:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
+
+    def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
+        """Takes logs from other classes and routes them to the appropriate pools in
+        Output Manager.
+
+        Parameters
+        ----------
+        log_pool : List[Dict[str, str | Dict[str, str]]]
+            A list of log, warning, and error dictionaries containing all the components needed
+            to log the information to the appropriate pool.
+        """
+        for log in log_pool:
+            if "error" in log:
+                if (
+                    isinstance(log["error"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.om.add_error(log["error"], log["message"], log["info_map"])
+            elif "log" in log:
+                if (
+                    isinstance(log["log"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.om.add_log(log["log"], log["message"], log["info_map"])
+            elif "warning" in log:
+                if (
+                    isinstance(log["warning"], str)
+                    and isinstance(log["message"], str)
+                    and isinstance(log["info_map"], dict)
+                ):
+                    self.om.add_warning(log["warning"], log["message"], log["info_map"])
