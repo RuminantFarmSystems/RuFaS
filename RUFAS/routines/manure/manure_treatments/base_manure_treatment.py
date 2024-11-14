@@ -3,6 +3,8 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple, Union
 
+import numpy as np
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.constants_and_units.gas_emission_constants import GasEmissionConstants
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
@@ -250,6 +252,32 @@ class BaseManureTreatment(ABC):
 
         """
         pass
+
+    @staticmethod
+    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+        """Determines the temperature of the manure in outdoor liquid and slurry storages.
+
+        Parameters
+        ----------
+        air_temperature : float
+            The current day's ambient air temperature (°C).
+
+        Returns
+        -------
+        float
+            The estimated temperature of the manure storage (°C).
+
+        References
+        ----------
+
+        This function clamps stored manure temperature to between 0 and 35 °C. Between 0 and 35 °C, outdoor stored
+        liquid manure temperature is assumed to be equal to ambient air temperature. These bounds were based on
+        personal communication and recommendations from A. Leytem (april.leytem@usda.gov) and A. VanderZaag
+        (andrew.vanderzaag@AGR.GC.CA). These bounds are also support by work from Genedy and Ogejo, 2021
+        (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and maximum liquid manure
+        temperatures in outdoor clay pit and concrete tank manure storages.
+        """
+        return float(np.clip(air_temperature, 0.0, 35.0))
 
     def calc_methane_emission(self, *args, **kwargs) -> float:
         """Calculates the methane emission of the manure treatment.
