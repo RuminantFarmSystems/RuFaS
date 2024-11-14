@@ -1,11 +1,7 @@
 from math import exp, log
 from typing import Optional
 
-from RUFAS.routines.field.crop_and_soil_constants import (
-    CUBIC_MILLIMETERS_TO_LITERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    MILLIGRAMS_TO_KILOGRAMS,
-)
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -389,7 +385,10 @@ class LeachingRunoffErosion:
 
         """
         water_amount_in_liters = (
-            water_amount * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_LITERS
+            water_amount
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_LITERS
         )
 
         nitrogen_content_in_mg_per_kg = LayerData.determine_soil_nutrient_concentration(
@@ -400,6 +399,6 @@ class LeachingRunoffErosion:
             nitrogen_content_in_mg_per_kg * extraction_coefficient * water_amount_in_liters / field_size
         )
 
-        nitrogen_leached_in_kg_per_ha = nitrogen_leached_in_mg_per_ha * MILLIGRAMS_TO_KILOGRAMS
+        nitrogen_leached_in_kg_per_ha = nitrogen_leached_in_mg_per_ha * GeneralConstants.MILLIGRAMS_TO_KG
 
         return min(nitrogen_content, nitrogen_leached_in_kg_per_ha)
