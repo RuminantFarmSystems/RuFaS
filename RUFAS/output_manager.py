@@ -640,10 +640,13 @@ class OutputManager(object):
         """
         file_pointer.write(DISCLAIMER_MESSAGE + "\n")
 
-    def dict_to_file_json(self, data_dict: dict[str, Any],
-                          path: Path,
-                          minify_output_file: bool = False,
-                          origin_label: OriginLabel = OriginLabel.NONE) -> None:
+    def dict_to_file_json(
+        self,
+        data_dict: dict[str, Any],
+        path: Path,
+        minify_output_file: bool = False,
+        origin_label: OriginLabel = OriginLabel.NONE,
+    ) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
