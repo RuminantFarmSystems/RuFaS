@@ -123,8 +123,6 @@ class OutputManager(object):
         Contains logs reported to the output manager
     time : Time
         A Time object used to track the simulation time
-    _include_detailed_values : bool
-        Set to True to include detailed values in the json output files after the simulation
     _exclude_info_maps_flag : bool
         Set to True to exclude info_maps when adding variables to the variables_pool
     _variables_usage_counter : Counter[str]
@@ -170,7 +168,6 @@ class OutputManager(object):
             self.warnings_pool: dict[str, OutputManager.pool_element_type] = {}
             self.errors_pool: dict[str, OutputManager.pool_element_type] = {}
             self.logs_pool: dict[str, OutputManager.pool_element_type] = {}
-            self._include_detailed_values: bool = True
             self._exclude_info_maps_flag: bool = False
             self.__metadata_prefix: str = ""
             self.__supported_filter_types_prefixes: dict[str, str] = {
@@ -770,7 +767,6 @@ class OutputManager(object):
         ...     }
         ... }
         >>> output_manager = OutputManager()
-        >>> output_manager.set_include_detailed_values(True)
         >>> modified_data_dict = output_manager._add_detailed_values(
         ...     example_data_dict, OriginLabel.TRUE_AND_REPORT_ORIGINS
         ... )
@@ -792,7 +788,7 @@ class OutputManager(object):
         ... ]
         """
 
-        if not self._include_detailed_values:
+        if origin_label is OriginLabel.NONE:
             return data_dict
 
         for key, sub_data_dict in data_dict.items():
@@ -1984,11 +1980,6 @@ class OutputManager(object):
                 f"Finished task: {task_id} with {errors_count} error(s), "
                 f"{warnings_count} warning(s), and {logs_count} log(s).\n"
             )
-
-    def set_include_detailed_values(self, flag: bool) -> None:
-        """Sets the flag for adding detailed values to the output files."""
-
-        self._include_detailed_values = flag
 
     def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
         """
