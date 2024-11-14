@@ -35,6 +35,20 @@
       "type": "json",
       "properties": "animal_population_properties"
     },
+    "animal_net_merit": {
+      "title": "Animal Net Merit data",
+      "description": "The net merit value for cows.",
+      "path": "input/data/animal/animal_genetics/NetMerit_HO.csv",
+      "type": "csv",
+      "properties": "animal_net_merit_properties"
+    },
+    "animal_top_listing_semen": {
+      "title": "Animal Top Listing Semen data",
+      "description": "The top listing semen value for new born calves.",
+      "path": "input/data/animal/animal_genetics/TopListingSemen_HO.csv",
+      "type": "csv",
+      "properties": "animal_top_listing_semen_properties"
+    },
     "lactation": {
       "title": "Lactation curve adjustment values",
       "description": "Values for the adjustment of the three wood parameters based on farm specific data",
@@ -139,6 +153,41 @@
       "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
+    },
+    "soil_1": {
+      "title": "Soil data",
+      "description": "Characteristic soil information, including composition, slope, and layer details.",
+      "path": "input/data/soil/default_soil.json",
+      "type": "json",
+      "properties": "soil_profile_properties"
+    },
+    "fertilizer_schedule": {
+      "title": "Fertilizer schedule.",
+      "description": "Fertilizer types available, and their application schedule.",
+      "path": "input/data/fertilizer_schedule/default_fertilizer_schedule.json",
+      "type": "json",
+      "properties": "fertilizer_schedule_properties"
+    },
+    "manure_schedule": {
+      "title": "Manure schedule.",
+      "description": "Specifies manure applications to a field.",
+      "path": "input/data/manure_schedule/default_manure_schedule.json",
+      "type": "json",
+      "properties": "manure_schedule_properties"
+    },
+    "tillage_schedule": {
+      "title": "Tillage schedule.",
+      "description": "Schedule of tillage applications for a field.",
+      "path": "input/data/tillage_schedule/default_tillage_schedule.json",
+      "type": "json",
+      "properties": "tillage_schedule_properties"
+    },
+    "field": {
+      "title": "Field specification",
+      "description": "Field characteristics and references to field management specifications.",
+      "path": "input/data/field/default_field.json",
+      "type": "json",
+      "properties": "field_properties"
     }
   },
   "cross-validation": {}

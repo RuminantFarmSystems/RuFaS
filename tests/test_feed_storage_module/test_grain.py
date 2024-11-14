@@ -1,6 +1,6 @@
 import pytest
 
-from RUFAS.routines.feed_storage.enums import CropCategory
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
 from RUFAS.routines.feed_storage.grain import Grain
 
 
