@@ -10,7 +10,6 @@ from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.units import MeasurementUnits
 
 
@@ -71,7 +70,7 @@ def test_remove_amount_incorporated(
     [
         ([1, 2, 3], "<class 'list'>"),
         (
-            Field(manure_manager=MagicMock(ManureManager)),
+            Field(),
             "<class 'RUFAS.routines.field.field.field.Field'>",
         ),
     ],
