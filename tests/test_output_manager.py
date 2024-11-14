@@ -2777,9 +2777,10 @@ def test_print_errors_warnings_logs(
                 "ModuleD.variable_w": {
                     "info_maps": [
                         {"data_origin": [["SourceClassD", "method_d"]], "units": "m"},
-                        {"data_origin": [["SourceClassD", "method_d"]], "units": "m"}
+                        {"data_origin": [["SourceClassD", "method_d"]], "units": "m"},
                     ],
-                    "values": [1.5, 2.0]}
+                    "values": [1.5, 2.0],
+                }
             },
         ),
         # Test case with dictionary values and origin_label=TRUE_AND_REPORT_ORIGINS
