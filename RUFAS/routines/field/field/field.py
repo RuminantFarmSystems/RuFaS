@@ -3,19 +3,7 @@ from math import exp
 from typing import Any, Dict, List, Optional, Sequence
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.data_structures.manure_to_crop_soil_connection import (
-    ManureEventNutrientRequest,
-    ManureEventNutrientRequestResults,
-)
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
-from RUFAS.output_manager import OutputManager
-from RUFAS.routines.field.crop.crop import Crop
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
-from RUFAS.routines.field.field.field_data import FieldData
-from RUFAS.routines.field.field.manure_application import ManureApplication
-from RUFAS.routines.field.field.tillage_application import TillageApplication
 from RUFAS.data_structures.events import (
     BaseFieldManagementEvent,
     FertilizerEvent,
@@ -24,9 +12,22 @@ from RUFAS.data_structures.events import (
     PlantingEvent,
     TillageEvent,
 )
-from RUFAS.routines.field.soil.soil import Soil
-from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
+    NutrientRequest,
+    NutrientRequestResults,
+)
 from RUFAS.data_structures.manure_types import ManureType
+from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop import Crop
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.field.fertilizer_application import FertilizerApplication
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.field.manure_application import ManureApplication
+from RUFAS.routines.field.field.tillage_application import TillageApplication
+from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
