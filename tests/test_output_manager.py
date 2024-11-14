@@ -2669,7 +2669,7 @@ def test_print_errors_warnings_logs(
 
 
 @pytest.mark.parametrize(
-    "input_data, detailed_values_flag, origin_label, expected",
+    "input_data, origin_label, expected",
     [
         # Basic test case with a single data_origin per value and origin_label=TRUE_AND_REPORT_ORIGINS
         (
@@ -2682,7 +2682,6 @@ def test_print_errors_warnings_logs(
                     "values": [10, 20],
                 }
             },
-            True,  # detailed_values_flag
             OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
                 "ModuleA.variable_x": {
@@ -2709,7 +2708,6 @@ def test_print_errors_warnings_logs(
                     "values": [30, 40],
                 }
             },
-            True,  # detailed_values_flag
             OriginLabel.TRUE_ORIGIN,
             {
                 "ModuleB.variable_y": {
@@ -2742,7 +2740,6 @@ def test_print_errors_warnings_logs(
                     "values": [25.5, 26.1],
                 }
             },
-            True,  # detailed_values_flag
             OriginLabel.REPORT_ORIGIN,
             {
                 "ModuleC.variable_z": {
@@ -2775,20 +2772,11 @@ def test_print_errors_warnings_logs(
                     "values": [1.5, 2.0],
                 }
             },
-            True,  # detailed_values_flag
             OriginLabel.NONE,
             {
-                "ModuleD.variable_w": {
-                    "info_maps": [
-                        {"data_origin": [["SourceClassD", "method_d"]], "units": MeasurementUnits.METERS.value},
-                        {"data_origin": [["SourceClassD", "method_d"]], "units": MeasurementUnits.METERS.value},
-                    ],
-                    "values": [1.5, 2.0],
-                    "detailed_values": [
-                        "1.5 (m)",
-                        "2.0 (m)",
-                    ],
-                }
+                'ModuleD.variable_w': {'info_maps': [{'data_origin': [['SourceClassD', 'method_d']], 'units': 'm'},
+                                                     {'data_origin': [['SourceClassD', 'method_d']], 'units': 'm'}],
+                                                     'values': [1.5, 2.0]}
             },
         ),
         # Test case with dictionary values and origin_label=TRUE_AND_REPORT_ORIGINS
@@ -2802,7 +2790,6 @@ def test_print_errors_warnings_logs(
                     "values": [{"key1": 10, "key2": 20}, {"key1": 30, "key2": 40}],
                 }
             },
-            True,  # detailed_values_flag
             OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
                 "ModuleE.variable_dict": {
@@ -2829,7 +2816,6 @@ def test_print_errors_warnings_logs(
                     "values": [50, 60],
                 }
             },
-            True,  # detailed_values_flag
             OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
                 "ModuleF.missing_data_origin_units": {
@@ -2851,7 +2837,6 @@ def test_print_errors_warnings_logs(
                     "values": [70, 80],
                 }
             },
-            True,  # detailed_values_flag
             OriginLabel.TRUE_AND_REPORT_ORIGINS,
             {
                 "ModuleG.mismatched_lengths": {
@@ -2862,37 +2847,12 @@ def test_print_errors_warnings_logs(
                 }
             },
         ),
-        # Test case with _include_detailed_values set to False
-        (
-            {
-                "ModuleH.include_detailed_values_false": {
-                    "info_maps": [
-                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
-                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
-                    ],
-                    "values": [90, 100],
-                }
-            },
-            False,  # detailed_values_flag
-            OriginLabel.TRUE_AND_REPORT_ORIGINS,
-            {
-                "ModuleH.include_detailed_values_false": {
-                    "info_maps": [
-                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
-                        {"data_origin": [["SourceClassH", "method_h"]], "units": MeasurementUnits.KILOGRAMS.value},
-                    ],
-                    "values": [90, 100],
-                }
-            },
-        ),
     ],
 )
 def test_add_detailed_values(
-    input_data: Dict[str, Any],
-    detailed_values_flag: bool,
+    input_data: dict[str, Any],
     origin_label: OriginLabel,
-    expected: Dict[str, Any],
-    mocker: MockerFixture,
+    expected: dict[str, Any],
 ) -> None:
     """
     Unit test for the _add_detailed_values() method in OutputManager class.
@@ -2900,38 +2860,12 @@ def test_add_detailed_values(
 
     # Arrange
     output_manager = OutputManager()
-    mocker.patch.object(output_manager, "_include_detailed_values", detailed_values_flag)
 
     # Act
     result = output_manager._add_detailed_values(input_data, origin_label)
 
     # Assert
     assert result == expected
-
-
-@pytest.mark.parametrize(
-    "new_flag_value",
-    [
-        True,
-        False,
-    ],
-)
-def test_set_detailed_values(new_flag_value: bool) -> None:
-    """
-    Unit test for the set_include_detailed_values() method in OutputManager class.
-    """
-
-    # Arrange
-    manager1 = OutputManager()
-
-    # Act
-    manager1.set_include_detailed_values(new_flag_value)
-
-    # Assert
-    assert manager1._include_detailed_values == new_flag_value
-
-    # Clean up
-    manager1.set_include_detailed_values(False)
 
 
 @pytest.mark.parametrize(
