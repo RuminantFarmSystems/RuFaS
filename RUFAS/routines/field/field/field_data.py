@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop.dormancy import Dormancy
-from RUFAS.routines.field.crop_and_soil_constants import HECTARES_TO_SQUARE_MILLIMETERS, LITERS_TO_CUBIC_MILLIMETERS
 
 
 @dataclass(kw_only=True)
@@ -155,6 +155,6 @@ class FieldData:
             Millimeter amount that is distributed evenly across the specified field area (mm)
 
         """
-        amount_in_cubic_millimeters = liter_amount * LITERS_TO_CUBIC_MILLIMETERS
-        field_size_in_square_millimeters = field_size * HECTARES_TO_SQUARE_MILLIMETERS
+        amount_in_cubic_millimeters = liter_amount * GeneralConstants.LITERS_TO_CUBIC_MILLIMETERS
+        field_size_in_square_millimeters = field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
         return amount_in_cubic_millimeters / field_size_in_square_millimeters
