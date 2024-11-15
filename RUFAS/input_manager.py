@@ -930,7 +930,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._add_variable_to_pool.__name__,
+            "function": self._check_modifiability.__name__,
         }
         is_modifiable_during_runtime = self._is_modifiable_during_runtime(
             variable_name=variable_name, variable_properties=metadata_properties
