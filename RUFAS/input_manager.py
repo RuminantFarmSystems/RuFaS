@@ -93,6 +93,7 @@ class InputManager:
         self._load_properties()
         valid, message = self.data_validator.validate_properties(self.__metadata, self.metadata_depth_limit)
         if not valid:
+            self._route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
         self._route_logs(self.data_validator.event_logs)
@@ -1088,6 +1089,7 @@ class InputManager:
             self._route_logs(self.data_validator.event_logs)
             return add_variable_success
         else:
+            self._route_logs(self.data_validator.event_logs)
             return False
 
     def dump_get_data_logs(self, path: Path) -> None:
