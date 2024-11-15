@@ -1,7 +1,7 @@
 import os
 import re
 from enum import Enum
-from typing import Dict, Any, Callable, List, Union, Sequence, Tuple
+from typing import Any, Callable, Union, Sequence
 
 
 class ElementState(Enum):
@@ -153,7 +153,7 @@ class Modifiability(Enum):
     UNREQUIRED_UNLOCKED: str = "unrequired unlocked"
 
     @classmethod
-    def values(cls) -> List[str]:
+    def values(cls) -> list[str]:
         """
         Provides a list of the string values of the enum members.
 
@@ -165,11 +165,11 @@ class Modifiability(Enum):
         return list(map(lambda c: c.value, cls))
 
     @classmethod
-    def get_required_during_initialization(cls) -> List["Modifiability"]:
+    def get_required_during_initialization(cls) -> list["Modifiability"]:
         return [Modifiability.REQUIRED_LOCKED, Modifiability.REQUIRED_UNLOCKED]
 
     @classmethod
-    def get_modifiable_at_runtime(cls) -> List["Modifiability"]:
+    def get_modifiable_at_runtime(cls) -> list["Modifiability"]:
         return [Modifiability.REQUIRED_UNLOCKED, Modifiability.UNREQUIRED_UNLOCKED]
 
 
@@ -179,7 +179,7 @@ class DataValidator:
     def __init__(self) -> None:
         self.event_logs: list[dict[str, str | dict[str, str]]] = []
 
-    def validate_properties(self, metadata: Dict[str, Any], metadata_depth_limit: int) -> Tuple[bool, str]:
+    def validate_properties(self, metadata: dict[str, Any], metadata_depth_limit: int) -> tuple[bool, str]:
         """Iteratively traverses the metadata properties to check the max depth and routes
         properties to be validated by type.
 
@@ -198,7 +198,7 @@ class DataValidator:
         current_max_depth: int = 0
         deepest_path: list[str] = []
 
-        type_to_validator_map: Dict[str, Callable[[list[str], dict[str, Any]], tuple[bool, str]]] = {
+        type_to_validator_map: dict[str, Callable[[list[str], dict[str, Any]], tuple[bool, str]]] = {
             "number": self._metadata_number_validator,
             "array": self._metadata_array_validator,
             "bool": self._metadata_bool_validator,
@@ -267,7 +267,7 @@ class DataValidator:
         optional_properties_keys: set[str],
         properties: dict[str, Any],
         path: list[str],
-    ) -> Tuple[bool, str]:
+    ) -> tuple[bool, str]:
         """Validates that keys in the metadata properties sections."""
         info_map = {
             "class": DataValidator.__name__,
@@ -322,7 +322,7 @@ class DataValidator:
 
         return True, ""
 
-    def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_number_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
         """Validates number type properties in metadata."""
         info_map = {
             "class": DataValidator.__name__,
@@ -436,7 +436,7 @@ class DataValidator:
 
         return True, ""
 
-    def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_string_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
         """Validates string type properties in metadata."""
         info_map = {
             "class": DataValidator.__name__,
@@ -524,7 +524,7 @@ class DataValidator:
 
         return True, ""
 
-    def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_bool_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
         """Validates bool type properties in metadata."""
         info_map = {
             "class": DataValidator.__name__,
@@ -564,7 +564,7 @@ class DataValidator:
 
         return True, ""
 
-    def _metadata_array_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_array_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
         """Validates array type properties in metadata."""
         info_map = {
             "class": DataValidator.__name__,
@@ -623,7 +623,7 @@ class DataValidator:
 
         return True, ""
 
-    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> Tuple[bool, str]:
+    def _metadata_object_validator(self, key_path: list[str], value: dict[str, Any]) -> tuple[bool, str]:
         """Validates object type properties in metadata."""
         required_object_property_keys = {"type"}
         optional_object_property_keys = {"description"}
@@ -635,8 +635,8 @@ class DataValidator:
         return True, ""
 
     def validate_metadata(
-        self, metadata: Dict[str, Any], valid_data_types: set[str], address_to_data: str
-    ) -> Tuple[bool, str]:
+        self, metadata: dict[str, Any], valid_data_types: set[str], address_to_data: str
+    ) -> tuple[bool, str]:
         """Checks that top-level metadata has valid and required keys and values."""
         info_map = {
             "class": DataValidator.__name__,
@@ -705,9 +705,9 @@ class DataValidator:
     # Validate input by type related
     def validate_data_by_type(
         self,
-        variable_properties: Dict[str, Any],
-        variable_path: List[str | int],
-        data: Dict[str, Any],
+        variable_properties: dict[str, Any],
+        variable_path: list[str | int],
+        data: dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -801,8 +801,8 @@ class DataValidator:
 
     def _validate_array_container_properties(
         self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
+        variable_path: list[str | int],
+        variable_properties: dict[str, Any],
         data: Any,
         properties_blob_key: str,
     ) -> bool:
@@ -878,9 +878,9 @@ class DataValidator:
 
     def _array_type_validator(
         self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        data: Dict[str, Any],
+        variable_path: list[str | int],
+        variable_properties: dict[str, Any],
+        data: dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -946,9 +946,9 @@ class DataValidator:
 
     def _object_type_validator(
         self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        data: Dict[str, Any],
+        variable_path: list[str | int],
+        variable_properties: dict[str, Any],
+        data: dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: ElementsCounter,
@@ -1046,9 +1046,9 @@ class DataValidator:
 
     def _number_type_validator(
         self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        data: Dict[str, Any],
+        variable_path: list[str | int],
+        variable_properties: dict[str, Any],
+        data: dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -1114,9 +1114,9 @@ class DataValidator:
 
     def _string_type_validator(
         self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        data: Dict[str, Any],
+        variable_path: list[str | int],
+        variable_properties: dict[str, Any],
+        data: dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -1194,9 +1194,9 @@ class DataValidator:
 
     def _bool_type_validator(
         self,
-        variable_path: List[str | int],
-        variable_properties: Dict[str, Any],
-        data: Dict[str, Any],
+        variable_path: list[str | int],
+        variable_properties: dict[str, Any],
+        data: dict[str, Any],
         eager_termination: bool,
         properties_blob_key: str,
         elements_counter: "ElementsCounter",
@@ -1235,9 +1235,9 @@ class DataValidator:
 
     def _fix_data(
         self,
-        variable_properties: Dict[str, Any],
-        element_hierarchy: List[Union[str, int]],
-        data: Dict[str, Any],
+        variable_properties: dict[str, Any],
+        element_hierarchy: list[Union[str, int]],
+        data: dict[str, Any],
         properties_blob_key: str,
     ) -> bool:
         """
@@ -1315,9 +1315,9 @@ class DataValidator:
 
     def _extract_data_by_key_list(
         self,
-        data: List[Any] | Dict[str, Any],
+        data: list[Any] | dict[str, Any],
         variable_path: Sequence[str | int],
-        variable_properties: Dict[str, Any],
+        variable_properties: dict[str, Any],
         called_during_initialization: bool,
     ) -> Any:
         """
@@ -1362,7 +1362,7 @@ class DataValidator:
         return result
 
     def _log_missing_data(
-        self, variable_properties: Dict[str, Any], var_name: str, called_during_initialization: bool
+        self, variable_properties: dict[str, Any], var_name: str, called_during_initialization: bool
     ) -> None:
         """
         Handles logging for missing data for a variable, logging errors or warnings based on the context of
@@ -1419,7 +1419,7 @@ class DataValidator:
             }
         )
 
-    def _is_data_required_upon_initialization(self, variable_name: str, variable_properties: Dict[str, Any]) -> bool:
+    def _is_data_required_upon_initialization(self, variable_name: str, variable_properties: dict[str, Any]) -> bool:
         """
         Determines whether a variable requires a data value upon initialization based on its modifiability status.
 
@@ -1447,7 +1447,7 @@ class DataValidator:
         )
         return variable_modifiability in Modifiability.get_required_during_initialization()
 
-    def _get_variable_modifiability(self, variable_name: str, variable_properties: Dict[str, Any]) -> Modifiability:
+    def _get_variable_modifiability(self, variable_name: str, variable_properties: dict[str, Any]) -> Modifiability:
         """
         Determines the modifiability status of a variable based on its properties and returns the corresponding enum
         value.
@@ -1500,7 +1500,7 @@ class DataValidator:
             )
             return Modifiability.__getitem__("_".join(default.strip().upper().split()))
 
-    def convert_variable_path_to_str(self, variable_path: List[str | int]) -> str:
+    def convert_variable_path_to_str(self, variable_path: list[str | int]) -> str:
         """
         Converts a list of keys (int or str) into a string representation of the path to a variable.
 
@@ -1535,7 +1535,7 @@ class DataValidator:
                 formatted_path_elems.append(f"{raw_path_elem}")
         return ".".join(formatted_path_elems)
 
-    def extract_value_by_key_list(self, data: List[Any] | Dict[str, Any], variable_path: Sequence[str | int]) -> Any:
+    def extract_value_by_key_list(self, data: list[Any] | dict[str, Any], variable_path: Sequence[str | int]) -> Any:
         """
         Extracts a value from a nested list or dictionary using a list of keys (int or str).
 
