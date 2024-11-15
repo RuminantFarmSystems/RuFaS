@@ -1277,8 +1277,7 @@ def test_add_variable_to_pool_valid(
 
     patch_add = mocker.patch("RUFAS.input_manager.InputManager._add_to_pool", wraps=input_manager._add_to_pool)
     input_manager._add_to_pool.__name__ = "_add_to_pool"
-    patch_check = mocker.patch(
-        "RUFAS.input_manager.InputManager._check_modifiability")
+    patch_check = mocker.patch("RUFAS.input_manager.InputManager._check_modifiability")
     patch_validate = mocker.patch("RUFAS.input_manager.InputManager._validate_data", wraps=input_manager._validate_data)
     patch_prepare = mocker.patch("RUFAS.input_manager.InputManager._prepare_data", wraps=input_manager._prepare_data)
 
