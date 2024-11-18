@@ -990,6 +990,11 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
         )
         self.om.add_variable(
+            "annual_machine_decomposed_manure",
+            field.soil.data.machine_manure.annual_decomposed_manure,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
+        )
+        self.om.add_variable(
             "annual_runoff_machine_manure_organic_phosphorus",
             field.soil.data.machine_manure.annual_runoff_manure_organic_phosphorus,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
@@ -1003,6 +1008,11 @@ class FieldDataReporter:
             "annual_runoff_grazing_manure_organic_phosphorus",
             field.soil.data.grazing_manure.annual_runoff_manure_organic_phosphorus,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
+        )
+        self.om.add_variable(
+            "annual_grazing_decomposed_manure",
+            field.soil.data.grazing_manure.annual_decomposed_manure,
+            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS})
         )
         self.om.add_variable(
             "annual_soil_phosphorus_runoff",
