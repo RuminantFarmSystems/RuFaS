@@ -41,7 +41,7 @@ class Schedule:
         self.name = name
         self.years = years
 
-        self.days = self._elongate_list(days, len(years))
+        self.days = Utility.elongate_list(days, len(years))
 
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
