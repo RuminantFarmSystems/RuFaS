@@ -309,7 +309,6 @@ class Field:
         nitrogen_applied = fertilizer_applied.get("nitrogen_mass")
         potassium_applied = fertilizer_applied.get("potassium_mass")
 
-        # TODO: specify these fractions in fertilizer mixes - issue #573
         inorganic_nitrogen_fraction = nitrogen_applied / total_mass_applied
         ammonium_fraction = 0.0
         organic_nitrogen_fraction = 0.0
