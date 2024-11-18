@@ -51,48 +51,110 @@ We adjusted our quarterly target schedule to align with the US federal fiscal ye
 * Q4: July 1 to September 30th
 
 ## Q1 Goals (October 1 - December 31)
+
+### Overall Project Goals
+* Biophysical module disentanglement
+  
 ### Animal Module
-
+* Complete lactation curve manuscript
+* Update and cosolidate scientific documentation
+* Implementation of genetics informed culling
+* New herd initialization method to support footprinting
+* Amino Acid Supply
+* Finish refresh
+  
 ### Manure Module
-
+* Update manure temperature representation to include temperature limits
+* Complete refresh design
+  
 ### Soil and Crop Module
-
+* Debug/improve accuracy of N2O emissions
+* Complete first draft of documentation
+  
 ### Feed Storage Module
+* Implement dummy connection with animal module
+* Implement dummy purchased feed logic
+* Review and update Feed Module user inputs
 
 ### Energy, Economics, and Emissions (EEE) Module
-
+* Design economics model
+* Bring field energy use methods up to date
+  
 ## Q2 Goals (January 1 to March 31)
+
+### Overall Project Goals
+
+* Scientific documentation - completion, review, and addition to GitHub
+* Data collection app update
+* Finish software orientation series (7 weeks)
+* Website update
+
 ### Animal Module
-
+* Complete SA and manuscript
+* Complete Pilot testing manuscript
+* Complete Sys engineering manuscript
+* Amino Acid supplementation and impact on production
+* Update ration formulation
+* Implmement functional connection with feed inventory
+  
 ### Manure Module
-
+* Complete Scientific Documentation
+* Improve representation of manure surface area and volume
+* Representation of manure imports and exports
+* Implement manure module refresh
+  
 ### Soil and Crop Module
 
-### Feed Storage Module
+* Evaluation of model outputs with experimental datasets
+* Pilot testing reports
+* External review of first draft of documentation
+* Review alignment of documentation with code
+* Improve field management input methods
+* Complete plan for refresh 
 
+### Feed Storage Module
+* Model evaluation
+* Represent feed shrink
+* Connect Feed module with updated Animal Module/Ration Formulation
+* Consistent representation of crops → feeds
+  
 ### Energy, Economics, and Emissions (EEE) Module
+* Develop methodology for economics module
+* Test/evaluate economics module
+* Test field energy use methods
+* Design and Implement animal energy use methods
+* Develop methodology, design and implement feed storage energy use methods
 
 ## Q3 Goals (April 1 to June 30)
+### Overall Project Goals
+* Publish RuFaS Repository
+  
 ### Animal Module
-
+* Animal Health Submodule Design
+  
 ### Manure Module
+* Write and submit peer reviewed publication
+* Represent water evaporation in liquid storage
+* Sensitivity Analysis
 
 ### Soil and Crop Module
-
+* Publication of initial model and evaluation
+* Improve representation of irrigation
+* Add methane emissions from soil
+* Enable Complex combinations of harvesting
+* Implement refresh - timeline TBD dependent on planning progress
+* Consistent representation of crops → feeds
+  
 ### Feed Storage Module
-
+* Representation of multiple storage units for the same feed
+  
 ### Energy, Economics, and Emissions (EEE) Module
-
+* Design and implement manure energy use methods
+  
 ## Q4 Goals (July 1 to September 30)
-### Animal Module
-
-### Manure Module
-
-### Soil and Crop Module
-
-### Feed Storage Module
-
-### Energy, Economics, and Emissions (EEE) Module
+### Overall Project Goals
+* Prepare for Annual Meeting
+* Finish any tasks that were not finished in Q1-Q3
 
 # Resources
 
