@@ -348,7 +348,7 @@ def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: Outpu
 
     pool = output_manager.variables_pool
 
-    assert mock_add.call_count == 16
+    assert mock_add.call_count == 18
 
     assert pool["FieldDataReporter.send_soil_annual_variables.annual_water_content_change.field='name 1'"][
         "values"
