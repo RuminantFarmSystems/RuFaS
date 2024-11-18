@@ -492,7 +492,7 @@ class EmissionsEstimator:
         for fertilizer_application in filtered_fertilizers:
             fertilizer_application_date = Time.convert_year_jday_to_date(
                 fertilizer_application["year"], fertilizer_application["day"]
-            )
+            ).date()
             applied_crops = self._extract_applied_crops(sorted_crops, fertilizer_application_date)
             applied = False
 
