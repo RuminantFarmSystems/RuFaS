@@ -344,18 +344,18 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default number value.",
-                    "message": f"Invalid 'default' for '{key_path}': " f"Value is not nullable and default is 'None'.",
+                    "message": f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'.",
                     "info_map": info_map,
                 }
             )
-            error_message = f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'."
+            error_message = f"Invalid 'default' for '{key_path}': value is not nullable and default is 'None'."
             return False, error_message
 
         if default is not None and not isinstance(default, (int, float)) and not has_no_default:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default number value.",
-                    "message": f"Invalid 'default' for '{key_path}': Expected a number but " f"got {type(default)}.",
+                    "message": f"Invalid 'default' for '{key_path}': Expected a number but got {type(default)}.",
                     "info_map": info_map,
                 }
             )
@@ -452,7 +452,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default string value.",
-                    "message": f"Invalid 'default' for '{key_path}': Value is not nullable and" f" default is 'None'",
+                    "message": f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                     "info_map": info_map,
                 }
             )
@@ -463,7 +463,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default string value.",
-                    "message": f"Invalid 'default' for '{key_path}': Expected a string but" f" got {type(default)}",
+                    "message": f"Invalid 'default' for '{key_path}': Expected a string but got {type(default)}",
                     "info_map": info_map,
                 }
             )
@@ -475,7 +475,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata string properties pattern.",
-                    "message": f"Invalid 'pattern' for '{key_path}': Expected a string but got" f" {type(pattern)}",
+                    "message": f"Invalid 'pattern' for '{key_path}': Expected a string but got {type(pattern)}",
                     "info_map": info_map,
                 }
             )
@@ -537,7 +537,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default bool value.",
-                    "message": f"Invalid 'default' for '{key_path}': Value is not nullable and" f" default is 'None'",
+                    "message": f"Invalid 'default' for '{key_path}': Value is not nullable and default is 'None'",
                     "info_map": info_map,
                 }
             )
@@ -547,7 +547,7 @@ class DataValidator:
             self.event_logs.append(
                 {
                     "error": "Invalid metadata default bool value.",
-                    "message": f"Invalid 'default' for '{key_path}': Expected a bool but got" f" {type(default)}",
+                    "message": f"Invalid 'default' for '{key_path}': Expected a bool but got {type(default)}",
                     "info_map": info_map,
                 }
             )
