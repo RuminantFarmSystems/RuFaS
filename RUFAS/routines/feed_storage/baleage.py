@@ -1,7 +1,7 @@
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
-from .enums import CropCategory
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
 from .storage import Storage
 
 
