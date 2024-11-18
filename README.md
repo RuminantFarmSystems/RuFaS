@@ -43,56 +43,56 @@ N/A
 
 Remember, flexibility and creativity are your allies in the grand adventure of project work! 🚀 Each task, whether a solo journey or part of a larger quest, plays a vital role in the epic saga of our project. Approach each with the dedication and spirit they deserve, and together, we will triumph!
 
-# 2024 Road Map
-## Q1 Goals
-### SWE Goals
-* Finish Feed Storage Module (P1)
-  - Fix the issues in the Feed library _Issues_ [1245](https://github.com/RuminantFarmSystems/MASM/issues/1245)
-  - Feed Degradation _Issues_ [1375](https://github.com/RuminantFarmSystems/MASM/issues/1375) [1376](https://github.com/RuminantFarmSystems/MASM/issues/1376) [1377](https://github.com/RuminantFarmSystems/MASM/issues/1377) [1378](https://github.com/RuminantFarmSystems/MASM/issues/1378)
-  - Purchase Feed logic
-* Finish Energy and Emission from EEE Module for FARM ES (Purchased feed emissions and field management fuel) (P0)
-* Implement Scenario Manager (P0)
-* Implement end to end testing (P1)
-* Analyze Animal Module and Plan on action items (P0) _Issues_ [1229](https://github.com/RuminantFarmSystems/MASM/issues/1229) [1232](https://github.com/RuminantFarmSystems/MASM/issues/1232) [1235](https://github.com/RuminantFarmSystems/MASM/issues/1235)
-* Analyze S&C Module and Plan action items (P0) _Issues_ [1230](https://github.com/RuminantFarmSystems/MASM/issues/1230) [1233](https://github.com/RuminantFarmSystems/MASM/issues/1233) [1236](https://github.com/RuminantFarmSystems/MASM/issues/1236)
-* Analyze Manure Module and Plan action items (P0) _Issues_ [1231](https://github.com/RuminantFarmSystems/MASM/issues/1231) [1234](https://github.com/RuminantFarmSystems/MASM/issues/1234) [1237](https://github.com/RuminantFarmSystems/MASM/issues/1237)
-* Un-entangle bio physical modules [document here](https://docs.google.com/document/d/17BVgTnsqwVEZbdNoztIfBQILYJ94inlyXgwCvq9iQQw/edit?usp=sharing)  _Issues_ [1411](https://github.com/RuminantFarmSystems/MASM/issues/1411)
-* Implement IM cross validation (P1)
-* Draft Developer’s Rights and Responsibilities (P2)
-* Fix units across the codebase (P1) _Issues_ [1253](https://github.com/RuminantFarmSystems/MASM/issues/1253) [1254](https://github.com/RuminantFarmSystems/MASM/issues/1254)
-* Revisit website backend (P2)
-### SME Goals
-* Pilot testing reports (P0)
-* Comparison/benchmarking with other estimates of GHG emissions (P0)
-* Develop a set of standard scenarios for end-to-end testing (P0)
-* SA of Animal & C&S module (P1)
-* Evaluation of Manure Module (P1)
-* SA of Manure Module (P1)
-* SA of Feed module (P2)
-* Energy methodology publication (P2)
-* Website (P1)
-* Complete feed module documentation (P1)
-* Develop design doc for automated lactation curve parameter selection implementation in RuFaS (P2)
-* Refine use of equipment (P2)
+# 2025 Road Map
+We adjusted our quarterly target schedule to align with the US federal fiscal year. Moooving forward, the quarters will be:
+* Q1: October 1 to December 31st
+* Q2: January 1 to March 31st
+* Q3: April 1 to June 30th
+* Q4: July 1 to September 30th
 
-## Q2 Goals
-### SWE Goals
-* Finish Economics from EEE Module
-* Finish Energy and Emission from EEE Module (Electricity and Manure Management Fuel)
-* Take actions on the action items from Q1 Animal Module
-* Take actions on the action items from Q1 S&C Module
-* Take actions on the action items from Q1 Manure Module
-* Revisit Time class
-* Un-entangle bio physical modules- (implementation)
-* Finalize Developer’s Rights and Responsibilities
+## Q1 Goals (October 1 - December 31)
+### Animal Module
 
-### SME Goals
-* Publish SA and evaluation of Animal Module
-* Publish SA and evaluation of Crop and Soil Module
-* Evaluate Manure Module and publish introduction manuscript
-* Animal Health Design Doc development
-* Grazing Design doc development
-* Document Stakeholder Requirements
+### Manure Module
+
+### Soil and Crop Module
+
+### Feed Storage Module
+
+### Energy, Economics, and Emissions (EEE) Module
+
+## Q2 Goals (January 1 to March 31)
+### Animal Module
+
+### Manure Module
+
+### Soil and Crop Module
+
+### Feed Storage Module
+
+### Energy, Economics, and Emissions (EEE) Module
+
+## Q3 Goals (April 1 to June 30)
+### Animal Module
+
+### Manure Module
+
+### Soil and Crop Module
+
+### Feed Storage Module
+
+### Energy, Economics, and Emissions (EEE) Module
+
+## Q4 Goals (July 1 to September 30)
+### Animal Module
+
+### Manure Module
+
+### Soil and Crop Module
+
+### Feed Storage Module
+
+### Energy, Economics, and Emissions (EEE) Module
 
 # Resources
 
