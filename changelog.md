@@ -20,7 +20,6 @@ A **changelog** is a structured record of changes made to the codebase over time
 ## Changelog Entries
 
 ### Current version
-- [1945](https://github.com/RuminantFarmSystems/MASM/pull/1945) - [minor change] [Animal] Implements Animal Genetics submodule.
 
 v0.9.2
 
@@ -29,6 +28,7 @@ v0.9.2
 - [2011](https://github.com/RuminantFarmSystems/MASM/pull/2011) - [minor change] [Animal] Implements the Animal Growth submodule logic and tests.
 - [2021](https://github.com/RuminantFarmSystems/MASM/pull/2021) - [minor change] [Animal] **Adds dependency**. Creates a new `MilkProduction` submodule and several support submodules to calculate milk production.
 - [2022](https://github.com/RuminantFarmSystems/MASM/pull/2022) - [minor change] [Manure] Removes DefaultEnum class and all references to it in the Manure module.
+- [2006](https://github.com/RuminantFarmSystems/MASM/pull/2006) - [minor change] [Manure] Adds a method to determine storage manure temperature based on outdoor air temperature for use in calculations of emissions associated with Manure Storages.
 - [2023](https://github.com/RuminantFarmSystems/MASM/pull/2023) - [minor change] [Manure] Fixes calculation of organic bedding dry solids added to manure in manure handler.
 - [2025](https://github.com/RuminantFarmSystems/MASM/pull/2025) - [minor change] [Formatting] Sorts import statements in codebase.
 - [2004](https://github.com/RuminantFarmSystems/MASM/pull/2004) - [minor change] [Animal] Implement the animal digestive system in the biophysical folder.
@@ -36,8 +36,19 @@ v0.9.2
 - [1985](https://github.com/RuminantFarmSystems/MASM/pull/1985) - [minor change] [TaskManager] extracts all the input data values (for all input variables from JSON input files) for each task and combines them into a single CSV file for side-by-side comparison.
 - [2029](https://github.com/RuminantFarmSystems/MASM/pull/2029) - [minor change] [EEE] Adding tests for emission.py (2/2)
 - [2031](https://github.com/RuminantFarmSystems/MASM/pull/2031) - [minor change] [Formatting] Changes all relative import statements that import from higher-level modules to be absolute import statements.
+- [2033](https://github.com/RuminantFarmSystems/MASM/pull/2033) - [minor change] [InputManager] Consolidate methods for adding data to the Input Manager at runtime.
 - [2039](https://github.com/RuminantFarmSystems/MASM/pull/2039) - [minor change] [Animal][Testing] Renames AnimalNutrients to Nutrients and adds full unit testing coverage for this class.
 - [2014](https://github.com/RuminantFarmSystems/MASM/pull/2014) - [minor change] [Feed Storage] Fixes the Feed Storage mass degradation routines to properly account for mass and moisture loss, and updates E2E test suite to test these changes.
+- [2054](https://github.com/RuminantFarmSystems/MASM/pull/2054) - [minor change] [e2e Testing] Adding end-to-end testing coverage for the Crop and Soil module.
+- [1575](https://github.com/RuminantFarmSystems/MASM/pull/1575) - [minor change] [OutputManager] Adds options to periodically dump variables pool to a JSON file to help manage the size of the pool during a simulation.
+- [2047](https://github.com/RuminantFarmSystems/MASM/pull/2047) - [minor change] [Soil and Crop] Break down methods in the fields_data_reporter into smaller and more specific methods.
+- [1945](https://github.com/RuminantFarmSystems/MASM/pull/1945) - [minor change] [Animal] Implements Animal Genetics submodule.
+- [2048](https://github.com/RuminantFarmSystems/MASM/pull/2048) - [minor change] [Animal][Testing] Adds end to end testing for Animal domain.
+- [1809](https://github.com/RuminantFarmSystems/MASM/pull/1809) - [minor change] [InputManager] Extract the validation methods from InputManager.
+- [2045](https://github.com/RuminantFarmSystems/MASM/pull/2045) - [minor change] [Documentation] Regenerates the Sphinx HTML documentation.
+- [2050](https://github.com/RuminantFarmSystems/MASM/pull/2050) - [minor change] [Crop & Soil][Feed Storage] Disentangle the Crop & Soil and Feed Storage modules.
+- [2050](https://github.com/RuminantFarmSystems/MASM/pull/2050) - [minor change] [Crop & Soil][GeneralConstants] Update references to constants in Crop and Soil module to use GeneralConstants.
+- [1866](https://github.com/RuminantFarmSystems/MASM/pull/1866) - [minor change] [Metadata] Adds minimums for some Animal module inputs in metadata.
 - [1785](https://github.com/RuminantFarmSystems/MASM/pull/1785/) - [minor change] [TaskManager] Adds sobol and morris samplers, updates argument names.
 
 ### v0.9.2
