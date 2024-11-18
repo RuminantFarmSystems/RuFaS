@@ -4,10 +4,6 @@ from typing import Optional
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-# TODO: the equations for this model, referenced in the soil psuedocode, are derived from the excel file
-#   located on basecamp: https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358
-#   but the meaning (and validity) of the terms is extremely unclear from either source. The
-#   documentation cannot be adequately completed without a better understanding of these methods.
 class Decomposition:
     """
     This class is responsible for calculating the factors related carbon decomposition rate.
@@ -25,6 +21,13 @@ class Decomposition:
     data : SoilData
         The SoilData instance being used by this module. Contains information about the soil's properties, carbon pools,
         and other relevant data for simulating decomposition.
+
+    Notes
+    -----
+    The equations for this model, referenced in the soil psuedocode, are derived from the excel file located on
+    basecamp: https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358, but the meaning (and validity) of the
+    terms is extremely unclear from either source. The documentation cannot be adequately completed without a better
+    understanding of these methods.
 
     """
 
