@@ -5,10 +5,6 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-# TODO: these methods do not currently account for whether or not the roots can reach a layer. See Nitrogen module.
-#   I'm not entirely sure if that should happen for this module, since the methods allow a crop to pull water up
-#   from deeper in the soil if the given layer does not have enough to meet the demands of that depth.
-
 
 class WaterUptake:
     """
@@ -367,13 +363,9 @@ class WaterUptake:
         SWAT 5:2.2.1
 
         """
-        # TODO: Note that this method is identical to NitrogenIncorporation._determine_nitrogen_uptake_to_depth()
         if root_depth <= 0:
             return 0
 
         term1 = max_transpiration / (1 - exp(-water_distro_parameter))
         term2 = 1 - exp(-water_distro_parameter * depth / root_depth)
         return term1 * term2
-
-
-# ------------
