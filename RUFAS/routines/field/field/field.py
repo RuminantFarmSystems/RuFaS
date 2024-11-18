@@ -1097,7 +1097,8 @@ class Field:
         units = {
             "crop": MeasurementUnits.UNITLESS,
             "heat_scheduled_harvest": MeasurementUnits.UNITLESS,
-            "date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "planting_year": MeasurementUnits.CALENDAR_YEAR,
+            "planting_day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
@@ -1110,7 +1111,8 @@ class Field:
         value = {
             "crop": species,
             "heat_scheduled_harvest": heat_scheduled_harvest,
-            "date": {"year": year, "day": day},
+            "planting_year": year,
+            "planting_day": day,
             "field_size": self.field_data.field_size,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
