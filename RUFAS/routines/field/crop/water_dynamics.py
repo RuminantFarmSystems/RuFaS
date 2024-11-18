@@ -2,8 +2,6 @@ from typing import Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
 
-# TODO: This module needs to be updated to include water uptake by plants and evapotranspiration (implemented in Field?)
-
 
 class WaterDynamics:
     """
