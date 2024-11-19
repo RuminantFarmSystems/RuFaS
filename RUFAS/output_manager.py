@@ -86,6 +86,11 @@ class OriginLabel(Enum):
         Indicates that only the report origin should be included.
     NONE : str
         Indicates that no origin information should be included.
+
+    Notes
+    -----
+    NONE is the default setting.
+
     """
 
     TRUE_AND_REPORT_ORIGINS = "true and report origins"
@@ -722,7 +727,7 @@ class OutputManager(object):
 
         Notes
         -----
-        When the flag `include_detailed_values` is set to True, this method iterates over each key in the
+        When the OriginLabel is set to anything other than NONE, this method iterates over each key in the
         provided dictionary, and it will create a `detailed_values` list that integrates the data origins,
         values, and units. Depending on the `origin_label` parameter, the format of the detailed values will vary:
 
@@ -741,7 +746,7 @@ class OutputManager(object):
           or "[report_origin]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
           if the value is a dictionary.
 
-        - If `origin_label` is `OriginLabel.NONE`, the format is simply "value (units)".
+        - If `origin_label` is `OriginLabel.NONE`, there will be no detailed_values information added.
 
         Examples
         --------
@@ -871,7 +876,8 @@ class OutputManager(object):
           or "[report_origin]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
           if the value is a dictionary.
 
-        - If `origin_label` is `OriginLabel.NONE`, the format is simply "value (units)".
+        - If `origin_label` is `OriginLabel.NONE`, there will be no detailed_values information so no formatting will
+        occur.
         """
 
         true_origin_class = data["true_origin_class"]
