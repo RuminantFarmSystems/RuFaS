@@ -2885,6 +2885,10 @@ def test_add_detailed_values(
         ({"info_maps": [{"data_origin": "source"}]}, False),
         # Case 5: 'info_maps' and 'values' have different lengths
         ({"info_maps": [{"data_origin": "source"}, {"data_origin": "source2"}], "values": [1]}, False),
+        # Case 6: 'info_maps' is empty
+        ({"info_maps": [], "values": [1]}, False),
+        # Case 7: 'values' is empty
+        ({"info_maps": [{"data_origin": "source"}], "values": []}, False),
     ],
 )
 def test_can_add_detailed_values(sub_data_dict: Dict[str, Any], expected_result: bool) -> None:
@@ -3341,3 +3345,36 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
 
     mock_output_manager.create_directory = output_manager_original_method_states["create_directory"]
     mock_output_manager.add_log = output_manager_original_method_states["add_log"]
+
+
+@pytest.mark.parametrize(
+    "filter_content, expected_label, expected_error",
+    [
+        # Case 1: Missing 'origin_label' key
+        ({}, OriginLabel.NONE, False),
+        # Case 2: Non-string 'origin_label' value
+        ({"origin_label": 123}, OriginLabel.NONE, True),
+        # Case 3: Invalid 'origin_label' value
+        ({"origin_label": "invalid_label"}, OriginLabel.NONE, True),
+        # Case 4: Valid 'origin_label' value
+        ({"origin_label": "true and report origins"}, OriginLabel("true and report origins"), False),
+    ],
+)
+def test_get_origin_label(filter_content, expected_label, expected_error, mocker):
+    """
+    Unit test for the _get_origin_label() method in OutputManager class.
+    """
+    # Arrange
+    output_manager = OutputManager()
+    mocked_add_error = mocker.patch.object(output_manager, "add_error")
+
+    # Act
+    result = output_manager._get_origin_label(filter_content)
+
+    # Assert
+    assert result == expected_label
+
+    if expected_error:
+        mocked_add_error.assert_called_once()
+    else:
+        mocked_add_error.assert_not_called()
