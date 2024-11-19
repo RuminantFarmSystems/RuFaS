@@ -1,4 +1,6 @@
 import sys
+from datetime import datetime, date
+from random import random
 from typing import Any, Callable
 
 from scipy.stats import truncnorm
@@ -20,7 +22,9 @@ from RUFAS.biophysical.animal.digestive_system.digestive_system import Digestive
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (NewBornCalfValuesTypedDict, CalfValuesTypedDict,
+                                                                    HeiferIValuesTypedDict, HeiferIIValuesTypedDict,
+                                                                    CowValuesTypedDict)
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
@@ -31,7 +35,7 @@ from RUFAS.time import Time
 
 class Animal:
     animal_type: AnimalType
-    birth_date: str
+    birth_date: date
     birth_weight: float
     body_weight: float
     body_weight_history: list[BodyWeightHistory] = []
@@ -71,19 +75,17 @@ class Animal:
     def is_milking(self) -> bool:
         return self.days_in_milk > 0
 
-    def __init__(self, args: AnimalBaseInitArgsTypedDict) -> None:
+    def __init__(
+            self,
+            args: [NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict |
+                   HeiferIIValuesTypedDict] | CowValuesTypedDict) -> None:
         self.id = int(args.get("id"))
         self.breed = Breed(args.get("breed"))
         self.animal_type = AnimalType(args.get("animal_type"))
-        self.birth_date = args.get("birth_date")
+        self.birth_date = datetime.strptime(args.get("birth_date"), "%Y-%m-%d").date()
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
-        self.mature_body_weight = float(truncnorm.rvs(
-            -animal_constants.STDI,
-            animal_constants.STDI,
-            AnimalConfig.average_mature_body_weight,
-            AnimalConfig.std_mature_body_weight,
-        ))
+        self.net_merit = args.get("net_merit", 0.0)
 
         self.culled = False
 
@@ -94,6 +96,46 @@ class Animal:
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
         self.reproduction: Reproduction = Reproduction(do_not_breed=False)
+
+    def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict) -> None:
+        if AnimalConfig.semen_type == "conventional":
+            male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen
+        elif AnimalConfig.semen_type == "sexed":
+            male_calf_rate = AnimalConfig.male_calf_rate_sexed_semen
+        else:
+            raise ValueError(f"Unexpected semen type: {AnimalConfig.semen_type}")
+
+        self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
+
+        if random() < AnimalConfig.still_birth_rate:
+            self.culled = True
+            self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
+
+        self.sold = True if (self.sex == Sex.FEMALE or random() > AnimalConfig.keep_female_calf_rate) else False
+
+        self.birth_weight = args.get("birth_weight")
+        self.body_weight = args.get("birth_weight")
+        self.wean_weight = 0.0
+        self.mature_body_weight = float(truncnorm.rvs(
+            -animal_constants.STDI,
+            animal_constants.STDI,
+            AnimalConfig.average_mature_body_weight,
+            AnimalConfig.std_mature_body_weight,
+        ))
+        self.nutrients.total_phosphorus_in_animal = args.get("initial_phosphorus")
+
+    def _initialize_calf_or_heiferI(self, args: CalfValuesTypedDict | HeiferIValuesTypedDict) -> None:
+        self.culled = False
+        self.sold = False
+        self.sex = Sex.FEMALE
+        self.birth_weight = args.get("birth_weight")
+        self.body_weight = args.get("body_weight")
+        self.wean_weight = args.get("wean_weight")
+        self.mature_body_weight = args.get("mature_body_weight")
+        self.events.init_from_string(args.get("events"))
+
+    def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict) -> None:
+        pass
 
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:

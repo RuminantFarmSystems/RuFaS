@@ -14,6 +14,10 @@ class AnimalConfig:
     do_not_breed_time: int = 185
 
     semen_type: str = "conventional"
+    male_calf_rate_conventional_semen: float = 0.53
+    male_calf_rate_sexed_semen: float = 0.10
+    keep_female_calf_rate: float = 1
+    still_birth_rate: float = 0.065
     average_gestation_length: int = 276
     std_gestation_length: float = 6
     cow_times_milked_per_day: int = 3
@@ -107,6 +111,11 @@ class AnimalConfig:
         cls.do_not_breed_time = animal_config_data["management_decisions"]["do_not_breed_time"]
 
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
+        cls.male_calf_rate_conventional_semen = animal_config_data["farm_level"]["calf"][
+            "male_calf_rate_conventional_semen"]
+        cls.male_calf_rate_sexed_semen = animal_config_data["farm_level"]["calf"]["male_calf_rate_sexed_semen"]
+        cls.keep_female_calf_rate = animal_config_data["farm_level"]["calf"]["keep_female_calf_rate"]
+        cls.still_birth_rate = animal_config_data["from_literature"]["life_cycle"]["still_birth_rate"]
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]
         cls.std_gestation_length = animal_config_data["farm_level"]["repro"]["std_gestation_len"]
         cls.cow_times_milked_per_day = animal_config_data["management_decisions"]["cow_times_milked_per_day"]
