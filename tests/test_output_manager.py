@@ -3360,7 +3360,8 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
         ({"origin_label": "true and report origins"}, OriginLabel("true and report origins"), False),
     ],
 )
-def test_get_origin_label(filter_content, expected_label, expected_error, mocker):
+def test_get_origin_label(filter_content: dict[str, Any], expected_label: OriginLabel, expected_error: bool,
+                          mocker: MockerFixture) -> None:
     """
     Unit test for the _get_origin_label() method in OutputManager class.
     """
