@@ -15,6 +15,7 @@ from RUFAS.biophysical.animal.data_types.growth_outputs import GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production_inputs import MilkProductionInputs
 from RUFAS.biophysical.animal.data_types.milk_production_outputs import MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -53,6 +54,7 @@ class Animal:
     sold_at_day: int = sys.maxsize
     wean_weight: float = 0.0
     metabolizable_energy_intake: float = 0.0
+    pen_history: list[PenHistory] = []
 
     @property
     def is_pregnant(self) -> bool:
@@ -300,10 +302,6 @@ class Animal:
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.animal_statistics.estrus_count,
             "estrus_day": self.reproduction.estrus_day,
-            # "tai_program_start_day_h": self.tai_program_start_day,
-            # "synch_ed_program_start_day_h": self.synch_ed_program_start_day_h,
-            # "synch_ed_estrus_day": self.synch_ed_estrus_day,
-            # "synch_ed_stop_day": self.synch_ed_stop_day,
             "conception_rate": self.reproduction.conception_rate,
             "ai_day": self.reproduction.ai_day,
             "abortion_day": self.reproduction.abortion_day,
@@ -332,10 +330,6 @@ class Animal:
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.animal_statistics.estrus_count,
             "estrus_day": self.reproduction.estrus_day,
-            # "tai_program_start_day_h": self.tai_program_start_day_h,
-            # "synch_ed_program_start_day_h": self.synch_ed_program_start_day_h,
-            # "synch_ed_estrus_day": self.synch_ed_estrus_day,
-            # "synch_ed_stop_day": self.synch_ed_stop_day,
             "conception_rate": self.reproduction.conception_rate,
             "ai_day": self.reproduction.ai_day,
             "abortion_day": self.reproduction.abortion_day,
@@ -343,11 +337,30 @@ class Animal:
             "gestation_length": self.reproduction.gestation_length,
             "p_gest_for_calf": self.nutrients.phosphorus_for_gestation_required_for_calf,
             "calf_birth_weight": self.reproduction.calf_birth_weight,
-            # "presynch_method": self.presynch_method,
-            # "tai_method_c": self.tai_method_c,
-            # "resynch_method": self.resynch_method,
             "days_in_milk": self.days_in_milk,
             "parity": self.reproduction.calves,
             "calving_interval": self.reproduction.calving_interval,
             "net_merit": self.net_merit,
         }
+
+    def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
+        """
+        Updates the animal's pen history by either appending to the existing
+        history if the animal is in a different pen than it was the last time
+        this method is called or modifying the last element in the pen_history
+        list to reflect the current simulation day.
+
+        Args:
+            curr_pen: the pen that the animal is currently in
+            curr_day: the current simulation day
+            classes_in_pen: the classes in the animal's current pen
+        """
+        last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
+        if last_pen is None or last_pen != current_pen:
+            self.pen_history.append(
+                PenHistory(start_date=current_day, end_date=current_day, pen=current_pen,
+                           animal_types_in_pen=list(animal_types_in_pen))
+            )
+        else:  # last_pen == curr_pen
+            self.pen_history[-1]["end_date"] = current_day
+            self.pen_history[-1]["animal_types_in_pen"] = list(animal_types_in_pen)
