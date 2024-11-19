@@ -16,6 +16,7 @@ class AnimalConfig:
     semen_type: str = "conventional"
     average_gestation_length: int = 276
     std_gestation_length: float = 6
+    cow_times_milked_per_day: int = 3
 
     heifer_reproduction_program: HeiferReproductionProtocol = HeiferReproductionProtocol("ED")
     heifer_reproduction_sub_program: HeiferTAISubProtocol | HeiferSynchEDSubProtocol = HeiferTAISubProtocol("5dCG2P")
@@ -108,6 +109,7 @@ class AnimalConfig:
         cls.semen_type = animal_config_data["management_decisions"]["semen_type"]
         cls.average_gestation_length = animal_config_data["farm_level"]["repro"]["avg_gestation_len"]
         cls.std_gestation_length = animal_config_data["farm_level"]["repro"]["std_gestation_len"]
+        cls.cow_times_milked_per_day = animal_config_data["management_decisions"]["cow_times_milked_per_day"]
 
         cls.heifer_reproduction_program = HeiferReproductionProtocol(
             animal_config_data["management_decisions"]["heifer_repro_method"])

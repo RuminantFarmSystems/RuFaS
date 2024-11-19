@@ -55,6 +55,8 @@ class Animal:
     wean_weight: float = 0.0
     metabolizable_energy_intake: float = 0.0
     pen_history: list[PenHistory] = []
+    daily_vertical_distance: float = 0.0
+    daily_horizontal_distance: float = 0.0
 
     @property
     def is_pregnant(self) -> bool:
@@ -364,3 +366,21 @@ class Animal:
         else:  # last_pen == curr_pen
             self.pen_history[-1]["end_date"] = current_day
             self.pen_history[-1]["animal_types_in_pen"] = list(animal_types_in_pen)
+
+    def calculate_daily_walking_distance(self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float) -> float:
+        """
+        Calculates and sets the animal's daily vertical and horizontal
+        walking distance (DVD and DHD).
+
+        Parameters
+        ----------
+        vertical_dist_to_parlor : float
+            Vertical distance to milking parlor (km).
+        horizontal_dist_to_parlor : float
+            Horizontal distance to milking parlor, km.
+
+        """
+        if not self.animal_type.is_cow:
+            raise ValueError("Cannot calculate daily walking distance for animal types other than cow.")
+        self.daily_vertical_distance = 2 * vertical_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
+        self.daily_horizontal_distance = 2 * horizontal_dist_to_parlor * AnimalConfig.cow_times_milked_per_day

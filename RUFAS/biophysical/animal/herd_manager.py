@@ -19,7 +19,6 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from tests.animal_module_tests.test_pen import calf_daily_growth_values
 
 om = OutputManager()
 
@@ -125,7 +124,10 @@ class HerdManager:
         self.p_conc = {"calf": 0, "heiferI": 0, "heiferII": 0, "heiferIII": 0, "cow": 0}
 
         self.phosphorus_concentration_by_animal_class = {
-            animal_type: 0.0 for animal_type in [Calf, HeiferI, HeiferII, HeiferIII, Cow]
+            animal_type: 0.0 for animal_type in [
+                AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.LAC_COW,
+                AnimalType.CALF.DRY_COW
+            ]
         }
 
         self.housing = data["housing"]
