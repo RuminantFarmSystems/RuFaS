@@ -63,34 +63,6 @@ class Schedule:
             raise ValueError(f"'{self.name}': expected pattern repeat to be >= 0, received '{self.pattern_repeat}'.")
 
     @staticmethod
-    def _elongate_list(list_to_elongate: List[Any], reference_list_length: int) -> List[Any]:
-        """
-        Takes a list and lengthens it to match the length of the reference list, if the original length was 1.
-
-        Parameters
-        ----------
-        list_to_elongate : List[Any]
-            List to be extended if its length is 1.
-        reference_list_length : int
-            Length of that the list should be extended to, if it its original length is 1.
-
-        Returns
-        -------
-        List[Any]
-            The elongated list.
-
-        Notes
-        -----
-        In the context of Schedule-descendant classes, the reference list length will always be the length of the years
-        list.
-
-        """
-        if len(list_to_elongate) != 1:
-            return list_to_elongate
-        elongated_list = list_to_elongate * reference_list_length
-        return elongated_list
-
-    @staticmethod
     def _validate_days(years: List[int], days: List[int]) -> bool:
         """
         Checks that all values passed for days are in the correct range.

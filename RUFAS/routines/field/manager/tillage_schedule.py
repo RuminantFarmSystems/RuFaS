@@ -3,6 +3,7 @@ from typing import List
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.manager.events import TillageEvent
 from RUFAS.routines.field.manager.schedule import Schedule
+from RUFAS.util import Utility
 
 
 class TillageSchedule(Schedule):
@@ -60,12 +61,12 @@ class TillageSchedule(Schedule):
     ):
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
-        self.tillage_depths = self._elongate_list(tillage_depths, len(years))
-        self.incorporation_fractions = self._elongate_list(incorporation_fractions, len(years))
-        self.mixing_fractions = self._elongate_list(mixing_fractions, len(years))
+        self.tillage_depths = Utility.elongate_list(tillage_depths, len(years))
+        self.incorporation_fractions = Utility.elongate_list(incorporation_fractions, len(years))
+        self.mixing_fractions = Utility.elongate_list(mixing_fractions, len(years))
 
         self.implements = [TillageImplement(implement) for implement in implements]
-        self.implements = self._elongate_list(self.implements, len(years))
+        self.implements = Utility.elongate_list(self.implements, len(years))
 
         self._validate_tillage_parameters()
 

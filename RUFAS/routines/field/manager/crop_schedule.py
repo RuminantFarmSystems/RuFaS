@@ -3,6 +3,7 @@ from typing import List
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS, HarvestOperation
 from RUFAS.routines.field.manager.events import HarvestEvent, PlantingEvent
 from RUFAS.routines.field.manager.schedule import Schedule
+from RUFAS.util import Utility
 
 
 class CropSchedule(Schedule):
@@ -89,12 +90,12 @@ class CropSchedule(Schedule):
         self._validate_planting_parameters()
 
         self.harvest_years = harvest_years
-        self.harvest_days = self._elongate_list(harvest_days, len(harvest_years))
+        self.harvest_days = Utility.elongate_list(harvest_days, len(harvest_years))
         self.harvesting_skip = harvesting_skip
 
         harvest_operations_enum_list = [HarvestOperation(operation) for operation in harvest_operations]
 
-        self.harvest_operations = self._elongate_list(harvest_operations_enum_list, len(harvest_years))
+        self.harvest_operations = Utility.elongate_list(harvest_operations_enum_list, len(harvest_years))
 
         self._validate_harvest_parameters()
 
