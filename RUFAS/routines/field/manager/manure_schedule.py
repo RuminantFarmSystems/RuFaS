@@ -88,8 +88,6 @@ class ManureSchedule(Schedule):
 
         self._validate_manure_parameters()
 
-        self._validate_pattern_parameters()
-
     def _validate_manure_parameters(self) -> None:
         """
         Checks that all parameters defining manure application schedule are valid, otherwise raises error.

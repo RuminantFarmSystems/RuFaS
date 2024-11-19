@@ -95,8 +95,6 @@ class FertilizerSchedule(Schedule):
 
         self._validate_fertilizer_parameters()
 
-        self._validate_pattern_parameters()
-
     def _validate_fertilizer_parameters(self) -> None:
         """
         Checks that all fields defining a fertilizer application schedule are valid, raises errors if not.

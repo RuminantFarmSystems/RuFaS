@@ -101,8 +101,6 @@ class CropSchedule(Schedule):
 
         self.heat_scheduled = use_heat_scheduling
 
-        self._validate_pattern_parameters()
-
     def _validate_planting_parameters(self) -> None:
         """
         Checks fields that dictate planting for correctness, otherwise raises errors.

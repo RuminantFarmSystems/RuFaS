@@ -70,7 +70,7 @@ class TillageSchedule(Schedule):
 
         self._validate_tillage_parameters()
 
-        self._validate_pattern_parameters()
+        Utility.validate_pattern_parameters(self.name, self.pattern_skip, self.pattern_repeat)
 
     def _validate_tillage_parameters(self) -> None:
         """
