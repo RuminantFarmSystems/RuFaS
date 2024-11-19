@@ -1,5 +1,4 @@
-from copy import copy
-from typing import Any, List
+from typing import List
 
 from RUFAS.util import Utility
 
@@ -41,54 +40,11 @@ class Schedule:
         self.name = name
         self.years = years
 
-        self.days = self._elongate_list(days, len(years))
+        self.days = Utility.elongate_list(days, len(years))
 
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
-
-    def _validate_pattern_parameters(self) -> None:
-        """
-        Checks the pattern skip and repeat parameters, if they are not correct raises errors.
-
-        Raises
-        ------
-        ValueError
-            If the skip is < 0.
-            If the repeat is < 0.
-
-        """
-        if self.pattern_skip < 0:
-            raise ValueError(f"'{self.name}': expected pattern skip to be >= 0, received '{self.pattern_skip}'.")
-        if self.pattern_repeat < 0:
-            raise ValueError(f"'{self.name}': expected pattern repeat to be >= 0, received '{self.pattern_repeat}'.")
-
-    @staticmethod
-    def _elongate_list(list_to_elongate: List[Any], reference_list_length: int) -> List[Any]:
-        """
-        Takes a list and lengthens it to match the length of the reference list, if the original length was 1.
-
-        Parameters
-        ----------
-        list_to_elongate : List[Any]
-            List to be extended if its length is 1.
-        reference_list_length : int
-            Length of that the list should be extended to, if it its original length is 1.
-
-        Returns
-        -------
-        List[Any]
-            The elongated list.
-
-        Notes
-        -----
-        In the context of Schedule-descendant classes, the reference list length will always be the length of the years
-        list.
-
-        """
-        if len(list_to_elongate) != 1:
-            return list_to_elongate
-        elongated_list = list_to_elongate * reference_list_length
-        return elongated_list
+        Utility.validate_pattern_parameters(self.name, self.pattern_skip, self.pattern_repeat)
 
     @staticmethod
     def _validate_days(years: List[int], days: List[int]) -> bool:
@@ -140,49 +96,3 @@ class Schedule:
 
         """
         return all(0 < years[index] <= years[index + 1] for index in range(0, len(years) - 1))
-
-    @staticmethod
-    def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
-        """
-        Takes a pattern of numbers and repeats the pattern of differences between the numbers for a specified number of
-        repetitions, skipping over specified gaps between repetitions.
-
-        Parameters
-        ----------
-        pattern : List[int]
-            The pattern to be repeated.
-        skip : int
-            Number of steps to skip between repeats (0 if no steps should be skipped).
-        repeat : int
-            Number of times pattern should be repeated.
-
-        Returns
-        -------
-        List[int]
-            The full repeated pattern of numbers.
-
-        Examples
-        --------
-        >>> repeat_pattern([1, 3, 5], 1, 2)
-        [1, 3, 5, 7, 9, 11, 13, 15, 17]
-
-        >>> repeat_pattern([1, 3, 5], 0, 1)
-        [1, 3, 5, 6, 8, 10]
-
-        >>> repeat_pattern([2, 3, 7], 3, 2)
-        [2, 3, 7, 11, 12, 16, 20, 21, 24]
-
-        """
-        differences = [skip + 1]
-        in_pattern_differences = range(1, len(pattern[1:]) + 1)
-        for difference in in_pattern_differences:
-            differences.append(pattern[difference] - pattern[difference - 1])
-
-        full_pattern = copy(pattern)
-        differences_index = 0
-        number_of_new_values = range(repeat * len(pattern))
-        for _new_value in number_of_new_values:
-            full_pattern.append(full_pattern[-1] + differences[differences_index])
-            differences_index += 1
-            differences_index %= len(pattern)
-        return full_pattern

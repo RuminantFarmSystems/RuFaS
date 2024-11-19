@@ -2,6 +2,7 @@ from typing import Any, List
 
 from RUFAS.routines.field.manager.events import FertilizerEvent
 from RUFAS.routines.field.manager.schedule import Schedule
+from RUFAS.util import Utility
 
 
 class FertilizerSchedule(Schedule):
@@ -79,22 +80,20 @@ class FertilizerSchedule(Schedule):
     ):
         super().__init__(name, years, days, pattern_skip, pattern_repeat)
 
-        self.mix_names = self._elongate_list(mix_names, len(years))
-        self.nitrogen_masses = self._elongate_list(nitrogen_masses, len(years))
-        self.phosphorus_masses = self._elongate_list(phosphorus_masses, len(years))
-        self.potassium_masses = self._elongate_list(potassium_masses, len(years))
+        self.mix_names = Utility.elongate_list(mix_names, len(years))
+        self.nitrogen_masses = Utility.elongate_list(nitrogen_masses, len(years))
+        self.phosphorus_masses = Utility.elongate_list(phosphorus_masses, len(years))
+        self.potassium_masses = Utility.elongate_list(potassium_masses, len(years))
 
         if application_depths is None:
             application_depths = [0.0]
-        self.application_depths = self._elongate_list(application_depths, len(years))
+        self.application_depths = Utility.elongate_list(application_depths, len(years))
 
         if surface_remainder_fractions is None:
             surface_remainder_fractions = [1.0]
-        self.surface_remainder_fractions = self._elongate_list(surface_remainder_fractions, len(years))
+        self.surface_remainder_fractions = Utility.elongate_list(surface_remainder_fractions, len(years))
 
         self._validate_fertilizer_parameters()
-
-        self._validate_pattern_parameters()
 
     def _validate_fertilizer_parameters(self) -> None:
         """
@@ -185,7 +184,7 @@ class FertilizerSchedule(Schedule):
             List of all fertilizer events that occur over the course of this fertilizer schedule.
 
         """
-        all_years = self._repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        all_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
         all_days = self.days * (self.pattern_repeat + 1)
         all_mix_names = self.mix_names * (self.pattern_repeat + 1)
         all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
