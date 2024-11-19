@@ -862,3 +862,21 @@ def test_combine(
     mock_list_dir.assert_called_once_with(saved_csv_working_folder)
 
     mock_rmtree.assert_called_once_with(saved_csv_working_folder)
+
+
+@pytest.mark.parametrize(
+    "test_list,length,expected",
+    [
+        ([], 3, []),
+        ([], 0, []),
+        ([1, 2], 1, [1, 2]),
+        ([1.0, 2.0], 5, [1.0, 2.0]),
+        (["test"], 4, ["test", "test", "test", "test"]),
+        ([3], 1, [3]),
+        ([5], 5, [5, 5, 5, 5, 5]),
+    ],
+)
+def test_elongate_list(test_list: List[Any], length: int, expected: List[Any]) -> None:
+    """Check that lists are elongated correctly."""
+    actual = Utility.elongate_list(test_list, length)
+    assert actual == expected
