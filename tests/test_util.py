@@ -880,3 +880,59 @@ def test_elongate_list(test_list: List[Any], length: int, expected: List[Any]) -
     """Check that lists are elongated correctly."""
     actual = Utility.elongate_list(test_list, length)
     assert actual == expected
+
+
+@pytest.mark.parametrize("pattern, skip, repeat, expected",
+                         [([1, 3, 5], 1, 3,
+                           [
+                               1,
+                               3,
+                               5,
+                               7,
+                               9,
+                               11,
+                               13,
+                               15,
+                               17,
+                               19,
+                               21,
+                               23,
+                           ]),
+                          ([1, 3, 5], 0, 1, [1, 3, 5, 6, 8, 10]),
+                          ([2, 3, 7], 3, 2, [
+                              2,
+                              3,
+                              7,
+                              11,
+                              12,
+                              16,
+                              20,
+                              21,
+                              25,
+                          ]),
+                          ([2, 3, 7], 0, 0, [2, 3, 7]),
+                          ([2], 0, 0, [2]),
+                          ([2], 3, 1, [2, 6]),
+                          ([2], 0, 5, [2, 3, 4, 5, 6, 7]),
+                          ([2, 3, 3], 2, 3, [
+                              2,
+                              3,
+                              3,
+                              6,
+                              7,
+                              7,
+                              10,
+                              11,
+                              11,
+                              14,
+                              15,
+                              15,
+                          ]),
+                          ([1, 1], 0, 4, [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]),
+                          ([1, 1, 3], 3, 1, [1, 1, 3, 7, 7, 9]),
+                          ([], 0, 0, []),
+                          ([], 3, 7, [])
+                          ])
+def test_repeat_pattern(pattern: List[int], skip: int, repeat: int, expected: list) -> None:
+    """Tests that repeat_pattern correctly repeats patterns."""
+    assert Utility.repeat_pattern(pattern, skip, repeat) == expected

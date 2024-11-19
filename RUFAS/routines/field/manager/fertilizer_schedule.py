@@ -186,7 +186,7 @@ class FertilizerSchedule(Schedule):
             List of all fertilizer events that occur over the course of this fertilizer schedule.
 
         """
-        all_years = self._repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        all_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
         all_days = self.days * (self.pattern_repeat + 1)
         all_mix_names = self.mix_names * (self.pattern_repeat + 1)
         all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)

@@ -147,7 +147,7 @@ class TillageSchedule(Schedule):
             List of all tillage events that will happen over the course of this TillageSchedule.
 
         """
-        all_tilling_years = self._repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        all_tilling_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
         all_tilling_days = self.days * (self.pattern_repeat + 1)
         all_tillage_depths = self.tillage_depths * (self.pattern_repeat + 1)
         all_incorporation_fractions = self.incorporation_fractions * (self.pattern_repeat + 1)

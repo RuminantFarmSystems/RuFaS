@@ -188,7 +188,7 @@ class CropSchedule(Schedule):
             List of all planting events that will happen for this crop schedule.
 
         """
-        all_planting_years = self._repeat_pattern(self.planting_years, self.planting_skip, self.pattern_repeat)
+        all_planting_years = Utility.repeat_pattern(self.planting_years, self.planting_skip, self.pattern_repeat)
         all_planting_days = self.planting_days * (self.pattern_repeat + 1)
         all_planting_dates = list(zip(all_planting_years, all_planting_days))
 
@@ -218,7 +218,7 @@ class CropSchedule(Schedule):
         scheduled, which is why this method contains the if block that removes all non-final harvest events.
 
         """
-        all_harvesting_years = self._repeat_pattern(self.harvest_years, self.harvesting_skip, self.pattern_repeat)
+        all_harvesting_years = Utility.repeat_pattern(self.harvest_years, self.harvesting_skip, self.pattern_repeat)
         all_harvesting_days = self.harvest_days * (self.pattern_repeat + 1)
         all_harvesting_operations = self.harvest_operations * (self.pattern_repeat + 1)
         all_harvesting_dates = list(zip(all_harvesting_years, all_harvesting_days, all_harvesting_operations))

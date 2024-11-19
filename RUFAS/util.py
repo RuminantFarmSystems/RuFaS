@@ -3,6 +3,7 @@ import enum
 import os
 import re
 import shutil
+from copy import copy
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
@@ -672,3 +673,49 @@ class Utility:
             return list_to_elongate
         elongated_list = list_to_elongate * reference_list_length
         return elongated_list
+
+    @staticmethod
+    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
+        """
+        Takes a pattern of numbers and repeats the pattern of differences between the numbers for a specified number of
+        repetitions, skipping over specified gaps between repetitions.
+
+        Parameters
+        ----------
+        pattern : List[int]
+            The pattern to be repeated.
+        skip : int
+            Number of steps to skip between repeats (0 if no steps should be skipped).
+        repeat : int
+            Number of times pattern should be repeated.
+
+        Returns
+        -------
+        List[int]
+            The full repeated pattern of numbers.
+
+        Examples
+        --------
+        >>> repeat_pattern([1, 3, 5], 1, 2)
+        [1, 3, 5, 7, 9, 11, 13, 15, 17]
+
+        >>> repeat_pattern([1, 3, 5], 0, 1)
+        [1, 3, 5, 6, 8, 10]
+
+        >>> repeat_pattern([2, 3, 7], 3, 2)
+        [2, 3, 7, 11, 12, 16, 20, 21, 24]
+
+        """
+        differences = [skip + 1]
+        in_pattern_differences = range(1, len(pattern[1:]) + 1)
+        for difference in in_pattern_differences:
+            differences.append(pattern[difference] - pattern[difference - 1])
+
+        full_pattern = copy(pattern)
+        differences_index = 0
+        number_of_new_values = range(repeat * len(pattern))
+        for _new_value in number_of_new_values:
+            full_pattern.append(full_pattern[-1] + differences[differences_index])
+            differences_index += 1
+            differences_index %= len(pattern)
+        return full_pattern

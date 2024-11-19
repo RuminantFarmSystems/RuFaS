@@ -190,7 +190,7 @@ class ManureSchedule(Schedule):
             List of ManureEvents representing all manure applications that will occur over the simulation run.
 
         """
-        all_years = self._repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        all_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
         all_days = self.days * (self.pattern_repeat + 1)
         all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
         all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
