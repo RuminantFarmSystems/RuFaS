@@ -2659,7 +2659,7 @@ def test_print_credits(
 )
 def test_print_errors_warnings_logs(
     mock_output_manager: OutputManager, log_verbose: LogVerbosity, expected_output: str, capfd
-):
+) -> None:
     mock_output_manager._OutputManager__log_verbose = log_verbose
     task_id = "id"
     with patch.object(OutputManager, "_get_errors_warnings_logs_counts", return_value=(2, 1, 5)):
