@@ -1086,10 +1086,8 @@ class InputManager:
                 properties_blob_key=properties_blob_key,
                 eager_termination=eager_termination,
             )
-            self._route_logs(self.data_validator.event_logs)
             return add_variable_success
         else:
-            self._route_logs(self.data_validator.event_logs)
             return False
 
     def dump_get_data_logs(self, path: Path) -> None:
