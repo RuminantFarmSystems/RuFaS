@@ -14,8 +14,7 @@ from RUFAS.routines.manure.manure_handlers.manure_handler_classes import BaseMan
 from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
 from RUFAS.routines.manure.manure_separators.manure_separator_classes import BaseManureSeparator, ManureSeparatorFactory
 from RUFAS.routines.manure.manure_separators.manure_separator_daily_output import ManureSeparatorDailyOutput
 from RUFAS.routines.manure.manure_treatments.anaerobic_digestion_and_lagoon import AnaerobicDigestionAndLagoon
@@ -23,7 +22,7 @@ from RUFAS.routines.manure.manure_treatments.base_manure_treatment import BaseMa
 from RUFAS.routines.manure.manure_treatments.manure_treatment_daily_output import ManureTreatmentDailyOutput
 from RUFAS.routines.manure.manure_treatments.manure_treatment_factory import ManureTreatmentFactory
 from RUFAS.routines.manure.manure_treatments.manure_treatment_types import ManureTreatmentType
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.reception_pits.reception_pit import ReceptionPit
 from RUFAS.routines.manure.reception_pits.reception_pit_daily_output import ReceptionPitDailyOutput
@@ -338,6 +337,7 @@ class ManureManager:
         ----------
         request : NutrientRequest
             The specific nutrient request, including quantities of nitrogen and phosphorus.
+
         Returns
         -------
         NutrientRequestResults | None
