@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from RUFAS.routines.field.manager.events import FertilizerEvent
+from RUFAS.data_structures.events import FertilizerEvent
 from RUFAS.routines.field.manager.schedule import Schedule
 
 
