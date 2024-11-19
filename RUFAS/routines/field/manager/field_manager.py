@@ -135,7 +135,7 @@ class FieldManager:
 
         soil_profile = FieldManager._setup_soil(
             soil_configuration=field_configuration_data.get("soil_specification"),
-            field_size=field_configuration_data.get("field_size")
+            field_size=field_configuration_data.get("field_size"),
         )
 
         fertilizer_events, available_fertilizer_mixes = FieldManager._setup_fertilizer_data(
@@ -191,7 +191,9 @@ class FieldManager:
             seasonal_high_water_table=field_configuration_data.get("seasonal_high_water_table"),
             watering_amount_in_liters=field_configuration_data.get("watering_amount_in_liters"),
             watering_interval=field_configuration_data.get("watering_interval"),
-            supplement_manure_nutrient_deficiencies=field_configuration_data.get("supplement_manure_nutrient_deficiencies"),
+            supplement_manure_nutrient_deficiencies=field_configuration_data.get(
+                "supplement_manure_nutrient_deficiencies"
+            ),
             simulate_water_stress=field_configuration_data.get("simulate_water_stress"),
             simulate_temp_stress=field_configuration_data.get("simulate_temp_stress"),
             simulate_nitrogen_stress=field_configuration_data.get("simulate_nitrogen_stress"),
@@ -200,7 +202,7 @@ class FieldManager:
 
     @staticmethod
     def _setup_fertilizer_data(
-            fertilizer_configuration: str
+        fertilizer_configuration: str,
     ) -> tuple[list[FertilizerEvent], dict[str, dict[str, float]]]:
         """
         Sets up the fertilizer data including events and mixes based on the
@@ -225,9 +227,7 @@ class FieldManager:
         return fertilizer_events, available_fertilizer_mixes
 
     @staticmethod
-    def _setup_manure_data(
-            manure_configuration: str
-    ) -> list[ManureEvent]:
+    def _setup_manure_data(manure_configuration: str) -> list[ManureEvent]:
         """
         Setup manure data using the given manure configuration. This method
         initializes the manure application schedule, generates manure events,
@@ -249,9 +249,7 @@ class FieldManager:
         return manure_events
 
     @staticmethod
-    def _setup_tillage_data(
-            tillage_configuration: str
-    ) -> list[TillageEvent]:
+    def _setup_tillage_data(tillage_configuration: str) -> list[TillageEvent]:
         """
         Generates a list of TillageEvent objects based on the provided tillage
         configuration string.
@@ -271,9 +269,7 @@ class FieldManager:
         return tillage_events
 
     @staticmethod
-    def _setup_crop_data(
-            crop_rotation_configuration: str
-    ) -> tuple[list[PlantingEvent], list[HarvestEvent]]:
+    def _setup_crop_data(crop_rotation_configuration: str) -> tuple[list[PlantingEvent], list[HarvestEvent]]:
         """
         Generates all planting and harvest events based on a given crop rotation configuration.
 
@@ -291,7 +287,7 @@ class FieldManager:
         """
         crop_schedules = FieldManager._setup_crop_schedules(crop_rotation_configuration)
         all_planting_events: list[PlantingEvent] = []
-        all_harvest_events : list[HarvestEvent] = []
+        all_harvest_events: list[HarvestEvent] = []
         for schedule in crop_schedules:
             all_planting_events += schedule.generate_planting_events()
             all_harvest_events += schedule.generate_harvest_events()
