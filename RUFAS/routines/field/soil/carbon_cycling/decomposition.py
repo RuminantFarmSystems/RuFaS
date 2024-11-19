@@ -24,10 +24,11 @@ class Decomposition:
 
     Notes
     -----
-    The equations for this model, referenced in the soil psuedocode, are derived from the excel file located on
-    basecamp: https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358, but the meaning (and validity) of the
-    terms is extremely unclear from either source. The documentation cannot be adequately completed without a better
-    understanding of these methods.
+    The equations for this model, referenced in the soil psuedocode, are derived from an
+    `excel file <https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358>`_ on Basecamp, but the meaning (and
+    validity) of terms is extremely unclear from both sources. The documentation cannot be adequately completed without
+    a better understanding of these methods. Path to excel file on Basecamp: "Ruminant Farm Systems Model (RuFaS) ›
+    Docs & Files › Scientific Documentation › Soil and Crop Module › Literature › Carbon Models › DAYCENT".
 
     """
 
