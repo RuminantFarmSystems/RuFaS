@@ -2,8 +2,6 @@ from typing import Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
 
-# TODO: This module needs to be updated to include water uptake by plants and evapotranspiration (implemented in Field?)
-
 
 class WaterDynamics:
     """
@@ -142,7 +140,7 @@ class WaterDynamics:
     @staticmethod
     def _determine_evapotranspiration(evaporation: float, transpiration: float) -> float:
         """
-        Calculate the annual evapotranspiration. #TODO: why is this 'annual' routine executed every day? issue #1256
+        Calculate evapotranspiration as the sum of evaporation and transpiration.
 
         Parameters
         ----------
@@ -155,8 +153,6 @@ class WaterDynamics:
         -------
         float
             Total evapotranspiration (mm).
-
-        TODO: find where SWAT has this equation (if it does, if not make note of assumption) issue #1255
 
         """
         return evaporation + transpiration
