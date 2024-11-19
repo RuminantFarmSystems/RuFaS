@@ -7,9 +7,9 @@ from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
+from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system_inputs import DigestiveSystemInputs
-from RUFAS.biophysical.animal.data_types.digestive_system_outputs import DigestiveSystemOutputs
 from RUFAS.biophysical.animal.data_types.growth_inputs import GrowthInputs
 from RUFAS.biophysical.animal.data_types.growth_outputs import GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production_inputs import MilkProductionInputs
@@ -34,29 +34,34 @@ class Animal:
     birth_date: str
     birth_weight: float
     body_weight: float
+    body_weight_history: list[BodyWeightHistory] = []
     breed: Breed
-    sex: Sex
+    culled: bool = False
+    daily_horizontal_distance: float = 0.0
+    daily_vertical_distance: float = 0.0
+    days_born: int = 0
+    days_in_milk: int = 0
+    days_in_pregnancy: int = 0
+    dead: bool = False
+    dry_matter_intake: float = 0.0
+    dry_matter_intake_estimation: float = 0.0
+    events: AnimalEvents = AnimalEvents()
+    future_cull_date: int = sys.maxsize
+    future_death_date: int = sys.maxsize
     id: int
-    mature_body_weight: float
+    mature_body_weight: float = 0.0
+    metabolizable_energy_intake: float = 0.0
     net_merit: float
     nutrient: dict[str, float]
     nutrient_concentrations: dict[str, float]
-    culled: bool = False
-    dead: bool = False
-    days_born: int = 0
-    days_in_pregnancy: int = 0
-    events: AnimalEvents = AnimalEvents()
-    days_in_milk: int = 0
-    future_cull_date: int = sys.maxsize
-    future_death_date: int = sys.maxsize
+    nutrient_requirements: dict[str, float] = {}
+    pen_history: list[PenHistory] = []
     ration_formulation = {"objective": 0.00}
+    semen_type: str
+    sex: Sex
     sold: bool = False
     sold_at_day: int = sys.maxsize
     wean_weight: float = 0.0
-    metabolizable_energy_intake: float = 0.0
-    pen_history: list[PenHistory] = []
-    daily_vertical_distance: float = 0.0
-    daily_horizontal_distance: float = 0.0
 
     @property
     def is_pregnant(self) -> bool:
@@ -121,10 +126,7 @@ class Animal:
             fat_content=self.milk_production.fat_content,
             crude_protein_content=self.milk_production.crude_protein_content,
         )
-        digestive_system_outputs: DigestiveSystemOutputs = self.digestive_system.process_digestion(
-            digestive_system_inputs)
-        self.animal_statistics.methane_emission = digestive_system_outputs.methane_emission
-        self.animal_statistics.phosphorus_excreted = digestive_system_outputs.phosphorus_excreted
+        self.digestive_system.process_digestion(digestive_system_inputs)
 
 
         milk_production_inputs = MilkProductionInputs(

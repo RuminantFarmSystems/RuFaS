@@ -7,15 +7,20 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
+from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
+from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
 from RUFAS.biophysical.feed.feed import Feed
+from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.time import Time
 from RUFAS.weather import Weather
@@ -101,7 +106,7 @@ class HerdManager:
         self.all_pens: list[Pen] = []
 
         # dictionary: key is animal ID, value is the pen ID that animal is in
-        self.animal_to_pen_id_map = {}
+        self.animal_to_pen_id_map: dict[str, Animal] = {}
 
         # alternative option: AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
         self.set_animal_grouping_scenario(AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW)
@@ -121,8 +126,6 @@ class HerdManager:
         # herd, whether by birth or replacement herd purchase. They are calculated
         # in _update_phosphorus_concentrations() and are calculated by dividing the total P in the animals
         # of the class by the total body weight of the animals, on a per-animal basis
-        self.p_conc = {"calf": 0, "heiferI": 0, "heiferII": 0, "heiferIII": 0, "cow": 0}
-
         self.phosphorus_concentration_by_animal_class = {
             animal_type: 0.0 for animal_type in [
                 AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.LAC_COW,
@@ -133,9 +136,9 @@ class HerdManager:
         self.housing = data["housing"]
         self.pasture_concentrate = data["pasture_concentrate"]
 
-        udrm = udr.UserDefinedRationManager()
+        user_defined_ration_manager = UserDefinedRationManager()
         self.ration_user_input = data["ration"]["user_input"]
-        udrm.use_user_defined_ration = self.ration_user_input
+        user_defined_ration_manager.use_user_defined_ration = self.ration_user_input
 
         # how often a ration is calculated, days
         self.formulation_interval = data["ration"]["formulation_interval"]
@@ -152,7 +155,7 @@ class HerdManager:
                 self.cows
             ) = herd_factory.initialize_herd()
 
-            self.initialize_nutrient_rqmts(weather, time, feed)
+            self.initialize_nutrient_requirements(weather, time, feed)
 
             self.allocate_animals_to_pens()
 
@@ -246,13 +249,13 @@ class HerdManager:
             if pen.needs_ration_formulation or self.end_ration_interval():
                 self.reformulate_ration_single_pen(pen, current_temperature, feed)
 
-        manure_excretions_output_data = {}
+        manure_excretions_output_data = AnimalManureExcretions()
         for pen in self.all_pens:
-            self.collect_manure_excretions_output_data(pen, manure_excretions_output_data)
-        # AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
+            manure_excretions_output_data += pen.total_manure_excretion
+        AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
 
         # self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
-        # AnimalModuleReporter.report_daily_reports(self, feed.available_feeds)
+        AnimalModuleReporter.report_daily_reports(self, feed.available_feeds)
 
     def initialize_pens(
             self,
@@ -315,7 +318,7 @@ class HerdManager:
 
             self.all_pens.append(pen)
 
-    def initialize_nutrient_rqmts(self, weather: Weather, time: Time, feed: Feed) -> None:
+    def initialize_nutrient_requirements(self, weather: Weather, time: Time, feed: Feed) -> None:
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -414,14 +417,14 @@ class HerdManager:
             Instance of Pen class.
 
         """
-        available_feeds = ration_driver.AvailableFeeds()
+        available_feeds = AvailableFeeds()
         available_feeds.feed_nutrients(feed)
         if not pen.is_populated:
             return
         pen.subset_class_feeds(feed)
         pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
 
-        ration_per_animal: Dict[str, float | str] = {}
+        ration_per_animal: dict[str, float | str] = {}
         ration_vals = {}
 
         while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":

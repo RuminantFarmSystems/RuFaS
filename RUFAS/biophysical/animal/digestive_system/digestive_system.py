@@ -1,5 +1,4 @@
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
-from RUFAS.biophysical.animal.data_types.digestive_system_outputs import DigestiveSystemOutputs
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.digestive_system_inputs import DigestiveSystemInputs
