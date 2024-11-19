@@ -254,7 +254,7 @@ class OutputManager(object):
             f"{self.available_memory} Bytes.\n"
         )
 
-        if save_chunk_threshold_call_count > 0:
+        if save_chunk_threshold_call_count and save_chunk_threshold_call_count > 0:
             self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
             log_message += (
                 "The threshold add_variable_call count for saving pool chunk is set to "
