@@ -41,7 +41,7 @@ class Pen:
         self.manure_separator_after_digestion = manure_separator_after_digestion
         self.manure_storage = manure_storage
 
-        self.animals_in_pen = {}
+        self.animals_in_pen: dict[int, Animal] = {}
         self.animal_types_in_pen = set()
 
         self.ration = {}
@@ -241,29 +241,9 @@ class Pen:
 
     @property
     def total_manure_excretion(self) -> AnimalManureExcretions:
-        total_manure_excretion = AnimalManureExcretions(
-            urea=0.0,
-            urine=0.0,
-            manure_total_ammoniacal_nitrogen=0.0,
-            urine_nitrogen=0.0,
-            manure_nitrogen=0.0,
-            manure_mass=0.0,
-            total_solids=0.0,
-            degradable_volatile_solids=0.0,
-            non_degradable_volatile_solids=0.0,
-            inorganic_phosphorus_fraction=0.0,
-            organic_phosphorus_fraction=0.0,
-            non_water_inorganic_phosphorus_fraction=0.0,
-            non_water_organic_phosphorus_fraction=0.0,
-            phosphorus=0.0,
-            phosphorus_fraction=0.0,
-            potassium=0.0,
-            enteric_methane_g=0.0,
-        )
+        total_manure_excretion = AnimalManureExcretions()
         for animal in self.animals_in_pen.values():
-            animal_manure = animal.digestive_system.manure_excretion
-            for (key, value) in animal_manure.items():
-                total_manure_excretion[key] += value
+            total_manure_excretion += animal.digestive_system.manure_excretion
         return total_manure_excretion
 
     def get_manure_data(self) -> PenManureData:

@@ -13,8 +13,16 @@ class DigestiveSystem:
     """
     This class serves as an entry point for the animal digestive systems.
     """
+    manure_excretion: AnimalManureExcretions
+    phosphorus_excreted: float
+    methane_emission: float
 
-    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> DigestiveSystemOutputs:
+    def __init__(self) -> None:
+        self.manure_excretion = AnimalManureExcretions()
+        self.phosphorus_excreted = 0.0
+        self.methane_emission = 0.0
+
+    def process_digestion(self, digestive_system_inputs: DigestiveSystemInputs) -> None:
         """
         Handles an animal's daily digest updates.
 
@@ -47,11 +55,10 @@ class DigestiveSystem:
                 digestive_system_inputs.nutrients,
                 digestive_system_inputs.nutrient_concentrations,
             )
-
-            return DigestiveSystemOutputs(
-                methane_emission=methane_emission,
-                phosphorus_excreted=phosphorus,
-                manure_excretion=excretion)
+            self.methane_emission = methane_emission
+            self.phosphorus_excreted = phosphorus
+            self.manure_excretion = excretion
+            return
 
         elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
@@ -67,11 +74,10 @@ class DigestiveSystem:
                 digestive_system_inputs.nutrients,
                 digestive_system_inputs.nutrient_concentrations,
             )
-
-            return DigestiveSystemOutputs(
-                methane_emission=methane_emission,
-                phosphorus_excreted=phosphorus,
-                manure_excretion=excretion)
+            self.methane_emission = methane_emission
+            self.phosphorus_excreted = phosphorus
+            self.manure_excretion = excretion
+            return
 
         elif digestive_system_inputs.animal_type.is_cow:
             methane_emission = EntericMethaneCalculator.calculate_cow_methane(
@@ -98,10 +104,11 @@ class DigestiveSystem:
                 digestive_system_inputs.nutrient_concentrations,
             )
 
-            return DigestiveSystemOutputs(
-                methane_emission=methane_emission,
-                phosphorus_excreted=phosphorus,
-                manure_excretion=excretion)
+            self.methane_emission = methane_emission
+            self.phosphorus_excreted = phosphorus
+            self.manure_excretion = excretion
+            return
+
         else:
             supported_animal: list[str] = ["Calf", "HeiferI", "HeiferI", "HeiferII", "HeiferIII", "DryCow", "LacCow"]
             info_map = {
