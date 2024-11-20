@@ -266,7 +266,8 @@ class Field:
                 "class": self.__class__.__name__,
                 "function": self._execute_fertilizer_application.__name__,
                 "suffix": f"field='{self.field_data.name}'",
-                "date": {"year": year, "day": day},
+                "year": year,
+                "day": day,
             }
             log_message = "Tried to apply fertilizer with no nitrogen, phosphorus, or potassium requested."
             self.om.add_log("fertilizer_application_log", log_message, info_map)
@@ -563,7 +564,8 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._execute_manure_application.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
         }
 
         if manure_supplied is not None:
@@ -814,7 +816,8 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_nutrient_application_error.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
         }
         if surface_remainder_fraction is not None:
             error_message = (
@@ -933,7 +936,8 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._create_manure_request.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": event.year, "day": event.day},
+            "year": event.year,
+            "day": event.day,
         }
         if event.nitrogen_mass == event.phosphorus_mass == 0.0:
             log_message = "Tried to apply manure with no nitrogen or phosphorus requested."
@@ -1120,7 +1124,8 @@ class Field:
         units = {
             "crop": MeasurementUnits.UNITLESS,
             "heat_scheduled_harvest": MeasurementUnits.UNITLESS,
-            "date": {"year": MeasurementUnits.CALENDAR_YEAR, "day": MeasurementUnits.ORDINAL_DAY},
+            "year": MeasurementUnits.CALENDAR_YEAR,
+            "day": MeasurementUnits.ORDINAL_DAY,
             "field_size": MeasurementUnits.HECTARE,
             "average_clay_percent": MeasurementUnits.PERCENT,
         }
@@ -1133,7 +1138,8 @@ class Field:
         value = {
             "crop": species,
             "heat_scheduled_harvest": heat_scheduled_harvest,
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
             "field_size": self.field_data.field_size,
             "average_clay_percent": self.soil.data.average_clay_percent,
         }
@@ -1181,7 +1187,8 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._harvest_crop.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"day": time.current_julian_day, "year": time.current_calendar_year},
+            "day": time.current_julian_day,
+            "year": time.current_calendar_year,
         }
         if len(crops_to_be_harvested) > 1:
             self.om.add_warning(
@@ -1738,7 +1745,8 @@ class Field:
             "class": self.__class__.__name__,
             "function": self._record_field_watering.__name__,
             "suffix": f"field='{self.field_data.name}'",
-            "date": {"year": year, "day": day},
+            "year": year,
+            "day": day,
             "field_size": self.field_data.field_size,
             "units": MeasurementUnits.MILLIMETERS,
         }
