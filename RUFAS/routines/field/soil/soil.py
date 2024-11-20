@@ -97,8 +97,6 @@ class Soil:
             Average annual air temperature (degrees C).
 
         """
-        # TODO: if no other daily update methods are added here, this method should be removed and Field should call
-        #       this method directly
         self.soil_temp.daily_soil_temperature_update(
             solar_radiation,
             avg_temp,
