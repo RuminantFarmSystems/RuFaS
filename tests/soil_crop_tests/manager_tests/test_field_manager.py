@@ -1779,7 +1779,7 @@ def test_setup_field(
     field_config: dict[str, str | float | bool | int | None] | dict[str, str | float | bool | int],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
-        mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """Tests that a Field instance is correctly initialized with a given input configuration."""
     mock_fertilizer_events = [MagicMock(FertilizerEvent)]
@@ -1788,9 +1788,7 @@ def test_setup_field(
     mock_planting_events = [MagicMock(PlantingEvent)]
     mock_harvest_events = [MagicMock(HarvestEvent)]
 
-    dummy_available_fertilizer_mixes = {
-        "A" : {"N": 0.0, "P": 1.1, "K": 2.2}
-    }
+    dummy_available_fertilizer_mixes = {"A": {"N": 0.0, "P": 1.1, "K": 2.2}}
 
     mocked_soil_profile = MagicMock(Soil)
     mocked_soil_data = MagicMock(SoilData)
@@ -1799,24 +1797,21 @@ def test_setup_field(
     mock_input_manager.get_data = mock.MagicMock(return_value=field_config)
 
     mock_setup_soil_data = mocker.patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil",
-        return_value=mocked_soil_profile
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_soil", return_value=mocked_soil_profile
     )
     mock_setup_fertilizer_data = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_data",
-        return_value=(mock_fertilizer_events, dummy_available_fertilizer_mixes)
+        return_value=(mock_fertilizer_events, dummy_available_fertilizer_mixes),
     )
     mock_setup_manure_data = mocker.patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_data",
-        return_value=mock_manure_events
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_data", return_value=mock_manure_events
     )
     mock_setup_tillage_data = mocker.patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_data",
-        return_value=mock_tillage_events
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_data", return_value=mock_tillage_events
     )
     mock_setup_crop_data = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_data",
-        return_value=(mock_planting_events, mock_harvest_events)
+        return_value=(mock_planting_events, mock_harvest_events),
     )
 
     new_field = FieldManager._setup_field(field_name)
@@ -1905,8 +1900,7 @@ def test_setup_field(
     ],
 )
 def test_setup_field_data(
-    field_name: str,
-    field_config: dict[str, str | float | bool | int | None] | dict[str, str | float | bool | int]
+    field_name: str, field_config: dict[str, str | float | bool | int | None] | dict[str, str | float | bool | int]
 ) -> None:
     result = FieldManager._setup_field_data(field_name, field_config)
     assert result.name == field_name
@@ -1917,9 +1911,7 @@ def test_setup_field_data(
     assert result.seasonal_high_water_table == field_config.get("seasonal_high_water_table")
     assert result.watering_amount_in_liters == field_config.get("watering_amount_in_liters")
     assert result.watering_interval == field_config.get("watering_interval")
-    assert result.supplement_manure_nutrient_deficiencies == field_config.get(
-        "supplement_manure_nutrient_deficiencies"
-    )
+    assert result.supplement_manure_nutrient_deficiencies == field_config.get("supplement_manure_nutrient_deficiencies")
     assert result.simulate_water_stress == field_config.get("simulate_water_stress")
     assert result.simulate_temp_stress == field_config.get("simulate_temp_stress")
     assert result.simulate_nitrogen_stress == field_config.get("simulate_nitrogen_stress")
@@ -1928,9 +1920,7 @@ def test_setup_field_data(
 
 def test_setup_fertilizer_date(mocker: MockerFixture) -> None:
     dummy_fertilizer_schedule = MagicMock(FertilizerSchedule)
-    dummy_available_fertilizer_mixes = {
-        "A": {"N": 0.0, "P": 1.1, "K": 2.2}
-    }
+    dummy_available_fertilizer_mixes = {"A": {"N": 0.0, "P": 1.1, "K": 2.2}}
     dummy_fertilizer_events = [MagicMock(FertilizerEvent), MagicMock(FertilizerEvent)]
 
     mock_generate_fertilizer_events = mocker.patch.object(
@@ -1938,7 +1928,7 @@ def test_setup_fertilizer_date(mocker: MockerFixture) -> None:
     )
     mock_setup_fertilizer_schedule = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_fertilizer_schedule",
-        return_value=(dummy_available_fertilizer_mixes, dummy_fertilizer_schedule)
+        return_value=(dummy_available_fertilizer_mixes, dummy_fertilizer_schedule),
     )
 
     result_fertilizer_events, result_fertilizer_mixes = FieldManager._setup_fertilizer_data("fertilizer_config")
@@ -1959,7 +1949,7 @@ def test_setup_manure_date(mocker: MockerFixture) -> None:
     )
     mock_setup_manure_schedule = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_schedule",
-        return_value=dummy_manure_application_schedule
+        return_value=dummy_manure_application_schedule,
     )
 
     result = FieldManager._setup_manure_data("manure_config")
@@ -1979,7 +1969,7 @@ def test_setup_tillage_date(mocker: MockerFixture) -> None:
     )
     mock_setup_tillage_schedule = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_schedule",
-        return_value=dummy_tillage_schedule
+        return_value=dummy_tillage_schedule,
     )
 
     result = FieldManager._setup_tillage_data("tillage_config")
@@ -2003,7 +1993,7 @@ def test_setup_crop_date(mocker: MockerFixture) -> None:
     )
     mock_setup_crop_schedule = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_schedules",
-        return_value=[dummy_crop_schedule]
+        return_value=[dummy_crop_schedule],
     )
 
     result_planting, result_harvest = FieldManager._setup_crop_data("crop_rotation_config")
