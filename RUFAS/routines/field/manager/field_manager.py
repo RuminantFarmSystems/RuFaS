@@ -174,7 +174,7 @@ class FieldManager:
         field_name: str
             The name of the field.
         field_configuration_data: dict[str, Any]
-            Dictionary containing configuration details such as field size, latitude, longitude, and other simulation
+            Configuration details such as field size, latitude, longitude, and other simulation
             parameters.
 
         Returns
@@ -211,7 +211,7 @@ class FieldManager:
         Parameters
         ----------
         fertilizer_configuration : str
-            The configuration string that specifies the fertilizer setup.
+            The configuration that specifies the fertilizer setup.
 
         Returns
         -------
@@ -236,7 +236,7 @@ class FieldManager:
         Parameters
         ----------
         manure_configuration : str
-            Configuration string for the manure application schedule.
+            Configuration for the manure application schedule.
 
         Returns
         -------
@@ -252,7 +252,7 @@ class FieldManager:
     def _setup_tillage_data(tillage_configuration: str) -> list[TillageEvent]:
         """
         Generates a list of TillageEvent objects based on the provided tillage
-        configuration string.
+        configuration.
 
         Parameters
         ----------
