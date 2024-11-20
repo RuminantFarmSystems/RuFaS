@@ -1,5 +1,6 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 
+from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
@@ -128,60 +129,27 @@ class FieldManager:
 
         """
         im = InputManager()
-        field_configuration_data = im.get_data(field_name)
-        field_size = field_configuration_data.get("field_size")
-        absolute_latitude = field_configuration_data.get("absolute_latitude")
-        longitude = field_configuration_data.get("longitude")
-        minimum_daylength = field_configuration_data.get("minimum_daylength")
-        seasonal_high_water_table = field_configuration_data.get("seasonal_high_water_table")
-        watering_amount_in_liters = field_configuration_data.get("watering_amount_in_liters")
-        watering_interval = field_configuration_data.get("watering_interval")
-        supplement_manure = field_configuration_data.get("supplement_manure_nutrient_deficiencies")
-        simulate_water_stress = field_configuration_data.get("simulate_water_stress")
-        simulate_temp_stress = field_configuration_data.get("simulate_temp_stress")
-        simulate_nitrogen_stress = field_configuration_data.get("simulate_nitrogen_stress")
-        simulate_phosphorus_stress = field_configuration_data.get("simulate_phosphorus_stress")
+        field_configuration_data: dict[str, str | float | bool] = im.get_data(field_name)
 
-        fertilizer_configuration = field_configuration_data.get("fertilizer_management_specification")
-        (
-            available_fertilizer_mixes,
-            fertilizer_schedule,
-        ) = FieldManager._setup_fertilizer_schedule(fertilizer_configuration)
-        fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
+        field_data = FieldManager._setup_field_data(field_name, field_configuration_data)
 
-        manure_configuration = field_configuration_data.get("manure_management_specification")
-        manure_application_schedule = FieldManager._setup_manure_schedule(manure_configuration)
-        manure_events = manure_application_schedule.generate_manure_events()
+        soil_profile = FieldManager._setup_soil(
+            soil_configuration=field_configuration_data.get("soil_specification"),
+            field_size=field_configuration_data.get("field_size"),
+        )
 
-        tillage_configuration = field_configuration_data.get("tillage_management_specification")
-        tillage_schedule = FieldManager._setup_tillage_schedule(tillage_configuration)
-        tillage_events = tillage_schedule.generate_tillage_events()
+        fertilizer_events, available_fertilizer_mixes = FieldManager._setup_fertilizer_data(
+            field_configuration_data.get("fertilizer_management_specification")
+        )
 
-        crop_rotation_configuration = field_configuration_data.get("crop_specification")
-        crop_schedules = FieldManager._setup_crop_schedules(crop_rotation_configuration)
-        all_planting_events = []
-        all_harvest_events = []
-        for schedule in crop_schedules:
-            all_planting_events += schedule.generate_planting_events()
-            all_harvest_events += schedule.generate_harvest_events()
+        manure_events = FieldManager._setup_manure_data(field_configuration_data.get("manure_management_specification"))
 
-        soil_configuration = field_configuration_data.get("soil_specification")
-        soil_profile = FieldManager._setup_soil(soil_configuration, field_size)
+        tillage_events = FieldManager._setup_tillage_data(
+            field_configuration_data.get("tillage_management_specification")
+        )
 
-        field_data = FieldData(
-            name=field_name,
-            field_size=field_size,
-            absolute_latitude=absolute_latitude,
-            longitude=longitude,
-            minimum_daylength=minimum_daylength,
-            seasonal_high_water_table=seasonal_high_water_table,
-            watering_amount_in_liters=watering_amount_in_liters,
-            watering_interval=watering_interval,
-            supplement_manure_nutrient_deficiencies=supplement_manure,
-            simulate_water_stress=simulate_water_stress,
-            simulate_temp_stress=simulate_temp_stress,
-            simulate_nitrogen_stress=simulate_nitrogen_stress,
-            simulate_phosphorus_stress=simulate_phosphorus_stress,
+        all_planting_events, all_harvest_events = FieldManager._setup_crop_data(
+            field_configuration_data.get("crop_specification")
         )
 
         return Field(
@@ -196,9 +164,139 @@ class FieldManager:
         )
 
     @staticmethod
+    def _setup_field_data(field_name: str, field_configuration_data: dict[str, Any]) -> FieldData:
+        """
+        This static method sets up the field data parameters using the given field name and
+        field configuration data.
+
+        Parameters
+        ----------
+        field_name: str
+            The name of the field.
+        field_configuration_data: dict[str, Any]
+            Dictionary containing configuration details such as field size, latitude, longitude, and other simulation
+            parameters.
+
+        Returns
+        -------
+        FieldData
+            An instance of the FieldData class populated with the values from the field_configuration_data.
+        """
+        return FieldData(
+            name=field_name,
+            field_size=field_configuration_data.get("field_size"),
+            absolute_latitude=field_configuration_data.get("absolute_latitude"),
+            longitude=field_configuration_data.get("longitude"),
+            minimum_daylength=field_configuration_data.get("minimum_daylength"),
+            seasonal_high_water_table=field_configuration_data.get("seasonal_high_water_table"),
+            watering_amount_in_liters=field_configuration_data.get("watering_amount_in_liters"),
+            watering_interval=field_configuration_data.get("watering_interval"),
+            supplement_manure_nutrient_deficiencies=field_configuration_data.get(
+                "supplement_manure_nutrient_deficiencies"
+            ),
+            simulate_water_stress=field_configuration_data.get("simulate_water_stress"),
+            simulate_temp_stress=field_configuration_data.get("simulate_temp_stress"),
+            simulate_nitrogen_stress=field_configuration_data.get("simulate_nitrogen_stress"),
+            simulate_phosphorus_stress=field_configuration_data.get("simulate_phosphorus_stress"),
+        )
+
+    @staticmethod
+    def _setup_fertilizer_data(
+        fertilizer_configuration: str,
+    ) -> tuple[list[FertilizerEvent], dict[str, dict[str, float]]]:
+        """
+        Sets up the fertilizer data including events and mixes based on the
+        provided configuration.
+
+        Parameters
+        ----------
+        fertilizer_configuration : str
+            The configuration string that specifies the fertilizer setup.
+
+        Returns
+        -------
+        tuple[list[FertilizerEvent], dict[str, dict[str, float]]]
+            A tuple consisting of a list of FertilizerEvent objects and a
+            dictionary mapping fertilizer mix names to their quantities in kg/ha.
+        """
+        (
+            available_fertilizer_mixes,
+            fertilizer_schedule,
+        ) = FieldManager._setup_fertilizer_schedule(fertilizer_configuration)
+        fertilizer_events = fertilizer_schedule.generate_fertilizer_events()
+        return fertilizer_events, available_fertilizer_mixes
+
+    @staticmethod
+    def _setup_manure_data(manure_configuration: str) -> list[ManureEvent]:
+        """
+        Setup manure data using the given manure configuration. This method
+        initializes the manure application schedule, generates manure events,
+        and returns a list of these events.
+
+        Parameters
+        ----------
+        manure_configuration : str
+            Configuration string for the manure application schedule.
+
+        Returns
+        -------
+        list[ManureEvent]
+            List of manure events generated according to the manure application
+            schedule.
+        """
+        manure_application_schedule = FieldManager._setup_manure_schedule(manure_configuration)
+        manure_events = manure_application_schedule.generate_manure_events()
+        return manure_events
+
+    @staticmethod
+    def _setup_tillage_data(tillage_configuration: str) -> list[TillageEvent]:
+        """
+        Generates a list of TillageEvent objects based on the provided tillage
+        configuration string.
+
+        Parameters
+        ----------
+        tillage_configuration : str
+            A string representing the tillage configuration.
+
+        Returns
+        -------
+        list[TillageEvent]
+            A list of TillageEvent objects derived from the tillage configuration.
+        """
+        tillage_schedule = FieldManager._setup_tillage_schedule(tillage_configuration)
+        tillage_events = tillage_schedule.generate_tillage_events()
+        return tillage_events
+
+    @staticmethod
+    def _setup_crop_data(crop_rotation_configuration: str) -> tuple[list[PlantingEvent], list[HarvestEvent]]:
+        """
+        Generates all planting and harvest events based on a given crop rotation configuration.
+
+        Parameters
+        ----------
+        crop_rotation_configuration : str
+            Configuration for crop rotation detailing the schedule and crops to be planted.
+
+        Returns
+        -------
+        tuple[list[PlantingEvent], list[HarvestEvent]]
+            A tuple containing two lists:
+            - List of all planting events required by the crop rotation schedule.
+            - List of all harvest events corresponding to the planting events.
+        """
+        crop_schedules = FieldManager._setup_crop_schedules(crop_rotation_configuration)
+        all_planting_events: list[PlantingEvent] = []
+        all_harvest_events: list[HarvestEvent] = []
+        for schedule in crop_schedules:
+            all_planting_events += schedule.generate_planting_events()
+            all_harvest_events += schedule.generate_harvest_events()
+        return all_planting_events, all_harvest_events
+
+    @staticmethod
     def _setup_fertilizer_schedule(
         fertilizer_schedule: str,
-    ) -> Tuple[Dict, FertilizerSchedule]:
+    ) -> Tuple[dict[str, dict[str, float]], FertilizerSchedule]:
         """
         Sets up the fertilizer schedule and the list of available fertilizer mixes.
 
@@ -209,14 +307,14 @@ class FieldManager:
 
         Returns
         -------
-        Tuple[Dict, FertilizerSchedule]
+        Tuple[dict[str, dict[str, float], FertilizerSchedule]
             Dictionary containing the specifications of the available fertilizer mixes, and a FertilizerSchedule.
 
         """
         im = InputManager()
-        fertilizer_data = im.get_data(fertilizer_schedule)
-        available_fertilizer_mixes = {}
-        fertilizer_mix_data = fertilizer_data.get("available_fertilizer_mixes")
+        fertilizer_data: dict[str, list[dict[str, float] | str | float | int] | int] = im.get_data(fertilizer_schedule)
+        available_fertilizer_mixes: dict[str, dict[str, float]] = {}
+        fertilizer_mix_data: list[dict[str, str | float]] = fertilizer_data.get("available_fertilizer_mixes", {})
         for mix in fertilizer_mix_data:
             available_fertilizer_mixes[mix.get("name")] = {
                 "N": mix.get("N"),
@@ -257,9 +355,9 @@ class FieldManager:
 
         """
         im = InputManager()
-        manure_schedule_data = im.get_data(manure_schedule)
-        manure_type_strings = manure_schedule_data.get("manure_types")
-        manure_types = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
+        manure_schedule_data: dict[str, int | list[int | float | str]] = im.get_data(manure_schedule)
+        manure_type_strings: list[str] = manure_schedule_data.get("manure_types")
+        manure_types: list[ManureType] = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
         manure_schedule_instance = ManureSchedule(
             name="manure_schedule",
             years=manure_schedule_data.get("years"),
@@ -292,7 +390,7 @@ class FieldManager:
 
         """
         im = InputManager()
-        tillage_schedule_data = im.get_data(tillage_schedule)
+        tillage_schedule_data: dict[str, int | list[int | float | str]] = im.get_data(tillage_schedule)
         tillage_schedule_instance = TillageSchedule(
             name="tillage_schedule",
             years=tillage_schedule_data.get("years"),
@@ -324,7 +422,9 @@ class FieldManager:
         """
         im = InputManager()
         schedules = []
-        crop_rotation_data = im.get_data(f"{crop_rotation}.crop_schedules")
+        crop_rotation_data: list[dict[str, str | int | list[int | str]]] = im.get_data(
+            f"{crop_rotation}.crop_schedules"
+        )
 
         for index, rotation in enumerate(crop_rotation_data):
             if rotation.get("harvest_type") == "scheduled":
