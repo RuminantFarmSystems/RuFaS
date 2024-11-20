@@ -22,13 +22,17 @@ class Decomposition:
         The SoilData instance being used by this module. Contains information about the soil's properties, carbon pools,
         and other relevant data for simulating decomposition.
 
+    References
+    ----------
+    Excel file in Basecamp, located at "Ruminant Farm Systems Model (RuFaS) › Docs & Files › Scientific Documentation ›
+    Soil and Crop Module › Literature › Carbon Models › DAYCENT"
+
     Notes
     -----
     The equations for this model, referenced in the soil psuedocode, are derived from an
     `excel file <https://3.basecamp.com/3486446/buckets/5296287/vaults/2740532358>`_ on Basecamp, but the meaning (and
     validity) of terms is extremely unclear from both sources. The documentation cannot be adequately completed without
-    a better understanding of these methods. Path to excel file on Basecamp: "Ruminant Farm Systems Model (RuFaS) ›
-    Docs & Files › Scientific Documentation › Soil and Crop Module › Literature › Carbon Models › DAYCENT".
+    a better understanding of these methods.
 
     """
 
