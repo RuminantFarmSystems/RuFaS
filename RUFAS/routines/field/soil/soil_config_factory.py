@@ -8,7 +8,6 @@ class SoilConfiguration(Enum):
     """Enum of all currently support soil configurations"""
 
     GENERIC = "generic"
-    # TODO: implement additional soil types
 
 
 class SoilConfigFactory:
