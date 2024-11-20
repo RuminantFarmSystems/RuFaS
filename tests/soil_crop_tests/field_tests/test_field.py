@@ -408,7 +408,8 @@ def test_create_manure_request(nitrogen_mass, phosphorus_mass, manure_type, expe
                 "class": field.__class__.__name__,
                 "function": field._create_manure_request.__name__,
                 "suffix": f"field='{field.field_data.name}'",
-                "date": {"year": manure_event.year, "day": manure_event.day},
+                "year": manure_event.year,
+                "day": manure_event.day,
             },
         )
 
@@ -689,8 +690,8 @@ def test_plant_crop(
                 "units": {
                     "crop": MeasurementUnits.UNITLESS.value,
                     "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
-                    "planting_year": MeasurementUnits.CALENDAR_YEAR.value,
-                    "planting_day": MeasurementUnits.ORDINAL_DAY.value,
+                    "year": MeasurementUnits.CALENDAR_YEAR.value,
+                    "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
@@ -698,8 +699,8 @@ def test_plant_crop(
             {
                 "crop": CropSpecies.CORN_GRAIN,
                 "heat_scheduled_harvest": False,
-                "planting_year": 1993,
-                "planting_day": 100,
+                "year": 1993,
+                "day": 100,
                 "field_size": 1.3,
                 "average_clay_percent": 40.0,
             },
@@ -716,8 +717,8 @@ def test_plant_crop(
                 "units": {
                     "crop": MeasurementUnits.UNITLESS.value,
                     "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
-                    "planting_year": MeasurementUnits.CALENDAR_YEAR.value,
-                    "planting_day": MeasurementUnits.ORDINAL_DAY.value,
+                    "year": MeasurementUnits.CALENDAR_YEAR.value,
+                    "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
@@ -725,8 +726,8 @@ def test_plant_crop(
             {
                 "crop": CropSpecies.WINTER_WHEAT_GRAIN,
                 "heat_scheduled_harvest": True,
-                "planting_year": 1996,
-                "planting_day": 120,
+                "year": 1996,
+                "day": 120,
                 "field_size": 2.55,
                 "average_clay_percent": 40.0,
             },
@@ -743,8 +744,8 @@ def test_plant_crop(
                 "units": {
                     "crop": MeasurementUnits.UNITLESS.value,
                     "heat_scheduled_harvest": MeasurementUnits.UNITLESS.value,
-                    "planting_year": MeasurementUnits.CALENDAR_YEAR.value,
-                    "planting_day": MeasurementUnits.ORDINAL_DAY.value,
+                    "year": MeasurementUnits.CALENDAR_YEAR.value,
+                    "day": MeasurementUnits.ORDINAL_DAY.value,
                     "field_size": MeasurementUnits.HECTARE.value,
                     "average_clay_percent": MeasurementUnits.PERCENT.value,
                 },
@@ -752,8 +753,8 @@ def test_plant_crop(
             {
                 "crop": CropSpecies.SOYBEAN_GRAIN,
                 "heat_scheduled_harvest": False,
-                "planting_year": 2008,
-                "planting_day": 122,
+                "year": 2008,
+                "day": 122,
                 "field_size": 0.95,
                 "average_clay_percent": 40.0,
             },
@@ -900,7 +901,8 @@ def test_harvest_crop_warnings(
         timestamp = "00-Jan-1970_Thu_00-00-00"
         expected_info_map = {
             "suffix": f"field='{mock_field_data.name}'",
-            "date": {"day": mock_time.current_julian_day, "year": mock_time.current_calendar_year},
+            "day": mock_time.current_julian_day,
+            "year": mock_time.current_calendar_year,
             "timestamp": timestamp,
         }
 
@@ -1082,7 +1084,8 @@ def test_execute_fertilizer_application(
         else:
             expected_info_map = {
                 "suffix": "field='test'",
-                "date": {"year": year, "day": day},
+                "year": year,
+                "day": day,
                 "timestamp": "00-Jan-1970_Thu_00-00-00",
             }
             expected_log_message = "Tried to apply fertilizer with no nitrogen, phosphorus, or potassium requested."
@@ -2077,7 +2080,8 @@ def test_add_manure_water(
             200,
             {
                 "suffix": "field='test'",
-                "date": {"year": 1998, "day": 200},
+                "year": 1998,
+                "day": 200,
                 "timestamp": "00-Jan-1970_Thu_00-00-00",
             },
             "Invalid application depth (100.0) and surface remainder fraction (1.0). Defaulting"
@@ -2091,7 +2095,8 @@ def test_add_manure_water(
             100,
             {
                 "suffix": "field='test'",
-                "date": {"year": 2005, "day": 100},
+                "year": 2005,
+                "day": 100,
                 "timestamp": "00-Jan-1970_Thu_00-00-00",
             },
             "Invalid application depth (800.0) is lower than the bottom depth of the soil profile, setting"
@@ -2840,7 +2845,8 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
             135.6,
             {
                 "suffix": "field='name_1'",
-                "date": {"year": 1993, "day": 120},
+                "year": 1993,
+                "day": 120,
                 "field_size": 100,
                 "units": MeasurementUnits.MILLIMETERS.value,
             },
@@ -2854,7 +2860,8 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
             1.2,
             {
                 "suffix": "field='name_2'",
-                "date": {"year": 1996, "day": 3},
+                "year": 1996,
+                "day": 3,
                 "field_size": 14.65,
                 "units": MeasurementUnits.MILLIMETERS.value,
             },
@@ -2868,7 +2875,8 @@ def test_error_field_data_initialization(watering_amount: float, interval: int) 
             1.2,
             {
                 "suffix": "field='name_2'",
-                "date": {"year": 2023, "day": 48},
+                "year": 2023,
+                "day": 48,
                 "field_size": 14.65,
                 "units": MeasurementUnits.MILLIMETERS.value,
             },
