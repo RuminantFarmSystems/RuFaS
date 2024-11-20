@@ -2,11 +2,13 @@ import math
 from collections import defaultdict
 from typing import Any, Optional
 
+from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
+from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
@@ -23,6 +25,7 @@ from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.animal.purchased_feed_emissions_estimator import PurchasedFeedEmissionsEstimator
 from RUFAS.time import Time
+from RUFAS.util import Utility
 from RUFAS.weather import Weather
 
 om = OutputManager()
@@ -132,6 +135,7 @@ class HerdManager:
                 AnimalType.CALF.DRY_COW
             ]
         }
+        self.herd_statistics = HerdStatistics()
 
         self.housing = data["housing"]
         self.pasture_concentrate = data["pasture_concentrate"]
@@ -1040,3 +1044,160 @@ class HerdManager:
             Current temperature.
         """
         pass
+
+    def update_herd_statistics(self) -> None:
+        (
+            self.herd_statistics.calf_num,
+            self.herd_statistics.heiferI_num,
+            self.herd_statistics.heiferII_num,
+            self.herd_statistics.heiferIII_num,
+            self.herd_statistics.cow_num,
+        ) = (
+            len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs), len(self.cows)
+        )
+        self._calculate_herd_percentages()
+        self._calculate_cow_percentages()
+        self._calculate_cull_reason_stats_percent()
+        self._calculate_percent_cow_per_parity()
+
+    def _calculate_herd_percentages(self, total_animal_num: int) -> None:
+        """Calculates percentage of each animal class in the herd.
+
+        When the total number of animals is 0, it is assumed that the count of
+        each animal class has already been set to or initialized with 0.
+
+        Args:
+            total_animal_num: The total number of animals in the herd.
+
+        """
+        denominator = sum([len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs),
+                           len(self.cows)])
+        denominator = denominator if denominator > 0 else 1
+        pc = Utility.percent_calculator(denominator)
+        self.herd_statistics.calf_percent = pc(self.herd_statistics.calf_num)
+        self.herd_statistics.heiferI_percent = pc(self.herd_statistics.heiferI_num)
+        self.herd_statistics.heiferII_percent = pc(self.herd_statistics.heiferII_num)
+        self.herd_statistics.heiferIII_percent = pc(self.herd_statistics.heiferIII_num)
+        self.herd_statistics.cow_percent = pc(self.herd_statistics.cow_num)
+
+    def _calculate_cow_percentages(self) -> None:
+        """Calculates percentages of different kinds of cows"""
+        denominator = self.herd_statistics.cow_num if self.herd_statistics.cow_num > 0 else 1
+        pc = Utility.percent_calculator(denominator)
+        self.herd_statistics.dry_cow_percent = pc(self.herd_statistics.dry_cow_num)
+        self.herd_statistics.milking_cow_percent = pc(self.herd_statistics.milking_cow_num)
+        self.herd_statistics.preg_cow_percent = pc(self.herd_statistics.preg_cow_num)
+        self.herd_statistics.non_preg_cow_percent = pc(self.herd_statistics.open_cow_num)
+
+    def _calculate_cull_reason_stats_percent(self) -> None:
+        """Calculates the percentage of culled cows for each cull reason."""
+        denominator = self.herd_statistics.cow_herd_exit_num if self.herd_statistics.cow_herd_exit_num > 0 else 1
+        pc = Utility.percent_calculator(denominator)
+        for cull_reason in self.herd_statistics.cull_reason_stats:
+            self.herd_statistics.cull_reason_stats_percent[cull_reason] = pc(
+                self.herd_statistics.cull_reason_stats[cull_reason])
+
+    def _calculate_percent_cow_per_parity(self) -> None:
+        """Calculates the percentage of cows for each parity number."""
+        denominator = self.herd_statistics.cow_num if self.herd_statistics.cow_num > 0 else 1
+        pc = Utility.percent_calculator(denominator)
+        for parity in self.num_cow_for_parity:
+            self.percent_cow_for_parity[parity] = pc(self.num_cow_for_parity[parity])
+
+    def _update_cow_milking_statistics(self) -> None:
+        lactating_cows: list[Animal] = [cow for cow in self.cows if cow.is_milking]
+        vwp_cows = [cow for cow in self.cows if cow.days_in_milk < AnimalConfig.voluntary_waiting_period]
+        self.herd_statistics.milking_cow_num = len(lactating_cows)
+        self.herd_statistics.dry_cow_num = len(self.cows) - len(lactating_cows)
+        self.herd_statistics.vwp_cow_num = len(vwp_cows)
+
+        self.herd_statistics.avg_days_in_milk = (sum(
+            [cow.days_in_milk for cow in lactating_cows]) / len(lactating_cows)) if len(lactating_cows) > 0 else 0
+
+
+        self.herd_statistics.daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in self.cows)
+        self.herd_statistics.dry_cows_daily_milk_production = sum(cow.estimated_daily_milk_produced for cow in self.cows if not cow.milking)
+        self.herd_statistics.herd_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if cow.milking)
+        self.herd_statistics.herd_milk_fat_percent = (self.herd_milk_fat_kg / self.daily_milk_production) * 100
+        self.herd_statistics.dry_cows_milk_fat_kg = sum(cow.milk_fat_kg for cow in cows if not cow.milking)
+        self.herd_statistics.herd_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if cow.milking)
+        self.herd_statistics.herd_milk_protein_percent = (self.herd_milk_protein_kg / self.daily_milk_production) * 100
+        self.herd_statistics.dry_cows_milk_protein_kg = sum(cow.milk_protein_kg for cow in cows if not cow.milking)
+
+
+    def _update_cow_pregnancy_statistics(self) -> None:
+        pregnant_cows: list[Animal] = [cow for cow in self.cows if cow.is_pregnant]
+        self.herd_statistics.preg_cow_num = len(pregnant_cows)
+        self.herd_statistics.open_cow_num = len(self.cows) - len(pregnant_cows)
+
+        self.herd_statistics.avg_days_pregnant = (sum(
+            [cow.days_in_pregnancy for cow in pregnant_cows]) / len(pregnant_cows)) if len(pregnant_cows) > 0 else 0
+
+    def _update_culling_statistics(self) -> None:
+        culled_cows: list[Animal] = [cow for cow in self.cows if cow.culled]
+
+        self.herd_statistics.cow_herd_exit_num += len(culled_cows)
+        self.herd_statistics.avg_cow_culling_age = (sum([cow.days_born for cow in culled_cows]) / len(culled_cows)) \
+            if len(culled_cows) > 0 else 0
+
+        self.herd_statistics.sold_and_died_cows_info += [
+            {
+                "id": cow.id,
+                "animal_type": cow.animal_type,
+                "sold_at_day": cow.sold_at_day,
+                "body_weight": cow.body_weight,
+                "cull_reason": cow.cull_reason,
+                "days_in_milk": cow.days_in_milk,
+                "parity": cow.reproduction.calves,
+            } for cow in culled_cows
+        ]
+        for cull_reason in self.herd_statistics.cull_reason_stats_range.keys():
+            self.herd_statistics.cull_reason_stats_range[cull_reason] += len([cow for cow in culled_cows if
+                                                                        cow.cull_reason == cull_reason])
+            self.herd_statistics.cull_reason_stats[cull_reason] += len([cow for cow in culled_cows if
+                                                                        cow.cull_reason == cull_reason])
+
+        sold_cows: list[Animal] = [cow for cow in culled_cows if cow.cull_reason != animal_constants.DEATH_CULL]
+        self.herd_statistics.sold_cow_num += [
+            {
+                "id": cow.id,
+                "animal_type": cow.animal_type,
+                "sold_at_day": cow.sold_at_day,
+                "body_weight": cow.body_weight,
+                "cull_reason": cow.cull_reason,
+                "days_in_milk": cow.days_in_milk,
+                "parity": cow.reproduction.calves,
+            } for cow in sold_cows
+        ]
+        self.herd_statistics.sold_cow_num += len(sold_cows)
+
+        for parity in self.herd_statistics.parity_culling_stats_range.keys():
+            if parity == "greater_than_3":
+                culled_cows_with_current_parity = [cow for cow in culled_cows if cow.reproduction.calves > 3]
+            else:
+                current_parity = int(parity)
+                culled_cows_with_current_parity = [cow for cow in culled_cows
+                                                   if cow.reproduction.calves == current_parity]
+            self.herd_statistics.parity_culling_stats_range[parity] += len(culled_cows_with_current_parity)
+
+    def _update_cow_reproduction_statistics(self) -> None:
+        self.herd_statistics.GnRH_injection_num += cow.GnRH_injections
+        self.herd_statistics.PGF_injection_num += cow.PGF_injections
+        self.herd_statistics.preg_check_num += cow.preg_diagnoses
+        self.herd_statistics.semen_num += cow.semen_num
+        self.herd_statistics.ai_num += cow.AI_times
+
+    def _update_heifer_reproduction_statistics(self) -> None:
+        self.herd_statistics.GnRH_injection_num_h += heiferII.GnRH_injections
+        self.herd_statistics.PGF_injection_num_h += heiferII.PGF_injections
+        self.herd_statistics.preg_check_num_h += heiferII.preg_diagnoses
+        self.herd_statistics.semen_num_h += heiferII.semen_num
+        self.herd_statistics.ai_num_h += heiferII.AI_times
+        self.herd_statistics.ed_period_h += heiferII.ED_days
+
+    def _update_average_mature_body_weight(self) -> None:
+        all_animals: list[Animal] = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows
+        self.herd_statistics.avg_mature_body_weight = sum(
+            [animal.mature_body_weight for animal in all_animals]) / len(all_animals) if len(all_animals) > 0 else 0
+
+

@@ -26,7 +26,8 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (NewBornCalfV
                                                                     HeiferIValuesTypedDict, HeiferIIValuesTypedDict,
                                                                     CowValuesTypedDict)
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, HeiferTAISubProtocol, \
+    HeiferSynchEDSubProtocol
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
@@ -79,6 +80,15 @@ class Animal:
             self,
             args: [NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict |
                    HeiferIIValuesTypedDict] | CowValuesTypedDict) -> None:
+        initialize_animal_methods = {
+            AnimalType.CALF: self._initialize_calf_or_heiferI,
+            AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
+            AnimalType.HEIFER_II: self._initialize_heiferII_or_heiferIII,
+            AnimalType.HEIFER_III: self._initialize_heiferII_or_heiferIII,
+            AnimalType.LAC_COW: self._initialize_cow,
+            AnimalType.DRY_COW: self._initialize_cow
+        }
+
         self.id = int(args.get("id"))
         self.breed = Breed(args.get("breed"))
         self.animal_type = AnimalType(args.get("animal_type"))
@@ -87,7 +97,7 @@ class Animal:
         self.birth_weight = float(args.get("birth_weight"))
         self.net_merit = args.get("net_merit", 0.0)
 
-        self.culled = False
+        self.cull_reason = ""
 
         self.animal_statistics = AnimalStatistics()
         self.growth: Growth = Growth()
@@ -96,6 +106,12 @@ class Animal:
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
         self.reproduction: Reproduction = Reproduction(do_not_breed=False)
+        self.animal_statistics: AnimalStatistics = AnimalStatistics()
+
+        if self.animal_type == AnimalType.CALF and "body_weight" in args.keys():
+            self._initialize_calf_or_heiferI(args)
+        else:
+            initialize_animal_methods[self.animal_type](args)
 
     def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict) -> None:
         if AnimalConfig.semen_type == "conventional":
@@ -135,7 +151,34 @@ class Animal:
         self.events.init_from_string(args.get("events"))
 
     def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict) -> None:
-        pass
+        self._initialize_calf_or_heiferI(args)
+        heifer_reproduction_program = HeiferReproductionProtocol(args.get("repro_program"))
+        heifer_reproduction_sub_program = None
+        if heifer_reproduction_program == HeiferReproductionProtocol.TAI:
+            heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("repro_sub_protocol"))
+        elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
+            heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("repro_sub_protocol"))
+        self.days_in_pregnancy = args.get("days_in_pregnancy", 0)
+        self.reproduction = Reproduction(
+            heifer_reproduction_program=heifer_reproduction_program,
+            heifer_reproduction_sub_program=heifer_reproduction_sub_program,
+            ai_day=args.get("ai_day", 0),
+            estrus_count=args.get("estrus_count", 0),
+            estrus_day=args.get("estrus_day", 0),
+            abortion_day=args.get("abortion_day", 0),
+            conception_rate=args.get("conception_rate", 0),
+            gestation_length=args.get("gestation_length", 0),
+            calf_birth_weight=args.get("calf_birth_weight", 0)
+        )
+        self.nutrients.phosphorus_for_gestation_required_for_calf = args.get(
+            "phosphorus_for_gestation_required_for_calf", 0)
+
+    def _initialize_cow(self, args: CowValuesTypedDict) -> None:
+        self._initialize_heiferII_or_heiferIII(args)
+        self.days_in_milk = args.get("days_in_milk", 0)
+        self.reproduction.calves = args.get("calves", 0)
+        self.reproduction.calving_interval = args.get("calving_interval", 0)
+
 
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:
@@ -372,7 +415,7 @@ class Animal:
             "wean_weight": self.wean_weight,
             "events": str(self.events),
             "repro_program": self.reproduction.cow_reproduction_program,
-            "repro_sub_protocol": self.heifer_reproduction_sub_program,
+            "repro_sub_protocol": self.reproduction.heifer_reproduction_sub_program,
             "mature_body_weight": self.mature_body_weight,
             "estrus_count": self.animal_statistics.estrus_count,
             "estrus_day": self.reproduction.estrus_day,

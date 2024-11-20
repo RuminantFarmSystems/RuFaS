@@ -45,7 +45,6 @@ class Pen:
         self.manure_storage = manure_storage
 
         self.animals_in_pen: dict[int, Animal] = {}
-        self.animal_types_in_pen = set()
 
         self.ration = {}
         self.ration_per_animal = {}
@@ -124,7 +123,7 @@ class Pen:
 
     @property
     def animal_types_in_pen(self) -> set[AnimalType]:
-        animal_types = set([animal.type for animal in self.animals_in_pen.values()])
+        animal_types = set([animal.animal_type for animal in self.animals_in_pen.values()])
         return animal_types
 
     @property
