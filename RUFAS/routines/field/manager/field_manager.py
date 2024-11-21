@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple, Any
+from typing import List, Tuple, Any
 
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
