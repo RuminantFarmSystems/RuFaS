@@ -21,6 +21,7 @@ from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
+
 class LogVerbosity(Enum):
     """
     The different types of logs printed by Output Manager. Set by the `verbose` gnu arg in main.py.
