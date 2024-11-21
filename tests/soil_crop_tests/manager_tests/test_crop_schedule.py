@@ -348,4 +348,5 @@ def test_generate_harvest_events(
         repeat,
     )
     actual = crop_sched.generate_harvest_events()
+    print(type(actual[0]))
     assert actual == expected

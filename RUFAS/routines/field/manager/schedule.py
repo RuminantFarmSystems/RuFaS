@@ -1,5 +1,6 @@
 from typing import List
 
+from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
 
 
@@ -96,3 +97,51 @@ class Schedule:
 
         """
         return all(0 < years[index] <= years[index + 1] for index in range(0, len(years) - 1))
+
+    def generate_events(
+        self,
+        years: list[int],
+        days: list[int],
+        additional_attributes: list[list],
+        event_class,
+        pattern_skip: int,
+        pattern_repeat: int,
+        heat_scheduled: bool
+    ) -> list:
+        """
+        Generic method to generate application events.
+
+        Parameters
+        ----------
+        years : List[int]
+            List of years for the schedule.
+        days : List[int]
+            List of days for the schedule.
+        additional_attributes : List[List]
+            Additional attributes for the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
+        event_class : class
+            The class to instantiate for each event.
+        pattern_skip : int
+            Number of years to skip.
+        pattern_repeat : int
+            Number of times the pattern should repeat.
+        heat_scheduled : bool
+            Flag indicating if heat unit scheduling is utilized for harvesting decisions.
+
+        Returns
+        -------
+        list
+            List of instantiated event objects.
+        """
+        all_years = Utility.repeat_pattern(years, pattern_skip, pattern_repeat)
+        all_days = days * (pattern_repeat + 1)
+        repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes]
+        all_events = list(zip(all_years, all_days, *repeated_attributes))
+        if heat_scheduled:
+            all_events[:] = [
+                harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS
+            ]
+        result = [event_class(*event) for event in all_events]
+        print(result[0].day, result[0].year, result[0].year)
+
+        return result
