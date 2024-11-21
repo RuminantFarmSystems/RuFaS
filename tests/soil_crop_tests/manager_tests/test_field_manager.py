@@ -1808,12 +1808,11 @@ def test_setup_field(
         return_value=(dummy_available_fertilizer_mixes, mock_fertilizer_events),
     )
     mock_setup_manure_events = mocker.patch(
-        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_events",
-        return_value=mock_manure_events
+        "RUFAS.routines.field.manager.field_manager.FieldManager._setup_manure_events", return_value=mock_manure_events
     )
     mock_setup_tillage_events = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_tillage_events",
-        return_value=mock_tillage_events
+        return_value=mock_tillage_events,
     )
     mock_setup_crop_data = mocker.patch(
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_crop_events",
