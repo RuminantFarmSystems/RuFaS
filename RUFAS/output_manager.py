@@ -21,7 +21,6 @@ from RUFAS.util import Utility
 
 DISCLAIMER_MESSAGE = "Under construction, use the results with caution."
 
-
 class LogVerbosity(Enum):
     """
     The different types of logs printed by Output Manager. Set by the `verbose` gnu arg in main.py.
@@ -76,6 +75,7 @@ class LogVerbosity(Enum):
 class OriginLabel(Enum):
     """
     An enumeration representing the different labels for data origins when generating json output files.
+
     Attributes
     ----------
     TRUE_AND_REPORT_ORIGINS : str
@@ -86,10 +86,6 @@ class OriginLabel(Enum):
         Indicates that only the report origin should be included.
     NONE : str
         Indicates that no origin information should be included.
-
-    Notes
-    -----
-    NONE is the default setting.
 
     """
 
@@ -259,7 +255,7 @@ class OutputManager(object):
             f"{self.available_memory} Bytes.\n"
         )
 
-        if save_chunk_threshold_call_count and save_chunk_threshold_call_count > 0:
+        if save_chunk_threshold_call_count is not None and save_chunk_threshold_call_count > 0:
             self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
             log_message += (
                 "The threshold add_variable_call count for saving pool chunk is set to "
@@ -662,7 +658,7 @@ class OutputManager(object):
         minify_output_file : bool
             Boolean flag indicating whether to minify the output JSON file.
 
-        origin_label : OriginLabel
+        origin_label : OriginLabel, default OriginLabel.NONE
             The origin label specifying the format of the detailed values string.
 
         Raises
@@ -838,11 +834,6 @@ class OutputManager(object):
         ----------
         origin_label : OriginLabel
             The origin label specifying the format of the detailed values string.
-            It can be one of the following:
-            - OriginLabel.TRUE_AND_REPORT_ORIGINS: Include both true origin and report origin.
-            - OriginLabel.TRUE_ORIGIN: Include only the true origin.
-            - OriginLabel.REPORT_ORIGIN: Include only the report origin.
-            - OriginLabel.NONE: Include no origin information.
 
         data : dict[str, Any]
             A dictionary containing the necessary data for formatting the detailed values string.
@@ -1339,7 +1330,7 @@ class OutputManager(object):
         Returns
         -------
         dict[str, OutputManager.pool_element_type]
-            dictionary containing data from the filtered pool of data, with data from within dictionaries unpacked and
+            Dictionary containing data from the filtered pool of data, with data from within dictionaries unpacked and
             separated.
 
         """
