@@ -77,22 +77,22 @@ class PhosphorusIncorporation:
             self.data.phosphorus_shapes[0],
             self.data.phosphorus_shapes[1],
         )
-        self.data.optimal_phosphorus = NitrogenIncorporation.determine_optimal_nutrient(
+        self.growth_constraints.optimal_phosphorus = NitrogenIncorporation.determine_optimal_nutrient(
             self.data.optimal_phosphorus_fraction, self.data.biomass
         )
-        if self.data.optimal_phosphorus - self.data.previous_phosphorus < 0:
+        if self.growth_constraints.optimal_phosphorus - self.data.previous_phosphorus < 0:
             self.data.potential_phosphorus_uptake = 0
         else:
             self.data.potential_phosphorus_uptake = NitrogenIncorporation.determine_potential_nutrient_uptake(
-                self.data.optimal_phosphorus,
+                self.growth_constraints.optimal_phosphorus,
                 self.data.previous_phosphorus,
                 self.data.mature_phosphorus_fraction,
                 self.data.biomass_growth_max,
             )
         self.uptake_phosphorus(layer_phosphates, layer_depths)
         soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", layer_phosphates)
-        self.data.phosphorus = NitrogenIncorporation.determine_stored_nutrient(
-            self.data.total_phosphorus_uptake, self.data.phosphorus, 0
+        self.growth_constraints.phosphorus = NitrogenIncorporation.determine_stored_nutrient(
+            self.data.total_phosphorus_uptake, self.growth_constraints.phosphorus, 0
         )
 
     def uptake_phosphorus(self, layer_phosphates: List[float], layer_depths: List[float]) -> None:
@@ -143,7 +143,7 @@ class PhosphorusIncorporation:
         Copies the current phosphorus value to previous_phosphorus (for use between time steps).
 
         """
-        self.data.previous_phosphorus = self.data.phosphorus
+        self.data.previous_phosphorus = self.growth_constraints.phosphorus
 
     def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
         """

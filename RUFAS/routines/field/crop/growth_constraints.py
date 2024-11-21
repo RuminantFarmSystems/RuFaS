@@ -1,8 +1,6 @@
 from math import exp
 from typing import Optional
 
-from RUFAS.routines.field.crop.crop_data import CropData
-
 
 class GrowthConstraints:
     """
@@ -46,8 +44,19 @@ class GrowthConstraints:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+    def __init__(self):
+        # SWAT Table A-3
+        self.minimum_temperature: float = 0
+        self.optimal_temperature: float = 25
+
+        self.nitrogen: float = 0.0
+        self.optimal_nitrogen: float = 0.0
+        self.phosphorus: float = 0.0
+        self.optimal_phosphorus: float = 0.0
+        self.water_stress: float = 0.0
+        self.temp_stress: Optional[float] = None
+        self.nitrogen_stress: Optional[float] = None
+        self.phosphorus_stress: Optional[float] = None
 
     def constrain_growth(
         self,
@@ -92,25 +101,25 @@ class GrowthConstraints:
             0.0
             if not simulate_temp_stress
             else self._determine_temperature_stress(
-                temperature, self.data.minimum_temperature, self.data.optimal_temperature
+                temperature, self.minimum_temperature, self.optimal_temperature
             )
         )
         self.data.nitrogen_stress = (
             0.0
             if not simulate_nitrogen_stress
-            else self._determine_nutrient_stress(self.data.nitrogen, self.data.optimal_nitrogen)
+            else self._determine_nutrient_stress(self.nitrogen, self.optimal_nitrogen)
         )
         self.data.phosphorus_stress = (
             0.0
             if not simulate_phosphorus_stress
-            else self._determine_nutrient_stress(self.data.phosphorus, self.data.optimal_phosphorus)
+            else self._determine_nutrient_stress(self.phosphorus, self.optimal_phosphorus)
         )
 
         self.data.growth_factor = self._determine_growth_factor(
-            self.data.water_stress,
-            self.data.temp_stress,
-            self.data.nitrogen_stress,
-            self.data.phosphorus_stress,
+            self.water_stress,
+            self.temp_stress,
+            self.nitrogen_stress,
+            self.phosphorus_stress,
         )
 
     @staticmethod

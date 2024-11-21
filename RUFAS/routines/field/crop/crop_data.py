@@ -4,7 +4,6 @@ from typing import Any, List, Optional
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
 class PlantCategory(Enum):
@@ -57,18 +56,12 @@ class CropData:
         The name of this specific crop instance.
     id : Optional[Any]
         The unique identifier for this crop instance.
-    plant_code : Optional[str]
-        4-letter plant code (used by SWAT).
-    scientific_name : Optional[str]
-        Taxonomic name of the plant.
     plant_category : Optional[PlantCategory]
         Classification of the plant (Reference SWAT crop.dat file, IDC variable).
     is_perennial : Optional[bool]
         Indicates if this plant is perennial.
     is_nitrogen_fixer : bool
         Indicates if the plant is a nitrogen fixer.
-    priority : int
-        Crop's priority level for shared resources in a field with multiple crops.
     field_proportion : float
         Proportion of the field occupied by this crop.
     is_alive : bool
@@ -83,18 +76,10 @@ class CropData:
         Year of planting for this crop.
     planting_day : int
         Julian day of planting for this crop.
-    next_harvest_year : int
-        Year for the next harvest.
-    next_harvest_day : int
-        Julian day for the next harvest.
     use_heat_scheduling : bool
         If heat unit scheduling is used for harvesting.
     harvest_heat_fraction : float
         Fraction of potential heat units for optimal growth stage for harvest.
-    is_harvest_day : bool
-        If today is the harvest day for this plant.
-    next_harvest_operation : HarvestOperation
-        Specific harvest operation to be executed next.
     minimum_temperature : float
         Minimum temperature for plant growth (Celsius).
     optimal_temperature : float
@@ -386,12 +371,9 @@ class CropData:
     species: CropSpecies = None
     name: Optional[str] = "default generic annual crop"
     id: Optional[Any] = None
-    plant_code: Optional[str] = None
-    scientific_name: Optional[str] = None
     plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")
     is_perennial: Optional[bool] = False
     is_nitrogen_fixer: bool = False
-    priority: int = 1
     field_proportion: float = 1.0
     is_alive: bool = True
 
@@ -402,16 +384,12 @@ class CropData:
     # Management variables
     planting_year: int = 0
     planting_day: int = 100
-    next_harvest_year: int = 0
-    next_harvest_day: int = 250
     use_heat_scheduling: bool = False
     harvest_heat_fraction: float = 1.10
-    is_harvest_day: bool = False
-    next_harvest_operation: HarvestOperation = HarvestOperation.HARVEST_KILL
 
-    # SWAT Table A-3
-    minimum_temperature: float = 0
-    optimal_temperature: float = 25
+    # # SWAT Table A-3
+    # minimum_temperature: float = 0
+    # optimal_temperature: float = 25
 
     # SWAT Table A-4
     max_leaf_area_index: float = 4.0
@@ -457,15 +435,15 @@ class CropData:
     above_ground_biomass: float = 0.1
     root_biomass: Optional[float] = 0.0
 
-    # ---- growth constraints
-    nitrogen: float = 0.0
-    optimal_nitrogen: float = 0.0
-    phosphorus: float = 0.0
-    optimal_phosphorus: float = 0.0
-    water_stress: float = 0.0
-    temp_stress: Optional[float] = None
-    nitrogen_stress: Optional[float] = None
-    phosphorus_stress: Optional[float] = None
+    # # ---- growth constraints
+    # nitrogen: float = 0.0
+    # optimal_nitrogen: float = 0.0
+    # phosphorus: float = 0.0
+    # optimal_phosphorus: float = 0.0
+    # water_stress: float = 0.0
+    # temp_stress: Optional[float] = None
+    # nitrogen_stress: Optional[float] = None
+    # phosphorus_stress: Optional[float] = None
 
     # ---- heat_units
     maximum_temperature: float = 38

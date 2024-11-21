@@ -103,19 +103,19 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
         self.om.add_variable(
-            "water_stress", crop.data.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            "water_stress", crop.growth_constraints.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
         self.om.add_variable(
-            "temp_stress", crop.data.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            "temp_stress", crop.growth_constraints.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
         self.om.add_variable(
             "nitrogen_stress",
-            crop.data.nitrogen_stress,
+            crop.growth_constraints.nitrogen_stress,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
             "phosphorus_stress",
-            crop.data.phosphorus_stress,
+            crop.growth_constraints.phosphorus_stress,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(

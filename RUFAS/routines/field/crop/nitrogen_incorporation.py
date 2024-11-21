@@ -68,14 +68,14 @@ class NitrogenIncorporation:
             self.data.nitrogen_shapes[0],
             self.data.nitrogen_shapes[1],
         )
-        self.data.optimal_nitrogen = self.determine_optimal_nutrient(
+        self.growth_constraints.optimal_nitrogen = self.determine_optimal_nutrient(
             self.data.optimal_nitrogen_fraction, self.data.biomass
         )
-        if self.data.optimal_nitrogen - self.data.previous_nitrogen < 0:
+        if self.growth_constraints.optimal_nitrogen - self.data.previous_nitrogen < 0:
             self.data.potential_nitrogen_uptake = 0
         else:
             self.data.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
-                self.data.optimal_nitrogen,
+                self.growth_constraints.optimal_nitrogen,
                 self.data.previous_nitrogen,
                 self.data.mature_nitrogen_fraction,
                 self.data.biomass_growth_max,
@@ -84,9 +84,9 @@ class NitrogenIncorporation:
         soil_data.set_vectorized_layer_attribute("nitrate_content", layer_nitrates)
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
-        self.data.nitrogen = self.determine_stored_nutrient(
+        self.growth_constraints.nitrogen = self.determine_stored_nutrient(
             self.data.total_nitrogen_uptake,
-            self.data.nitrogen,
+            self.growth_constraints.nitrogen,
             self.data.fixed_nitrogen,
         )
 
@@ -137,7 +137,7 @@ class NitrogenIncorporation:
         Copies the current nitrogen value to previous_nitrogen (for use between time steps).
 
         """
-        self.data.previous_nitrogen = self.data.nitrogen
+        self.data.previous_nitrogen = self.growth_constraints.nitrogen
 
     def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
         """
