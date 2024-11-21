@@ -135,16 +135,14 @@ class FieldManager:
 
         soil_profile = FieldManager._setup_soil(
             soil_configuration=field_configuration_data["soil_specification"],
-            field_size=field_configuration_data["field_size"]
+            field_size=field_configuration_data["field_size"],
         )
 
         available_fertilizer_mixes, fertilizer_events = FieldManager._setup_fertilizer_events(
             field_configuration_data["fertilizer_management_specification"]
         )
 
-        manure_events = FieldManager._setup_manure_events(
-            field_configuration_data["manure_management_specification"]
-        )
+        manure_events = FieldManager._setup_manure_events(field_configuration_data["manure_management_specification"])
 
         tillage_events = FieldManager._setup_tillage_events(
             field_configuration_data["tillage_management_specification"]
@@ -360,9 +358,7 @@ class FieldManager:
         """
         im = InputManager()
         schedules = []
-        crop_rotation_data: list[dict[str, Any]] = im.get_data(
-            f"{crop_rotation}.crop_schedules"
-        )
+        crop_rotation_data: list[dict[str, Any]] = im.get_data(f"{crop_rotation}.crop_schedules")
 
         for index, rotation in enumerate(crop_rotation_data):
             if rotation["harvest_type"] == "scheduled":
@@ -441,7 +437,8 @@ class FieldManager:
 
     @staticmethod
     def _setup_soil_layer(
-            field_size: float, top_depth: float, initial_residue: float, layer_config: dict[str, Any]) -> LayerData:
+        field_size: float, top_depth: float, initial_residue: float, layer_config: dict[str, Any]
+    ) -> LayerData:
         """
         Initializes a LayerData instance to be added to a SoilData object.
 
