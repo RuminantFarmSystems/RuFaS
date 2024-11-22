@@ -124,20 +124,10 @@ class CropData:
         Fraction of potential heat units for half maturity (unitless).
     mature_heat_fraction : float
         Fraction of potential heat units for maturity (unitless).
-    near_mature_nitrogen_fraction : float
-        Nitrogen fraction of biomass near maturity (unitless).
-    nitrogen_distro_param : float
-        Nitrogen uptake distribution parameter (unitless).
     root_depth : float
         Current depth of plant roots in soil (mm).
-    nitrogen_shapes : Optional[List[float]]
-        Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nitrogen : Optional[float]
-        Nitrogen in biomass on the previous day (kg/ha).
     optimal_nitrogen_fraction : Optional[float]
         Optimal nitrogen proportion in biomass for current stage (unitless).
-    potential_nitrogen_uptake : Optional[float]
-        Potential nitrogen uptake under ideal conditions (kg/ha).
     total_soil_layers : Optional[int]
         Total number of layers in the soil profile (unitless).
     accessible_soil_layers : Optional[int]
@@ -350,13 +340,8 @@ class CropData:
     # ---- nitrogen incorporation
     half_mature_heat_fraction: float = 0.5
     mature_heat_fraction: float = 1.0
-    near_mature_nitrogen_fraction: float = 0.02
-    nitrogen_distro_param: float = 10
     root_depth: float = 1
-    nitrogen_shapes: Optional[List[float]] = None
-    previous_nitrogen: Optional[float] = None
     optimal_nitrogen_fraction: Optional[float] = None
-    potential_nitrogen_uptake: Optional[float] = None
     total_soil_layers: Optional[int] = None
     accessible_soil_layers: Optional[int] = None
     accessible_depths: Optional[List[float]] = None

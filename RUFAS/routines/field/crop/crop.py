@@ -101,7 +101,12 @@ class Crop:
     def biomass_allocation(self) -> BiomassAllocation:
         """Provides access to the BiomassAllocation object."""
         return self._biomass_allocation
-    
+
+    @property
+    def nirogen_incorporation(self) -> NitrogenIncorporation:
+        """Provides access to the NitrogenIncorporation object."""
+        return self._nitrogen_incorporation
+
     @property
     def leaf_area_index(self) -> LeafAreaIndex:
         """Provides access to the LeafAreaIndex object."""

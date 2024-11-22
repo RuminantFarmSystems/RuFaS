@@ -26,6 +26,14 @@ class NitrogenIncorporation:
         Nitrogen fraction of biomass at half-maturity (unitless).
     mature_nitrogen_fraction : float
         Nitrogen fraction of biomass at maturity (unitless).
+    nitrogen_distro_param : float
+        Nitrogen uptake distribution parameter (unitless).
+    nitrogen_shapes : Optional[List[float]]
+        Shape coefficients for nitrogen uptake equations (unitless).
+    previous_nitrogen : Optional[float]
+        Nitrogen in biomass on the previous day (kg/ha).
+    potential_nitrogen_uptake : Optional[float]
+        Potential nitrogen uptake under ideal conditions (kg/ha).
 
     References
     ----------
@@ -40,6 +48,11 @@ class NitrogenIncorporation:
         self.emergence_nitrogen_fraction: float = 0.05
         self.half_mature_nitrogen_fraction: float = 0.02
         self.mature_nitrogen_fraction: float = 0.01
+
+        self.nitrogen_distro_param: float = 10.0
+        self.nitrogen_shapes: Optional[List[float]] = None
+        self.previous_nitrogen: Optional[float] = None
+        self.potential_nitrogen_uptake: Optional[float] = None
 
     # ---- wrapper functions (main routines) ----
     def incorporate_nitrogen(self, soil_data: SoilData) -> None:
@@ -65,7 +78,7 @@ class NitrogenIncorporation:
         soil_water_factor = soil_data.soil_water_factor
 
         self.shift_nitrogen_time()
-        self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
+        self.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction,
             self.data.mature_heat_fraction,
             self.emergence_nitrogen_fraction,
@@ -76,18 +89,18 @@ class NitrogenIncorporation:
             self.data.heat_fraction,
             self.emergence_nitrogen_fraction,
             self.mature_nitrogen_fraction,
-            self.data.nitrogen_shapes[0],
-            self.data.nitrogen_shapes[1],
+            self.nitrogen_shapes[0],
+            self.nitrogen_shapes[1],
         )
         self.data.optimal_nitrogen = self.determine_optimal_nutrient(
             self.data.optimal_nitrogen_fraction, self.data.biomass
         )
-        if self.data.optimal_nitrogen - self.data.previous_nitrogen < 0:
-            self.data.potential_nitrogen_uptake = 0
+        if self.data.optimal_nitrogen - self.previous_nitrogen < 0:
+            self.potential_nitrogen_uptake = 0
         else:
-            self.data.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
+            self.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
                 self.data.optimal_nitrogen,
-                self.data.previous_nitrogen,
+                self.previous_nitrogen,
                 self.mature_nitrogen_fraction,
                 self.data.biomass_growth_max,
             )
@@ -123,9 +136,9 @@ class NitrogenIncorporation:
         accessible_nitrates = self.access_layers(layer_nitrates)
         self.data.layer_nitrogen_potentials = self.determine_layer_nutrient_uptake_potential(
             accessible_depths,
-            self.data.potential_nitrogen_uptake,
+            self.potential_nitrogen_uptake,
             self.data.root_depth,
-            self.data.nitrogen_distro_param,
+            self.nitrogen_distro_param,
         )
         self.data.unmet_nitrogen_demands = self.determine_layer_nutrient_demands(
             self.data.layer_nitrogen_potentials, accessible_nitrates
@@ -148,7 +161,7 @@ class NitrogenIncorporation:
         Copies the current nitrogen value to previous_nitrogen (for use between time steps).
 
         """
-        self.data.previous_nitrogen = self.data.nitrogen
+        self.previous_nitrogen = self.data.nitrogen
 
     def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
         """
@@ -274,7 +287,7 @@ class NitrogenIncorporation:
             (unitless).
 
         """
-        unmet_demand = self.data.potential_nitrogen_uptake - self.data.total_nitrogen_uptake
+        unmet_demand = self.potential_nitrogen_uptake - self.data.total_nitrogen_uptake
         if unmet_demand > 0:
             self.data.fixed_nitrogen = self._determine_fixed_nitrogen(
                 unmet_demand,
