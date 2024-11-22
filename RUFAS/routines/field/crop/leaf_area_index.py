@@ -19,10 +19,28 @@ class LeafAreaIndex:
     data : CropData
         Reference to the provided `CropData` instance or a new default instance.
 
+    first_heat_fraction_point : float
+        Fraction of growing season for the first point on leaf development curve (unitless).
+
+    first_leaf_fraction_point : float
+        Fraction of max leaf area index at first point on leaf development curve (unitless).
+
+    second_heat_fraction_point : float
+        Fraction of growing season for the second point on leaf development curve (unitless).
+
+    second_leaf_fraction_point : float
+        Fraction of max leaf area index at second point on leaf development curve (unitless).
+
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
+
+        # SWAT Table A-4
+        self.first_heat_fraction_point: float = 0.15
+        self.first_leaf_fraction_point: float = 0.01
+        self.second_heat_fraction_point: float = 0.50
+        self.second_leaf_fraction_point: float = 0.95
 
     def grow_canopy(self) -> None:
         """
@@ -30,10 +48,10 @@ class LeafAreaIndex:
 
         """
         self.data._lai_shapes = self._determine_lai_shapes(
-            self.data.first_heat_fraction_point,
-            self.data.second_heat_fraction_point,
-            self.data.first_leaf_fraction_point,
-            self.data.second_leaf_fraction_point,
+            self.first_heat_fraction_point,
+            self.second_heat_fraction_point,
+            self.first_leaf_fraction_point,
+            self.second_leaf_fraction_point,
         )
 
         self.data.optimal_leaf_area_fraction = self._determine_optimal_leaf_area_fraction(

@@ -64,7 +64,7 @@ class HeatUnits:
                 max_air_temperature, self.data.maximum_temperature
             )
             self.data.minimum_heat_unit_temperature = HeatUnits._determine_minimum_heat_unit_temperature(
-                min_air_temperature, self.growth_constraints.minimum_temperature
+                min_air_temperature, self.data.minimum_temperature
             )
             self.data.heat_unit_temperature = (
                 self.data.minimum_heat_unit_temperature + self.data.maximum_heat_unit_temperature
@@ -74,7 +74,7 @@ class HeatUnits:
             use_temp = self.data.heat_unit_temperature
         else:
             use_temp = mean_air_temperature
-        self.data.is_growing = self.growth_constraints.minimum_temperature <= use_temp <= self.data.maximum_temperature
+        self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.data.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
 
     def accumulate_heat_units(self, air_temperature: float = None) -> None:
@@ -119,10 +119,10 @@ class HeatUnits:
         """
         if self.data.use_heat_unit_temperature or (air_temperature is None):  # alternative method
             self.data.new_heat_units = self._determine_new_heat_units(
-                self.data.heat_unit_temperature, self.growth_constraints.minimum_temperature
+                self.data.heat_unit_temperature, self.data.minimum_temperature
             )
         else:  # main method
-            self.data.new_heat_units = self._determine_new_heat_units(air_temperature, self.growth_constraints.minimum_temperature)
+            self.data.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
 
     def add_heat_units(self) -> None:
         """

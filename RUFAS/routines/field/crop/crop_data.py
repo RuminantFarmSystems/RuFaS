@@ -82,18 +82,8 @@ class CropData:
         Fraction of potential heat units for optimal growth stage for harvest.
     minimum_temperature : float
         Minimum temperature for plant growth (Celsius).
-    optimal_temperature : float
-        Ideal temperature for maximum plant growth (Celsius).
     max_leaf_area_index : float
         Maximum leaf area index for the plant (unitless).
-    first_heat_fraction_point : float
-        Fraction of growing season for the first point on leaf development curve (unitless).
-    first_leaf_fraction_point : float
-        Fraction of max leaf area index at first point on leaf development curve (unitless).
-    second_heat_fraction_point : float
-        Fraction of growing season for the second point on leaf development curve (unitless).
-    second_leaf_fraction_point : float
-        Fraction of max leaf area index at second point on leaf development curve (unitless).
     senescent_heat_fraction : float
         Fraction of potential heat units for plant senescence (unitless).
     light_use_efficiency : float
@@ -150,14 +140,6 @@ class CropData:
         Phosphorus stored in plant biomass (kg/ha).
     optimal_phosphorus : float, default 0.0
         Optimal amount of phosphorus for current growth stage (kg/ha).
-    water_stress : float
-        Water stress for the day (unitless).
-    temp_stress : Optional[float]
-        Temperature stress for the day (unitless).
-    nitrogen_stress : Optional[float]
-        Nitrogen stress for the day (unitless).
-    phosphorus_stress : Optional[float]
-        Phosphorus stress for the day (unitless).
     maximum_temperature : float
         Maximum temperature for plant growth (Celsius).
     potential_heat_units : float
@@ -388,22 +370,14 @@ class CropData:
     harvest_heat_fraction: float = 1.10
 
     # # SWAT Table A-3
-    # minimum_temperature: float = 0
-    # optimal_temperature: float = 25
+    minimum_temperature: float = 0
 
     # SWAT Table A-4
     max_leaf_area_index: float = 4.0
-    first_heat_fraction_point: float = 0.15
-    first_leaf_fraction_point: float = 0.01
-    second_heat_fraction_point: float = 0.50
-    second_leaf_fraction_point: float = 0.95
     senescent_heat_fraction: float = 0.9
 
     # SWAT Table A-5
     light_use_efficiency: float = 30
-    # light_use_decline_rate: float  # UNUSED (WAVP, $\Delta rue_{dcl}$)
-    # stressed_light_use_efficiency  # UNUSED (BIOEHI, $RUE_{hi}$)
-    # carbon_dioxide_stress_level = 660 # UNUSED (CO2HI, $CO_{2hi}$)
 
     # SWAT Table A-6
     minimum_cover_management_factor: float = 0.2
@@ -436,14 +410,10 @@ class CropData:
     root_biomass: Optional[float] = 0.0
 
     # # ---- growth constraints
-    # nitrogen: float = 0.0
-    # optimal_nitrogen: float = 0.0
-    # phosphorus: float = 0.0
-    # optimal_phosphorus: float = 0.0
-    # water_stress: float = 0.0
-    # temp_stress: Optional[float] = None
-    # nitrogen_stress: Optional[float] = None
-    # phosphorus_stress: Optional[float] = None
+    nitrogen: float = 0.0
+    optimal_nitrogen: float = 0.0
+    phosphorus: float = 0.0
+    optimal_phosphorus: float = 0.0
 
     # ---- heat_units
     maximum_temperature: float = 38
