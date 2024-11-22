@@ -287,8 +287,8 @@ def test_report_ration_interval_data(animal_manager_fixture: AnimalManager, mock
     for pen in animal_manager_fixture.all_pens:
         AnimalModuleReporter.report_ration_interval_data(pen, feed, 1)
 
-    mock_ration_report.assert_called()
-    mock_add_variable.assert_called()
+    assert mock_ration_report.call_count == 2
+    assert mock_add_variable.call_count == 10
 
 
 def test_report_daily_ration(animal_manager_fixture: AnimalManager, mocker: MockerFixture) -> None:
@@ -437,10 +437,9 @@ def test_report_life_cycle_manager_data(mocker: MockerFixture) -> None:
     AnimalModuleReporter.report_life_cycle_manager_data(life_cycle_manager, sim_day)
 
     # assert
-    mock_add_variable.assert_called()
+    assert mock_add_variable.call_count == 49
 
 
-# Test cases
 @pytest.mark.parametrize(
     "animal_id, animal_type, body_weight, sold_at_day, " "cull_reason, days_in_milk, calves",
     [
