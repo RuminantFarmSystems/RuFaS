@@ -88,16 +88,8 @@ class CropData:
         Fraction of potential heat units for plant senescence (unitless).
     minimum_cover_management_factor : float
         Minimum cover and management factor for water erosion (unitless).
-    optimal_harvest_index : float
-        Optimal harvest index under ideal growth conditions (unitless).
-    min_harvest_index : float
-        Minimum harvest index under drought conditions (unitless).
     yield_nitrogen_fraction : Optional[float]
         Fraction of nitrogen in yield (unitless).
-    yield_phosphorus_fraction : Optional[float]
-        Fraction of phosphorus in yield (unitless).
-    light_extinction : float
-        Light extinction coefficient (unitless).
     leaf_area_index : float
         Leaf area index of the plant (unitless).
     biomass : float
@@ -106,14 +98,8 @@ class CropData:
         Growth factor multiplier for the plant (unitless).
     root_fraction : float
         Proportion of biomass in roots (unitless).
-    usable_light : Optional[float]
-        Solar radiation captured for photosynthesis (MJ/m^2).
     biomass_growth_max : float, default 0.0
         Upper limit of biomass accumulation for the day (kg/ha).
-    biomass_growth : Optional[float]
-        Biomass accumulated during the day (kg/ha).
-    previous_biomass : Optional[float]
-        Biomass accumulated on the previous day (kg/ha).
     above_ground_biomass : float
         Above ground plant biomass excluding roots (kg/ha).
     root_biomass : Optional[float]
@@ -363,21 +349,14 @@ class CropData:
     senescent_heat_fraction: float = 0.9
 
     # SWAT Table A-8
-    optimal_harvest_index: float = 0.5
-    min_harvest_index: float = 0.2
     yield_nitrogen_fraction: Optional[float] = 0.2
-    yield_phosphorus_fraction: Optional[float] = 0.003
 
     # ---- biomass allocation
-    light_extinction: float = 0.65
     leaf_area_index: float = 0.0
     biomass: float = 0
     growth_factor: float = 1.0
     root_fraction: float = 1 / 3
-    usable_light: Optional[float] = None
     biomass_growth_max: float = 0.0
-    biomass_growth: Optional[float] = None
-    previous_biomass: Optional[float] = None
     above_ground_biomass: float = 0.1
     root_biomass: Optional[float] = 0.0
 

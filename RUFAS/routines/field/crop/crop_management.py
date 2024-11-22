@@ -26,6 +26,12 @@ class CropManagement:
     ----------
     data : CropData
         A reference to `crop_data`, on which crop management operations will be conducted.
+    optimal_harvest_index : float
+        Optimal harvest index under ideal growth conditions (unitless).
+    min_harvest_index : float
+        Minimum harvest index under drought conditions (unitless).
+    yield_phosphorus_fraction : Optional[float]
+        Fraction of phosphorus in yield (unitless).
 
     Notes
     -----
@@ -37,6 +43,11 @@ class CropManagement:
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
         self.om = OutputManager()
+
+        # SWAT Table A-8
+        self.optimal_harvest_index: float = 0.5
+        self.min_harvest_index: float = 0.2
+        self.yield_phosphorus_fraction: Optional[float] = 0.003
 
     # ---- Main Methods ----
     def manage_harvest(
@@ -102,7 +113,7 @@ class CropManagement:
         self.data.is_alive = False
         self.data.yield_residue += self.data.biomass
         self.data.residue_nitrogen = self.data.yield_residue * self.data.yield_nitrogen_fraction
-        self.data.residue_phosphorus = self.data.yield_residue * self.data.yield_phosphorus_fraction
+        self.data.residue_phosphorus = self.data.yield_residue * self.yield_phosphorus_fraction
 
     def determine_harvest_index(self) -> None:
         """
@@ -122,11 +133,11 @@ class CropManagement:
             self.data.harvest_index = self.data.user_harvest_index  # SWAT 5:3.3.1
         else:
             self.data.potential_harvest_index = self._determine_potential_harvest_index(
-                self.data.heat_fraction, self.data.optimal_harvest_index
+                self.data.heat_fraction, self.optimal_harvest_index
             )
             self.data.harvest_index = self._adjust_harvest_index(
                 self.data.potential_harvest_index,
-                self.data.min_harvest_index,
+                self.min_harvest_index,
                 self.data.water_deficiency,
             )
 
@@ -215,9 +226,9 @@ class CropManagement:
             self.data.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.data.yield_residue
         else:
             self.data.yield_nitrogen = self.data.yield_nitrogen_fraction * self.data.dry_matter_yield_collected
-            self.data.yield_phosphorus = self.data.yield_phosphorus_fraction * self.data.dry_matter_yield_collected
+            self.data.yield_phosphorus = self.yield_phosphorus_fraction * self.data.dry_matter_yield_collected
             self.data.residue_nitrogen = self.data.yield_nitrogen_fraction * self.data.yield_residue
-            self.data.residue_phosphorus = self.data.yield_phosphorus_fraction * self.data.yield_residue
+            self.data.residue_phosphorus = self.yield_phosphorus_fraction * self.data.yield_residue
 
     def _recalculate_biomass_distribution(self, roots_harvested: bool) -> None:
         """
