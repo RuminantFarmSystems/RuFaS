@@ -28,7 +28,7 @@ class LeafAreaIndex:
         Fraction of max leaf area index at second point on leaf development curve (unitless).
     max_canopy_height : float
         Maximum canopy height for the plant (m).
-    _lai_shapes : Optional[float]
+    lai_shapes : Optional[float]
         Shape coefficients for calculating leaf area index (unitless).
     optimal_leaf_area_fraction : Optional[float]
         Fraction of max leaf area index for current heat fraction (unitless).

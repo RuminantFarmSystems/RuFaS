@@ -132,40 +132,8 @@ class CropData:
         Total number of layers in the soil profile (unitless).
     accessible_soil_layers : Optional[int]
         Number of soil layers accessible to plant roots (unitless).
-    accessible_depths : Optional[List[float]]
-        Soil layer boundaries accessible to plant (mm).
     inaccessible_soil_layers : Optional[int]
         Number of soil layers inaccessible to plant roots (unitless).
-    layer_nitrogen_potentials : Optional[float]
-        Potential nitrogen uptake from each soil layer (kg/ha).
-    unmet_nitrogen_demands : Optional[float]
-        Unmet nitrogen demands by overlaying soil layers (kg/ha).
-    nitrogen_requests : Optional[float]
-        Nitrogen requested from each soil layer (kg/ha).
-    actual_nitrogen_uptakes : Optional[List[float]]
-        Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nitrogen_uptake : Optional[float]
-        Total nitrogen uptake by the plant (kg/ha).
-    fixed_nitrogen : Optional[float]
-        Total nitrogen fixed by the plant (kg/ha).
-    nitrate_factor : Optional[float]
-        Soil nitrate factor (unitless).
-    fixation_stage_factor : Optional[float]
-        Growth stage factor for nitrogen-fixing symbiotes
-    near_mature_phosphorus_fraction : float, default 0.3
-        Expected fraction of plant biomass comprised of nitrogen for the plant near maturity (unitless).
-    phosphorus_distro_param : float, default 10
-        Phosphorus uptake distribution parameter (unitless).
-    phosphorus_shapes : Optional[List[float]], default None
-        First and second shape coefficients for the nitrogen uptake equations (unitless).
-    previous_phosphorus : Optional[float], default None
-        Phosphorus value on the previous day (kg/ha).
-    total_phosphorus_uptake : Optional[float], default None
-        Total amount of phosphorus taken up by the plant (kg/ha).
-    potential_phosphorus_uptake : Optional[float], default None
-        Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
-    actual_phosphorus_uptakes : Optional[List[float]], default None
-        Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
     max_root_depth : float, default 2000
         Maximum depth of roots in the soil (mm).
     cumulative_evaporation : float, default 0.0
@@ -344,25 +312,7 @@ class CropData:
     optimal_nitrogen_fraction: Optional[float] = None
     total_soil_layers: Optional[int] = None
     accessible_soil_layers: Optional[int] = None
-    accessible_depths: Optional[List[float]] = None
     inaccessible_soil_layers: Optional[int] = None
-    layer_nitrogen_potentials: Optional[float] = None
-    unmet_nitrogen_demands: Optional[float] = None
-    nitrogen_requests: Optional[float] = None
-    actual_nitrogen_uptakes: Optional[List[float]] = None
-    total_nitrogen_uptake: Optional[float] = None
-    fixed_nitrogen: Optional[float] = None
-    nitrate_factor: Optional[float] = None
-    fixation_stage_factor: Optional[float] = None
-
-    # --- phosphorus incorporation ----
-    near_mature_phosphorus_fraction: float = 0.3
-    phosphorus_distro_param: float = 10
-    phosphorus_shapes: Optional[List[float]] = None
-    previous_phosphorus: Optional[float] = None
-    total_phosphorus_uptake: Optional[float] = None
-    potential_phosphorus_uptake: Optional[float] = None
-    actual_phosphorus_uptakes: Optional[List[float]] = None
 
     # ---- root development
     max_root_depth: float = 2_000

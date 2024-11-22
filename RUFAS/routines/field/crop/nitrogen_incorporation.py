@@ -34,6 +34,22 @@ class NitrogenIncorporation:
         Nitrogen in biomass on the previous day (kg/ha).
     potential_nitrogen_uptake : Optional[float]
         Potential nitrogen uptake under ideal conditions (kg/ha).
+    layer_nitrogen_potentials : Optional[float]
+        Potential nitrogen uptake from each soil layer (kg/ha).
+    unmet_nitrogen_demands : Optional[float]
+        Unmet nitrogen demands by overlaying soil layers (kg/ha).
+    nitrogen_requests : Optional[float]
+        Nitrogen requested from each soil layer (kg/ha).
+    actual_nitrogen_uptakes : Optional[List[float]]
+        Actual nitrogen uptake from each soil layer (kg/ha).
+    total_nitrogen_uptake : Optional[float]
+        Total nitrogen uptake by the plant (kg/ha).
+    fixed_nitrogen : Optional[float]
+        Total nitrogen fixed by the plant (kg/ha).
+    nitrate_factor : Optional[float]
+        Soil nitrate factor (unitless).
+    fixation_stage_factor : Optional[float]
+        Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     References
     ----------
@@ -53,6 +69,14 @@ class NitrogenIncorporation:
         self.nitrogen_shapes: Optional[List[float]] = None
         self.previous_nitrogen: Optional[float] = None
         self.potential_nitrogen_uptake: Optional[float] = None
+        self.layer_nitrogen_potentials: Optional[float] = None
+        self.unmet_nitrogen_demands: Optional[float] = None
+        self.nitrogen_requests: Optional[float] = None
+        self.actual_nitrogen_uptakes: Optional[List[float]] = None
+        self.total_nitrogen_uptake: Optional[float] = None
+        self.fixed_nitrogen: Optional[float] = None
+        self.nitrate_factor: Optional[float] = None
+        self.fixation_stage_factor: Optional[float] = None
 
     # ---- wrapper functions (main routines) ----
     def incorporate_nitrogen(self, soil_data: SoilData) -> None:
@@ -109,9 +133,9 @@ class NitrogenIncorporation:
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
         self.data.nitrogen = self.determine_stored_nutrient(
-            self.data.total_nitrogen_uptake,
+            self.total_nitrogen_uptake,
             self.data.nitrogen,
-            self.data.fixed_nitrogen,
+            self.fixed_nitrogen,
         )
 
     def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
@@ -134,22 +158,22 @@ class NitrogenIncorporation:
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_nitrates = self.access_layers(layer_nitrates)
-        self.data.layer_nitrogen_potentials = self.determine_layer_nutrient_uptake_potential(
+        self.layer_nitrogen_potentials = self.determine_layer_nutrient_uptake_potential(
             accessible_depths,
             self.potential_nitrogen_uptake,
             self.data.root_depth,
             self.nitrogen_distro_param,
         )
-        self.data.unmet_nitrogen_demands = self.determine_layer_nutrient_demands(
-            self.data.layer_nitrogen_potentials, accessible_nitrates
+        self.unmet_nitrogen_demands = self.determine_layer_nutrient_demands(
+            self.layer_nitrogen_potentials, accessible_nitrates
         )
-        self.data.nitrogen_requests = self.determine_layer_nutrient_uptake(
-            self.data.unmet_nitrogen_demands,
-            self.data.layer_nitrogen_potentials,
+        self.nitrogen_requests = self.determine_layer_nutrient_uptake(
+            self.unmet_nitrogen_demands,
+            self.layer_nitrogen_potentials,
             accessible_nitrates,
         )
-        self.data.actual_nitrogen_uptakes = self.determine_layer_extracted_resource(
-            self.data.nitrogen_requests, accessible_nitrates
+        self.actual_nitrogen_uptakes = self.determine_layer_extracted_resource(
+            self.nitrogen_requests, accessible_nitrates
         )
         self.extend_nitrate_uptakes_to_full_profile()
         self.extract_nitrogen_from_soil_layers(layer_nitrates)
@@ -213,7 +237,7 @@ class NitrogenIncorporation:
 
         """
         if self.data.inaccessible_soil_layers > 0:
-            self.data.actual_nitrogen_uptakes += [0] * self.data.inaccessible_soil_layers
+            self.actual_nitrogen_uptakes += [0] * self.data.inaccessible_soil_layers
 
     def extract_nitrogen_from_soil_layers(self, layer_nitrates: List[float]) -> None:
         """
@@ -231,11 +255,11 @@ class NitrogenIncorporation:
         are subtracted from the nitrate content of each corresponding soil layer.
 
         """
-        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.data.actual_nitrogen_uptakes)]
+        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.actual_nitrogen_uptakes)]
 
     def tally_total_nitrogen_uptake(self) -> None:
         """determines total nitrogen extracted from soil by summing actual uptake from each layer"""
-        self.data.total_nitrogen_uptake = sum(self.data.actual_nitrogen_uptakes)
+        self.total_nitrogen_uptake = sum(self.actual_nitrogen_uptakes)
 
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
         """
@@ -261,7 +285,7 @@ class NitrogenIncorporation:
             self.update_fixation_attributes(total_accessible_nitrates)
             self.fix_nitrogen(soil_water_factor)
         else:
-            self.data.fixed_nitrogen = 0
+            self.fixed_nitrogen = 0
 
     def update_fixation_attributes(self, total_accessible_nitrates: float) -> None:
         """
@@ -273,8 +297,8 @@ class NitrogenIncorporation:
             The total nitrates accessible to the plant's roots.
 
         """
-        self.data.nitrate_factor = self._determine_nitrate_factor(total_accessible_nitrates)
-        self.data.fixation_stage_factor = self._determine_fixation_stage_factor(self.data.heat_fraction)
+        self.nitrate_factor = self._determine_nitrate_factor(total_accessible_nitrates)
+        self.fixation_stage_factor = self._determine_fixation_stage_factor(self.data.heat_fraction)
 
     def fix_nitrogen(self, water_factor: float) -> None:
         """
@@ -287,16 +311,16 @@ class NitrogenIncorporation:
             (unitless).
 
         """
-        unmet_demand = self.potential_nitrogen_uptake - self.data.total_nitrogen_uptake
+        unmet_demand = self.potential_nitrogen_uptake - self.total_nitrogen_uptake
         if unmet_demand > 0:
-            self.data.fixed_nitrogen = self._determine_fixed_nitrogen(
+            self.fixed_nitrogen = self._determine_fixed_nitrogen(
                 unmet_demand,
-                stage_factor=self.data.fixation_stage_factor,
+                stage_factor=self.fixation_stage_factor,
                 water_factor=water_factor,
-                nitrate_factor=self.data.nitrate_factor,
+                nitrate_factor=self.nitrate_factor,
             )
         else:
-            self.data.fixed_nitrogen = 0
+            self.fixed_nitrogen = 0
 
     # ---- static methods ----
     @staticmethod
