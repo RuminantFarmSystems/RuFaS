@@ -75,7 +75,7 @@ class Crop:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self._data = crop_data or CropData()
-        self._growth_constraints = GrowthConstraints(self._data)
+        self._growth_constraints = GrowthConstraints()
         self._biomass_allocation = BiomassAllocation(self._data)
         self._water_dynamics = WaterDynamics(self._data)
         self._water_uptake = WaterUptake(self._data)
@@ -91,6 +91,16 @@ class Crop:
     def data(self) -> CropData:
         """Provides access to the CropData object."""
         return self._data
+
+    @property
+    def growth_constraints(self) -> GrowthConstraints:
+        """Provides access to the GrowthConstraints object."""
+        return self._growth_constraints
+
+    @property
+    def biomass_allocation(self) -> BiomassAllocation:
+        """Provides access to the BiomassAllocation object."""
+        return self._biomass_allocation
 
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData

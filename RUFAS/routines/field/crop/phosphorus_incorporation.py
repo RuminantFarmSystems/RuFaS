@@ -28,6 +28,12 @@ class PhosphorusIncorporation:
     data : CropData
         A reference to the `crop_data` object, used for accessing and updating information related to phosphorus
         uptake and incorporation.
+    emergence_phosphorus_fraction : float
+        Phosphorus fraction of biomass at emergence (unitless).
+    half_mature_phosphorus_fraction : float
+        Phosphorus fraction of biomass at half-maturity (unitless).
+    mature_phosphorus_fraction : float
+        Phosphorus fraction of biomass at maturity (unitless).
 
     References
     ----------
@@ -42,6 +48,11 @@ class PhosphorusIncorporation:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
+
+        # SWAT Table A-7
+        self.emergence_phosphorus_fraction: float = 0.005
+        self.half_mature_phosphorus_fraction: float = 0.003
+        self.mature_phosphorus_fraction: float = 0.002
 
     def incorporate_phosphorus(self, soil_data: SoilData) -> None:
         """
@@ -66,14 +77,14 @@ class PhosphorusIncorporation:
         self.data.phosphorus_shapes = NitrogenIncorporation.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction,
             self.data.mature_heat_fraction,
-            self.data.emergence_phosphorus_fraction,
-            self.data.half_mature_phosphorus_fraction,
-            self.data.mature_phosphorus_fraction,
+            self.emergence_phosphorus_fraction,
+            self.half_mature_phosphorus_fraction,
+            self.mature_phosphorus_fraction,
         )
         self.data.optimal_phosphorus_fraction = NitrogenIncorporation.determine_optimal_nutrient_fraction(
             self.data.heat_fraction,
-            self.data.emergence_phosphorus_fraction,
-            self.data.mature_phosphorus_fraction,
+            self.emergence_phosphorus_fraction,
+            self.mature_phosphorus_fraction,
             self.data.phosphorus_shapes[0],
             self.data.phosphorus_shapes[1],
         )
@@ -86,7 +97,7 @@ class PhosphorusIncorporation:
             self.data.potential_phosphorus_uptake = NitrogenIncorporation.determine_potential_nutrient_uptake(
                 self.data.optimal_phosphorus,
                 self.data.previous_phosphorus,
-                self.data.mature_phosphorus_fraction,
+                self.mature_phosphorus_fraction,
                 self.data.biomass_growth_max,
             )
         self.uptake_phosphorus(layer_phosphates, layer_depths)

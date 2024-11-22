@@ -20,6 +20,12 @@ class NitrogenIncorporation:
     ----------
     data : CropData
         Reference to the provided `CropData` instance or a new default instance.
+    emergence_nitrogen_fraction : float
+        Nitrogen fraction of biomass at emergence (unitless).
+    half_mature_nitrogen_fraction : float
+        Nitrogen fraction of biomass at half-maturity (unitless).
+    mature_nitrogen_fraction : float
+        Nitrogen fraction of biomass at maturity (unitless).
 
     References
     ----------
@@ -29,6 +35,11 @@ class NitrogenIncorporation:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
+
+        # SWAT Table A-7
+        self.emergence_nitrogen_fraction: float = 0.05
+        self.half_mature_nitrogen_fraction: float = 0.02
+        self.mature_nitrogen_fraction: float = 0.01
 
     # ---- wrapper functions (main routines) ----
     def incorporate_nitrogen(self, soil_data: SoilData) -> None:
@@ -57,14 +68,14 @@ class NitrogenIncorporation:
         self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction,
             self.data.mature_heat_fraction,
-            self.data.emergence_nitrogen_fraction,
-            self.data.half_mature_nitrogen_fraction,
-            self.data.mature_nitrogen_fraction,
+            self.emergence_nitrogen_fraction,
+            self.half_mature_nitrogen_fraction,
+            self.mature_nitrogen_fraction,
         )
         self.data.optimal_nitrogen_fraction = self.determine_optimal_nutrient_fraction(
             self.data.heat_fraction,
-            self.data.emergence_nitrogen_fraction,
-            self.data.mature_nitrogen_fraction,
+            self.emergence_nitrogen_fraction,
+            self.mature_nitrogen_fraction,
             self.data.nitrogen_shapes[0],
             self.data.nitrogen_shapes[1],
         )
@@ -77,7 +88,7 @@ class NitrogenIncorporation:
             self.data.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
                 self.data.optimal_nitrogen,
                 self.data.previous_nitrogen,
-                self.data.mature_nitrogen_fraction,
+                self.mature_nitrogen_fraction,
                 self.data.biomass_growth_max,
             )
         self.uptake_nitrogen(layer_nitrates, layer_depths)

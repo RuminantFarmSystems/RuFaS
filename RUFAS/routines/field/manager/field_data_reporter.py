@@ -69,7 +69,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "usable_light",
-            crop.data.usable_light,
+            crop.biomass_allocation.usable_light,
             dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
         )
         self.om.add_variable(
@@ -79,7 +79,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "biomass_growth",
-            crop.data.biomass_growth,
+            crop.biomass_allocation.biomass_growth,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
@@ -103,19 +103,19 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
         self.om.add_variable(
-            "water_stress", crop.data.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            "water_stress", crop.growth_constraints.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
         self.om.add_variable(
-            "temp_stress", crop.data.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            "temp_stress", crop.growth_constraints.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
         self.om.add_variable(
             "nitrogen_stress",
-            crop.data.nitrogen_stress,
+            crop.growth_constraints.nitrogen_stress,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
             "phosphorus_stress",
-            crop.data.phosphorus_stress,
+            crop.growth_constraints.phosphorus_stress,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(

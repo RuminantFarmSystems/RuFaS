@@ -4,7 +4,6 @@ from typing import Any, List, Optional
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 
 
 class PlantCategory(Enum):
@@ -57,18 +56,12 @@ class CropData:
         The name of this specific crop instance.
     id : Optional[Any]
         The unique identifier for this crop instance.
-    plant_code : Optional[str]
-        4-letter plant code (used by SWAT).
-    scientific_name : Optional[str]
-        Taxonomic name of the plant.
     plant_category : Optional[PlantCategory]
         Classification of the plant (Reference SWAT crop.dat file, IDC variable).
     is_perennial : Optional[bool]
         Indicates if this plant is perennial.
     is_nitrogen_fixer : bool
         Indicates if the plant is a nitrogen fixer.
-    priority : int
-        Crop's priority level for shared resources in a field with multiple crops.
     field_proportion : float
         Proportion of the field occupied by this crop.
     is_alive : bool
@@ -83,60 +76,20 @@ class CropData:
         Year of planting for this crop.
     planting_day : int
         Julian day of planting for this crop.
-    next_harvest_year : int
-        Year for the next harvest.
-    next_harvest_day : int
-        Julian day for the next harvest.
     use_heat_scheduling : bool
         If heat unit scheduling is used for harvesting.
     harvest_heat_fraction : float
         Fraction of potential heat units for optimal growth stage for harvest.
-    is_harvest_day : bool
-        If today is the harvest day for this plant.
-    next_harvest_operation : HarvestOperation
-        Specific harvest operation to be executed next.
     minimum_temperature : float
         Minimum temperature for plant growth (Celsius).
-    optimal_temperature : float
-        Ideal temperature for maximum plant growth (Celsius).
     max_leaf_area_index : float
         Maximum leaf area index for the plant (unitless).
-    first_heat_fraction_point : float
-        Fraction of growing season for the first point on leaf development curve (unitless).
-    first_leaf_fraction_point : float
-        Fraction of max leaf area index at first point on leaf development curve (unitless).
-    second_heat_fraction_point : float
-        Fraction of growing season for the second point on leaf development curve (unitless).
-    second_leaf_fraction_point : float
-        Fraction of max leaf area index at second point on leaf development curve (unitless).
     senescent_heat_fraction : float
         Fraction of potential heat units for plant senescence (unitless).
-    light_use_efficiency : float
-        Light use efficiency of the plant (dg/MJ).
     minimum_cover_management_factor : float
         Minimum cover and management factor for water erosion (unitless).
-    emergence_nitrogen_fraction : float
-        Nitrogen fraction of biomass at emergence (unitless).
-    half_mature_nitrogen_fraction : float
-        Nitrogen fraction of biomass at half-maturity (unitless).
-    mature_nitrogen_fraction : float
-        Nitrogen fraction of biomass at maturity (unitless).
-    emergence_phosphorus_fraction : float
-        Phosphorus fraction of biomass at emergence (unitless).
-    half_mature_phosphorus_fraction : float
-        Phosphorus fraction of biomass at half-maturity (unitless).
-    mature_phosphorus_fraction : float
-        Phosphorus fraction of biomass at maturity (unitless).
-    optimal_harvest_index : float
-        Optimal harvest index under ideal growth conditions (unitless).
-    min_harvest_index : float
-        Minimum harvest index under drought conditions (unitless).
     yield_nitrogen_fraction : Optional[float]
         Fraction of nitrogen in yield (unitless).
-    yield_phosphorus_fraction : Optional[float]
-        Fraction of phosphorus in yield (unitless).
-    light_extinction : float
-        Light extinction coefficient (unitless).
     leaf_area_index : float
         Leaf area index of the plant (unitless).
     biomass : float
@@ -145,14 +98,8 @@ class CropData:
         Growth factor multiplier for the plant (unitless).
     root_fraction : float
         Proportion of biomass in roots (unitless).
-    usable_light : Optional[float]
-        Solar radiation captured for photosynthesis (MJ/m^2).
     biomass_growth_max : float, default 0.0
         Upper limit of biomass accumulation for the day (kg/ha).
-    biomass_growth : Optional[float]
-        Biomass accumulated during the day (kg/ha).
-    previous_biomass : Optional[float]
-        Biomass accumulated on the previous day (kg/ha).
     above_ground_biomass : float
         Above ground plant biomass excluding roots (kg/ha).
     root_biomass : Optional[float]
@@ -165,14 +112,6 @@ class CropData:
         Phosphorus stored in plant biomass (kg/ha).
     optimal_phosphorus : float, default 0.0
         Optimal amount of phosphorus for current growth stage (kg/ha).
-    water_stress : float
-        Water stress for the day (unitless).
-    temp_stress : Optional[float]
-        Temperature stress for the day (unitless).
-    nitrogen_stress : Optional[float]
-        Nitrogen stress for the day (unitless).
-    phosphorus_stress : Optional[float]
-        Phosphorus stress for the day (unitless).
     maximum_temperature : float
         Maximum temperature for plant growth (Celsius).
     potential_heat_units : float
@@ -386,12 +325,9 @@ class CropData:
     species: CropSpecies = None
     name: Optional[str] = "default generic annual crop"
     id: Optional[Any] = None
-    plant_code: Optional[str] = None
-    scientific_name: Optional[str] = None
     plant_category: Optional[PlantCategory] = PlantCategory("cool_annual")
     is_perennial: Optional[bool] = False
     is_nitrogen_fixer: bool = False
-    priority: int = 1
     field_proportion: float = 1.0
     is_alive: bool = True
 
@@ -402,70 +338,33 @@ class CropData:
     # Management variables
     planting_year: int = 0
     planting_day: int = 100
-    next_harvest_year: int = 0
-    next_harvest_day: int = 250
     use_heat_scheduling: bool = False
     harvest_heat_fraction: float = 1.10
-    is_harvest_day: bool = False
-    next_harvest_operation: HarvestOperation = HarvestOperation.HARVEST_KILL
 
-    # SWAT Table A-3
+    # # SWAT Table A-3
     minimum_temperature: float = 0
-    optimal_temperature: float = 25
 
     # SWAT Table A-4
     max_leaf_area_index: float = 4.0
-    first_heat_fraction_point: float = 0.15
-    first_leaf_fraction_point: float = 0.01
-    second_heat_fraction_point: float = 0.50
-    second_leaf_fraction_point: float = 0.95
     senescent_heat_fraction: float = 0.9
 
-    # SWAT Table A-5
-    light_use_efficiency: float = 30
-    # light_use_decline_rate: float  # UNUSED (WAVP, $\Delta rue_{dcl}$)
-    # stressed_light_use_efficiency  # UNUSED (BIOEHI, $RUE_{hi}$)
-    # carbon_dioxide_stress_level = 660 # UNUSED (CO2HI, $CO_{2hi}$)
-
-    # SWAT Table A-6
-    minimum_cover_management_factor: float = 0.2
-
-    # SWAT Table A-7
-    emergence_nitrogen_fraction: float = 0.05
-    half_mature_nitrogen_fraction: float = 0.02
-    mature_nitrogen_fraction: float = 0.01
-    emergence_phosphorus_fraction: float = 0.005
-    half_mature_phosphorus_fraction: float = 0.003
-    mature_phosphorus_fraction: float = 0.002
-
     # SWAT Table A-8
-    optimal_harvest_index: float = 0.5
-    min_harvest_index: float = 0.2
     yield_nitrogen_fraction: Optional[float] = 0.2
-    yield_phosphorus_fraction: Optional[float] = 0.003
 
     # ---- biomass allocation
-    light_extinction: float = 0.65
     leaf_area_index: float = 0.0
     biomass: float = 0
     growth_factor: float = 1.0
     root_fraction: float = 1 / 3
-    usable_light: Optional[float] = None
     biomass_growth_max: float = 0.0
-    biomass_growth: Optional[float] = None
-    previous_biomass: Optional[float] = None
     above_ground_biomass: float = 0.1
     root_biomass: Optional[float] = 0.0
 
-    # ---- growth constraints
+    # # ---- growth constraints
     nitrogen: float = 0.0
     optimal_nitrogen: float = 0.0
     phosphorus: float = 0.0
     optimal_phosphorus: float = 0.0
-    water_stress: float = 0.0
-    temp_stress: Optional[float] = None
-    nitrogen_stress: Optional[float] = None
-    phosphorus_stress: Optional[float] = None
 
     # ---- heat_units
     maximum_temperature: float = 38

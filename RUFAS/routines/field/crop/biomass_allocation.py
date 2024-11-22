@@ -20,6 +20,16 @@ class BiomassAllocation:
     data : CropData
         The data object used for biomass calculation. Stores information
         about the plant's growth and environmental factors.
+    light_extinction : float
+        Light extinction coefficient (unitless).
+    usable_light : Optional[float]
+        Solar radiation captured for photosynthesis (MJ/m^2).
+    biomass_growth : Optional[float]
+        Biomass accumulated during the day (kg/ha).
+    previous_biomass : Optional[float]
+        Biomass accumulated on the previous day (kg/ha).
+    light_use_efficiency : float
+        Light use efficiency of the plant (dg/MJ).
 
     Methods
     -------
@@ -43,6 +53,14 @@ class BiomassAllocation:
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
+
+        self.light_extinction: float = 0.65
+        self.usable_light: Optional[float] = None
+        self.biomass_growth: Optional[float] = None
+        self.previous_biomass: Optional[float] = None
+
+        # SWAT Table A-5
+        self.light_use_efficiency: float = 30
 
     def allocate_biomass(self, light: float) -> None:
         """
@@ -71,10 +89,10 @@ class BiomassAllocation:
         """
 
         # intercept light
-        self.data.usable_light = self._intercept_radiation(light, self.data.light_extinction, self.data.leaf_area_index)
+        self.usable_light = self._intercept_radiation(light, self.light_extinction, self.data.leaf_area_index)
         # accumulate biomass
         self.data.biomass_growth_max = self._determine_max_accumulation(
-            self.data.usable_light, self.data.light_use_efficiency
+            self.usable_light, self.light_use_efficiency
         )
         self.data.previous_biomass = self.data.biomass
         self.data.biomass_growth = self._determine_accumulated_biomass(
