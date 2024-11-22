@@ -91,9 +91,7 @@ class BiomassAllocation:
         # intercept light
         self.usable_light = self._intercept_radiation(light, self.light_extinction, self.data.leaf_area_index)
         # accumulate biomass
-        self.data.biomass_growth_max = self._determine_max_accumulation(
-            self.usable_light, self.light_use_efficiency
-        )
+        self.data.biomass_growth_max = self._determine_max_accumulation(self.usable_light, self.light_use_efficiency)
         self.data.previous_biomass = self.data.biomass
         self.data.biomass_growth = self._determine_accumulated_biomass(
             self.data.growth_factor, self.data.biomass_growth_max
