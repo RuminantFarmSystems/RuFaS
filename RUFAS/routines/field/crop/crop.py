@@ -101,6 +101,11 @@ class Crop:
     def biomass_allocation(self) -> BiomassAllocation:
         """Provides access to the BiomassAllocation object."""
         return self._biomass_allocation
+    
+    @property
+    def leaf_area_index(self) -> LeafAreaIndex:
+        """Provides access to the LeafAreaIndex object."""
+        return self._leaf_area_index
 
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData

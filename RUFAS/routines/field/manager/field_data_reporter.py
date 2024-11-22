@@ -136,16 +136,16 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
-            "canopy_height", crop.data.canopy_height, dict(info_map, **{"units": MeasurementUnits.METERS})
+            "canopy_height", crop.leaf_area_index.canopy_height, dict(info_map, **{"units": MeasurementUnits.METERS})
         )
         self.om.add_variable(
             "leaf_area_added",
-            crop.data.leaf_area_added,
+            crop.leaf_area_index.leaf_area_added,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
             "optimal_leaf_area_change",
-            crop.data.optimal_leaf_area_change,
+            crop.leaf_area_index.optimal_leaf_area_change,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(

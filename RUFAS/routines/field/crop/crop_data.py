@@ -112,8 +112,6 @@ class CropData:
         Phosphorus stored in plant biomass (kg/ha).
     optimal_phosphorus : float, default 0.0
         Optimal amount of phosphorus for current growth stage (kg/ha).
-    maximum_temperature : float
-        Maximum temperature for plant growth (Celsius).
     potential_heat_units : float
         Total heat units required for maturity (unitless).
     accumulated_heat_units : float
@@ -122,32 +120,6 @@ class CropData:
         If the crop is currently growing.
     is_dormant : bool
         If the crop is currently dormant.
-    use_heat_unit_temperature : bool
-        If alternative heat unit method is used.
-    new_heat_units : Optional[float]
-        Heat units accumulated on the current day (Celsius*).
-    minimum_heat_unit_temperature : Optional[float]
-        Minimum temperature for heat unit calculations (Celsius).
-    maximum_heat_unit_temperature : Optional[float]
-        Maximum temperature for heat unit calculations (Celsius).
-    heat_unit_temperature : Optional[float]
-        Heat unit temperature for alternative method (Celsius).
-    max_canopy_height : float
-        Maximum canopy height for the plant (m).
-    _lai_shapes : Optional[float]
-        Shape coefficients for calculating leaf area index (unitless).
-    optimal_leaf_area_fraction : Optional[float]
-        Fraction of max leaf area index for current heat fraction (unitless).
-    canopy_height : Optional[float]
-        Current height of the plant (m).
-    leaf_area_added : Optional[float]
-        Leaf area index change during the day (unitless).
-    optimal_leaf_area_change : Optional[float]
-        Leaf area index added under ideal conditions (unitless).
-    previous_leaf_area_index : Optional[float]
-        Leaf area index on the previous day (unitless).
-    previous_optimal_leaf_area_fraction : Optional[float]
-        Optimal leaf area fraction on the previous day (unitless).
     half_mature_heat_fraction : float
         Fraction of potential heat units for half maturity (unitless).
     mature_heat_fraction : float
@@ -367,26 +339,13 @@ class CropData:
     optimal_phosphorus: float = 0.0
 
     # ---- heat_units
-    maximum_temperature: float = 38
     potential_heat_units: float = 800
     accumulated_heat_units: float = 0
     is_growing: bool = True
     is_dormant: bool = False
-    use_heat_unit_temperature: bool = False
-    new_heat_units: Optional[float] = None
-    minimum_heat_unit_temperature: Optional[float] = None
-    maximum_heat_unit_temperature: Optional[float] = None
-    heat_unit_temperature: Optional[float] = None
 
     # ---- leaf area index
     max_canopy_height: float = 2.5
-    _lai_shapes: Optional[float] = None
-    optimal_leaf_area_fraction: Optional[float] = None
-    canopy_height: Optional[float] = None
-    leaf_area_added: Optional[float] = None
-    optimal_leaf_area_change: Optional[float] = None
-    previous_leaf_area_index: Optional[float] = None
-    previous_optimal_leaf_area_fraction: Optional[float] = None
 
     # ---- nitrogen incorporation
     half_mature_heat_fraction: float = 0.5
