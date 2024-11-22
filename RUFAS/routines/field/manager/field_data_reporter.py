@@ -69,7 +69,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "usable_light",
-            crop.data.usable_light,
+            crop.biomass_allocation.usable_light,
             dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
         )
         self.om.add_variable(
@@ -79,7 +79,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "biomass_growth",
-            crop.data.biomass_growth,
+            crop.biomass_allocation.biomass_growth,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
