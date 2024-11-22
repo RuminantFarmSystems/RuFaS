@@ -304,7 +304,7 @@ animal_schema = {
                                 },
                                 "infoText": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off"
                             },
-                            "minimum": 0,
+                            "minimum": 1,
                             "default": 218
                         },
                         "heifer_repro_cull_time": {
@@ -465,7 +465,7 @@ animal_schema = {
                                         },
                                         "infoText": "Wean Length (days) -- Length of the weaning process"
                                     },
-                                    "minimum": 0,
+                                    "minimum": 1,
                                     "default": 7
                                 },
                                 "milk_type": {
@@ -597,7 +597,7 @@ animal_schema = {
                                         },
                                         "infoText": "Calving Interval (days) -- Current average calving interval, used for initial bodyweight adjustment and other calculations"
                                     },
-                                    "minimum": 0,
+                                    "minimum": 1,
                                     "default": 400
                                 },
                                 "heifers": {
@@ -846,7 +846,7 @@ animal_schema = {
                                         },
                                         "infoText": "Average Holstein Birth Weight (kg/head)"
                                     },
-                                    "minimum": 0,
+                                    "minimum": 1,
                                     "default": 42.9
                                 },
                                 "birth_weight_std_ho": {
@@ -872,7 +872,7 @@ animal_schema = {
                                         },
                                         "infoText": "Average Jersey Birth Weight (kg/head)"
                                     },
-                                    "minimum": 0,
+                                    "minimum": 1,
                                     "default": 25.2
                                 },
                                 "birth_weight_std_je": {
