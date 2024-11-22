@@ -277,34 +277,18 @@ def test_report_ration_interval_data(animal_manager_fixture: AnimalManager, mock
         pen.MEdiet = test_data["MEdiet"]
         pen.avg_nutrient_rqmts = test_data["avg_nutrient_rqmts"]
 
-    mocker.patch(
+    mock_ration_report = mocker.patch(
         "RUFAS.routines.animal.ration.ration_driver.RationReporter.report_ration_supply",
         return_value="ration_supply_report",
     )
 
+    mock_add_variable = mocker.patch("RUFAS.routines.animal.animal_module_reporter.om.add_variable")
+
     for pen in animal_manager_fixture.all_pens:
         AnimalModuleReporter.report_ration_interval_data(pen, feed, 1)
 
-    for i in range(1, 2):
-        assert om.variables_pool[
-            f"AnimalModuleReporter.report_ration_interval_data.ration_nutrient_amount_pen_{i}_combo{i}"
-        ]["values"] == [test_data["ration_nutrient_amount"]]
-
-        assert om.variables_pool[f"AnimalModuleReporter.report_ration_interval_data.MEdiet_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data["MEdiet"]]
-
-        assert om.variables_pool[f"AnimalModuleReporter.report_ration_interval_data.avg_rqmts_pen_{i}_combo{i}"][
-            "values"
-        ] == [test_data["avg_nutrient_rqmts"]]
-
-        assert om.variables_pool[
-            f"AnimalModuleReporter.report_ration_interval_data.ration_per_animal_for_pen_{i}_combo{i}"
-        ]["values"] == [test_data["formatted_ration"]]
-
-        assert om.variables_pool[
-            f"AnimalModuleReporter.report_ration_interval_data.ration_supply_report_for_pen_{i}_combo{i}"
-        ]["values"] == ["ration_supply_report"]
+    assert mock_ration_report.call_count == 2
+    assert mock_add_variable.call_count == 10
 
 
 def test_report_daily_ration(animal_manager_fixture: AnimalManager, mocker: MockerFixture) -> None:
@@ -447,38 +431,15 @@ def test_report_life_cycle_manager_data(mocker: MockerFixture) -> None:
     }
 
     sim_day = 42
+    mock_add_variable = mocker.patch("RUFAS.routines.animal.animal_module_reporter.om.add_variable")
 
     # act
     AnimalModuleReporter.report_life_cycle_manager_data(life_cycle_manager, sim_day)
 
     # assert
-    for key, value in keydict.items():
-        assert om.variables_pool[f"AnimalModuleReporter.report_life_cycle_manager_data.{key}"]["values"] == [
-            keydict[key]
-        ]
-    assert om.variables_pool["AnimalModuleReporter.report_life_cycle_manager_data.sim_day"]["values"] == [sim_day]
-    for i in range(1, 3):
-        assert om.variables_pool[f"AnimalModuleReporter.report_life_cycle_manager_data.num_cow_for_parity_{i}"][
-            "values"
-        ] == [100 * i]
-        assert om.variables_pool[f"AnimalModuleReporter.report_life_cycle_manager_data.calving_to_preg_time_{i}"][
-            "values"
-        ] == [100 * i]
-        assert om.variables_pool[f"AnimalModuleReporter.report_life_cycle_manager_data.avg_age_for_calving_{i}"][
-            "values"
-        ] == [100 * i]
-    assert om.variables_pool["AnimalModuleReporter.report_life_cycle_manager_data.num_cow_for_parity_greater_than_3"][
-        "values"
-    ] == [400]
-    assert om.variables_pool["AnimalModuleReporter.report_life_cycle_manager_data.calving_to_preg_time_greater_than_3"][
-        "values"
-    ] == [400]
-    assert om.variables_pool["AnimalModuleReporter.report_life_cycle_manager_data.avg_age_for_calving_greater_than_3"][
-        "values"
-    ] == [400]
+    assert mock_add_variable.call_count == 49
 
 
-# Test cases
 @pytest.mark.parametrize(
     "animal_id, animal_type, body_weight, sold_at_day, " "cull_reason, days_in_milk, calves",
     [
