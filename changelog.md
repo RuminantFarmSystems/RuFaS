@@ -54,6 +54,7 @@ v0.9.2
 - [1866](https://github.com/RuminantFarmSystems/MASM/pull/1866) - [minor change] [Metadata] Adds minimums for some Animal module inputs in metadata.
 - [2069](https://github.com/RuminantFarmSystems/MASM/pull/2069) - [minor change] [Crop & Soil] Flatten the units in SC module.
 - [2076](https://github.com/RuminantFarmSystems/MASM/pull/2076) - [minor change] [Crop & Soil] Removes TODOs from the Crop & Soil module.
+- [2084](https://github.com/RuminantFarmSystems/MASM/pull/2084) - [minor change] [Crop & Soil] Reorganizes CropData attributes into appropriate classes.
 
 
 ### v0.9.2
