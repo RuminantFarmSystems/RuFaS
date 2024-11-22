@@ -22,19 +22,14 @@ class GrowthConstraints:
     ----------
     data : CropData
         A reference to the `crop_data` object on which the growth constraint operations are conducted.
-
     optimal_temperature : float
         Ideal temperature for maximum plant growth (Celsius).
-
     water_stress : float
         Water stress for the day (unitless).
-
     temp_stress : Optional[float]
         Temperature stress for the day (unitless).
-
     nitrogen_stress : Optional[float]
         Nitrogen stress for the day (unitless).
-
     phosphorus_stress : Optional[float]
         Phosphorus stress for the day (unitless).
 

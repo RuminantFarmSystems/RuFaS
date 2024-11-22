@@ -86,22 +86,8 @@ class CropData:
         Maximum leaf area index for the plant (unitless).
     senescent_heat_fraction : float
         Fraction of potential heat units for plant senescence (unitless).
-    light_use_efficiency : float
-        Light use efficiency of the plant (dg/MJ).
     minimum_cover_management_factor : float
         Minimum cover and management factor for water erosion (unitless).
-    emergence_nitrogen_fraction : float
-        Nitrogen fraction of biomass at emergence (unitless).
-    half_mature_nitrogen_fraction : float
-        Nitrogen fraction of biomass at half-maturity (unitless).
-    mature_nitrogen_fraction : float
-        Nitrogen fraction of biomass at maturity (unitless).
-    emergence_phosphorus_fraction : float
-        Phosphorus fraction of biomass at emergence (unitless).
-    half_mature_phosphorus_fraction : float
-        Phosphorus fraction of biomass at half-maturity (unitless).
-    mature_phosphorus_fraction : float
-        Phosphorus fraction of biomass at maturity (unitless).
     optimal_harvest_index : float
         Optimal harvest index under ideal growth conditions (unitless).
     min_harvest_index : float
@@ -375,20 +361,6 @@ class CropData:
     # SWAT Table A-4
     max_leaf_area_index: float = 4.0
     senescent_heat_fraction: float = 0.9
-
-    # SWAT Table A-5
-    light_use_efficiency: float = 30
-
-    # SWAT Table A-6
-    minimum_cover_management_factor: float = 0.2
-
-    # SWAT Table A-7
-    emergence_nitrogen_fraction: float = 0.05
-    half_mature_nitrogen_fraction: float = 0.02
-    mature_nitrogen_fraction: float = 0.01
-    emergence_phosphorus_fraction: float = 0.005
-    half_mature_phosphorus_fraction: float = 0.003
-    mature_phosphorus_fraction: float = 0.002
 
     # SWAT Table A-8
     optimal_harvest_index: float = 0.5

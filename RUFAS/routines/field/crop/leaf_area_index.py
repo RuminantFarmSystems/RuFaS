@@ -18,16 +18,12 @@ class LeafAreaIndex:
     ----------
     data : CropData
         Reference to the provided `CropData` instance or a new default instance.
-
     first_heat_fraction_point : float
         Fraction of growing season for the first point on leaf development curve (unitless).
-
     first_leaf_fraction_point : float
         Fraction of max leaf area index at first point on leaf development curve (unitless).
-
     second_heat_fraction_point : float
         Fraction of growing season for the second point on leaf development curve (unitless).
-
     second_leaf_fraction_point : float
         Fraction of max leaf area index at second point on leaf development curve (unitless).
 
