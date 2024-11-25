@@ -68,9 +68,9 @@ def test_uptake_water(max_trans):
 )
 def test_extract_water_from_soil(layers, uptakes, should_fail: bool) -> None:
     """This method only tests for edge cases, other parts of the method already have coverage"""
-    crop_data = CropData(actual_water_uptakes=uptakes)
+    crop_data = CropData()
     soil_data = SoilData(soil_layers=layers, field_size=3)
-    uptake = WaterUptake(crop_data=crop_data)
+    uptake = WaterUptake(crop_data=crop_data, actual_water_uptakes=uptakes)
     if should_fail:
         with pytest.raises(Exception) as e:
             uptake.extract_water_from_soil(soil_data)

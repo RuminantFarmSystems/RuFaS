@@ -75,11 +75,10 @@ def test_cycle_water(mocker: MockFixture, evap: float, trans: float, et_max: flo
     data = CropData(
         cumulative_evaporation=0,
         cumulative_transpiration=0,
-        cumulative_evapotranspiration=0,
         cumulative_potential_evapotranspiration=0,
         cumulative_water_uptake=10.0,
     )
-    water_dyn = WaterDynamics(data)
+    water_dyn = WaterDynamics(data, cumulative_evapotranspiration=0)
     water_deficiency = mocker.patch.object(water_dyn, "_determine_water_deficiency", return_value=0.8)
 
     water_dyn.cycle_water(evap, trans, et_max)
@@ -88,11 +87,10 @@ def test_cycle_water(mocker: MockFixture, evap: float, trans: float, et_max: flo
     actual = [
         water_dyn.data.cumulative_evaporation,
         water_dyn.data.cumulative_transpiration,
-        water_dyn.data.cumulative_evapotranspiration,
         water_dyn.data.cumulative_potential_evapotranspiration,
         water_dyn.data.water_deficiency,
     ]
-    expected = [evap, trans, evap + trans, et_max, 0.8]
+    expected = [evap, trans, et_max, 0.8]
     assert actual == expected
 
 
