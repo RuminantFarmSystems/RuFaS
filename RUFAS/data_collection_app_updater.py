@@ -405,7 +405,7 @@ class DataCollectionAppUpdater:
     def _add_file_name_input_field(self, schema: dict[str, Any]) -> dict[str, Any]:
         """Adds field to schema for collecting filename that data will be saved as."""
         filename_field = {
-            "filename": {
+            "fileName": {
                 "title": "File Name",
                 "type": "string",
                 "options": {

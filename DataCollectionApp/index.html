@@ -187,11 +187,11 @@
 
             if (Array.isArray(data)) {
                 data.forEach((item, index) => {
-                    var fileName = item.filename || `item_${index + 1}`
+                    var fileName = item.fileName;
 
                     var jsonData = JSON.stringify(item, null, 2);
 
-                    saveJsonFile(jsonData, `item_${index + 1}.json`, 'application/json');
+                    saveJsonFile(jsonData, fileName, 'application/json');
                 });
                 alert(`${data.length} JSON files have been saved.`);
             } else {
