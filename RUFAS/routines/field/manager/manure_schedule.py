@@ -1,8 +1,8 @@
 from typing import List, Optional, Union
 
-from RUFAS.routines.field.manager.events import ManureEvent
+from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.schedule import Schedule
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.util import Utility
 
 
@@ -140,21 +140,21 @@ class ManureSchedule(Schedule):
         if not valid_coverage_fractions:
             raise ValueError(
                 error_header + f"expected all field coverage fractions to be in the range [0.0, 1.0], "
-                f"received '{self.field_coverages}'."
+                               f"received '{self.field_coverages}'."
             )
 
         valid_depths = Utility.determine_if_all_non_negative_values(self.application_depths)
         if not valid_depths:
             raise ValueError(
                 error_header + f"expected all manure application depths to be >= 0, received "
-                f"'{self.application_depths}'."
+                               f"'{self.application_depths}'."
             )
 
         valid_surface_fractions = Utility.validate_fractions(self.surface_remainder_fractions)
         if not valid_surface_fractions:
             raise ValueError(
                 error_header + f"expected all surface remainder fractions to be in the range [0.0, 1.0], "
-                f"received '{self.surface_remainder_fractions}'."
+                               f"received '{self.surface_remainder_fractions}'."
             )
 
         self.validate_equal_lengths(error_header,

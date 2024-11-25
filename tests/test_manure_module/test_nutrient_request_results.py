@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pytest import approx
 
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import NutrientRequestResults
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequestResults
 
 
 def test_nutrient_request_results_default_init() -> None:
