@@ -1,26 +1,10 @@
-from typing import List, Union
+from typing import List
 
 import pytest
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
 from RUFAS.data_structures.manure_types import ManureType
-
-
-@pytest.mark.parametrize(
-    "values,expected",
-    [
-        ([1, 3, 4], True),
-        ([0.0, 1.2, 3.8], True),
-        ([], True),
-        ([-0.1, 0.1], False),
-        ([-2, -4], False),
-    ],
-)
-def test_determine_if_all_non_negative_values(values: List[Union[int, float]], expected: bool) -> None:
-    """Tests that lists are correctly checked for negative values."""
-    actual = ManureSchedule._determine_if_all_non_negative_values(values)
-    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -60,7 +44,7 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.75],
             [0.0],
             [1.0],
-            "'test_3': expected all nitrogen masses to be >= 0, received '[-15.0]'.",
+            "'test_3': expected all nitrogen masses to be in >= 0, received '[-15.0]'.",
         ),
         (
             "test_4",
@@ -72,7 +56,7 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.75],
             [0.0],
             [1.0],
-            "'test_4': expected all phosphorus masses to be >= 0, received '[-10, -10]'.",
+            "'test_4': expected all phosphorus masses to be in >= 0, received '[-10, -10]'.",
         ),
         (
             "test_5",
@@ -84,7 +68,8 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [1.05],
             [0.0],
             [1.0],
-            "'test_5': expected all field coverage fractions to be in the range [0.0, 1.0], received '[1.05]'.",
+            "'test_5': expected all field coverages to be in range [0.0, 1.0], received "
+            "'[1.05]'.",
         ),
         (
             "test_6",
@@ -96,7 +81,7 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.75],
             [-15.0],
             [0.85],
-            "'test_6': expected all manure application depths to be >= 0, received '[-15.0]'.",
+            "'test_6': expected all manure application depths to be in >= 0, received '[-15.0]'.",
         ),
         (
             "test_7",
@@ -108,8 +93,8 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.8],
             [20],
             [-0.15],
-            "'test_7': expected all surface remainder fractions to be in the range [0.0, 1.0],"
-            " received '[-0.15, -0.15]'.",
+            "'test_7': expected all surface remainder fractions to be in range [0.0, "
+            "1.0], received '[-0.15, -0.15]'.",
         ),
         (
             "test_8",
@@ -121,11 +106,14 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.8, 0.9],
             [0.0],
             [1.0],
-            "'test_8': expected equal number of manure application parameters, received '[1990, 1990, 1993]' years,"
-            " '[120, 140]' days, '[20, 20, 20]' nitrogen masses, '[15, 10, 20]' phosphorus masses, '[0.8, 0.9]' field"
-            " coverage fractions, '[0.0, 0.0, 0.0]' application depths, '[<ManureType.LIQUID: 'liquid'>, "
-            "<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>]' manure types and '[1.0, 1.0, 1.0]' surface"
-            " remainder fractions.",
+            "'test_8':  Mismatch in length of parameters. Provided parameters are: "
+            "years=[1990, 1990, 1993], days=[120, 140], nitrogen_masses=[20, 20, 20], "
+            "phosphorus_masses=[15, 10, 20], application_depths=[0.0, 0.0, 0.0], "
+            "surface_remainder_fractions=[1.0, 1.0, 1.0], "
+            "manure_types=[<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>, "
+            "<ManureType.LIQUID: 'liquid'>]. Lengths are: {'years': 3, 'days': 2, "
+            "'nitrogen_masses': 3, 'phosphorus_masses': 3, 'application_depths': 3, "
+            "'surface_remainder_fractions': 3, 'manure_types': 3}.",
         ),
         (
             "test_9",
