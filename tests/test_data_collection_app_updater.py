@@ -51,7 +51,9 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
         Path("DataCollectionApp/schema/animal_schema.js"),
         Path("DataCollectionApp/schema/config_schema.js"),
     ]
+    dummy_schema = {"test?": "test!"}
     create_object_schema = mocker.patch.object(dca_updater, "_create_object_schema", return_value={"test?": "test!"})
+    add_filename = mocker.patch.object(dca_updater, "_add_filename_input_field", return_value=dummy_schema)
     expected_create_calls = [
         mocker.call("animal_properties", "dummy_animal_props"),
         mocker.call("config_properties", "dummy_config_props"),
@@ -63,6 +65,7 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
     assert add_log.call_count == 3
     empty_dir.assert_called_once()
     create_object_schema.assert_has_calls(expected_create_calls)
+    assert add_filename.call_count == 2
     assert actual_schemas == expected_schema_paths
     assert mock_open.call_count == 2
 
@@ -158,6 +161,7 @@ def test_create_string_schema(
                 "title": "Start Date",
                 "type": "string",
                 "default": "2009:1",
+                "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
                 "options": {
                     "infoText": "The year and Julian day on which the simulation will start.",
                     "grid_columns": 12,
@@ -483,5 +487,28 @@ def test_create_object_schema(
 def test_parse_variable_name_into_title(dca_updater: DataCollectionAppUpdater, name: str, expected: str) -> None:
     """Tests that names partially or all in snake case are converted into more readable names."""
     actual = dca_updater._parse_variable_name_into_title(name)
+
+    assert actual == expected
+
+
+def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None:
+    dummy_schema = {"properties": {}}
+    expected = {
+        "properties": {
+            "fileName": {
+                "title": "File Name",
+                "type": "string",
+                "pattern": r"^[a-zA-Z0-9_\- ]{1,255}$",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {"class": "text-primary form-control"},
+                    "infoText": "Used to name the file that saves the data entered. This name will not be included in "
+                    "the saved file."
+                },
+            }
+        }
+    }
+
+    actual = dca_updater._add_filename_input_field(dummy_schema)
 
     assert actual == expected

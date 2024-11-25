@@ -103,18 +103,18 @@ class DataCollectionAppUpdater:
                 continue
 
             new_schema = self._create_object_schema(key, properties[key])
-            new_schema_with_filename = self._add_file_name_input_field(new_schema)
+            new_schema_with_filename = self._add_filename_input_field(new_schema)
 
             schema_name = key.replace("properties", "schema")
-            new_schema_file_name = f"{schema_name}.js"
-            new_schema_file_path = Path.joinpath(SCHEMA_DIRECTORY_PATH, new_schema_file_name)
+            new_schema_filename = f"{schema_name}.js"
+            new_schema_file_path = Path.joinpath(SCHEMA_DIRECTORY_PATH, new_schema_filename)
             schema_paths.append(new_schema_file_path)
 
             self._om.add_log(
                 "Schema generator writing new schema", f"Writing new schema in {new_schema_file_path}", info_map
             )
 
-            schema_body = json.dumps(new_schema, indent=4)
+            schema_body = json.dumps(new_schema_with_filename, indent=4)
             with open(new_schema_file_path, "w") as outfile:
                 outfile.write(f"{schema_name} = {schema_body}")
 
@@ -256,6 +256,8 @@ class DataCollectionAppUpdater:
         if pattern is not None:
             try:
                 enum = self._get_list_of_options(pattern)
+                schema["enum"] = enum
+                schema["format"] = "select2"
             except ValueError:
                 info_map = {"class": self.__class__.__name__, "function": self._create_string_schema.__name__}
                 self._om.add_warning(
@@ -263,9 +265,7 @@ class DataCollectionAppUpdater:
                     f"Variable {var_name} will not have drop-down options for Data Collection App users to pick from.",
                     info_map,
                 )
-                return schema
-            schema["enum"] = enum
-            schema["format"] = "select2"
+                schema["pattern"] = pattern
 
         return schema
 
@@ -402,16 +402,18 @@ class DataCollectionAppUpdater:
         capitalized_words = [word.capitalize() for word in words]
         return " ".join(capitalized_words)
 
-    def _add_file_name_input_field(self, schema: dict[str, Any]) -> dict[str, Any]:
+    def _add_filename_input_field(self, schema: dict[str, Any]) -> dict[str, Any]:
         """Adds field to schema for collecting filename that data will be saved as."""
         filename_field = {
             "fileName": {
                 "title": "File Name",
                 "type": "string",
+                "pattern": r"^[a-zA-Z0-9_\- ]{1,255}$",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control"},
-                    "infoText": "Used to name the file that saves the data entered."
+                    "infoText": "Used to name the file that saves the data entered. This name will not be included in "
+                    "the saved file."
                 },
             }
         }
