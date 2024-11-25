@@ -216,8 +216,17 @@ class CropSchedule(Schedule):
         scheduled, which is why this method contains the if block that removes all non-final harvest events.
 
         """
-        return list(self.generate_events(self.harvest_years, self.harvest_days, [self.harvest_operations],
-                                         HarvestEvent, self.pattern_skip, self.pattern_repeat, self.heat_scheduled))
+        return list(
+            self.generate_events(
+                self.harvest_years,
+                self.harvest_days,
+                [self.harvest_operations],
+                HarvestEvent,
+                self.pattern_skip,
+                self.pattern_repeat,
+                self.heat_scheduled,
+            )
+        )
         # all_harvesting_years = Utility.repeat_pattern(self.harvest_years, self.harvesting_skip, self.pattern_repeat)
         # all_harvesting_days = self.harvest_days * (self.pattern_repeat + 1)
         # all_harvesting_operations = self.harvest_operations * (self.pattern_repeat + 1)

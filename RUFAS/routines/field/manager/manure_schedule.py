@@ -140,31 +140,33 @@ class ManureSchedule(Schedule):
         if not valid_coverage_fractions:
             raise ValueError(
                 error_header + f"expected all field coverage fractions to be in the range [0.0, 1.0], "
-                               f"received '{self.field_coverages}'."
+                f"received '{self.field_coverages}'."
             )
 
         valid_depths = Utility.determine_if_all_non_negative_values(self.application_depths)
         if not valid_depths:
             raise ValueError(
                 error_header + f"expected all manure application depths to be >= 0, received "
-                               f"'{self.application_depths}'."
+                f"'{self.application_depths}'."
             )
 
         valid_surface_fractions = Utility.validate_fractions(self.surface_remainder_fractions)
         if not valid_surface_fractions:
             raise ValueError(
                 error_header + f"expected all surface remainder fractions to be in the range [0.0, 1.0], "
-                               f"received '{self.surface_remainder_fractions}'."
+                f"received '{self.surface_remainder_fractions}'."
             )
 
-        self.validate_equal_lengths(error_header,
-                                    years=self.years,
-                                    days=self.days,
-                                    nitrogen_masses=self.nitrogen_masses,
-                                    phosphorus_masses=self.phosphorus_masses,
-                                    application_depths=self.application_depths,
-                                    surface_remainder_fractions=self.surface_remainder_fractions,
-                                    manure_types=self.manure_types)
+        self.validate_equal_lengths(
+            error_header,
+            years=self.years,
+            days=self.days,
+            nitrogen_masses=self.nitrogen_masses,
+            phosphorus_masses=self.phosphorus_masses,
+            application_depths=self.application_depths,
+            surface_remainder_fractions=self.surface_remainder_fractions,
+            manure_types=self.manure_types,
+        )
 
     def generate_manure_events(self) -> List[ManureEvent]:
         """

@@ -113,10 +113,12 @@ class FertilizerSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        non_negative_parameters = [("nitrogen masses", self.nitrogen_masses),
-                                   ("phosphorus masses", self.phosphorus_masses),
-                                   ("potassium masses", self.potassium_masses),
-                                   ("application depths", self.application_depths)]
+        non_negative_parameters = [
+            ("nitrogen masses", self.nitrogen_masses),
+            ("phosphorus masses", self.phosphorus_masses),
+            ("potassium masses", self.potassium_masses),
+            ("application depths", self.application_depths),
+        ]
         fraction_parameters = [("surface remainder fractions", self.surface_remainder_fractions)]
 
         self.validate_parameters(non_negative_parameters, fraction_parameters)

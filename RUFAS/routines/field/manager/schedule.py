@@ -106,7 +106,7 @@ class Schedule:
         event_class,
         pattern_skip: int,
         pattern_repeat: int,
-        heat_scheduled: bool
+        heat_scheduled: bool,
     ) -> list:
         """
         Generic method to generate application events.
@@ -138,9 +138,7 @@ class Schedule:
         repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes]
         all_events = list(zip(all_years, all_days, *repeated_attributes))
         if heat_scheduled:
-            all_events[:] = [
-                harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS
-            ]
+            all_events[:] = [harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS]
         result = [event_class(*event) for event in all_events]
 
         return result
@@ -225,7 +223,8 @@ class Schedule:
         if not valid_years:
             raise ValueError(
                 f"'{self.name}': " + f"expected all years to be > 0 and in non-descending order,"
-                                     f" received " f"'{self.years}'."
+                f" received "
+                f"'{self.years}'."
             )
 
         valid_days = self._validate_days(self.years, self.days)
@@ -234,13 +233,9 @@ class Schedule:
 
         for name, parameter in non_negative_parameters:
             if not Utility.determine_if_all_non_negative_values(parameter):
-                raise ValueError(
-                    f"'{self.name}': "
-                    + f"expected all {name} to be in >= 0, received '{parameter}'."
-                )
+                raise ValueError(f"'{self.name}': " + f"expected all {name} to be in >= 0, received '{parameter}'.")
         for name, parameter in fraction_parameters:
             if not Utility.validate_fractions(parameter):
                 raise ValueError(
-                    f"'{self.name}': " + f"expected all {name} to be in range [0.0, 1.0], "
-                                         f"received '{parameter}'."
+                    f"'{self.name}': " + f"expected all {name} to be in range [0.0, 1.0], " f"received '{parameter}'."
                 )
