@@ -56,7 +56,7 @@ v0.9.2
 - [2069](https://github.com/RuminantFarmSystems/MASM/pull/2069) - [minor change] [Crop & Soil] Flatten the units in SC module.
 - [2076](https://github.com/RuminantFarmSystems/MASM/pull/2076) - [minor change] [Crop & Soil] Removes TODOs from the Crop & Soil module.
 - [1785](https://github.com/RuminantFarmSystems/MASM/pull/1785) - [minor change] [TaskManager] Adds sobol and morris samplers, updates argument names.
-
+- [2086](https://github.com/RuminantFarmSystems/MASM/pull/2086) - [minor change] [Animal] Updates default parity fraction. 
 
 ### v0.9.2
 
