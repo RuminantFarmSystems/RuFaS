@@ -117,6 +117,16 @@ class Crop:
         """Provides access to the WaterDynamics object."""
         return self._water_dynamics
 
+    @property
+    def crop_management(self) -> CropManagement:
+        """Provides access to the CropManagement object."""
+        return self._crop_management
+
+    @property
+    def phosphorus_incorporation(self) -> PhosphorusIncorporation:
+        """Provides access to the PhosphorusIncorporation object."""
+        return self._phosphorus_incorporation
+
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
     ) -> None:

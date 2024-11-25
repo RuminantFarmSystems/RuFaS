@@ -162,73 +162,17 @@ class CropData:
         Total amount of water the plant took from the soil on the current day (mm).
     cumulative_water_uptake : float, default 0.0
         Cumulative sum of water taken up by the plant over the course of its lifetime (mm).
-    harvest_efficiency : float, default 1.0
-        Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
-        (unitless; [0, 1]).
     dry_matter_percentage : float, default 85.689
         Percentage of fresh yield that is dry matter (unitless). This value is the default for Sorghum harvested as a
         grain.
-    lignin_dry_matter_percentage : float, default 1.518
-        Percentage of dry matter yield that is lignin (unitless). This value is the default for Sorghum harvested as a
-        grain.
-    crude_protein_percent : float, default 12.481
-        Percentage of dry matter mass that is dietary crude protein (unitless).
-    non_protein_nitrogen : float, default 2.518
-        Percentage of dry matter mass that is non-protein nitrogen (unitless).
-    starch : float, default 72.586
-        Percentage of dry matter mass that is starch (unitless).
-    adf : float, default 3.934
-        Percentage of dry matter mass that is acid detergent fiber (unitless).
-    ndf : float, default 6.134
-        Percentage of dry matter mass that is neutral detergent fiber (unitless).
-    sugar : float, default 2.235
-        Percentage of dry matter mass that is labile carbohydrate (unitless).
-    ash : float, default 2.496
-        Percentage of dry matter mass that is ash (unitless).
-    dry_down_fraction : float, default 0.2
-        Proportion of plant biomass that is lost to dry-down (unitless; [0, 1]).
     optimal_phosphorus_fraction : float, default 0.073
         Optimal proportion of the plant's biomass comprised of nitrogen for the current growth stage (unitless).
     user_harvest_index : Optional[float], default None
         A user-specified harvest index (unitless). If given, 'harvest-index-override' is triggered.
-    potential_harvest_index : Optional[float], default None
-        Potential harvest index for a given day (unitless).
-    harvest_index : Optional[float], default None
-        Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
-        (unitless).
-    cut_biomass : Optional[float], default None
-        Total amount of the desired crop product (kg/ha).
-    wet_yield_collected : float, default 0.0
-        Amount of the desired crop product to be removed from the field (kg/ha).
-    dry_matter_yield_collected : float, default 0.0
-        Dry matter mass collected at harvest (kg/ha).
-    yield_residue : float, default 0.0
-        Amount of dry matter residue created; unharvested yield (kg/ha).
-    yield_nitrogen : Optional[float], default None
-        Nitrogen contained in the harvested yield (kg/ha).
-    yield_phosphorus : Optional[float], default None
-        Phosphorus contained in the harvested yield (kg/ha).
-    residue_nitrogen : float, default 0.0
-        Amount of nitrogen in the residue from this plant (kg/ha).
-    residue_phosphorus : float, default 0.0
-        Amount of phosphorus in the residue from this plant (kg/ha).
-    root_distribution_param_da: float, default 145.0
-        Empirical root distribution parameter d_a (mm).
-        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
-            Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.
-    root_distribution_param_c: float, default -1.165
-        Empirical root distribution parameter c (unitless).
-        Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
-            Research 189 (2016): 68-74, table 1.
     dormancy_loss_fraction : Optional[float], default None
         Fraction of biomass the crop loses when it goes dormant (unitless). Fraction of biomass the crop loses when it
         goes dormant. Default 0.1 for perennials, 0.3 for trees.
         Reference: SWAT Theoretical 5:1.2, and crop.dat BIO_LEAF description
-    minimum_lai_during_dormancy : Optional[float], default 0.75
-        Minimum leaf area index for plants (perennials and trees only).
-        Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
-        now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
-        no information about how this value can be measured or calculated.
 
     The crop quality attributes listed in the base CropData class use the values for Sorghum harvested as a grain.
 
@@ -314,35 +258,12 @@ class CropData:
     cumulative_water_uptake: float = 0.0
 
     # ---- yields
-    harvest_efficiency: float = 1.0
     dry_matter_percentage: float = 85.689
-    lignin_dry_matter_percentage: float = 1.518
-    crude_protein_percent: float = 12.481
-    non_protein_nitrogen: float = 2.518
-    starch: float = 72.586
-    adf: float = 3.934
-    ndf: float = 6.134
-    sugar: float = 2.235
-    ash: float = 2.496
-    dry_down_fraction: float = 0.2
     optimal_phosphorus_fraction: float = 0.073
     user_harvest_index: Optional[float] = None
-    potential_harvest_index: Optional[float] = None
-    harvest_index: Optional[float] = None
-    cut_biomass: Optional[float] = None
-    wet_yield_collected: float = 0.0
-    dry_matter_yield_collected: float = 0.0
-    yield_residue: float = 0.0
-    yield_nitrogen: Optional[float] = None
-    yield_phosphorus: Optional[float] = None
-    residue_nitrogen: float = 0.0
-    residue_phosphorus: float = 0.0
-    root_distribution_param_da: float = 145.0
-    root_distribution_param_c: float = -1.165
 
     # ---- dormancy
     dormancy_loss_fraction: Optional[float] = None
-    minimum_lai_during_dormancy: Optional[float] = 0.75
 
     def __post_init__(self):
         """
