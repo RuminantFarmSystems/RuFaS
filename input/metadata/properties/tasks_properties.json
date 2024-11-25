@@ -6,6 +6,21 @@
       "default": 1,
       "minimum": 1
     },
+    "export_input_data_to_csv": {
+      "type": "bool",
+      "description": "Select this flag to export the input data pool into a CSV file for all tasks.",
+      "default": false
+    },
+    "input_data_csv_export_path": {
+      "type": "string",
+      "description": "The path to save the exported input data CSV file.",
+      "default": "output/saved_input_data/"
+    },
+    "input_data_csv_import_path": {
+      "type": "string",
+      "description": "If user wish to compare the input data with previous runs, the user can pass in the previously saved input data CSV path. The result will be combined together for a side-by-side comparison.",
+      "default": ""
+    },
     "tasks": {
       "type": "array",
       "description": "The list of things that Task Manager should do in an unordered manner",
@@ -126,6 +141,30 @@
           "maximum": 4294967295,
           "default": 0
         },
+        "chunkification": {
+          "type": "bool",
+          "description": "Whether to periodically save the output variable pool to a file.",
+          "default": false
+        },
+        "save_chunk_threshold_call_count": {
+          "type": "number",
+          "description": "The threshold add variable call count for saving the output variable pool chunk.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage": {
+          "type": "number",
+          "description": "The maximum memory usage in Bytes.",
+          "default": 0,
+          "minimum": 0
+        },
+        "maximum_memory_usage_percent": {
+          "type": "number",
+          "description": "The maximum percentage of memory use. If save_chunk_threshold_call_count is provided, then that is what is used to determine when to chunk, otherwise it is maximum memory usage, otherwise it is max memory usage percent.",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100
+        },
         "multi_run_counts": {
           "type": "number",
           "description": "If task type is multi_run, indicates how many single simulations should run.",
@@ -136,18 +175,18 @@
         "sampler": {
           "type": "string",
           "description": "The sampler for Sensitivity Analysis",
-          "pattern": "fractional_factorial|saltelli_sobol",
-          "default": "saltelli_sobol"
+          "pattern": "fractional_factorial|sobol|morris",
+          "default": "fractional_factorial"
         },
-        "saltelli_skip": {
+        "skip_values": {
           "type": "number",
-          "description": "The saltelli skip value for Sensitivity Analysis",
+          "description": "The number of points in the sampling sequence to skip for Sensitivity Analysis",
           "minimum": 0,
           "default": 0
         },
-        "saltelli_number": {
+        "sampler_n": {
           "type": "number",
-          "description": "The saltelli sampling value for Sensitivity Analysis",
+          "description": "The number of samples to generate for Sensitivity Analysis. Ideally a power of 2 and >= 'skip_values'",
           "minimum": 2,
           "default": 2
         },

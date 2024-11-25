@@ -1,5 +1,6 @@
 from math import exp, log, sqrt
 from typing import List, Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 
 
@@ -190,13 +191,7 @@ class LeafAreaIndex:
         if not 0 < second_leaf_fraction < 1:
             raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
         if first_heat_fraction == second_heat_fraction:
-            # TODO: perhaps a way to handle this instead of throwing an error would be better
-            #   something like: second_heat_fraction += 1e-9
             raise ValueError("first_heat_fraction cannot be exactly equal to second_heat_fractions")
-
-        # TODO: need to add any of these errors that get thrown when RuFaS runs to the  `OutputManager`.
-        #    This should probably be done in the `grow_canopy()` function
-        #    I'm still unsure how to do this effectively with warnings raised by static functions. - morrowcj
 
         first_log = LeafAreaIndex._calc_shape_log(first_heat_fraction, first_leaf_fraction)
         second_log = LeafAreaIndex._calc_shape_log(second_heat_fraction, second_leaf_fraction)

@@ -1,5 +1,5 @@
 import math
-from typing import Dict, List, Callable
+from typing import Callable, Dict, List
 
 import numpy as np
 

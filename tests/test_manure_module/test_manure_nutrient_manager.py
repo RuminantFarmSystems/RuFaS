@@ -4,16 +4,11 @@ import re
 
 import pytest
 from pytest_mock import MockerFixture
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
-from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import (
-    ManureNutrientManager,
-)
+from RUFAS.routines.manure.manure_nutrients.manure_nutrient_manager import ManureNutrientManager
 from RUFAS.routines.manure.manure_nutrients.manure_nutrients import ManureNutrients
-from RUFAS.routines.manure.manure_nutrients.nutrient_request import NutrientRequest
-from RUFAS.routines.manure.manure_nutrients.nutrient_request_results import (
-    NutrientRequestResults,
-)
+from RUFAS.data_structures.manure_to_crop_soil_connection import NutrientRequest, NutrientRequestResults
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize("manure_type", [ManureType.LIQUID, ManureType.SOLID])

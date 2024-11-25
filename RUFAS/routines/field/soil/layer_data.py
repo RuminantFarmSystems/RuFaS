@@ -1,16 +1,8 @@
-from dataclasses import dataclass, field, InitVar
+from dataclasses import InitVar, dataclass, field
+from math import exp, log
 from typing import Optional
-from math import log, exp
 
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.field.crop_and_soil_constants import (
-    MEGAGRAMS_TO_KILOGRAMS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
-    KILOGRAMS_TO_MILLIGRAMS,
-    MILLIGRAMS_TO_KILOGRAMS,
-    FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL,
-)
 
 
 @dataclass
@@ -374,7 +366,6 @@ class LayerData:
     active_inorganic_phosphorus_content: float = 0
     stable_inorganic_phosphorus_content: float = 0
     fresh_organic_phosphorus_content: float = 0
-    # TODO: organic phosphorus still needs to be implemented - issue #444
 
     active_inorganic_unbalanced_counter: int = 0
     labile_inorganic_unbalanced_counter: int = 0
@@ -559,10 +550,10 @@ class LayerData:
         )
 
         initial_active_organic_nitrogen_concentration = (
-            humic_organic_nitrogen_concentration * FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+            humic_organic_nitrogen_concentration * GeneralConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
         )  # SWAT eqn. 3:1.1.3
         initial_stable_organic_nitrogen_concentration = humic_organic_nitrogen_concentration * (
-            1 - FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
+            1 - GeneralConstants.FRACTION_OF_HUMIC_NITROGEN_IN_ACTIVE_POOL
         )  # SWAT eqn. 3:1.1.4
 
         self.active_organic_nitrogen_content = self.determine_soil_nutrient_area_density(
@@ -601,9 +592,11 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            self.layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+            self.layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
-        soil_mass_in_kg = self.bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        soil_mass_in_kg = self.bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
         self.total_soil_carbon_amount = soil_mass_in_kg * (self.organic_carbon_fraction) / field_size
 
         if self.top_depth == 0:
@@ -751,10 +744,12 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+            layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        soil_phosphorus_mass_in_mg = nutrient_content * field_size * KILOGRAMS_TO_MILLIGRAMS
+        soil_mass_in_kg = bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        soil_phosphorus_mass_in_mg = nutrient_content * field_size * GeneralConstants.KG_TO_MILLIGRAMS
         return soil_phosphorus_mass_in_mg / soil_mass_in_kg
 
     @staticmethod
@@ -785,10 +780,12 @@ class LayerData:
 
         """
         soil_volume_in_cubic_meters = (
-            layer_thickness * (field_size * HECTARES_TO_SQUARE_MILLIMETERS) * CUBIC_MILLIMETERS_TO_CUBIC_METERS
+            layer_thickness
+            * (field_size * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS)
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
         )
-        soil_mass_in_kg = bulk_density * MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
-        total_nutrient_mass_in_kg = nutrient_concentration * soil_mass_in_kg * MILLIGRAMS_TO_KILOGRAMS
+        soil_mass_in_kg = bulk_density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * soil_volume_in_cubic_meters
+        total_nutrient_mass_in_kg = nutrient_concentration * soil_mass_in_kg * GeneralConstants.MILLIGRAMS_TO_KG
         return total_nutrient_mass_in_kg / field_size
 
     @property

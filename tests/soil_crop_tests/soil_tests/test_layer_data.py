@@ -1,16 +1,11 @@
-from unittest.mock import patch, PropertyMock, MagicMock
-from math import log, exp
+from math import exp, log
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
-from RUFAS.routines.field.crop_and_soil_constants import (
-    CUBIC_MILLIMETERS_TO_CUBIC_METERS,
-    HECTARES_TO_SQUARE_MILLIMETERS,
-    KILOGRAMS_TO_MILLIGRAMS,
-    MILLIGRAMS_TO_KILOGRAMS,
-    MEGAGRAMS_TO_KILOGRAMS,
-)
+
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.soil.layer_data import LayerData
 
 
@@ -417,10 +412,15 @@ def test_calculate_phosphorus_sorption_parameter(clay: float, phosphorus: float,
 def test_determine_soil_nutrient_concentration(nutrient: float, density: float, depth: float, area: float) -> None:
     """Tests that the soil nutrient concentration is calculated correctly."""
     observed = LayerData.determine_soil_nutrient_concentration(nutrient, density, depth, area)
-    total_soil_volume = depth * area * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS
-    total_soil_mass = density * MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
+    total_soil_volume = (
+        depth
+        * area
+        * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+        * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
+    )
+    total_soil_mass = density * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS * total_soil_volume
     total_nutrient_mass = nutrient * area
-    expected_concentration = (total_nutrient_mass * KILOGRAMS_TO_MILLIGRAMS) / total_soil_mass
+    expected_concentration = (total_nutrient_mass * GeneralConstants.KG_TO_MILLIGRAMS) / total_soil_mass
     assert pytest.approx(observed) == expected_concentration
 
 
@@ -435,10 +435,15 @@ def test_determine_soil_nutrient_area_density(
     observed = LayerData.determine_soil_nutrient_area_density(phosphorus, density, thickness, field_size)
     expected_soil_mass_kg = (
         density
-        * MEGAGRAMS_TO_KILOGRAMS
-        * (thickness * field_size * HECTARES_TO_SQUARE_MILLIMETERS * CUBIC_MILLIMETERS_TO_CUBIC_METERS)
+        * GeneralConstants.MEGAGRAMS_TO_KILOGRAMS
+        * (
+            thickness
+            * field_size
+            * GeneralConstants.HECTARES_TO_SQUARE_MILLIMETERS
+            * GeneralConstants.CUBIC_MILLIMETERS_TO_CUBIC_METERS
+        )
     )
-    expected = phosphorus * MILLIGRAMS_TO_KILOGRAMS * expected_soil_mass_kg * (1 / field_size)
+    expected = phosphorus * GeneralConstants.MILLIGRAMS_TO_KG * expected_soil_mass_kg * (1 / field_size)
     assert pytest.approx(observed) == expected
 
 

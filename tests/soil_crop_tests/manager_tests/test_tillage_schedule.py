@@ -1,9 +1,10 @@
-import pytest
 from typing import List
 
-from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.field.manager.events import TillageEvent
+import pytest
+
 from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.events import TillageEvent
+from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 
 
 @pytest.mark.parametrize(

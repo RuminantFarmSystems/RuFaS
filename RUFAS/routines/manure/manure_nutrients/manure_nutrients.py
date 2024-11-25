@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, fields
 from typing import Dict
 
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.units import MeasurementUnits
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
 @dataclass(kw_only=True, frozen=True)

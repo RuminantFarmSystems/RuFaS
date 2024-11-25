@@ -1,10 +1,9 @@
-from typing import Optional, List
+from typing import List, Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-# TODO: Phosphorus has identical methods to NitrogenIncorporation, excluding nitrogen fixation. They
-#  should be combined into one class (NutrientIncorporation) and simplified. Issue #450
 
 """
 This module is based upon the 'Phosphorus Uptake" section (5:2.3.2) of of the SWAT model documentation
@@ -92,7 +91,6 @@ class PhosphorusIncorporation:
             )
         self.uptake_phosphorus(layer_phosphates, layer_depths)
         soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", layer_phosphates)
-        # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         self.data.phosphorus = NitrogenIncorporation.determine_stored_nutrient(
             self.data.total_phosphorus_uptake, self.data.phosphorus, 0
         )

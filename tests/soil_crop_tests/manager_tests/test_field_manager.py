@@ -1,27 +1,31 @@
-import mock
+from typing import Any, Callable, Dict, List
+from unittest.mock import MagicMock, call, patch
 
+import mock
+import pytest
+from pytest_mock.plugin import MockerFixture
+
+from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.manure_to_crop_soil_connection import (
+    ManureEventNutrientRequest,
+    ManureEventNutrientRequestResults,
+)
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.field.manager.field_manager import FieldManager
-from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
-from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
-from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
-from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.field import Field
+from RUFAS.routines.field.field.field_data import FieldData
+from RUFAS.routines.field.manager.crop_schedule import CropSchedule
+from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
+from RUFAS.routines.field.manager.field_manager import FieldManager
+from RUFAS.routines.field.manager.manure_schedule import ManureSchedule
+from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
+from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.time import Time
 from RUFAS.weather import Weather
-from RUFAS.routines.manure.manure_manager import ManureManager
-import pytest
-from pytest_mock.plugin import MockerFixture
-from typing import List, Dict, Callable
-from unittest.mock import MagicMock, patch, call
 
 im = InputManager()
 om = OutputManager()
@@ -40,18 +44,13 @@ def input_manager_original_method_states(
     """Fixture to store original methods of InputManager"""
     return {
         "get_data": mock_input_manager.get_data,
-        "add_dict_variable_to_pool": mock_input_manager.add_dict_variable_to_pool,
     }
 
 
 @pytest.mark.parametrize("field_blob_names", [[], ["field_1", "field_2", "field_3"]])
 def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) -> None:
     """Tests that FieldManager init method runs correctly."""
-    mocked_manure_manager = mocker.MagicMock(ManureManager)
-    mocked_feed_manager = mocker.MagicMock(FeedManager)
-    expected_field_setup_calls = [
-        call(field_name, mocked_manure_manager, mocked_feed_manager) for field_name in field_blob_names
-    ]
+    expected_field_setup_calls = [call(field_name) for field_name in field_blob_names]
     data_keys_by_properties = mocker.patch(
         "RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=field_blob_names
     )
@@ -59,7 +58,7 @@ def test_field_manager_init(mocker: MockerFixture, field_blob_names: list[str]) 
         "RUFAS.routines.field.manager.field_manager.FieldManager._setup_field", return_value=MagicMock(Field)
     )
     add_warning = mocker.patch.object(om, "add_warning")
-    field_manager = FieldManager(mocked_manure_manager, mocked_feed_manager)
+    field_manager = FieldManager()
 
     assert len(field_manager.fields) == len(field_blob_names)
     assert len(field_manager.output_gatherer.fields) == len(field_blob_names)
@@ -84,56 +83,72 @@ def mock_weather(mocker: MockerFixture) -> Weather:
 
 
 @pytest.mark.parametrize(
-    "fields",
+    "fields, expected_harvests_count, manure_applications",
     [
-        [
-            Field(
-                field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-            Field(
-                field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-            Field(
-                field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
-            ),
-        ],
-        [],
+        (
+            [
+                Field(
+                    field_data=FieldData(name="field1"),
+                ),
+                Field(
+                    field_data=FieldData(name="field2"),
+                ),
+                Field(
+                    field_data=FieldData(name="field3"),
+                ),
+            ],
+            6,
+            [
+                MagicMock(spec=ManureEventNutrientRequestResults),
+                MagicMock(spec=ManureEventNutrientRequestResults),
+                MagicMock(spec=ManureEventNutrientRequestResults),
+            ],
+        ),
+        ([], 0, {}),
     ],
 )
 def test_daily_update_routine(
-    fields: List[Field],
+    manure_applications: dict[str, List[ManureEventNutrientRequestResults]],
     mock_weather: Weather,
     mocker: MockerFixture,
+    fields: list[Field],
+    expected_harvests_count: int,
 ) -> None:
-    """Tests that the daily routines and it's methods were called and updated correctly"""
+    """Tests that the daily routines and its methods are called and updated correctly."""
     mocked_time = MagicMock(Time)
     setattr(mocked_time, "year", 1)
     setattr(mocked_time, "calendar_year", 1998)
     setattr(mocked_time, "year", 1998)
     setattr(mocked_time, "day", 5)
 
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
     get_conditions = mocker.patch.object(
         mock_weather, "get_current_day_conditions", return_value=MagicMock(CurrentDayConditions)
     )
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
+        fm = FieldManager()
         mock_add_var = mocker.patch.object(fm.om, "add_variable")
 
         fm.fields = fields
         for field in fields:
-            field.manage_field = MagicMock()
+            mocker.patch.object(
+                field,
+                "manage_field",
+                return_value=[
+                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                    HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY),
+                ],
+            )
         fm.output_gatherer.send_daily_variables = MagicMock()
-        fm.daily_update_routine(weather=mock_weather, time=mocked_time)
+        actual = fm.daily_update_routine(
+            weather=mock_weather, time=mocked_time, manure_applications=manure_applications
+        )
+
         for field in fields:
             assert field.manage_field.call_count == 1
         assert get_conditions.call_count == len(fields)
         assert fm.output_gatherer.send_daily_variables.call_count == 1
         assert mock_add_var.call_count == len(fields)
+        assert len(actual) == expected_harvests_count
 
 
 @pytest.mark.parametrize(
@@ -142,28 +157,23 @@ def test_daily_update_routine(
         [
             Field(
                 field_data=FieldData(name="field1"),
-                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field2"),
-                manure_manager=MagicMock(ManureManager),
             ),
             Field(
                 field_data=FieldData(name="field3"),
-                manure_manager=MagicMock(ManureManager),
             ),
         ],
         [],
     ],
 )
-def test_annual_update_routine(fields: List[Field]):
+def test_annual_update_routine(fields: List[Field]) -> None:
     """Tests that the annual routines and it's methods were called and updated correctly"""
     for field in fields:
         field.perform_annual_reset = MagicMock()
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
     with patch("RUFAS.input_manager.InputManager.get_data_keys_by_properties", return_value=[]):
-        fm = FieldManager(mocked_manure_manager, mocked_feed_manager)
+        fm = FieldManager()
         fm.fields = fields
         fm.output_gatherer.send_annual_variables = MagicMock()
         fm.annual_update_routine()
@@ -312,11 +322,11 @@ def test_annual_update_routine(fields: List[Field]):
     ],
 )
 def test_setup_fertilizer_schedule(
-    fertilizer_schedule_data: Dict,
-    expected_available_mixes: Dict,
+    fertilizer_schedule_data: dict[str, list[dict[str, Any]]],
+    expected_available_mixes: dict[str, dict[str, float]],
     expected_schedule: FertilizerSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that fertilizer schedules and available fertilizer mixes are correctly setup."""
     mock_input_manager.get_data = mock.MagicMock(return_value=fertilizer_schedule_data)
@@ -703,10 +713,10 @@ def test_setup_fertilizer_schedule(
     ],
 )
 def test_setup_manure_schedule(
-    manure_schedule_data: Dict,
+    manure_schedule_data: dict[str, list[int] | list[ManureType] | list[float] | int],
     expected_manure_schedule: ManureSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that ManureSchedules are correctly initialized with data from the InputManager."""
     mock_input_manager.get_data = mock.MagicMock(return_value=manure_schedule_data)
@@ -1117,10 +1127,10 @@ def test_setup_manure_schedule(
     ],
 )
 def test_setup_tillage_schedule(
-    tillage_schedule_data: Dict,
+    tillage_schedule_data: dict[str, int | list[int] | list[float] | list[str]],
     expected_tillage_schedule: TillageSchedule,
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that TillageSchedules are correctly initialized with data from the InputManager."""
     mock_input_manager.get_data = mock.MagicMock(return_value=tillage_schedule_data)
@@ -1272,10 +1282,10 @@ def test_setup_tillage_schedule(
     ],
 )
 def test_crop_schedule_setup(
-    crop_schedule_config: Dict,
+    crop_schedule_config: list[dict[str, Any]],
     expected: List[CropSchedule],
     mock_input_manager: InputManager,
-    input_manager_original_method_states: Dict[str, Callable],
+    input_manager_original_method_states: dict[str, Callable],
 ) -> None:
     """Tests that crop schedules are created correctly from the crop schedule configuration passed to it."""
     mock_input_manager.get_data = mock.MagicMock(return_value=crop_schedule_config)
@@ -1407,7 +1417,9 @@ def test_crop_schedule_setup(
         ),
     ],
 )
-def test_setup_soil_layer(field_size: float, top: float, residue: float, config: Dict, expected: LayerData) -> None:
+def test_setup_soil_layer(
+    field_size: float, top: float, residue: float, config: dict[str, float | int], expected: LayerData
+) -> None:
     """Tests that LayerData instances are configured correctly with a given specification."""
     actual = FieldManager._setup_soil_layer(field_size, top, residue, config)
     assert actual == expected
@@ -1435,7 +1447,7 @@ def test_setup_soil_layer(field_size: float, top: float, residue: float, config:
         },
     ],
 )
-def test_setup_soil_layer_error(config: Dict) -> None:
+def test_setup_soil_layer_error(config: dict[str, float | int]) -> None:
     """Tests that errors are thrown correctly when not enough information is provided to create one."""
     with pytest.raises(ValueError) as e:
         FieldManager._setup_soil_layer(1.0, 0.0, 0.0, config)
@@ -1644,7 +1656,7 @@ def test_setup_soil_layer_error(config: Dict) -> None:
     ],
 )
 def test_setup_soil(
-    soil_configuration: Dict,
+    soil_configuration: dict[str, float | int | list[dict[str, Any]]],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
@@ -1697,7 +1709,7 @@ def test_setup_soil(
     ],
 )
 def test_setup_soil_error(
-    soil_configuration: dict,
+    soil_configuration: dict[str, float | int] | dict[str, float | int | None],
     error_message: str,
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
@@ -1763,13 +1775,11 @@ def test_setup_soil_error(
 )
 def test_setup_field(
     field_name: str,
-    field_config: Dict,
+    field_config: dict[str, str | float | bool | int | None] | dict[str, str | float | bool | int],
     mock_input_manager: InputManager,
     input_manager_original_method_states: Dict[str, Callable],
 ) -> None:
     """Tests that a Field instance is correctly initialized with a given input configuration."""
-    mocked_manure_manager = MagicMock(ManureManager)
-    mocked_feed_manager = MagicMock(FeedManager)
     mocked_fertilizer_schedule = MagicMock(FertilizerSchedule)
     mocked_manure_schedule = MagicMock(ManureSchedule)
     mocked_tillage_schedule = MagicMock(TillageSchedule)
@@ -1808,7 +1818,7 @@ def test_setup_field(
             return_value=mocked_soil_profile,
         ) as patched_soil_setup,
     ):
-        new_field = FieldManager._setup_field(field_name, mocked_manure_manager, mocked_feed_manager)
+        new_field = FieldManager._setup_field(field_name)
 
         assert new_field.field_data.name == field_name
         assert new_field.field_data.field_size == field_config.get("field_size")
@@ -1830,7 +1840,6 @@ def test_setup_field(
             "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
             "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
         }
-        assert new_field.manure_manager == mocked_manure_manager
 
         mock_input_manager.get_data.assert_called_once_with(field_name)
         patched_fertilizer_setup.assert_called_once_with(field_config.get("fertilizer_management_specification"))
@@ -1842,3 +1851,23 @@ def test_setup_field(
         )
 
         mock_input_manager.get_data = input_manager_original_method_states["get_data"]
+
+
+def test_check_manure_schedules() -> None:
+    """Tests that check_manure_schedules calls _check_manure_application_schedule and returns the correct results."""
+    # Arrange
+    field = MagicMock(Field)
+    time = MagicMock(Time)
+    expected_manure_requests = [
+        ManureEventNutrientRequest(field_name="field1", event=MagicMock(), nutrient_request=MagicMock()),
+        ManureEventNutrientRequest(field_name="field2", event=MagicMock(), nutrient_request=MagicMock()),
+    ]
+    field.check_manure_application_schedule.return_value = expected_manure_requests
+    field_manager = FieldManager()
+
+    # Act
+    manure_requests = field_manager.check_manure_schedules(field, time)
+
+    # Assert
+    field.check_manure_application_schedule.assert_called_once_with(time)
+    assert manure_requests == expected_manure_requests

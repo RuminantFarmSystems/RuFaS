@@ -1,5 +1,6 @@
+from RUFAS.output_manager import OutputManager
+
 from .emissions import EmissionsEstimator
-from ...output_manager import OutputManager
 
 
 class EEEManager:

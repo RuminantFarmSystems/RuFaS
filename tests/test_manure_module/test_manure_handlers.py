@@ -2,36 +2,25 @@ import pytest
 from pytest import approx
 from pytest_mock import MockerFixture
 
-from RUFAS.time import Time
-from RUFAS.weather import Weather
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding
 from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     AlleyScraper,
-    Tillage,
-    Harrowing,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     BaseManureHandler,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import FlushSystem
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import ManualScraping
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
+    FlushSystem,
+    Harrowing,
+    ManualScraping,
     ManureHandlerConfig,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerFactory,
-)
-from RUFAS.routines.manure.manure_handlers.manure_handler_classes import (
     ManureHandlerType,
+    Tillage,
 )
-from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import (
-    ManureHandlerDailyOutput,
-)
+from RUFAS.routines.manure.manure_handlers.manure_handler_daily_output import ManureHandlerDailyOutput
 from RUFAS.routines.manure.manure_handlers.milking_parlor import MilkingParlor
 from RUFAS.routines.manure.pen_manure.manure_manager_pen import ManureManagerPen
 from RUFAS.routines.manure.pen_manure.pen_manure import PenManure
-
+from RUFAS.time import Time
+from RUFAS.weather import Weather
 
 # Test ManureHandlerDailyOutput
 # ============================
@@ -326,8 +315,10 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     mock_bedding.calc_total_bedding_volume.return_value = total_bedding_volume = 30.0
     mock_bedding.calc_total_bedding_mass.return_value = total_bedding_mass = 31.0
     mock_bedding.calc_organic_bedding_mass_added_to_manure.return_value = organic_bedding_added = 32.0
+    mock_bedding.bedding_dry_matter_content = bedding_dry_matter_content = 0.8
 
-    expected_total_non_degradable_volatile_solids = VSnd + organic_bedding_added
+    expected_organic_bedding_dry_solids = organic_bedding_added * bedding_dry_matter_content
+    expected_total_non_degradable_volatile_solids = VSnd + expected_organic_bedding_dry_solids
 
     sim_day = 10
     housing_ammonia_emission = 1.0
@@ -373,7 +364,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
 
     current_barn_temp = 30.0
-    patch_for_adjust_air_temp = mocker.patch(
+    patch_for_determine_barn_temp = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
         "determine_barn_air_temperature",
         return_value=current_barn_temp,
@@ -426,7 +417,7 @@ def test_manure_handler_daily_update(mocker: MockerFixture) -> None:
     )
     assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 1
-    assert patch_for_adjust_air_temp.call_count == 1
+    assert patch_for_determine_barn_temp.call_count == 1
 
     # --- Test pen type that does not require GHG emissions estimations. ---
     mock_pen.pen_type = "compost bedded pack barn"
@@ -530,7 +521,7 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
         return_value=current_day_avg_tempC,
     )
     current_barn_temp = 30.0
-    patch_for_adjust_air_temp = mocker.patch(
+    patch_for_determine_barn_temp = mocker.patch(
         "RUFAS.routines.manure.manure_handlers.manure_handler_classes.GasEmissionsCalculator."
         "determine_barn_air_temperature",
         return_value=current_barn_temp,
@@ -580,7 +571,7 @@ def test_manure_handler_daily_update_no_bedding(mocker: MockerFixture) -> None:
     )
     assert manure_handler_daily_output.air_temperature == approx(current_day_avg_tempC)
     assert patch_for_get_current_day_avg_tempC.call_count == 1
-    assert patch_for_adjust_air_temp.call_count == 1
+    assert patch_for_determine_barn_temp.call_count == 1
 
 
 def test_manure_handler_daily_update_zero_animals(mocker: MockerFixture) -> None:

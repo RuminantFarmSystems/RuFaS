@@ -1,8 +1,9 @@
-import pytest
-from typing import List, Any
+from typing import Any, List
 
+import pytest
+
+from RUFAS.data_structures.events import FertilizerEvent
 from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
-from RUFAS.routines.field.manager.events import FertilizerEvent
 
 
 @pytest.mark.parametrize(

@@ -7,11 +7,13 @@ import sys
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple, TextIO, Counter
+from typing import Any, Counter, TextIO, Union
 
 import numpy as np
 import pandas as pd
+import psutil
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.graph_generator import GraphGenerator
 from RUFAS.report_generator import ReportGenerator
 from RUFAS.units import MeasurementUnits
@@ -71,6 +73,29 @@ class LogVerbosity(Enum):
         return self.value[:-1].upper()
 
 
+class OriginLabel(Enum):
+    """
+    An enumeration representing the different labels for data origins when generating json output files.
+
+    Attributes
+    ----------
+    TRUE_AND_REPORT_ORIGINS : str
+        Indicates that both the true origin and report origin should be included.
+    TRUE_ORIGIN : str
+        Indicates that only the true origin should be included.
+    REPORT_ORIGIN : str
+        Indicates that only the report origin should be included.
+    NONE : str
+        Indicates that no origin information should be included.
+
+    """
+
+    TRUE_AND_REPORT_ORIGINS = "true and report origins"
+    TRUE_ORIGIN = "true origin"
+    REPORT_ORIGIN = "report origin"
+    NONE = "none"
+
+
 class OutputManager(object):
     """
     Output manager for RuFaS simulation results. Works by collecting variables,
@@ -83,25 +108,23 @@ class OutputManager(object):
 
     Class Attributes
     ----------------
-    pool_element_type : Dict[str, List[Any]]
+    pool_element_type : dict[str, list[Any]]
         Type alias for the pool elements
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH : int
         Maximum depth for recursive serialization in JSON output files (default: 4)
 
     Attributes
     ----------
-    variables_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+    variables_pool : dict[str, dict[str, list[dict[str, Any]]]
         Contains variables reported to the output manager
-    warnings_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+    warnings_pool : dict[str, dict[str, list[dict[str, Any]]]
         Contains warnings reported to the output manager
-    errors_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+    errors_pool : dict[str, dict[str, list[dict[str, Any]]]
         Contains errors reported to the output manager
-    logs_pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+    logs_pool : dict[str, dict[str, list[dict[str, Any]]]
         Contains logs reported to the output manager
     time : Time
         A Time object used to track the simulation time
-    _include_detailed_values : bool
-        Set to True to include detailed values in the json output files after the simulation
     _exclude_info_maps_flag : bool
         Set to True to exclude info_maps when adding variables to the variables_pool
     _variables_usage_counter : Counter[str]
@@ -111,11 +134,28 @@ class OutputManager(object):
     is_first_post_processing : bool, default True
         True if post-processing (i.e. filtering and saving variables) has not occurred yet. This variable is used during
         end-to-end testing to manage which filters are used during different post-processing runs.
-
+    chunkification : bool
+        Set to True to enable chunkification of the output variable pool.
+    saved_pool_chunks_num : int
+        The number of saved pool chunks.
+    saved_pool_chunks_path : Path | None
+        The path to the directory where saved pool chunks are stored.
+    available_memory : int
+        The available memory on the system.
+    average_add_variable_call_addition : int, default 118
+        The average memory usage increase per call to add_variable.
+    add_variable_call : int
+        The number of calls to add_variable().
+    save_chunk_threshold_call_count : int
+        The threshold add_variable_call count for saving pool chunk.
+    current_pool_size : int
+        The current size of the variables pool.
+    maximum_pool_size : float
+        The maximum allowed variable pool size.
     """
 
     __instance = None
-    pool_element_type = Dict[str, List[Any]]
+    pool_element_type = dict[str, list[Any]]
     JSON_OUTPUT_MAX_RECURSIVE_DEPTH = 4
 
     def __new__(cls):
@@ -126,20 +166,19 @@ class OutputManager(object):
     def __init__(self) -> None:
         if OutputManager.__instance is None:
             OutputManager.__instance = self
-            self.variables_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self.warnings_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self.errors_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self.logs_pool: Dict[str, OutputManager.pool_element_type] = {}
-            self._include_detailed_values: bool = False
+            self.variables_pool: dict[str, OutputManager.pool_element_type] = {}
+            self.warnings_pool: dict[str, OutputManager.pool_element_type] = {}
+            self.errors_pool: dict[str, OutputManager.pool_element_type] = {}
+            self.logs_pool: dict[str, OutputManager.pool_element_type] = {}
             self._exclude_info_maps_flag: bool = False
             self.__metadata_prefix: str = ""
-            self.__supported_filter_types_prefixes: Dict[str, str] = {
+            self.__supported_filter_types_prefixes: dict[str, str] = {
                 "csv": "csv_",
                 "graph": "graph_",
                 "json": "json_",
                 "report": "report_",
             }
-            self.__end_to_end_testing_filter_prefixes: Dict[str, str] = {
+            self.__end_to_end_testing_filter_prefixes: dict[str, str] = {
                 "json": "e2e_json_",
                 "comparison": "e2e_comparison_",
             }
@@ -148,6 +187,13 @@ class OutputManager(object):
             self.chunkification: bool = False
             self.saved_pool_chunks_num: int = 0
             self.saved_pool_chunks_path: Path | None = None
+
+            self.available_memory: int = 0
+            self.average_add_variable_call_addition: int = 118
+            self.add_variable_call = 0
+            self.save_chunk_threshold_call_count: int = 0
+            self.current_pool_size: int = 0
+            self.maximum_pool_size: float = np.inf
 
             self.add_log(
                 "init_log",
@@ -170,18 +216,78 @@ class OutputManager(object):
         else:
             return self.__supported_filter_types_prefixes
 
+    def setup_pool_overflow_control(
+        self,
+        output_dir: Path,
+        max_memory_usage_percent: int,
+        max_memory_usage: int | None = None,
+        save_chunk_threshold_call_count: int | None = None,
+    ) -> None:
+        """Sets up the mechanism by which chunkification of the output variable pool is controlled.
+
+        Parameters
+        ----------
+        output_dir : Path
+            The path to the output directory where chunks will be saved.
+        max_memory_usage_percent : int
+            The setting for the maximum output variable pool size as a percentage of the available memory.
+        max_memory_usage : int | None, optional
+            The setting for the maximum output variable pool size in bytes.
+        save_chunk_threshold_call_count : int | None, optional
+            The setting for the threshold add_variable_call count for saving pool chunk.
+        """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.setup_pool_overflow_control.__name__,
+        }
+        self.chunkification = True
+
+        self.available_memory = psutil.virtual_memory().available
+        available_memory_gb = self.available_memory / GeneralConstants.BYTES_PER_GB
+
+        self.saved_pool_chunks_path = Path.joinpath(
+            output_dir, f"saved_pool/{self.__metadata_prefix}_{Utility.get_timestamp(include_millis=True)}"
+        )
+        self.create_directory(self.saved_pool_chunks_path)
+
+        log_message = (
+            f"Created {self.saved_pool_chunks_path} for saved pools during simulation.\n"
+            f"Current system available memory: {available_memory_gb:.2f} GB = "
+            f"{self.available_memory} Bytes.\n"
+        )
+
+        if save_chunk_threshold_call_count is not None and save_chunk_threshold_call_count > 0:
+            self.save_chunk_threshold_call_count = save_chunk_threshold_call_count
+            log_message += (
+                "The threshold add_variable_call count for saving pool chunk is set to "
+                f"{self.save_chunk_threshold_call_count}"
+            )
+        elif max_memory_usage:
+            self.maximum_pool_size = max_memory_usage
+            log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
+        else:
+            self.maximum_pool_size = (
+                max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
+            ) * self.available_memory
+            log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
+        self.add_log(
+            "Pool Overflow Control Setup",
+            log_message,
+            info_map,
+        )
+
     def _pool_element_factory(self) -> pool_element_type:
         """Factory for elements added to pools"""
-        info_maps: List[Dict[str, Any]] = []
-        values: List[Any] = []
+        info_maps: list[dict[str, Any]] = []
+        values: list[Any] = []
         return {"info_maps": info_maps, "values": values}
 
     def _add_to_pool(
         self,
-        pool: Dict[str, pool_element_type],
+        pool: dict[str, pool_element_type],
         key: str,
         value: Any,
-        info_map: Dict[str, Any],
+        info_map: dict[str, Any],
         first_info_map_only: bool = False,
     ) -> None:
         """
@@ -189,13 +295,13 @@ class OutputManager(object):
 
         Parameters
         ----------
-        pool : Dict[str, Dict[str, List[Dict[str, Any]]]
+        pool : dict[str, dict[str, list[dict[str, Any]]]
             The pool to add the value and info_map to.
         key : str
             The key to add the value and info_map at.
         value : Any
             The value to be added to the pool.
-        info_map : Dict[str, Any]
+        info_map : dict[str, Any]
             The info map to be added to the pool.
         first_info_map_only : bool, default False
             If true, records only the first info map passed for that variable. If false, records all info maps passed
@@ -219,7 +325,7 @@ class OutputManager(object):
         else:
             pool[key]["values"].append(deepcopy(value))
 
-    def add_variable(self, name: str, value: Any, info_map: Dict[str, Any], first_info_map_only: bool = False) -> None:
+    def add_variable(self, name: str, value: Any, info_map: dict[str, Any], first_info_map_only: bool = False) -> None:
         """
         Adds a variable to the pool.
 
@@ -229,7 +335,7 @@ class OutputManager(object):
             The name of the variable
         value : Any
             The value of the variable
-        info_map : Dict[str, Any]
+        info_map : dict[str, Any]
             Additional args, some are non-optional
         info_map["class"] : str
             The name of the class which called this function
@@ -247,9 +353,12 @@ class OutputManager(object):
             for that variable.
 
         """
+        self.add_variable_call += 1
         units = info_map.get("units")
         if units is None:
-            raise KeyError("'units' was not found in info_map for call to 'add_variable()'")
+            raise KeyError(f"'units' was not found in info_map for call to 'add_variable()' for {name}.")
+        if isinstance(units, dict) and len(info_map.get("units")) != len(value) and value != {}:
+            raise KeyError(f"'units' missing in units dict for a variable in {name}.")
         units = self._stringify_units(units)
 
         key = self._generate_key(name, info_map)
@@ -258,6 +367,18 @@ class OutputManager(object):
         if isinstance(value, dict):
             for k, v in value.items():
                 self._variables_usage_counter[f"{key}.{k}"] = 0
+
+        if self.chunkification:
+            self.current_pool_size += self.average_add_variable_call_addition
+            is_save_chunk_threshold_reached = (
+                self.save_chunk_threshold_call_count > 0
+                and self.add_variable_call % self.save_chunk_threshold_call_count == 0
+            )
+            is_pool_size_at_maximum_capacity = (
+                self.save_chunk_threshold_call_count == 0 and self.current_pool_size >= self.maximum_pool_size
+            )
+            if is_save_chunk_threshold_reached or is_pool_size_at_maximum_capacity:
+                self._save_current_variable_pool()
 
     def _save_current_variable_pool(self) -> None:
         """
@@ -268,7 +389,6 @@ class OutputManager(object):
             "function": self._save_current_variable_pool.__name__,
         }
 
-        self.create_directory(self.saved_pool_chunks_path)
         saved_pool_file_name = self.generate_file_name(f"saved_pool_{self.saved_pool_chunks_num}", "json")
         saved_pool_file_path = Path.joinpath(self.saved_pool_chunks_path, saved_pool_file_name)
         self.dict_to_file_json(data_dict=self.variables_pool, path=saved_pool_file_path, minify_output_file=True)
@@ -281,7 +401,7 @@ class OutputManager(object):
         self.current_pool_size = sys.getsizeof(self.variables_pool.__repr__())
         self.saved_pool_chunks_num += 1
 
-    def _stringify_units(self, units: Dict[str, Any] | MeasurementUnits) -> Dict[str, Any] | str:
+    def _stringify_units(self, units: dict[str, Any] | MeasurementUnits) -> dict[str, Any] | str:
         """
         Recursively validates that units is either a valid MeasurementUnits enum member or a dictionary with
         valid MeasurementUnits enum members (including nested dictionaries). Converts the MeasurementUnits
@@ -289,13 +409,13 @@ class OutputManager(object):
 
         Parameters
         ----------
-        units : Dict[str, Any] | str
+        units : dict[str, Any] | str
             Either a string that can be converted to an MeasurementUnits, or a dictionary mapping string keys to either
             MeasurementUnits values or further dictionaries.
 
         Returns
         -------
-        Dict[str, Any] | str
+        dict[str, Any] | str
             The validated and stringified units.
 
         Raises
@@ -323,7 +443,7 @@ class OutputManager(object):
 
         return str(units)
 
-    def add_log(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
+    def add_log(self, name: str, msg: str, info_map: dict[str, Any]) -> None:
         """
         Adds a log message to the pool of logs.
 
@@ -333,7 +453,7 @@ class OutputManager(object):
             The name of the log
         msg : str
             The log message to be added to the pool
-        info_map: Dict[str, Any]
+        info_map: dict[str, Any]
             Additional args to be logged, some are non-optional
         info_map["class"] : str
             The name of the class which called this function
@@ -352,7 +472,7 @@ class OutputManager(object):
         self._add_to_pool(self.logs_pool, key, msg, info_map)
         self._handle_log_output(name, msg, info_map, LogVerbosity.LOGS)
 
-    def add_warning(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
+    def add_warning(self, name: str, msg: str, info_map: dict[str, Any]) -> None:
         """
         Adds a warning message to the pool of warnings.
 
@@ -362,7 +482,7 @@ class OutputManager(object):
             The name of the warning
         msg : str
             The warning message to be added to the pool
-        info_map: Dict[str, Any]
+        info_map: dict[str, Any]
             Additional args to be logged, some are non-optional
         info_map["class"] : str
             The name of the class which called this function
@@ -381,7 +501,7 @@ class OutputManager(object):
         self._add_to_pool(self.warnings_pool, key, msg, info_map)
         self._handle_log_output(name, msg, info_map, LogVerbosity.WARNINGS)
 
-    def add_error(self, name: str, msg: str, info_map: Dict[str, Any]) -> None:
+    def add_error(self, name: str, msg: str, info_map: dict[str, Any]) -> None:
         """
         Adds an error message to the pool of errors.
 
@@ -391,7 +511,7 @@ class OutputManager(object):
             The name of the error
         msg : str
             The error message to be added to the pool
-        info_map: Dict[str, Any]
+        info_map: dict[str, Any]
             Additional args to be logged, some are non-optional
         info_map["class"] : str
             The name of the class which called this function
@@ -410,7 +530,7 @@ class OutputManager(object):
         self._add_to_pool(self.errors_pool, key, msg, info_map)
         self._handle_log_output(name, msg, info_map, LogVerbosity.ERRORS)
 
-    def _handle_log_output(self, name: str, msg: str, info_map: Dict[str, Any], log_level: LogVerbosity) -> None:
+    def _handle_log_output(self, name: str, msg: str, info_map: dict[str, Any], log_level: LogVerbosity) -> None:
         """Formats log output based on log_level.
 
         Parameters
@@ -419,12 +539,12 @@ class OutputManager(object):
             The name of the log.
         msg : str
             The log message to be added to the pool.
-        info_map : Dict[str, Any]
+        info_map : dict[str, Any]
             Additional args to be logged.
         log_level : LogVerbosity
             The LogVerbosity level.
         """
-        colors: Dict[LogVerbosity, str] = {
+        colors: dict[LogVerbosity, str] = {
             LogVerbosity.NONE: "\033[0m",
             LogVerbosity.ERRORS: "\33[91m",
             LogVerbosity.WARNINGS: "\33[93m",
@@ -451,7 +571,7 @@ class OutputManager(object):
         """Sets the __log_verbose attribute"""
         self.__log_verbose = log_verbose
 
-    def _generate_key(self, name: str, info_map: Dict[str, Union[str, bool]]) -> str:
+    def _generate_key(self, name: str, info_map: dict[str, Union[str, bool]]) -> str:
         """
         Generates key for the pool.
         See "add_variable" docs for detailed arg description.
@@ -519,12 +639,18 @@ class OutputManager(object):
         """
         file_pointer.write(DISCLAIMER_MESSAGE + "\n")
 
-    def dict_to_file_json(self, data_dict: Dict[str, Any], path: Path, minify_output_file: bool = False) -> None:
+    def dict_to_file_json(
+        self,
+        data_dict: dict[str, Any],
+        path: Path,
+        minify_output_file: bool = False,
+        origin_label: OriginLabel = OriginLabel.NONE,
+    ) -> None:
         """Saves a dictionary into a JSON file
 
         Parameters
         ----------
-        data_dict : Dict[str, Any]
+        data_dict : dict[str, Any]
             The dictionary to be saved
 
         path : Path
@@ -532,6 +658,9 @@ class OutputManager(object):
 
         minify_output_file : bool
             Boolean flag indicating whether to minify the output JSON file.
+
+        origin_label : OriginLabel, default OriginLabel.NONE
+            The origin label specifying the format of the detailed values string.
 
         Raises
         ------
@@ -557,7 +686,7 @@ class OutputManager(object):
         data_dict = {**{"DISCLAIMER": DISCLAIMER_MESSAGE}, **data_dict}
         try:
             with open(path, "w") as json_file:
-                data_dict = self._add_detailed_values(data_dict)
+                data_dict = self._add_detailed_values(data_dict, origin_label)
                 if minify_output_file:
                     json.dump(
                         Utility.make_serializable(data_dict, max_depth=self.JSON_OUTPUT_MAX_RECURSIVE_DEPTH),
@@ -574,32 +703,47 @@ class OutputManager(object):
         except Exception as e:
             raise e
 
-    def _add_detailed_values(self, data_dict: Dict[str, Any]) -> Dict[str, Any]:
+    def _add_detailed_values(self, data_dict: dict[str, Any], origin_label: OriginLabel) -> dict[str, Any]:
         """
         Adds a `detailed_values` list to each sub-dictionary to replace the original `values` list.
 
-        Notes
-        -----
-        This method iterates over each key in the provided dictionary. For keys that correspond to
-        dictionaries containing `info_maps` and `values` keys with matching lengths, it creates a new list
-        named `detailed_values`. This list contains details about the data origin, including the class name,
-        function name, and the key itself, paired with each corresponding value from the `values` list.
-        The format used for detailing the origin is "[class_name.function_name]->[key]",
-        where `class_name` and `function_name` are derived from the `data_origin`
-        entries within `info_maps`.
-
         Parameters
         ----------
-        data_dict : Dict[str, Any]
+        data_dict : dict[str, Any]
             The input dictionary containing keys that may map to other dictionaries with `info_maps` and `values` keys.
             `info_maps` should contain a list of dictionaries, each with a `data_origin` key indicating the source
             of the data. `values` should contain a list of values corresponding to these origins.
+        origin_label : OriginLabel
+            The origin label specifying the format of the detailed values string.
 
         Returns
         -------
-        Dict[str, Any]
+        dict[str, Any]
             The modified dictionary with a `detailed_values` list added to each sub-dictionary that meets the
-            criteria. This list provides detailed information on the origin of each value.
+            criteria. This list provides detailed information on the origins and units of each value.
+
+        Notes
+        -----
+        When the OriginLabel is set to anything other than NONE, this method iterates over each key in the
+        provided dictionary, and it will create a `detailed_values` list that integrates the data origins,
+        values, and units. Depending on the `origin_label` parameter, the format of the detailed values will vary:
+
+        - If `origin_label` is `OriginLabel.TRUE_AND_REPORT_ORIGINS`, the format is:
+          "[true_origin_class.true_origin_function]->[report_origin]: value (units)"
+          or "[true_origin_class.true_origin_function]->[report_origin]: subkey1 = value1 (units1),
+           subkey2 = value2 (units2), ..." if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.TRUE_ORIGIN`, the format is:
+          "[true_origin_class.true_origin_function]: value (units)"
+          or "[true_origin_class.true_origin_function]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.REPORT_ORIGIN`, the format is:
+          "[report_origin]: value (units)"
+          or "[report_origin]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.NONE`, there will be no detailed_values information added.
 
         Examples
         --------
@@ -610,51 +754,149 @@ class OutputManager(object):
         ...             {"data_origin": [["AnimalManager", "daily_updates"]], "units": "animals"}
         ...         ],
         ...         "values": [193, 194]
+        ...     },
+        ...     "WeatherModuleReporter.report_daily_weather.temperature": {
+        ...         "info_maps": [
+        ...             {"data_origin": [["WeatherManager", "daily_temperature"]],
+        ...              "units": {"avg": "°C", "min": "°C", "max": "°C"}},
+        ...             {"data_origin": [["WeatherManager", "daily_temperature"]],
+        ...              "units": {"avg": "°C", "min": "°C", "max": "°C"}}
+        ...         ],
+        ...         "values": [
+        ...             {"avg": 25.5, "min": 18.2, "max": 32.1},
+        ...             {"avg": 26.1, "min": 19.7, "max": 33.4}
+        ...         ]
         ...     }
         ... }
         >>> output_manager = OutputManager()
-        >>> output_manager.set_include_detailed_values(True)
-        >>> modified_data_dict = output_manager._add_detailed_values(example_data_dict)
+        >>> modified_data_dict = output_manager._add_detailed_values(
+        ...     example_data_dict, OriginLabel.TRUE_AND_REPORT_ORIGINS
+        ... )
         >>> assert modified_data_dict[
         ...     "AnimalModuleReporter.report_daily_animal_population.num_animals"]["detailed_values"
         ... ] == [
-        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
-        ...     193)],
-        ...    [("[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]",
-        ...     194)]
+        ...    "[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]: "
+        ...    "193 (animals)",
+        ...    "[AnimalManager.daily_updates]->[AnimalModuleReporter.report_daily_animal_population.num_animals]: "
+        ...    "194 (animals)"
+        ... ]
+        >>> assert modified_data_dict[
+        ...     "WeatherModuleReporter.report_daily_weather.temperature"]["detailed_values"
+        ... ] == [
+        ...    "[WeatherManager.daily_temperature]->[WeatherModuleReporter.report_daily_weather.temperature]: "
+        ...    "avg = 25.5 (°C), min = 18.2 (°C), max = 32.1 (°C)",
+        ...    "[WeatherManager.daily_temperature]->[WeatherModuleReporter.report_daily_weather.temperature]: "
+        ...    "avg = 26.1 (°C), min = 19.7 (°C), max = 33.4 (°C)"
         ... ]
         """
 
-        if not self._include_detailed_values:
+        if origin_label is OriginLabel.NONE:
             return data_dict
 
         for key, sub_data_dict in data_dict.items():
             if not self._can_add_detailed_values(sub_data_dict):
                 continue
 
-            data_origins: List[List[Tuple[str, str]]] = []
+            data_origins: list[list[tuple[str, str]]] = []
+            units: list[str | dict[str, str]] = []
             for info_map in sub_data_dict["info_maps"]:
                 if "data_origin" not in info_map:
                     break
+                if "units" not in info_map:
+                    break
                 data_origins.append(info_map["data_origin"])
+                units.append(info_map["units"])
 
-            if len(data_origins) != len(sub_data_dict["values"]):
+            if len(data_origins) != len(sub_data_dict["values"]) or len(units) != len(sub_data_dict["values"]):
                 continue
 
-            detailed_values: List[List[Tuple[str, Any]]] = []
+            detailed_values: list[list[str]] = []
             for index, value in enumerate(sub_data_dict["values"]):
-                detailed_origin_for_value = []
                 for origin in data_origins[index]:
-                    class_name, function_name = origin
-                    origin_key = f"[{class_name}.{function_name}]->[{key}]"
-                    detailed_origin_for_value.append((origin_key, value))
-                detailed_values.append(detailed_origin_for_value)
+                    detailed_origin_data = {
+                        "true_origin_class": origin[0],
+                        "true_origin_function": origin[1],
+                        "report_origin": key,
+                        "value": value,
+                        "units": units[index],
+                    }
+                    detailed_value = self._format_detailed_value_str(origin_label, detailed_origin_data)
+                    detailed_values.append(detailed_value)
 
             sub_data_dict["detailed_values"] = detailed_values
 
         return data_dict
 
-    def _can_add_detailed_values(self, sub_data_dict: Dict[str, Any]) -> bool:
+    def _format_detailed_value_str(self, origin_label: OriginLabel, data: dict[str, Any]) -> str:
+        """
+        Formats the detailed values string based on the provided origin label and data.
+
+        Parameters
+        ----------
+        origin_label : OriginLabel
+            The origin label specifying the format of the detailed values string.
+
+        data : dict[str, Any]
+            A dictionary containing the necessary data for formatting the detailed values string.
+            It should have the following keys:
+            - "true_origin_class": The class name of the true origin.
+            - "true_origin_function": The function name of the true origin.
+            - "report_origin": The report origin which already includes the class and function names.
+            - "value": The value associated with the origin.
+            - "units": The units associated with the value.
+
+        Returns
+        -------
+        str
+            The formatted detailed values string based on the provided origin label and data.
+
+        Notes
+        -----
+        The format of the detailed values string depends on the `origin_label` parameter:
+        - If `origin_label` is `OriginLabel.TRUE_AND_REPORT_ORIGINS`, the format is:
+          "[true_origin_class.true_origin_function]->[report_origin]: value (units)"
+          or "[true_origin_class.true_origin_function]->[report_origin]: subkey1 = value1 (units1),
+           subkey2 = value2 (units2), ..." if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.TRUE_ORIGIN`, the format is:
+          "[true_origin_class.true_origin_function]: value (units)"
+          or "[true_origin_class.true_origin_function]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.REPORT_ORIGIN`, the format is:
+          "[report_origin]: value (units)"
+          or "[report_origin]: subkey1 = value1 (units1), subkey2 = value2 (units2), ..."
+          if the value is a dictionary.
+
+        - If `origin_label` is `OriginLabel.NONE`, there will be no detailed_values information so no formatting will
+        occur.
+        """
+
+        true_origin_class = data["true_origin_class"]
+        true_origin_function = data["true_origin_function"]
+        report_origin = data["report_origin"]
+        value = data["value"]
+        units = data["units"]
+
+        origin_label_str = ""
+        if origin_label is OriginLabel.TRUE_AND_REPORT_ORIGINS:
+            origin_label_str = f"[{true_origin_class}.{true_origin_function}]->[{report_origin}]"
+        elif origin_label is OriginLabel.TRUE_ORIGIN:
+            origin_label_str = f"[{true_origin_class}.{true_origin_function}]"
+        elif origin_label is OriginLabel.REPORT_ORIGIN:
+            origin_label_str = f"[{report_origin}]"
+
+        if isinstance(value, dict) and isinstance(units, dict):
+            formatted_values = [f"{subkey} = {value[subkey]} ({units[subkey]})" for subkey in value.keys()]
+            return (
+                f"{origin_label_str}: {', '.join(formatted_values)}"
+                if origin_label_str
+                else f"{', '.join(formatted_values)}"
+            )
+
+        return f"{origin_label_str}: {value} ({units})" if origin_label_str else f"{value} ({units})"
+
+    def _can_add_detailed_values(self, sub_data_dict: dict[str, Any]) -> bool:
         """
         Checks if the provided sub_data_dict has the necessary structure and data to add detailed values.
 
@@ -663,9 +905,16 @@ class OutputManager(object):
         - It must contain the keys "info_maps" and "values".
         - The length of the "info_maps" list and the "values" list must be equal.
 
+        Notes
+        -----
+        The sub_data_dict should meet the following requirements:
+        - It must be a dictionary.
+        - It must contain the keys "info_maps" and "values".
+        - The length of the "info_maps" list and the "values" list must be equal.
+
         Parameters
         ----------
-        sub_data_dict : Dict[str, Any]
+        sub_data_dict : dict[str, Any]
             The dictionary to check for compatibility with adding detailed values.
 
         Returns
@@ -673,28 +922,29 @@ class OutputManager(object):
         bool
             True if the sub_data_dict meets the requirements for adding detailed values, False otherwise.
         """
-
         if not isinstance(sub_data_dict, dict):
             return False
         if "info_maps" not in sub_data_dict or "values" not in sub_data_dict:
+            return False
+        if not sub_data_dict["info_maps"] or not sub_data_dict["values"]:
             return False
         if len(sub_data_dict["info_maps"]) != len(sub_data_dict["values"]):
             return False
         return True
 
-    def _dict_to_csv_column_list(self, variable_name: str, data_dict: Dict[str, List[Any]]) -> List[pd.Series]:
+    def _dict_to_csv_column_list(self, variable_name: str, data_dict: dict[str, list[Any]]) -> list[pd.Series]:
         """Turns a dictionary to a list of csv columns.
 
         Parameters
         ----------
         variable_name : str
             The name of the variable having its values written into a CSV column.
-        data_dict : Dict[str, List[Any]]
+        data_dict : dict[str, list[Any]]
             The dictionary to read from
 
         Returns
         -------
-        List[pd.Series]
+        list[pd.Series]
             A list of (column_name, column_data) tuples.
 
         """
@@ -703,7 +953,7 @@ class OutputManager(object):
         units = data_dict["info_maps"][0]["units"] if data_dict.get("info_maps", []) else None
         data_list = data_dict["values"]
         if data_list and isinstance(data_list[0], dict):
-            csv_column_lists: Dict[str, List[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
+            csv_column_lists: dict[str, list[Any]] = {subkey: [] for item in data_list for subkey in item.keys()}
             for nested_dictionary in data_list:
                 for subkey, value in nested_dictionary.items():
                     csv_column_lists[subkey].append(value)
@@ -718,7 +968,7 @@ class OutputManager(object):
         return column_list
 
     def _get_units_substr(
-        self, variable_name: str, units: str | Dict[str, str] | None, subkey: str | None = None
+        self, variable_name: str, units: str | dict[str, str] | None, subkey: str | None = None
     ) -> str:
         """Get the units substring for a column title.
 
@@ -726,7 +976,7 @@ class OutputManager(object):
         ----------
         variable_name : str
             The name of the variable or group of variables associated with the units.
-        units : str | Dict[str, str] | None
+        units : str | dict[str, str] | None
             The units associated with the data.
         subkey : str | None, optional
             The subkey to retrieve the units for, if units is a dictionary. Default is None.
@@ -778,12 +1028,12 @@ class OutputManager(object):
 
         return ""
 
-    def _dict_to_file_csv(self, data_dict: Dict[str, Any], path: Path) -> None:
+    def _dict_to_file_csv(self, data_dict: dict[str, Any], path: Path) -> None:
         """Saves a dictionary to a csv file.
 
         Parameters
         ----------
-        data_dict : Dict[str, Any]
+        data_dict : dict[str, Any]
             The dictionary to be saved.
         path : Path
             The path to the file to be saved.
@@ -817,12 +1067,12 @@ class OutputManager(object):
 
         self.add_log("save_dict_file_try", f"Successfully saved to {path}.", info_map)
 
-    def _list_to_file_txt(self, data_list: List[str], path: Path) -> None:
+    def _list_to_file_txt(self, data_list: list[str], path: Path) -> None:
         """Saves a list into a text file
 
         Parameters
         ----------
-        data_list : List[str]
+        data_list : list[str]
             The list of variable names to be saved
         path : str
             The path to the file to be saved
@@ -852,12 +1102,12 @@ class OutputManager(object):
         timestamp: str = Utility.get_timestamp(include_millis=include_millis)
         return f"{self.__metadata_prefix}_{base_name}_{timestamp}.{extension}"
 
-    def _exclude_info_maps(self, pool: Dict[str, pool_element_type]) -> Dict[str, pool_element_type]:
+    def _exclude_info_maps(self, pool: dict[str, pool_element_type]) -> dict[str, pool_element_type]:
         """Makes a copy of the given pool and removes info_maps from it.
 
         Returns
         -------
-        Dict[str, OutputManager.pool_element_type]
+        dict[str, OutputManager.pool_element_type]
             A copy of the given pool with info_maps removed from it.
 
         """
@@ -867,7 +1117,7 @@ class OutputManager(object):
                 value.pop("info_maps")
         return pool_copy
 
-    def _list_filter_files_in_dir(self, dir_path: Path) -> List[str]:
+    def _list_filter_files_in_dir(self, dir_path: Path) -> list[str]:
         """Returns the list of supported filter files in the given path"""
         info_map = {
             "class": self.__class__.__name__,
@@ -903,7 +1153,7 @@ class OutputManager(object):
         else:
             raise NotADirectoryError("The specified path must be a directory")
 
-    def _load_filter_file_content(self, path: Path) -> List[Dict[str, str | int]]:
+    def _load_filter_file_content(self, path: Path) -> list[dict[str, str | int]]:
         """
         Loads and processes the content of a filter file from the specified path.
 
@@ -914,7 +1164,7 @@ class OutputManager(object):
 
         Returns
         -------
-        List[Dict[str, str|int]]
+        list[dict[str, str|int]]
             A list of dictionaries, each containing the loaded filter content,
             with keys and values depending on the file type.
 
@@ -979,18 +1229,21 @@ class OutputManager(object):
             self.add_error("Unexpected error", str(e), info_map)
             raise
 
-    def filter_variables_pool(self, filter_content: Dict[str, Any]) -> Dict[str, pool_element_type]:
+    def filter_variables_pool(
+        self,
+        filter_content: dict[str, Any],
+    ) -> dict[str, pool_element_type]:
         """
         Returns a filtered variables pool based on options specified in filter_content.
 
         Parameters
         ----------
-        filter_content : Dict[str, Any]
+        filter_content : dict[str, Any]
             A dictionary that contains filtering options.
 
         Returns
         -------
-        Dict[str, OutputManager.pool_element_type]
+        dict[str, OutputManager.pool_element_type]
             A filtered variables pool based on either inclusion or exclusion.
         """
         filter_name: str = filter_content.get("name", "NO NAME FOUND")
@@ -1009,7 +1262,7 @@ class OutputManager(object):
             filter_excl_msg = f"Performing filtering by inclusion per filter's contents. {filter_name=}"
         self.add_log("filtering_log", filter_excl_msg, info_map)
 
-        filtered_pool: Dict[str, OutputManager.pool_element_type] = Utility.filter_dictionary(
+        filtered_pool: dict[str, OutputManager.pool_element_type] = Utility.filter_dictionary(
             dict_to_filter=self.variables_pool,
             filter_patterns=filter_content.get("filters", []),
             filter_by_exclusion=filter_by_exclusion,
@@ -1020,7 +1273,7 @@ class OutputManager(object):
             info_map,
         )
 
-        selected_variables: List[str] | None = filter_content.get("variables")
+        selected_variables: list[str] | None = filter_content.get("variables")
 
         results = self._parse_filtered_variables(
             filtered_pool, selected_variables, filter_name, use_filter_name, filter_by_exclusion
@@ -1053,21 +1306,21 @@ class OutputManager(object):
 
     def _parse_filtered_variables(
         self,
-        filtered_pool: Dict[str, OutputManager.pool_element_type],
-        selected_variables: List[str] | None,
+        filtered_pool: dict[str, OutputManager.pool_element_type],
+        selected_variables: list[str] | None,
         filter_name: str,
         use_filter_name: bool,
         filter_by_exclusion: bool,
-    ) -> Dict[str, OutputManager.pool_element_type]:
+    ) -> dict[str, OutputManager.pool_element_type]:
         """
         Unpacks and counts variables that have been filtered out of the Output Manager's variables pool.
 
         Parameters
         ----------
-        filtered_pool : Dict[str, OutputManager.pool_element_type]
+        filtered_pool : dict[str, OutputManager.pool_element_type]
             Variables that have been filtered out of the Output Manager's pool.
-        selected_variables : List[str] | None
-            List of key names to select or exclude from variables containing dictionaries.
+        selected_variables : list[str] | None
+            list of key names to select or exclude from variables containing dictionaries.
         filter_name : str
             Name of the filter used to collect variables for the filtered pool.
         use_filter_name : bool
@@ -1077,7 +1330,7 @@ class OutputManager(object):
 
         Returns
         -------
-        Dict[str, OutputManager.pool_element_type]
+        dict[str, OutputManager.pool_element_type]
             Dictionary containing data from the filtered pool of data, with data from within dictionaries unpacked and
             separated.
 
@@ -1089,13 +1342,13 @@ class OutputManager(object):
             "filter_by_exclusion": filter_by_exclusion,
             "use_filter_name": use_filter_name,
         }
-        results: Dict[str, OutputManager.pool_element_type] = {}
+        results: dict[str, OutputManager.pool_element_type] = {}
         counter: int = 0
         for key in filtered_pool.keys():
-            info_maps: List[Dict[str, Any]] = (
+            info_maps: list[dict[str, Any]] = (
                 filtered_pool[key]["info_maps"] if "info_maps" in filtered_pool[key] else []
             )
-            data: List[Any] = filtered_pool[key]["values"]
+            data: list[Any] = filtered_pool[key]["values"]
             is_data_in_dict: bool = all(isinstance(element, dict) for element in data)
             if selected_variables is None or not is_data_in_dict:
                 combined_key = f"{filter_name}_{counter}" if use_filter_name else key
@@ -1124,54 +1377,44 @@ class OutputManager(object):
             counter += 1
         return results
 
-    def _sort_saved_chunk_files(self) -> List[Path]:
+    def _sort_saved_chunk_files(self) -> list[Path]:
         """
         Get a list of all saved chunks of the output variable pool by retrieving all JSON files under
         the saved_pool_chunks_path. Then sort the files according to their file name to preserve the order.
         """
-        list_of_dumped_files: List[Path] = [
+        list_of_dumped_files: list[Path] = [
             file for file in self.saved_pool_chunks_path.iterdir() if file.is_file() and file.name.endswith(".json")
         ]
         list_of_dumped_files.sort(key=lambda file_name: int((str(file_name).split("saved_pool_")[1]).split("_")[0]))
         return list_of_dumped_files
 
-    def filter_saved_pools(
-        self, filter_content: Dict[str, Any], list_of_dumped_files: List[Path]
-    ) -> Dict[str, OutputManager.pool_element_type]:
+    def load_saved_pools(self) -> None:
         """
         Filters saved pools of data by applying specific filter criteria.
 
-        This method iterates over JSON files in the saved pool directory. It then loads each file and applies the
-        filter by calling the `filter_variables_pool()` method. The results are aggregated into a single dictionary,
+        This method iterates over JSON files in the saved pool directory. It then loads each file as the OutputManager
+        variable pool and applies the filter by calling the `filter_variables_pool()` method. The results are
+        aggregated into a single dictionary,
         combining entries under the same key by extending lists of info_maps and values.
 
-        Parameters
-        ----------
-        filter_content : (Dict[str, Any])
-            A dictionary specifying the criteria used to filter the variables pools.
-
-        list_of_dumped_files: List[Path]
-            A list containing all chunks of the output variable pool to be filtered.
-
-        Returns
-        -------
-        Dict[str, OutputManager.pool_element_type]:
-            A dictionary containing the aggregated filtered pool elements after applying the filter to all JSON files
-            under the saved_pool_chunks_path directory.
+        Notes
+        -----
+        This function has a side effect that modifies the variable_pool of the OutputManager
         """
-        filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+        filtered_pool: dict[str, OutputManager.pool_element_type] = {}
+        list_of_dumped_files = self._sort_saved_chunk_files()
         for file in list_of_dumped_files:
             self.load_variables_pool_from_file(file)
-            temp_filtered_pool = self.filter_variables_pool(filter_content)
-            for key, value in temp_filtered_pool.items():
+            for key, value in self.variables_pool.items():
                 if key in filtered_pool.keys():
                     filtered_pool[key]["info_maps"].extend(value["info_maps"])
                     filtered_pool[key]["values"].extend(value["values"])
                 else:
                     filtered_pool[key] = value
+            self.current_pool_size = sys.getsizeof(filtered_pool)
             self.variables_pool = {}
 
-        return filtered_pool
+        self.variables_pool = filtered_pool
 
     def save_results(  # noqa: C901
         self,
@@ -1221,6 +1464,7 @@ class OutputManager(object):
         report_generator = ReportGenerator(self.time)
         if self.chunkification:
             self._save_current_variable_pool()
+            self.load_saved_pools()
         for filter_file in list_of_filter_files:
             info_map["filter file"] = filter_file
             input_path = filters_dir_path / filter_file
@@ -1246,13 +1490,9 @@ class OutputManager(object):
                     )
                     continue
 
-                filtered_pool: Dict[str, OutputManager.pool_element_type] = {}
+                filtered_pool: dict[str, OutputManager.pool_element_type] = {}
                 if "filters" in filter_content.keys():
-                    filtered_pool = (
-                        self.filter_saved_pools(filter_content, self._sort_saved_chunk_files())
-                        if self.chunkification
-                        else self.filter_variables_pool(filter_content)
-                    )
+                    filtered_pool = self.filter_variables_pool(filter_content)
                 if exclude_info_maps:
                     filtered_pool = self._exclude_info_maps(filtered_pool)
 
@@ -1283,9 +1523,9 @@ class OutputManager(object):
     def _route_save_functions(
         self,
         filter_file: str,
-        filtered_pool: Dict[str, pool_element_type],
+        filtered_pool: dict[str, pool_element_type],
         produce_graphics: bool,
-        filter_content: Dict[str, str | int],
+        filter_content: dict[str, str | int],
         json_dir: Path,
         graphics_dir: Path,
         csv_dir: Path,
@@ -1346,8 +1586,8 @@ class OutputManager(object):
         self,
         filter_file: str,
         save_path: Path,
-        filtered_pool: Dict[str, pool_element_type],
-        filter_content: Dict[str, Union[str, int]],
+        filtered_pool: dict[str, pool_element_type],
+        filter_content: dict[str, Union[str, int]],
     ) -> None:
         """
         Saves the filtered pool to a JSON file.
@@ -1358,9 +1598,9 @@ class OutputManager(object):
             The name of the filter file being processed.
         save_path : Path
             The directory path where the JSON file will be saved.
-        filtered_pool : Dict[str, pool_element_type]
+        filtered_pool : dict[str, pool_element_type]
             The pool of filtered data to be saved.
-        filter_content : Dict[str, Union[str, int]]
+        filter_content : dict[str, Union[str, int]]
             Additional content from the filter that might influence the file naming.
         """
 
@@ -1369,17 +1609,18 @@ class OutputManager(object):
         else:
             base_name = f"saved_variables_{filter_file}"
 
+        origin_label = self._get_origin_label(filter_content)
         file_name = self.generate_file_name(base_name, "json")
         file_path = save_path / file_name
-        self.dict_to_file_json(filtered_pool, file_path)
+        self.dict_to_file_json(filtered_pool, file_path, origin_label=origin_label)
 
-    def _route_logs(self, log_pool: List[Dict[str, str | Dict[str, str]]]) -> None:
+    def _route_logs(self, log_pool: list[dict[str, str | dict[str, str]]]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
         Output Manager.
 
         Parameters
         ----------
-        log_pool : List[Dict[str, str | Dict[str, str]]]
+        log_pool : list[dict[str, str | dict[str, str]]]
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
         """
@@ -1738,11 +1979,6 @@ class OutputManager(object):
                 f"{warnings_count} warning(s), and {logs_count} log(s).\n"
             )
 
-    def set_include_detailed_values(self, flag: bool) -> None:
-        """Sets the flag for adding detailed values to the output files."""
-
-        self._include_detailed_values = flag
-
     def set_exclude_info_maps_flag(self, exclude_info_maps: bool) -> None:
         """
         Sets the exclude_info_maps flag to the given value.
@@ -1754,12 +1990,69 @@ class OutputManager(object):
 
         self._exclude_info_maps_flag = exclude_info_maps
 
+    def _get_origin_label(self, filter_content: dict[str, str | int]) -> OriginLabel:
+        """
+        Retrieves the origin label from the provided filter content.
+
+        Parameters
+        ----------
+        filter_content : dict[str, str | int]
+            A dictionary containing filter information, which may include the "origin_label" key.
+
+        Returns
+        -------
+        OriginLabel
+            The origin label corresponding to the value in the filter content.
+            If the "origin_label" key is not present or has an invalid value, OriginLabel.NONE is returned.
+
+        Notes
+        -----
+        This method checks the value of the `origin_label` key in the provided `filter_content` dictionary.
+        If the value is a valid string matching one of the supported options defined in the `OriginLabel` enum,
+        the corresponding `OriginLabel` member is returned. If the value is invalid or the key is not present,
+        `OriginLabel.NONE` is returned, and an error is added to the Output Manager's errors pool.
+        """
+
+        if "origin_label" not in filter_content:
+            return OriginLabel.NONE
+
+        origin_label_value = filter_content["origin_label"]
+        supported_options = [label.value for label in OriginLabel]
+
+        if not isinstance(origin_label_value, str):
+            self.add_error(
+                "invalid_origin_label",
+                f"Origin label must be a string. Received '{origin_label_value}' of type {type(origin_label_value)}.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._get_origin_label.__name__,
+                },
+            )
+            return OriginLabel.NONE
+
+        if origin_label_value not in supported_options:
+            self.add_error(
+                "invalid_origin_label",
+                f"Origin label must be one of {supported_options}. Received '{origin_label_value}'.",
+                info_map={
+                    "class": self.__class__.__name__,
+                    "function": self._get_origin_label.__name__,
+                },
+            )
+            return OriginLabel.NONE
+
+        return OriginLabel(origin_label_value)
+
     def run_startup_sequence(
         self,
         verbosity: LogVerbosity,
         exclude_info_maps: bool,
         output_directory: Path,
         clear_output_directory: bool,
+        chunkification: bool,
+        max_memory_usage_percent: int,
+        max_memory_usage: int,
+        save_chunk_threshold_call_count: int,
         variables_file_path: Path,
         output_prefix: str,
         version_number: str,
@@ -1775,4 +2068,9 @@ class OutputManager(object):
         self.create_directory(output_directory)
         if clear_output_directory:
             self.clear_output_dir(variables_file_path, output_directory)
+
+        if chunkification:
+            self.setup_pool_overflow_control(
+                output_directory, max_memory_usage_percent, max_memory_usage, save_chunk_threshold_call_count
+            )
         self.is_end_to_end_testing_run = is_end_to_end_testing_run

@@ -1,5 +1,5 @@
-from typing import Any, Union
 from math import exp, sqrt
+from typing import Any, Union
 
 from RUFAS.general_constants import GeneralConstants
 
@@ -29,6 +29,8 @@ class ManurePool:
         Amount of organic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff (kg).
     inorganic_phosphorus_runoff : float, default 0.0
         Amount of inorganic phosphorus from machine- or grazer-applied manure dissolved in and removed by runoff (kg).
+    annual_decomposed_manure : float, default 0.0
+        Amount of annual manure decomposed/mineralized (kg).
 
     """
 
@@ -46,6 +48,7 @@ class ManurePool:
         inorganic_phosphorus_runoff: float = 0.0,
         annual_runoff_manure_inorganic_phosphorus: float = 0.0,
         annual_runoff_manure_organic_phosphorus: float = 0.0,
+        annual_decomposed_manure: float = 0.0,
     ) -> None:
         self.manure_dry_mass = manure_dry_mass
         self.manure_applied_mass = manure_applied_mass
@@ -59,6 +62,7 @@ class ManurePool:
         self.inorganic_phosphorus_runoff = inorganic_phosphorus_runoff
         self.annual_runoff_manure_inorganic_phosphorus = annual_runoff_manure_inorganic_phosphorus
         self.annual_runoff_manure_organic_phosphorus = annual_runoff_manure_organic_phosphorus
+        self.annual_decomposed_manure = annual_decomposed_manure
 
     def __eq__(self, other: Union["ManurePool", object]) -> Any:
         if not isinstance(other, ManurePool):
@@ -115,6 +119,8 @@ class ManurePool:
             self.manure_moisture_factor,
         )
 
+        self.stable_organic_phosphorus = max(0.0, self.stable_organic_phosphorus - mineralized_stable_organic)
+
         mineralized_stable_inorganic = self.determine_mineralized_surface_phosphorus(
             self.stable_inorganic_phosphorus,
             0.0025,
@@ -122,11 +128,21 @@ class ManurePool:
             self.manure_moisture_factor,
         )
 
+        self.stable_inorganic_phosphorus = max(0.0, self.stable_inorganic_phosphorus - mineralized_stable_inorganic)
+
         mineralized_water_extractable_organic = self.determine_mineralized_surface_phosphorus(
             self.water_extractable_organic_phosphorus,
             0.1,
             temperature_factor,
             self.manure_moisture_factor,
+        )
+
+        self.water_extractable_organic_phosphorus = max(
+            0.0, self.water_extractable_organic_phosphorus - mineralized_water_extractable_organic
+        )
+
+        self.annual_decomposed_manure += (
+            mineralized_water_extractable_organic + mineralized_stable_organic + mineralized_stable_inorganic
         )
 
         assimilated_mass, assimilated_coverage = self.determine_assimilated_surface_manure(
@@ -159,19 +175,16 @@ class ManurePool:
 
         self.stable_organic_phosphorus = max(
             0.0,
-            self.stable_organic_phosphorus - assimilated_stable_organic - mineralized_stable_organic,
+            self.stable_organic_phosphorus - assimilated_stable_organic,
         )
 
         self.stable_inorganic_phosphorus = max(
             0.0,
-            self.stable_inorganic_phosphorus - assimilated_stable_inorganic - mineralized_stable_inorganic,
+            self.stable_inorganic_phosphorus - assimilated_stable_inorganic,
         )
 
         self.water_extractable_organic_phosphorus = max(
-            0.0,
-            self.water_extractable_organic_phosphorus
-            - assimilated_water_extractable_organic
-            - mineralized_water_extractable_organic,
+            0.0, self.water_extractable_organic_phosphorus - assimilated_water_extractable_organic
         )
 
         self.water_extractable_inorganic_phosphorus = max(
