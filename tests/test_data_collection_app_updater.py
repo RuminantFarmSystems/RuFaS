@@ -503,7 +503,7 @@ def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control"},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                    "the saved file."
+                    "the saved file.",
                 },
             }
         }
