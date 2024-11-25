@@ -142,6 +142,27 @@ class Schedule:
                 harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS
             ]
         result = [event_class(*event) for event in all_events]
-        print(result[0].day, result[0].year, result[0].year)
 
         return result
+
+    @staticmethod
+    def validate_depths(depths: List[float]) -> bool:
+        """
+        Checks that depths passed are all valid.
+
+        Parameters
+        ----------
+        depths : List[float]
+            List of tillage depths to be validated.
+
+        Returns
+        -------
+        bool
+            True if all tillage depths are valid, False otherwise.
+
+        Notes
+        -----
+        Tillage depths must be > 0.
+
+        """
+        return all(depth > 0.0 for depth in depths)

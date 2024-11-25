@@ -736,3 +736,21 @@ class Utility:
             raise ValueError(f"'{name}': expected pattern skip to be >= 0, received '{pattern_skip}'.")
         if pattern_repeat < 0:
             raise ValueError(f"'{name}': expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
+
+    @staticmethod
+    def determine_if_all_non_negative_values(values: List[int]) -> bool:
+        """
+        Checks that all values in a list are >= 0.
+
+        Parameters
+        ----------
+        values : List[Any]
+            List of values to be checked.
+
+        Returns
+        -------
+        bool
+            True if all values are >= 0, False otherwise.
+
+        """
+        return all(value >= 0 for value in values)

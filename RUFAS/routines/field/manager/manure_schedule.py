@@ -143,7 +143,7 @@ class ManureSchedule(Schedule):
                 f"received '{self.field_coverages}'."
             )
 
-        valid_depths = all(depth >= 0.0 for depth in self.application_depths)
+        valid_depths = self.validate_depths(self.application_depths)
         if not valid_depths:
             raise ValueError(
                 error_header + f"expected all manure application depths to be >= 0, received "

@@ -101,7 +101,7 @@ class TillageSchedule(Schedule):
                 error_header + f"expected all planting days to be in range [1, 366], received " f"'{self.days}'."
             )
 
-        valid_depths = self._validate_depths(self.tillage_depths)
+        valid_depths = self.validate_depths(self.tillage_depths)
         if not valid_depths:
             raise ValueError(
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."
@@ -176,28 +176,6 @@ class TillageSchedule(Schedule):
             )
             tillage_events.append(new_tillage_event)
         return tillage_events
-
-    @staticmethod
-    def _validate_depths(tillage_depths: List[float]) -> bool:
-        """
-        Checks that tillage depths passed are all valid.
-
-        Parameters
-        ----------
-        tillage_depths : List[float]
-            List of tillage depths to be validated.
-
-        Returns
-        -------
-        bool
-            True if all tillage depths are valid, False otherwise.
-
-        Notes
-        -----
-        Tillage depths must be > 0.
-
-        """
-        return all(depth > 0.0 for depth in tillage_depths)
 
     @staticmethod
     def _validate_fractions(fractions: List[float]) -> bool:
