@@ -8,22 +8,6 @@ from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize(
-    "values,expected",
-    [
-        ([1, 3, 4], True),
-        ([0.0, 1.2, 3.8], True),
-        ([], True),
-        ([-0.1, 0.1], False),
-        ([-2, -4], False),
-    ],
-)
-def test_determine_if_all_non_negative_values(values: List[Union[int, float]], expected: bool) -> None:
-    """Tests that lists are correctly checked for negative values."""
-    actual = ManureSchedule._determine_if_all_non_negative_values(values)
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
     "name,years,days,nitrogen,phosphorus,manure_type,field_coverage,depths,remainder_fracs,expected",
     [
         (
@@ -121,11 +105,14 @@ def test_determine_if_all_non_negative_values(values: List[Union[int, float]], e
             [0.8, 0.9],
             [0.0],
             [1.0],
-            "'test_8': expected equal number of manure application parameters, received '[1990, 1990, 1993]' years,"
-            " '[120, 140]' days, '[20, 20, 20]' nitrogen masses, '[15, 10, 20]' phosphorus masses, '[0.8, 0.9]' field"
-            " coverage fractions, '[0.0, 0.0, 0.0]' application depths, '[<ManureType.LIQUID: 'liquid'>, "
-            "<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>]' manure types and '[1.0, 1.0, 1.0]' surface"
-            " remainder fractions.",
+            "'test_8':  Mismatch in length of parameters. Provided parameters are: "
+            'years=[1990, 1990, 1993], days=[120, 140], nitrogen_masses=[20, 20, 20], '
+            'phosphorus_masses=[15, 10, 20], application_depths=[0.0, 0.0, 0.0], '
+            'surface_remainder_fractions=[1.0, 1.0, 1.0], '
+            "manure_types=[<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>, "
+            "<ManureType.LIQUID: 'liquid'>]. Lengths are: {'years': 3, 'days': 2, "
+            "'nitrogen_masses': 3, 'phosphorus_masses': 3, 'application_depths': 3, "
+            "'surface_remainder_fractions': 3, 'manure_types': 3}.",
         ),
         (
             "test_9",

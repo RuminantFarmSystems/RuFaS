@@ -68,9 +68,12 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
             [0.5],
             [0.5],
             ["disk-harrow"],
-            "'test_6': expected number of years, days, depths, incorporation and mixing fractions to be equal, received"
-            " '[1990]' years, '[150, 200]' days,  '[100]' tillage depths, '[0.5]' incorporation fractions, '[0.5]' "
-            "mixing fractions and '['disk-harrow']' implements.",
+            "'test_6':  Mismatch in length of parameters. Provided parameters are: "
+            'years=[1990], days=[150, 200], tillage_depths=[100], '
+            'incorporation_fractions=[0.5], mixing_fractions=[0.5], '
+            "implements=[<TillageImplement.DISK_HARROW: 'disk-harrow'>]. Lengths are: "
+            "{'years': 1, 'days': 2, 'tillage_depths': 1, 'incorporation_fractions': 1, "
+            "'mixing_fractions': 1, 'implements': 1}.",
         ),
     ],
 )
@@ -102,23 +105,7 @@ def test_validate_tillage_parameters(
 )
 def test_validate_depths(depths: List[float], expected: bool) -> None:
     """Tests that tillage depths are validated correctly."""
-    actual = TillageSchedule._validate_depths(depths)
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
-    "fracs,expected",
-    [
-        ([0.0, 0.3, 0.99], True),
-        ([0.5, 1.0], True),
-        ([], True),
-        ([-0.01, 0.03], False),
-        ([0.4, 1.1], False),
-    ],
-)
-def test_validate_fractions(fracs: List[float], expected) -> None:
-    """Tests that all fractions passed are valid."""
-    actual = TillageSchedule._validate_fractions(fracs)
+    actual = TillageSchedule.validate_depths(depths)
     assert actual == expected
 
 

@@ -55,7 +55,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [0.0],
             [1.0],
-            "'test_4': expected all phosphorus masses to be >= 0, received '[10, -15]'.",
+            "'test_4': expected all phosphorus masses to be in >= 0, received '[10, -15]'.",
         ),
         (
             "test_5",
@@ -67,7 +67,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [-30.0, 30.0],
             [0.8],
-            "'test_5': expected all application depths to be >= 0, received '[-30.0, 30.0]'.",
+            "'test_5': expected all application depths to be in >= 0, received '[-30.0, 30.0]'.",
         ),
         (
             "test_6",
@@ -91,11 +91,14 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [0.0],
             [1.0],
-            "'test_7': expected equal numbers of fertilizer application parameters, received "
-            "'[1999, 2000, 2001]' years, '[100, 100, 100]' days, '['mix_5', 'mix_5', 'mix_5']' "
-            "mix names, '[15, 15]' nitrogen masses, '[10, 10, 10]' phosphorus masses, '[10, 10, 10]' potassium masses, "
-            "'[0.0, 0.0, 0.0]' application depths, and '[1.0, 1.0, 1.0]' surface remainder "
-            "fractions.",
+            "'test_7':  Mismatch in length of parameters. Provided parameters are: "
+            "years=[1999, 2000, 2001], days=[100, 100, 100], mix_names=['mix_5', 'mix_5', "
+            "'mix_5'], nitrogen_masses=[15, 15], phosphorus_masses=[10, 10, 10], "
+            'potassium_masses=[10, 10, 10], application_depths=[0.0, 0.0, 0.0], '
+            "surface_remainder_fractions=[1.0, 1.0, 1.0]. Lengths are: {'years': 3, "
+            "'days': 3, 'mix_names': 3, 'nitrogen_masses': 2, 'phosphorus_masses': 3, "
+            "'potassium_masses': 3, 'application_depths': 3, "
+            "'surface_remainder_fractions': 3}.",
         ),
     ],
 )
@@ -115,22 +118,6 @@ def test_validate_fertilizer_parameters(
     with pytest.raises(ValueError) as e:
         FertilizerSchedule(name, mix_names, years, days, nitrogen, phosphorus, potassium, depths, fractions, 1, 1)
     assert str(e.value) == expected_err_msg
-
-
-@pytest.mark.parametrize(
-    "values,expected",
-    [
-        ([1, 3, 4], True),
-        ([0.0, 1.2, 3.8], True),
-        ([], True),
-        ([-0.1, 0.1], False),
-        ([-2, -4], False),
-    ],
-)
-def test_determine_if_all_non_negative_values(values: List[Any], expected: bool) -> None:
-    """Tests that lists are correctly checked for negative values."""
-    actual = FertilizerSchedule._determine_if_all_non_negative_values(values)
-    assert actual == expected
 
 
 @pytest.mark.parametrize(
