@@ -492,7 +492,7 @@ def test_parse_variable_name_into_title(dca_updater: DataCollectionAppUpdater, n
 
 
 def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None:
-    dummy_schema = {"properties": {}}
+    dummy_schema: dict[str, Any] = {"properties": {}}
     expected = {
         "properties": {
             "fileName": {
