@@ -51,7 +51,7 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
         Path("DataCollectionApp/schema/animal_schema.js"),
         Path("DataCollectionApp/schema/config_schema.js"),
     ]
-    dummy_schema = {"test?": "test!"}
+    dummy_schema: dict[str, str] = {"test?": "test!"}
     create_object_schema = mocker.patch.object(dca_updater, "_create_object_schema", return_value={"test?": "test!"})
     add_filename = mocker.patch.object(dca_updater, "_add_filename_input_field", return_value=dummy_schema)
     expected_create_calls = [
