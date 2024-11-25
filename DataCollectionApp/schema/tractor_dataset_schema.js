@@ -362,9 +362,10 @@ tractor_dataset_schema = {
                 "default": 0
             }
         },
-        "filename": {
+        "fileName": {
             "title": "File Name",
             "type": "string",
+            "pattern": "^[a-zA-Z0-9_\\- ]{1,255}$",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {

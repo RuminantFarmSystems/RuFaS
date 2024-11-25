@@ -189,7 +189,9 @@
                 data.forEach((item, index) => {
                     var fileName = item.fileName;
 
-                    var jsonData = JSON.stringify(item, null, 2);
+                    const { fileName: _, ...jsonDataToDownload } = item;
+
+                    var jsonData = JSON.stringify(jsonDataToDownload, null, 2);
 
                     saveJsonFile(jsonData, fileName, 'application/json');
                 });
