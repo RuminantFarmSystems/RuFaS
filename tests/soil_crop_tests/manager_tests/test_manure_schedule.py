@@ -8,22 +8,6 @@ from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
 
 
 @pytest.mark.parametrize(
-    "values,expected",
-    [
-        ([1, 3, 4], True),
-        ([0.0, 1.2, 3.8], True),
-        ([], True),
-        ([-0.1, 0.1], False),
-        ([-2, -4], False),
-    ],
-)
-def test_determine_if_all_non_negative_values(values: List[Union[int, float]], expected: bool) -> None:
-    """Tests that lists are correctly checked for negative values."""
-    actual = ManureSchedule._determine_if_all_non_negative_values(values)
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
     "name,years,days,nitrogen,phosphorus,manure_type,field_coverage,depths,remainder_fracs,expected",
     [
         (

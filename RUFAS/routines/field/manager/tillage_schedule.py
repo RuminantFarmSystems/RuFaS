@@ -107,14 +107,14 @@ class TillageSchedule(Schedule):
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."
             )
 
-        valid_incorp_fractions = self._validate_fractions(self.incorporation_fractions)
+        valid_incorp_fractions = Utility.validate_fractions(self.incorporation_fractions)
         if not valid_incorp_fractions:
             raise ValueError(
                 error_header + f"expected all incorporation fractions to be in range [0.0, 1.0], received "
                                f"'{self.incorporation_fractions}'."
             )
 
-        valid_mix_fractions = self._validate_fractions(self.mixing_fractions)
+        valid_mix_fractions = Utility.validate_fractions(self.mixing_fractions)
         if not valid_mix_fractions:
             raise ValueError(
                 error_header + f"expected all mixing fractions to be in range [0.0, 1.0], received "
@@ -168,25 +168,3 @@ class TillageSchedule(Schedule):
             )
             tillage_events.append(new_tillage_event)
         return tillage_events
-
-    @staticmethod
-    def _validate_fractions(fractions: List[float]) -> bool:
-        """
-        Checks that all fractions passed are valid.
-
-        Parameters
-        ----------
-        fractions : List[float]
-            List of fractions to be valid
-
-        Returns
-        -------
-        bool
-            True if all fractions passed are valid, False otherwise.
-
-        Notes
-        -----
-        A fraction is valid if it is in the range[0.0, 1.0]
-
-        """
-        return all(0.0 <= fraction <= 1.0 for fraction in fractions)

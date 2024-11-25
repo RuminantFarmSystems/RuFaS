@@ -113,47 +113,54 @@ class FertilizerSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
+        non_negative_parameters = [("nitrogen masses", self.nitrogen_masses),
+                                   ("phosphorus masses", self.phosphorus_masses),
+                                   ("potassium masses", self.potassium_masses),
+                                   ("application depths", self.application_depths)]
+        fraction_parameters = [("surface remainder fractions", self.surface_remainder_fractions)]
 
-        valid_years = self._validate_years(self.years)
-        if not valid_years:
-            raise ValueError(
-                error_header + f"expected all years to be > 0 and in non-descending order, received " f"'{self.years}'."
-            )
+        self.validate_parameters(non_negative_parameters, fraction_parameters)
 
-        valid_days = self._validate_days(self.years, self.days)
-        if not valid_days:
-            raise ValueError(error_header + f"expected all days to be in range [1, 366], received '{self.days}'.")
-
-        valid_nitrogen_masses = Utility.determine_if_all_non_negative_values(self.nitrogen_masses)
-        if not valid_nitrogen_masses:
-            raise ValueError(
-                error_header + f"expected all nitrogen masses to be in >= 0, received " f"'{self.nitrogen_masses}'."
-            )
-
-        valid_phosphorus_masses = Utility.determine_if_all_non_negative_values(self.phosphorus_masses)
-        if not valid_phosphorus_masses:
-            raise ValueError(
-                error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
-            )
-
-        valid_potassium_masses = Utility.determine_if_all_non_negative_values(self.potassium_masses)
-        if not valid_potassium_masses:
-            raise ValueError(
-                error_header + f"expected all potassium masses to be >= 0, received '{self.potassium_masses}'."
-            )
-
-        valid_depths = Utility.determine_if_all_non_negative_values(self.application_depths)
-        if not valid_depths:
-            raise ValueError(
-                error_header + f"expected all application depths to be >= 0, received " f"'{self.application_depths}'."
-            )
-
-        valid_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions)
-        if not valid_fractions:
-            raise ValueError(
-                error_header + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
-                f"received '{self.surface_remainder_fractions}'."
-            )
+        # valid_years = self._validate_years(self.years)
+        # if not valid_years:
+        #     raise ValueError(
+        #         error_header + f"expected all years to be > 0 and in non-descending order, received " f"'{self.years}'."
+        #     )
+        #
+        # valid_days = self._validate_days(self.years, self.days)
+        # if not valid_days:
+        #     raise ValueError(error_header + f"expected all days to be in range [1, 366], received '{self.days}'.")
+        #
+        # valid_nitrogen_masses = Utility.determine_if_all_non_negative_values(self.nitrogen_masses)
+        # if not valid_nitrogen_masses:
+        #     raise ValueError(
+        #         error_header + f"expected all nitrogen masses to be in >= 0, received " f"'{self.nitrogen_masses}'."
+        #     )
+        #
+        # valid_phosphorus_masses = Utility.determine_if_all_non_negative_values(self.phosphorus_masses)
+        # if not valid_phosphorus_masses:
+        #     raise ValueError(
+        #         error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
+        #     )
+        #
+        # valid_potassium_masses = Utility.determine_if_all_non_negative_values(self.potassium_masses)
+        # if not valid_potassium_masses:
+        #     raise ValueError(
+        #         error_header + f"expected all potassium masses to be >= 0, received '{self.potassium_masses}'."
+        #     )
+        #
+        # valid_depths = Utility.determine_if_all_non_negative_values(self.application_depths)
+        # if not valid_depths:
+        #     raise ValueError(
+        #         error_header + f"expected all application depths to be >= 0, received " f"'{self.application_depths}'."
+        #     )
+        #
+        # valid_fractions = Utility.validate_fractions(self.surface_remainder_fractions)
+        # if not valid_fractions:
+        #     raise ValueError(
+        #         error_header + f"expected all surface remainder fractions to be in range [0.0, 1.0], "
+        #         f"received '{self.surface_remainder_fractions}'."
+        #     )
 
         self.validate_equal_lengths(error_header,
                                     years=self.years,
