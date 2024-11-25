@@ -14,6 +14,16 @@ class BiomassAllocation:
     crop_data : Optional[CropData]
         The data object used for biomass calculation. Stores information
         about the plant's growth and environmental factors.
+    light_extinction : float
+        Light extinction coefficient (unitless).
+    usable_light : Optional[float]
+        Solar radiation captured for photosynthesis (MJ/m^2).
+    biomass_growth : Optional[float]
+        Biomass accumulated during the day (kg/ha).
+    previous_biomass : Optional[float]
+        Biomass accumulated on the previous day (kg/ha).
+    light_use_efficiency : float
+        Light use efficiency of the plant (dg/MJ).
 
     Attributes
     ----------
@@ -51,16 +61,24 @@ class BiomassAllocation:
         Calculates the below ground biomass of a plant.
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        light_extinction: float = 0.65,
+        usable_light: Optional[float] = None,
+        biomass_growth: Optional[float] = None,
+        previous_biomass: Optional[float] = None,
+        light_use_efficiency: float = 30,
+    ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-        self.light_extinction: float = 0.65
-        self.usable_light: Optional[float] = None
-        self.biomass_growth: Optional[float] = None
-        self.previous_biomass: Optional[float] = None
+        self.light_extinction = light_extinction
+        self.usable_light = usable_light
+        self.biomass_growth = biomass_growth
+        self.previous_biomass = previous_biomass
 
         # SWAT Table A-5
-        self.light_use_efficiency: float = 30
+        self.light_use_efficiency = light_use_efficiency
 
     def allocate_biomass(self, light: float) -> None:
         """

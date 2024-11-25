@@ -22,6 +22,24 @@ class PhosphorusIncorporation:
     crop_data : CropData, optional
         An instance of `CropData` containing crop specifications and attributes. If not provided, a default
         `CropData` instance is initialized with default values.
+    emergence_phosphorus_fraction : float
+        Phosphorus fraction of biomass at emergence (unitless).
+    half_mature_phosphorus_fraction : float
+        Phosphorus fraction of biomass at half-maturity (unitless).
+    mature_phosphorus_fraction : float
+        Phosphorus fraction of biomass at maturity (unitless).
+    phosphorus_distro_param : float, default 10
+        Phosphorus uptake distribution parameter (unitless).
+    phosphorus_shapes : Optional[List[float]], default None
+        First and second shape coefficients for the nitrogen uptake equations (unitless).
+    previous_phosphorus : Optional[float], default None
+        Phosphorus value on the previous day (kg/ha).
+    total_phosphorus_uptake : Optional[float], default None
+        Total amount of phosphorus taken up by the plant (kg/ha).
+    potential_phosphorus_uptake : Optional[float], default None
+        Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
+    actual_phosphorus_uptakes : Optional[List[float]], default None
+        Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
 
     Attributes
     ----------
@@ -58,20 +76,32 @@ class PhosphorusIncorporation:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        emergence_phosphorus_fraction: float = 0.005,
+        half_mature_phosphorus_fraction: float = 0.003,
+        mature_phosphorus_fraction: float = 0.002,
+        phosphorus_distro_param: float = 10,
+        phosphorus_shapes: Optional[List[float]] = None,
+        previous_phosphorus: Optional[float] = None,
+        total_phosphorus_uptake: Optional[float] = None,
+        potential_phosphorus_uptake: Optional[float] = None,
+        actual_phosphorus_uptakes: Optional[List[float]] = None,
+    ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
         # SWAT Table A-7
-        self.emergence_phosphorus_fraction: float = 0.005
-        self.half_mature_phosphorus_fraction: float = 0.003
-        self.mature_phosphorus_fraction: float = 0.002
+        self.emergence_phosphorus_fraction = emergence_phosphorus_fraction
+        self.half_mature_phosphorus_fraction = half_mature_phosphorus_fraction
+        self.mature_phosphorus_fraction = mature_phosphorus_fraction
 
-        self.phosphorus_distro_param: float = 10
-        self.phosphorus_shapes: Optional[List[float]] = None
-        self.previous_phosphorus: Optional[float] = None
-        self.total_phosphorus_uptake: Optional[float] = None
-        self.potential_phosphorus_uptake: Optional[float] = None
-        self.actual_phosphorus_uptakes: Optional[List[float]] = None
+        self.phosphorus_distro_param = phosphorus_distro_param
+        self.phosphorus_shapes = phosphorus_shapes
+        self.previous_phosphorus = previous_phosphorus
+        self.total_phosphorus_uptake = total_phosphorus_uptake
+        self.potential_phosphorus_uptake = potential_phosphorus_uptake
+        self.actual_phosphorus_uptakes = actual_phosphorus_uptakes
 
     def incorporate_phosphorus(self, soil_data: SoilData) -> None:
         """

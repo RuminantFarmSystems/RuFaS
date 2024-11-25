@@ -15,6 +15,36 @@ class NitrogenIncorporation:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
+    emergence_nitrogen_fraction : float
+        Nitrogen fraction of biomass at emergence (unitless).
+    half_mature_nitrogen_fraction : float
+        Nitrogen fraction of biomass at half-maturity (unitless).
+    mature_nitrogen_fraction : float
+        Nitrogen fraction of biomass at maturity (unitless).
+    nitrogen_distro_param : float
+        Nitrogen uptake distribution parameter (unitless).
+    nitrogen_shapes : Optional[List[float]]
+        Shape coefficients for nitrogen uptake equations (unitless).
+    previous_nitrogen : Optional[float]
+        Nitrogen in biomass on the previous day (kg/ha).
+    potential_nitrogen_uptake : Optional[float]
+        Potential nitrogen uptake under ideal conditions (kg/ha).
+    layer_nitrogen_potentials : Optional[float]
+        Potential nitrogen uptake from each soil layer (kg/ha).
+    unmet_nitrogen_demands : Optional[float]
+        Unmet nitrogen demands by overlaying soil layers (kg/ha).
+    nitrogen_requests : Optional[float]
+        Nitrogen requested from each soil layer (kg/ha).
+    actual_nitrogen_uptakes : Optional[List[float]]
+        Actual nitrogen uptake from each soil layer (kg/ha).
+    total_nitrogen_uptake : Optional[float]
+        Total nitrogen uptake by the plant (kg/ha).
+    fixed_nitrogen : Optional[float]
+        Total nitrogen fixed by the plant (kg/ha).
+    nitrate_factor : Optional[float]
+        Soil nitrate factor (unitless).
+    fixation_stage_factor : Optional[float]
+        Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     Attributes
     ----------
@@ -57,26 +87,44 @@ class NitrogenIncorporation:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        emergence_nitrogen_fraction: float = 0.05,
+        half_mature_nitrogen_fraction: float = 0.02,
+        mature_nitrogen_fraction: float = 0.01,
+        nitrogen_distro_param: float = 10.0,
+        nitrogen_shapes: Optional[List[float]] = None,
+        previous_nitrogen: Optional[float] = None,
+        potential_nitrogen_uptake: Optional[float] = None,
+        layer_nitrogen_potentials: Optional[float] = None,
+        unmet_nitrogen_demands: Optional[float] = None,
+        nitrogen_requests: Optional[float] = None,
+        actual_nitrogen_uptakes: Optional[List[float]] = None,
+        total_nitrogen_uptake: Optional[float] = None,
+        fixed_nitrogen: Optional[float] = None,
+        nitrate_factor: Optional[float] = None,
+        fixation_stage_factor: Optional[float] = None,
+    ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
         # SWAT Table A-7
-        self.emergence_nitrogen_fraction: float = 0.05
-        self.half_mature_nitrogen_fraction: float = 0.02
-        self.mature_nitrogen_fraction: float = 0.01
+        self.emergence_nitrogen_fraction = emergence_nitrogen_fraction
+        self.half_mature_nitrogen_fraction = half_mature_nitrogen_fraction
+        self.mature_nitrogen_fraction = mature_nitrogen_fraction
+        self.nitrogen_distro_param = nitrogen_distro_param
 
-        self.nitrogen_distro_param: float = 10.0
-        self.nitrogen_shapes: Optional[List[float]] = None
-        self.previous_nitrogen: Optional[float] = None
-        self.potential_nitrogen_uptake: Optional[float] = None
-        self.layer_nitrogen_potentials: Optional[float] = None
-        self.unmet_nitrogen_demands: Optional[float] = None
-        self.nitrogen_requests: Optional[float] = None
-        self.actual_nitrogen_uptakes: Optional[List[float]] = None
-        self.total_nitrogen_uptake: Optional[float] = None
-        self.fixed_nitrogen: Optional[float] = None
-        self.nitrate_factor: Optional[float] = None
-        self.fixation_stage_factor: Optional[float] = None
+        self.nitrogen_shapes = nitrogen_shapes
+        self.previous_nitrogen = previous_nitrogen
+        self.potential_nitrogen_uptake = potential_nitrogen_uptake
+        self.layer_nitrogen_potentials = layer_nitrogen_potentials
+        self.unmet_nitrogen_demands = unmet_nitrogen_demands
+        self.nitrogen_requests = nitrogen_requests
+        self.actual_nitrogen_uptakes = actual_nitrogen_uptakes
+        self.total_nitrogen_uptake = total_nitrogen_uptake
+        self.fixed_nitrogen = fixed_nitrogen
+        self.nitrate_factor = nitrate_factor
+        self.fixation_stage_factor = fixation_stage_factor
 
     # ---- wrapper functions (main routines) ----
     def incorporate_nitrogen(self, soil_data: SoilData) -> None:

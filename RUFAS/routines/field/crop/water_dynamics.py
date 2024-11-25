@@ -12,6 +12,8 @@ class WaterDynamics:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and states relevant to water dynamics.
         If not provided, a default instance with generic parameters is used.
+    cumulative_evapotranspiration : float, default 0.0
+        Total water lost to evapotranspiration by the plant during the growing season (mm).
 
     Attributes
     ----------
@@ -23,9 +25,13 @@ class WaterDynamics:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        cumulative_evapotranspiration: float = 0.0,
+    ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
-        self.cumulative_evapotranspiration: float = 0.0
+        self.cumulative_evapotranspiration = cumulative_evapotranspiration
 
     def cycle_water(
         self,

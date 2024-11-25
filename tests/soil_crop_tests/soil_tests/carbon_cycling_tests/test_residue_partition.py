@@ -613,7 +613,7 @@ def test_add_residue_to_pools(rainfall: float) -> None:
                     field_size=1.1,
                 ),
             ],
-            CropData(yield_residue=300),
+            CropData(),
         ),
         (
             [
@@ -645,7 +645,7 @@ def test_add_residue_to_pools(rainfall: float) -> None:
                     field_size=1.1,
                 ),
             ],
-            CropData(yield_residue=30),
+            CropData(),
         ),
         (
             [
@@ -677,7 +677,7 @@ def test_add_residue_to_pools(rainfall: float) -> None:
                     field_size=1.1,
                 ),
             ],
-            CropData(yield_residue=3),
+            CropData(),
         ),
     ],
 )

@@ -12,6 +12,18 @@ class HeatUnits:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes. If not provided, a default
         `CropData` instance is initialized with default values.
+    maximum_temperature : float
+        Maximum temperature for plant growth (Celsius).
+    use_heat_unit_temperature : bool
+        If alternative heat unit method is used.
+    new_heat_units : Optional[float]
+        Heat units accumulated on the current day (Celsius*).
+    minimum_heat_unit_temperature : Optional[float]
+        Minimum temperature for heat unit calculations (Celsius).
+    maximum_heat_unit_temperature : Optional[float]
+        Maximum temperature for heat unit calculations (Celsius).
+    heat_unit_temperature : Optional[float]
+        Heat unit temperature for alternative method (Celsius).
 
     Attributes
     ----------
@@ -37,14 +49,23 @@ class HeatUnits:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        maximum_temperature: float = 38.0,
+        use_heat_unit_temperature: bool = False,
+        new_heat_units: Optional[float] = None,
+        minimum_heat_unit_temperature: Optional[float] = None,
+        maximum_heat_unit_temperature: Optional[float] = None,
+        heat_unit_temperature: Optional[float] = None,
+    ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
-        self.maximum_temperature: float = 38.0
-        self.use_heat_unit_temperature: bool = False
-        self.new_heat_units: Optional[float] = None
-        self.minimum_heat_unit_temperature: Optional[float] = None
-        self.maximum_heat_unit_temperature: Optional[float] = None
-        self.heat_unit_temperature: Optional[float] = None
+        self.maximum_temperature = maximum_temperature
+        self.use_heat_unit_temperature = use_heat_unit_temperature
+        self.new_heat_units = new_heat_units
+        self.minimum_heat_unit_temperature = minimum_heat_unit_temperature
+        self.maximum_heat_unit_temperature = maximum_heat_unit_temperature
+        self.heat_unit_temperature = heat_unit_temperature
 
     def absorb_heat_units(
         self,

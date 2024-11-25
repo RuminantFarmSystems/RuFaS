@@ -33,21 +33,40 @@ class WaterUptake:
     crop_data : CropData
         Stores and provides access to crop-related data influencing root development, including parameters
         like root depth, growth rates, and environmental conditions affecting root expansion.
-    
-        
+    water_distro_parameter : float, default 10
+        Water-use distribution parameter governing water-uptake from the soil (unitless).
+    potential_water_uptakes : Optional[List[float]], default None
+        The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
+    water_compensation_factor : float, default 0.01
+        Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
+        (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
+        can be drawn from deeper layers.
+    unmet_water_demands : Optional[List[float]], default None
+        Cumulative water demands not met by all previous layers (mm).
+    actual_water_uptakes : Optional[List[float]], default None
+        The actual amount of water to be removed from the soil (mm).
+
     References
     ----------
     "Water Uptake By Plants" section of SWAT (5:2.2.1)
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        water_distro_parameter: float = 10,
+        potential_water_uptakes: Optional[List[float]] = None,
+        water_compensation_factor: float = 0.01,
+        unmet_water_demands: Optional[List[float]] = None,
+        actual_water_uptakes: Optional[List[float]] = None,
+    ):
         self.crop_data = crop_data or CropData()
-        self.water_distro_parameter: float = 10
-        self.potential_water_uptakes: Optional[list[float]] = None
-        self.water_compensation_factor: float = 0.01
-        self.unmet_water_demands: Optional[list[float]] = None
-        self.actual_water_uptakes: Optional[list[float]] = None
+        self.water_distro_parameter = water_distro_parameter
+        self.potential_water_uptakes = potential_water_uptakes
+        self.water_compensation_factor = water_compensation_factor
+        self.unmet_water_demands = unmet_water_demands
+        self.actual_water_uptakes = actual_water_uptakes
 
     def uptake_water(self, soil_data: SoilData) -> None:
         """
