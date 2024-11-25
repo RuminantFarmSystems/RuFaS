@@ -196,10 +196,11 @@ class Schedule:
             )
         return True
 
-    def validate_parameters(self,
-                            non_negative_parameters: list[tuple[str, list] | None],
-                            fraction_parameters: list[tuple[str, list] | None],
-                            ) -> None:
+    def validate_parameters(
+        self,
+        non_negative_parameters: list[tuple[str, list] | None],
+        fraction_parameters: list[tuple[str, list] | None],
+    ) -> None:
         """
         General validations for schedule parameter.
 

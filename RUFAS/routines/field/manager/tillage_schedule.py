@@ -88,8 +88,10 @@ class TillageSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        fraction_parameters = [("incorporation fractions", self.incorporation_fractions),
-                               ("mixing fractions", self.mixing_fractions)]
+        fraction_parameters = [
+            ("incorporation fractions", self.incorporation_fractions),
+            ("mixing fractions", self.mixing_fractions),
+        ]
 
         self.validate_parameters([], fraction_parameters)
         valid_depths = self.validate_depths(self.tillage_depths)
@@ -98,13 +100,15 @@ class TillageSchedule(Schedule):
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."
             )
 
-        self.validate_equal_lengths(error_header,
-                                    years=self.years,
-                                    days=self.days,
-                                    tillage_depths=self.tillage_depths,
-                                    incorporation_fractions=self.incorporation_fractions,
-                                    mixing_fractions=self.mixing_fractions,
-                                    implements=self.implements)
+        self.validate_equal_lengths(
+            error_header,
+            years=self.years,
+            days=self.days,
+            tillage_depths=self.tillage_depths,
+            incorporation_fractions=self.incorporation_fractions,
+            mixing_fractions=self.mixing_fractions,
+            implements=self.implements,
+        )
 
     def generate_tillage_events(self) -> List[TillageEvent]:
         """
