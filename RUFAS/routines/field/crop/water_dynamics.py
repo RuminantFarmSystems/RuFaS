@@ -18,11 +18,14 @@ class WaterDynamics:
     data : CropData
         Reference to the `CropData` instance used to access and modify water-related parameters and states
         for the crop.
+    cumulative_evapotranspiration : float, default 0.0
+        Total water lost to evapotranspiration by the plant during the growing season (mm).
 
     """
 
     def __init__(self, crop_data: Optional[CropData] = None):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.cumulative_evapotranspiration: float = 0.0
 
     def cycle_water(
         self,
@@ -50,7 +53,7 @@ class WaterDynamics:
         self.data.cumulative_evaporation += evaporation
         self.data.cumulative_transpiration += transpiration
         self.data.cumulative_potential_evapotranspiration += potential_evapotranspiration
-        self.data.cumulative_evapotranspiration += self._determine_evapotranspiration(
+        self.cumulative_evapotranspiration += self._determine_evapotranspiration(
             self.data.cumulative_evaporation, self.data.cumulative_transpiration
         )
 

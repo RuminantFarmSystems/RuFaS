@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -140,17 +140,12 @@ class CropData:
         Total water lost to evaporation by the plant during the growing season (mm).
     cumulative_transpiration : float, default 0.0
         Total water lost to transpiration by the plant during the growing season (mm).
-    cumulative_evapotranspiration : float, default 0.0
-        Total water lost to evapotranspiration by the plant during the growing season (mm).
     cumulative_potential_evapotranspiration : float, default 0.0
         Total expected maximum water loss by the plant during the growing season (mm).
     water_deficiency : Optional[float], default None
         Water deficiency factor for the plant (unitless).
     max_transpiration : Optional[float], default None
         Maximum transpiration on a given day (mm).
-    evapotranspiration_weighting_coefficient : float, default 1
-        Plant evapotranspiration curve number coefficient (unitless), in the range 0.5 to 2.0 inclusive. Used in SWAT
-        equation 2:1.1.9, definition in .bsn input data description (named CNCOEF there)
     canopy_water : float, default 0
         Amount of water currently held in the canopy (mm).
     max_canopy_water_capacity : float, default 0.8
@@ -163,18 +158,6 @@ class CropData:
             which cites the following paper that I could not find:
            'Wang, D., Li, J. S., & Rao, M. J. (2006). Winter wheat canopy interception under sprinkler irrigation.
             Scientia Agricultura Sinica, 39(9), 1859–1864.'
-    water_distro_parameter : float, default 10
-        Water-use distribution parameter governing water-uptake from the soil (unitless).
-    potential_water_uptakes : Optional[List[float]], default None
-        The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
-    water_compensation_factor : float, default 0.01
-        Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
-        (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
-        can be drawn from deeper layers.
-    unmet_water_demands : Optional[List[float]], default None
-        Cumulative water demands not met by all previous layers (mm).
-    actual_water_uptakes : Optional[List[float]], default None
-        The actual amount of water to be removed from the soil (mm).
     water_uptake : float, default 0.0
         Total amount of water the plant took from the soil on the current day (mm).
     cumulative_water_uptake : float, default 0.0
@@ -320,20 +303,13 @@ class CropData:
     # ---- water dynamics
     cumulative_evaporation: float = 0.0
     cumulative_transpiration: float = 0.0
-    cumulative_evapotranspiration: float = 0.0
     cumulative_potential_evapotranspiration: float = 0.0
     water_deficiency: Optional[float] = None
     max_transpiration: Optional[float] = None
-    evapotranspiration_weighting_coefficient: float = 1
     canopy_water: float = 0
     max_canopy_water_capacity: float = 0.8
 
     # ---- transpiration
-    water_distro_parameter: float = 10
-    potential_water_uptakes: Optional[List[float]] = None
-    water_compensation_factor: float = 0.01
-    unmet_water_demands: Optional[List[float]] = None
-    actual_water_uptakes: Optional[List[float]] = None
     water_uptake: float = 0.0
     cumulative_water_uptake: float = 0.0
 

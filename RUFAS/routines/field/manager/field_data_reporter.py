@@ -195,7 +195,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "cumulative_evapotranspiration",
-            crop.data.cumulative_evapotranspiration,
+            crop.water_dynamics.cumulative_evapotranspiration,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
         self.om.add_variable(

@@ -112,6 +112,11 @@ class Crop:
         """Provides access to the LeafAreaIndex object."""
         return self._leaf_area_index
 
+    @property
+    def water_dynamics(self) -> WaterDynamics:
+        """Provides access to the WaterDynamics object."""
+        return self._water_dynamics
+
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
     ) -> None:
