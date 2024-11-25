@@ -88,37 +88,14 @@ class TillageSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
+        fraction_parameters = [("incorporation fractions", self.incorporation_fractions),
+                               ("mixing fractions", self.mixing_fractions)]
 
-        valid_years = self._validate_years(self.years)
-        if not valid_years:
-            raise ValueError(
-                error_header + f"expected all years to be > 0 and in non-descending order, received " f"'{self.years}'."
-            )
-
-        valid_days = self._validate_days(self.years, self.days)
-        if not valid_days:
-            raise ValueError(
-                error_header + f"expected all planting days to be in range [1, 366], received " f"'{self.days}'."
-            )
-
+        self.validate_parameters([], fraction_parameters)
         valid_depths = self.validate_depths(self.tillage_depths)
         if not valid_depths:
             raise ValueError(
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."
-            )
-
-        valid_incorp_fractions = Utility.validate_fractions(self.incorporation_fractions)
-        if not valid_incorp_fractions:
-            raise ValueError(
-                error_header + f"expected all incorporation fractions to be in range [0.0, 1.0], received "
-                               f"'{self.incorporation_fractions}'."
-            )
-
-        valid_mix_fractions = Utility.validate_fractions(self.mixing_fractions)
-        if not valid_mix_fractions:
-            raise ValueError(
-                error_header + f"expected all mixing fractions to be in range [0.0, 1.0], received "
-                               f"'{self.mixing_fractions}'."
             )
 
         self.validate_equal_lengths(error_header,

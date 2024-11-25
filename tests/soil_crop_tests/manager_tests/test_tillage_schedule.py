@@ -28,7 +28,7 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
             [0.5],
             [0.5],
             ["coulter-chisel-plow"],
-            "'test_2': expected all planting days to be in range [1, 366], received '[200, 0]'.",
+            "'test_2': expected all days to be in range [1, 366], received '[200, 0]'.",
         ),
         (
             "test_3",

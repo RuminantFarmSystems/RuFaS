@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.schedule import Schedule

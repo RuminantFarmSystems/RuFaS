@@ -1,4 +1,4 @@
-from typing import List, Iterable, Any
+from typing import List
 
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
@@ -199,8 +199,8 @@ class Schedule:
         return True
 
     def validate_parameters(self,
-                            non_negative_parameters: list[tuple[str, list]],
-                            fraction_parameters: list[tuple[str, list]],
+                            non_negative_parameters: list[tuple[str, list] | None],
+                            fraction_parameters: list[tuple[str, list] | None],
                             ) -> None:
         """
         General validations for schedule parameter.
