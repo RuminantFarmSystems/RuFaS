@@ -1,4 +1,4 @@
-from typing import List, Iterable
+from typing import List, Iterable, Any
 
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
@@ -197,3 +197,50 @@ class Schedule:
                 f"Lengths are: {lengths}."
             )
         return True
+
+    def validate_parameters(self,
+                            non_negative_parameters: list[tuple[str, list]],
+                            fraction_parameters: list[tuple[str, list]],
+                            ) -> None:
+        """
+        General validations for schedule parameter.
+
+        Parameters
+        ----------
+        non_negative_parameters: list[tuple[str, list]]
+            A list of parameters wrapped in a tuple containing their names and values that should be non-negative.
+        fraction_parameters: list[tuple[str, list]]
+            A list of parameters wrapped in a tuple containing their names and values that should be fractions.
+
+        Raises
+        ------
+        ValueError
+            If non-negative values are negative.
+            If fraction is out of range [0.0, 1.0].
+            If not all years > 0 and in non-descending order.
+            If not all days to be in range [1, 366].
+
+        """
+        valid_years = self._validate_years(self.years)
+        if not valid_years:
+            raise ValueError(
+                f"'{self.name}': " + f"expected all years to be > 0 and in non-descending order,"
+                                     f" received " f"'{self.years}'."
+            )
+
+        valid_days = self._validate_days(self.years, self.days)
+        if not valid_days:
+            raise ValueError(f"'{self.name}': " + f"expected all days to be in range [1, 366], received '{self.days}'.")
+
+        for name, parameter in non_negative_parameters:
+            if not Utility.determine_if_all_non_negative_values(parameter):
+                raise ValueError(
+                    f"'{self.name}': "
+                    + f"expected all {name} to be in >= 0, received '{parameter}'."
+                )
+        for name, parameter in fraction_parameters:
+            if not Utility.validate_fractions(parameter):
+                raise ValueError(
+                    f"'{self.name}': " + f"expected all {name} to be in range [0.0, 1.0], "
+                                         f"received '{parameter}'."
+                )

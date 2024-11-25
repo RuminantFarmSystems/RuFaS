@@ -738,7 +738,7 @@ class Utility:
             raise ValueError(f"'{name}': expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
 
     @staticmethod
-    def determine_if_all_non_negative_values(values: List[int]) -> bool:
+    def determine_if_all_non_negative_values(values: list[int | float]) -> bool:
         """
         Checks that all values in a list are >= 0.
 
@@ -754,3 +754,25 @@ class Utility:
 
         """
         return all(value >= 0 for value in values)
+
+    @staticmethod
+    def validate_fractions(fractions: List[float]) -> bool:
+        """
+        Checks that all fractions passed are valid.
+
+        Parameters
+        ----------
+        fractions : List[float]
+            List of fractions to be valid
+
+        Returns
+        -------
+        bool
+            True if all fractions passed are valid, False otherwise.
+
+        Notes
+        -----
+        A fraction is valid if it is in the range[0.0, 1.0]
+
+        """
+        return all(0.0 <= fraction <= 1.0 for fraction in fractions)

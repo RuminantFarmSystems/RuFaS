@@ -118,13 +118,13 @@ class ManureSchedule(Schedule):
         if not valid_days:
             raise ValueError(error_header + f"expected all days to be in range [1, 366], received '{self.days}'.")
 
-        valid_nitrogen_masses = self._determine_if_all_non_negative_values(self.nitrogen_masses)
+        valid_nitrogen_masses = Utility.determine_if_all_non_negative_values(self.nitrogen_masses)
         if not valid_nitrogen_masses:
             raise ValueError(
                 error_header + f"expected all nitrogen masses to be >= 0, received " f"'{self.nitrogen_masses}'."
             )
 
-        valid_phosphorus_masses = self._determine_if_all_non_negative_values(self.phosphorus_masses)
+        valid_phosphorus_masses = Utility.determine_if_all_non_negative_values(self.phosphorus_masses)
         if not valid_phosphorus_masses:
             raise ValueError(
                 error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
@@ -136,7 +136,7 @@ class ManureSchedule(Schedule):
                 error_header + f"expected all manure types to be valid ManureTypes, received " f"'{self.manure_types}'."
             )
 
-        valid_coverage_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.field_coverages)
+        valid_coverage_fractions = Utility.validate_fractions(self.field_coverages)
         if not valid_coverage_fractions:
             raise ValueError(
                 error_header + f"expected all field coverage fractions to be in the range [0.0, 1.0], "
@@ -150,7 +150,7 @@ class ManureSchedule(Schedule):
                 f"'{self.application_depths}'."
             )
 
-        valid_surface_fractions = all(0.0 <= fraction <= 1.0 for fraction in self.surface_remainder_fractions)
+        valid_surface_fractions = Utility.validate_fractions(self.surface_remainder_fractions)
         if not valid_surface_fractions:
             raise ValueError(
                 error_header + f"expected all surface remainder fractions to be in the range [0.0, 1.0], "
@@ -211,21 +211,3 @@ class ManureSchedule(Schedule):
             )
             manure_application_events.append(new_event)
         return manure_application_events
-
-    @staticmethod
-    def _determine_if_all_non_negative_values(values: List[Union[int, float]]) -> bool:
-        """
-        Checks that all values in a list are >= 0.
-
-        Parameters
-        ----------
-        values : List[Union[int, float]]
-            List of values to be checked.
-
-        Returns
-        -------
-        bool
-            True if all values are >= 0, False otherwise.
-
-        """
-        return all(value >= 0 for value in values)

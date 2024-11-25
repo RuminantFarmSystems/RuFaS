@@ -55,7 +55,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [0.0],
             [1.0],
-            "'test_4': expected all phosphorus masses to be >= 0, received '[10, -15]'.",
+            "'test_4': expected all phosphorus masses to be in >= 0, received '[10, -15]'.",
         ),
         (
             "test_5",
@@ -67,7 +67,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [-30.0, 30.0],
             [0.8],
-            "'test_5': expected all application depths to be >= 0, received '[-30.0, 30.0]'.",
+            "'test_5': expected all application depths to be in >= 0, received '[-30.0, 30.0]'.",
         ),
         (
             "test_6",
