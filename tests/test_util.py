@@ -959,14 +959,8 @@ def test_repeat_pattern(pattern: List[int], skip: int, repeat: int, expected: li
     "name,skip,repeat,expected,error",
     [
         ("test_1", -1, 1, "'test_1': expected pattern skip to be >= 0, received '-1'.", True),
-        (
-            "test_2",
-            1,
-            -1,
-            "'test_2': expected pattern repeat to be >= 0, received '-1'.",
-            True
-        ),
-        ("test_3", 1, 1, "Nothing", False)
+        ("test_2", 1, -1, "'test_2': expected pattern repeat to be >= 0, received '-1'.", True),
+        ("test_3", 1, 1, "Nothing", False),
     ],
 )
 def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected: str, error: bool) -> None:
