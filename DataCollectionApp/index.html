@@ -185,21 +185,19 @@
         document.getElementById('save_results').addEventListener('click', function() {
             var data = jsoneditor.getValue();
 
-            // Check if data is an array
             if (Array.isArray(data)) {
                 data.forEach((item, index) => {
-                    // Convert each item in the array to a JSON string
+                    var fileName = item.filename || `item_${index + 1}`
+
                     var jsonData = JSON.stringify(item, null, 2);
 
-                    // Save each item as a separate JSON file
                     saveJsonFile(jsonData, `item_${index + 1}.json`, 'application/json');
                 });
                 alert(`${data.length} JSON files have been saved.`);
             } else {
-                // If not an array, save the whole data object as a single file
                 var jsonData = JSON.stringify(data, null, 2);
                 saveJsonFile(jsonData, 'data.json', 'application/json');
-                alert("Data is not an array. A single JSON file has been saved.");
+                alert("Cannot parse data as an array. Saving all data in a single file instead.");
             }
         });
 

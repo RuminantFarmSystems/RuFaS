@@ -276,6 +276,17 @@ fertilizer_schedule_schema = {
             },
             "minimum": 0,
             "default": 0
+        },
+        "filename": {
+            "title": "File Name",
+            "type": "string",
+            "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "Used to name the file that saves the data entered."
+            }
         }
     }
 }

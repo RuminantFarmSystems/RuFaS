@@ -103,6 +103,7 @@ class DataCollectionAppUpdater:
                 continue
 
             new_schema = self._create_object_schema(key, properties[key])
+            new_schema_with_filename = self._add_file_name_input_field(new_schema)
 
             schema_name = key.replace("properties", "schema")
             new_schema_file_name = f"{schema_name}.js"
@@ -400,3 +401,19 @@ class DataCollectionAppUpdater:
         words = re.split(r"[_\s]+", variable_name)
         capitalized_words = [word.capitalize() for word in words]
         return " ".join(capitalized_words)
+
+    def _add_file_name_input_field(self, schema: dict[str, Any]) -> dict[str, Any]:
+        """Adds field to schema for collecting filename that data will be saved as."""
+        filename_field = {
+            "filename": {
+                "title": "File Name",
+                "type": "string",
+                "options": {
+                    "grid_columns": 12,
+                    "inputAttributes": {"class": "text-primary form-control"},
+                    "infoText": "Used to name the file that saves the data entered."
+                },
+            }
+        }
+        schema["properties"].update(filename_field)
+        return schema

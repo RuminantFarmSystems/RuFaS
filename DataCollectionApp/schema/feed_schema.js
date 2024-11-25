@@ -550,6 +550,17 @@ feed_schema = {
             "options": {
                 "infoText": "User Defined Ration Percentages"
             }
+        },
+        "filename": {
+            "title": "File Name",
+            "type": "string",
+            "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "Used to name the file that saves the data entered."
+            }
         }
     }
 }

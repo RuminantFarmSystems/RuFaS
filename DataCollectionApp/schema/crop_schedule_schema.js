@@ -234,6 +234,17 @@ crop_schedule_schema = {
                     "infoText": "Contains all the properties necessary to create a CropSchedule object."
                 }
             }
+        },
+        "filename": {
+            "title": "File Name",
+            "type": "string",
+            "options": {
+                "grid_columns": 12,
+                "inputAttributes": {
+                    "class": "text-primary form-control"
+                },
+                "infoText": "Used to name the file that saves the data entered."
+            }
         }
     }
 }
