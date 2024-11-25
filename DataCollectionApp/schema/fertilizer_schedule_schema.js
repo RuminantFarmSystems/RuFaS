@@ -286,7 +286,7 @@ fertilizer_schedule_schema = {
                 "inputAttributes": {
                     "class": "text-primary form-control"
                 },
-                "infoText": "Used to name the file that saves the data entered."
+                "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
     }
