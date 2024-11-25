@@ -112,11 +112,12 @@ class ManureSchedule(Schedule):
             ("phosphorus masses", self.phosphorus_masses),
             ("manure application depths", self.application_depths),
         ]
-        fraction_parameters = [("field coverages", self.field_coverages),
-                               ("surface remainder fractions", self.surface_remainder_fractions)]
+        fraction_parameters = [
+            ("field coverages", self.field_coverages),
+            ("surface remainder fractions", self.surface_remainder_fractions),
+        ]
 
         self.validate_parameters(non_negative_parameters, fraction_parameters)
-
 
         # valid_years = self._validate_years(self.years)
         # if not valid_years:
