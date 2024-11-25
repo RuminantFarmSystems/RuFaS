@@ -10,12 +10,12 @@
       },
       {
         "task_type": "SENSITIVITY_ANALYSIS",
-        "output_prefix": "animal_S8",
+        "output_prefix": "animal_S08",
         "log_verbosity": "errors",
         "sampler": "sobol",
         "saltelli_number": 8,
         "saltelli_skip": 2048,
-        "SA_load_balancing_start": 0.894,
+        "SA_load_balancing_start": 0,
         "SA_load_balancing_stop": 1.0,
         "random_seed": 42,
         "SA_input_variables": [
