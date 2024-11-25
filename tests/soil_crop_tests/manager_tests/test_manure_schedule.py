@@ -44,7 +44,7 @@ from RUFAS.data_structures.manure_types import ManureType
             [0.75],
             [0.0],
             [1.0],
-            "'test_3': expected all nitrogen masses to be >= 0, received '[-15.0]'.",
+            "'test_3': expected all nitrogen masses to be in >= 0, received '[-15.0]'.",
         ),
         (
             "test_4",
@@ -56,7 +56,7 @@ from RUFAS.data_structures.manure_types import ManureType
             [0.75],
             [0.0],
             [1.0],
-            "'test_4': expected all phosphorus masses to be >= 0, received '[-10, -10]'.",
+            "'test_4': expected all phosphorus masses to be in >= 0, received '[-10, -10]'.",
         ),
         (
             "test_5",
@@ -68,7 +68,8 @@ from RUFAS.data_structures.manure_types import ManureType
             [1.05],
             [0.0],
             [1.0],
-            "'test_5': expected all field coverage fractions to be in the range [0.0, 1.0], received '[1.05]'.",
+            "'test_5': expected all field coverages to be in range [0.0, 1.0], received "
+            "'[1.05]'.",
         ),
         (
             "test_6",
@@ -80,7 +81,7 @@ from RUFAS.data_structures.manure_types import ManureType
             [0.75],
             [-15.0],
             [0.85],
-            "'test_6': expected all manure application depths to be >= 0, received '[-15.0]'.",
+            "'test_6': expected all manure application depths to be in >= 0, received '[-15.0]'.",
         ),
         (
             "test_7",
@@ -92,8 +93,8 @@ from RUFAS.data_structures.manure_types import ManureType
             [0.8],
             [20],
             [-0.15],
-            "'test_7': expected all surface remainder fractions to be in the range [0.0, 1.0],"
-            " received '[-0.15, -0.15]'.",
+            "'test_7': expected all surface remainder fractions to be in range [0.0, "
+            "1.0], received '[-0.15, -0.15]'.",
         ),
         (
             "test_8",
