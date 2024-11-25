@@ -1,6 +1,7 @@
-from typing import Optional
-from RUFAS.routines.field.soil.soil_data import SoilData
 import math
+from typing import Optional
+
+from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class ResiduePartition:
@@ -219,7 +220,6 @@ class ResiduePartition:
         """
         plant_residue_lignin_composition += 0.12 * rainfall * 0.1
         return plant_residue_lignin_composition
-        # TODO: check source, 0.1 or 0.01, ask Hector about the value
 
     @staticmethod
     def _determine_plant_lignin_nitrogen_fraction(
@@ -227,8 +227,6 @@ class ResiduePartition:
         total_residue: float,
         crop_yield_nitrogen: float,
     ) -> float:
-        # TODO nitrogen_fraction_plant_residue calculate in RuFaS [C.5.B.1] but not "accurate" for carbon use -
-        #  GitHub Issue #163
         """
         This method calculates the plant lignin to nitrogen ratio when nitrogen in plant residue at harvest
         is greater than zero.
@@ -567,7 +565,6 @@ class ResiduePartition:
         pseudocode_soil S.6.B.II.3
 
         """
-        # TODO: Check where the 0.15 and 0.01 factors came from issue #445
         return max(0.0, weighted_residue_dry_matter_lignin_fraction - 0.15 * rainfall * 0.01)
 
     @staticmethod

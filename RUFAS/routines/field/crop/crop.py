@@ -1,27 +1,28 @@
 from __future__ import annotations
+
 from copy import copy
+from typing import Any, Optional
+
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.field.crop.crop_enum import CropSpecies
-from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
-from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
-from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
-from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
-from RUFAS.routines.field.crop.water_uptake import WaterUptake
-from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
-from RUFAS.routines.field.crop.heat_units import HeatUnits
-from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
-from RUFAS.routines.field.crop.root_development import RootDevelopment
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_enum import CropSpecies
 from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.crop.dormancy import Dormancy
-from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.growth_constraints import GrowthConstraints
+from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
+from RUFAS.routines.field.crop.heat_units import HeatUnits
+from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
+from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.crop.phosphorus_incorporation import PhosphorusIncorporation
+from RUFAS.routines.field.crop.root_development import RootDevelopment
+from RUFAS.routines.field.crop.species_data_factory import CropSpeciesDataFactory
+from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
+from RUFAS.routines.field.crop.water_uptake import WaterUptake
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from typing import Any, Optional
-
 from RUFAS.time import Time
 
 
@@ -204,8 +205,7 @@ class Crop:
         field_size: float,
         time: Time,
         soil_data: SoilData,
-        feed_manager: FeedManager,
-    ) -> None:
+    ) -> HarvestedCropStorageType | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
 
         Parameters
@@ -220,10 +220,14 @@ class Crop:
             Time instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
-        feed_manager : FeedManager
-            Instance of the FeedManager that receives harvested crops.
+
+        Returns
+        -------
+        HarvestedCropStorageType | None
+            Harvested Crop and the type of storage it will go in if the crop harvest produced a yield, otherwise None.
+
         """
-        self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
+        return self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data)
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Wrapper method for setting the max transpiration for a crop."""

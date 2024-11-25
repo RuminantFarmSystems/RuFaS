@@ -1,4 +1,5 @@
 from typing import Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 
 
@@ -129,7 +130,6 @@ class HeatUnits:
         """
         self.data.accumulated_heat_units += self.data.new_heat_units
 
-    # TODO: add these warnings to output manager at a later date.
     def _check_absorb_heat_for_input_errors(
         self,
         mean_air_temperature: float = None,
@@ -187,7 +187,7 @@ class HeatUnits:
         SWAT Reference 5:1.1
 
         """
-        return max(temperature - min_temperature, 0)  # from SWAT:
+        return max(temperature - min_temperature, 0)
 
     @staticmethod
     def _determine_minimum_heat_unit_temperature(min_air_temp: float, min_growth_temp: float) -> float:
@@ -232,5 +232,3 @@ class HeatUnits:
 
         """
         return min(max_air_temp, max_growth_temp)
-
-    # TODO: Heat scheduling? SWAT 5:1.1.1 - GitHub Issue #368

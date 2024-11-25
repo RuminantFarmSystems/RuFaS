@@ -1,19 +1,19 @@
 import copy
 import datetime
-from pathlib import Path
 import random
-from typing import List, Dict, Any, Type
+from pathlib import Path
+from typing import Any, Dict, List, Type
 
 from tqdm import tqdm
 
+from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
+from RUFAS.biophysical.animal.herd_manager import HerdManager
+from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
-from RUFAS.biophysical.animal.herd_manager import HerdManager
-from RUFAS.biophysical.feed.feed import Feed
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
-from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
-from RUFAS.biophysical.animal.animal import Animal
 
 om = OutputManager()
 
@@ -367,7 +367,7 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
-        self.im.add_dict_variable_to_pool(
+        self.im.add_runtime_variable_to_pool(
             variable_name="runtime_animal_population",
             data=self.post_animal_population.__repr__(),
             properties_blob_key="animal_population_properties",

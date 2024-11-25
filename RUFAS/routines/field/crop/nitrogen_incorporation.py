@@ -1,6 +1,7 @@
-from math import log, exp
 from bisect import bisect
+from math import exp, log
 from typing import List, Optional
+
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -51,8 +52,6 @@ class NitrogenIncorporation:
         layer_depths = soil_data.get_vectorized_layer_attribute("bottom_depth")
         layer_nitrates = soil_data.get_vectorized_layer_attribute("nitrate_content")
         soil_water_factor = soil_data.soil_water_factor
-        # TODO: soil_water_factor should be vectorized (methods need updating) instead of just using the average.
-        #   That will require refactoring the subroutines. - GitHub Issue #450
 
         self.shift_nitrogen_time()
         self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
@@ -83,10 +82,8 @@ class NitrogenIncorporation:
             )
         self.uptake_nitrogen(layer_nitrates, layer_depths)
         soil_data.set_vectorized_layer_attribute("nitrate_content", layer_nitrates)
-        # TODO: the above line is a temporary solution - should be changed with GitHub Issue #450
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
-        # TODO: fixing nitrogen does not increase biomass. Why not?
         self.data.nitrogen = self.determine_stored_nutrient(
             self.data.total_nitrogen_uptake,
             self.data.nitrogen,
@@ -414,7 +411,6 @@ class NitrogenIncorporation:
                 + " emergence_nitrogen_fraction must all be between 0 and 1"
             )
             raise ValueError(frac_error_msg)
-        # raise other errors  # TODO: perhaps rather than throwing errors, we should set values to sensible edge case?
         if emergence_nitrogen_fraction == mature_nitrogen_fraction:  # leads to divide by zero
             raise ValueError("emergence_nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
         if nitrogen_fraction == emergence_nitrogen_fraction:  # leads to divide by zero
@@ -800,7 +796,6 @@ class NitrogenIncorporation:
         """
         return min(request, max(0.0, source))
 
-    # TODO: method signature
     @staticmethod
     def _determine_nitrate_factor(total_accessible_nitrates: float) -> float:
         """

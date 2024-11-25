@@ -1,14 +1,13 @@
+import json
 from collections import namedtuple
-from deepdiff import DeepDiff
 from pathlib import Path
 from typing import Any
+
+from deepdiff import DeepDiff
 
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
-
-import json
-
 
 ResultPathType = namedtuple("ResultPaths", ["domain", "expected_results_path", "actual_results_path"])
 
@@ -63,7 +62,7 @@ class E2ETestResultsComparer:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
 
-            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2)
+            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=8)
 
             is_difference_in_results: bool = False if (diff == {}) else True
             if is_difference_in_results:

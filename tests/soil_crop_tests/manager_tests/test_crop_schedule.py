@@ -1,9 +1,10 @@
+from typing import Dict, List
+
 import pytest
-from typing import List, Dict
 
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.routines.field.manager.events import PlantingEvent, HarvestEvent
+from RUFAS.data_structures.events import HarvestEvent, PlantingEvent
 
 
 @pytest.mark.parametrize(

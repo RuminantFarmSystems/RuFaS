@@ -1,7 +1,8 @@
-from dataclasses import dataclass, InitVar, field
-from typing import List, Optional
-from math import inf
 from copy import deepcopy
+from dataclasses import InitVar, dataclass, field
+from math import inf
+from typing import List, Optional
+
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.soil.layer_data import LayerData
@@ -418,6 +419,8 @@ class SoilData:
         self.machine_manure.annual_runoff_manure_inorganic_phosphorus = 0
         self.machine_manure.annual_runoff_manure_organic_phosphorus = 0
         self.annual_soil_phosphorus_runoff = 0
+        self.machine_manure.annual_decomposed_manure = 0
+        self.grazing_manure.annual_decomposed_manure = 0
 
         self.annual_runoff_nitrates_total = 0
         self.annual_runoff_ammonium_total = 0
