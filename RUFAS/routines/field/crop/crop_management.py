@@ -30,9 +30,6 @@ class CropManagement:
     harvest_efficiency : float, default 1.0
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
         (unitless; [0, 1]).
-    lignin_dry_matter_percentage : float, default 1.518
-        Percentage of dry matter yield that is lignin (unitless). This value is the default for Sorghum harvested as a
-        grain.
     crude_protein_percent : float, default 12.481
         Percentage of dry matter mass that is dietary crude protein (unitless).
     non_protein_nitrogen : float, default 2.518
@@ -90,9 +87,6 @@ class CropManagement:
     harvest_efficiency : float, default 1.0
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
         (unitless; [0, 1]).
-    lignin_dry_matter_percentage : float, default 1.518
-        Percentage of dry matter yield that is lignin (unitless). This value is the default for Sorghum harvested as a
-        grain.
     crude_protein_percent : float, default 12.481
         Percentage of dry matter mass that is dietary crude protein (unitless).
     non_protein_nitrogen : float, default 2.518
@@ -151,7 +145,6 @@ class CropManagement:
         min_harvest_index: float = 0.2,
         yield_phosphorus_fraction: Optional[float] = 0.003,
         harvest_efficiency: float = 1.0,
-        lignin_dry_matter_percentage: float = 1.518,
         crude_protein_percent: float = 12.481,
         non_protein_nitrogen: float = 2.518,
         starch: float = 72.586,
@@ -181,7 +174,6 @@ class CropManagement:
         self.yield_phosphorus_fraction = yield_phosphorus_fraction
 
         self.harvest_efficiency = harvest_efficiency
-        self.lignin_dry_matter_percentage = lignin_dry_matter_percentage
         self.crude_protein_percent = crude_protein_percent
         self.non_protein_nitrogen = non_protein_nitrogen
         self.starch = starch

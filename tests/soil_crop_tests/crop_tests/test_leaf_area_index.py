@@ -205,28 +205,30 @@ def test_grow_canopy(
     # observe
     data = CropData(
         leaf_area_index=0.7,
-        first_heat_fraction_point=0.2,
-        second_heat_fraction_point=0.33,
-        first_leaf_fraction_point=0.05,
-        second_leaf_fraction_point=0.95,
         max_canopy_height=2.5,
         growth_factor=0.95,
         max_leaf_area_index=3.0,
         senescent_heat_fraction=0.9,
+    )
+    lai = LeafAreaIndex(
+        data,
+        first_heat_fraction_point=0.2,
+        second_heat_fraction_point=0.33,
+        first_leaf_fraction_point=0.05,
+        second_leaf_fraction_point=0.95,
         previous_leaf_area_index=previous_leaf_area_index,
         previous_optimal_leaf_area_fraction=previous_optimal_leaf_area_fraction,
     )
-    lai = LeafAreaIndex(data)
 
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heatfrac):
         lai.grow_canopy()
         # expect
         shapes = LeafAreaIndex._determine_lai_shapes(0.2, 0.33, 0.05, 0.95)
-        assert data._lai_shapes == shapes
+        assert lai.lai_shapes == shapes
         optimal_lai = LeafAreaIndex._determine_optimal_leaf_area_fraction(heatfrac, shapes[0], shapes[1])
-        assert data.optimal_leaf_area_fraction == optimal_lai
-        assert data.canopy_height == LeafAreaIndex.determine_canopy_height(
-            data.max_canopy_height, data.optimal_leaf_area_fraction
+        assert lai.optimal_leaf_area_fraction == optimal_lai
+        assert lai.canopy_height == LeafAreaIndex.determine_canopy_height(
+            data.max_canopy_height, lai.optimal_leaf_area_fraction
         )
         if heatfrac <= 0.9:  # normal growth
             assert data.is_in_senescence is False
@@ -238,17 +240,17 @@ def test_grow_canopy(
                 max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0, 3.0, 0.1)
             else:
                 max_change = LeafAreaIndex._determine_max_leaf_area_change(optimal_lai, 0.01, 3.0, 0.1)
-            assert data.optimal_leaf_area_change == max_change
+            assert lai.optimal_leaf_area_change == max_change
             added = max_change * sqrt(0.95)
             if max_change < added:  # when heatfrac = 0, no growth occurs
                 added = max_change
-            assert data.leaf_area_added == added
+            assert lai.leaf_area_added == added
             if previous_leaf_area_index is None:
                 assert data.leaf_area_index == added
             else:
                 assert data.leaf_area_index == 0.1 + added
-            assert data.previous_leaf_area_index == data.leaf_area_index
-            assert data.previous_optimal_leaf_area_fraction == optimal_lai
+            assert lai.previous_leaf_area_index == data.leaf_area_index
+            assert lai.previous_optimal_leaf_area_fraction == optimal_lai
         else:  # senescence
             assert data.is_in_senescence is True
             assert data.leaf_area_index == LeafAreaIndex._determine_senescent_leaf_area_index(

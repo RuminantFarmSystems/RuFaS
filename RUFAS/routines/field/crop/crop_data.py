@@ -76,6 +76,9 @@ class CropData:
         Year of planting for this crop.
     planting_day : int
         Julian day of planting for this crop.
+    lignin_dry_matter_percentage : float, default 1.518
+        Percentage of dry matter yield that is lignin (unitless). This value is the default for Sorghum harvested as a
+        grain.
     use_heat_scheduling : bool
         If heat unit scheduling is used for harvesting.
     harvest_heat_fraction : float
@@ -195,6 +198,7 @@ class CropData:
     # Management variables
     planting_year: int = 0
     planting_day: int = 100
+    lignin_dry_matter_percentage: float = 1.518
     use_heat_scheduling: bool = False
     harvest_heat_fraction: float = 1.10
 
