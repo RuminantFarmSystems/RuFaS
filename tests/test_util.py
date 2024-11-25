@@ -978,3 +978,15 @@ def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected
     else:
         Utility.validate_pattern_parameters(name, skip, repeat)
         assert True
+
+
+@pytest.mark.parametrize(
+    "values, expected",
+    [
+        ([5, 3, 5, 2], True),
+        ([5, 3, 5, -2], False),
+        ([5], True)
+    ],
+)
+def test_determine_if_all_non_negative_values(values: List[Any], expected: bool) -> None:
+    assert Utility.determine_if_all_non_negative_values(values) == expected

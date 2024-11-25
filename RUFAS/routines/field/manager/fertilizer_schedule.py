@@ -124,25 +124,25 @@ class FertilizerSchedule(Schedule):
         if not valid_days:
             raise ValueError(error_header + f"expected all days to be in range [1, 366], received '{self.days}'.")
 
-        valid_nitrogen_masses = self._determine_if_all_non_negative_values(self.nitrogen_masses)
+        valid_nitrogen_masses = Utility.determine_if_all_non_negative_values(self.nitrogen_masses)
         if not valid_nitrogen_masses:
             raise ValueError(
                 error_header + f"expected all nitrogen masses to be in >= 0, received " f"'{self.nitrogen_masses}'."
             )
 
-        valid_phosphorus_masses = self._determine_if_all_non_negative_values(self.phosphorus_masses)
+        valid_phosphorus_masses = Utility.determine_if_all_non_negative_values(self.phosphorus_masses)
         if not valid_phosphorus_masses:
             raise ValueError(
                 error_header + f"expected all phosphorus masses to be >= 0, received " f"'{self.phosphorus_masses}'."
             )
 
-        valid_potassium_masses = self._determine_if_all_non_negative_values(self.potassium_masses)
+        valid_potassium_masses = Utility.determine_if_all_non_negative_values(self.potassium_masses)
         if not valid_potassium_masses:
             raise ValueError(
                 error_header + f"expected all potassium masses to be >= 0, received '{self.potassium_masses}'."
             )
 
-        valid_depths = self._determine_if_all_non_negative_values(self.application_depths)
+        valid_depths = Utility.determine_if_all_non_negative_values(self.application_depths)
         if not valid_depths:
             raise ValueError(
                 error_header + f"expected all application depths to be >= 0, received " f"'{self.application_depths}'."
@@ -219,21 +219,3 @@ class FertilizerSchedule(Schedule):
             )
             fertilizer_events.append(new_event)
         return fertilizer_events
-
-    @staticmethod
-    def _determine_if_all_non_negative_values(values: List[Any]) -> bool:
-        """
-        Checks that all values in a list are >= 0.
-
-        Parameters
-        ----------
-        values : List[Any]
-            List of values to be checked.
-
-        Returns
-        -------
-        bool
-            True if all values are >= 0, False otherwise.
-
-        """
-        return all(value >= 0 for value in values)
