@@ -69,8 +69,8 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
             [0.5],
             ["disk-harrow"],
             "'test_6':  Mismatch in length of parameters. Provided parameters are: "
-            'years=[1990], days=[150, 200], tillage_depths=[100], '
-            'incorporation_fractions=[0.5], mixing_fractions=[0.5], '
+            "years=[1990], days=[150, 200], tillage_depths=[100], "
+            "incorporation_fractions=[0.5], mixing_fractions=[0.5], "
             "implements=[<TillageImplement.DISK_HARROW: 'disk-harrow'>]. Lengths are: "
             "{'years': 1, 'days': 2, 'tillage_depths': 1, 'incorporation_fractions': 1, "
             "'mixing_fractions': 1, 'implements': 1}.",

@@ -41,21 +41,19 @@ def test_validate_years(years: List[int], expected: bool) -> None:
 
 def test_validate_equal_lengths_valid() -> None:
     """Test that the validation for valid parameter length are valid."""
-    assert Schedule.validate_equal_lengths("valid tests",
-                                           year=[2023, 2024, 2025],
-                                           day=[1, 3, 64],
-                                           depth=[1.1, 1.2, 5.2])
+    assert Schedule.validate_equal_lengths(
+        "valid tests", year=[2023, 2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2, 5.2]
+    )
 
 
 def test_validate_equal_lengths_invalid() -> None:
     """Test that the validation for invalid parameter length are valid."""
     try:
-        Schedule.validate_equal_lengths("invalid tests",
-                                        year=[2023, 2024, 2025],
-                                        day=[1, 3, 64],
-                                        depth=[1.1, 1.2])
+        Schedule.validate_equal_lengths("invalid tests", year=[2023, 2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2])
         assert False
     except ValueError as e:
-        assert e.args[0] == ("invalid tests Mismatch in length of parameters. Provided parameters are: year=[2023, "
-                             "2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2]. Lengths are: {'year': 3, 'day': 3, "
-                             "'depth': 2}.")
+        assert e.args[0] == (
+            "invalid tests Mismatch in length of parameters. Provided parameters are: year=[2023, "
+            "2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2]. Lengths are: {'year': 3, 'day': 3, "
+            "'depth': 2}."
+        )

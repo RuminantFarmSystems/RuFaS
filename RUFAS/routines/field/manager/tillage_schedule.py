@@ -111,23 +111,25 @@ class TillageSchedule(Schedule):
         if not valid_incorp_fractions:
             raise ValueError(
                 error_header + f"expected all incorporation fractions to be in range [0.0, 1.0], received "
-                               f"'{self.incorporation_fractions}'."
+                f"'{self.incorporation_fractions}'."
             )
 
         valid_mix_fractions = Utility.validate_fractions(self.mixing_fractions)
         if not valid_mix_fractions:
             raise ValueError(
                 error_header + f"expected all mixing fractions to be in range [0.0, 1.0], received "
-                               f"'{self.mixing_fractions}'."
+                f"'{self.mixing_fractions}'."
             )
 
-        self.validate_equal_lengths(error_header,
-                                    years=self.years,
-                                    days=self.days,
-                                    tillage_depths=self.tillage_depths,
-                                    incorporation_fractions=self.incorporation_fractions,
-                                    mixing_fractions=self.mixing_fractions,
-                                    implements=self.implements)
+        self.validate_equal_lengths(
+            error_header,
+            years=self.years,
+            days=self.days,
+            tillage_depths=self.tillage_depths,
+            incorporation_fractions=self.incorporation_fractions,
+            mixing_fractions=self.mixing_fractions,
+            implements=self.implements,
+        )
 
     def generate_tillage_events(self) -> List[TillageEvent]:
         """
