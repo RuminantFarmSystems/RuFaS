@@ -123,15 +123,17 @@ class FertilizerSchedule(Schedule):
 
         self.validate_parameters(non_negative_parameters, fraction_parameters)
 
-        self.validate_equal_lengths(error_header,
-                                    years=self.years,
-                                    days=self.days,
-                                    mix_names=self.mix_names,
-                                    nitrogen_masses=self.nitrogen_masses,
-                                    phosphorus_masses=self.phosphorus_masses,
-                                    potassium_masses=self.potassium_masses,
-                                    application_depths=self.application_depths,
-                                    surface_remainder_fractions=self.surface_remainder_fractions)
+        self.validate_equal_lengths(
+            error_header,
+            years=self.years,
+            days=self.days,
+            mix_names=self.mix_names,
+            nitrogen_masses=self.nitrogen_masses,
+            phosphorus_masses=self.phosphorus_masses,
+            potassium_masses=self.potassium_masses,
+            application_depths=self.application_depths,
+            surface_remainder_fractions=self.surface_remainder_fractions,
+        )
 
     def generate_fertilizer_events(self) -> List[FertilizerEvent]:
         """
