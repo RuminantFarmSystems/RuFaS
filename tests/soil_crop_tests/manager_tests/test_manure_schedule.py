@@ -68,8 +68,7 @@ from RUFAS.data_structures.manure_types import ManureType
             [1.05],
             [0.0],
             [1.0],
-            "'test_5': expected all field coverages to be in range [0.0, 1.0], received "
-            "'[1.05]'.",
+            "'test_5': expected all field coverages to be in range [0.0, 1.0], received " "'[1.05]'.",
         ),
         (
             "test_6",
