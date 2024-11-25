@@ -155,24 +155,15 @@ class FertilizerSchedule(Schedule):
                 f"received '{self.surface_remainder_fractions}'."
             )
 
-        equal_fertilizer_parameters = (
-            len(self.years)
-            == len(self.days)
-            == len(self.mix_names)
-            == len(self.nitrogen_masses)
-            == len(self.phosphorus_masses)
-            == len(self.potassium_masses)
-            == len(self.application_depths)
-            == len(self.surface_remainder_fractions)
-        )
-        if not equal_fertilizer_parameters:
-            raise ValueError(
-                error_header + f"expected equal numbers of fertilizer application parameters, received "
-                f"'{self.years}' years, '{self.days}' days, '{self.mix_names}' mix names, "
-                f"'{self.nitrogen_masses}' nitrogen masses, '{self.phosphorus_masses}' "
-                f"phosphorus masses, '{self.potassium_masses}' potassium masses, '{self.application_depths}' "
-                f"application depths, and '{self.surface_remainder_fractions}' surface remainder fractions."
-            )
+        self.validate_equal_lengths(error_header,
+                                    years=self.years,
+                                    days=self.days,
+                                    mix_names=self.mix_names,
+                                    nitrogen_masses=self.nitrogen_masses,
+                                    phosphorus_masses=self.phosphorus_masses,
+                                    potassium_masses=self.potassium_masses,
+                                    application_depths=self.application_depths,
+                                    surface_remainder_fractions=self.surface_remainder_fractions)
 
     def generate_fertilizer_events(self) -> List[FertilizerEvent]:
         """

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Iterable
 
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
@@ -166,3 +166,34 @@ class Schedule:
 
         """
         return all(depth > 0.0 for depth in depths)
+
+    @staticmethod
+    def validate_equal_lengths(header: str, **kwargs) -> bool:
+        """
+        Validates that all provided iterables have the same length.
+
+        Parameters
+        ----------
+        header: str
+            Error header when needs to throw an error.
+        kwargs : list of iterables
+            The iterables to check for length equality.
+
+        Returns
+        -------
+        bool
+            True if all lengths are equal.
+
+        Raises
+        ------
+        ValueError
+            If the lengths of the provided iterables are not all equal.
+        """
+        lengths = {key: len(value) for key, value in kwargs.items()}
+        if len(set(lengths.values())) != 1:
+            raise ValueError(
+                f"{header} Mismatch in length of parameters. "
+                f"Provided parameters are: {', '.join(f'{key}={value}' for key, value in kwargs.items())}. "
+                f"Lengths are: {lengths}."
+            )
+        return True
