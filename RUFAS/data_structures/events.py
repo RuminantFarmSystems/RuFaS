@@ -123,7 +123,7 @@ class HarvestEvent(BaseFieldManagementEvent):
         crop_reference: str,
         year: int = 1,
         day: int = 240,
-        operation: HarvestOperation = HarvestOperation.HARVEST_KILL
+        operation: HarvestOperation = HarvestOperation.HARVEST_KILL,
     ):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference

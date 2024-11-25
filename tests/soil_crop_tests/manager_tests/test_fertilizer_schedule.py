@@ -94,7 +94,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             "'test_7':  Mismatch in length of parameters. Provided parameters are: "
             "years=[1999, 2000, 2001], days=[100, 100, 100], mix_names=['mix_5', 'mix_5', "
             "'mix_5'], nitrogen_masses=[15, 15], phosphorus_masses=[10, 10, 10], "
-            'potassium_masses=[10, 10, 10], application_depths=[0.0, 0.0, 0.0], '
+            "potassium_masses=[10, 10, 10], application_depths=[0.0, 0.0, 0.0], "
             "surface_remainder_fractions=[1.0, 1.0, 1.0]. Lengths are: {'years': 3, "
             "'days': 3, 'mix_names': 3, 'nitrogen_masses': 2, 'phosphorus_masses': 3, "
             "'potassium_masses': 3, 'application_depths': 3, "
