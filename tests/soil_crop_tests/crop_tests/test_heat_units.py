@@ -17,7 +17,7 @@ from RUFAS.routines.field.crop.heat_units import HeatUnits
         (13.77, 29.9),  # arbitrary
     ],
 )
-def test_determine_new_heat_units(temp, min_t):
+def test_determine_new_heat_units(temp: float, min_t: float) -> None:
     """check that new heat units are correctly calculated by calc_new_heat_units()"""
     diff = temp - min_t
     if diff < 0:
@@ -28,7 +28,7 @@ def test_determine_new_heat_units(temp, min_t):
 
 
 @pytest.mark.parametrize("air,plant", [(100, 50), (50, 100), (100, 100)])
-def test_determine_minimum_heat_unit_temperature(air, plant):
+def test_determine_minimum_heat_unit_temperature(air: float, plant: float) -> None:
     """check that minimum heat units are properly calculated by calc_minimum_heat_unit_temperature()"""
     if air < plant:
         expect = plant
@@ -38,7 +38,7 @@ def test_determine_minimum_heat_unit_temperature(air, plant):
 
 
 @pytest.mark.parametrize("air,plant", [(100, 50), (50, 100), (100, 100)])
-def test_determine_maximum_heat_unit_temperature(air, plant):
+def test_determine_maximum_heat_unit_temperature(air: float, plant: float) -> None:
     """check that maximum heat units are properly calculated by calc_maximum_heat_unit_temperature()"""
     if air > plant:
         expect = plant
@@ -58,7 +58,8 @@ def test_determine_maximum_heat_unit_temperature(air, plant):
         (False, None, None, None),
     ],
 )
-def test_check_absorb_heat_for_input_errors(use_alt, meant, min_t, max_t):
+def test_check_absorb_heat_for_input_errors(use_alt: bool, meant: float | None, min_t: float | None,
+                                            max_t: float | None) -> None:
     """check that errors are thrown when improper input is given, using _check_absorb_heat_for_input_errors"""
     data = CropData()
     heat = HeatUnits(data, use_heat_unit_temperature=use_alt)
@@ -67,7 +68,7 @@ def test_check_absorb_heat_for_input_errors(use_alt, meant, min_t, max_t):
 
 
 @pytest.mark.parametrize("temp", [0, 20.5, None])
-def test_accumulate_heat_units(temp, mocker: MockerFixture):
+def test_accumulate_heat_units(temp: float | None, mocker: MockerFixture) -> None:
     """check that accumulate_heat_units() calls the right functions"""
     patch_a = mocker.patch("RUFAS.routines.field.crop.heat_units.HeatUnits.assign_new_heat_units")
     patch_b = mocker.patch("RUFAS.routines.field.crop.heat_units.HeatUnits.add_heat_units")
@@ -94,7 +95,7 @@ def test_accumulate_heat_units(temp, mocker: MockerFixture):
         (False, None),
     ],
 )
-def test_assign_new_heat_units(use_alt, temp):
+def test_assign_new_heat_units(use_alt: bool, temp: float | None) -> None:
     """check that assign_new_heat_units properly assigns heat units"""
     data = CropData(
         minimum_temperature=15,
@@ -112,7 +113,7 @@ def test_assign_new_heat_units(use_alt, temp):
 
 
 @pytest.mark.parametrize("start,new", [(0, 0), (0, 1), (1, 1), (0, 135.6), (18.55, 1002.5)])
-def test_add_heat_units(start, new):
+def test_add_heat_units(start: float, new: float) -> None:
     """check that heat units are accumulated properly"""
     data = CropData(accumulated_heat_units=start)
     heat = HeatUnits(data, new_heat_units=new)
@@ -136,7 +137,7 @@ def test_add_heat_units(start, new):
         (26, 18, 14, False),  # Same as above
     ],
 )
-def test_absorb_heat_units(mean, mint, maxt, use_heat_unit_temp):
+def test_absorb_heat_units(mean: float | None, mint: float, maxt: float, use_heat_unit_temp: bool) -> None:
     data = CropData(
         minimum_temperature=20,
     )

@@ -18,7 +18,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
         (133.26, 149.4),  # arbitrary
     ],
 )
-def test_shift_phosphorus_time(old, new):
+def test_shift_phosphorus_time(old: float | None, new: float) -> None:
     """ensure shift_phosphorus_time correctly copies current phosphorus value to previous_phosphorus"""
     data = CropData(phosphorus=new)
     incorp = PhosphorusIncorporation(data, previous_phosphorus=old)
@@ -35,7 +35,8 @@ def test_shift_phosphorus_time(old, new):
         (28.4, [18.2, 21.6, 100.4], [3, 0]),
     ],
 )
-def test_phosphorus_determine_deepest_accessible_soil_layer(root_depth, depths, expect):
+def test_phosphorus_determine_deepest_accessible_soil_layer(root_depth: float, depths: list[float],
+                                                            expect: list[float]) -> None:
     """ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer"""
     data = CropData(root_depth=root_depth)
     incorp = PhosphorusIncorporation(data)
@@ -55,7 +56,7 @@ def test_phosphorus_determine_deepest_accessible_soil_layer(root_depth, depths, 
         (2, [22.5, 80.6, 100.0, 199.9]),  # arbitrary list
     ],
 )
-def test_access_layers(deepest, layers):
+def test_access_layers(deepest: float, layers: list[float]) -> None:
     """check that soil layers are accessed correctly with access_layers()"""
     data = CropData(accessible_soil_layers=deepest)
     incorp = PhosphorusIncorporation(data)
@@ -75,7 +76,7 @@ def test_access_layers(deepest, layers):
         ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
     ],
 )
-def test_cd_phosphorus_from_soil_layers(uptakes, phosphates):
+def test_cd_phosphorus_from_soil_layers(uptakes: list[float], phosphates: list[float]) -> None:
     """check that layer_nitrates were correctly updated by extract_phosphorus_from_soil_layers"""
     nitrates_copy = phosphates.copy()
     data = CropData()
@@ -97,7 +98,7 @@ def test_cd_phosphorus_from_soil_layers(uptakes, phosphates):
         [15.3, 18.2, 4, 20.33],
     ],
 )
-def test_tally_total_phosphorus_uptake(uptakes):
+def test_tally_total_phosphorus_uptake(uptakes: list[float]) -> None:
     """check that total phosphorus was correctly summed by tally_total_phosphorus_uptake"""
     data = CropData()
     incorp = PhosphorusIncorporation(data, actual_phosphorus_uptakes=uptakes)

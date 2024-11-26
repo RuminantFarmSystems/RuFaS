@@ -682,13 +682,14 @@ def test_add_residue_to_pools(rainfall: float) -> None:
         ),
     ],
 )
-def test_partition_residue(layers: list, crop: CropData, rainfall=10):
+def test_partition_residue(layers: list, crop: CropData) -> None:
     """Testing if main routine correctly updates the attributes"""
     data = SoilData(soil_layers=layers, field_size=1.1)
     crop_management = CropManagement()
     data.plant_surface_residue = crop_management.yield_residue or 0
     data.plant_root_residue = crop.root_biomass or 0
     partition = ResiduePartition(data)
+    rainfall = 10
 
     ResiduePartition._determine_plant_metabolic_active_carbon_usage = MagicMock(return_value=2.1)
     ResiduePartition._determine_plant_metabolic_carbon_amount = MagicMock(return_value=2.4)

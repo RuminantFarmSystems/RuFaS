@@ -13,7 +13,7 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 @pytest.mark.parametrize("pot,avail,wilt", [(1, 2, 3)])
-def test_determine_actual_layer_uptake(pot, avail, wilt):
+def test_determine_actual_layer_uptake(pot: float, avail: float, wilt: float) -> None:
     """checks that layer uptake is correct"""
     if pot > avail - wilt:
         expect = avail - wilt
@@ -23,7 +23,7 @@ def test_determine_actual_layer_uptake(pot, avail, wilt):
 
 
 @pytest.mark.parametrize("pot,avail,cap", [(1, 2, 3), (1, 1, 8)])
-def test_correct_layer_for_efficiency(pot, avail, cap):
+def test_correct_layer_for_efficiency(pot: float, avail: float, cap: float) -> None:
     """checks that layer efficiency is corrected properly"""
     if avail >= cap * 0.25:
         assert WaterUptake._correct_layer_for_efficiency(pot, avail, cap) == pot
@@ -32,7 +32,7 @@ def test_correct_layer_for_efficiency(pot, avail, cap):
 
 
 @pytest.mark.parametrize("max_trans", [5])
-def test_uptake_water(max_trans):
+def test_uptake_water(max_trans: float) -> None:
     """ensure that uptake_water can run without error"""
     # This patch is a quick fix for the mock from NitrogenIncorporation spilling over into this one.
     with patch(
@@ -66,7 +66,7 @@ def test_uptake_water(max_trans):
         ),
     ],
 )
-def test_extract_water_from_soil(layers, uptakes, should_fail: bool) -> None:
+def test_extract_water_from_soil(layers: list[LayerData], uptakes: list[LayerData], should_fail: bool) -> None:
     """This method only tests for edge cases, other parts of the method already have coverage"""
     crop_data = CropData()
     soil_data = SoilData(soil_layers=layers, field_size=3)

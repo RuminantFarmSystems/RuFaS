@@ -12,7 +12,7 @@ from RUFAS.routines.field.crop.water_dynamics import WaterDynamics
     "evap,trans",
     [(0, 0), (0, 1), (1, 0), (1, 0), (-1, 0), (0, -1), (-1, -1), (0.32, 1.357)],
 )
-def test_determine_evapotranspiration(evap, trans):
+def test_determine_evapotranspiration(evap: float, trans: float) -> None:
     """ensure that evapotranspiration is correclty calculated"""
     assert WaterDynamics._determine_evapotranspiration(evap, trans) == evap + trans
 
@@ -30,7 +30,7 @@ def test_determine_evapotranspiration(evap, trans):
         (821.0, 533.53),  # arbitrary evapotranspiration > max_evapotranspiration
     ],
 )
-def test_determine_water_deficiency(et, max_et):
+def test_determine_water_deficiency(et: float, max_et: float) -> None:
     """ensure that water deficiency is properly calculated"""
     if max_et == 0:
         expect = 0
@@ -48,7 +48,7 @@ def test_determine_water_deficiency(et, max_et):
         (2.5, 2.69678),
     ],
 )
-def test_determine_maximum_transpiration(leaf_area_index, potential_evapotrans_adj):
+def test_determine_maximum_transpiration(leaf_area_index: float, potential_evapotrans_adj: float) -> None:
     observe = WaterDynamics._determine_maximum_transpiration(leaf_area_index, potential_evapotrans_adj)
     if leaf_area_index > 3:
         assert observe == potential_evapotrans_adj
