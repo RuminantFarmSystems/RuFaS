@@ -117,8 +117,6 @@ def test_manual_custom_crop_data():
     aspen = CropData(
         name="custom crop: aspen",
         species="aspen",
-        scientific_name="Populus tremuloides",
-        plant_code="PTREM",
         plant_category=PlantCategory("tree"),
         is_nitrogen_fixer=False,
         max_leaf_area_index=5.0,
@@ -127,8 +125,6 @@ def test_manual_custom_crop_data():
     # check that each attribute is set appropriately
     assert aspen.name == "custom crop: aspen"
     assert aspen.species == "aspen"
-    assert aspen.scientific_name == "Populus tremuloides"
-    assert aspen.plant_code == "PTREM"
     assert aspen.plant_category == PlantCategory("tree")
     assert aspen.is_nitrogen_fixer is False
     assert aspen.max_leaf_area_index == 5.0

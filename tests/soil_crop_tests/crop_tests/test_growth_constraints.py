@@ -147,9 +147,8 @@ def test_constrain_growth(
         phosphorus=12.9,
         optimal_phosphorus=31.2,
         minimum_temperature=12.8,
-        optimal_temperature=24.0,
     )
-    gc = GrowthConstraints(data)
+    gc = GrowthConstraints(data, optimal_temperature=24.0)
     water_stress = mocker.patch.object(gc, "_determine_water_stress", return_value=returned_stress)
     temp_stress = mocker.patch.object(gc, "_determine_temperature_stress", return_value=returned_stress)
     nutrient_stress = mocker.patch.object(gc, "_determine_nutrient_stress", return_value=returned_stress)
