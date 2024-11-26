@@ -127,9 +127,7 @@ class CropSchedule(Schedule):
                 f"'{self.planting_days}'."
             )
 
-        self.validate_equal_lengths(self.name,
-                                    planting_years=self.planting_years,
-                                    planting_days=self.planting_days)
+        self.validate_equal_lengths(self.name, planting_years=self.planting_years, planting_days=self.planting_days)
 
     def _validate_harvest_parameters(self) -> None:
         """
@@ -157,10 +155,12 @@ class CropSchedule(Schedule):
                 f"'{self.name}': expected all harvest days to be in range [1, 366], received " f"'{self.harvest_days}'."
             )
 
-        self.validate_equal_lengths(self.name,
-                                    planting_years=self.harvest_years,
-                                    planting_days=self.harvest_days,
-                                    harvest_operations=self.harvest_operations)
+        self.validate_equal_lengths(
+            self.name,
+            planting_years=self.harvest_years,
+            planting_days=self.harvest_days,
+            harvest_operations=self.harvest_operations,
+        )
 
         last_kills = self.harvest_operations[-1] in FINAL_HARVEST_OPERATIONS
         others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
