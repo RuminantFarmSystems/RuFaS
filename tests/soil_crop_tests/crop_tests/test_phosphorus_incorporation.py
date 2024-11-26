@@ -20,10 +20,10 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 )
 def test_shift_phosphorus_time(old, new):
     """ensure shift_phosphorus_time correctly copies current phosphorus value to previous_phosphorus"""
-    data = CropData(previous_phosphorus=old, phosphorus=new)
-    incorp = PhosphorusIncorporation(data)
+    data = CropData(phosphorus=new)
+    incorp = PhosphorusIncorporation(data, previous_phosphorus=old)
     incorp.shift_phosphorus_time()
-    assert data.previous_phosphorus == new
+    assert incorp.previous_phosphorus == new
 
 
 @pytest.mark.parametrize(
@@ -78,8 +78,8 @@ def test_access_layers(deepest, layers):
 def test_cd_phosphorus_from_soil_layers(uptakes, phosphates):
     """check that layer_nitrates were correctly updated by extract_phosphorus_from_soil_layers"""
     nitrates_copy = phosphates.copy()
-    data = CropData(actual_phosphorus_uptakes=uptakes)
-    incorp = PhosphorusIncorporation(data)
+    data = CropData()
+    incorp = PhosphorusIncorporation(data, actual_phosphorus_uptakes=uptakes)
     incorp.extract_phosphorus_from_soil_layers(phosphates)
     remaining = []
 
@@ -99,34 +99,34 @@ def test_cd_phosphorus_from_soil_layers(uptakes, phosphates):
 )
 def test_tally_total_phosphorus_uptake(uptakes):
     """check that total phosphorus was correctly summed by tally_total_phosphorus_uptake"""
-    data = CropData(actual_phosphorus_uptakes=uptakes)
-    incorp = PhosphorusIncorporation(data)
+    data = CropData()
+    incorp = PhosphorusIncorporation(data, actual_phosphorus_uptakes=uptakes)
     incorp.tally_total_phosphorus_uptake()
-    assert data.total_phosphorus_uptake == sum(uptakes)
+    assert incorp.total_phosphorus_uptake == sum(uptakes)
 
 
 @pytest.mark.parametrize("layers", (0, 3))
 def test_extend_phosphate_uptakes_to_full_profile(layers: int) -> None:
     """Checks that the helper method extend_phosphate_uptakes_to_full_profile() does correctly updates the list to the
     right length"""
-    data = CropData(actual_phosphorus_uptakes=[1.0, 2.0, 3.0], inaccessible_soil_layers=layers)
-    incorp = PhosphorusIncorporation(data)
-    pre_actual_phosphorus = data.actual_phosphorus_uptakes
+    data = CropData(inaccessible_soil_layers=layers)
+    incorp = PhosphorusIncorporation(data, actual_phosphorus_uptakes=[1.0, 2.0, 3.0])
+    pre_actual_phosphorus = incorp.actual_phosphorus_uptakes
     incorp.extend_phosphate_uptakes_to_full_profile()
 
     if layers > 0:
         pre_actual_phosphorus += [0] * layers
-        assert data.actual_phosphorus_uptakes == pre_actual_phosphorus
+        assert incorp.actual_phosphorus_uptakes == pre_actual_phosphorus
     else:
-        assert data.actual_phosphorus_uptakes == pre_actual_phosphorus
+        assert incorp.actual_phosphorus_uptakes == pre_actual_phosphorus
 
 
 @pytest.mark.parametrize("depths,phosphates", [([0.5, 1, 10, 20], [0.5, 0.8, 5, 10])])
 def test_uptake_phosphorus(phosphates, depths):
     """check that uptake_phosphorus() correctly called functions and variables were updated as expected"""
     # initialize crop and run method
-    data = CropData(potential_phosphorus_uptake=17.5, root_depth=35.0, phosphorus_distro_param=0.32)
-    incorp = PhosphorusIncorporation(data)
+    data = CropData(root_depth=35.0)
+    incorp = PhosphorusIncorporation(data, potential_phosphorus_uptake=17.5, phosphorus_distro_param=0.32)
 
     # Mock functions
     incorp.find_deepest_accessible_soil_layer = MagicMock(return_value=None)
@@ -157,7 +157,7 @@ def test_uptake_phosphorus(phosphates, depths):
     assert data.phosphorus_requests == [8.9, 9.9, 13.12]
 
     NitrogenIncorporation.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
-    assert data.actual_phosphorus_uptakes == [5.0, 4.0, 2.0]
+    assert incorp.actual_phosphorus_uptakes == [5.0, 4.0, 2.0]
 
     incorp.extend_phosphate_uptakes_to_full_profile.assert_called_once()
     incorp.extract_phosphorus_from_soil_layers.assert_called_once()
@@ -174,12 +174,7 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
     data = CropData(
         half_mature_heat_fraction=0.54,
         mature_heat_fraction=0.99,
-        emergence_phosphorus_fraction=0.71,
-        half_mature_phosphorus_fraction=0.68,
-        near_mature_phosphorus_fraction=0.62,
-        mature_phosphorus_fraction=0.60,
         biomass=122.8,
-        previous_phosphorus=0,
         biomass_growth_max=999,
     )
     soil = SoilData(field_size=1.55)
@@ -188,7 +183,13 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
     soil.set_vectorized_layer_attribute("top_depth", top_depths)
     soil.set_vectorized_layer_attribute("bottom_depth", depths)
     soil.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", phosphates)
-    incorp = PhosphorusIncorporation(data)
+    incorp = PhosphorusIncorporation(
+        data,
+        emergence_phosphorus_fraction=0.71,
+        half_mature_phosphorus_fraction=0.68,
+        mature_phosphorus_fraction=0.60,
+        previous_phosphorus=0,
+    )
 
     # mock intermediate functions
     incorp.shift_phosphorus_time = MagicMock(return_value=None)
@@ -210,7 +211,7 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
     # assertions
     incorp.shift_phosphorus_time.assert_called_once()
     NitrogenIncorporation.determine_nutrient_shape_parameters.assert_called_once_with(0.54, 0.99, 0.71, 0.68, 0.60)
-    assert data.phosphorus_shapes == [1.2, 0.8]
+    assert incorp.phosphorus_shapes == [1.2, 0.8]
 
     NitrogenIncorporation.determine_optimal_nutrient_fraction.assert_called_once_with(0.38, 0.71, 0.60, 1.2, 0.8)
     assert data.optimal_phosphorus_fraction == 0.75
@@ -220,11 +221,11 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
         assert data.optimal_phosphorus == -268
 
         NitrogenIncorporation.determine_potential_nutrient_uptake.assert_not_called()
-        assert data.potential_phosphorus_uptake == 0
+        assert incorp.potential_phosphorus_uptake == 0
     else:
         assert data.optimal_phosphorus == 268
         NitrogenIncorporation.determine_potential_nutrient_uptake.assert_called_once_with(268, 0, 0.60, 999)
-        assert data.potential_phosphorus_uptake == 123.1
+        assert incorp.potential_phosphorus_uptake == 123.1
 
     incorp.uptake_phosphorus.assert_called_once_with(phosphates, depths)
     NitrogenIncorporation.determine_stored_nutrient.assert_called_once()  # should be called_once_with() w/ attr mocked
