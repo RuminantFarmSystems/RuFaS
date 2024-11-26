@@ -1,6 +1,5 @@
 feed_schema = {
     "title": "Feed Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "calf_feeds": {
@@ -15,7 +14,6 @@ feed_schema = {
             },
             "items": {
                 "title": "Calf Feeds Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -24,7 +22,8 @@ feed_schema = {
                 },
                 "minimum": 1,
                 "maximum": 306,
-                "default": 155
+                "default": 155,
+                "type": "number"
             }
         },
         "growing_feeds": {
@@ -39,7 +38,6 @@ feed_schema = {
             },
             "items": {
                 "title": "Growing Feeds Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -47,7 +45,8 @@ feed_schema = {
                     }
                 },
                 "minimum": 1,
-                "maximum": 306
+                "maximum": 306,
+                "type": "number"
             }
         },
         "close_up_feeds": {
@@ -62,7 +61,6 @@ feed_schema = {
             },
             "items": {
                 "title": "Close Up Feeds Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -70,7 +68,8 @@ feed_schema = {
                     }
                 },
                 "minimum": 1,
-                "maximum": 306
+                "maximum": 306,
+                "type": "number"
             }
         },
         "lac_cow_feeds": {
@@ -85,7 +84,6 @@ feed_schema = {
             },
             "items": {
                 "title": "Lac Cow Feeds Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -93,7 +91,8 @@ feed_schema = {
                     }
                 },
                 "minimum": 1,
-                "maximum": 306
+                "maximum": 306,
+                "type": "number"
             }
         },
         "purchased_feeds": {
@@ -108,12 +107,10 @@ feed_schema = {
             },
             "items": {
                 "title": "Purchased Feeds Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "purchased_feed": {
                         "title": "Purchased Feed",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -122,11 +119,11 @@ feed_schema = {
                             "infoText": "No description available"
                         },
                         "minimum": 1,
-                        "maximum": 306
+                        "maximum": 306,
+                        "type": "number"
                     },
                     "purchased_feed_cost": {
                         "title": "Purchased Feed Cost",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -134,9 +131,11 @@ feed_schema = {
                             },
                             "infoText": "Cost of Feed (US dollars/kg DM)"
                         },
-                        "minimum": 0
+                        "minimum": 0,
+                        "type": "number"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "farm_grown_feeds": {
@@ -151,7 +150,6 @@ feed_schema = {
             },
             "items": {
                 "title": "Farm Grown Feeds Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -159,7 +157,8 @@ feed_schema = {
                     }
                 },
                 "minimum": 1,
-                "maximum": 306
+                "maximum": 306,
+                "type": "number"
             }
         },
         "storage_options": {
@@ -174,12 +173,10 @@ feed_schema = {
             },
             "items": {
                 "title": "Storage Options Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "storage_type": {
                         "title": "Storage Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -202,11 +199,11 @@ feed_schema = {
                             "Bale - Uncovered",
                             "Bin"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "moisture": {
                         "title": "Moisture",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -223,11 +220,11 @@ feed_schema = {
                             "Moist Hay",
                             "Dry Hay"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "additive": {
                         "title": "Additive",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -241,11 +238,11 @@ feed_schema = {
                             "nutrient additive",
                             "absorbant"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "packing_density": {
                         "title": "Packing Density",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -255,11 +252,11 @@ feed_schema = {
                         },
                         "minimum": 200,
                         "maximum": 800,
-                        "default": 200
+                        "default": 200,
+                        "type": "number"
                     },
                     "inoculation": {
                         "title": "Inoculation",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -273,11 +270,11 @@ feed_schema = {
                             "heterofermentative",
                             "homofermentative"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "bunk_type": {
                         "title": "Bunk Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -289,7 +286,8 @@ feed_schema = {
                         "enum": [
                             "open_floor"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "ventilation": {
                         "title": "Ventilation",
@@ -306,7 +304,6 @@ feed_schema = {
                     },
                     "removal_rate": {
                         "title": "Removal Rate",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -316,11 +313,11 @@ feed_schema = {
                         },
                         "minimum": 0,
                         "maximum": 20,
-                        "default": 0.5
+                        "default": 0.5,
+                        "type": "number"
                     },
                     "initial_dry_matter": {
                         "title": "Initial Dry Matter",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -330,14 +327,15 @@ feed_schema = {
                         },
                         "minimum": 0,
                         "maximum": 500000,
-                        "default": 1000
+                        "default": 1000,
+                        "type": "number"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "user_defined_ration_percentages": {
             "title": "User Defined Ration Percentages",
-            "type": "object",
             "format": "grid",
             "properties": {
                 "calf": {
@@ -352,12 +350,10 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Calf Element",
-                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
                                 "title": "Feed Type",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -367,11 +363,11 @@ feed_schema = {
                                 },
                                 "minimum": 1,
                                 "maximum": 306,
-                                "default": 155
+                                "default": 155,
+                                "type": "number"
                             },
                             "ration_percentage": {
                                 "title": "Ration Percentage",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -380,9 +376,11 @@ feed_schema = {
                                     "infoText": "Calf Ration Percentage"
                                 },
                                 "minimum": 0,
-                                "maximum": 100
+                                "maximum": 100,
+                                "type": "number"
                             }
-                        }
+                        },
+                        "type": "object"
                     }
                 },
                 "growing": {
@@ -397,12 +395,10 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Growing Element",
-                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
                                 "title": "Feed Type",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -412,11 +408,11 @@ feed_schema = {
                                 },
                                 "minimum": 1,
                                 "maximum": 306,
-                                "default": 1
+                                "default": 1,
+                                "type": "number"
                             },
                             "ration_percentage": {
                                 "title": "Ration Percentage",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -425,9 +421,11 @@ feed_schema = {
                                     "infoText": "Growing Heifers Ration Percentage"
                                 },
                                 "minimum": 0,
-                                "maximum": 100
+                                "maximum": 100,
+                                "type": "number"
                             }
-                        }
+                        },
+                        "type": "object"
                     }
                 },
                 "close_up": {
@@ -442,12 +440,10 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Close Up Element",
-                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
                                 "title": "Feed Type",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -457,11 +453,11 @@ feed_schema = {
                                 },
                                 "minimum": 1,
                                 "maximum": 306,
-                                "default": 1
+                                "default": 1,
+                                "type": "number"
                             },
                             "ration_percentage": {
                                 "title": "Ration Percentage",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -470,9 +466,11 @@ feed_schema = {
                                     "infoText": "Close UP Ration Percentage"
                                 },
                                 "minimum": 0,
-                                "maximum": 100
+                                "maximum": 100,
+                                "type": "number"
                             }
-                        }
+                        },
+                        "type": "object"
                     }
                 },
                 "lac_cow": {
@@ -487,12 +485,10 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Lac Cow Element",
-                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
                                 "title": "Feed Type",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -502,11 +498,11 @@ feed_schema = {
                                 },
                                 "minimum": 1,
                                 "maximum": 306,
-                                "default": 1
+                                "default": 1,
+                                "type": "number"
                             },
                             "ration_percentage": {
                                 "title": "Ration Percentage",
-                                "type": "number",
                                 "options": {
                                     "grid_columns": 12,
                                     "inputAttributes": {
@@ -515,14 +511,15 @@ feed_schema = {
                                     "infoText": "Lactating Cow Ration Percentage"
                                 },
                                 "minimum": 0,
-                                "maximum": 100
+                                "maximum": 100,
+                                "type": "number"
                             }
-                        }
+                        },
+                        "type": "object"
                     }
                 },
                 "tolerance": {
                     "title": "Tolerance",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -531,11 +528,11 @@ feed_schema = {
                         "infoText": "Tolerance -- Allowable +/- percentage variance in each of the defined ration inclusion percentage values"
                     },
                     "minimum": 0,
-                    "maximum": 1
+                    "maximum": 1,
+                    "type": "number"
                 },
                 "milk_reduction_maximum": {
                     "title": "Milk Reduction Maximum",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -544,12 +541,14 @@ feed_schema = {
                         "infoText": "Milk Reduction Maximum -- Allowable amount of milk reduction (kg) when dietary nutrient supply cannot meet animal requirements"
                     },
                     "minimum": 0,
-                    "maximum": 50
+                    "maximum": 50,
+                    "type": "number"
                 }
             },
             "options": {
                 "infoText": "User Defined Ration Percentages"
-            }
+            },
+            "type": "object"
         },
         "fileName": {
             "title": "File Name",
@@ -563,5 +562,6 @@ feed_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }

@@ -127,6 +127,28 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
                     "inputAttributes": {"class": "text-primary form-control"},
                 },
             },
+        ),
+        (
+            "feed_type",
+            {
+                "type": "string",
+                "description": "The general type or category of the feed (group).",
+                "default": "Forage",
+                "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)$",
+                "nullable": True
+            },
+            {
+                "title": "Feed Type",
+                "type": ["string", "null"],
+                "enum": ["one", "two"],
+                "format": "select2",
+                "default": "Forage",
+                "options": {
+                    "infoText": "The general type or category of the feed (group).",
+                    "grid_columns": 12,
+                    "inputAttributes": {"class": "text-primary form-control"},
+                },
+            },
         )
     ],
 )
@@ -139,7 +161,7 @@ def test_create_string_schema(
 ) -> None:
     """Tests that created string schema correctly handles a valid string property."""
     mocked_get_options = mocker.patch.object(dca_updater, "_get_list_of_options", return_value=["one", "two"])
-
+    print("here")
     actual = dca_updater._create_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
@@ -211,10 +233,36 @@ def test_create_string_schema_value_error(
                 "minimum": 0,
                 "maximum": 1_000_000,
                 "default": 0,
+                "nullable": False
             },
             {
                 "title": "Pattern Repeat",
                 "type": "number",
+                "minimum": 0,
+                "maximum": 1_000_000,
+                "default": 0,
+                "options": {
+                    "grid_columns": 12,
+                    "infoText": "Number of times that this crop schedule should be repeated.",
+                    "inputAttributes": {
+                        "class": "text-primary form-control",
+                    },
+                },
+            },
+        ),
+        (
+            "pattern_repeat",
+            {
+                "type": "number",
+                "description": "Number of times that this crop schedule should be repeated.",
+                "minimum": 0,
+                "maximum": 1_000_000,
+                "default": 0,
+                "nullable": True
+            },
+            {
+                "title": "Pattern Repeat",
+                "type": ["number", "null"],
                 "minimum": 0,
                 "maximum": 1_000_000,
                 "default": 0,
@@ -261,6 +309,28 @@ def test_create_number_schema(
                     },
                 },
             },
+        ),
+        (
+            "ventilation",
+            {
+                "type": "bool",
+                "description": "Ventilation -- True if the storage unit has appropriate ventilation.",
+                "default": True,
+                "nullable": True
+            },
+            {
+                "title": "Ventilation",
+                "type": ["boolean", "null"],
+                "default": True,
+                "format": "checkbox",
+                "options": {
+                    "grid_columns": 12,
+                    "infoText": "Ventilation -- True if the storage unit has appropriate ventilation.",
+                    "inputAttributes": {
+                        "class": "text-primary form-control",
+                    },
+                },
+            },
         )
     ],
 )
@@ -281,6 +351,7 @@ def test_create_bool_schema(
             {
                 "type": "array",
                 "description": "Death rate for first, second, third, and later lactations",
+                "nullable": True,
                 "properties": {
                     "type": "number",
                     "description": "Death rate for first, second, third, and later lactations",
@@ -290,7 +361,7 @@ def test_create_bool_schema(
             },
             {
                 "title": "Parity Death Prob",
-                "type": "array",
+                "type": ["array", "null"],
                 "format": "grid",
                 "options": {
                     "infoText": "Death rate for first, second, third, and later lactations",

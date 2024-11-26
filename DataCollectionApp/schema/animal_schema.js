@@ -1,16 +1,13 @@
 animal_schema = {
     "title": "Animal Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "herd_information": {
             "title": "Herd Information",
-            "type": "object",
             "format": "grid",
             "properties": {
                 "calf_num": {
                     "title": "Calf Num",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -19,11 +16,11 @@ animal_schema = {
                         "infoText": "Number of Calves (head) -- The initial number of pre-weaned calves"
                     },
                     "minimum": 2,
-                    "default": 8
+                    "default": 8,
+                    "type": "number"
                 },
                 "heiferI_num": {
                     "title": "Heiferi Num",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -32,11 +29,11 @@ animal_schema = {
                         "infoText": "Number of HeiferI's (head) -- The initial number of heifers that are weaned but not yet bred"
                     },
                     "minimum": 2,
-                    "default": 44
+                    "default": 44,
+                    "type": "number"
                 },
                 "heiferII_num": {
                     "title": "Heiferii Num",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -45,11 +42,11 @@ animal_schema = {
                         "infoText": "Number of HeiferII's (head) -- The initial number of heifers that are either eligible for breeding (based on user-inputted Breeding Start Day for heifers), or in early pregnancy"
                     },
                     "minimum": 2,
-                    "default": 38
+                    "default": 38,
+                    "type": "number"
                 },
                 "heiferIII_num_springers": {
                     "title": "Heiferiii Num Springers",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -58,11 +55,11 @@ animal_schema = {
                         "infoText": "Number of HeiferIII's (head) -- The initial number of close-up heifers (heifers within the user-defined close-up period, i.e. Prefresh Day)"
                     },
                     "minimum": 2,
-                    "default": 5
+                    "default": 5,
+                    "type": "number"
                 },
                 "cow_num": {
                     "title": "Cow Num",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -71,11 +68,11 @@ animal_schema = {
                         "infoText": "Number of Cows (head) -- The initial number of dry and lactating cows."
                     },
                     "minimum": 6,
-                    "default": 100
+                    "default": 100,
+                    "type": "number"
                 },
                 "replace_num": {
                     "title": "Replace Num",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -84,11 +81,11 @@ animal_schema = {
                         "infoText": "Replacements (head) -- Number of replacement animals available in the replacement market"
                     },
                     "minimum": 50,
-                    "default": 5000
+                    "default": 5000,
+                    "type": "number"
                 },
                 "herd_num": {
                     "title": "Herd Num",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -97,11 +94,11 @@ animal_schema = {
                         "infoText": "Herd Number (head) -- The target number of dry and lactating cows on the farm"
                     },
                     "minimum": 6,
-                    "default": 100
+                    "default": 100,
+                    "type": "number"
                 },
                 "breed": {
                     "title": "Breed",
-                    "type": "string",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -114,16 +111,15 @@ animal_schema = {
                         "HO",
                         "JE"
                     ],
-                    "format": "select2"
+                    "format": "select2",
+                    "type": "string"
                 },
                 "parity_fractions": {
                     "title": "Parity Fractions",
-                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "1": {
                             "title": "1",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -132,11 +128,12 @@ animal_schema = {
                                 "infoText": "No description available"
                             },
                             "minimum": 0.0,
-                            "maximum": 1.0
+                            "maximum": 1.0,
+                            "default": 0.346,
+                            "type": "number"
                         },
                         "2": {
                             "title": "2",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -145,11 +142,12 @@ animal_schema = {
                                 "infoText": "No description available"
                             },
                             "minimum": 0.0,
-                            "maximum": 1.0
+                            "maximum": 1.0,
+                            "default": 0.272,
+                            "type": "number"
                         },
                         "3": {
                             "title": "3",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -158,16 +156,18 @@ animal_schema = {
                                 "infoText": "No description available"
                             },
                             "minimum": 0.0,
-                            "maximum": 1.0
+                            "maximum": 1.0,
+                            "default": 0.379,
+                            "type": "number"
                         }
                     },
                     "options": {
                         "infoText": "Fractions of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these fractions must be 1.0"
-                    }
+                    },
+                    "type": "object"
                 },
                 "annual_milk_yield": {
                     "title": "Annual Milk Yield",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -175,21 +175,24 @@ animal_schema = {
                         },
                         "infoText": "The total milk yield generated by the farm in one year (kg). If this information is not available, it can be input as null"
                     },
-                    "minimum": 0
+                    "minimum": 0,
+                    "type": [
+                        "number",
+                        "null"
+                    ]
                 }
             },
             "options": {
                 "infoText": "Herd Demographics"
-            }
+            },
+            "type": "object"
         },
         "herd_initialization": {
             "title": "Herd Initialization",
-            "type": "object",
             "format": "grid",
             "properties": {
                 "initial_animal_num": {
                     "title": "Initial Animal Num",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -198,11 +201,11 @@ animal_schema = {
                         "infoText": "The initial number of animals for the simulation starting with to generate the herd"
                     },
                     "minimum": 0,
-                    "default": 10000
+                    "default": 10000,
+                    "type": "number"
                 },
                 "simulation_days": {
                     "title": "Simulation Days",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -211,26 +214,25 @@ animal_schema = {
                         "infoText": "The number of days to simulate for generating the herd"
                     },
                     "minimum": 0,
-                    "default": 5000
+                    "default": 5000,
+                    "type": "number"
                 }
             },
             "options": {
                 "infoText": "Animal generation related inputs"
-            }
+            },
+            "type": "object"
         },
         "animal_config": {
             "title": "Animal Config",
-            "type": "object",
             "format": "grid",
             "properties": {
                 "management_decisions": {
                     "title": "Management Decisions",
-                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "breeding_start_day_h": {
                             "title": "Breeding Start Day H",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -239,11 +241,11 @@ animal_schema = {
                                 "infoText": "Heifer Breeding Start Day (days) -- Days old when RuFaS initiates estrus protocol (first cycle to occur ~21 days later)"
                             },
                             "minimum": 0,
-                            "default": 380
+                            "default": 380,
+                            "type": "number"
                         },
                         "heifer_repro_method": {
                             "title": "Heifer Repro Method",
-                            "type": "string",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -257,11 +259,11 @@ animal_schema = {
                                 "ED",
                                 "SynchED"
                             ],
-                            "format": "select2"
+                            "format": "select2",
+                            "type": "string"
                         },
                         "cow_repro_method": {
                             "title": "Cow Repro Method",
-                            "type": "string",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -275,11 +277,11 @@ animal_schema = {
                                 "ED",
                                 "ED-TAI"
                             ],
-                            "format": "select2"
+                            "format": "select2",
+                            "type": "string"
                         },
                         "semen_type": {
                             "title": "Semen Type",
-                            "type": "string",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -292,11 +294,11 @@ animal_schema = {
                                 "sexed",
                                 "conventional"
                             ],
-                            "format": "select2"
+                            "format": "select2",
+                            "type": "string"
                         },
                         "days_in_preg_when_dry": {
                             "title": "Days In Preg When Dry",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -305,11 +307,11 @@ animal_schema = {
                                 "infoText": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off"
                             },
                             "minimum": 1,
-                            "default": 218
+                            "default": 218,
+                            "type": "number"
                         },
                         "heifer_repro_cull_time": {
                             "title": "Heifer Repro Cull Time",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -318,11 +320,11 @@ animal_schema = {
                                 "infoText": "Heifer Reproduction Cull Time (days) -- Days old when a heifer would be culled for failure to become pregnant"
                             },
                             "minimum": 0,
-                            "default": 500
+                            "default": 500,
+                            "type": "number"
                         },
                         "do_not_breed_time": {
                             "title": "Do Not Breed Time",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -331,11 +333,11 @@ animal_schema = {
                                 "infoText": "Cow Do Not Breed Time (days) -- The length of the breeding period after parturition for cows after which reproduction protocols stop if they fail to get pregnant"
                             },
                             "minimum": 0,
-                            "default": 185
+                            "default": 185,
+                            "type": "number"
                         },
                         "cull_milk_production": {
                             "title": "Cull Milk Production",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -344,11 +346,11 @@ animal_schema = {
                                 "infoText": "Cull Milk Production (kg/d) -- Milk production threshold at which 'do not breed' cows are culled if they fall below"
                             },
                             "minimum": 0,
-                            "default": 30
+                            "default": 30,
+                            "type": "number"
                         },
                         "cow_times_milked_per_day": {
                             "title": "Cow Times Milked Per Day",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -357,11 +359,11 @@ animal_schema = {
                                 "infoText": "Number of Milkings (per day) -- The average or most common number of times cows are milked per day (1, 2, or 3 times daily)"
                             },
                             "minimum": 0,
-                            "default": 3
+                            "default": 3,
+                            "type": "number"
                         },
                         "milk_fat_percent": {
                             "title": "Milk Fat Percent",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -370,11 +372,11 @@ animal_schema = {
                                 "infoText": "Milk Fat Percent (percent) -- The average or most common milk fat percentage in cow milk"
                             },
                             "minimum": 0,
-                            "default": 3.5
+                            "default": 3.5,
+                            "type": "number"
                         },
                         "milk_protein_percent": {
                             "title": "Milk Protein Percent",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -383,26 +385,25 @@ animal_schema = {
                                 "infoText": "Milk Protein Percent (percent) -- The average or most common milk protein percentage in cow milk"
                             },
                             "minimum": 0,
-                            "default": 3.2
+                            "default": 3.2,
+                            "type": "number"
                         }
                     },
                     "options": {
                         "infoText": "General Management"
-                    }
+                    },
+                    "type": "object"
                 },
                 "farm_level": {
                     "title": "Farm Level",
-                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "calf": {
                             "title": "Calf",
-                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "male_calf_rate_sexed_semen": {
                                     "title": "Male Calf Rate Sexed Semen",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -412,11 +413,11 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 1,
-                                    "default": 0.1
+                                    "default": 0.1,
+                                    "type": "number"
                                 },
                                 "male_calf_rate_conventional_semen": {
                                     "title": "Male Calf Rate Conventional Semen",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -426,11 +427,11 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 1,
-                                    "default": 0.53
+                                    "default": 0.53,
+                                    "type": "number"
                                 },
                                 "keep_female_calf_rate": {
                                     "title": "Keep Female Calf Rate",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -440,11 +441,11 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 1,
-                                    "default": 1
+                                    "default": 1,
+                                    "type": "number"
                                 },
                                 "wean_day": {
                                     "title": "Wean Day",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -453,11 +454,11 @@ animal_schema = {
                                         "infoText": "Wean Day (days) -- The days of age at which calves are fully weaned from milk or milk replacer"
                                     },
                                     "minimum": 0,
-                                    "default": 60
+                                    "default": 60,
+                                    "type": "number"
                                 },
                                 "wean_length": {
                                     "title": "Wean Length",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -466,11 +467,11 @@ animal_schema = {
                                         "infoText": "Wean Length (days) -- Length of the weaning process"
                                     },
                                     "minimum": 1,
-                                    "default": 7
+                                    "default": 7,
+                                    "type": "number"
                                 },
                                 "milk_type": {
                                     "title": "Milk Type",
-                                    "type": "string",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -483,21 +484,21 @@ animal_schema = {
                                         "whole",
                                         "replacer"
                                     ],
-                                    "format": "select2"
+                                    "format": "select2",
+                                    "type": "string"
                                 }
                             },
                             "options": {
                                 "infoText": "Calf Management"
-                            }
+                            },
+                            "type": "object"
                         },
                         "repro": {
                             "title": "Repro",
-                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "voluntary_waiting_period": {
                                     "title": "Voluntary Waiting Period",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -506,11 +507,11 @@ animal_schema = {
                                         "infoText": "Voluntary Waiting Period (days) -- When the cow's days in milk has reached this day, monitoring for estrus and subsequent breeding, if found, will begin. Used only in the ED and ED-TAI protocols. When TAI protocol is used, this value will be ignored, and it is recommended to set it to 0."
                                     },
                                     "minimum": 0,
-                                    "default": 50
+                                    "default": 50,
+                                    "type": "number"
                                 },
                                 "conception_rate_decrease": {
                                     "title": "Conception Rate Decrease",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -520,7 +521,8 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 0.1,
-                                    "default": 0.026
+                                    "default": 0.026,
+                                    "type": "number"
                                 },
                                 "decrease_conception_rate_in_rebreeding": {
                                     "title": "Decrease Conception Rate In Rebreeding",
@@ -550,7 +552,6 @@ animal_schema = {
                                 },
                                 "avg_gestation_len": {
                                     "title": "Avg Gestation Len",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -559,11 +560,11 @@ animal_schema = {
                                         "infoText": "Average Gestation Length (days) -- Average length of gestation"
                                     },
                                     "minimum": 0,
-                                    "default": 278
+                                    "default": 278,
+                                    "type": "number"
                                 },
                                 "std_gestation_len": {
                                     "title": "Std Gestation Len",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -572,11 +573,11 @@ animal_schema = {
                                         "infoText": "Gestation Length Standard Deviation (days) -- Standard deviation of gestation length"
                                     },
                                     "minimum": 0,
-                                    "default": 6
+                                    "default": 6,
+                                    "type": "number"
                                 },
                                 "prefresh_day": {
                                     "title": "Prefresh Day",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -585,11 +586,11 @@ animal_schema = {
                                         "infoText": "Prefresh Day -- days prior to calving at which pregnant animals enter the close-up period (i.e., the length of the close-up period)"
                                     },
                                     "minimum": 0,
-                                    "default": 30
+                                    "default": 30,
+                                    "type": "number"
                                 },
                                 "calving_interval": {
                                     "title": "Calving Interval",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -598,16 +599,15 @@ animal_schema = {
                                         "infoText": "Calving Interval (days) -- Current average calving interval, used for initial bodyweight adjustment and other calculations"
                                     },
                                     "minimum": 1,
-                                    "default": 400
+                                    "default": 400,
+                                    "type": "number"
                                 },
                                 "heifers": {
                                     "title": "Heifers",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "estrus_detection_rate": {
                                             "title": "Estrus Detection Rate",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -617,11 +617,11 @@ animal_schema = {
                                             },
                                             "minimum": 0,
                                             "maximum": 1,
-                                            "default": 0.6
+                                            "default": 0.6,
+                                            "type": "number"
                                         },
                                         "estrus_conception_rate": {
                                             "title": "Estrus Conception Rate",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -631,11 +631,11 @@ animal_schema = {
                                             },
                                             "minimum": 0,
                                             "maximum": 1,
-                                            "default": 0.9
+                                            "default": 0.9,
+                                            "type": "number"
                                         },
                                         "repro_sub_protocol": {
                                             "title": "Repro Sub Protocol",
-                                            "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -651,16 +651,15 @@ animal_schema = {
                                                 "CP",
                                                 "N/A"
                                             ],
-                                            "format": "select2"
+                                            "format": "select2",
+                                            "type": "string"
                                         },
                                         "repro_sub_properties": {
                                             "title": "Repro Sub Properties",
-                                            "type": "object",
                                             "format": "grid",
                                             "properties": {
                                                 "conception_rate": {
                                                     "title": "Conception Rate",
-                                                    "type": "number",
                                                     "options": {
                                                         "grid_columns": 12,
                                                         "inputAttributes": {
@@ -670,11 +669,11 @@ animal_schema = {
                                                     },
                                                     "minimum": 0,
                                                     "maximum": 1,
-                                                    "default": 0.6
+                                                    "default": 0.6,
+                                                    "type": "number"
                                                 },
                                                 "estrus_detection_rate": {
                                                     "title": "Estrus Detection Rate",
-                                                    "type": "number",
                                                     "options": {
                                                         "grid_columns": 12,
                                                         "inputAttributes": {
@@ -684,23 +683,24 @@ animal_schema = {
                                                     },
                                                     "minimum": 0,
                                                     "maximum": 1,
-                                                    "default": 0.7
+                                                    "default": 0.7,
+                                                    "type": "number"
                                                 }
-                                            }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "options": {
                                         "infoText": "Heifer Reproduction Protocols"
-                                    }
+                                    },
+                                    "type": "object"
                                 },
                                 "cows": {
                                     "title": "Cows",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "estrus_detection_rate": {
                                             "title": "Estrus Detection Rate",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -710,11 +710,11 @@ animal_schema = {
                                             },
                                             "minimum": 0,
                                             "maximum": 1,
-                                            "default": 0.6
+                                            "default": 0.6,
+                                            "type": "number"
                                         },
                                         "ED_conception_rate": {
                                             "title": "Ed Conception Rate",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -724,11 +724,11 @@ animal_schema = {
                                             },
                                             "minimum": 0,
                                             "maximum": 1,
-                                            "default": 0.6
+                                            "default": 0.6,
+                                            "type": "number"
                                         },
                                         "presynch_program": {
                                             "title": "Presynch Program",
-                                            "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -743,11 +743,11 @@ animal_schema = {
                                                 "G6G",
                                                 "None"
                                             ],
-                                            "format": "select2"
+                                            "format": "select2",
+                                            "type": "string"
                                         },
                                         "presynch_program_start_day": {
                                             "title": "Presynch Program Start Day",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -756,11 +756,11 @@ animal_schema = {
                                                 "infoText": "The presynch program start day is the day of the first hormone injection in a presynch program used in the TAI protocol. When a presynch program is followed by an OvSynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. The durations of the 3 options - PreSynch, Double OvSynch, and G6G, are 25, 16, and 8 days, respectively. Because the presynch program is only supported in TAI protocol, this value will be ignored when other protocols such as ED or ED-TAI are used, and it is recommended to set it to 0."
                                             },
                                             "minimum": 0,
-                                            "default": 50
+                                            "default": 50,
+                                            "type": "number"
                                         },
                                         "ovsynch_program": {
                                             "title": "Ovsynch Program",
-                                            "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -776,11 +776,11 @@ animal_schema = {
                                                 "5d CoSynch",
                                                 "None"
                                             ],
-                                            "format": "select2"
+                                            "format": "select2",
+                                            "type": "string"
                                         },
                                         "ovsynch_program_start_day": {
                                             "title": "Ovsynch Program Start Day",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -789,11 +789,11 @@ animal_schema = {
                                                 "infoText": "When set properly in the TAI protocol, OvSynch program start day is the day of the first GnRH injection in an OvSynch program. When the OvSynch program follows a presynch program, the start day of the OvSynch program should be on or after the last day of the presynch program. Otherwise, the OvSynch program will be shifted to start on the last day of the presynch program. When ED-TAI protocol is used and no estrus detected between the end of the voluntary waiting period and this OvSynch program start day, then the OvSynch program will start on this day. When the ED protocol is used, this value will be ignored, and it is recommended to set it to 0."
                                             },
                                             "minimum": 0,
-                                            "default": 70
+                                            "default": 70,
+                                            "type": "number"
                                         },
                                         "ovsynch_program_conception_rate": {
                                             "title": "Ovsynch Program Conception Rate",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -803,11 +803,11 @@ animal_schema = {
                                             },
                                             "minimum": 0,
                                             "maximum": 1,
-                                            "default": 0.6
+                                            "default": 0.6,
+                                            "type": "number"
                                         },
                                         "resynch_program": {
                                             "title": "Resynch Program",
-                                            "type": "string",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -822,23 +822,24 @@ animal_schema = {
                                                 "PGFatPD",
                                                 "None"
                                             ],
-                                            "format": "select2"
+                                            "format": "select2",
+                                            "type": "string"
                                         }
-                                    }
+                                    },
+                                    "type": "object"
                                 }
                             },
                             "options": {
                                 "infoText": "Repro Management"
-                            }
+                            },
+                            "type": "object"
                         },
                         "bodyweight": {
                             "title": "Bodyweight",
-                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "birth_weight_avg_ho": {
                                     "title": "Birth Weight Avg Ho",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -847,11 +848,11 @@ animal_schema = {
                                         "infoText": "Average Holstein Birth Weight (kg/head)"
                                     },
                                     "minimum": 1,
-                                    "default": 42.9
+                                    "default": 42.9,
+                                    "type": "number"
                                 },
                                 "birth_weight_std_ho": {
                                     "title": "Birth Weight Std Ho",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -860,11 +861,11 @@ animal_schema = {
                                         "infoText": "Holstein Birth Weight Standard Deviation (kg/head)"
                                     },
                                     "minimum": 0,
-                                    "default": 6
+                                    "default": 6,
+                                    "type": "number"
                                 },
                                 "birth_weight_avg_je": {
                                     "title": "Birth Weight Avg Je",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -873,11 +874,11 @@ animal_schema = {
                                         "infoText": "Average Jersey Birth Weight (kg/head)"
                                     },
                                     "minimum": 1,
-                                    "default": 25.2
+                                    "default": 25.2,
+                                    "type": "number"
                                 },
                                 "birth_weight_std_je": {
                                     "title": "Birth Weight Std Je",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -886,11 +887,11 @@ animal_schema = {
                                         "infoText": "Jersey Birth Weight Standard Deviation (kg/head)"
                                     },
                                     "minimum": 0,
-                                    "default": 4.4
+                                    "default": 4.4,
+                                    "type": "number"
                                 },
                                 "target_heifer_preg_day": {
                                     "title": "Target Heifer Preg Day",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -899,11 +900,11 @@ animal_schema = {
                                         "infoText": "Target Heifer Pregnancy Day (days) -- The target age (in days) for heifers to become pregnant - for adjusting heifer body weight"
                                     },
                                     "minimum": 0,
-                                    "default": 420
+                                    "default": 420,
+                                    "type": "number"
                                 },
                                 "mature_body_weight_avg": {
                                     "title": "Mature Body Weight Avg",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -912,11 +913,11 @@ animal_schema = {
                                         "infoText": "Average Mature Body Weight (kg/head) -- The average mature body weight of cows"
                                     },
                                     "minimum": 0,
-                                    "default": 740.1
+                                    "default": 740.1,
+                                    "type": "number"
                                 },
                                 "mature_body_weight_std": {
                                     "title": "Mature Body Weight Std",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -925,31 +926,31 @@ animal_schema = {
                                         "infoText": "Mature Body Weight Standard Deviation (kg/head) -- The standard deviation of mature body weight of cows"
                                     },
                                     "minimum": 0,
-                                    "default": 73.5
+                                    "default": 73.5,
+                                    "type": "number"
                                 }
                             },
                             "options": {
                                 "infoText": "Bodyweight"
-                            }
+                            },
+                            "type": "object"
                         }
                     },
                     "options": {
                         "infoText": "Farm Level Management"
-                    }
+                    },
+                    "type": "object"
                 },
                 "from_literature": {
                     "title": "From Literature",
-                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "repro": {
                             "title": "Repro",
-                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "preg_check_day_1": {
                                     "title": "Preg Check Day 1",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -958,11 +959,11 @@ animal_schema = {
                                         "infoText": "Pregnancy Check Days, Check 1 (days) -- Days since last insemination at the 1st pregnancy check"
                                     },
                                     "minimum": 1,
-                                    "default": 32
+                                    "default": 32,
+                                    "type": "number"
                                 },
                                 "preg_loss_rate_1": {
                                     "title": "Preg Loss Rate 1",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -972,11 +973,11 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 1,
-                                    "default": 0.02
+                                    "default": 0.02,
+                                    "type": "number"
                                 },
                                 "preg_check_day_2": {
                                     "title": "Preg Check Day 2",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -985,11 +986,11 @@ animal_schema = {
                                         "infoText": "Pregnancy Check Days, Check 2 (days) --  Days since last insemination at the second pregnancy check, for cows confirmed pregnant at 1st pregnancy check"
                                     },
                                     "minimum": 0,
-                                    "default": 60
+                                    "default": 60,
+                                    "type": "number"
                                 },
                                 "preg_loss_rate_2": {
                                     "title": "Preg Loss Rate 2",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -999,11 +1000,11 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 0.1,
-                                    "default": 0.096
+                                    "default": 0.096,
+                                    "type": "number"
                                 },
                                 "preg_check_day_3": {
                                     "title": "Preg Check Day 3",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1012,11 +1013,11 @@ animal_schema = {
                                         "infoText": "Pregnancy Check Day, Check 3 (days) -- Days since last insemination at the third pregnancy check, for cows confirmed pregnant at 2nd pregnancy check"
                                     },
                                     "minimum": 0,
-                                    "default": 200
+                                    "default": 200,
+                                    "type": "number"
                                 },
                                 "preg_loss_rate_3": {
                                     "title": "Preg Loss Rate 3",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1026,11 +1027,11 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 0.1,
-                                    "default": 0.017
+                                    "default": 0.017,
+                                    "type": "number"
                                 },
                                 "avg_estrus_cycle_return": {
                                     "title": "Avg Estrus Cycle Return",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1039,11 +1040,11 @@ animal_schema = {
                                         "infoText": "Average Estrous Cycle Return (days) -- Average days between calving and first estrous cycle after calving"
                                     },
                                     "minimum": 1,
-                                    "default": 23
+                                    "default": 23,
+                                    "type": "number"
                                 },
                                 "std_estrus_cycle_return": {
                                     "title": "Std Estrus Cycle Return",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1052,11 +1053,11 @@ animal_schema = {
                                         "infoText": "Estrous Cycle Return Standard Deviation (days)"
                                     },
                                     "minimum": 1,
-                                    "default": 6
+                                    "default": 6,
+                                    "type": "number"
                                 },
                                 "avg_estrus_cycle_heifer": {
                                     "title": "Avg Estrus Cycle Heifer",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1065,11 +1066,11 @@ animal_schema = {
                                         "infoText": "Heifer Estrous Cycle Length (days) -- Average length of estrous cycle for heifers"
                                     },
                                     "minimum": 1,
-                                    "default": 21
+                                    "default": 21,
+                                    "type": "number"
                                 },
                                 "std_estrus_cycle_heifer": {
                                     "title": "Std Estrus Cycle Heifer",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1078,11 +1079,11 @@ animal_schema = {
                                         "infoText": "Heifer Estrous Cycle Length Standard Deviation (days)"
                                     },
                                     "minimum": 1,
-                                    "default": 2.5
+                                    "default": 2.5,
+                                    "type": "number"
                                 },
                                 "avg_estrus_cycle_cow": {
                                     "title": "Avg Estrus Cycle Cow",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1091,11 +1092,11 @@ animal_schema = {
                                         "infoText": "Cow Estrous Cycle Length (days) -- Average length of estrous cycle for cows"
                                     },
                                     "minimum": 1,
-                                    "default": 21
+                                    "default": 21,
+                                    "type": "number"
                                 },
                                 "std_estrus_cycle_cow": {
                                     "title": "Std Estrus Cycle Cow",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1104,11 +1105,11 @@ animal_schema = {
                                         "infoText": "Cow Estrous Cycle Length Standard Deviation (days)"
                                     },
                                     "minimum": 1,
-                                    "default": 4
+                                    "default": 4,
+                                    "type": "number"
                                 },
                                 "avg_estrus_cycle_after_pgf": {
                                     "title": "Avg Estrus Cycle After Pgf",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1117,11 +1118,11 @@ animal_schema = {
                                         "infoText": "Average Estrous Cycle days after PGF (days) -- Average days between the injection of PGF and the occurrence of estrus in the PGFatPD resynch protocol"
                                     },
                                     "minimum": 1,
-                                    "default": 5
+                                    "default": 5,
+                                    "type": "number"
                                 },
                                 "std_estrus_cycle_after_pgf": {
                                     "title": "Std Estrus Cycle After Pgf",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1130,16 +1131,17 @@ animal_schema = {
                                         "infoText": "Estrous Cycle days after PGF Standard Deviation (days) -- Standard deviation of days between the injection of PGF and the occurrence of estrus in the PGFatPD resynch protocol"
                                     },
                                     "minimum": 1,
-                                    "default": 2
+                                    "default": 2,
+                                    "type": "number"
                                 }
                             },
                             "options": {
                                 "infoText": "Literature Repro Values"
-                            }
+                            },
+                            "type": "object"
                         },
                         "culling": {
                             "title": "Culling",
-                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "cull_day_count": {
@@ -1154,24 +1156,22 @@ animal_schema = {
                                     },
                                     "items": {
                                         "title": "Cull Day Count Element",
-                                        "type": "number",
                                         "options": {
                                             "grid_columns": 12,
                                             "inputAttributes": {
                                                 "class": "text-primary form-control"
                                             }
                                         },
-                                        "minimum": 0
+                                        "minimum": 0,
+                                        "type": "number"
                                     }
                                 },
                                 "feet_leg_cull": {
                                     "title": "Feet Leg Cull",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
                                             "title": "Probability",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -1180,7 +1180,8 @@ animal_schema = {
                                                 "infoText": "The probability of culling due to feet-and-leg-related health issues."
                                             },
                                             "minimum": 0,
-                                            "maximum": 1
+                                            "maximum": 1,
+                                            "type": "number"
                                         },
                                         "cull_day_prob": {
                                             "title": "Cull Day Prob",
@@ -1194,7 +1195,6 @@ animal_schema = {
                                             },
                                             "items": {
                                                 "title": "Cull Day Prob Element",
-                                                "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
                                                     "inputAttributes": {
@@ -1202,22 +1202,22 @@ animal_schema = {
                                                     }
                                                 },
                                                 "minimum": 0,
-                                                "maximum": 1
+                                                "maximum": 1,
+                                                "type": "number"
                                             }
                                         }
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to feet-and-leg-related health issues."
-                                    }
+                                    },
+                                    "type": "object"
                                 },
                                 "injury_cull": {
                                     "title": "Injury Cull",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
                                             "title": "Probability",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -1226,7 +1226,8 @@ animal_schema = {
                                                 "infoText": "The probability of culling due to injury-related health issues."
                                             },
                                             "minimum": 0,
-                                            "maximum": 1
+                                            "maximum": 1,
+                                            "type": "number"
                                         },
                                         "cull_day_prob": {
                                             "title": "Cull Day Prob",
@@ -1240,7 +1241,6 @@ animal_schema = {
                                             },
                                             "items": {
                                                 "title": "Cull Day Prob Element",
-                                                "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
                                                     "inputAttributes": {
@@ -1248,22 +1248,22 @@ animal_schema = {
                                                     }
                                                 },
                                                 "minimum": 0,
-                                                "maximum": 1
+                                                "maximum": 1,
+                                                "type": "number"
                                             }
                                         }
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to injury-related health issues."
-                                    }
+                                    },
+                                    "type": "object"
                                 },
                                 "mastitis_cull": {
                                     "title": "Mastitis Cull",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
                                             "title": "Probability",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -1272,7 +1272,8 @@ animal_schema = {
                                                 "infoText": "The probability of culling due to mastitis-related health issues."
                                             },
                                             "minimum": 0,
-                                            "maximum": 1
+                                            "maximum": 1,
+                                            "type": "number"
                                         },
                                         "cull_day_prob": {
                                             "title": "Cull Day Prob",
@@ -1286,7 +1287,6 @@ animal_schema = {
                                             },
                                             "items": {
                                                 "title": "Cull Day Prob Element",
-                                                "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
                                                     "inputAttributes": {
@@ -1294,22 +1294,22 @@ animal_schema = {
                                                     }
                                                 },
                                                 "minimum": 0,
-                                                "maximum": 1
+                                                "maximum": 1,
+                                                "type": "number"
                                             }
                                         }
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to mastitis-related health issues."
-                                    }
+                                    },
+                                    "type": "object"
                                 },
                                 "disease_cull": {
                                     "title": "Disease Cull",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
                                             "title": "Probability",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -1318,7 +1318,8 @@ animal_schema = {
                                                 "infoText": "The probability of culling due to disease-related health issues."
                                             },
                                             "minimum": 0,
-                                            "maximum": 1
+                                            "maximum": 1,
+                                            "type": "number"
                                         },
                                         "cull_day_prob": {
                                             "title": "Cull Day Prob",
@@ -1332,7 +1333,6 @@ animal_schema = {
                                             },
                                             "items": {
                                                 "title": "Cull Day Prob Element",
-                                                "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
                                                     "inputAttributes": {
@@ -1340,22 +1340,22 @@ animal_schema = {
                                                     }
                                                 },
                                                 "minimum": 0,
-                                                "maximum": 1
+                                                "maximum": 1,
+                                                "type": "number"
                                             }
                                         }
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to disease-related health issues."
-                                    }
+                                    },
+                                    "type": "object"
                                 },
                                 "udder_cull": {
                                     "title": "Udder Cull",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
                                             "title": "Probability",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -1364,7 +1364,8 @@ animal_schema = {
                                                 "infoText": "The probability of culling due to udder-related health issues."
                                             },
                                             "minimum": 0,
-                                            "maximum": 1
+                                            "maximum": 1,
+                                            "type": "number"
                                         },
                                         "cull_day_prob": {
                                             "title": "Cull Day Prob",
@@ -1378,7 +1379,6 @@ animal_schema = {
                                             },
                                             "items": {
                                                 "title": "Cull Day Prob Element",
-                                                "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
                                                     "inputAttributes": {
@@ -1386,22 +1386,22 @@ animal_schema = {
                                                     }
                                                 },
                                                 "minimum": 0,
-                                                "maximum": 1
+                                                "maximum": 1,
+                                                "type": "number"
                                             }
                                         }
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to udder-related health issues."
-                                    }
+                                    },
+                                    "type": "object"
                                 },
                                 "unknown_cull": {
                                     "title": "Unknown Cull",
-                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
                                             "title": "Probability",
-                                            "type": "number",
                                             "options": {
                                                 "grid_columns": 12,
                                                 "inputAttributes": {
@@ -1410,7 +1410,8 @@ animal_schema = {
                                                 "infoText": "The probability of culling due to other health issues."
                                             },
                                             "minimum": 0,
-                                            "maximum": 1
+                                            "maximum": 1,
+                                            "type": "number"
                                         },
                                         "cull_day_prob": {
                                             "title": "Cull Day Prob",
@@ -1424,7 +1425,6 @@ animal_schema = {
                                             },
                                             "items": {
                                                 "title": "Cull Day Prob Element",
-                                                "type": "number",
                                                 "options": {
                                                     "grid_columns": 12,
                                                     "inputAttributes": {
@@ -1432,13 +1432,15 @@ animal_schema = {
                                                     }
                                                 },
                                                 "minimum": 0,
-                                                "maximum": 1
+                                                "maximum": 1,
+                                                "type": "number"
                                             }
                                         }
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to other health issues."
-                                    }
+                                    },
+                                    "type": "object"
                                 },
                                 "parity_death_prob": {
                                     "title": "Parity Death Prob",
@@ -1452,7 +1454,6 @@ animal_schema = {
                                     },
                                     "items": {
                                         "title": "Parity Death Prob Element",
-                                        "type": "number",
                                         "options": {
                                             "grid_columns": 12,
                                             "inputAttributes": {
@@ -1461,7 +1462,8 @@ animal_schema = {
                                             "infoText": "Death Probability, by Parity Group -- The probability of death for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)"
                                         },
                                         "minimum": 0,
-                                        "maximum": 1
+                                        "maximum": 1,
+                                        "type": "number"
                                     }
                                 },
                                 "parity_cull_prob": {
@@ -1476,7 +1478,6 @@ animal_schema = {
                                     },
                                     "items": {
                                         "title": "Parity Cull Prob Element",
-                                        "type": "number",
                                         "options": {
                                             "grid_columns": 12,
                                             "inputAttributes": {
@@ -1485,7 +1486,8 @@ animal_schema = {
                                             "infoText": "Cull Probability, by Parity -- The probability of culling for cows of a single parity (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)"
                                         },
                                         "minimum": 0,
-                                        "maximum": 1
+                                        "maximum": 1,
+                                        "type": "number"
                                     }
                                 },
                                 "death_day_prob": {
@@ -1500,7 +1502,6 @@ animal_schema = {
                                     },
                                     "items": {
                                         "title": "Death Day Prob Element",
-                                        "type": "number",
                                         "options": {
                                             "grid_columns": 12,
                                             "inputAttributes": {
@@ -1508,22 +1509,22 @@ animal_schema = {
                                             }
                                         },
                                         "minimum": 0,
-                                        "maximum": 1
+                                        "maximum": 1,
+                                        "type": "number"
                                     }
                                 }
                             },
                             "options": {
                                 "infoText": "Probabilities for removal from the herd for specific reason"
-                            }
+                            },
+                            "type": "object"
                         },
                         "life_cycle": {
                             "title": "Life Cycle",
-                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "still_birth_rate": {
                                     "title": "Still Birth Rate",
-                                    "type": "number",
                                     "options": {
                                         "grid_columns": 12,
                                         "inputAttributes": {
@@ -1533,31 +1534,33 @@ animal_schema = {
                                     },
                                     "minimum": 0,
                                     "maximum": 1,
-                                    "default": 0.065
+                                    "default": 0.065,
+                                    "type": "number"
                                 }
                             },
                             "options": {
                                 "infoText": ""
-                            }
+                            },
+                            "type": "object"
                         }
                     },
                     "options": {
                         "infoText": "From Literature"
-                    }
+                    },
+                    "type": "object"
                 }
             },
             "options": {
                 "infoText": "Animal Configuration"
-            }
+            },
+            "type": "object"
         },
         "methane_mitigation": {
             "title": "Methane Mitigation",
-            "type": "object",
             "format": "grid",
             "properties": {
                 "methane_mitigation_method": {
                     "title": "Methane Mitigation Method",
-                    "type": "string",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -1573,22 +1576,22 @@ animal_schema = {
                         "Essential Oils",
                         "Seaweed"
                     ],
-                    "format": "select2"
+                    "format": "select2",
+                    "type": "string"
                 },
                 "methane_mitigation_additive_amount": {
                     "title": "Methane Mitigation Additive Amount",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
                             "class": "text-primary form-control"
                         }
                     },
-                    "default": 0
+                    "default": 0,
+                    "type": "number"
                 },
                 "3-NOP_additive_amount": {
                     "title": "3-nop Additive Amount",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -1598,11 +1601,11 @@ animal_schema = {
                     },
                     "minimum": 40,
                     "maximum": 100,
-                    "default": 70
+                    "default": 70,
+                    "type": "number"
                 },
                 "monensin_additive_amount": {
                     "title": "Monensin Additive Amount",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -1612,11 +1615,11 @@ animal_schema = {
                     },
                     "minimum": 20,
                     "maximum": 36,
-                    "default": 24
+                    "default": 24,
+                    "type": "number"
                 },
                 "essential_oils_additive_amount": {
                     "title": "Essential Oils Additive Amount",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -1626,11 +1629,11 @@ animal_schema = {
                     },
                     "minimum": 0,
                     "maximum": 100,
-                    "default": 0
+                    "default": 0,
+                    "type": "number"
                 },
                 "seaweed_additive_amount": {
                     "title": "Seaweed Additive Amount",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -1640,16 +1643,17 @@ animal_schema = {
                     },
                     "minimum": 0,
                     "maximum": 100,
-                    "default": 0
+                    "default": 0,
+                    "type": "number"
                 }
             },
             "options": {
                 "infoText": "Methane Mitigation"
-            }
+            },
+            "type": "object"
         },
         "housing": {
             "title": "Housing",
-            "type": "string",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -1663,11 +1667,11 @@ animal_schema = {
                 "pasture",
                 "drylot"
             ],
-            "format": "select2"
+            "format": "select2",
+            "type": "string"
         },
         "pasture_concentrate": {
             "title": "Pasture Concentrate",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -1676,11 +1680,11 @@ animal_schema = {
                 "infoText": "Pasture Concentrate Fed (kg/head/day) -- Amount of concentrate provided to lactating cows each day if animals are housed on pasture"
             },
             "minimum": 0,
-            "default": 0
+            "default": 0,
+            "type": "number"
         },
         "methane_model": {
             "title": "Methane Model",
-            "type": "string",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -1694,11 +1698,11 @@ animal_schema = {
                 "Mutian",
                 "IPCC"
             ],
-            "format": "select2"
+            "format": "select2",
+            "type": "string"
         },
         "ration": {
             "title": "Ration",
-            "type": "object",
             "format": "grid",
             "properties": {
                 "user_input": {
@@ -1716,7 +1720,6 @@ animal_schema = {
                 },
                 "formulation_interval": {
                     "title": "Formulation Interval",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -1725,11 +1728,11 @@ animal_schema = {
                         "infoText": "Formulation Interval (days) -- The length of time in days between when the diets are reformulated"
                     },
                     "minimum": 1,
-                    "default": 30
+                    "default": 30,
+                    "type": "number"
                 },
                 "phosphorus_requirement_buffer": {
                     "title": "Phosphorus Requirement Buffer",
-                    "type": "number",
                     "options": {
                         "grid_columns": 12,
                         "inputAttributes": {
@@ -1738,12 +1741,14 @@ animal_schema = {
                         "infoText": "Percentage increase in phosphorus nutrient requirement in calculation of animal requirements. The default value is highly recommended as the starting value (e.g. some testing may be required to find a reasonable buffer value). For example, if you wanted to supply 150% of the calculated requirement, you would use a value of 50."
                     },
                     "minimum": 0,
-                    "default": 75
+                    "default": 75,
+                    "type": "number"
                 }
             },
             "options": {
                 "infoText": "Ration"
-            }
+            },
+            "type": "object"
         },
         "pen_information": {
             "title": "Pen Information",
@@ -1757,34 +1762,32 @@ animal_schema = {
             },
             "items": {
                 "title": "Pen Information Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "id": {
                         "title": "Id",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Pen ID -- The index of the pen"
-                        }
+                        },
+                        "type": "number"
                     },
                     "pen_name": {
                         "title": "Pen Name",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Pen Name -- The name or identifier of a given pen"
-                        }
+                        },
+                        "type": "string"
                     },
                     "animal_combination": {
                         "title": "Animal Combination",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1798,11 +1801,11 @@ animal_schema = {
                             "CLOSE_UP",
                             "LAC_COW"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "vertical_dist_to_milking_parlor": {
                         "title": "Vertical Dist To Milking Parlor",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1811,11 +1814,11 @@ animal_schema = {
                             "infoText": "Vertical Distance to Milking Parlor (m) -- The elevation gain (in meters) between the pen and the milking parlor"
                         },
                         "minimum": 0,
-                        "default": 0.1
+                        "default": 0.1,
+                        "type": "number"
                     },
                     "horizontal_dist_to_milking_parlor": {
                         "title": "Horizontal Dist To Milking Parlor",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1824,11 +1827,11 @@ animal_schema = {
                             "infoText": "Horizontal Distance to Milking Parlor (m) -- The distance (in meters) between the pen and the milking parlor"
                         },
                         "minimum": 0,
-                        "default": 10
+                        "default": 10,
+                        "type": "number"
                     },
                     "number_of_stalls": {
                         "title": "Number Of Stalls",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1837,11 +1840,11 @@ animal_schema = {
                             "infoText": "Number of Stalls -- The number of stalls in the pen"
                         },
                         "minimum": 0,
-                        "default": 1000
+                        "default": 1000,
+                        "type": "number"
                     },
                     "housing_type": {
                         "title": "Housing Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1853,11 +1856,11 @@ animal_schema = {
                         "enum": [
                             "open air barn"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "pen_type": {
                         "title": "Pen Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1872,11 +1875,11 @@ animal_schema = {
                             "open lot",
                             "compost bedded pack barn"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "max_stocking_density": {
                         "title": "Max Stocking Density",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1886,11 +1889,11 @@ animal_schema = {
                         },
                         "minimum": 0.5,
                         "maximum": 5,
-                        "default": 1.2
+                        "default": 1.2,
+                        "type": "number"
                     },
                     "manure_management_scenario_id": {
                         "title": "Manure Management Scenario Id",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -1899,9 +1902,11 @@ animal_schema = {
                             "infoText": "Manure Management Scenario ID (number) -- The ID number of the manure management practices that are used for this pen (scenarios are defined in manure management schema)"
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "fileName": {
@@ -1916,5 +1921,6 @@ animal_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }

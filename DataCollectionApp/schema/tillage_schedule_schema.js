@@ -1,6 +1,5 @@
 tillage_schedule_schema = {
     "title": "Tillage Schedule Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "years": {
@@ -15,14 +14,14 @@ tillage_schedule_schema = {
             },
             "items": {
                 "title": "Years Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 1
+                "minimum": 1,
+                "type": "number"
             }
         },
         "days": {
@@ -37,7 +36,6 @@ tillage_schedule_schema = {
             },
             "items": {
                 "title": "Days Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -45,7 +43,8 @@ tillage_schedule_schema = {
                     }
                 },
                 "minimum": 1,
-                "maximum": 366
+                "maximum": 366,
+                "type": "number"
             }
         },
         "tillage_depths": {
@@ -60,14 +59,14 @@ tillage_schedule_schema = {
             },
             "items": {
                 "title": "Tillage Depths Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.1
+                "minimum": 0.1,
+                "type": "number"
             }
         },
         "incorporation_fractions": {
@@ -82,7 +81,6 @@ tillage_schedule_schema = {
             },
             "items": {
                 "title": "Incorporation Fractions Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -90,7 +88,8 @@ tillage_schedule_schema = {
                     }
                 },
                 "minimum": 0.0,
-                "maximum": 1.0
+                "maximum": 1.0,
+                "type": "number"
             }
         },
         "mixing_fractions": {
@@ -105,7 +104,6 @@ tillage_schedule_schema = {
             },
             "items": {
                 "title": "Mixing Fractions Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -113,7 +111,8 @@ tillage_schedule_schema = {
                     }
                 },
                 "minimum": 0.0,
-                "maximum": 1.0
+                "maximum": 1.0,
+                "type": "number"
             }
         },
         "implements": {
@@ -128,7 +127,6 @@ tillage_schedule_schema = {
             },
             "items": {
                 "title": "Implements Element",
-                "type": "string",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -143,12 +141,12 @@ tillage_schedule_schema = {
                     "cultivator",
                     "seedbed-conditioner"
                 ],
-                "format": "select2"
+                "format": "select2",
+                "type": "string"
             }
         },
         "pattern_repeat": {
             "title": "Pattern Repeat",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -157,11 +155,11 @@ tillage_schedule_schema = {
                 "infoText": "Number of times that this tillage schedule should be repeated."
             },
             "minimum": 0,
-            "default": 0
+            "default": 0,
+            "type": "number"
         },
         "pattern_skip": {
             "title": "Pattern Skip",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -170,7 +168,8 @@ tillage_schedule_schema = {
                 "infoText": "Number of years to be skipped between schedule repetitions."
             },
             "minimum": 0,
-            "default": 0
+            "default": 0,
+            "type": "number"
         },
         "fileName": {
             "title": "File Name",
@@ -184,5 +183,6 @@ tillage_schedule_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }

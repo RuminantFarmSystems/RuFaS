@@ -1,6 +1,5 @@
 manure_schedule_schema = {
     "title": "Manure Schedule Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "years": {
@@ -15,14 +14,14 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Years Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 1
+                "minimum": 1,
+                "type": "number"
             }
         },
         "days": {
@@ -37,7 +36,6 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Days Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -45,7 +43,8 @@ manure_schedule_schema = {
                     }
                 },
                 "minimum": 1,
-                "maximum": 366
+                "maximum": 366,
+                "type": "number"
             }
         },
         "nitrogen_masses": {
@@ -60,14 +59,14 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Nitrogen Masses Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "phosphorus_masses": {
@@ -82,14 +81,14 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Phosphorus Masses Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "potassium_masses": {
@@ -104,14 +103,14 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Potassium Masses Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "coverage_fractions": {
@@ -126,7 +125,6 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Coverage Fractions Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -134,7 +132,8 @@ manure_schedule_schema = {
                     }
                 },
                 "minimum": 0.01,
-                "maximum": 1.0
+                "maximum": 1.0,
+                "type": "number"
             }
         },
         "application_depths": {
@@ -149,14 +148,14 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Application Depths Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "surface_remainder_fractions": {
@@ -171,7 +170,6 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Surface Remainder Fractions Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -179,7 +177,8 @@ manure_schedule_schema = {
                     }
                 },
                 "minimum": 0.0,
-                "maximum": 1.0
+                "maximum": 1.0,
+                "type": "number"
             }
         },
         "manure_types": {
@@ -194,7 +193,6 @@ manure_schedule_schema = {
             },
             "items": {
                 "title": "Manure Types Element",
-                "type": "string",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -205,12 +203,12 @@ manure_schedule_schema = {
                     "liquid",
                     "solid"
                 ],
-                "format": "select2"
+                "format": "select2",
+                "type": "string"
             }
         },
         "pattern_repeat": {
             "title": "Pattern Repeat",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -219,11 +217,11 @@ manure_schedule_schema = {
                 "infoText": "Number of times that this manure application schedule should be repeated."
             },
             "minimum": 0,
-            "default": 0
+            "default": 0,
+            "type": "number"
         },
         "pattern_skip": {
             "title": "Pattern Skip",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -232,7 +230,8 @@ manure_schedule_schema = {
                 "infoText": "Number of years to be skipped between schedule repetitions."
             },
             "minimum": 0,
-            "default": 0
+            "default": 0,
+            "type": "number"
         },
         "fileName": {
             "title": "File Name",
@@ -246,5 +245,6 @@ manure_schedule_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }
