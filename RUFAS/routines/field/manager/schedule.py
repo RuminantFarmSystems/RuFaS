@@ -202,8 +202,10 @@ class Schedule:
 
     def _validate_parameters(
         self,
-        non_negative_parameters: list[tuple[str, list] | None],
-        fraction_parameters: list[tuple[str, list] | None],
+        years_parameters: list[Optional[tuple[str, list]]],
+        days_parameters: list[Optional[tuple[str, list]]],
+        non_negative_parameters: list[Optional[tuple[str, list]]],
+        fraction_parameters: list[Optional[tuple[str, list]]],
     ) -> None:
         """
         General validations for schedule parameter.
@@ -228,8 +230,8 @@ class Schedule:
         if not valid_years:
             raise ValueError(
                 f"'{self.name}': " + f"expected all years to be > 0 and in non-descending order,"
-                f" received "
-                f"'{self.years}'."
+                                     f" received "
+                                     f"'{self.years}'."
             )
 
         valid_days = self._validate_days(self.years, self.days)

@@ -135,14 +135,15 @@ def test_crop_schedule_init(
             "test_2",
             [1998, 1999, 2000],
             [200, 200, 367],
-            "'test_2': expected all planting days to be in range [1, 366], " "received '[200, 200, 367]'.",
+            "'test_2': expected all planting days to be in range [1, 366], received "
+            "'[200, 200, 367]'.",
         ),
         (
             "test_3",
             [1997, 1998],
             [90, 120, 90],
-            "'test_3': expected number of planting years and days to be the same, "
-            "received '[1997, 1998]' years and '[90, 120, 90]' days.",
+            "test_3 Mismatch in length of parameters. Provided parameters are: planting_years=[1997, 1998],"
+            " planting_days=[90, 120, 90]. Lengths are: {'planting_years': 2, 'planting_days': 3}.",
         ),
     ],
 )
@@ -151,7 +152,9 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
     with pytest.raises(ValueError) as e:
         test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["harvest_kill"], False, 1, 1)
         test._validate_planting_parameters()
+        print(e.value)
     assert str(e.value) == expected
+
 
 
 @pytest.mark.parametrize(
