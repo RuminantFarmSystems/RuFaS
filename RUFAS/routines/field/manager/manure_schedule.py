@@ -146,14 +146,21 @@ class ManureSchedule(Schedule):
 
         """
         return list(
-            self.generate_events(self.years,
-                                 self.days,
-                                 [],
-                                 [self.nitrogen_masses, self.phosphorus_masses,
-                                  self.manure_types, self.field_coverages, self.application_depths,
-                                  self.surface_remainder_fractions],
-                                 ManureEvent,
-                                 self.pattern_skip,
-                                 self.pattern_repeat,
-                                 False)
+            self.generate_events(
+                self.years,
+                self.days,
+                [],
+                [
+                    self.nitrogen_masses,
+                    self.phosphorus_masses,
+                    self.manure_types,
+                    self.field_coverages,
+                    self.application_depths,
+                    self.surface_remainder_fractions,
+                ],
+                ManureEvent,
+                self.pattern_skip,
+                self.pattern_repeat,
+                False,
+            )
         )
