@@ -2371,7 +2371,7 @@ def test_route_save_functions_graph(
     ],
 )
 def test_route_logs(
-    log_pool: dict[str, str | dict[str, str]], expected_calls: dict[str, int], mocker: MockerFixture
+    log_pool: list[dict[str, str | dict[str, str]]], expected_calls: dict[str, int], mocker: MockerFixture
 ) -> None:
 
     output_manager = OutputManager()
