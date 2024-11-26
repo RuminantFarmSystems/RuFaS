@@ -211,12 +211,12 @@ def test_validate_harvest_parameters(
             1,
             1,
             [
-                PlantingEvent("test_crop", 1, 120, False),
-                PlantingEvent("test_crop", 3, 100, False),
-                PlantingEvent("test_crop", 4, 100, False),
-                PlantingEvent("test_crop", 6, 120, False),
-                PlantingEvent("test_crop", 8, 100, False),
-                PlantingEvent("test_crop", 9, 100, False),
+                PlantingEvent("test_crop", False, 1, 120),
+                PlantingEvent("test_crop", False, 3, 100),
+                PlantingEvent("test_crop", False, 4, 100),
+                PlantingEvent("test_crop", False, 6, 120),
+                PlantingEvent("test_crop", False, 8, 100),
+                PlantingEvent("test_crop", False, 9, 100),
             ],
         ),
         (
@@ -226,12 +226,12 @@ def test_validate_harvest_parameters(
             2,
             2,
             [
-                PlantingEvent("test_crop", 2, 115, True),
-                PlantingEvent("test_crop", 4, 115, True),
-                PlantingEvent("test_crop", 7, 115, True),
-                PlantingEvent("test_crop", 9, 115, True),
-                PlantingEvent("test_crop", 12, 115, True),
-                PlantingEvent("test_crop", 14, 115, True),
+                PlantingEvent("test_crop", True, 2, 115),
+                PlantingEvent("test_crop", True, 4, 115),
+                PlantingEvent("test_crop", True, 7, 115),
+                PlantingEvent("test_crop", True, 9, 115),
+                PlantingEvent("test_crop", True, 12, 115),
+                PlantingEvent("test_crop", True, 14, 115),
             ],
         ),
         (
@@ -241,9 +241,9 @@ def test_validate_harvest_parameters(
             2,
             0,
             [
-                PlantingEvent("test_crop", 1, 120, False),
-                PlantingEvent("test_crop", 2, 120, False),
-                PlantingEvent("test_crop", 5, 110, False),
+                PlantingEvent("test_crop", False, 1, 120),
+                PlantingEvent("test_crop", False, 2, 120),
+                PlantingEvent("test_crop", False, 5, 110),
             ],
         ),
     ],
@@ -348,4 +348,5 @@ def test_generate_harvest_events(
         repeat,
     )
     actual = crop_sched.generate_harvest_events()
-    assert actual == expected
+
+    assert expected == actual
