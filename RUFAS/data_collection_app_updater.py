@@ -93,7 +93,7 @@ class DataCollectionAppUpdater:
 
         self._om.add_log("Schema generation starting", "Creating new schemas from metadata properties.", info_map)
 
-        Utility.empty_dir(SCHEMA_DIRECTORY_PATH)
+        Utility.empty_dir(SCHEMA_DIRECTORY_PATH, [".keep"])
 
         properties: dict[str, Any] = self._im.meta_data["properties"]
 
