@@ -135,7 +135,7 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
                 "description": "The general type or category of the feed (group).",
                 "default": "Forage",
                 "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)$",
-                "nullable": True
+                "nullable": True,
             },
             {
                 "title": "Feed Type",
@@ -149,7 +149,7 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
                     "inputAttributes": {"class": "text-primary form-control"},
                 },
             },
-        )
+        ),
     ],
 )
 def test_create_string_schema(
@@ -233,7 +233,7 @@ def test_create_string_schema_value_error(
                 "minimum": 0,
                 "maximum": 1_000_000,
                 "default": 0,
-                "nullable": False
+                "nullable": False,
             },
             {
                 "title": "Pattern Repeat",
@@ -258,7 +258,7 @@ def test_create_string_schema_value_error(
                 "minimum": 0,
                 "maximum": 1_000_000,
                 "default": 0,
-                "nullable": True
+                "nullable": True,
             },
             {
                 "title": "Pattern Repeat",
@@ -274,7 +274,7 @@ def test_create_string_schema_value_error(
                     },
                 },
             },
-        )
+        ),
     ],
 )
 def test_create_number_schema(
@@ -316,7 +316,7 @@ def test_create_number_schema(
                 "type": "bool",
                 "description": "Ventilation -- True if the storage unit has appropriate ventilation.",
                 "default": True,
-                "nullable": True
+                "nullable": True,
             },
             {
                 "title": "Ventilation",
@@ -331,7 +331,7 @@ def test_create_number_schema(
                     },
                 },
             },
-        )
+        ),
     ],
 )
 def test_create_bool_schema(
