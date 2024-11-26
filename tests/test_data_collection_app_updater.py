@@ -244,10 +244,7 @@ def test_create_string_schema_value_error(
                 "options": {
                     "grid_columns": 12,
                     "infoText": "Number of times that this crop schedule should be repeated.",
-                    "inputAttributes": {
-                        "class": "text-primary form-control",
-                        "placeholder": ""
-                    },
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
                 },
             },
         ),
@@ -270,10 +267,7 @@ def test_create_string_schema_value_error(
                 "options": {
                     "grid_columns": 12,
                     "infoText": "Number of times that this crop schedule should be repeated.",
-                    "inputAttributes": {
-                        "class": "text-primary form-control",
-                        "placeholder": ""
-                    },
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
                 },
             },
         ),
@@ -378,9 +372,7 @@ def test_create_bool_schema(
                     "options": {
                         "grid_columns": 12,
                         "infoText": "Death rate for first, second, third, and later lactations",
-                        "inputAttributes": {
-                            "class": "text-primary form-control", "placeholder": ""
-                        },
+                        "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
                     },
                 },
             },
@@ -418,7 +410,7 @@ def test_create_bool_schema(
                     "type": "object",
                     "format": "grid",
                     "default": None,
-                    'options': {'infoText': None},
+                    "options": {"infoText": None},
                     "properties": {
                         "scenario_id": {
                             "title": "Scenario Id",
@@ -484,9 +476,7 @@ def test_create_array_schema(
                         "options": {
                             "grid_columns": 12,
                             "infoText": "Stillbirth rate",
-                            "inputAttributes": {
-                                "class": "text-primary form-control", "placeholder": ""
-                            },
+                            "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
                         },
                     }
                 },
