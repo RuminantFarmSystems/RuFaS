@@ -135,12 +135,12 @@ def test_validate_fertilizer_parameters(
             1,
             2,
             [
-                FertilizerEvent("mix_1", 1990, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 1993, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 1995, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 1998, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 2000, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 2003, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
+                FertilizerEvent(1990, 100, "mix_1", 10.0, 10.0, 10.0, 30.0, 0.8),
+                FertilizerEvent(1993, 100, "mix_1", 10.0, 10.0, 10.0, 30.0, 0.8),
+                FertilizerEvent(1995, 100, "mix_1", 10.0, 10.0, 10.0, 30.0, 0.8),
+                FertilizerEvent(1998, 100, "mix_1", 10.0, 10.0, 10.0, 30.0, 0.8),
+                FertilizerEvent(2000, 100, "mix_1", 10.0, 10.0, 10.0, 30.0, 0.8),
+                FertilizerEvent(2003, 100, "mix_1", 10.0, 10.0, 10.0, 30.0, 0.8),
             ],
         ),
         (
@@ -155,12 +155,12 @@ def test_validate_fertilizer_parameters(
             0,
             1,
             [
-                FertilizerEvent("mix_1", 1991, 150, 15.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1991, 240, 8.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1992, 90, 20.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1993, 150, 15.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1993, 240, 8.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1994, 90, 20.0, 10.0, 6.0, 0.0, 1.0),
+                FertilizerEvent(1991, 150, "mix_1", 15.0, 10.0, 6.0, 0.0, 1.0),
+                FertilizerEvent(1991, 240, "mix_2", 8.0, 10.0, 6.0, 0.0, 1.0),
+                FertilizerEvent(1992, 90, "mix_1", 20.0, 10.0, 6.0, 0.0, 1.0),
+                FertilizerEvent(1993, 150, "mix_1", 15.0, 10.0, 6.0, 0.0, 1.0),
+                FertilizerEvent(1993, 240, "mix_2", 8.0, 10.0, 6.0, 0.0, 1.0),
+                FertilizerEvent(1994, 90, "mix_1", 20.0, 10.0, 6.0, 0.0, 1.0),
             ],
         ),
         (
@@ -175,12 +175,12 @@ def test_validate_fertilizer_parameters(
             0,
             2,
             [
-                FertilizerEvent("mix_3", 1995, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_4", 1996, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_3", 1997, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_4", 1998, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_3", 1999, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_4", 2000, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
+                FertilizerEvent(1995, 100, "mix_3", 10.0, 25.0, 8.0, 0.0, 1.0),
+                FertilizerEvent(1996, 100, "mix_4", 20.0, 10.0, 8.0, 0.0, 1.0),
+                FertilizerEvent(1997, 100, "mix_3", 10.0, 25.0, 8.0, 0.0, 1.0),
+                FertilizerEvent(1998, 100, "mix_4", 20.0, 10.0, 8.0, 0.0, 1.0),
+                FertilizerEvent(1999, 100, "mix_3", 10.0, 25.0, 8.0, 0.0, 1.0),
+                FertilizerEvent(2000, 100, "mix_4", 20.0, 10.0, 8.0, 0.0, 1.0),
             ],
         ),
         (
@@ -195,12 +195,12 @@ def test_validate_fertilizer_parameters(
             0,
             1,
             [
-                FertilizerEvent("mix_1", 1991, 150, 15.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1991, 240, 8.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1992, 90, 20.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1993, 150, 15.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1993, 240, 8.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1994, 90, 20.0, 10.0, 5.0, 0.0, 1.0),
+                FertilizerEvent(1991, 150, "mix_1", 15.0, 10.0, 5.0, 0.0, 1.0),
+                FertilizerEvent(1991, 240, "mix_2", 8.0, 10.0, 5.0, 0.0, 1.0),
+                FertilizerEvent(1992, 90, "mix_1", 20.0, 10.0, 5.0, 0.0, 1.0),
+                FertilizerEvent(1993, 150, "mix_1", 15.0, 10.0, 5.0, 0.0, 1.0),
+                FertilizerEvent(1993, 240, "mix_2", 8.0, 10.0, 5.0, 0.0, 1.0),
+                FertilizerEvent(1994, 90, "mix_1", 20.0, 10.0, 5.0, 0.0, 1.0),
             ],
         ),
     ],
@@ -233,4 +233,5 @@ def test_generate_fertilizer_events(
         repeat,
     )
     actual = fert_sched.generate_fertilizer_events()
+    print(actual[0].mix_name)
     assert actual == expected

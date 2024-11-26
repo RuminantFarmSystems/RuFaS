@@ -144,6 +144,8 @@ class Schedule:
         if heat_scheduled_harvest:
             all_events[:] = [harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS]
         result = [event_class(*additional_attributes, *event) for event in all_events]
+        for event in all_events:
+            print(*event)
 
         return result
 
@@ -202,8 +204,6 @@ class Schedule:
 
     def _validate_parameters(
         self,
-        years_parameters: list[Optional[tuple[str, list]]],
-        days_parameters: list[Optional[tuple[str, list]]],
         non_negative_parameters: list[Optional[tuple[str, list]]],
         fraction_parameters: list[Optional[tuple[str, list]]],
     ) -> None:

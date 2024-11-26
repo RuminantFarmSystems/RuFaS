@@ -300,9 +300,9 @@ class FertilizerEvent(BaseFieldManagementEvent):
 
     def __init__(
         self,
-        mix_name: str,
         year: int,
         day: int,
+        mix_name: str,
         nitrogen_mass: float,
         phosphorus_mass: float,
         potassium_mass: float,
