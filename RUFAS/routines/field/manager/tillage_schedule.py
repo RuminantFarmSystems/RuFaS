@@ -121,13 +121,14 @@ class TillageSchedule(Schedule):
 
         """
         return list(
-            self.generate_events(self.years,
-                                 self.days,
-                                 [],
-                                 [self.tillage_depths, self.incorporation_fractions,
-                                  self.mixing_fractions, self.implements],
-                                 TillageEvent,
-                                 self.pattern_skip,
-                                 self.pattern_repeat,
-                                 False)
+            self.generate_events(
+                self.years,
+                self.days,
+                [],
+                [self.tillage_depths, self.incorporation_fractions, self.mixing_fractions, self.implements],
+                TillageEvent,
+                self.pattern_skip,
+                self.pattern_repeat,
+                False,
+            )
         )
