@@ -145,17 +145,25 @@ class FertilizerSchedule(Schedule):
             List of all fertilizer events that occur over the course of this fertilizer schedule.
 
         """
-        return list(self.generate_events(
-            self.years,
-            self.days,
-            [],
-            [self.mix_names, self.nitrogen_masses, self.phosphorus_masses, self.potassium_masses,
-             self.application_depths, self.surface_remainder_fractions],
-            FertilizerEvent,
-            self.pattern_skip,
-            self.pattern_repeat,
-            False
-        ))
+        return list(
+            self.generate_events(
+                self.years,
+                self.days,
+                [],
+                [
+                    self.mix_names,
+                    self.nitrogen_masses,
+                    self.phosphorus_masses,
+                    self.potassium_masses,
+                    self.application_depths,
+                    self.surface_remainder_fractions,
+                ],
+                FertilizerEvent,
+                self.pattern_skip,
+                self.pattern_repeat,
+                False,
+            )
+        )
         # all_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
         # all_days = self.days * (self.pattern_repeat + 1)
         # all_mix_names = self.mix_names * (self.pattern_repeat + 1)
