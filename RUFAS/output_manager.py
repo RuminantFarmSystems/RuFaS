@@ -1503,7 +1503,7 @@ class OutputManager(object):
                         filter_content["graph_details"]["metadata_prefix"] = self.__metadata_prefix
                         self.create_directory(graphics_dir)
                     log_pool = report_generator.generate_report(filter_content, filtered_pool)
-                    self._route_logs(log_pool)
+                    self.route_logs(log_pool)
                 else:
                     self._route_save_functions(
                         filter_file,
@@ -1562,7 +1562,7 @@ class OutputManager(object):
                     log_pool = graph_generator.generate_graph(
                         filtered_pool, filter_content, filter_file, graphics_dir, produce_graphics
                     )
-                    self._route_logs(log_pool)
+                    self.route_logs(log_pool)
                 except Exception as e:
                     self.add_error("graph generation exception", str(e), info_map)
             else:
@@ -1614,7 +1614,7 @@ class OutputManager(object):
         file_path = save_path / file_name
         self.dict_to_file_json(filtered_pool, file_path, origin_label=origin_label)
 
-    def _route_logs(self, log_pool: list[dict[str, str | dict[str, str]]]) -> None:
+    def route_logs(self, log_pool: list[dict[str, str | dict[str, str]]]) -> None:
         """Takes logs from other classes and routes them to the appropriate pools in
         Output Manager.
 
@@ -1624,12 +1624,17 @@ class OutputManager(object):
             A list of log, warning, and error dictionaries containing all the components needed
             to log the information to the appropriate pool.
         """
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.route_logs.__name__,
+        }
         for log in log_pool:
             if "error" in log:
                 if (
                     isinstance(log["error"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
+                    and log.keys() == ["error", "message", "info_map"]
                 ):
                     self.add_error(log["error"], log["message"], log["info_map"])
             elif "log" in log:
@@ -1637,6 +1642,7 @@ class OutputManager(object):
                     isinstance(log["log"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
+                    and log.keys() == ["error", "message", "info_map"]
                 ):
                     self.add_log(log["log"], log["message"], log["info_map"])
             elif "warning" in log:
@@ -1644,8 +1650,15 @@ class OutputManager(object):
                     isinstance(log["warning"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
+                    and log.keys() == ["error", "message", "info_map"]
                 ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
+            else:
+                self.add_warning(
+                    "Wrong format for event logs",
+                    f"Event log data contains invalid format or types, the event was logged as {log}",
+                    info_map,
+                )
 
     def dump_logs(self, path: Path) -> None:
         """
