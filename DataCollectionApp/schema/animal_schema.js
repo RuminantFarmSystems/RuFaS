@@ -1,9 +1,11 @@
 animal_schema = {
     "title": "Animal Properties",
+    "type": "object",
     "format": "grid",
     "properties": {
         "herd_information": {
             "title": "Herd Information",
+            "type": "object",
             "format": "grid",
             "properties": {
                 "calf_num": {
@@ -116,6 +118,7 @@ animal_schema = {
                 },
                 "parity_fractions": {
                     "title": "Parity Fractions",
+                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "1": {
@@ -163,8 +166,7 @@ animal_schema = {
                     },
                     "options": {
                         "infoText": "Fractions of the milking animal population that are parity 1, 2, and 3 and beyond. The sum of these fractions must be 1.0"
-                    },
-                    "type": "object"
+                    }
                 },
                 "annual_milk_yield": {
                     "title": "Annual Milk Yield",
@@ -184,11 +186,11 @@ animal_schema = {
             },
             "options": {
                 "infoText": "Herd Demographics"
-            },
-            "type": "object"
+            }
         },
         "herd_initialization": {
             "title": "Herd Initialization",
+            "type": "object",
             "format": "grid",
             "properties": {
                 "initial_animal_num": {
@@ -220,15 +222,16 @@ animal_schema = {
             },
             "options": {
                 "infoText": "Animal generation related inputs"
-            },
-            "type": "object"
+            }
         },
         "animal_config": {
             "title": "Animal Config",
+            "type": "object",
             "format": "grid",
             "properties": {
                 "management_decisions": {
                     "title": "Management Decisions",
+                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "breeding_start_day_h": {
@@ -391,15 +394,16 @@ animal_schema = {
                     },
                     "options": {
                         "infoText": "General Management"
-                    },
-                    "type": "object"
+                    }
                 },
                 "farm_level": {
                     "title": "Farm Level",
+                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "calf": {
                             "title": "Calf",
+                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "male_calf_rate_sexed_semen": {
@@ -490,11 +494,11 @@ animal_schema = {
                             },
                             "options": {
                                 "infoText": "Calf Management"
-                            },
-                            "type": "object"
+                            }
                         },
                         "repro": {
                             "title": "Repro",
+                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "voluntary_waiting_period": {
@@ -604,6 +608,7 @@ animal_schema = {
                                 },
                                 "heifers": {
                                     "title": "Heifers",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "estrus_detection_rate": {
@@ -656,6 +661,7 @@ animal_schema = {
                                         },
                                         "repro_sub_properties": {
                                             "title": "Repro Sub Properties",
+                                            "type": "object",
                                             "format": "grid",
                                             "properties": {
                                                 "conception_rate": {
@@ -686,17 +692,16 @@ animal_schema = {
                                                     "default": 0.7,
                                                     "type": "number"
                                                 }
-                                            },
-                                            "type": "object"
+                                            }
                                         }
                                     },
                                     "options": {
                                         "infoText": "Heifer Reproduction Protocols"
-                                    },
-                                    "type": "object"
+                                    }
                                 },
                                 "cows": {
                                     "title": "Cows",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "estrus_detection_rate": {
@@ -825,17 +830,16 @@ animal_schema = {
                                             "format": "select2",
                                             "type": "string"
                                         }
-                                    },
-                                    "type": "object"
+                                    }
                                 }
                             },
                             "options": {
                                 "infoText": "Repro Management"
-                            },
-                            "type": "object"
+                            }
                         },
                         "bodyweight": {
                             "title": "Bodyweight",
+                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "birth_weight_avg_ho": {
@@ -932,21 +936,21 @@ animal_schema = {
                             },
                             "options": {
                                 "infoText": "Bodyweight"
-                            },
-                            "type": "object"
+                            }
                         }
                     },
                     "options": {
                         "infoText": "Farm Level Management"
-                    },
-                    "type": "object"
+                    }
                 },
                 "from_literature": {
                     "title": "From Literature",
+                    "type": "object",
                     "format": "grid",
                     "properties": {
                         "repro": {
                             "title": "Repro",
+                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "preg_check_day_1": {
@@ -1137,11 +1141,11 @@ animal_schema = {
                             },
                             "options": {
                                 "infoText": "Literature Repro Values"
-                            },
-                            "type": "object"
+                            }
                         },
                         "culling": {
                             "title": "Culling",
+                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "cull_day_count": {
@@ -1168,6 +1172,7 @@ animal_schema = {
                                 },
                                 "feet_leg_cull": {
                                     "title": "Feet Leg Cull",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
@@ -1209,11 +1214,11 @@ animal_schema = {
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to feet-and-leg-related health issues."
-                                    },
-                                    "type": "object"
+                                    }
                                 },
                                 "injury_cull": {
                                     "title": "Injury Cull",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
@@ -1255,11 +1260,11 @@ animal_schema = {
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to injury-related health issues."
-                                    },
-                                    "type": "object"
+                                    }
                                 },
                                 "mastitis_cull": {
                                     "title": "Mastitis Cull",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
@@ -1301,11 +1306,11 @@ animal_schema = {
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to mastitis-related health issues."
-                                    },
-                                    "type": "object"
+                                    }
                                 },
                                 "disease_cull": {
                                     "title": "Disease Cull",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
@@ -1347,11 +1352,11 @@ animal_schema = {
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to disease-related health issues."
-                                    },
-                                    "type": "object"
+                                    }
                                 },
                                 "udder_cull": {
                                     "title": "Udder Cull",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
@@ -1393,11 +1398,11 @@ animal_schema = {
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to udder-related health issues."
-                                    },
-                                    "type": "object"
+                                    }
                                 },
                                 "unknown_cull": {
                                     "title": "Unknown Cull",
+                                    "type": "object",
                                     "format": "grid",
                                     "properties": {
                                         "probability": {
@@ -1439,8 +1444,7 @@ animal_schema = {
                                     },
                                     "options": {
                                         "infoText": "Cull probabilities due to other health issues."
-                                    },
-                                    "type": "object"
+                                    }
                                 },
                                 "parity_death_prob": {
                                     "title": "Parity Death Prob",
@@ -1516,11 +1520,11 @@ animal_schema = {
                             },
                             "options": {
                                 "infoText": "Probabilities for removal from the herd for specific reason"
-                            },
-                            "type": "object"
+                            }
                         },
                         "life_cycle": {
                             "title": "Life Cycle",
+                            "type": "object",
                             "format": "grid",
                             "properties": {
                                 "still_birth_rate": {
@@ -1540,23 +1544,21 @@ animal_schema = {
                             },
                             "options": {
                                 "infoText": ""
-                            },
-                            "type": "object"
+                            }
                         }
                     },
                     "options": {
                         "infoText": "From Literature"
-                    },
-                    "type": "object"
+                    }
                 }
             },
             "options": {
                 "infoText": "Animal Configuration"
-            },
-            "type": "object"
+            }
         },
         "methane_mitigation": {
             "title": "Methane Mitigation",
+            "type": "object",
             "format": "grid",
             "properties": {
                 "methane_mitigation_method": {
@@ -1649,8 +1651,7 @@ animal_schema = {
             },
             "options": {
                 "infoText": "Methane Mitigation"
-            },
-            "type": "object"
+            }
         },
         "housing": {
             "title": "Housing",
@@ -1703,6 +1704,7 @@ animal_schema = {
         },
         "ration": {
             "title": "Ration",
+            "type": "object",
             "format": "grid",
             "properties": {
                 "user_input": {
@@ -1747,8 +1749,7 @@ animal_schema = {
             },
             "options": {
                 "infoText": "Ration"
-            },
-            "type": "object"
+            }
         },
         "pen_information": {
             "title": "Pen Information",
@@ -1762,6 +1763,7 @@ animal_schema = {
             },
             "items": {
                 "title": "Pen Information Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "id": {
@@ -1905,8 +1907,7 @@ animal_schema = {
                         "default": 0,
                         "type": "number"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "fileName": {
@@ -1921,6 +1922,5 @@ animal_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    },
-    "type": "object"
+    }
 }

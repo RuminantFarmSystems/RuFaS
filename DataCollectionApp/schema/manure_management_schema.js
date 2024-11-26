@@ -1,5 +1,6 @@
 manure_management_schema = {
     "title": "Manure Management Properties",
+    "type": "object",
     "format": "grid",
     "properties": {
         "manure_management_scenarios": {
@@ -14,6 +15,7 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Management Scenarios Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "scenario_id": {
@@ -83,8 +85,7 @@ manure_management_schema = {
                         },
                         "type": "string"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "bedding_configs": {
@@ -98,6 +99,7 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Bedding Configs Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
@@ -208,8 +210,7 @@ manure_management_schema = {
                         },
                         "type": "number"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "manure_handler_configs": {
@@ -223,6 +224,7 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Handler Configs Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
@@ -315,8 +317,7 @@ manure_management_schema = {
                         "maximum": 1.0,
                         "type": "number"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "manure_separator_configs": {
@@ -330,6 +331,7 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Separator Configs Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
@@ -440,8 +442,7 @@ manure_management_schema = {
                         },
                         "type": "number"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "manure_treatment_configs": {
@@ -455,6 +456,7 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Treatment Configs Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
@@ -761,8 +763,7 @@ manure_management_schema = {
                         "default": 0.01,
                         "type": "number"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "fileName": {
@@ -777,6 +778,5 @@ manure_management_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    },
-    "type": "object"
+    }
 }

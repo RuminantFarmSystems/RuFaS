@@ -1,5 +1,6 @@
 tillage_schedule_schema = {
     "title": "Tillage Schedule Properties",
+    "type": "object",
     "format": "grid",
     "properties": {
         "years": {
@@ -183,6 +184,5 @@ tillage_schedule_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    },
-    "type": "object"
+    }
 }

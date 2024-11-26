@@ -351,7 +351,6 @@ def test_create_bool_schema(
             {
                 "type": "array",
                 "description": "Death rate for first, second, third, and later lactations",
-                "nullable": True,
                 "properties": {
                     "type": "number",
                     "description": "Death rate for first, second, third, and later lactations",
@@ -361,7 +360,7 @@ def test_create_bool_schema(
             },
             {
                 "title": "Parity Death Prob",
-                "type": ["array", "null"],
+                "type": "array",
                 "format": "grid",
                 "options": {
                     "infoText": "Death rate for first, second, third, and later lactations",

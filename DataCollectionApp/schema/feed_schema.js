@@ -1,5 +1,6 @@
 feed_schema = {
     "title": "Feed Properties",
+    "type": "object",
     "format": "grid",
     "properties": {
         "calf_feeds": {
@@ -107,6 +108,7 @@ feed_schema = {
             },
             "items": {
                 "title": "Purchased Feeds Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "purchased_feed": {
@@ -134,8 +136,7 @@ feed_schema = {
                         "minimum": 0,
                         "type": "number"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "farm_grown_feeds": {
@@ -173,6 +174,7 @@ feed_schema = {
             },
             "items": {
                 "title": "Storage Options Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "storage_type": {
@@ -330,12 +332,12 @@ feed_schema = {
                         "default": 1000,
                         "type": "number"
                     }
-                },
-                "type": "object"
+                }
             }
         },
         "user_defined_ration_percentages": {
             "title": "User Defined Ration Percentages",
+            "type": "object",
             "format": "grid",
             "properties": {
                 "calf": {
@@ -350,6 +352,7 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Calf Element",
+                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
@@ -379,8 +382,7 @@ feed_schema = {
                                 "maximum": 100,
                                 "type": "number"
                             }
-                        },
-                        "type": "object"
+                        }
                     }
                 },
                 "growing": {
@@ -395,6 +397,7 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Growing Element",
+                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
@@ -424,8 +427,7 @@ feed_schema = {
                                 "maximum": 100,
                                 "type": "number"
                             }
-                        },
-                        "type": "object"
+                        }
                     }
                 },
                 "close_up": {
@@ -440,6 +442,7 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Close Up Element",
+                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
@@ -469,8 +472,7 @@ feed_schema = {
                                 "maximum": 100,
                                 "type": "number"
                             }
-                        },
-                        "type": "object"
+                        }
                     }
                 },
                 "lac_cow": {
@@ -485,6 +487,7 @@ feed_schema = {
                     },
                     "items": {
                         "title": "Lac Cow Element",
+                        "type": "object",
                         "format": "grid",
                         "properties": {
                             "feed_type": {
@@ -514,8 +517,7 @@ feed_schema = {
                                 "maximum": 100,
                                 "type": "number"
                             }
-                        },
-                        "type": "object"
+                        }
                     }
                 },
                 "tolerance": {
@@ -547,8 +549,7 @@ feed_schema = {
             },
             "options": {
                 "infoText": "User Defined Ration Percentages"
-            },
-            "type": "object"
+            }
         },
         "fileName": {
             "title": "File Name",
@@ -562,6 +563,5 @@ feed_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    },
-    "type": "object"
+    }
 }

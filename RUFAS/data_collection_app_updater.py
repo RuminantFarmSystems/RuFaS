@@ -343,16 +343,11 @@ class DataCollectionAppUpdater:
         }
         default = input_properties.get("default")
         description = input_properties.get("description")
-        nullable = input_properties.get("nullable")
 
         if default is not None:
             schema["default"] = default
         if description is not None:
             schema["options"]["infoText"] = description
-        if nullable:
-            schema["type"] = ["array", "null"]
-        else:
-            schema["type"] = "array"
 
         element_properties = input_properties["properties"]
         element_schema_creator = self._type_to_schema_map[element_properties["type"]]
@@ -380,20 +375,15 @@ class DataCollectionAppUpdater:
 
         """
         title = self._parse_variable_name_into_title(var_name)
-        schema: dict[str, Any] = {"title": title, "format": "grid", "properties": {}}
+        schema: dict[str, Any] = {"title": title, "type": "object", "format": "grid", "properties": {}}
         default = input_properties.get("default")
         description = input_properties.get("description")
-        nullable = input_properties.get("nullable")
 
         if default is not None:
             schema["default"] = default
         if description is not None:
             schema["options"] = {}
             schema["options"]["infoText"] = description
-        if nullable:
-            schema["type"] = ["object", "null"]
-        else:
-            schema["type"] = "object"
 
         ignored_keys = ["type", "description", "default"]
         keys = [key for key in input_properties.keys() if key not in ignored_keys]

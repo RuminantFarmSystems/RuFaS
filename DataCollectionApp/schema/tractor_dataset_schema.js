@@ -1,5 +1,6 @@
 tractor_dataset_schema = {
     "title": "Tractor Dataset Properties",
+    "type": "object",
     "format": "grid",
     "properties": {
         "ID": {
@@ -373,6 +374,5 @@ tractor_dataset_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    },
-    "type": "object"
+    }
 }

@@ -1,5 +1,6 @@
 crop_schedule_schema = {
     "title": "Crop Schedule Properties",
+    "type": "object",
     "format": "grid",
     "properties": {
         "crop_schedules": {
@@ -14,6 +15,7 @@ crop_schedule_schema = {
             },
             "items": {
                 "title": "Crop Schedules Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "crop_species": {
@@ -230,8 +232,7 @@ crop_schedule_schema = {
                 },
                 "options": {
                     "infoText": "Contains all the properties necessary to create a CropSchedule object."
-                },
-                "type": "object"
+                }
             }
         },
         "fileName": {
@@ -246,6 +247,5 @@ crop_schedule_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    },
-    "type": "object"
+    }
 }

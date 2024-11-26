@@ -1,5 +1,6 @@
 fertilizer_schedule_schema = {
     "title": "Fertilizer Schedule Properties",
+    "type": "object",
     "format": "grid",
     "properties": {
         "available_fertilizer_mixes": {
@@ -14,6 +15,7 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Available Fertilizer Mixes Element",
+                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
@@ -69,8 +71,7 @@ fertilizer_schedule_schema = {
                 },
                 "options": {
                     "infoText": "The name and nutrient breakdown of a single fertilizer mix."
-                },
-                "type": "object"
+                }
             }
         },
         "mix_names": {
@@ -288,6 +289,5 @@ fertilizer_schedule_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    },
-    "type": "object"
+    }
 }
