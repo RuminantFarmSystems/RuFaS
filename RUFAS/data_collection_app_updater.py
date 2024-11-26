@@ -307,6 +307,15 @@ class DataCollectionAppUpdater:
         When a string input is taken, often it is to select from a preset group of options. This method is designed to
         derive those options from the Regex pattern that is used to validate it.
 
+        Examples
+        --------
+        >>> DataCollectionAppUpdater._get_list_of_options("^(kg)$")
+        ["kg"]
+        >>> DataCollectionAppUpdater._get_list_of_options("^(default|no_kill)$")
+        ["default", "no_kill"]
+        >>> DataCollectionAppUpdater._get_list_of_options("^(TAI|ED|Synch-ED)$")
+        ["TAI", "ED", "Synch-ED"]
+
         """
         pattern = "\\^\\(.*\\)\\$"
         is_valid_pattern = bool(re.match(pattern, input_pattern))
