@@ -181,14 +181,10 @@ class DataCollectionAppUpdater:
             schema["minimum"] = minimum
         if maximum is not None:
             schema["maximum"] = maximum
-        if default is not None:
-            schema["default"] = default
-        if description is not None:
-            schema["options"]["infoText"] = description
-        if nullable:
-            schema["type"] = ["number", "null"]
-        else:
-            schema["type"] = "number"
+        schema["default"] = default
+        schema["options"]["inputAttributes"]["placeholder"] = ""
+        schema["options"]["infoText"] = description
+        schema["type"] = ["number", "null"] if nullable else "number"
 
         return schema
 
@@ -212,7 +208,6 @@ class DataCollectionAppUpdater:
         title = self._parse_variable_name_into_title(var_name)
         schema: dict[str, Any] = {
             "title": title,
-            "type": "boolean",
             "format": "checkbox",
             "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
         }
@@ -220,14 +215,9 @@ class DataCollectionAppUpdater:
         description = input_properties.get("description")
         nullable = input_properties.get("nullable")
 
-        if default is not None:
-            schema["default"] = default
-        if description is not None:
-            schema["options"]["infoText"] = description
-        if nullable:
-            schema["type"] = ["boolean", "null"]
-        else:
-            schema["type"] = "boolean"
+        schema["default"] = default
+        schema["options"]["infoText"] = description
+        schema["type"] = ["boolean", "null"] if nullable else "boolean"
 
         return schema
 
@@ -258,10 +248,8 @@ class DataCollectionAppUpdater:
         description = input_properties.get("description")
         nullable = input_properties.get("nullable")
 
-        if default is not None:
-            schema["default"] = default
-        if description is not None:
-            schema["options"]["infoText"] = description
+        schema["default"] = default
+        schema["options"]["infoText"] = description
         if pattern is not None:
             try:
                 enum = self._get_list_of_options(pattern)
@@ -275,10 +263,7 @@ class DataCollectionAppUpdater:
                     info_map,
                 )
                 schema["pattern"] = pattern
-        if nullable:
-            schema["type"] = ["string", "null"]
-        else:
-            schema["type"] = "string"
+        schema["type"] = ["string", "null"] if nullable else "string"
 
         return schema
 
@@ -321,7 +306,7 @@ class DataCollectionAppUpdater:
         if not is_valid_pattern:
             raise ValueError(f"'{input_pattern}' is not a valid pattern. Cannot create list of valid options.")
 
-        unsplit_list = input_pattern[2:-2]
+        unsplit_list = input_pattern[2:-2]  # Removes "^(" and ")$" from the start and end of the string, respectively.
         split_list = unsplit_list.split("|")
         return split_list
 
@@ -352,10 +337,8 @@ class DataCollectionAppUpdater:
         default = input_properties.get("default")
         description = input_properties.get("description")
 
-        if default is not None:
-            schema["default"] = default
-        if description is not None:
-            schema["options"]["infoText"] = description
+        schema["default"] = default
+        schema["options"]["infoText"] = description
 
         element_properties = input_properties["properties"]
         element_schema_creator = self._type_to_schema_map[element_properties["type"]]
@@ -387,11 +370,8 @@ class DataCollectionAppUpdater:
         default = input_properties.get("default")
         description = input_properties.get("description")
 
-        if default is not None:
-            schema["default"] = default
-        if description is not None:
-            schema["options"] = {}
-            schema["options"]["infoText"] = description
+        schema["default"] = default
+        schema["options"] = {"infoText": description}
 
         ignored_keys = ["type", "description", "default"]
         keys = [key for key in input_properties.keys() if key not in ignored_keys]

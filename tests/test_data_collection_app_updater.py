@@ -246,6 +246,7 @@ def test_create_string_schema_value_error(
                     "infoText": "Number of times that this crop schedule should be repeated.",
                     "inputAttributes": {
                         "class": "text-primary form-control",
+                        "placeholder": ""
                     },
                 },
             },
@@ -271,6 +272,7 @@ def test_create_string_schema_value_error(
                     "infoText": "Number of times that this crop schedule should be repeated.",
                     "inputAttributes": {
                         "class": "text-primary form-control",
+                        "placeholder": ""
                     },
                 },
             },
@@ -366,16 +368,18 @@ def test_create_bool_schema(
                     "infoText": "Death rate for first, second, third, and later lactations",
                     "inputAttributes": {"class": "text-primary form-control"},
                 },
+                "default": None,
                 "items": {
                     "title": "Parity Death Prob Element",
                     "type": "number",
                     "minimum": 0,
                     "maximum": 1,
+                    "default": None,
                     "options": {
                         "grid_columns": 12,
                         "infoText": "Death rate for first, second, third, and later lactations",
                         "inputAttributes": {
-                            "class": "text-primary form-control",
+                            "class": "text-primary form-control", "placeholder": ""
                         },
                     },
                 },
@@ -408,20 +412,24 @@ def test_create_bool_schema(
                     "inputAttributes": {"class": "text-primary form-control"},
                     "infoText": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
                 },
+                "default": None,
                 "items": {
                     "title": "Manure Management Scenarios Element",
                     "type": "object",
                     "format": "grid",
+                    "default": None,
+                    'options': {'infoText': None},
                     "properties": {
                         "scenario_id": {
                             "title": "Scenario Id",
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
-                                "inputAttributes": {"class": "text-primary form-control"},
+                                "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
                                 "infoText": "Scenario ID -- An identification number for livestock enclosures.",
                             },
                             "minimum": 0,
+                            "default": None,
                         },
                         "bedding_type": {
                             "title": "Bedding Type",
@@ -433,6 +441,7 @@ def test_create_bool_schema(
                             },
                             "enum": ["Sand", "Straw", "Sawdust", "Manure_solids", "Other"],
                             "format": "select2",
+                            "default": None,
                         },
                     },
                 },
@@ -462,6 +471,7 @@ def test_create_array_schema(
             {
                 "title": "Life Cycle",
                 "type": "object",
+                "default": None,
                 "format": "grid",
                 "options": {"infoText": ""},
                 "properties": {
@@ -470,11 +480,12 @@ def test_create_array_schema(
                         "type": "number",
                         "minimum": 0,
                         "maximum": 1,
+                        "default": None,
                         "options": {
                             "grid_columns": 12,
                             "infoText": "Stillbirth rate",
                             "inputAttributes": {
-                                "class": "text-primary form-control",
+                                "class": "text-primary form-control", "placeholder": ""
                             },
                         },
                     }
@@ -503,6 +514,7 @@ def test_create_array_schema(
             {
                 "title": "Herd Information",
                 "type": "object",
+                "default": None,
                 "format": "grid",
                 "options": {"infoText": "Herd Demographics"},
                 "properties": {
@@ -511,7 +523,7 @@ def test_create_array_schema(
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
-                            "inputAttributes": {"class": "text-primary form-control"},
+                            "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
                             "infoText": "Number of Calves (head) -- The initial number of pre-weaned calves",
                         },
                         "minimum": 0,
