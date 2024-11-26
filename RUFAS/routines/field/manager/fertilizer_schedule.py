@@ -121,7 +121,7 @@ class FertilizerSchedule(Schedule):
         ]
         fraction_parameters = [("surface remainder fractions", self.surface_remainder_fractions)]
 
-        self.validate_parameters(non_negative_parameters, fraction_parameters)
+        self._validate_parameters(non_negative_parameters, fraction_parameters)
 
         self.validate_equal_lengths(
             error_header,

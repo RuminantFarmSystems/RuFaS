@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import List
 
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
@@ -196,7 +197,7 @@ class Schedule:
             )
         return True
 
-    def validate_parameters(
+    def _validate_parameters(
         self,
         non_negative_parameters: list[tuple[str, list] | None],
         fraction_parameters: list[tuple[str, list] | None],
