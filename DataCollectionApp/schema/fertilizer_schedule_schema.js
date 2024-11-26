@@ -1,6 +1,5 @@
 fertilizer_schedule_schema = {
     "title": "Fertilizer Schedule Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "available_fertilizer_mixes": {
@@ -15,23 +14,21 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Available Fertilizer Mixes Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
                         "title": "Name",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Name of the fertilizer mix."
-                        }
+                        },
+                        "type": "string"
                     },
                     "N": {
                         "title": "N",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -40,11 +37,11 @@ fertilizer_schedule_schema = {
                             "infoText": "Fraction of nitrogen contained in the fertilizer mix by mass."
                         },
                         "minimum": 0.0,
-                        "maximum": 1.0
+                        "maximum": 1.0,
+                        "type": "number"
                     },
                     "P": {
                         "title": "P",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -53,11 +50,11 @@ fertilizer_schedule_schema = {
                             "infoText": "Fraction of phosphorus contained in the fertilizer mix by mass."
                         },
                         "minimum": 0.0,
-                        "maximum": 1.0
+                        "maximum": 1.0,
+                        "type": "number"
                     },
                     "K": {
                         "title": "K",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -66,12 +63,14 @@ fertilizer_schedule_schema = {
                             "infoText": "Fraction of potassium contained in the fertilizer mix by mass."
                         },
                         "minimum": 0.0,
-                        "maximum": 1.0
+                        "maximum": 1.0,
+                        "type": "number"
                     }
                 },
                 "options": {
                     "infoText": "The name and nutrient breakdown of a single fertilizer mix."
-                }
+                },
+                "type": "object"
             }
         },
         "mix_names": {
@@ -86,13 +85,13 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Mix Names Element",
-                "type": "string",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
-                }
+                },
+                "type": "string"
             }
         },
         "years": {
@@ -107,14 +106,14 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Years Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 1
+                "minimum": 1,
+                "type": "number"
             }
         },
         "days": {
@@ -129,7 +128,6 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Days Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -137,7 +135,8 @@ fertilizer_schedule_schema = {
                     }
                 },
                 "minimum": 1,
-                "maximum": 366
+                "maximum": 366,
+                "type": "number"
             }
         },
         "nitrogen_masses": {
@@ -152,14 +151,14 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Nitrogen Masses Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "phosphorus_masses": {
@@ -174,14 +173,14 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Phosphorus Masses Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "potassium_masses": {
@@ -196,14 +195,14 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Potassium Masses Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "application_depths": {
@@ -218,14 +217,14 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Application Depths Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "minimum": 0.0
+                "minimum": 0.0,
+                "type": "number"
             }
         },
         "surface_remainder_fractions": {
@@ -240,7 +239,6 @@ fertilizer_schedule_schema = {
             },
             "items": {
                 "title": "Surface Remainder Fractions Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -248,12 +246,12 @@ fertilizer_schedule_schema = {
                     }
                 },
                 "minimum": 0.0,
-                "maximum": 1.0
+                "maximum": 1.0,
+                "type": "number"
             }
         },
         "pattern_repeat": {
             "title": "Pattern Repeat",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -262,11 +260,11 @@ fertilizer_schedule_schema = {
                 "infoText": "Number of times that this fertilizer application schedule should be repeated."
             },
             "minimum": 0,
-            "default": 0
+            "default": 0,
+            "type": "number"
         },
         "pattern_skip": {
             "title": "Pattern Skip",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -275,7 +273,8 @@ fertilizer_schedule_schema = {
                 "infoText": "Number of years to be skipped between schedule repetitions."
             },
             "minimum": 0,
-            "default": 0
+            "default": 0,
+            "type": "number"
         },
         "fileName": {
             "title": "File Name",
@@ -289,5 +288,6 @@ fertilizer_schedule_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }

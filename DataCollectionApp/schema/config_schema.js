@@ -1,11 +1,9 @@
 config_schema = {
     "title": "Config Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "start_date": {
             "title": "Start Date",
-            "type": "string",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -14,11 +12,11 @@ config_schema = {
                 "infoText": "The year and Julian day on which the simulation will start."
             },
             "default": "2009:1",
-            "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$"
+            "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
+            "type": "string"
         },
         "end_date": {
             "title": "End Date",
-            "type": "string",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -27,7 +25,8 @@ config_schema = {
                 "infoText": "The year and Julian day on which the simulation will end."
             },
             "default": "2009:100",
-            "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$"
+            "pattern": "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
+            "type": "string"
         },
         "simulate_animals": {
             "title": "Simulate Animals",
@@ -44,7 +43,6 @@ config_schema = {
         },
         "nutrient_standard": {
             "title": "Nutrient Standard",
-            "type": "string",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -57,11 +55,11 @@ config_schema = {
                 "NASEM",
                 "NRC"
             ],
-            "format": "select2"
+            "format": "select2",
+            "type": "string"
         },
         "FIPS_county_code": {
             "title": "Fips County Code",
-            "type": "number",
             "options": {
                 "grid_columns": 12,
                 "inputAttributes": {
@@ -70,7 +68,8 @@ config_schema = {
                 "infoText": "Unique 5-digit code that represents a specific U.S. county."
             },
             "minimum": 1000,
-            "maximum": 56045
+            "maximum": 56045,
+            "type": "number"
         },
         "include_detailed_values": {
             "title": "Include Detailed Values",
@@ -97,5 +96,6 @@ config_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }

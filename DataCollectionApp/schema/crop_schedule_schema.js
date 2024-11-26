@@ -1,6 +1,5 @@
 crop_schedule_schema = {
     "title": "Crop Schedule Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "crop_schedules": {
@@ -15,12 +14,10 @@ crop_schedule_schema = {
             },
             "items": {
                 "title": "Crop Schedules Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "crop_species": {
                         "title": "Crop Species",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -52,7 +49,8 @@ crop_schedule_schema = {
                             "winter_wheat_silage",
                             "winter_wheat_baleage"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "harvest_days": {
                         "title": "Harvest Days",
@@ -66,7 +64,6 @@ crop_schedule_schema = {
                         },
                         "items": {
                             "title": "Harvest Days Element",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -75,7 +72,8 @@ crop_schedule_schema = {
                                 "infoText": "Julian day of year to harvest"
                             },
                             "minimum": 1,
-                            "maximum": 366
+                            "maximum": 366,
+                            "type": "number"
                         }
                     },
                     "harvest_years": {
@@ -90,14 +88,14 @@ crop_schedule_schema = {
                         },
                         "items": {
                             "title": "Harvest Years Element",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
                                     "class": "text-primary form-control"
                                 }
                             },
-                            "minimum": 1
+                            "minimum": 1,
+                            "type": "number"
                         }
                     },
                     "harvest_operations": {
@@ -112,7 +110,6 @@ crop_schedule_schema = {
                         },
                         "items": {
                             "title": "Harvest Operations Element",
-                            "type": "string",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -125,12 +122,12 @@ crop_schedule_schema = {
                                 "harvest_only",
                                 "kill_only"
                             ],
-                            "format": "select2"
+                            "format": "select2",
+                            "type": "string"
                         }
                     },
                     "harvest_type": {
                         "title": "Harvest Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -143,7 +140,8 @@ crop_schedule_schema = {
                             "scheduled",
                             "optimal"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "planting_days": {
                         "title": "Planting Days",
@@ -157,7 +155,6 @@ crop_schedule_schema = {
                         },
                         "items": {
                             "title": "Planting Days Element",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
@@ -165,7 +162,8 @@ crop_schedule_schema = {
                                 }
                             },
                             "minimum": 1,
-                            "maximum": 366
+                            "maximum": 366,
+                            "type": "number"
                         }
                     },
                     "planting_years": {
@@ -180,19 +178,18 @@ crop_schedule_schema = {
                         },
                         "items": {
                             "title": "Planting Years Element",
-                            "type": "number",
                             "options": {
                                 "grid_columns": 12,
                                 "inputAttributes": {
                                     "class": "text-primary form-control"
                                 }
                             },
-                            "minimum": 1
+                            "minimum": 1,
+                            "type": "number"
                         }
                     },
                     "pattern_repeat": {
                         "title": "Pattern Repeat",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -201,11 +198,11 @@ crop_schedule_schema = {
                             "infoText": "Number of times that this crop schedule should be repeated."
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "planting_skip": {
                         "title": "Planting Skip",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -214,11 +211,11 @@ crop_schedule_schema = {
                             "infoText": "Number of years to be skipped between planting schedule repetitions."
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "harvesting_skip": {
                         "title": "Harvesting Skip",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -227,12 +224,14 @@ crop_schedule_schema = {
                             "infoText": "Number of years to be skipped between harvest schedule repetitions."
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     }
                 },
                 "options": {
                     "infoText": "Contains all the properties necessary to create a CropSchedule object."
-                }
+                },
+                "type": "object"
             }
         },
         "fileName": {
@@ -247,5 +246,6 @@ crop_schedule_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }

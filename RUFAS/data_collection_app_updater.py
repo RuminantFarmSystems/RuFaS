@@ -169,13 +169,13 @@ class DataCollectionAppUpdater:
         title = self._parse_variable_name_into_title(var_name)
         schema: dict[str, Any] = {
             "title": title,
-            "type": "number",
             "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
         }
         minimum = input_properties.get("minimum")
         maximum = input_properties.get("maximum")
         default = input_properties.get("default")
         description = input_properties.get("description")
+        nullable = input_properties.get("nullable")
 
         if minimum is not None:
             schema["minimum"] = minimum
@@ -185,6 +185,10 @@ class DataCollectionAppUpdater:
             schema["default"] = default
         if description is not None:
             schema["options"]["infoText"] = description
+        if nullable:
+            schema["type"] = ["number", "null"]
+        else:
+            schema["type"] = "number"
 
         return schema
 
@@ -214,11 +218,16 @@ class DataCollectionAppUpdater:
         }
         default = input_properties.get("default")
         description = input_properties.get("description")
+        nullable = input_properties.get("nullable")
 
         if default is not None:
             schema["default"] = default
         if description is not None:
             schema["options"]["infoText"] = description
+        if nullable:
+            schema["type"] = ["boolean", "null"]
+        else:
+            schema["type"] = "boolean"
 
         return schema
 
@@ -242,12 +251,12 @@ class DataCollectionAppUpdater:
         title = self._parse_variable_name_into_title(var_name)
         schema: dict[str, Any] = {
             "title": title,
-            "type": "string",
             "options": {"grid_columns": 12, "inputAttributes": {"class": "text-primary form-control"}},
         }
         default = input_properties.get("default")
         pattern = input_properties.get("pattern")
         description = input_properties.get("description")
+        nullable = input_properties.get("nullable")
 
         if default is not None:
             schema["default"] = default
@@ -266,6 +275,10 @@ class DataCollectionAppUpdater:
                     info_map,
                 )
                 schema["pattern"] = pattern
+        if nullable:
+            schema["type"] = ["string", "null"]
+        else:
+            schema["type"] = "string"
 
         return schema
 
@@ -330,11 +343,16 @@ class DataCollectionAppUpdater:
         }
         default = input_properties.get("default")
         description = input_properties.get("description")
+        nullable = input_properties.get("nullable")
 
         if default is not None:
             schema["default"] = default
         if description is not None:
             schema["options"]["infoText"] = description
+        if nullable:
+            schema["type"] = ["array", "null"]
+        else:
+            schema["type"] = "array"
 
         element_properties = input_properties["properties"]
         element_schema_creator = self._type_to_schema_map[element_properties["type"]]
@@ -362,15 +380,20 @@ class DataCollectionAppUpdater:
 
         """
         title = self._parse_variable_name_into_title(var_name)
-        schema: dict[str, Any] = {"title": title, "type": "object", "format": "grid", "properties": {}}
+        schema: dict[str, Any] = {"title": title, "format": "grid", "properties": {}}
         default = input_properties.get("default")
         description = input_properties.get("description")
+        nullable = input_properties.get("nullable")
 
         if default is not None:
             schema["default"] = default
         if description is not None:
             schema["options"] = {}
             schema["options"]["infoText"] = description
+        if nullable:
+            schema["type"] = ["object", "null"]
+        else:
+            schema["type"] = "object"
 
         ignored_keys = ["type", "description", "default"]
         keys = [key for key in input_properties.keys() if key not in ignored_keys]

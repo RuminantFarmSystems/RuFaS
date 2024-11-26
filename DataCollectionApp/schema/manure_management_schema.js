@@ -1,6 +1,5 @@
 manure_management_schema = {
     "title": "Manure Management Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "manure_management_scenarios": {
@@ -15,12 +14,10 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Management Scenarios Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "scenario_id": {
                         "title": "Scenario Id",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -28,64 +25,66 @@ manure_management_schema = {
                             },
                             "infoText": "Scenario ID -- An identification number for livestock enclosures."
                         },
-                        "minimum": 0
+                        "minimum": 0,
+                        "type": "number"
                     },
                     "bedding_type": {
                         "title": "Bedding Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Name of the bedding configuration to be used in the scenario. Must match 'name' attribute of the Bedding Config to be used."
-                        }
+                        },
+                        "type": "string"
                     },
                     "manure_handler": {
                         "title": "Manure Handler",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Name of the Manure Handling Method -- Method for cleaning barn alleyways. Must match 'name' attribute of the Manure Handler Config to be used."
-                        }
+                        },
+                        "type": "string"
                     },
                     "manure_separator": {
                         "title": "Manure Separator",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Name of the manure separator used in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
-                        }
+                        },
+                        "type": "string"
                     },
                     "manure_separator_after_digestion": {
                         "title": "Manure Separator After Digestion",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Name of the manure separator used after digestion in a manure management scenario. Each named separator must have a Manure Separator Config defined, unless no separator ('none') is used."
-                        }
+                        },
+                        "type": "string"
                     },
                     "manure_treatment": {
                         "title": "Manure Treatment",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Name of the manure treatment and/or storage used in a manure management scenario. Each named treatment must have a Manure Treatment Config defined, unless the treatment is 'anaerobic digestion and lagoon' or 'anaerobic digestion and lagoon with separator'."
-                        }
+                        },
+                        "type": "string"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "bedding_configs": {
@@ -99,23 +98,21 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Bedding Configs Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
                         "title": "Name",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Unique identifier for this bedding configuration."
-                        }
+                        },
+                        "type": "string"
                     },
                     "bedding_type": {
                         "title": "Bedding Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -131,86 +128,88 @@ manure_management_schema = {
                             "CBPB sawdust",
                             "none"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "bedding_mass_per_day": {
                         "title": "Bedding Mass Per Day",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "bedding_density": {
                         "title": "Bedding Density",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "bedding_dry_matter_content": {
                         "title": "Bedding Dry Matter Content",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "bedding_cleaned_fraction": {
                         "title": "Bedding Cleaned Fraction",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "bedding_carbon_fraction": {
                         "title": "Bedding Carbon Fraction",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "bedding_phosphorus_content": {
                         "title": "Bedding Phosphorus Content",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "sand_removal_efficiency": {
                         "title": "Sand Removal Efficiency",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "manure_handler_configs": {
@@ -224,23 +223,21 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Handler Configs Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
                         "title": "Name",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "Name of the unique manure handler config."
-                        }
+                        },
+                        "type": "string"
                     },
                     "manure_handler_type": {
                         "title": "Manure Handler Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -255,22 +252,22 @@ manure_management_schema = {
                             "tillage",
                             "harrowing"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "cleaning_water_use_rate": {
                         "title": "Cleaning Water Use Rate",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "minutes_per_cleaning": {
                         "title": "Minutes Per Cleaning",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -278,11 +275,11 @@ manure_management_schema = {
                             },
                             "infoText": "No description available"
                         },
-                        "minimum": 0
+                        "minimum": 0,
+                        "type": "number"
                     },
                     "cleanings_per_day": {
                         "title": "Cleanings Per Day",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -290,11 +287,11 @@ manure_management_schema = {
                             },
                             "infoText": "No description available"
                         },
-                        "minimum": 0
+                        "minimum": 0,
+                        "type": "number"
                     },
                     "daily_tillage_frequency": {
                         "title": "Daily Tillage Frequency",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -302,11 +299,11 @@ manure_management_schema = {
                             },
                             "infoText": "Daily Tillage Frequency -- The number of times per day that tillage is performed."
                         },
-                        "minimum": 0
+                        "minimum": 0,
+                        "type": "number"
                     },
                     "cleaning_water_recycle_fraction": {
                         "title": "Cleaning Water Recycle Fraction",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -315,9 +312,11 @@ manure_management_schema = {
                             "infoText": "Fraction of cleaning water that is from recycled (not fresh) water sources."
                         },
                         "minimum": 0.0,
-                        "maximum": 1.0
+                        "maximum": 1.0,
+                        "type": "number"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "manure_separator_configs": {
@@ -331,12 +330,10 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Separator Configs Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
                         "title": "Name",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -347,11 +344,11 @@ manure_management_schema = {
                         "enum": [
                             "?!none$)(.*"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "manure_separator_type": {
                         "title": "Manure Separator Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -363,86 +360,88 @@ manure_management_schema = {
                             "screw press",
                             "rotary screen"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "percent_dry_solids": {
                         "title": "Percent Dry Solids",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "total_solids_removal_efficiency_for_separator": {
                         "title": "Total Solids Removal Efficiency For Separator",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "volatile_solids_removal_efficiency_for_separator": {
                         "title": "Volatile Solids Removal Efficiency For Separator",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "nitrogen_removal_efficiency_for_separator": {
                         "title": "Nitrogen Removal Efficiency For Separator",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "total_ammoniacal_nitrogen_removal_efficiency_for_separator": {
                         "title": "Total Ammoniacal Nitrogen Removal Efficiency For Separator",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "phosphorus_removal_efficiency_for_separator": {
                         "title": "Phosphorus Removal Efficiency For Separator",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     },
                     "potassium_removal_efficiency_for_separator": {
                         "title": "Potassium Removal Efficiency For Separator",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
                                 "class": "text-primary form-control"
                             },
                             "infoText": "No description available"
-                        }
+                        },
+                        "type": "number"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "manure_treatment_configs": {
@@ -456,12 +455,10 @@ manure_management_schema = {
             },
             "items": {
                 "title": "Manure Treatment Configs Element",
-                "type": "object",
                 "format": "grid",
                 "properties": {
                     "name": {
                         "title": "Name",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -473,11 +470,11 @@ manure_management_schema = {
                             "?!anaerobic digestion and lagoon",
                             "anaerobic digestion and lagoon with separator$)(.*"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "manure_treatment_type": {
                         "title": "Manure Treatment Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -494,11 +491,11 @@ manure_management_schema = {
                             "composting",
                             "anaerobic digestion"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "total_solids_removal_efficiency_for_treatment": {
                         "title": "Total Solids Removal Efficiency For Treatment",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -508,11 +505,11 @@ manure_management_schema = {
                         },
                         "minimum": 0.0,
                         "maximum": 1.0,
-                        "default": 0.0
+                        "default": 0.0,
+                        "type": "number"
                     },
                     "volatile_solids_removal_efficiency_for_treatment": {
                         "title": "Volatile Solids Removal Efficiency For Treatment",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -522,11 +519,11 @@ manure_management_schema = {
                         },
                         "minimum": 0.0,
                         "maximum": 1.0,
-                        "default": 0.0
+                        "default": 0.0,
+                        "type": "number"
                     },
                     "nitrogen_removal_efficiency_for_treatment": {
                         "title": "Nitrogen Removal Efficiency For Treatment",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -536,11 +533,11 @@ manure_management_schema = {
                         },
                         "minimum": 0.0,
                         "maximum": 1.0,
-                        "default": 0.0
+                        "default": 0.0,
+                        "type": "number"
                     },
                     "total_ammoniacal_nitrogen_removal_efficiency_for_treatment": {
                         "title": "Total Ammoniacal Nitrogen Removal Efficiency For Treatment",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -550,11 +547,11 @@ manure_management_schema = {
                         },
                         "minimum": 0.0,
                         "maximum": 1.0,
-                        "default": 0.0
+                        "default": 0.0,
+                        "type": "number"
                     },
                     "phosphorus_removal_efficiency_for_treatment": {
                         "title": "Phosphorus Removal Efficiency For Treatment",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -564,11 +561,11 @@ manure_management_schema = {
                         },
                         "minimum": 0.0,
                         "maximum": 1.0,
-                        "default": 0.0
+                        "default": 0.0,
+                        "type": "number"
                     },
                     "potassium_removal_efficiency_for_treatment": {
                         "title": "Potassium Removal Efficiency For Treatment",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -578,11 +575,11 @@ manure_management_schema = {
                         },
                         "minimum": 0.0,
                         "maximum": 1.0,
-                        "default": 0.0
+                        "default": 0.0,
+                        "type": "number"
                     },
                     "storage_time_period": {
                         "title": "Storage Time Period",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -591,11 +588,11 @@ manure_management_schema = {
                             "infoText": "Storage Time Period -- The number of days that manure is stored before it is removed from the system (day)."
                         },
                         "minimum": 0,
-                        "default": 120
+                        "default": 120,
+                        "type": "number"
                     },
                     "freeboard_input": {
                         "title": "Freeboard Input",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -603,11 +600,11 @@ manure_management_schema = {
                             },
                             "infoText": "Freeboard -- Empty storage space above the manure in the treatment system."
                         },
-                        "default": 0.0
+                        "default": 0.0,
+                        "type": "number"
                     },
                     "composting_type": {
                         "title": "Composting Type",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -621,11 +618,11 @@ manure_management_schema = {
                             "passive windrow",
                             "static pile"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "last_compost_turning_or_addition": {
                         "title": "Last Compost Turning Or Addition",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -633,11 +630,11 @@ manure_management_schema = {
                             },
                             "infoText": "The number of days since the last turning or addition event (day)"
                         },
-                        "default": 1
+                        "default": 1,
+                        "type": "number"
                     },
                     "manure_cover": {
                         "title": "Manure Cover",
-                        "type": "string",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -653,11 +650,11 @@ manure_management_schema = {
                             "cover and flare",
                             "N/A"
                         ],
-                        "format": "select2"
+                        "format": "select2",
+                        "type": "string"
                     },
                     "hydraulic_retention_time": {
                         "title": "Hydraulic Retention Time",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -666,11 +663,11 @@ manure_management_schema = {
                             "infoText": "Hydraulic Retention Time -- The average time that manure is retained in the treatment system (day)."
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "sludge_accumulation_period": {
                         "title": "Sludge Accumulation Period",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -679,11 +676,11 @@ manure_management_schema = {
                             "infoText": "Sludge Accumulation Period -- The number of days that sludge is accumulated in the treatment system (day)."
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "sludge_accumulation_volume_fraction": {
                         "title": "Sludge Accumulation Volume Fraction",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -693,11 +690,11 @@ manure_management_schema = {
                         },
                         "minimum": 0,
                         "maximum": 1,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "top_cover_volume_fraction": {
                         "title": "Top Cover Volume Fraction",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -707,11 +704,11 @@ manure_management_schema = {
                         },
                         "minimum": 0,
                         "maximum": 1,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "evaporation_fraction": {
                         "title": "Evaporation Fraction",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -721,11 +718,11 @@ manure_management_schema = {
                         },
                         "minimum": 0,
                         "maximum": 1,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "anaerobic_digestion_temperature_set_point": {
                         "title": "Anaerobic Digestion Temperature Set Point",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -734,11 +731,11 @@ manure_management_schema = {
                             "infoText": "Anaerobic Digestion Temperature Set Point -- The temperature set point for the anaerobic digestion treatment system (degrees Celsius)."
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "anaerobic_digestion_temperature_celsius": {
                         "title": "Anaerobic Digestion Temperature Celsius",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -747,11 +744,11 @@ manure_management_schema = {
                             "infoText": "Anaerobic Digestion Temperature Celsius -- The temperature of the anaerobic digestion treatment system (degrees Celsius)."
                         },
                         "minimum": 0,
-                        "default": 0
+                        "default": 0,
+                        "type": "number"
                     },
                     "digester_methane_leakage_fraction": {
                         "title": "Digester Methane Leakage Fraction",
-                        "type": "number",
                         "options": {
                             "grid_columns": 12,
                             "inputAttributes": {
@@ -761,9 +758,11 @@ manure_management_schema = {
                         },
                         "minimum": 0.0,
                         "maximum": 1.0,
-                        "default": 0.01
+                        "default": 0.01,
+                        "type": "number"
                     }
-                }
+                },
+                "type": "object"
             }
         },
         "fileName": {
@@ -778,5 +777,6 @@ manure_management_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }

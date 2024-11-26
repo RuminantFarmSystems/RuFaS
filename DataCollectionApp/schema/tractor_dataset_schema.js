@@ -1,6 +1,5 @@
 tractor_dataset_schema = {
     "title": "Tractor Dataset Properties",
-    "type": "object",
     "format": "grid",
     "properties": {
         "ID": {
@@ -15,13 +14,13 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Id Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
-                }
+                },
+                "type": "number"
             }
         },
         "Crop Type or Tillage Implement": {
@@ -36,14 +35,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Crop Type Or Tillage Implement Element",
-                "type": "string",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": "untitled"
+                "default": "untitled",
+                "type": "string"
             }
         },
         "Tractor Size": {
@@ -58,7 +57,6 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor Size Element",
-                "type": "string",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -71,7 +69,8 @@ tractor_dataset_schema = {
                     "medium",
                     "large"
                 ],
-                "format": "select2"
+                "format": "select2",
+                "type": "string"
             }
         },
         "Operation": {
@@ -86,13 +85,13 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Operation Element",
-                "type": "string",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
-                }
+                },
+                "type": "string"
             }
         },
         "Depth": {
@@ -107,7 +106,6 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Depth Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -116,7 +114,8 @@ tractor_dataset_schema = {
                 },
                 "minimum": 0,
                 "maximum": 10,
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor Implement": {
@@ -131,13 +130,13 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor Implement Element",
-                "type": "string",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
-                }
+                },
+                "type": "string"
             }
         },
         "Tractor A (unitless)": {
@@ -152,14 +151,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor A (unitless) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor B (unitless)": {
@@ -174,14 +173,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor B (unitless) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor C (unitless)": {
@@ -196,14 +195,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor C (unitless) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor Implement Width (m)": {
@@ -218,7 +217,6 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor Implement Width (m) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -226,7 +224,8 @@ tractor_dataset_schema = {
                     }
                 },
                 "minimum": 0,
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor Implement Mass (kg)": {
@@ -241,7 +240,6 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor Implement Mass (kg) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
@@ -249,7 +247,8 @@ tractor_dataset_schema = {
                     }
                 },
                 "minimum": 0,
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor E (unitless)": {
@@ -264,14 +263,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor E (unitless) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor F (unitless)": {
@@ -286,14 +285,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor F (unitless) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "Tractor G (unitless)": {
@@ -308,14 +307,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Tractor G (unitless) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "is depth relevant": {
@@ -352,14 +351,14 @@ tractor_dataset_schema = {
             },
             "items": {
                 "title": "Max Throughput (tons Dm/hour) Element",
-                "type": "number",
                 "options": {
                     "grid_columns": 12,
                     "inputAttributes": {
                         "class": "text-primary form-control"
                     }
                 },
-                "default": 0
+                "default": 0,
+                "type": "number"
             }
         },
         "fileName": {
@@ -374,5 +373,6 @@ tractor_dataset_schema = {
                 "infoText": "Used to name the file that saves the data entered. This name will not be included in the saved file."
             }
         }
-    }
+    },
+    "type": "object"
 }
