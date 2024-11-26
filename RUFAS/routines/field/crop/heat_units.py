@@ -114,7 +114,7 @@ class HeatUnits:
         self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
 
-    def accumulate_heat_units(self, air_temperature: float = None) -> None:
+    def accumulate_heat_units(self, air_temperature: Optional[float] = None) -> None:
         """
         Accumulates heat units during a day based on the air temperature.
 
@@ -144,7 +144,7 @@ class HeatUnits:
         self.assign_new_heat_units(air_temperature)
         self.add_heat_units()
 
-    def assign_new_heat_units(self, air_temperature: float = None) -> None:
+    def assign_new_heat_units(self, air_temperature: Optional[float] = None) -> None:
         """
         Assign new heat units based on whether the alternative accumulation method is to be used.
 
@@ -169,9 +169,9 @@ class HeatUnits:
 
     def _check_absorb_heat_for_input_errors(
         self,
-        mean_air_temperature: float = None,
-        min_air_temperature: float = None,
-        max_air_temperature: float = None,
+        mean_air_temperature: Optional[float] = None,
+        min_air_temperature: Optional[float] = None,
+        max_air_temperature: Optional[float] = None,
     ) -> None:
         """
         Raises errors if inputs given for absorb_heat_units don't make sense with the value of the
