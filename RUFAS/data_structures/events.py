@@ -167,12 +167,12 @@ class TillageEvent(BaseFieldManagementEvent):
 
     def __init__(
         self,
-        tillage_depth: float,
-        incorporation_fraction: float,
-        mixing_fraction: float,
-        implement: TillageImplement,
         year: int = 1,
         day: int = 160,
+        tillage_depth: float = None,
+        incorporation_fraction: float = None,
+        mixing_fraction: float = None,
+        implement: TillageImplement = None,
     ):
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
