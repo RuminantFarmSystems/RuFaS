@@ -105,7 +105,7 @@ def test_allocate_biomass(light: float, ext: float, conv: float, gfact: float, r
         root_fraction=rfrac,
         biomass=89.0,
     )
-    bioal = BiomassAllocation(data)
+    bioal = BiomassAllocation(data, light_extinction=ext, light_use_efficiency=conv)
     bioal.allocate_biomass(light)
 
     # photosynthesize
@@ -118,9 +118,10 @@ def test_allocate_biomass(light: float, ext: float, conv: float, gfact: float, r
     green = BiomassAllocation._determine_above_ground_biomass(rfrac, mass)
     root = BiomassAllocation._determine_below_ground_biomass(rfrac, mass)
 
+    assert bioal.usable_light == energy
     assert data.biomass_growth_max == max_growth
-    assert data.previous_biomass == 89.0
-    assert data.biomass_growth == growth
+    assert bioal.previous_biomass == 89.0
+    assert bioal.biomass_growth == growth
     assert data.biomass == mass
     assert data.above_ground_biomass == green
     assert data.root_biomass == root

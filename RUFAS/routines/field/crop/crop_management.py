@@ -23,7 +23,7 @@ class CropManagement:
         If not provided, default CropData will be used.
     optimal_harvest_index : float
         Optimal harvest index under ideal growth conditions (unitless).
-    min_harvest_index : float
+    minimum_harvest_index : float
         Minimum harvest index under drought conditions (unitless).
     yield_phosphorus_fraction : Optional[float]
         Fraction of phosphorus in yield (unitless).
@@ -80,7 +80,7 @@ class CropManagement:
         A reference to `crop_data`, on which crop management operations will be conducted.
     optimal_harvest_index : float
         Optimal harvest index under ideal growth conditions (unitless).
-    min_harvest_index : float
+    minimum_harvest_index : float
         Minimum harvest index under drought conditions (unitless).
     yield_phosphorus_fraction : Optional[float]
         Fraction of phosphorus in yield (unitless).
@@ -142,7 +142,7 @@ class CropManagement:
         self,
         crop_data: Optional[CropData] = None,
         optimal_harvest_index: float = 0.5,
-        min_harvest_index: float = 0.2,
+        minimum_harvest_index: float = 0.2,
         yield_phosphorus_fraction: Optional[float] = 0.003,
         harvest_efficiency: float = 1.0,
         crude_protein_percent: float = 12.481,
@@ -170,9 +170,8 @@ class CropManagement:
 
         # SWAT Table A-8
         self.optimal_harvest_index = optimal_harvest_index
-        self.min_harvest_index = min_harvest_index
+        self.minimum_harvest_index = minimum_harvest_index
         self.yield_phosphorus_fraction = yield_phosphorus_fraction
-
         self.harvest_efficiency = harvest_efficiency
         self.crude_protein_percent = crude_protein_percent
         self.non_protein_nitrogen = non_protein_nitrogen
@@ -258,7 +257,7 @@ class CropManagement:
         self.data.is_alive = False
         self.yield_residue += self.data.biomass
         self.residue_nitrogen = self.yield_residue * self.data.yield_nitrogen_fraction
-        self.residue_phosphorus = self.yield_residue * self.data.yield_phosphorus_fraction
+        self.residue_phosphorus = self.yield_residue * self.yield_phosphorus_fraction
 
     def determine_harvest_index(self) -> None:
         """
@@ -282,7 +281,7 @@ class CropManagement:
             )
             self.harvest_index = self._adjust_harvest_index(
                 self.potential_harvest_index,
-                self.min_harvest_index,
+                self.minimum_harvest_index,
                 self.data.water_deficiency,
             )
 
@@ -371,9 +370,9 @@ class CropManagement:
             self.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.yield_residue
         else:
             self.yield_nitrogen = self.data.yield_nitrogen_fraction * self.dry_matter_yield_collected
-            self.yield_phosphorus = self.data.yield_phosphorus_fraction * self.dry_matter_yield_collected
+            self.yield_phosphorus = self.yield_phosphorus_fraction * self.dry_matter_yield_collected
             self.residue_nitrogen = self.data.yield_nitrogen_fraction * self.yield_residue
-            self.residue_phosphorus = self.data.yield_phosphorus_fraction * self.yield_residue
+            self.residue_phosphorus = self.yield_phosphorus_fraction * self.yield_residue
 
     def _recalculate_biomass_distribution(self, roots_harvested: bool) -> None:
         """
@@ -442,7 +441,7 @@ class CropManagement:
             adf=self.adf,
             ndf=self.ndf,
             sugar=self.sugar,
-            lignin=self.lignin_dry_matter_percentage,
+            lignin=self.data.lignin_dry_matter_percentage,
             ash=self.ash,
         )
         return HarvestedCropStorageType(harvested_crop, self.data.storage_type)
@@ -530,7 +529,7 @@ class CropManagement:
         """
         soil_data.crop_yield_nitrogen = self.residue_nitrogen
         soil_data.plant_residue_lignin_composition = (
-            self.lignin_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+            self.data.lignin_dry_matter_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
         )
         if killed:
             self._distribute_residue_nutrients(soil_data)
@@ -702,17 +701,17 @@ class CropManagement:
         return optimal_harvest_index * heat_percent / (heat_percent + exp(11.1 - 10 * heat_fraction))
 
     @staticmethod
-    def _adjust_harvest_index(harvest_index: float, min_harvest_index: float, water_deficiency: float) -> float:
+    def _adjust_harvest_index(harvest_index: float, minimum_harvest_index: float, water_deficiency: float) -> float:
         """
         Calculates the actual harvest index for a given day, adjusted for water deficiency.
 
         Parameters
         ----------
-        min_harvest_index : float
+        minimum_harvest_index : float
             Harvest index in drought conditions; minimum possible harvest index for the plant. Must be positive and
             unitless.
         harvest_index : float
-            Potential harvest index for the day. Must be greater than min_harvest_index and unitless.
+            Potential harvest index for the day. Must be greater than minimum_harvest_index and unitless.
         water_deficiency : float
             Water deficiency factor for the plant (unitless).
 
@@ -724,7 +723,7 @@ class CropManagement:
         Notes
         -----
         The method takes into consideration the minimum harvest index under drought conditions, the potential harvest
-        index for the day, and the water deficiency factor of the plant. If values of min_harvest_index and
+        index for the day, and the water deficiency factor of the plant. If values of minimum_harvest_index and
         harvest_index are input below their bounds, they are updated to equal their lower bounds.
 
         References
@@ -733,11 +732,11 @@ class CropManagement:
 
         """
         harvest_index = max(harvest_index, 0)
-        harvest_index = max(harvest_index, min_harvest_index)
+        harvest_index = max(harvest_index, minimum_harvest_index)
 
-        adj_harvest_index = (harvest_index - min_harvest_index) * water_deficiency / (
+        adj_harvest_index = (harvest_index - minimum_harvest_index) * water_deficiency / (
             water_deficiency + exp(6.13 - 0.883 * water_deficiency)
-        ) + min_harvest_index
+        ) + minimum_harvest_index
         return max(adj_harvest_index, 0)
 
     @staticmethod
