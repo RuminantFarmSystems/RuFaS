@@ -1634,7 +1634,7 @@ class OutputManager(object):
                     isinstance(log["error"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
-                    and list(log.keys()) == ['error', 'message', 'info_map']
+                    and list(log.keys()) == ["error", "message", "info_map"]
                 ):
                     self.add_error(log["error"], log["message"], log["info_map"])
                 else:
@@ -1648,7 +1648,7 @@ class OutputManager(object):
                     isinstance(log["log"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
-                    and list(log.keys()) == ['log', 'message', 'info_map']
+                    and list(log.keys()) == ["log", "message", "info_map"]
                 ):
                     self.add_log(log["log"], log["message"], log["info_map"])
                 else:
@@ -1662,7 +1662,7 @@ class OutputManager(object):
                     isinstance(log["warning"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
-                    and list(log.keys()) == ['warning', 'message', 'info_map']
+                    and list(log.keys()) == ["warning", "message", "info_map"]
                 ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
                 else:
