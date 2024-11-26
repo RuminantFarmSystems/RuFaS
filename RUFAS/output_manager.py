@@ -1634,29 +1634,47 @@ class OutputManager(object):
                     isinstance(log["error"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
-                    and log.keys() == ["error", "message", "info_map"]
+                    and list(log.keys()) == ['error', 'message', 'info_map']
                 ):
                     self.add_error(log["error"], log["message"], log["info_map"])
+                else:
+                    self.add_warning(
+                        "Wrong format for adding error.",
+                        f"Unable to add error with the format: {log}",
+                        info_map,
+                    )
             elif "log" in log:
                 if (
                     isinstance(log["log"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
-                    and log.keys() == ["log", "message", "info_map"]
+                    and list(log.keys()) == ['log', 'message', 'info_map']
                 ):
                     self.add_log(log["log"], log["message"], log["info_map"])
+                else:
+                    self.add_warning(
+                        "Wrong format for adding log.",
+                        f"Unable to add log with the format: {log}",
+                        info_map,
+                    )
             elif "warning" in log:
                 if (
                     isinstance(log["warning"], str)
                     and isinstance(log["message"], str)
                     and isinstance(log["info_map"], dict)
-                    and log.keys() == ["warning", "message", "info_map"]
+                    and list(log.keys()) == ['warning', 'message', 'info_map']
                 ):
                     self.add_warning(log["warning"], log["message"], log["info_map"])
+                else:
+                    self.add_warning(
+                        "Wrong format for adding warning.",
+                        f"Unable to add warning with the format: {log}",
+                        info_map,
+                    )
             else:
                 self.add_warning(
-                    "Wrong format for event logs",
-                    f"Event log data contains invalid format or types, the event was logged as {log}",
+                    "Unsupported event key for output manager",
+                    f"Output manager can add logs, errors and warning. Given event contains the key {log.keys()}",
                     info_map,
                 )
 

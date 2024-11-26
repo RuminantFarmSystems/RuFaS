@@ -2380,7 +2380,59 @@ def test_route_logs(
     mocked_add_log = mocker.patch.object(output_manager, "add_log")
     mocked_add_warning = mocker.patch.object(output_manager, "add_warning")
 
-    output_manager._route_logs(log_pool)
+    output_manager.route_logs(log_pool)
+
+    assert mocked_add_error.call_count == expected_calls["add_error"]
+    assert mocked_add_log.call_count == expected_calls["add_log"]
+    assert mocked_add_warning.call_count == expected_calls["add_warning"]
+
+
+@pytest.mark.parametrize(
+    "log_pool, expected_calls",
+    [
+        (
+            [
+                {
+                    "wrong key": "info_log",
+                    "message": "Info message",
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+                {
+                    "warning": "warning_type",
+                    "message": "Warning message",
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+            ],
+            {"add_error": 0, "add_log": 0, "add_warning": 2},
+        ),
+        (
+            [
+                {
+                    "error": "error_type",
+                    "message": "Error message",
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+                {
+                    "log": "info_log",
+                    "message": 3,
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+            ],
+            {"add_error": 1, "add_log": 0, "add_warning": 1},
+        ),
+    ],
+)
+def test_route_logs_mismatch(
+    log_pool: dict[str, str | dict[str, str]], expected_calls: dict[str, int], mocker: MockerFixture
+) -> None:
+
+    output_manager = OutputManager()
+
+    mocked_add_error = mocker.patch.object(output_manager, "add_error")
+    mocked_add_log = mocker.patch.object(output_manager, "add_log")
+    mocked_add_warning = mocker.patch.object(output_manager, "add_warning")
+
+    output_manager.route_logs(log_pool)
 
     assert mocked_add_error.call_count == expected_calls["add_error"]
     assert mocked_add_log.call_count == expected_calls["add_log"]
