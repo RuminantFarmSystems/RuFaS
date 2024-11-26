@@ -1099,7 +1099,7 @@ def output_manager_original_method_states(
         "clear_output_dir": mock_output_manager.clear_output_dir,
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
-        "_route_logs": mock_output_manager._route_logs,
+        "_route_logs": mock_output_manager.route_logs,
         "print_credits": mock_output_manager.print_credits,
         "_stringify_units": mock_output_manager._stringify_units,
         "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
@@ -2149,7 +2149,7 @@ def test_save_results_report_generation(
     mock_output_manager._exclude_info_maps = MagicMock(return_value={})
     mock_output_manager._dict_to_file_csv = MagicMock()
     mock_output_manager.add_error = MagicMock()
-    mocker.patch.object(mock_output_manager, "_route_logs", return_value=None)
+    mocker.patch.object(mock_output_manager, "route_logs", return_value=None)
     mock_output_manager._OutputManager__metadata_prefix = "test_prefix"
     mock_output_manager.create_directory = MagicMock()
 
@@ -2290,7 +2290,7 @@ def test_route_save_functions_graph(
     mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
     add_warning = mocker.patch.object(mock_output_manager, "add_warning")
     add_error = mocker.patch.object(mock_output_manager, "add_error")
-    mocker.patch.object(mock_output_manager, "_route_logs", return_value=True)
+    mocker.patch.object(mock_output_manager, "route_logs", return_value=True)
     graph_data = {"filters": ".*", "other keys": "other values"}
 
     mock_output_manager._route_save_functions(
@@ -2380,7 +2380,59 @@ def test_route_logs(
     mocked_add_log = mocker.patch.object(output_manager, "add_log")
     mocked_add_warning = mocker.patch.object(output_manager, "add_warning")
 
-    output_manager._route_logs(log_pool)
+    output_manager.route_logs(log_pool)
+
+    assert mocked_add_error.call_count == expected_calls["add_error"]
+    assert mocked_add_log.call_count == expected_calls["add_log"]
+    assert mocked_add_warning.call_count == expected_calls["add_warning"]
+
+
+@pytest.mark.parametrize(
+    "log_pool, expected_calls",
+    [
+        (
+            [
+                {
+                    "wrong key": "info_log",
+                    "message": "Info message",
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+                {
+                    "warning": "warning_type",
+                    "message": "Warning message",
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+            ],
+            {"add_error": 0, "add_log": 0, "add_warning": 2},
+        ),
+        (
+            [
+                {
+                    "error": "error_type",
+                    "message": "Error message",
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+                {
+                    "log": "info_log",
+                    "message": 3,
+                    "info_map": {"class": "GraphGenerator", "function": "prepare_plot_data"},
+                },
+            ],
+            {"add_error": 1, "add_log": 0, "add_warning": 1},
+        ),
+    ],
+)
+def test_route_logs_mismatch(
+    log_pool: dict[str, str | dict[str, str]], expected_calls: dict[str, int], mocker: MockerFixture
+) -> None:
+
+    output_manager = OutputManager()
+
+    mocked_add_error = mocker.patch.object(output_manager, "add_error")
+    mocked_add_log = mocker.patch.object(output_manager, "add_log")
+    mocked_add_warning = mocker.patch.object(output_manager, "add_warning")
+
+    output_manager.route_logs(log_pool)
 
     assert mocked_add_error.call_count == expected_calls["add_error"]
     assert mocked_add_log.call_count == expected_calls["add_log"]
