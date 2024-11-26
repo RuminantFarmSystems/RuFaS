@@ -84,12 +84,14 @@ class PlantingEvent(BaseFieldManagementEvent):
 
     """
 
-    def __init__(self, crop_reference: str, year: int = 1, day: int = 120, heat_scheduled_harvest: bool = False):
+    def __init__(
+        self, crop_reference: str, heat_scheduled_harvest: bool = False, year: int = 1, day: int = 120
+    ) -> None:
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
         self.use_heat_scheduled_harvest = heat_scheduled_harvest
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """Overrides the equality operator for PlantingEvent objects."""
         if isinstance(other, PlantingEvent):
             return (
@@ -132,6 +134,7 @@ class HarvestEvent(BaseFieldManagementEvent):
     def __eq__(self, other):
         """Overrides the equality operator for HarvestEvent objects."""
         if isinstance(other, HarvestEvent):
+            # print(super().__eq__(other))
             return (
                 super().__eq__(other)
                 and other.crop_reference == self.crop_reference
@@ -164,12 +167,12 @@ class TillageEvent(BaseFieldManagementEvent):
 
     def __init__(
         self,
-        tillage_depth: float,
-        incorporation_fraction: float,
-        mixing_fraction: float,
-        implement: TillageImplement,
         year: int = 1,
         day: int = 160,
+        tillage_depth: float = None,
+        incorporation_fraction: float = None,
+        mixing_fraction: float = None,
+        implement: TillageImplement = None,
     ):
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
@@ -297,9 +300,9 @@ class FertilizerEvent(BaseFieldManagementEvent):
 
     def __init__(
         self,
-        mix_name: str,
         year: int,
         day: int,
+        mix_name: str,
         nitrogen_mass: float,
         phosphorus_mass: float,
         potassium_mass: float,
