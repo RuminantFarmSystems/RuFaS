@@ -177,9 +177,11 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
             [1998, 1999, 2000],
             [200, 200],
             ["harvest_only", "harvest_kill"],
-            "'test_3': expected number of values for harvest years, days, and operations to be equal, received "
-            "'[1998, 1999, 2000]' years, '[200, 200]' days, and '[<HarvestOperation.HARVEST_ONLY: 'harvest_only'>, "
-            "<HarvestOperation.HARVEST_KILL: 'harvest_kill'>]' operations.",
+            ('test_3 Mismatch in length of parameters. Provided parameters are: '
+             'planting_years=[1998, 1999, 2000], planting_days=[200, 200], '
+             "harvest_operations=[<HarvestOperation.HARVEST_ONLY: 'harvest_only'>, "
+             "<HarvestOperation.HARVEST_KILL: 'harvest_kill'>]. Lengths are: "
+             "{'planting_years': 3, 'planting_days': 2, 'harvest_operations': 2}.")
         ),
         (
             "test_4",

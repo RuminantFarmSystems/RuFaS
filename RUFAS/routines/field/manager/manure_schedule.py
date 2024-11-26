@@ -135,48 +135,25 @@ class ManureSchedule(Schedule):
             manure_types=self.manure_types,
         )
 
-    def generate_manure_events(self) -> List[ManureEvent]:
+    def generate_manure_events(self) -> list[ManureEvent]:
         """
         Creates a list of all manure applications that will be applied as dictated by this manure schedule.
 
         Returns
         -------
-        List[ManureEvent]
+        list[ManureEvent]
             List of ManureEvents representing all manure applications that will occur over the simulation run.
 
         """
-        all_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
-        all_days = self.days * (self.pattern_repeat + 1)
-        all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
-        all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
-        all_manure_types = self.manure_types * (self.pattern_repeat + 1)
-        all_field_coverages = self.field_coverages * (self.pattern_repeat + 1)
-        all_application_depths = self.application_depths * (self.pattern_repeat + 1)
-        all_surface_remainder_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
-        all_manure_application_events = list(
-            zip(
-                all_years,
-                all_days,
-                all_nitrogen_masses,
-                all_phosphorus_masses,
-                all_manure_types,
-                all_field_coverages,
-                all_application_depths,
-                all_surface_remainder_fractions,
-            )
+        return list(
+            self.generate_events(self.years,
+                                 self.days,
+                                 [],
+                                 [self.nitrogen_masses, self.phosphorus_masses,
+                                  self.manure_types, self.field_coverages, self.application_depths,
+                                  self.surface_remainder_fractions],
+                                 ManureEvent,
+                                 self.pattern_skip,
+                                 self.pattern_repeat,
+                                 False)
         )
-
-        manure_application_events = []
-        for event in all_manure_application_events:
-            new_event = ManureEvent(
-                year=event[0],
-                day=event[1],
-                nitrogen_mass=event[2],
-                phosphorus_mass=event[3],
-                manure_type=event[4],
-                field_coverage=event[5],
-                application_depth=event[6],
-                surface_remainder_fraction=event[7],
-            )
-            manure_application_events.append(new_event)
-        return manure_application_events

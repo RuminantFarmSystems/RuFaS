@@ -120,32 +120,43 @@ class TillageSchedule(Schedule):
             List of all tillage events that will happen over the course of this TillageSchedule.
 
         """
-        all_tilling_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
-        all_tilling_days = self.days * (self.pattern_repeat + 1)
-        all_tillage_depths = self.tillage_depths * (self.pattern_repeat + 1)
-        all_incorporation_fractions = self.incorporation_fractions * (self.pattern_repeat + 1)
-        all_mixing_fractions = self.mixing_fractions * (self.pattern_repeat + 1)
-        all_implements = self.implements * (self.pattern_repeat + 1)
-        all_tillage_events = list(
-            zip(
-                all_tillage_depths,
-                all_incorporation_fractions,
-                all_mixing_fractions,
-                all_implements,
-                all_tilling_years,
-                all_tilling_days,
-            )
+        return list(
+            self.generate_events(self.years,
+                                 self.days,
+                                 [],
+                                 [self.tillage_depths, self.incorporation_fractions,
+                                  self.mixing_fractions, self.implements],
+                                 TillageEvent,
+                                 self.pattern_skip,
+                                 self.pattern_repeat,
+                                 False)
         )
-
-        tillage_events = []
-        for event in all_tillage_events:
-            new_tillage_event = TillageEvent(
-                tillage_depth=event[0],
-                incorporation_fraction=event[1],
-                mixing_fraction=event[2],
-                implement=event[3],
-                year=event[4],
-                day=event[5],
-            )
-            tillage_events.append(new_tillage_event)
-        return tillage_events
+        # all_tilling_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
+        # all_tilling_days = self.days * (self.pattern_repeat + 1)
+        # all_tillage_depths = self.tillage_depths * (self.pattern_repeat + 1)
+        # all_incorporation_fractions = self.incorporation_fractions * (self.pattern_repeat + 1)
+        # all_mixing_fractions = self.mixing_fractions * (self.pattern_repeat + 1)
+        # all_implements = self.implements * (self.pattern_repeat + 1)
+        # all_tillage_events = list(
+        #     zip(
+        #         all_tillage_depths,
+        #         all_incorporation_fractions,
+        #         all_mixing_fractions,
+        #         all_implements,
+        #         all_tilling_years,
+        #         all_tilling_days,
+        #     )
+        # )
+        #
+        # tillage_events = []
+        # for event in all_tillage_events:
+        #     new_tillage_event = TillageEvent(
+        #         tillage_depth=event[0],
+        #         incorporation_fraction=event[1],
+        #         mixing_fraction=event[2],
+        #         implement=event[3],
+        #         year=event[4],
+        #         day=event[5],
+        #     )
+        #     tillage_events.append(new_tillage_event)
+        # return tillage_events
