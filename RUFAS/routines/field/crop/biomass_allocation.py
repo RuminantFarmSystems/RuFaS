@@ -110,9 +110,7 @@ class BiomassAllocation:
         # accumulate biomass
         self.data.biomass_growth_max = self._determine_max_accumulation(self.usable_light, self.light_use_efficiency)
         self.previous_biomass = self.data.biomass
-        self.biomass_growth = self._determine_accumulated_biomass(
-            self.data.growth_factor, self.data.biomass_growth_max
-        )
+        self.biomass_growth = self._determine_accumulated_biomass(self.data.growth_factor, self.data.biomass_growth_max)
         self.data.biomass += self.biomass_growth
 
     def partition_biomass(self) -> None:

@@ -105,9 +105,7 @@ class HeatUnits:
             self.minimum_heat_unit_temperature = HeatUnits._determine_minimum_heat_unit_temperature(
                 min_air_temperature, self.data.minimum_temperature
             )
-            self.heat_unit_temperature = (
-                self.minimum_heat_unit_temperature + self.maximum_heat_unit_temperature
-            ) / 2
+            self.heat_unit_temperature = (self.minimum_heat_unit_temperature + self.maximum_heat_unit_temperature) / 2
 
         if self.use_heat_unit_temperature or mean_air_temperature is None:
             use_temp = self.heat_unit_temperature

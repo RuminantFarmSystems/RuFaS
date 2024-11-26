@@ -82,7 +82,7 @@ class LeafAreaIndex:
         leaf_area_added: Optional[float] = None,
         optimal_leaf_area_change: Optional[float] = None,
         previous_leaf_area_index: Optional[float] = None,
-        previous_optimal_leaf_area_fraction: Optional[float] = None
+        previous_optimal_leaf_area_fraction: Optional[float] = None,
     ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
@@ -117,9 +117,7 @@ class LeafAreaIndex:
             self.lai_shapes[1],
         )
 
-        self.canopy_height = self.determine_canopy_height(
-            self.data.max_canopy_height, self.optimal_leaf_area_fraction
-        )
+        self.canopy_height = self.determine_canopy_height(self.data.max_canopy_height, self.optimal_leaf_area_fraction)
         if self.data.is_in_senescence and not self.data.is_perennial:  # senescence
             self.data.leaf_area_index = self._determine_senescent_leaf_area_index(
                 self.data.heat_fraction,

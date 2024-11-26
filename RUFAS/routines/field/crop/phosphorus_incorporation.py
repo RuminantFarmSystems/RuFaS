@@ -279,9 +279,7 @@ class PhosphorusIncorporation:
         reflecting the reduction in phosphate levels due to plant absorption.
 
         """
-        layer_phosphates[:] = [
-            max(src - snk, 0) for src, snk in zip(layer_phosphates, self.actual_phosphorus_uptakes)
-        ]
+        layer_phosphates[:] = [max(src - snk, 0) for src, snk in zip(layer_phosphates, self.actual_phosphorus_uptakes)]
 
     def tally_total_phosphorus_uptake(self) -> None:
         """

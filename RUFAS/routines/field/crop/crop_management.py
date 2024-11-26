@@ -334,9 +334,7 @@ class CropManagement:
         if not roots_harvested:
             self.cut_biomass = self.data.above_ground_biomass * self.harvest_index
         else:
-            self.cut_biomass = self.determine_biomass_cut_from_whole_plant(
-                self.data.biomass, self.harvest_index
-            )
+            self.cut_biomass = self.determine_biomass_cut_from_whole_plant(self.data.biomass, self.harvest_index)
 
         try:
             fraction_cut = self.cut_biomass / self.data.biomass
@@ -658,9 +656,7 @@ class CropManagement:
         if bottom_depth == 0.0:
             return 0.0
 
-        first_term = 1 / (
-            1 + (bottom_depth / self.root_distribution_param_da) ** self.root_distribution_param_c
-        )
+        first_term = 1 / (1 + (bottom_depth / self.root_distribution_param_da) ** self.root_distribution_param_c)
         second_term = 1 - 1 / (
             1 + (self.data.max_root_depth / self.root_distribution_param_da) ** self.root_distribution_param_c
         )
