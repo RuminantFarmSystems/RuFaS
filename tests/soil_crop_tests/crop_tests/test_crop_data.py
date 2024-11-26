@@ -36,7 +36,7 @@ def test_in_growing_season_property(mature: bool, dormant: bool, alive: bool, gr
 
 
 @pytest.mark.parametrize("usr_index, expect", [(1.0, True), (None, False)])
-def test_given_harvest_index_property(usr_index, expect):
+def test_given_harvest_index_property(usr_index: float | None, expect: bool) -> None:
     """test the class knows if harvest index override is specified"""
     data = CropData(user_harvest_index=usr_index)
     assert data.do_harvest_index_override == expect
@@ -111,7 +111,7 @@ def test_heat_fraction(accumulated: float, potential: float, expected: float) ->
     assert data.heat_fraction == expected
 
 
-def test_manual_custom_crop_data():
+def test_manual_custom_crop_data() -> None:
     """checks (and demonstrates) the alternate way of customizing a crop"""
     # setup custom crop
     aspen = CropData(

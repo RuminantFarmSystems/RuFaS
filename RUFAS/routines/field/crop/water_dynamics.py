@@ -120,7 +120,7 @@ class WaterDynamics:
         )
 
     @staticmethod
-    def _determine_maximum_transpiration(leaf_area_index, potential_evapotranspiration_adjusted: float) -> float:
+    def _determine_maximum_transpiration(leaf_area_index: float, potential_evapotranspiration_adjusted: float) -> float:
         """
         Calculates the maximum transpiration for a given day.
 

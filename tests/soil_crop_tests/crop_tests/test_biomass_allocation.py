@@ -11,7 +11,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
     "rad,ext,lai",
     [(1, 1, 1), (0, 0, 0), (1, 0, 1), (0.2, -0.38, 0.75), (0.2, 0.38, 0.75)],
 )
-def test_calc_intercepted_radiation(rad, ext, lai):
+def test_calc_intercepted_radiation(rad: float, ext: float, lai: float) -> None:
     """ensure that intercepted radiation is correctly calculated by calc_intercepted_radiation()"""
     h_photo = 0.5 * rad * (1 - exp(-ext * lai))
     result = BiomassAllocation._intercept_radiation(rad, ext, lai)
@@ -31,7 +31,7 @@ def test_calc_intercepted_radiation(rad, ext, lai):
         (18.5, 22.19, 18.5 * 22.19),  # rad < eff
     ],
 )
-def test_calc_max_accumulation(rad, eff, expected):
+def test_calc_max_accumulation(rad: float, eff: float, expected: float) -> None:
     """test that maximum biomass accumulation is properly calculated with calc_max_accumulation()"""
     assert BiomassAllocation._determine_max_accumulation(rad, eff) == expected
 
@@ -40,7 +40,7 @@ def test_calc_max_accumulation(rad, eff, expected):
     "factor,max_growth",
     [(1, 0), (0, 1), (1, 1), (0.8, 103.84), (1.2, 103.84), (1.2, 873.2)],
 )
-def test_calc_biomass_accumulation(factor, max_growth):
+def test_calc_biomass_accumulation(factor: float, max_growth: float) -> None:
     """ensure that biomass growth is correctly calculated by calc_biomass_accumulation()"""
     assert BiomassAllocation._determine_accumulated_biomass(factor, max_growth) == max_growth * factor
 
@@ -59,7 +59,7 @@ def test_calc_biomass_accumulation(factor, max_growth):
         (0.59, 529.33),  # arbitrary 2
     ],
 )
-def test_calc_above_ground_biomass(frac, bmass):
+def test_calc_above_ground_biomass(frac: float, bmass: float) -> None:
     """ensure that above ground biomass is correctly calculated"""
     expect = bmass * (1 - frac)
     assert BiomassAllocation._determine_above_ground_biomass(frac, bmass) == expect
@@ -79,7 +79,7 @@ def test_calc_above_ground_biomass(frac, bmass):
         (0.59, 529.33),  # arbitrary 2
     ],
 )
-def test_calc_below_ground_biomass(frac, bmass):
+def test_calc_below_ground_biomass(frac: float, bmass: float) -> None:
     """ensure that below ground biomass is correctly calculated"""
     assert BiomassAllocation._determine_below_ground_biomass(frac, bmass) == bmass * frac
 
