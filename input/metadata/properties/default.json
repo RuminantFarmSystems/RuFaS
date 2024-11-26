@@ -93,17 +93,20 @@
         "1": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 1.0
+          "maximum": 1.0,
+          "default": 0.346
         },
         "2": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 1.0
+          "maximum": 1.0,
+          "default": 0.272
         },
         "3": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 1.0
+          "maximum": 1.0,
+          "default": 0.379
         }
       },
       "annual_milk_yield": {
