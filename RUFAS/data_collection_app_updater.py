@@ -34,7 +34,7 @@ PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
 ]
 
 """Placeholder for inserting schema import scripts in index.html."""
-SCHEMA_SCRIPT_TAG_PLACEHOLDER: str = "    <!-- Spot where schema import scripts go -->"
+SCHEMA_SCRIPT_TAG_PLACEHOLDER: str = "    <!-- Schema imports go here-->"
 
 """Placeholder for listing newly available schemas in the rewritten index.html."""
 AVAILABLE_SCHEMAS_LIST_PLACEHOLDER: str = "// Spot where list of available schema go"

@@ -8,7 +8,7 @@
     <script src="./js/ace.js"></script>
     <script src="./js/assign.js"></script>
     <script src="./js/lz-string.min.js"></script>
-    <!-- Spot where schema import scripts go -->
+    <!-- Schema imports go here-->
     <link rel='stylesheet' id='theme-link'>
     <link rel='stylesheet' id='iconlib-link'>
     <style>
