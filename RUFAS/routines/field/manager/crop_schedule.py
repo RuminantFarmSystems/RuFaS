@@ -186,20 +186,32 @@ class CropSchedule(Schedule):
             List of all planting events that will happen for this crop schedule.
 
         """
-        all_planting_years = Utility.repeat_pattern(self.planting_years, self.planting_skip, self.pattern_repeat)
-        all_planting_days = self.planting_days * (self.pattern_repeat + 1)
-        all_planting_dates = list(zip(all_planting_years, all_planting_days))
-
-        planting_events = []
-        for date in all_planting_dates:
-            new_planting_event = PlantingEvent(
-                crop_reference=self.crop_reference,
-                year=date[0],
-                day=date[1],
-                heat_scheduled_harvest=self.heat_scheduled,
+        return list(
+            self.generate_events(
+                self.planting_years,
+                self.planting_days,
+                [self.crop_reference, self.heat_scheduled],
+                [],
+                PlantingEvent,
+                self.planting_skip,
+                self.pattern_repeat,
+                False,
             )
-            planting_events.append(new_planting_event)
-        return planting_events
+        )
+        # all_planting_years = Utility.repeat_pattern(self.planting_years, self.planting_skip, self.pattern_repeat)
+        # all_planting_days = self.planting_days * (self.pattern_repeat + 1)
+        # all_planting_dates = list(zip(all_planting_years, all_planting_days))
+        #
+        # planting_events = []
+        # for date in all_planting_dates:
+        #     new_planting_event = PlantingEvent(
+        #         crop_reference=self.crop_reference,
+        #         year=date[0],
+        #         day=date[1],
+        #         heat_scheduled_harvest=self.heat_scheduled,
+        #     )
+        #     planting_events.append(new_planting_event)
+        # return planting_events
 
     def generate_harvest_events(self) -> list:
         """
@@ -220,30 +232,11 @@ class CropSchedule(Schedule):
             self.generate_events(
                 self.harvest_years,
                 self.harvest_days,
+                [self.crop_reference],
                 [self.harvest_operations],
                 HarvestEvent,
-                self.pattern_skip,
+                self.harvesting_skip,
                 self.pattern_repeat,
                 self.heat_scheduled,
             )
         )
-        # all_harvesting_years = Utility.repeat_pattern(self.harvest_years, self.harvesting_skip, self.pattern_repeat)
-        # all_harvesting_days = self.harvest_days * (self.pattern_repeat + 1)
-        # all_harvesting_operations = self.harvest_operations * (self.pattern_repeat + 1)
-        # all_harvesting_dates = list(zip(all_harvesting_years, all_harvesting_days, all_harvesting_operations))
-        #
-        # if self.heat_scheduled:
-        #     all_harvesting_dates[:] = [
-        #         harvest for harvest in all_harvesting_dates if harvest[2] in FINAL_HARVEST_OPERATIONS
-        #     ]
-        #
-        # harvest_events = []
-        # for date in all_harvesting_dates:
-        #     new_harvest_event = HarvestEvent(
-        #         crop_reference=self.crop_reference,
-        #         year=date[0],
-        #         day=date[1],
-        #         operation=date[2],
-        #     )
-        #     harvest_events.append(new_harvest_event)
-        # return harvest_events

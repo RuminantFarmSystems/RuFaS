@@ -1,5 +1,4 @@
-from abc import abstractmethod
-from typing import List
+from typing import List, Any, Optional
 
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
@@ -103,11 +102,12 @@ class Schedule:
         self,
         years: list[int],
         days: list[int],
-        additional_attributes: list[list],
+        additional_attributes: Optional[list[Any]],
+        additional_attributes_events: list[list],
         event_class,
         pattern_skip: int,
         pattern_repeat: int,
-        heat_scheduled: bool,
+        heat_scheduled_harvest: bool,
     ) -> list:
         """
         Generic method to generate application events.
@@ -119,7 +119,9 @@ class Schedule:
         days : List[int]
             List of days for the schedule.
         additional_attributes : List[List]
-            Additional attributes for the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
+            Additional general attributes for the events (e.g., crop reference).
+        additional_attributes_events : List[List]
+            Additional attributes for each of the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
         event_class : class
             The class to instantiate for each event.
         pattern_skip : int
@@ -133,14 +135,15 @@ class Schedule:
         -------
         list
             List of instantiated event objects.
+
         """
         all_years = Utility.repeat_pattern(years, pattern_skip, pattern_repeat)
         all_days = days * (pattern_repeat + 1)
-        repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes]
+        repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes_events]
         all_events = list(zip(all_years, all_days, *repeated_attributes))
-        if heat_scheduled:
+        if heat_scheduled_harvest:
             all_events[:] = [harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS]
-        result = [event_class(*event) for event in all_events]
+        result = [event_class(*additional_attributes, *event) for event in all_events]
 
         return result
 
