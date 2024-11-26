@@ -214,39 +214,39 @@ def test_check_crop_planting_schedule(
     [
         (
             [
-                FertilizerEvent("mix_1", 100, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_2", 20, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_3", 15, 15, 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(100, 20, "mix_1", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(20, 20, "mix_2", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(15, 15, "mix_3", 1993, 75, 15, 0, 1.0),
             ],
             [],
             [
-                FertilizerEvent("mix_1", 100, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_2", 20, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_3", 15, 15, 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(100, 20, "mix_1", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(20, 20, "mix_2", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(15, 15, "mix_3", 1993, 75, 15, 0, 1.0),
             ],
         ),
         (
             [
-                FertilizerEvent("mix_1", 150, 20, 1992, 80, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 25, 5, 1992, 250, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 100, 50, 1993, 80, 15, 0, 1.0),
+                FertilizerEvent(150, 20, "mix_1", 1992, 80, 15, 0, 1.0),
+                FertilizerEvent(25, 5, "mix_1", 1992, 250, 15, 0, 1.0),
+                FertilizerEvent(100, 50, "mix_1", 1993, 80, 15, 0, 1.0),
             ],
             [
-                FertilizerEvent("mix_1", 25, 5, 1992, 250, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 100, 50, 1993, 80, 15, 0, 1.0),
+                FertilizerEvent(25, 5, "mix_1", 1992, 250, 15, 0, 1.0),
+                FertilizerEvent(100, 50, "mix_1", 1993, 80, 15, 0, 1.0),
             ],
-            [FertilizerEvent("mix_1", 150, 20, 1992, 80, 15, 0, 1.0)],
+            [FertilizerEvent(150, 20, "mix_1", 1992, 80, 15, 0, 1.0)],
         ),
         (
             [
-                FertilizerEvent("mix_1", 50, 10, 1998, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 1999, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 2000, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1998, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1999, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 2000, 90, 15, 0, 1.0),
             ],
             [
-                FertilizerEvent("mix_1", 50, 10, 1998, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 1999, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 2000, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1998, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1999, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 2000, 90, 15, 0, 1.0),
             ],
             [],
         ),
@@ -562,16 +562,16 @@ def test_harvest_heat_scheduled_crops(
         ),
         (
             [
-                PlantingEvent("corn", 1993, 120, False),
-                PlantingEvent("corn_supplement", 1993, 120, True),
-                PlantingEvent("cover_crop", 1993, 245, False),
+                PlantingEvent("corn", False, 1993, 120),
+                PlantingEvent("corn_supplement", True, 1993, 120),
+                PlantingEvent("cover_crop", False, 1993, 245),
             ],
             1993,
             120,
-            [PlantingEvent("cover_crop", 1993, 245, False)],
+            [PlantingEvent("cover_crop", False, 1993, 245)],
             [
-                PlantingEvent("corn", 1993, 120, False),
-                PlantingEvent("corn_supplement", 1993, 120, True),
+                PlantingEvent("corn", False, 1993, 120),
+                PlantingEvent("corn_supplement", True, 1993, 120),
             ],
         ),
         (
