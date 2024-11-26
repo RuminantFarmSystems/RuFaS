@@ -127,11 +127,9 @@ class CropSchedule(Schedule):
                 f"'{self.planting_days}'."
             )
 
-        if len(self.planting_years) != len(self.planting_days):
-            raise ValueError(
-                f"'{self.name}': expected number of planting years and days to be the same, received "
-                f"'{self.planting_years}' years and '{self.planting_days}' days."
-            )
+        self.validate_equal_lengths(self.name,
+                                    planting_years=self.planting_years,
+                                    planting_days=self.planting_days)
 
     def _validate_harvest_parameters(self) -> None:
         """
@@ -159,13 +157,10 @@ class CropSchedule(Schedule):
                 f"'{self.name}': expected all harvest days to be in range [1, 366], received " f"'{self.harvest_days}'."
             )
 
-        equal_harvest_parameters = len(self.harvest_years) == len(self.harvest_days) == len(self.harvest_operations)
-        if not equal_harvest_parameters:
-            raise ValueError(
-                f"'{self.name}': expected number of values for harvest years, days, and operations to be "
-                f"equal, received '{self.harvest_years}' years, '{self.harvest_days}' days, and "
-                f"'{self.harvest_operations}' operations."
-            )
+        self.validate_equal_lengths(self.name,
+                                    planting_years=self.harvest_years,
+                                    planting_days=self.harvest_days,
+                                    harvest_operations=self.harvest_operations)
 
         last_kills = self.harvest_operations[-1] in FINAL_HARVEST_OPERATIONS
         others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
@@ -198,20 +193,6 @@ class CropSchedule(Schedule):
                 False,
             )
         )
-        # all_planting_years = Utility.repeat_pattern(self.planting_years, self.planting_skip, self.pattern_repeat)
-        # all_planting_days = self.planting_days * (self.pattern_repeat + 1)
-        # all_planting_dates = list(zip(all_planting_years, all_planting_days))
-        #
-        # planting_events = []
-        # for date in all_planting_dates:
-        #     new_planting_event = PlantingEvent(
-        #         crop_reference=self.crop_reference,
-        #         year=date[0],
-        #         day=date[1],
-        #         heat_scheduled_harvest=self.heat_scheduled,
-        #     )
-        #     planting_events.append(new_planting_event)
-        # return planting_events
 
     def generate_harvest_events(self) -> list:
         """
