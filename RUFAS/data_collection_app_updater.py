@@ -282,8 +282,7 @@ class DataCollectionAppUpdater:
 
         return schema
 
-    @staticmethod
-    def _get_list_of_options(input_pattern: str) -> list[str]:
+    def _get_list_of_options(self, input_pattern: str) -> list[str]:
         """
         Gets a list of acceptable string inputs based on the Regex pattern that is used to validate the input.
 
