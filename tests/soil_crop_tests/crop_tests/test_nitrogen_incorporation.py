@@ -196,8 +196,9 @@ def test_error_determine_deepest_accessible_layer(root: float, depths: float) ->
         ),  # arbitrary (roots in 2nd)
     ],
 )
-def test_determine_layer_nitrogen_uptake_potential(bounds: float, demand: float, root_depth: float,
-                                                   ndistro: float) -> None:
+def test_determine_layer_nitrogen_uptake_potential(
+    bounds: float, demand: float, root_depth: float, ndistro: float
+) -> None:
     """
     ensure potential nitrogen uptake is calculated correctly for each soil layer with
     determine_layer_nitrogen_potential()
@@ -228,8 +229,9 @@ def test_determine_layer_nitrogen_uptake_potential(bounds: float, demand: float,
         ([3, 2, 1, 1], 1, 1, 1),  # descending with redundant layer
     ],
 )
-def test_error_determine_layer_nitrogen_uptake_potential(bounds: float, demand: float, root_depth: float,
-                                                         ndistro: float) -> None:
+def test_error_determine_layer_nitrogen_uptake_potential(
+    bounds: float, demand: float, root_depth: float, ndistro: float
+) -> None:
     """check that determine_layer_nitrogen_potential throws an error when soil boundaries are not properly ordered"""
     with pytest.raises(Exception):
         NitrogenIncorporation.determine_layer_nutrient_uptake_potential(bounds, demand, root_depth, ndistro)
@@ -267,8 +269,9 @@ def test_determine_nitrogen_uptake_to_depth(demand: float, depth: float, root_de
         (0.3, 0.28, 0.11, 0),
     ],
 )
-def test_error_determine_nitrogen_uptake_to_depth(demand: float, depth: float, root_depth: float,
-                                                  ndistro: float) -> None:
+def test_error_determine_nitrogen_uptake_to_depth(
+    demand: float, depth: float, root_depth: float, ndistro: float
+) -> None:
     """ "check that errors are appropriately thrown for determine_surface_nitrogen_uptake()"""
     with pytest.raises(Exception):
         NitrogenIncorporation._determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)

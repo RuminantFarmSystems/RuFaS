@@ -58,8 +58,9 @@ def test_determine_maximum_heat_unit_temperature(air: float, plant: float) -> No
         (False, None, None, None),
     ],
 )
-def test_check_absorb_heat_for_input_errors(use_alt: bool, meant: float | None, min_t: float | None,
-                                            max_t: float | None) -> None:
+def test_check_absorb_heat_for_input_errors(
+    use_alt: bool, meant: float | None, min_t: float | None, max_t: float | None
+) -> None:
     """check that errors are thrown when improper input is given, using _check_absorb_heat_for_input_errors"""
     data = CropData()
     heat = HeatUnits(data, use_heat_unit_temperature=use_alt)
