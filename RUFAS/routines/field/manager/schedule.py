@@ -1,6 +1,6 @@
-from copy import copy
-from typing import Any, List
+from typing import List, Any, Optional
 
+from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
 
 
@@ -41,54 +41,11 @@ class Schedule:
         self.name = name
         self.years = years
 
-        self.days = self._elongate_list(days, len(years))
+        self.days = Utility.elongate_list(days, len(years))
 
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
-
-    def _validate_pattern_parameters(self) -> None:
-        """
-        Checks the pattern skip and repeat parameters, if they are not correct raises errors.
-
-        Raises
-        ------
-        ValueError
-            If the skip is < 0.
-            If the repeat is < 0.
-
-        """
-        if self.pattern_skip < 0:
-            raise ValueError(f"'{self.name}': expected pattern skip to be >= 0, received '{self.pattern_skip}'.")
-        if self.pattern_repeat < 0:
-            raise ValueError(f"'{self.name}': expected pattern repeat to be >= 0, received '{self.pattern_repeat}'.")
-
-    @staticmethod
-    def _elongate_list(list_to_elongate: List[Any], reference_list_length: int) -> List[Any]:
-        """
-        Takes a list and lengthens it to match the length of the reference list, if the original length was 1.
-
-        Parameters
-        ----------
-        list_to_elongate : List[Any]
-            List to be extended if its length is 1.
-        reference_list_length : int
-            Length of that the list should be extended to, if it its original length is 1.
-
-        Returns
-        -------
-        List[Any]
-            The elongated list.
-
-        Notes
-        -----
-        In the context of Schedule-descendant classes, the reference list length will always be the length of the years
-        list.
-
-        """
-        if len(list_to_elongate) != 1:
-            return list_to_elongate
-        elongated_list = list_to_elongate * reference_list_length
-        return elongated_list
+        Utility.validate_pattern_parameters(self.name, self.pattern_skip, self.pattern_repeat)
 
     @staticmethod
     def _validate_days(years: List[int], days: List[int]) -> bool:
@@ -141,48 +98,151 @@ class Schedule:
         """
         return all(0 < years[index] <= years[index + 1] for index in range(0, len(years) - 1))
 
-    @staticmethod
-    def _repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> List[int]:
+    def generate_events(
+        self,
+        years: list[int],
+        days: list[int],
+        additional_attributes: Optional[list[Any]],
+        additional_attributes_events: list[list],
+        event_class,
+        pattern_skip: int,
+        pattern_repeat: int,
+        heat_scheduled_harvest: bool,
+    ) -> list:
         """
-        Takes a pattern of numbers and repeats the pattern of differences between the numbers for a specified number of
-        repetitions, skipping over specified gaps between repetitions.
+        Generic method to generate application events.
 
         Parameters
         ----------
-        pattern : List[int]
-            The pattern to be repeated.
-        skip : int
-            Number of steps to skip between repeats (0 if no steps should be skipped).
-        repeat : int
-            Number of times pattern should be repeated.
+        years : List[int]
+            List of years for the schedule.
+        days : List[int]
+            List of days for the schedule.
+        additional_attributes : List[List]
+            Additional general attributes for the events (e.g., crop reference).
+        additional_attributes_events : List[List]
+            Additional attributes for each of the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
+        event_class : class
+            The class to instantiate for each event.
+        pattern_skip : int
+            Number of years to skip.
+        pattern_repeat : int
+            Number of times the pattern should repeat.
+        heat_scheduled : bool
+            Flag indicating if heat unit scheduling is utilized for harvesting decisions.
 
         Returns
         -------
-        List[int]
-            The full repeated pattern of numbers.
-
-        Examples
-        --------
-        >>> repeat_pattern([1, 3, 5], 1, 2)
-        [1, 3, 5, 7, 9, 11, 13, 15, 17]
-
-        >>> repeat_pattern([1, 3, 5], 0, 1)
-        [1, 3, 5, 6, 8, 10]
-
-        >>> repeat_pattern([2, 3, 7], 3, 2)
-        [2, 3, 7, 11, 12, 16, 20, 21, 24]
+        list
+            List of instantiated event objects.
 
         """
-        differences = [skip + 1]
-        in_pattern_differences = range(1, len(pattern[1:]) + 1)
-        for difference in in_pattern_differences:
-            differences.append(pattern[difference] - pattern[difference - 1])
+        all_years = Utility.repeat_pattern(years, pattern_skip, pattern_repeat)
+        all_days = days * (pattern_repeat + 1)
+        repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes_events]
+        all_events = list(zip(all_years, all_days, *repeated_attributes))
+        if heat_scheduled_harvest:
+            all_events[:] = [harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS]
+        result = [event_class(*additional_attributes, *event) for event in all_events]
+        for event in all_events:
+            print(*event)
 
-        full_pattern = copy(pattern)
-        differences_index = 0
-        number_of_new_values = range(repeat * len(pattern))
-        for _new_value in number_of_new_values:
-            full_pattern.append(full_pattern[-1] + differences[differences_index])
-            differences_index += 1
-            differences_index %= len(pattern)
-        return full_pattern
+        return result
+
+    @staticmethod
+    def validate_depths(depths: List[float]) -> bool:
+        """
+        Checks that depths passed are all valid.
+
+        Parameters
+        ----------
+        depths : List[float]
+            List of tillage depths to be validated.
+
+        Returns
+        -------
+        bool
+            True if all tillage depths are valid, False otherwise.
+
+        Notes
+        -----
+        Tillage depths must be > 0.
+
+        """
+        return all(depth > 0.0 for depth in depths)
+
+    @staticmethod
+    def validate_equal_lengths(header: str, **kwargs) -> bool:
+        """
+        Validates that all provided iterables have the same length.
+
+        Parameters
+        ----------
+        header: str
+            Error header when needs to throw an error.
+        kwargs : list of iterables
+            The iterables to check for length equality.
+
+        Returns
+        -------
+        bool
+            True if all lengths are equal.
+
+        Raises
+        ------
+        ValueError
+            If the lengths of the provided iterables are not all equal.
+        """
+        lengths = {key: len(value) for key, value in kwargs.items()}
+        if len(set(lengths.values())) != 1:
+            raise ValueError(
+                f"{header} Mismatch in length of parameters. "
+                f"Provided parameters are: {', '.join(f'{key}={value}' for key, value in kwargs.items())}. "
+                f"Lengths are: {lengths}."
+            )
+        return True
+
+    def _validate_parameters(
+        self,
+        non_negative_parameters: list[Optional[tuple[str, list]]],
+        fraction_parameters: list[Optional[tuple[str, list]]],
+    ) -> None:
+        """
+        General validations for schedule parameter.
+
+        Parameters
+        ----------
+        non_negative_parameters: list[tuple[str, list]]
+            A list of parameters wrapped in a tuple containing their names and values that should be non-negative.
+        fraction_parameters: list[tuple[str, list]]
+            A list of parameters wrapped in a tuple containing their names and values that should be fractions.
+
+        Raises
+        ------
+        ValueError
+            If non-negative values are negative.
+            If fraction is out of range [0.0, 1.0].
+            If not all years > 0 and in non-descending order.
+            If not all days to be in range [1, 366].
+
+        """
+        valid_years = self._validate_years(self.years)
+        if not valid_years:
+            raise ValueError(
+                f"'{self.name}': " + f"expected all years to be > 0 and in non-descending order,"
+                f" received "
+                f"'{self.years}'."
+            )
+
+        valid_days = self._validate_days(self.years, self.days)
+        if not valid_days:
+            raise ValueError(f"'{self.name}': " + f"expected all days to be in range [1, 366], received '{self.days}'.")
+
+        for name, parameter in non_negative_parameters:
+            if not Utility.determine_if_all_non_negative_values(parameter):
+                raise ValueError(f"'{self.name}': " + f"expected all {name} to be in >= 0, received '{parameter}'.")
+        for name, parameter in fraction_parameters:
+            if not Utility.validate_fractions(parameter):
+                raise ValueError(
+                    f"'{self.name}': " + f"expected all {name} to be in range [0.0, 1.0], " f"received '{parameter}'."
+                )
