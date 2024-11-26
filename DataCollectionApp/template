@@ -97,7 +97,7 @@
             "items": {
                 "type": "object",
                 "title": "Data Entry",
-                // Spot where list of available schema go
+                // List of available schema goes here
             }
         }
         var data = {}

@@ -37,7 +37,7 @@ PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
 SCHEMA_SCRIPT_TAG_PLACEHOLDER: str = "    <!-- Schema imports go here-->"
 
 """Placeholder for listing newly available schemas in the rewritten index.html."""
-AVAILABLE_SCHEMAS_LIST_PLACEHOLDER: str = "// Spot where list of available schema go"
+AVAILABLE_SCHEMAS_LIST_PLACEHOLDER: str = "// List of available schema goes here"
 
 
 class DataCollectionAppUpdater:
