@@ -84,9 +84,9 @@ class PlantingEvent(BaseFieldManagementEvent):
 
     """
 
-    def __init__(self, crop_reference: str,
-                 heat_scheduled_harvest: bool = False,
-                 year: int = 1, day: int = 120) -> None:
+    def __init__(
+        self, crop_reference: str, heat_scheduled_harvest: bool = False, year: int = 1, day: int = 120
+    ) -> None:
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
         self.use_heat_scheduled_harvest = heat_scheduled_harvest
@@ -134,7 +134,7 @@ class HarvestEvent(BaseFieldManagementEvent):
     def __eq__(self, other):
         """Overrides the equality operator for HarvestEvent objects."""
         if isinstance(other, HarvestEvent):
-            #print(super().__eq__(other))
+            # print(super().__eq__(other))
             return (
                 super().__eq__(other)
                 and other.crop_reference == self.crop_reference
