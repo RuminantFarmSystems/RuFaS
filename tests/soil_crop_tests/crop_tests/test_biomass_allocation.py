@@ -97,17 +97,15 @@ def test_calc_below_ground_biomass(frac, bmass):
         (2372.55, 0.29, 15.17, 0.663, 0.205),  # arbitrary
     ],
 )
-def test_allocate_biomass(light, ext, conv, gfact, rfrac):
+def test_allocate_biomass(light: float, ext: float, conv: float, gfact: float, rfrac: float) -> None:
     """integration check to check that biomass gets allocated correctly"""
     data = CropData(
-        light_extinction=ext,
         leaf_area_index=1.87,
-        light_use_efficiency=conv,
         growth_factor=gfact,
         root_fraction=rfrac,
         biomass=89.0,
     )
-    bioal = BiomassAllocation(data)
+    bioal = BiomassAllocation(data, light_extinction=ext, light_use_efficiency=conv)
     bioal.allocate_biomass(light)
 
     # photosynthesize
@@ -120,10 +118,10 @@ def test_allocate_biomass(light, ext, conv, gfact, rfrac):
     green = BiomassAllocation._determine_above_ground_biomass(rfrac, mass)
     root = BiomassAllocation._determine_below_ground_biomass(rfrac, mass)
 
-    assert data.usable_light == energy
+    assert bioal.usable_light == energy
     assert data.biomass_growth_max == max_growth
-    assert data.previous_biomass == 89.0
-    assert data.biomass_growth == growth
+    assert bioal.previous_biomass == 89.0
+    assert bioal.biomass_growth == growth
     assert data.biomass == mass
     assert data.above_ground_biomass == green
     assert data.root_biomass == root
