@@ -562,16 +562,16 @@ def test_harvest_heat_scheduled_crops(
         ),
         (
             [
-                PlantingEvent("corn",False, 1993, 120),
-                PlantingEvent("corn_supplement",True, 1993, 120),
-                PlantingEvent("cover_crop",False, 1993, 245),
+                PlantingEvent("corn", False, 1993, 120),
+                PlantingEvent("corn_supplement", True, 1993, 120),
+                PlantingEvent("cover_crop", False, 1993, 245),
             ],
             1993,
             120,
-            [PlantingEvent("cover_crop",False, 1993, 245)],
+            [PlantingEvent("cover_crop", False, 1993, 245)],
             [
-                PlantingEvent("corn",False, 1993, 120),
-                PlantingEvent("corn_supplement",True, 1993, 120),
+                PlantingEvent("corn", False, 1993, 120),
+                PlantingEvent("corn_supplement", True, 1993, 120),
             ],
         ),
         (

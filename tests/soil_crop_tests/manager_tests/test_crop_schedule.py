@@ -135,8 +135,7 @@ def test_crop_schedule_init(
             "test_2",
             [1998, 1999, 2000],
             [200, 200, 367],
-            "'test_2': expected all planting days to be in range [1, 366], received "
-            "'[200, 200, 367]'.",
+            "'test_2': expected all planting days to be in range [1, 366], received " "'[200, 200, 367]'.",
         ),
         (
             "test_3",
@@ -154,7 +153,6 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
         test._validate_planting_parameters()
         print(e.value)
     assert str(e.value) == expected
-
 
 
 @pytest.mark.parametrize(

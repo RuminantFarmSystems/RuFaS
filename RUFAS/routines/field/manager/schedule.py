@@ -230,8 +230,8 @@ class Schedule:
         if not valid_years:
             raise ValueError(
                 f"'{self.name}': " + f"expected all years to be > 0 and in non-descending order,"
-                                     f" received "
-                                     f"'{self.years}'."
+                f" received "
+                f"'{self.years}'."
             )
 
         valid_days = self._validate_days(self.years, self.days)
