@@ -35,8 +35,9 @@ def test_shift_phosphorus_time(old: float | None, new: float) -> None:
         (28.4, [18.2, 21.6, 100.4], [3, 0]),
     ],
 )
-def test_phosphorus_determine_deepest_accessible_soil_layer(root_depth: float, depths: list[float],
-                                                            expect: list[float]) -> None:
+def test_phosphorus_determine_deepest_accessible_soil_layer(
+    root_depth: float, depths: list[float], expect: list[float]
+) -> None:
     """ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer"""
     data = CropData(root_depth=root_depth)
     incorp = PhosphorusIncorporation(data)
