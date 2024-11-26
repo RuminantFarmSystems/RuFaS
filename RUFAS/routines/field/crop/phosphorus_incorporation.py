@@ -40,6 +40,12 @@ class PhosphorusIncorporation:
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
     actual_phosphorus_uptakes : Optional[List[float]], default None
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
+    layer_phosphorus_potentials : Optional[float]
+        Potential phosphorus uptake from each soil layer (kg/ha).
+    unmet_phosphorus_demands : Optional[float]
+        Unmet phosphorus demands by overlaying soil layers (kg/ha).
+    phosphorus_requests : Optional[float]
+        Phosphorus requested from each soil layer (kg/ha).
 
     Attributes
     ----------
@@ -64,6 +70,12 @@ class PhosphorusIncorporation:
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
     actual_phosphorus_uptakes : Optional[List[float]], default None
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
+    layer_phosphorus_potentials : Optional[float]
+        Potential phosphorus uptake from each soil layer (kg/ha).
+    unmet_phosphorus_demands : Optional[float]
+        Unmet phosphorus demands by overlaying soil layers (kg/ha).
+    phosphorus_requests : Optional[float]
+        Phosphorus requested from each soil layer (kg/ha).
 
     References
     ----------
@@ -88,6 +100,9 @@ class PhosphorusIncorporation:
         total_phosphorus_uptake: Optional[float] = None,
         potential_phosphorus_uptake: Optional[float] = None,
         actual_phosphorus_uptakes: Optional[List[float]] = None,
+        layer_phosphorus_potentials: Optional[float] = None,
+        unmnet_phosphorus_demands: Optional[float] = None,
+        phosphorus_requests: Optional[float] = None,
     ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
@@ -102,6 +117,9 @@ class PhosphorusIncorporation:
         self.total_phosphorus_uptake = total_phosphorus_uptake
         self.potential_phosphorus_uptake = potential_phosphorus_uptake
         self.actual_phosphorus_uptakes = actual_phosphorus_uptakes
+        self.layer_phosphorus_potentials = layer_phosphorus_potentials
+        self.unmet_phosphorus_demands = unmnet_phosphorus_demands
+        self.phosphorus_requests = phosphorus_requests
 
     def incorporate_phosphorus(self, soil_data: SoilData) -> None:
         """
@@ -176,22 +194,22 @@ class PhosphorusIncorporation:
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_phosphates = self.access_layers(layer_phosphates)
-        self.data.layer_phosphorus_potentials = NitrogenIncorporation.determine_layer_nutrient_uptake_potential(
+        self.layer_phosphorus_potentials = NitrogenIncorporation.determine_layer_nutrient_uptake_potential(
             accessible_depths,
             self.potential_phosphorus_uptake,
             self.data.root_depth,
             self.phosphorus_distro_param,
         )
-        self.data.unmet_phosphorus_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
-            self.data.layer_phosphorus_potentials, accessible_phosphates
+        self.unmet_phosphorus_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
+            self.layer_phosphorus_potentials, accessible_phosphates
         )
-        self.data.phosphorus_requests = NitrogenIncorporation.determine_layer_nutrient_uptake(
-            self.data.unmet_phosphorus_demands,
-            self.data.layer_phosphorus_potentials,
+        self.phosphorus_requests = NitrogenIncorporation.determine_layer_nutrient_uptake(
+            self.unmet_phosphorus_demands,
+            self.layer_phosphorus_potentials,
             accessible_phosphates,
         )
         self.actual_phosphorus_uptakes = NitrogenIncorporation.determine_layer_extracted_resource(
-            self.data.phosphorus_requests, accessible_phosphates
+            self.phosphorus_requests, accessible_phosphates
         )
         self.extend_phosphate_uptakes_to_full_profile()
         self.extract_phosphorus_from_soil_layers(layer_phosphates)
