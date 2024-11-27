@@ -209,7 +209,7 @@ class Schedule:
         fraction_parameters: list[Optional[tuple[str, list]]],
         years: list[int],
         days: list[int],
-        name: str
+        name: str,
     ) -> None:
         """
         General validations for schedule parameter.
@@ -239,9 +239,7 @@ class Schedule:
         valid_years = Schedule._validate_years(years)
         if not valid_years:
             raise ValueError(
-                f"'{name}': " + f"expected all years to be > 0 and in non-descending order,"
-                f" received "
-                f"'{years}'."
+                f"'{name}': " + f"expected all years to be > 0 and in non-descending order," f" received " f"'{years}'."
             )
 
         valid_days = Schedule._validate_days(years, days)
@@ -250,11 +248,13 @@ class Schedule:
 
         for parameter_name, parameter in non_negative_parameters:
             if not Utility.determine_if_all_non_negative_values(parameter):
-                raise ValueError(f"'{name}': " + f"expected all {parameter_name} to be"
-                                                 f" in >= 0, received '{parameter}'.")
+                raise ValueError(
+                    f"'{name}': " + f"expected all {parameter_name} to be" f" in >= 0, received '{parameter}'."
+                )
         for parameter_name, parameter in fraction_parameters:
             if not Utility.validate_fractions(parameter):
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be in"
-                                    f" range [0.0, 1.0], " f"received '{parameter}'."
+                    f" range [0.0, 1.0], "
+                    f"received '{parameter}'."
                 )
