@@ -65,3 +65,101 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
 
     assert actual == expected
     get_data.assert_called_once_with("end_to_end_testing_result_paths.end_to_end_test_result_paths")
+
+
+def mock_diff_result():
+    """Return a mock DeepDiff result for testing."""
+    return {
+        "values_changed": {
+            "key1": {"old_value": 100.0, "new_value": 100.0001},
+            "key2": {"old_value": 50.0, "new_value": 51.0},
+            "nested_key": {
+                "nested": {
+                    "key3": {"old_value": 200.0, "new_value": 200.0000001},
+                    "key4": {"old_value": 30.0, "new_value": 40.0},
+                }
+            },
+        }
+    }
+
+
+@pytest.mark.parametrize(
+    "diff_result, tolerance, expected_keys",
+    [
+        # Case 1: Basic functionality
+        (
+            {
+                "values_changed": {
+                    "key1": {"old_value": 100.0, "new_value": 100.0001},  # Insignificant
+                    "key2": {"old_value": 50.0, "new_value": 51.0},       # Significant
+                }
+            },
+            1e-3,
+            {"key2"},  # Only "key2" should remain
+        ),
+        # Case 2: Nested dictionary
+        (
+            {
+                "values_changed": {
+                    "nested_key": {
+                        "nested": {
+                            "key3": {"old_value": 200.0, "new_value": 200.0000001},  # Insignificant
+                            "key4": {"old_value": 30.0, "new_value": 40.0},         # Significant
+                        }
+                    }
+                }
+            },
+            1e-7,
+            {"nested_key"},  # Only "nested_key" with "key4" inside should remain
+        ),
+        # Case 3: Empty nested dictionary
+        (
+            {
+                "values_changed": {
+                    "nested_key": {
+                        "nested": {
+                            "key1": {"old_value": 10.0, "new_value": 10.000001},  # Insignificant
+                            "key2": {"old_value": 20.0, "new_value": 20.000001},  # Insignificant
+                        }
+                    }
+                }
+            },
+            1e-5,
+            set(),  # The entire nested structure should be removed
+        ),
+        # Case 4: Boundary tolerance
+        (
+            {
+                "values_changed": {
+                    "key1": {"old_value": 10.0, "new_value": 10.000001},  # Below tolerance
+                    "key2": {"old_value": 10.0, "new_value": 10.00001},   # On tolerance
+                    "key3": {"old_value": 10.0, "new_value": 10.0001},    # Above tolerance
+                }
+            },
+            1e-5,
+            {"key3"},  # Only "key3" should remain
+        ),
+        # Case 5: Non-numeric and missing keys
+        (
+            {
+                "values_changed": {
+                    "key1": {"old_value": "a", "new_value": "b"},  # Non-numeric
+                    "key2": {"old_value": 10.0},  # Missing `new_value`
+                    "key3": {"new_value": 20.0},  # Missing `old_value`
+                    "key4": {},  # Empty dictionary
+                }
+            },
+            1e-3,
+            {"key1", "key2", "key3"},
+        ),
+    ],
+)
+def test_filter_insignificant_changes(diff_result, tolerance, expected_keys):
+    """Parameterized test for filter_insignificant_changes."""
+    filtered_result = E2ETestResultsComparer.filter_insignificant_changes(diff_result, tolerance)
+
+    # Extract remaining keys
+    remaining_keys = set(filtered_result["values_changed"].keys())
+
+    # Assert that only the expected keys remain
+    assert remaining_keys == expected_keys
