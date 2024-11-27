@@ -417,7 +417,7 @@ def test_create_bool_schema(
                     "type": "object",
                     "format": "grid",
                     "default": None,
-                    'options': {'infoText': None},
+                    "options": {"infoText": None},
                     "properties": {
                         "scenario_id": {
                             "title": "Scenario Id",
