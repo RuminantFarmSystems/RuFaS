@@ -9,7 +9,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
-ResultPathType = namedtuple("ResultPaths", ["domain", "expected_results_path", "actual_results_path"])
+ResultPathType = namedtuple("ResultPathType", ["domain", "expected_results_path", "actual_results_path"])
 DEFAULT_TOLERANCE = 1e-3
 
 
@@ -99,14 +99,15 @@ class E2ETestResultsComparer:
         return test_result_paths
 
     @staticmethod
-    def filter_insignificant_changes(diff_result, tolerance):
+    def filter_insignificant_changes(diff_result: dict[str, dict[str, dict[str, float | str]]],
+                                     tolerance: float) -> dict[str, dict[str, dict[str, float | str]]]:
         """
         Remove insignificant changes from a DeepDiff `values_changed` section.
         Modifies the `values_changed` section in place.
         """
         values_changed = diff_result.get("values_changed", {})
 
-        def is_significant(change):
+        def is_significant(change: dict[str, float | str]) -> bool:
             """Determine if a change is significant based on the tolerance."""
             if isinstance(change, dict) and "old_value" in change and "new_value" in change:
                 old_value = change["old_value"]
@@ -116,7 +117,7 @@ class E2ETestResultsComparer:
                     return difference > tolerance
             return True
 
-        def filter_nested(values_changed):
+        def filter_nested(values_changed: dict[str, dict[str, float | str]]) -> None:
             """Recursively filter out insignificant changes from a nested structure."""
             keys_to_remove = []
             for key, change in values_changed.items():
