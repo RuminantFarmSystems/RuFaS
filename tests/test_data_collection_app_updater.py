@@ -256,10 +256,7 @@ def test_create_string_schema_value_error(
                 "options": {
                     "grid_columns": 12,
                     "infoText": "Number of times that this crop schedule should be repeated.",
-                    "inputAttributes": {
-                        "class": "text-primary form-control",
-                        "placeholder": 1_000_000
-                    },
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": 1_000_000},
                 },
             },
         ),
@@ -282,10 +279,7 @@ def test_create_string_schema_value_error(
                 "options": {
                     "grid_columns": 12,
                     "infoText": "Number of times that this crop schedule should be repeated.",
-                    "inputAttributes": {
-                        "class": "text-primary form-control",
-                        "placeholder": 1_000_000
-                    },
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": 1_000_000},
                 },
             },
         ),
@@ -318,9 +312,7 @@ def test_create_number_schema(
                 "options": {
                     "grid_columns": 12,
                     "infoText": "Ventilation -- True if the storage unit has appropriate ventilation.",
-                    "inputAttributes": {
-                        "class": "text-primary form-control", "placeholder": True
-                    },
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": True},
                 },
             },
         ),
@@ -340,9 +332,7 @@ def test_create_number_schema(
                 "options": {
                     "grid_columns": 12,
                     "infoText": "Ventilation -- True if the storage unit has appropriate ventilation.",
-                    "inputAttributes": {
-                        "class": "text-primary form-control", "placeholder": True
-                    },
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": True},
                 },
             },
         ),
@@ -390,9 +380,7 @@ def test_create_bool_schema(
                     "options": {
                         "grid_columns": 12,
                         "infoText": "Death rate for first, second, third, and later lactations",
-                        "inputAttributes": {
-                            "class": "text-primary form-control", "placeholder": 1
-                        },
+                        "inputAttributes": {"class": "text-primary form-control", "placeholder": 1},
                     },
                 },
             },
@@ -496,9 +484,7 @@ def test_create_array_schema(
                         "options": {
                             "grid_columns": 12,
                             "infoText": "Stillbirth rate",
-                            "inputAttributes": {
-                                "class": "text-primary form-control", "placeholder": 1
-                            },
+                            "inputAttributes": {"class": "text-primary form-control", "placeholder": 1},
                         },
                     }
                 },
