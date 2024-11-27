@@ -2276,8 +2276,9 @@ def test_route_save_functions_comparison(mocker: MockerFixture) -> None:
     # Arrange
     output_manager = OutputManager()
     output_manager.is_first_post_processing = False
-    mocker.patch.object(type(output_manager), "_filter_prefixes", new_callable=PropertyMock,
-                        return_value={"comparison": "comparison_"})
+    mocker.patch.object(
+        type(output_manager), "_filter_prefixes", new_callable=PropertyMock, return_value={"comparison": "comparison_"}
+    )
     patch_create_directory = mocker.patch.object(output_manager, "create_directory")
     patch_for_save_to_json = mocker.patch.object(output_manager, "_save_to_json")
     filter_file = "comparison_file"
@@ -2341,8 +2342,9 @@ def test_save_to_json(
         base_name = f"comparison_{filter_content['name']}"
     else:
         base_name = (
-            f"saved_variables_{filter_content['name']}" if "name" in
-            filter_content else f"saved_variables_{filter_file}"
+            f"saved_variables_{filter_content['name']}"
+            if "name" in filter_content
+            else f"saved_variables_{filter_file}"
         )
 
     patch_for_generate_file_name.assert_called_once_with(base_name, "json")

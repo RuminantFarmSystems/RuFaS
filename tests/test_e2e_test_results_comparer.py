@@ -91,7 +91,7 @@ def mock_diff_result():
             {
                 "values_changed": {
                     "key1": {"old_value": 100.0, "new_value": 100.0001},  # Insignificant
-                    "key2": {"old_value": 50.0, "new_value": 51.0},       # Significant
+                    "key2": {"old_value": 50.0, "new_value": 51.0},  # Significant
                 }
             },
             1e-3,
@@ -104,7 +104,7 @@ def mock_diff_result():
                     "nested_key": {
                         "nested": {
                             "key3": {"old_value": 200.0, "new_value": 200.0000001},  # Insignificant
-                            "key4": {"old_value": 30.0, "new_value": 40.0},         # Significant
+                            "key4": {"old_value": 30.0, "new_value": 40.0},  # Significant
                         }
                     }
                 }
@@ -132,8 +132,8 @@ def mock_diff_result():
             {
                 "values_changed": {
                     "key1": {"old_value": 10.0, "new_value": 10.000001},  # Below tolerance
-                    "key2": {"old_value": 10.0, "new_value": 10.00001},   # On tolerance
-                    "key3": {"old_value": 10.0, "new_value": 10.0001},    # Above tolerance
+                    "key2": {"old_value": 10.0, "new_value": 10.00001},  # On tolerance
+                    "key3": {"old_value": 10.0, "new_value": 10.0001},  # Above tolerance
                 }
             },
             1e-5,
