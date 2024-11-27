@@ -296,6 +296,9 @@ class DataCollectionAppUpdater:
         When a string input is taken, often it is to select from a preset group of options. This method is designed to
         derive those options from the Regex pattern that is used to validate it.
 
+        The Regex pattern used to check `input_pattern` ensures there no special characters in-between "^(" and ")$"
+        unless they are a bar ("|"), hyphen ("-"), whitespace (" "), or slash ("/").
+
         Examples
         --------
         >>> DataCollectionAppUpdater._get_list_of_options("^(kg)$")
@@ -306,7 +309,7 @@ class DataCollectionAppUpdater:
         ["TAI", "ED", "Synch-ED"]
 
         """
-        pattern = "\\^\\(.*\\)\\$"
+        pattern = r"\^\((?:(?![^\w|\/ \-']).)*\)\$"
         is_valid_pattern = bool(re.match(pattern, input_pattern))
         if not is_valid_pattern:
             raise ValueError(f"'{input_pattern}' is not a valid pattern. Cannot create list of valid options.")
