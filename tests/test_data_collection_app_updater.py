@@ -88,10 +88,10 @@ def test_rewrite_index_page(dca_updater: DataCollectionAppUpdater, mocker: Mocke
         ("^(TAI|ED|Synch-ED)$", ["TAI", "ED", "Synch-ED"]),
         (
             "^(flush system|alley scraper|manual scraping|tillage|harrowing)$",
-            ["flush system", "alley scraper", "manual scraping", "tillage", "harrowing"]
+            ["flush system", "alley scraper", "manual scraping", "tillage", "harrowing"],
         ),
         ("^(cover|crust|no cover|cover and flare|N/A)$", ["cover", "crust", "no cover", "cover and flare", "N/A"]),
-        ("^(12 Diameter Bag|Upright Silo - Traditional)$", ["12 Diameter Bag", "Upright Silo - Traditional"])
+        ("^(12 Diameter Bag|Upright Silo - Traditional)$", ["12 Diameter Bag", "Upright Silo - Traditional"]),
     ],
 )
 def test_get_list_of_options(dca_updater: DataCollectionAppUpdater, pattern: str, expected: list[str]) -> None:
@@ -102,14 +102,15 @@ def test_get_list_of_options(dca_updater: DataCollectionAppUpdater, pattern: str
 
 
 @pytest.mark.parametrize(
-    "pattern", [
+    "pattern",
+    [
         "(kg)$",
         "(kg)",
         "$(kg)^",
         "[12][019][0-9]{2}:(?:[1-9]|[1-9][0-9]|[12][0-9]{2}|3[0-5][0-9]|36[0-6])$",
         "^(?!none$)(.*)$",
         "^(?!anaerobic digestion and lagoon|anaerobic digestion and lagoon with separator$)(.*)$",
-    ]
+    ],
 )
 def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, pattern: str) -> None:
     """Tests that an incorrectly structured Regex pattern produces an error."""
