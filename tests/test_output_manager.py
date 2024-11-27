@@ -1099,7 +1099,7 @@ def output_manager_original_method_states(
         "clear_output_dir": mock_output_manager.clear_output_dir,
         "is_file_in_dir": mock_output_manager.is_file_in_dir,
         "create_directory": mock_output_manager.create_directory,
-        "_route_logs": mock_output_manager.route_logs,
+        "route_logs": mock_output_manager.route_logs,
         "print_credits": mock_output_manager.print_credits,
         "_stringify_units": mock_output_manager._stringify_units,
         "_save_current_variable_pool": mock_output_manager._save_current_variable_pool,
