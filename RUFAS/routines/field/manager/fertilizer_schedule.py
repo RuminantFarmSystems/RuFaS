@@ -121,7 +121,7 @@ class FertilizerSchedule(Schedule):
         ]
         fraction_parameters = [("surface remainder fractions", self.surface_remainder_fractions)]
 
-        self._validate_parameters(non_negative_parameters, fraction_parameters)
+        self._validate_parameters(non_negative_parameters, fraction_parameters, self.years, self.days, self.name)
 
         self.validate_equal_lengths(
             error_header,
@@ -164,38 +164,3 @@ class FertilizerSchedule(Schedule):
                 False,
             )
         )
-        # all_years = Utility.repeat_pattern(self.years, self.pattern_skip, self.pattern_repeat)
-        # all_days = self.days * (self.pattern_repeat + 1)
-        # all_mix_names = self.mix_names * (self.pattern_repeat + 1)
-        # all_nitrogen_masses = self.nitrogen_masses * (self.pattern_repeat + 1)
-        # all_phosphorus_masses = self.phosphorus_masses * (self.pattern_repeat + 1)
-        # all_potassium_masses = self.potassium_masses * (self.pattern_repeat + 1)
-        # all_depths = self.application_depths * (self.pattern_repeat + 1)
-        # all_surface_fractions = self.surface_remainder_fractions * (self.pattern_repeat + 1)
-        # all_events = list(
-        #     zip(
-        #         all_mix_names,
-        #         all_years,
-        #         all_days,
-        #         all_nitrogen_masses,
-        #         all_phosphorus_masses,
-        #         all_potassium_masses,
-        #         all_depths,
-        #         all_surface_fractions,
-        #     )
-        # )
-        #
-        # fertilizer_events = []
-        # for event in all_events:
-        #     new_event = FertilizerEvent(
-        #         mix_name=event[0],
-        #         year=event[1],
-        #         day=event[2],
-        #         nitrogen_mass=event[3],
-        #         phosphorus_mass=event[4],
-        #         potassium_mass=event[5],
-        #         depth=event[6],
-        #         surface_remainder_fraction=event[7],
-        #     )
-        #     fertilizer_events.append(new_event)
-        # return fertilizer_events

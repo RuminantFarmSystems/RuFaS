@@ -113,19 +113,8 @@ class CropSchedule(Schedule):
             If not number of planting years and days are not equal.
 
         """
-        valid_years = self._validate_years(self.planting_years)
-        if not valid_years:
-            raise ValueError(
-                f"'{self.name}': expected all years to be > 0 and in non-descending order, received "
-                f"'{self.planting_years}'."
-            )
-
-        valid_days = self._validate_days(self.planting_years, self.planting_days)
-        if not valid_days:
-            raise ValueError(
-                f"'{self.name}': expected all planting days to be in range [1, 366], received "
-                f"'{self.planting_days}'."
-            )
+        self._validate_parameters([], [], self.planting_years,
+                                  self.planting_days, self.name)
 
         self.validate_equal_lengths(self.name, planting_years=self.planting_years, planting_days=self.planting_days)
 
@@ -142,18 +131,8 @@ class CropSchedule(Schedule):
             If the last harvest operation is not a final one, or if any operations before the last are final ones.
 
         """
-        harvest_years_valid = self._validate_years(self.harvest_years)
-        if not harvest_years_valid:
-            raise ValueError(
-                f"'{self.name}': expected all harvest years to be > 0 and in non-descending order, "
-                f"received '{self.harvest_years}'."
-            )
-
-        harvest_days_valid = self._validate_days(self.harvest_years, self.harvest_days)
-        if not harvest_days_valid:
-            raise ValueError(
-                f"'{self.name}': expected all harvest days to be in range [1, 366], received " f"'{self.harvest_days}'."
-            )
+        self._validate_parameters([], [], self.harvest_years,
+                                  self.harvest_days, self.name)
 
         self.validate_equal_lengths(
             self.name,

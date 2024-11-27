@@ -93,7 +93,7 @@ class TillageSchedule(Schedule):
             ("mixing fractions", self.mixing_fractions),
         ]
 
-        self._validate_parameters([], fraction_parameters)
+        self._validate_parameters([], fraction_parameters, self.years, self.days, self.name)
         valid_depths = self.validate_depths(self.tillage_depths)
         if not valid_depths:
             raise ValueError(

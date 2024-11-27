@@ -202,10 +202,14 @@ class Schedule:
             )
         return True
 
+    @classmethod
     def _validate_parameters(
-        self,
+        cls,
         non_negative_parameters: list[Optional[tuple[str, list]]],
         fraction_parameters: list[Optional[tuple[str, list]]],
+        years: list[int],
+        days: list[int],
+        name: str
     ) -> None:
         """
         General validations for schedule parameter.
@@ -216,6 +220,12 @@ class Schedule:
             A list of parameters wrapped in a tuple containing their names and values that should be non-negative.
         fraction_parameters: list[tuple[str, list]]
             A list of parameters wrapped in a tuple containing their names and values that should be fractions.
+        years: list[int]
+            List of event years.
+        days: list[int]
+            List of event days.
+        name : str
+            The name of the schedule, serving as a unique identifier.
 
         Raises
         ------
@@ -226,23 +236,25 @@ class Schedule:
             If not all days to be in range [1, 366].
 
         """
-        valid_years = self._validate_years(self.years)
+        valid_years = Schedule._validate_years(years)
         if not valid_years:
             raise ValueError(
-                f"'{self.name}': " + f"expected all years to be > 0 and in non-descending order,"
+                f"'{name}': " + f"expected all years to be > 0 and in non-descending order,"
                 f" received "
-                f"'{self.years}'."
+                f"'{years}'."
             )
 
-        valid_days = self._validate_days(self.years, self.days)
+        valid_days = Schedule._validate_days(years, days)
         if not valid_days:
-            raise ValueError(f"'{self.name}': " + f"expected all days to be in range [1, 366], received '{self.days}'.")
+            raise ValueError(f"'{name}': " + f"expected all days to be in range [1, 366], received '{days}'.")
 
-        for name, parameter in non_negative_parameters:
+        for parameter_name, parameter in non_negative_parameters:
             if not Utility.determine_if_all_non_negative_values(parameter):
-                raise ValueError(f"'{self.name}': " + f"expected all {name} to be in >= 0, received '{parameter}'.")
-        for name, parameter in fraction_parameters:
+                raise ValueError(f"'{name}': " + f"expected all {parameter_name} to be"
+                                                 f" in >= 0, received '{parameter}'.")
+        for parameter_name, parameter in fraction_parameters:
             if not Utility.validate_fractions(parameter):
                 raise ValueError(
-                    f"'{self.name}': " + f"expected all {name} to be in range [0.0, 1.0], " f"received '{parameter}'."
+                    f"'{name}': " + f"expected all {parameter_name} to be in"
+                                    f" range [0.0, 1.0], " f"received '{parameter}'."
                 )

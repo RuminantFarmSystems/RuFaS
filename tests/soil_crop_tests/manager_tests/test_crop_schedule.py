@@ -135,7 +135,8 @@ def test_crop_schedule_init(
             "test_2",
             [1998, 1999, 2000],
             [200, 200, 367],
-            "'test_2': expected all planting days to be in range [1, 366], received " "'[200, 200, 367]'.",
+            "'test_2': expected all days to be in range [1, 366], received '[200, 200, "
+            "367]'.",
         ),
         (
             "test_3",
@@ -163,14 +164,15 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
             [1996, 1993],
             [200],
             ["harvest_kill"],
-            "'test_1': expected all harvest years to be > 0 and in non-descending order, received '[1996, 1993]'.",
+            "'test_1': expected all years to be > 0 and in non-descending order, received "
+            "'[1996, 1993]'.",
         ),
         (
             "test_2",
             [1999, 2000],
             [200, 0],
             ["harvest_kill"],
-            "'test_2': expected all harvest days to be in range [1, 366], received '[200, 0]'.",
+            "'test_2': expected all days to be in range [1, 366], received '[200, 0]'.",
         ),
         (
             "test_3",

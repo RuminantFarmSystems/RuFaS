@@ -117,7 +117,7 @@ class ManureSchedule(Schedule):
             ("surface remainder fractions", self.surface_remainder_fractions),
         ]
 
-        self._validate_parameters(non_negative_parameters, fraction_parameters)
+        self._validate_parameters(non_negative_parameters, fraction_parameters, self.years, self.days, self.name)
         valid_manure_types = all(isinstance(manure_type, ManureType) for manure_type in self.manure_types)
         if not valid_manure_types:
             raise ValueError(
