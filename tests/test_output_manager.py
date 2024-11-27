@@ -2341,7 +2341,8 @@ def test_save_to_json(
         base_name = f"comparison_{filter_content['name']}"
     else:
         base_name = (
-            f"saved_variables_{filter_content['name']}" if "name" in filter_content else f"saved_variables_{filter_file}"
+            f"saved_variables_{filter_content['name']}" if "name" in
+            filter_content else f"saved_variables_{filter_file}"
         )
 
     patch_for_generate_file_name.assert_called_once_with(base_name, "json")
