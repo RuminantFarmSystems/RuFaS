@@ -124,7 +124,7 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
                 "options": {
                     "infoText": "The general type or category of the feed (group).",
                     "grid_columns": 12,
-                    "inputAttributes": {"class": "text-primary form-control"},
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": "Forage"},
                 },
             },
         ),
@@ -146,7 +146,7 @@ def test_get_list_of_options_error(dca_updater: DataCollectionAppUpdater, patter
                 "options": {
                     "infoText": "The general type or category of the feed (group).",
                     "grid_columns": 12,
-                    "inputAttributes": {"class": "text-primary form-control"},
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": "Forage"},
                 },
             },
         ),
@@ -161,7 +161,6 @@ def test_create_string_schema(
 ) -> None:
     """Tests that created string schema correctly handles a valid string property."""
     mocked_get_options = mocker.patch.object(dca_updater, "_get_list_of_options", return_value=["one", "two"])
-    print("here")
     actual = dca_updater._create_string_schema(title, properties)
 
     assert mocked_get_options.call_count == 1
@@ -187,7 +186,7 @@ def test_create_string_schema(
                 "options": {
                     "infoText": "The year and Julian day on which the simulation will start.",
                     "grid_columns": 12,
-                    "inputAttributes": {"class": "text-primary form-control"},
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": "2009:1"},
                 },
             },
         )
@@ -246,7 +245,7 @@ def test_create_string_schema_value_error(
                     "infoText": "Number of times that this crop schedule should be repeated.",
                     "inputAttributes": {
                         "class": "text-primary form-control",
-                        "placeholder": ""
+                        "placeholder": 1_000_000
                     },
                 },
             },
@@ -272,7 +271,7 @@ def test_create_string_schema_value_error(
                     "infoText": "Number of times that this crop schedule should be repeated.",
                     "inputAttributes": {
                         "class": "text-primary form-control",
-                        "placeholder": ""
+                        "placeholder": 1_000_000
                     },
                 },
             },
@@ -307,7 +306,7 @@ def test_create_number_schema(
                     "grid_columns": 12,
                     "infoText": "Ventilation -- True if the storage unit has appropriate ventilation.",
                     "inputAttributes": {
-                        "class": "text-primary form-control",
+                        "class": "text-primary form-control", "placeholder": True
                     },
                 },
             },
@@ -329,7 +328,7 @@ def test_create_number_schema(
                     "grid_columns": 12,
                     "infoText": "Ventilation -- True if the storage unit has appropriate ventilation.",
                     "inputAttributes": {
-                        "class": "text-primary form-control",
+                        "class": "text-primary form-control", "placeholder": True
                     },
                 },
             },
@@ -379,7 +378,7 @@ def test_create_bool_schema(
                         "grid_columns": 12,
                         "infoText": "Death rate for first, second, third, and later lactations",
                         "inputAttributes": {
-                            "class": "text-primary form-control", "placeholder": ""
+                            "class": "text-primary form-control", "placeholder": 1
                         },
                     },
                 },
@@ -425,7 +424,7 @@ def test_create_bool_schema(
                             "type": "number",
                             "options": {
                                 "grid_columns": 12,
-                                "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
+                                "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                                 "infoText": "Scenario ID -- An identification number for livestock enclosures.",
                             },
                             "minimum": 0,
@@ -436,7 +435,7 @@ def test_create_bool_schema(
                             "type": "string",
                             "options": {
                                 "grid_columns": 12,
-                                "inputAttributes": {"class": "text-primary form-control"},
+                                "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                                 "infoText": "Bedding Type -- The material used for bedding pack.",
                             },
                             "enum": ["Sand", "Straw", "Sawdust", "Manure_solids", "Other"],
@@ -485,7 +484,7 @@ def test_create_array_schema(
                             "grid_columns": 12,
                             "infoText": "Stillbirth rate",
                             "inputAttributes": {
-                                "class": "text-primary form-control", "placeholder": ""
+                                "class": "text-primary form-control", "placeholder": 1
                             },
                         },
                     }
@@ -523,7 +522,7 @@ def test_create_array_schema(
                         "type": "number",
                         "options": {
                             "grid_columns": 12,
-                            "inputAttributes": {"class": "text-primary form-control", "placeholder": ""},
+                            "inputAttributes": {"class": "text-primary form-control", "placeholder": 8},
                             "infoText": "Number of Calves (head) -- The initial number of pre-weaned calves",
                         },
                         "minimum": 0,
@@ -534,7 +533,7 @@ def test_create_array_schema(
                         "type": "string",
                         "options": {
                             "grid_columns": 12,
-                            "inputAttributes": {"class": "text-primary form-control"},
+                            "inputAttributes": {"class": "text-primary form-control", "placeholder": "HO"},
                             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd "
                             "(Holstein or Jersey)",
                         },
@@ -583,7 +582,7 @@ def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None
                 "pattern": r"^[a-zA-Z0-9_\- ]{1,255}$",
                 "options": {
                     "grid_columns": 12,
-                    "inputAttributes": {"class": "text-primary form-control"},
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
                     "the saved file.",
                 },

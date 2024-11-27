@@ -39,6 +39,9 @@ SCHEMA_SCRIPT_TAG_PLACEHOLDER: str = "    <!-- Schema imports go here-->"
 """Placeholder for listing newly available schemas in the rewritten index.html."""
 AVAILABLE_SCHEMAS_LIST_PLACEHOLDER: str = "// List of available schema goes here"
 
+"""Fallback placeholder in a DCA input field if no value has been entered into it."""
+INPUT_PLACEHOLDER: str = "null"
+
 
 class DataCollectionAppUpdater:
     """
@@ -182,7 +185,7 @@ class DataCollectionAppUpdater:
         if maximum is not None:
             schema["maximum"] = maximum
         schema["default"] = default
-        schema["options"]["inputAttributes"]["placeholder"] = ""
+        schema["options"]["inputAttributes"]["placeholder"] = default or minimum or maximum or INPUT_PLACEHOLDER
         schema["options"]["infoText"] = description
         schema["type"] = ["number", "null"] if nullable else "number"
 
@@ -217,6 +220,7 @@ class DataCollectionAppUpdater:
 
         schema["default"] = default
         schema["options"]["infoText"] = description
+        schema["options"]["inputAttributes"]["placeholder"] = default or INPUT_PLACEHOLDER
         schema["type"] = ["boolean", "null"] if nullable else "boolean"
 
         return schema
@@ -250,6 +254,7 @@ class DataCollectionAppUpdater:
 
         schema["default"] = default
         schema["options"]["infoText"] = description
+        schema["options"]["inputAttributes"]["placeholder"] = default or INPUT_PLACEHOLDER
         if pattern is not None:
             try:
                 enum = self._get_list_of_options(pattern)
@@ -412,7 +417,7 @@ class DataCollectionAppUpdater:
                 "pattern": r"^[a-zA-Z0-9_\- ]{1,255}$",
                 "options": {
                     "grid_columns": 12,
-                    "inputAttributes": {"class": "text-primary form-control"},
+                    "inputAttributes": {"class": "text-primary form-control", "placeholder": INPUT_PLACEHOLDER},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
                     "the saved file.",
                 },
