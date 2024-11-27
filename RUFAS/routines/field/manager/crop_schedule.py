@@ -113,8 +113,7 @@ class CropSchedule(Schedule):
             If not number of planting years and days are not equal.
 
         """
-        self._validate_parameters([], [], self.planting_years,
-                                  self.planting_days, self.name)
+        self._validate_parameters([], [], self.planting_years, self.planting_days, self.name)
 
         self.validate_equal_lengths(self.name, planting_years=self.planting_years, planting_days=self.planting_days)
 
@@ -131,8 +130,7 @@ class CropSchedule(Schedule):
             If the last harvest operation is not a final one, or if any operations before the last are final ones.
 
         """
-        self._validate_parameters([], [], self.harvest_years,
-                                  self.harvest_days, self.name)
+        self._validate_parameters([], [], self.harvest_years, self.harvest_days, self.name)
 
         self.validate_equal_lengths(
             self.name,
