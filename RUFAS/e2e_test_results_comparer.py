@@ -99,8 +99,9 @@ class E2ETestResultsComparer:
         return test_result_paths
 
     @staticmethod
-    def filter_insignificant_changes(diff_result: dict[str, dict[str, dict[str, float | str]]],
-                                     tolerance: float) -> dict[str, dict[str, dict[str, float | str]]]:
+    def filter_insignificant_changes(
+        diff_result: dict[str, dict[str, dict[str, float | str]]], tolerance: float
+    ) -> dict[str, dict[str, dict[str, float | str]]]:
         """
         Remove insignificant changes from a DeepDiff `values_changed` section.
         Modifies the `values_changed` section in place.

@@ -154,8 +154,9 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
         ),
     ],
 )
-def test_filter_insignificant_changes(diff_result: dict[str, dict[str, dict[str, float | str]]],
-                                      tolerance: float, expected_keys: set[str]) -> None:
+def test_filter_insignificant_changes(
+    diff_result: dict[str, dict[str, dict[str, float | str]]], tolerance: float, expected_keys: set[str]
+) -> None:
     """Parameterized test for filter_insignificant_changes."""
     filtered_result = E2ETestResultsComparer.filter_insignificant_changes(diff_result, tolerance)
     remaining_keys = set(filtered_result["values_changed"].keys())
