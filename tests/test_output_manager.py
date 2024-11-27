@@ -3330,9 +3330,7 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     mock_output_manager.add_log = output_manager_original_method_states["add_log"]
 
 
-def test_setup_pool_overflow_control_user_define_max_memory_usage(
-    mocker: MockerFixture
-) -> None:
+def test_setup_pool_overflow_control_user_define_max_memory_usage(mocker: MockerFixture) -> None:
     info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     output_manager = OutputManager()
     output_manager.chunkification = False
@@ -3383,9 +3381,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(
     mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
 
 
-def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(
-    mocker: MockerFixture
-) -> None:
+def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(mocker: MockerFixture) -> None:
     info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
     output_manager = OutputManager()
     output_manager.chunkification = False
