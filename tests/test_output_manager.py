@@ -3221,7 +3221,6 @@ def test_run_startup_sequence_not_clear_output_directory(
 
 def test_run_startup_sequence_chunkification(
     mock_output_manager: OutputManager,
-    output_manager_original_method_states: Dict[str, Callable],
     mocker: MockerFixture,
 ) -> None:
     mock_print_credits = mocker.patch.object(mock_output_manager, "print_credits")
@@ -3330,17 +3329,17 @@ def test_setup_pool_overflow_control_user_define_save_chunk_threshold_call_count
     mock_output_manager.add_log = output_manager_original_method_states["add_log"]
 
 
-def test_setup_pool_overflow_control_user_define_max_memory_usage(mocker: MockerFixture) -> None:
+def test_setup_pool_overflow_control_user_define_max_memory_usage(mocker: MockerFixture,
+                                                                  mock_output_manager: OutputManager) -> None:
     info_map = {"class": "OutputManager", "function": "setup_pool_overflow_control"}
-    output_manager = OutputManager()
-    output_manager.chunkification = False
-    output_manager.available_memory = 0
-    output_manager.saved_pool_chunks_path = Path("")
-    output_manager.save_chunk_threshold_call_count = 0
-    output_manager.maximum_pool_size = 0
+    mock_output_manager.chunkification = False
+    mock_output_manager.available_memory = 0
+    mock_output_manager.saved_pool_chunks_path = Path("")
+    mock_output_manager.save_chunk_threshold_call_count = 0
+    mock_output_manager.maximum_pool_size = 0
 
-    mock_create_directory = mocker.patch.object(output_manager, "create_directory")
-    mock_add_log = mocker.patch.object(output_manager, "add_log")
+    mock_create_directory = mocker.patch.object(mock_output_manager, "create_directory")
+    mock_add_log = mocker.patch.object(mock_output_manager, "add_log")
 
     psutil_virtual_memory_return = MagicMock()
     psutil_virtual_memory_return.available = 1024
@@ -3352,7 +3351,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(mocker: Mocker
     dummy_save_chunk_threshold_call_count: int = 0
 
     with freeze_time("2024-05-20 13:14:00"):
-        output_manager.setup_pool_overflow_control(
+        mock_output_manager.setup_pool_overflow_control(
             dummy_output_directory,
             dummy_max_memory_usage_percent,
             dummy_max_memory_usage,
@@ -3372,13 +3371,14 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage(mocker: Mocker
         f"{dummy_max_memory_usage} Bytes"
     )
 
-    assert output_manager.chunkification is True
-    assert output_manager.available_memory == expected_available_memory
-    assert output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
-    assert output_manager.save_chunk_threshold_call_count == 0
-    assert output_manager.maximum_pool_size == dummy_max_memory_usage
+    assert mock_output_manager.chunkification is True
+    assert mock_output_manager.available_memory == expected_available_memory
+    assert mock_output_manager.saved_pool_chunks_path == expected_saved_pool_chunks_path
+    assert mock_output_manager.save_chunk_threshold_call_count == 0
+    assert mock_output_manager.maximum_pool_size == dummy_max_memory_usage
     mock_add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
     mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
+    mock_output_manager.chunkification = False
 
 
 def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(mocker: MockerFixture) -> None:
@@ -3433,6 +3433,7 @@ def test_setup_pool_overflow_control_user_define_max_memory_usage_percentage(moc
 
     mock_create_directory.assert_called_once_with(expected_saved_pool_chunks_path)
     mock_add_log.assert_called_once_with("Pool Overflow Control Setup", expected_log_message, info_map)
+    output_manager.chunkification = False
 
 
 @pytest.mark.parametrize(
