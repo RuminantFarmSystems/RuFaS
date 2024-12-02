@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
@@ -54,8 +54,11 @@ class FeedManager:
         Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
     """
 
-    def __init__(self):
+    def __init__(self, feed_config: dict[str, Any]) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
+
+        # TODO: implement all this stuff
+        raise NotImplementedError
 
     def _query_result_factory(
         self, crop_category: CropCategory, crop_type: CropType, amount: float

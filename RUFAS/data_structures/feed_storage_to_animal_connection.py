@@ -41,11 +41,11 @@ class Feed:
         Amount of feed currently or expected to be available (kg).
     on_farm_price : float
         Price of using the feed that is already on-farm ($ / kg).
-    purchase_price : float | None
-        Price of buying feed from off-farm ($ / kg). If feed is not purchasable this is set to None.
+    purchase_price : float
+        Price of buying feed from off-farm ($ / kg).
 
     """
-    rufas_id: str
+    rufas_id: int
     Fd_Category: Category
     feed_type: Type
     DM: float
@@ -178,13 +178,13 @@ class IdealFeeds:
 
     Attributes
     ----------
-    ideal_feeds : dict[str, float]
+    ideal_feeds : dict[int, float]
         Amounts of feeds which would ideally be purchased before the next harvest of a crop, where the key is the RuFaS
         Feed ID and the value is the requested feed amount (kg).
 
     """
 
-    ideal_feeds : dict[str, float]
+    ideal_feeds : dict[int, float]
 
 
 @dataclass
@@ -194,13 +194,13 @@ class RequestedFeed:
 
     Attributes
     ----------
-    requested_feed : dict[str, float]
+    requested_feed : dict[int, float]
         Amounts of feeds to be fed to the herd, where the key is the RuFaS Feed ID and the value is the requested feed
         amount (kg).
 
     """
 
-    requested_feed : dict[str, float]
+    requested_feed : dict[int, float]
 
 
 @dataclass
@@ -216,7 +216,7 @@ class PurchaseAllowance:
 
     """
 
-    allowances : dict[str, float]
+    allowances : dict[int, float]
 
 
 class PlanningCycleAllowance(PurchaseAllowance):

@@ -214,10 +214,11 @@ class SimulationEngine:
         weather_data = self.im.get_data("weather")
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
-        self.feed_manager = FeedManager()
 
         feed_class_config = self.im.get_data("feed")
         self.feed = Feed(feed_class_config)
+        feed_manager_config = feed_class_config["purchased_feeds"]
+        self.feed_manager = FeedManager(feed_manager_config)
 
         manure_class_config = self.im.get_data("manure_management")
         animal_class_config = self.im.get_data("animal")
