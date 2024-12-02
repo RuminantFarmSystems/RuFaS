@@ -17,11 +17,32 @@ class GrowthConstraints:
     crop_data : Optional[CropData], optional
         A `CropData` object containing crop specifications and tracked attributes. If not provided,
         a default `CropData` object is initialized with default values.
+    optimal_temperature : float, default 25
+        Ideal temperature for maximum plant growth (Celsius).
+    water_stress : float, default 0.0
+        Water stress for the day (unitless).
+    temp_stress : Optional[float], default None
+        Temperature stress for the day (unitless).
+    nitrogen_stress : Optional[float], default None
+        Nitrogen stress for the day (unitless).
+    phosphorus_stress : Optional[float], default None
+        Phosphorus stress for the day (unitless).
 
     Attributes
     ----------
     data : CropData
         A reference to the `crop_data` object on which the growth constraint operations are conducted.
+    optimal_temperature : float
+        Ideal temperature for maximum plant growth (Celsius). See SWAT Appendix A - Model Databases, Table A-3 for
+        species specific values (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
+    water_stress : float
+        Water stress for the day (unitless).
+    temp_stress : Optional[float]
+        Temperature stress for the day (unitless).
+    nitrogen_stress : Optional[float]
+        Nitrogen stress for the day (unitless).
+    phosphorus_stress : Optional[float]
+        Phosphorus stress for the day (unitless).
 
     Methods
     -------
@@ -46,8 +67,22 @@ class GrowthConstraints:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        optimal_temperature: float = 25,
+        water_stress: float = 0.0,
+        temp_stress: Optional[float] = None,
+        nitrogen_stress: Optional[float] = None,
+        phosphorus_stress: Optional[float] = None,
+    ) -> None:
+        self.data = crop_data or CropData()
+
+        self.optimal_temperature = optimal_temperature
+        self.water_stress = water_stress
+        self.temp_stress = temp_stress
+        self.nitrogen_stress = nitrogen_stress
+        self.phosphorus_stress = phosphorus_stress
 
     def constrain_growth(
         self,
@@ -83,34 +118,34 @@ class GrowthConstraints:
 
         """
 
-        self.data.water_stress = (
+        self.water_stress = (
             0.0
             if not simulate_water_stress
             else self._determine_water_stress(self.data.water_uptake, max_transpiration)
         )
-        self.data.temp_stress = (
+        self.temp_stress = (
             0.0
             if not simulate_temp_stress
             else self._determine_temperature_stress(
-                temperature, self.data.minimum_temperature, self.data.optimal_temperature
+                temperature, self.data.minimum_temperature, self.optimal_temperature
             )
         )
-        self.data.nitrogen_stress = (
+        self.nitrogen_stress = (
             0.0
             if not simulate_nitrogen_stress
             else self._determine_nutrient_stress(self.data.nitrogen, self.data.optimal_nitrogen)
         )
-        self.data.phosphorus_stress = (
+        self.phosphorus_stress = (
             0.0
             if not simulate_phosphorus_stress
             else self._determine_nutrient_stress(self.data.phosphorus, self.data.optimal_phosphorus)
         )
 
         self.data.growth_factor = self._determine_growth_factor(
-            self.data.water_stress,
-            self.data.temp_stress,
-            self.data.nitrogen_stress,
-            self.data.phosphorus_stress,
+            self.water_stress,
+            self.temp_stress,
+            self.nitrogen_stress,
+            self.phosphorus_stress,
         )
 
     @staticmethod
