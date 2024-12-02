@@ -99,38 +99,77 @@ class E2ETestResultsComparer:
         return test_result_paths
 
     @staticmethod
+    def is_significant(change: dict[str, float | str], tolerance: float) -> bool:
+        """
+        Determines if a change is significant based on the tolerance.
+
+        Parameters
+        ----------
+        change : dict[str, float | str]
+            A dictionary representing a change with "old_value" and "new_value".
+        tolerance : float
+            The threshold for considering a difference as significant.
+
+        Returns
+        -------
+        bool
+            True if the change is significant, False otherwise.
+        """
+        if isinstance(change, dict) and "old_value" in change and "new_value" in change:
+            old_value = change["old_value"]
+            new_value = change["new_value"]
+            if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
+                difference = abs(new_value - old_value)
+                return difference > tolerance
+        return True
+
+    @staticmethod
+    def filter_nested(values_changed: dict[str, dict[str, float | str]], tolerance: float) -> None:
+        """
+        Recursively filters out insignificant changes from a nested structure.
+
+        Parameters
+        ----------
+        values_changed : dict[str, dict[str, float | str]]
+            The `values_changed` section of a DeepDiff result.
+        tolerance : float
+            The threshold for considering a difference as significant.
+
+        Notes
+        -----
+        This method modifies `values_changed` in place.
+        """
+        keys_to_remove = []
+        for key, change in values_changed.items():
+            if isinstance(change, dict) and "old_value" not in change and "new_value" not in change:
+                E2ETestResultsComparer.filter_nested(change, tolerance)
+                if not change:
+                    keys_to_remove.append(key)
+            elif not E2ETestResultsComparer.is_significant(change, tolerance):
+                keys_to_remove.append(key)
+
+        for key in keys_to_remove:
+            del values_changed[key]
+
+    @staticmethod
     def filter_insignificant_changes(
         diff_result: dict[str, dict[str, dict[str, float | str]]], tolerance: float
     ) -> dict[str, dict[str, dict[str, float | str]]]:
         """
-        Remove insignificant changes from a DeepDiff `values_changed` section.
-        Modifies the `values_changed` section in place.
+        Removes insignificant changes from a DeepDiff `values_changed` section.
+
+        Parameters
+        ----------
+        diff_result : dict[str, dict[str, dict[str, float | str]]]
+            The DeepDiff result to filter.
+        tolerance : float
+            The threshold for considering a difference as significant.
+
+        Returns
+        -------
+        dict[str, dict[str, dict[str, float | str]]]
+            The filtered DeepDiff result.
         """
         values_changed = diff_result.get("values_changed", {})
-
-        def is_significant(change: dict[str, float | str]) -> bool:
-            """Determine if a change is significant based on the tolerance."""
-            if isinstance(change, dict) and "old_value" in change and "new_value" in change:
-                old_value = change["old_value"]
-                new_value = change["new_value"]
-                if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
-                    difference = abs(new_value - old_value)
-                    return difference > tolerance
-            return True
-
-        def filter_nested(values_changed: dict[str, dict[str, float | str]]) -> None:
-            """Recursively filter out insignificant changes from a nested structure."""
-            keys_to_remove = []
-            for key, change in values_changed.items():
-                if isinstance(change, dict) and "old_value" not in change and "new_value" not in change:
-                    filter_nested(change)
-                    if not change:
-                        keys_to_remove.append(key)
-                elif not is_significant(change):
-                    keys_to_remove.append(key)
-            for key in keys_to_remove:
-                del values_changed[key]
-
-        filter_nested(values_changed)
-
+        E2ETestResultsComparer.filter_nested(values_changed, tolerance)
         return diff_result
