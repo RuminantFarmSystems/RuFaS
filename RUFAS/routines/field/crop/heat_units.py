@@ -12,17 +12,17 @@ class HeatUnits:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes. If not provided, a default
         `CropData` instance is initialized with default values.
-    maximum_temperature : float
+    maximum_temperature : float, default 38
         Maximum temperature for plant growth (Celsius).
-    use_heat_unit_temperature : bool
+    use_heat_unit_temperature : bool, default False
         If alternative heat unit method is used.
-    new_heat_units : Optional[float]
+    new_heat_units : Optional[float], default None
         Heat units accumulated on the current day (Celsius*).
-    minimum_heat_unit_temperature : Optional[float]
+    minimum_heat_unit_temperature : Optional[float], default None
         Minimum temperature for heat unit calculations (Celsius).
-    maximum_heat_unit_temperature : Optional[float]
+    maximum_heat_unit_temperature : Optional[float], default None
         Maximum temperature for heat unit calculations (Celsius).
-    heat_unit_temperature : Optional[float]
+    heat_unit_temperature : Optional[float], default None
         Heat unit temperature for alternative method (Celsius).
 
     Attributes
@@ -58,7 +58,7 @@ class HeatUnits:
         minimum_heat_unit_temperature: Optional[float] = None,
         maximum_heat_unit_temperature: Optional[float] = None,
         heat_unit_temperature: Optional[float] = None,
-    ):
+    ) -> None:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
         self.maximum_temperature = maximum_temperature
         self.use_heat_unit_temperature = use_heat_unit_temperature

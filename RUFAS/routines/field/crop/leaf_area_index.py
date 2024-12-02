@@ -13,29 +13,29 @@ class LeafAreaIndex:
     crop_data : Optional[CropData], optional
         A `CropData` instance containing crop specifications and attributes. Defaults to a new instance of `CropData` if
         not provided.
-    first_heat_fraction_point : float
+    first_heat_fraction_point : float, default 0.15
         Fraction of growing season for the first point on leaf development curve (unitless).
-    first_leaf_fraction_point : float
+    first_leaf_fraction_point : float, default 0.01
         Fraction of max leaf area index at first point on leaf development curve (unitless).
-    second_heat_fraction_point : float
+    second_heat_fraction_point : float, default 0.50
         Fraction of growing season for the second point on leaf development curve (unitless).
-    second_leaf_fraction_point : float
+    second_leaf_fraction_point : float, default 0.95
         Fraction of max leaf area index at second point on leaf development curve (unitless).
-    max_canopy_height : float
+    max_canopy_height : float, default None
         Maximum canopy height for the plant (m).
-    lai_shapes : Optional[float]
+    lai_shapes : Optional[float], default None
         Shape coefficients for calculating leaf area index (unitless).
-    optimal_leaf_area_fraction : Optional[float]
+    optimal_leaf_area_fraction : Optional[float], default None
         Fraction of max leaf area index for current heat fraction (unitless).
-    canopy_height : Optional[float]
+    canopy_height : Optional[float], default None
         Current height of the plant (m).
-    leaf_area_added : Optional[float]
+    leaf_area_added : Optional[float], default None
         Leaf area index change during the day (unitless).
-    optimal_leaf_area_change : Optional[float]
+    optimal_leaf_area_change : Optional[float], default None
         Leaf area index added under ideal conditions (unitless).
-    previous_leaf_area_index : Optional[float]
+    previous_leaf_area_index : Optional[float], default None
         Leaf area index on the previous day (unitless).
-    previous_optimal_leaf_area_fraction : Optional[float]
+    previous_optimal_leaf_area_fraction : Optional[float], default None
         Optimal leaf area fraction on the previous day (unitless).
 
     Attributes
@@ -67,6 +67,11 @@ class LeafAreaIndex:
     previous_optimal_leaf_area_fraction : Optional[float]
         Optimal leaf area fraction on the previous day (unitless).
 
+    References
+    ------------
+    See SWAT Appendix A - Model Databases, Table A-4 for species specific values of `first_heat_fraction_point`,
+    `first_leaf_fraction_point`, `second_heat_fraction_point`, and `second_leaf_fraction_point`
+    (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     """
 
     def __init__(
@@ -83,10 +88,8 @@ class LeafAreaIndex:
         optimal_leaf_area_change: Optional[float] = None,
         previous_leaf_area_index: Optional[float] = None,
         previous_optimal_leaf_area_fraction: Optional[float] = None,
-    ):
+    ) -> None:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
-
-        # SWAT Table A-4
         self.first_heat_fraction_point = first_heat_fraction_point
         self.first_leaf_fraction_point = first_leaf_fraction_point
         self.second_heat_fraction_point = second_heat_fraction_point
