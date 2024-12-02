@@ -157,9 +157,27 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
 def test_filter_insignificant_changes(
     diff_result: dict[str, dict[str, dict[str, float | str]]], tolerance: float, expected_keys: set[str]
 ) -> None:
-    """Parameterized test for filter_insignificant_changes."""
+    """Integration test for filter_insignificant_changes and associated helper functions."""
     filtered_result = E2ETestResultsComparer.filter_insignificant_changes(diff_result, tolerance)
     remaining_keys = set(filtered_result["values_changed"].keys())
 
     # Assert
     assert remaining_keys == expected_keys
+
+
+def test_is_significant() -> None:
+    """Unit test for is_significant()."""
+    assert E2ETestResultsComparer.is_significant({"old_value": 10.0, "new_value": 10.1}, 0.01) is True
+    assert E2ETestResultsComparer.is_significant({"old_value": 10.0, "new_value": 10.001}, 0.01) is False
+    assert E2ETestResultsComparer.is_significant({"old_value": "a", "new_value": "b"}, 0.01) is True
+
+
+def test_filter_nested() -> None:
+    """Unit test for filter_nested()."""
+    diff = {
+        "key1": {"old_value": 100.0, "new_value": 100.0001},
+        "key2": {"old_value": 50.0, "new_value": 51.0},
+    }
+    E2ETestResultsComparer.filter_nested(diff, 0.001)
+    assert "key1" not in diff
+    assert "key2" in diff
