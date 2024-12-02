@@ -9,9 +9,9 @@
     "herd_num": 100,
     "breed": "HO",
     "parity_fractions": {
-      "1": 0.386,
-      "2": 0.281,
-      "3": 0.333
+      "1": 0.346,
+      "2": 0.272,
+      "3": 0.379
     },
     "annual_milk_yield": null
   },
