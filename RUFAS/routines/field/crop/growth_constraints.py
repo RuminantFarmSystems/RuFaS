@@ -17,15 +17,15 @@ class GrowthConstraints:
     crop_data : Optional[CropData], optional
         A `CropData` object containing crop specifications and tracked attributes. If not provided,
         a default `CropData` object is initialized with default values.
-    optimal_temperature : float
+    optimal_temperature : float, default 25
         Ideal temperature for maximum plant growth (Celsius).
-    water_stress : float
+    water_stress : float, default 0.0
         Water stress for the day (unitless).
-    temp_stress : Optional[float]
+    temp_stress : Optional[float], default None
         Temperature stress for the day (unitless).
-    nitrogen_stress : Optional[float]
+    nitrogen_stress : Optional[float], default None
         Nitrogen stress for the day (unitless).
-    phosphorus_stress : Optional[float]
+    phosphorus_stress : Optional[float], default None
         Phosphorus stress for the day (unitless).
 
     Attributes
@@ -33,7 +33,8 @@ class GrowthConstraints:
     data : CropData
         A reference to the `crop_data` object on which the growth constraint operations are conducted.
     optimal_temperature : float
-        Ideal temperature for maximum plant growth (Celsius).
+        Ideal temperature for maximum plant growth (Celsius). See SWAT Appendix A - Model Databases, Table A-3 for
+        species specific values (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     water_stress : float
         Water stress for the day (unitless).
     temp_stress : Optional[float]
@@ -74,12 +75,10 @@ class GrowthConstraints:
         temp_stress: Optional[float] = None,
         nitrogen_stress: Optional[float] = None,
         phosphorus_stress: Optional[float] = None,
-    ):
+    ) -> None:
         self.data = crop_data or CropData()
 
-        # SWAT Table A-3
         self.optimal_temperature = optimal_temperature
-
         self.water_stress = water_stress
         self.temp_stress = temp_stress
         self.nitrogen_stress = nitrogen_stress

@@ -20,7 +20,7 @@ class Dormancy:
     ----------
     data : CropData
         A reference to the `crop_data` object on which dormancy operations will be conducted.
-    minimum_lai_during_dormancy : Optional[float], default 0.75
+    minimum_lai_during_dormancy : Optional[float]
         Minimum leaf area index for plants (perennials and trees only).
         Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
         now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
@@ -37,7 +37,7 @@ class Dormancy:
         self,
         crop_data: Optional[CropData] = None,
         minimum_lai_during_dormancy: Optional[float] = 0.75,
-    ):
+    ) -> None:
         self.data = crop_data or CropData
         self.minimum_lai_during_dormancy = minimum_lai_during_dormancy
 

@@ -202,7 +202,7 @@ class CropData:
     use_heat_scheduling: bool = False
     harvest_heat_fraction: float = 1.10
 
-    # # SWAT Table A-3
+    # SWAT Table A-3
     minimum_temperature: float = 0
 
     # SWAT Table A-4
@@ -221,7 +221,7 @@ class CropData:
     above_ground_biomass: float = 0.1
     root_biomass: Optional[float] = 0.0
 
-    # # ---- growth constraints
+    # ---- growth constraints
     nitrogen: float = 0.0
     optimal_nitrogen: float = 0.0
     phosphorus: float = 0.0

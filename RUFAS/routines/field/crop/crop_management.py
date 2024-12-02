@@ -84,49 +84,49 @@ class CropManagement:
         Minimum harvest index under drought conditions (unitless).
     yield_phosphorus_fraction : Optional[float]
         Fraction of phosphorus in yield (unitless).
-    harvest_efficiency : float, default 1.0
+    harvest_efficiency : float
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
         (unitless; [0, 1]).
-    crude_protein_percent : float, default 12.481
+    crude_protein_percent : float
         Percentage of dry matter mass that is dietary crude protein (unitless).
-    non_protein_nitrogen : float, default 2.518
+    non_protein_nitrogen : float
         Percentage of dry matter mass that is non-protein nitrogen (unitless).
-    starch : float, default 72.586
+    starch : float
         Percentage of dry matter mass that is starch (unitless).
-    adf : float, default 3.934
+    adf : float
         Percentage of dry matter mass that is acid detergent fiber (unitless).
-    ndf : float, default 6.134
+    ndf : float
         Percentage of dry matter mass that is neutral detergent fiber (unitless).
-    sugar : float, default 2.235
+    sugar : float
         Percentage of dry matter mass that is labile carbohydrate (unitless).
-    ash : float, default 2.496
+    ash : float
         Percentage of dry matter mass that is ash (unitless).
-    potential_harvest_index : Optional[float], default None
+    potential_harvest_index : Optional[float]
         Potential harvest index for a given day (unitless).
-    harvest_index : Optional[float], default None
+    harvest_index : Optional[float]
         Harvest index for a given day; fraction of above-ground plant biomass that is harvestable economic yield
         (unitless).
-    cut_biomass : Optional[float], default None
+    cut_biomass : Optional[float]
         Total amount of the desired crop product (kg/ha).
-    wet_yield_collected : float, default 0.0
+    wet_yield_collected : float
         Amount of the desired crop product to be removed from the field (kg/ha).
-    dry_matter_yield_collected : float, default 0.0
+    dry_matter_yield_collected : float
         Dry matter mass collected at harvest (kg/ha).
-    yield_residue : float, default 0.0
+    yield_residue : float
         Amount of dry matter residue created; unharvested yield (kg/ha).
-    yield_nitrogen : Optional[float], default None
+    yield_nitrogen : Optional[float]
         Nitrogen contained in the harvested yield (kg/ha).
-    yield_phosphorus : Optional[float], default None
+    yield_phosphorus : Optional[float]
         Phosphorus contained in the harvested yield (kg/ha).
-    residue_nitrogen : float, default 0.0
+    residue_nitrogen : float
         Amount of nitrogen in the residue from this plant (kg/ha).
-    residue_phosphorus : float, default 0.0
+    residue_phosphorus : float
         Amount of phosphorus in the residue from this plant (kg/ha).
-    root_distribution_param_da: float, default 145.0
+    root_distribution_param_da: float
         Empirical root distribution parameter d_a (mm).
         Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
             Research 189 (2016): 68-74, table 1. Note that the value has been converted to mm.
-    root_distribution_param_c: float, default -1.165
+    root_distribution_param_c: float
         Empirical root distribution parameter c (unitless).
         Reference: Fan, Jianling, et al. "Root distribution by depth for temperate agricultural crops." Field Crops
             Research 189 (2016): 68-74, table 1.
@@ -136,6 +136,10 @@ class CropManagement:
     This class is designed to handle various crop management operations using data provided by the `CropData` class.
     It is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model.
 
+    References
+    ------------
+    See SWAT Appendix A - Model Databases, Table A-8 for species-specific values of the `optimal_harvest_index` and
+    `minimum_harvest_index` (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     """
 
     def __init__(
@@ -164,11 +168,10 @@ class CropManagement:
         residue_phosphorus: float = 0.0,
         root_distribution_param_da: float = 145.0,
         root_distribution_param_c: float = -1.165,
-    ):
+    ) -> None:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
         self.om = OutputManager()
 
-        # SWAT Table A-8
         self.optimal_harvest_index = optimal_harvest_index
         self.minimum_harvest_index = minimum_harvest_index
         self.yield_phosphorus_fraction = yield_phosphorus_fraction
