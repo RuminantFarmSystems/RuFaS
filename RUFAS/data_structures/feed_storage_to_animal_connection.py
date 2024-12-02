@@ -1,3 +1,4 @@
+from datetime import date
 from dataclasses import dataclass
 from enum import Enum
 
@@ -79,7 +80,7 @@ class Feed:
 
     amount_available: float
     on_farm_price: float
-    purchase_price: float | None
+    purchase_price: float
 
 
 @dataclass
@@ -150,3 +151,84 @@ class NRCFeed(Feed):
     """NRC-specific representation of a RuFaS feed."""
     non_fiber_carb: float
     PAF: float
+
+
+@dataclass
+class TotalInventory:
+    """
+    Contains information about the amounts of feeds held at the specified date.
+
+    Attributes
+    ----------
+    available_feeds : list[Feed]
+        List of Feeds which are held by the Feed Storage module and are available to feed to animals.
+    inventory_date : date
+        Date at which the amounts of feeds expected to be held.
+
+    """
+
+    available_feeds: list[Feed]
+    inventory_date: date
+
+
+@dataclass
+class IdealFeeds:
+    """
+    Amounts of feeds that would ideally be purchased before the next harvest of a crop.
+
+    Attributes
+    ----------
+    ideal_feeds : dict[str, float]
+        Amounts of feeds which would ideally be purchased before the next harvest of a crop, where the key is the RuFaS
+        Feed ID and the value is the requested feed amount (kg).
+
+    """
+
+    ideal_feeds : dict[str, float]
+
+
+@dataclass
+class RequestedFeed:
+    """
+    Total amounts of feed needed for the herd.
+
+    Attributes
+    ----------
+    requested_feed : dict[str, float]
+        Amounts of feeds to be fed to the herd, where the key is the RuFaS Feed ID and the value is the requested feed
+        amount (kg).
+
+    """
+
+    requested_feed : dict[str, float]
+
+
+@dataclass
+class PurchaseAllowance:
+    """
+    Limits on amounts of feeds that may be purchased at a given time.
+
+    Attributes
+    ----------
+    allowances : dict[str, float]
+        Amounts of feeds that may be purchased, where the key is the RuFaS Feed ID and the value is the maximum amount
+        of that feed (kg).
+
+    """
+
+    allowances : dict[str, float]
+
+
+class PlanningCycleAllowance(PurchaseAllowance):
+    """User-defined limits on feeds that may be purchased between harvests of a crop."""
+    pass
+
+
+class AdvancePurchaseAllowance(PurchaseAllowance):
+    """User-defined limits on feeds that may be purchased at the beginning of a ration interval."""
+    pass
+
+
+class RuntimePurchaseAllowance(PurchaseAllowance):
+    """User-defined limits on feeds that may be purchased on a daily basis."""
+    pass
