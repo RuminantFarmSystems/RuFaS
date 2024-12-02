@@ -267,8 +267,8 @@ class OutputManager(object):
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         else:
             self.maximum_pool_size = (
-                                         max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
-                                     ) * self.available_memory
+                max_memory_usage_percent * GeneralConstants.PERCENTAGE_TO_FRACTION
+            ) * self.available_memory
             log_message += "The maximum output variable pool size is set to " f"{self.maximum_pool_size} Bytes"
         self.add_log(
             "Pool Overflow Control Setup",
@@ -1683,11 +1683,11 @@ class OutputManager(object):
                         info_map,
                     )
             except KeyError:
-                self.add_error("Wrong key for message or info map when reporting collected errors, logs,"
-                               " warnings",
-                               f"The key should be \"message\" for message, and \"info_map\" for info map."
-                               f" Got keys: {log.keys()}",
-                               info_map)
+                self.add_error(
+                    "Wrong key for message or info map when reporting collected errors, logs," " warnings",
+                    f'The key should be "message" for message, and "info_map" for info map.' f" Got keys: {log.keys()}",
+                    info_map,
+                )
 
     def dump_logs(self, path: Path) -> None:
         """
