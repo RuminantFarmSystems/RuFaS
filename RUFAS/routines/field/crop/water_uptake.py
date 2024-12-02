@@ -33,17 +33,17 @@ class WaterUptake:
     crop_data : CropData
         Stores and provides access to crop-related data influencing root development, including parameters
         like root depth, growth rates, and environmental conditions affecting root expansion.
-    water_distro_parameter : float, default 10
+    water_distro_parameter : float
         Water-use distribution parameter governing water-uptake from the soil (unitless).
-    potential_water_uptakes : Optional[List[float]], default None
+    potential_water_uptakes : Optional[List[float]]
         The maximum amount of water to be potentially taken up by a crop, from each soil layer (mm).
-    water_compensation_factor : float, default 0.01
+    water_compensation_factor : float
         Factor that determines the ability of a plant to draw water from deeper layers when demands are not met
         (unitless). 0 indicates no water can be drawn from deeper than expected and 1 indicates that any and all water
         can be drawn from deeper layers.
-    unmet_water_demands : Optional[List[float]], default None
+    unmet_water_demands : Optional[List[float]]
         Cumulative water demands not met by all previous layers (mm).
-    actual_water_uptakes : Optional[List[float]], default None
+    actual_water_uptakes : Optional[List[float]]
         The actual amount of water to be removed from the soil (mm).
 
     References

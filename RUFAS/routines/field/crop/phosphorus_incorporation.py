@@ -22,11 +22,11 @@ class PhosphorusIncorporation:
     crop_data : CropData, optional
         An instance of `CropData` containing crop specifications and attributes. If not provided, a default
         `CropData` instance is initialized with default values.
-    emergence_phosphorus_fraction : float
+    emergence_phosphorus_fraction : float, default 0.005
         Phosphorus fraction of biomass at emergence (unitless).
-    half_mature_phosphorus_fraction : float
+    half_mature_phosphorus_fraction : float, default 0.003
         Phosphorus fraction of biomass at half-maturity (unitless).
-    mature_phosphorus_fraction : float
+    mature_phosphorus_fraction : float, default 0.002
         Phosphorus fraction of biomass at maturity (unitless).
     phosphorus_distro_param : float, default 10
         Phosphorus uptake distribution parameter (unitless).
@@ -40,11 +40,11 @@ class PhosphorusIncorporation:
         Potential phosphorus to be taken up by the plant under ideal circumstances for the current day (kg/ha).
     actual_phosphorus_uptakes : Optional[List[float]], default None
         Actual phosphorus to be taken up by the plant from each soil layer (kg/ha).
-    layer_phosphorus_potentials : Optional[float]
+    layer_phosphorus_potentials : Optional[float], default None
         Potential phosphorus uptake from each soil layer (kg/ha).
-    unmet_phosphorus_demands : Optional[float]
+    unmet_phosphorus_demands : Optional[float], default None
         Unmet phosphorus demands by overlaying soil layers (kg/ha).
-    phosphorus_requests : Optional[float]
+    phosphorus_requests : Optional[float], default None
         Phosphorus requested from each soil layer (kg/ha).
 
     Attributes

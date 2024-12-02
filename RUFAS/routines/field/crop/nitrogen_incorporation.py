@@ -15,35 +15,35 @@ class NitrogenIncorporation:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
-    emergence_nitrogen_fraction : float
+    emergence_nitrogen_fraction : float, default 0.05
         Nitrogen fraction of biomass at emergence (unitless).
-    half_mature_nitrogen_fraction : float
+    half_mature_nitrogen_fraction : float, default 0.02
         Nitrogen fraction of biomass at half-maturity (unitless).
-    mature_nitrogen_fraction : float
+    mature_nitrogen_fraction : float, default 0.01
         Nitrogen fraction of biomass at maturity (unitless).
-    nitrogen_distro_param : float
+    nitrogen_distro_param : float, default 10.0
         Nitrogen uptake distribution parameter (unitless).
-    nitrogen_shapes : Optional[List[float]]
+    nitrogen_shapes : Optional[List[float]], default None
         Shape coefficients for nitrogen uptake equations (unitless).
-    previous_nitrogen : Optional[float]
+    previous_nitrogen : Optional[float], default None
         Nitrogen in biomass on the previous day (kg/ha).
-    potential_nitrogen_uptake : Optional[float]
+    potential_nitrogen_uptake : Optional[float], default None
         Potential nitrogen uptake under ideal conditions (kg/ha).
-    layer_nitrogen_potentials : Optional[float]
+    layer_nitrogen_potentials : Optional[float], default None
         Potential nitrogen uptake from each soil layer (kg/ha).
-    unmet_nitrogen_demands : Optional[float]
+    unmet_nitrogen_demands : Optional[float], default None
         Unmet nitrogen demands by overlaying soil layers (kg/ha).
-    nitrogen_requests : Optional[float]
+    nitrogen_requests : Optional[float], default None
         Nitrogen requested from each soil layer (kg/ha).
-    actual_nitrogen_uptakes : Optional[List[float]]
+    actual_nitrogen_uptakes : Optional[List[float]], default None
         Actual nitrogen uptake from each soil layer (kg/ha).
-    total_nitrogen_uptake : Optional[float]
+    total_nitrogen_uptake : Optional[float], default None
         Total nitrogen uptake by the plant (kg/ha).
-    fixed_nitrogen : Optional[float]
+    fixed_nitrogen : Optional[float], default None
         Total nitrogen fixed by the plant (kg/ha).
-    nitrate_factor : Optional[float]
+    nitrate_factor : Optional[float], default None
         Soil nitrate factor (unitless).
-    fixation_stage_factor : Optional[float]
+    fixation_stage_factor : Optional[float], default None
         Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     Attributes
