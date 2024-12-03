@@ -21,29 +21,9 @@ class CropManagement:
     crop_data : Optional[CropData], optional
         The data class containing crop specifications and tracked attributes.
         If not provided, default CropData will be used.
-    optimal_harvest_index : float
-        Optimal harvest index under ideal growth conditions (unitless).
-    minimum_harvest_index : float
-        Minimum harvest index under drought conditions (unitless).
-    yield_phosphorus_fraction : Optional[float]
-        Fraction of phosphorus in yield (unitless).
     harvest_efficiency : float, default 1.0
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
         (unitless; [0, 1]).
-    crude_protein_percent : float, default 12.481
-        Percentage of dry matter mass that is dietary crude protein (unitless).
-    non_protein_nitrogen : float, default 2.518
-        Percentage of dry matter mass that is non-protein nitrogen (unitless).
-    starch : float, default 72.586
-        Percentage of dry matter mass that is starch (unitless).
-    adf : float, default 3.934
-        Percentage of dry matter mass that is acid detergent fiber (unitless).
-    ndf : float, default 6.134
-        Percentage of dry matter mass that is neutral detergent fiber (unitless).
-    sugar : float, default 2.235
-        Percentage of dry matter mass that is labile carbohydrate (unitless).
-    ash : float, default 2.496
-        Percentage of dry matter mass that is ash (unitless).
     potential_harvest_index : Optional[float], default None
         Potential harvest index for a given day (unitless).
     harvest_index : Optional[float], default None
@@ -78,29 +58,9 @@ class CropManagement:
     ----------
     data : CropData
         A reference to `crop_data`, on which crop management operations will be conducted.
-    optimal_harvest_index : float
-        Optimal harvest index under ideal growth conditions (unitless).
-    minimum_harvest_index : float
-        Minimum harvest index under drought conditions (unitless).
-    yield_phosphorus_fraction : Optional[float]
-        Fraction of phosphorus in yield (unitless).
     harvest_efficiency : float
         Efficiency of the harvest operation: the proportion of yield that will be extracted from the field
         (unitless; [0, 1]).
-    crude_protein_percent : float
-        Percentage of dry matter mass that is dietary crude protein (unitless).
-    non_protein_nitrogen : float
-        Percentage of dry matter mass that is non-protein nitrogen (unitless).
-    starch : float
-        Percentage of dry matter mass that is starch (unitless).
-    adf : float
-        Percentage of dry matter mass that is acid detergent fiber (unitless).
-    ndf : float
-        Percentage of dry matter mass that is neutral detergent fiber (unitless).
-    sugar : float
-        Percentage of dry matter mass that is labile carbohydrate (unitless).
-    ash : float
-        Percentage of dry matter mass that is ash (unitless).
     potential_harvest_index : Optional[float]
         Potential harvest index for a given day (unitless).
     harvest_index : Optional[float]
@@ -136,26 +96,12 @@ class CropManagement:
     This class is designed to handle various crop management operations using data provided by the `CropData` class.
     It is primarily based upon the "Crop Yield" (5:2.4) and "General Management" (6:1) sections of the SWAT model.
 
-    References
-    ------------
-    See SWAT Appendix A - Model Databases, Table A-8 for species-specific values of the `optimal_harvest_index` and
-    `minimum_harvest_index` (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     """
 
     def __init__(
         self,
         crop_data: Optional[CropData] = None,
-        optimal_harvest_index: float = 0.5,
-        minimum_harvest_index: float = 0.2,
-        yield_phosphorus_fraction: Optional[float] = 0.003,
         harvest_efficiency: float = 1.0,
-        crude_protein_percent: float = 12.481,
-        non_protein_nitrogen: float = 2.518,
-        starch: float = 72.586,
-        adf: float = 3.934,
-        ndf: float = 6.134,
-        sugar: float = 2.235,
-        ash: float = 2.496,
         potential_harvest_index: Optional[float] = None,
         harvest_index: Optional[float] = None,
         cut_biomass: Optional[float] = None,
@@ -172,17 +118,7 @@ class CropManagement:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
         self.om = OutputManager()
 
-        self.optimal_harvest_index = optimal_harvest_index
-        self.minimum_harvest_index = minimum_harvest_index
-        self.yield_phosphorus_fraction = yield_phosphorus_fraction
         self.harvest_efficiency = harvest_efficiency
-        self.crude_protein_percent = crude_protein_percent
-        self.non_protein_nitrogen = non_protein_nitrogen
-        self.starch = starch
-        self.adf = adf
-        self.ndf = ndf
-        self.sugar = sugar
-        self.ash = ash
         self.potential_harvest_index = potential_harvest_index
         self.harvest_index = harvest_index
         self.cut_biomass = cut_biomass
@@ -260,7 +196,7 @@ class CropManagement:
         self.data.is_alive = False
         self.yield_residue += self.data.biomass
         self.residue_nitrogen = self.yield_residue * self.data.yield_nitrogen_fraction
-        self.residue_phosphorus = self.yield_residue * self.yield_phosphorus_fraction
+        self.residue_phosphorus = self.yield_residue * self.data.yield_phosphorus_fraction
 
     def determine_harvest_index(self) -> None:
         """
@@ -280,11 +216,11 @@ class CropManagement:
             self.harvest_index = self.data.user_harvest_index  # SWAT 5:3.3.1
         else:
             self.potential_harvest_index = self._determine_potential_harvest_index(
-                self.data.heat_fraction, self.optimal_harvest_index
+                self.data.heat_fraction, self.data.optimal_harvest_index
             )
             self.harvest_index = self._adjust_harvest_index(
                 self.potential_harvest_index,
-                self.minimum_harvest_index,
+                self.data.minimum_harvest_index,
                 self.data.water_deficiency,
             )
 
@@ -371,9 +307,9 @@ class CropManagement:
             self.residue_phosphorus = self.data.optimal_phosphorus_fraction * self.yield_residue
         else:
             self.yield_nitrogen = self.data.yield_nitrogen_fraction * self.dry_matter_yield_collected
-            self.yield_phosphorus = self.yield_phosphorus_fraction * self.dry_matter_yield_collected
+            self.yield_phosphorus = self.data.yield_phosphorus_fraction * self.dry_matter_yield_collected
             self.residue_nitrogen = self.data.yield_nitrogen_fraction * self.yield_residue
-            self.residue_phosphorus = self.yield_phosphorus_fraction * self.yield_residue
+            self.residue_phosphorus = self.data.yield_phosphorus_fraction * self.yield_residue
 
     def _recalculate_biomass_distribution(self, roots_harvested: bool) -> None:
         """
@@ -436,14 +372,14 @@ class CropManagement:
             fresh_mass=self.wet_yield_collected * field_size,
             dry_matter_percentage=self.data.dry_matter_percentage,
             dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
-            crude_protein_percent=self.crude_protein_percent,
-            non_protein_nitrogen=self.non_protein_nitrogen,
-            starch=self.starch,
-            adf=self.adf,
-            ndf=self.ndf,
-            sugar=self.sugar,
+            crude_protein_percent=self.data.crude_protein_percent,
+            non_protein_nitrogen=self.data.non_protein_nitrogen,
+            starch=self.data.starch,
+            adf=self.data.adf,
+            ndf=self.data.ndf,
+            sugar=self.data.sugar,
             lignin=self.data.lignin_dry_matter_percentage,
-            ash=self.ash,
+            ash=self.data.ash,
         )
         return HarvestedCropStorageType(harvested_crop, self.data.storage_type)
 

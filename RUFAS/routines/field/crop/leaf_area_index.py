@@ -51,11 +51,6 @@ class LeafAreaIndex:
     previous_optimal_leaf_area_fraction : Optional[float]
         Optimal leaf area fraction on the previous day (unitless).
 
-    References
-    ------------
-    See SWAT Appendix A - Model Databases, Table A-4 for species specific values of `first_heat_fraction_point`,
-    `first_leaf_fraction_point`, `second_heat_fraction_point`, and `second_leaf_fraction_point`
-    (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     """
 
     def __init__(
@@ -84,10 +79,10 @@ class LeafAreaIndex:
 
         """
         self.lai_shapes = self._determine_lai_shapes(
-            self.first_heat_fraction_point,
-            self.second_heat_fraction_point,
-            self.first_leaf_fraction_point,
-            self.second_leaf_fraction_point,
+            self.data.first_heat_fraction_point,
+            self.data.second_heat_fraction_point,
+            self.data.first_leaf_fraction_point,
+            self.data.second_leaf_fraction_point,
         )
 
         self.optimal_leaf_area_fraction = self._determine_optimal_leaf_area_fraction(

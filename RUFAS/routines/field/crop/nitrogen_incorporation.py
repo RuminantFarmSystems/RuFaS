@@ -133,14 +133,14 @@ class NitrogenIncorporation:
         self.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction,
             self.data.mature_heat_fraction,
-            self.emergence_nitrogen_fraction,
-            self.half_mature_nitrogen_fraction,
-            self.mature_nitrogen_fraction,
+            self.data.emergence_nitrogen_fraction,
+            self.data.half_mature_nitrogen_fraction,
+            self.data.mature_nitrogen_fraction,
         )
         self.data.optimal_nitrogen_fraction = self.determine_optimal_nutrient_fraction(
             self.data.heat_fraction,
-            self.emergence_nitrogen_fraction,
-            self.mature_nitrogen_fraction,
+            self.data.emergence_nitrogen_fraction,
+            self.data.mature_nitrogen_fraction,
             self.nitrogen_shapes[0],
             self.nitrogen_shapes[1],
         )
@@ -153,7 +153,7 @@ class NitrogenIncorporation:
             self.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
                 self.data.optimal_nitrogen,
                 self.previous_nitrogen,
-                self.mature_nitrogen_fraction,
+                self.data.mature_nitrogen_fraction,
                 self.data.biomass_growth_max,
             )
         self.uptake_nitrogen(layer_nitrates, layer_depths)
