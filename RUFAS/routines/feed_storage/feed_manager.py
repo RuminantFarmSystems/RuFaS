@@ -7,7 +7,15 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    PlanningCycleAllowance, RuntimePurchaseAllowance, Feed, NASEMFeed, NRCFeed, NutrientStandard, Type, Category, RequestedFeed
+    PlanningCycleAllowance,
+    RuntimePurchaseAllowance,
+    Feed,
+    NASEMFeed,
+    NRCFeed,
+    NutrientStandard,
+    Type,
+    Category,
+    RequestedFeed,
 )
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
@@ -234,7 +242,9 @@ class FeedManager:
         """Removes feeds from storage in a FIFO manner."""
         pass  # TODO: implement me!
 
-    def _setup_available_feeds(self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard) -> list[Feed]:
+    def _setup_available_feeds(
+        self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard
+    ) -> list[Feed]:
         feed_library = self._process_feed_library(nutrient_standard)
 
         feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
@@ -258,7 +268,9 @@ class FeedManager:
 
     def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[int, dict[str, Any]]:
         im = InputManager()
-        feed_library = im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
+        feed_library = (
+            im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
+        )
 
         feed_library = Utility.convert_dict_of_lists_to_dict_of_lists(feed_library)
 
