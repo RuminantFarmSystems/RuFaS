@@ -2,6 +2,7 @@ from bisect import bisect
 from math import exp, log
 from typing import List, Optional
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -176,7 +177,7 @@ class NitrogenIncorporation:
             A trimmed list with an element for each soil layer that is accessible to the plant's roots.
 
         """
-        return layer_list[0 : self.data.accessible_soil_layers]
+        return layer_list[0: self.data.accessible_soil_layers]
 
     def extend_nitrate_uptakes_to_full_profile(self) -> None:
         """
@@ -321,7 +322,15 @@ class NitrogenIncorporation:
             If half_mature_heat_fraction equals mature_heat_fraction.
 
         """
+        info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                    "function": NitrogenIncorporation.determine_nutrient_shape_parameters.__name__}
+        om = OutputManager()
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
+            om.add_error("Equal half_mature_heat_fraction and mature_heat_fraction.",
+                         f"half_mature_heat_fraction must not equal mature_heat_fraction,"
+                         f" received mature_heat_fraction is {mature_heat_fraction},"
+                         f" half_mature_heat_fraction is {half_mature_heat_fraction}",
+                         info_map)
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
         # 1st shape parameter
         log_half = NitrogenIncorporation._determine_shape_log(
@@ -395,6 +404,9 @@ class NitrogenIncorporation:
         SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
 
         """
+        info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                    "function": NitrogenIncorporation._determine_shape_log.__name__}
+        om = OutputManager()
         # throw an error if any parameters do not satisfy [0-1]
         if (
             nitrogen_fraction < 0
@@ -406,24 +418,56 @@ class NitrogenIncorporation:
             or emergence_nitrogen_fraction < 0
             or emergence_nitrogen_fraction > 1
         ):
+            om.add_error("Invalid nitrogen_fraction, heat_fraction, mature_nitrogen_fraction,"
+                         " or emergence_nitrogen_fraction.",
+                         f"One or more of the following fractions are not between 0 and 1,"
+                         f" nitrogen_fraction: {nitrogen_fraction}, heat_fraction: {heat_fraction},"
+                         f" mature_nitrogen_fraction: {mature_nitrogen_fraction},"
+                         f" emergence_nitrogen_fraction: {emergence_nitrogen_fraction}.",
+                         info_map)
             frac_error_msg = (
                 "nitrogen_fraction, heat_fraction, mature_nitrogen_fraction, and"
                 + " emergence_nitrogen_fraction must all be between 0 and 1"
             )
             raise ValueError(frac_error_msg)
-        if emergence_nitrogen_fraction == mature_nitrogen_fraction:  # leads to divide by zero
+        if emergence_nitrogen_fraction == mature_nitrogen_fraction:
+            om.add_error("Invalid value pair for emergence_nitrogen_fraction and mature_nitrogen_fraction.",
+                         f"Equal emergence_nitrogen_fraction and mature_nitrogen_fraction will lead to zero"
+                         f" division error,"
+                         f"emergence_nitrogen_fraction and mature_nitrogen_fraction are both."
+                         f" {emergence_nitrogen_fraction}",
+                         info_map)
             raise ValueError("emergence_nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
-        if nitrogen_fraction == emergence_nitrogen_fraction:  # leads to divide by zero
+        if nitrogen_fraction == emergence_nitrogen_fraction:
+            om.add_error("Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
+                         f"Equal nitrogen_fraction and emergence_nitrogen_fraction will lead to zero division"
+                         f" error, nitrogen_fraction and emergence_nitrogen_fraction are both."
+                         f" {emergence_nitrogen_fraction}.",
+                         info_map)
             raise ValueError("nitrogen_fraction must not be equivalent to emergence_nitrogen_fraction")
-        if nitrogen_fraction == mature_nitrogen_fraction:  # leads to log(0)
+        if nitrogen_fraction == mature_nitrogen_fraction:
+            om.add_error("Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction.",
+                         f"Equal nitrogen_fraction and mature_nitrogen_fraction will lead to log(0) calculation"
+                         f" error, nitrogen_fraction and mature_nitrogen_fraction are both."
+                         f" {mature_nitrogen_fraction}.",
+                         info_map)
             raise ValueError("nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
-        if (
-            nitrogen_fraction > emergence_nitrogen_fraction or nitrogen_fraction == emergence_nitrogen_fraction
-        ):  # leads to ln(-y) or divide by 0
+        if nitrogen_fraction > emergence_nitrogen_fraction:
+            om.add_error("Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
+                         f"nitrogen_fraction must be less than emergence_nitrogen_fraction to avoid ln(-y) "
+                         f"calculations, nitrogen_fraction is {nitrogen_fraction}, emergence_nitrogen_fraction is "
+                         f"{emergence_nitrogen_fraction}.",
+                         info_map)
             raise ValueError("nitrogen_fraction must be less than emergence_nitrogen_fraction")
-        if nitrogen_fraction == 0:  # leads to ln(0)
+        if nitrogen_fraction == 0:
+            om.add_error("Invalid nitrogen_fraction.",
+                         f"nitrogen_fraction must be greater than 0, received 0.",
+                         info_map)
             raise ValueError("nitrogen_fraction must be greater than 0")
         if heat_fraction == 0:
+            om.add_error("Invalid heat_fraction.",
+                         f"heat_fraction must be greater than 0, received 0",
+                         info_map)
             raise ValueError("heat_fraction must be greater than 0")
 
         # calculate first component of formula
@@ -433,6 +477,15 @@ class NitrogenIncorporation:
 
         # additional check
         if denominator > 1:  # leads to log(-y)
+            om.add_error("Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction or"
+                         " emergence_nitrogen_fraction and mature_nitrogen_fraction.",
+                         "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
+                         " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
+                         f"is negative. \nIs nitrogen_fraction({nitrogen_fraction}) <"
+                         f" mature_nitrogen_fraction({mature_nitrogen_fraction}) or"
+                         f" emergence_nitrogen_fraction({emergence_nitrogen_fraction}) <"
+                         f" mature_nitrogen_fraction({mature_nitrogen_fraction})?",
+                         info_map)
             raise ValueError(
                 "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
                 + " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
@@ -569,6 +622,12 @@ class NitrogenIncorporation:
 
         """
         if root_depth < 0.0:
+            info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                        "function": NitrogenIncorporation.determine_deepest_accessible_layer.__name__}
+            om = OutputManager()
+            om.add_error("Invalid root depth.",
+                         f"Negative root depth is invalid, provided root depth is {root_depth}.",
+                         info_map)
             raise ValueError("root_depth cannot be less than zero")
         elif root_depth == 0.0:
             return 0
