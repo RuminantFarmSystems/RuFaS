@@ -100,11 +100,7 @@ def test_calc_below_ground_biomass(frac: float, bmass: float) -> None:
 def test_allocate_biomass(light: float, ext: float, conv: float, gfact: float, rfrac: float) -> None:
     """integration check to check that biomass gets allocated correctly"""
     data = CropData(
-        leaf_area_index=1.87,
-        growth_factor=gfact,
-        root_fraction=rfrac,
-        biomass=89.0,
-        light_use_efficiency=conv
+        leaf_area_index=1.87, growth_factor=gfact, root_fraction=rfrac, biomass=89.0, light_use_efficiency=conv
     )
     bioal = BiomassAllocation(data, light_extinction=ext)
     bioal.allocate_biomass(light)

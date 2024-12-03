@@ -135,10 +135,7 @@ def test_kill() -> None:
 def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
     """ensure that the harvest index is properly evaluated"""
     data = CropData(
-        user_harvest_index=harvest,
-        water_deficiency=water_def,
-        optimal_harvest_index=0.95,
-        minimum_harvest_index=0.5
+        user_harvest_index=harvest, water_deficiency=water_def, optimal_harvest_index=0.95, minimum_harvest_index=0.5
     )
     crop = CropManagement(data)
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heat_frac):
@@ -237,7 +234,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         optimal_phosphorus_fraction=0.02,
         yield_nitrogen_fraction=0.12,
         above_ground_biomass=75.0,
-        yield_phosphorus_fraction=0.0092
+        yield_phosphorus_fraction=0.0092,
     )
     if override:
         data.user_harvest_index = harvest
@@ -597,7 +594,7 @@ def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
         optimal_phosphorus_fraction=0.02,
         yield_nitrogen_fraction=0.12,
         above_ground_biomass=75.0,
-        yield_phosphorus_fraction=0.0092
+        yield_phosphorus_fraction=0.0092,
     )
 
     crop = CropManagement(data, harvest_index=3)
