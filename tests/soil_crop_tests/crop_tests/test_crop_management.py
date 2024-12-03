@@ -321,7 +321,8 @@ def test_store_harvested_crop(
     wet_yield_collected: float,
     expected_fresh_mass: float,
 ) -> None:
-    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data, wet_yield_collected=wet_yield_collected)
+    mock_alfalfa_silage_data.wet_yield_collected = wet_yield_collected
+    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data)
     expected_harvest_crop = HarvestedCrop(
         category=mock_alfalfa_silage_data.crop_category,
         type=mock_alfalfa_silage_data.crop_type,
@@ -330,14 +331,14 @@ def test_store_harvested_crop(
         fresh_mass=expected_fresh_mass,
         dry_matter_percentage=mock_alfalfa_silage_data.dry_matter_percentage,
         dry_matter_digestibility=DEFAULT_DRY_MATTER_DIGESTIBILITY,
-        crude_protein_percent=crop_management.crude_protein_percent,
-        non_protein_nitrogen=crop_management.non_protein_nitrogen,
-        starch=crop_management.starch,
-        adf=crop_management.adf,
-        ndf=crop_management.ndf,
-        sugar=crop_management.sugar,
+        crude_protein_percent=mock_alfalfa_silage_data.crude_protein_percent,
+        non_protein_nitrogen=mock_alfalfa_silage_data.non_protein_nitrogen,
+        starch=mock_alfalfa_silage_data.starch,
+        adf=mock_alfalfa_silage_data.adf,
+        ndf=mock_alfalfa_silage_data.ndf,
+        sugar=mock_alfalfa_silage_data.sugar,
         lignin=mock_alfalfa_silage_data.lignin_dry_matter_percentage,
-        ash=crop_management.ash,
+        ash=mock_alfalfa_silage_data.ash,
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
