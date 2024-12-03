@@ -13,14 +13,6 @@ class LeafAreaIndex:
     crop_data : Optional[CropData], optional
         A `CropData` instance containing crop specifications and attributes. Defaults to a new instance of `CropData` if
         not provided.
-    first_heat_fraction_point : float, default 0.15
-        Fraction of growing season for the first point on leaf development curve (unitless).
-    first_leaf_fraction_point : float, default 0.01
-        Fraction of max leaf area index at first point on leaf development curve (unitless).
-    second_heat_fraction_point : float, default 0.50
-        Fraction of growing season for the second point on leaf development curve (unitless).
-    second_leaf_fraction_point : float, default 0.95
-        Fraction of max leaf area index at second point on leaf development curve (unitless).
     max_canopy_height : float, default None
         Maximum canopy height for the plant (m).
     lai_shapes : Optional[float], default None
@@ -42,14 +34,6 @@ class LeafAreaIndex:
     ----------
     data : CropData
         Reference to the provided `CropData` instance or a new default instance.
-    first_heat_fraction_point : float
-        Fraction of growing season for the first point on leaf development curve (unitless).
-    first_leaf_fraction_point : float
-        Fraction of max leaf area index at first point on leaf development curve (unitless).
-    second_heat_fraction_point : float
-        Fraction of growing season for the second point on leaf development curve (unitless).
-    second_leaf_fraction_point : float
-        Fraction of max leaf area index at second point on leaf development curve (unitless).
     max_canopy_height : float
         Maximum canopy height for the plant (m).
     lai_shapes : Optional[float]
@@ -77,10 +61,6 @@ class LeafAreaIndex:
     def __init__(
         self,
         crop_data: Optional[CropData] = None,
-        first_heat_fraction_point: float = 0.15,
-        first_leaf_fraction_point: float = 0.01,
-        second_heat_fraction_point: float = 0.50,
-        second_leaf_fraction_point: float = 0.95,
         lai_shapes: Optional[float] = None,
         optimal_leaf_area_fraction: Optional[float] = None,
         canopy_height: Optional[float] = None,
@@ -90,10 +70,6 @@ class LeafAreaIndex:
         previous_optimal_leaf_area_fraction: Optional[float] = None,
     ) -> None:
         self.data = crop_data or CropData()  # initialize with defaults, if not given
-        self.first_heat_fraction_point = first_heat_fraction_point
-        self.first_leaf_fraction_point = first_leaf_fraction_point
-        self.second_heat_fraction_point = second_heat_fraction_point
-        self.second_leaf_fraction_point = second_leaf_fraction_point
         self.lai_shapes = lai_shapes
         self.optimal_leaf_area_fraction = optimal_leaf_area_fraction
         self.canopy_height = canopy_height

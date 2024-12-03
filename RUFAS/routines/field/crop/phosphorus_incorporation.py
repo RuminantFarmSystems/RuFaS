@@ -22,12 +22,6 @@ class PhosphorusIncorporation:
     crop_data : CropData, optional
         An instance of `CropData` containing crop specifications and attributes. If not provided, a default
         `CropData` instance is initialized with default values.
-    emergence_phosphorus_fraction : float, default 0.005
-        Phosphorus fraction of biomass at emergence (unitless).
-    half_mature_phosphorus_fraction : float, default 0.003
-        Phosphorus fraction of biomass at half-maturity (unitless).
-    mature_phosphorus_fraction : float, default 0.002
-        Phosphorus fraction of biomass at maturity (unitless).
     phosphorus_distro_param : float, default 10
         Phosphorus uptake distribution parameter (unitless).
     phosphorus_shapes : Optional[List[float]], default None
