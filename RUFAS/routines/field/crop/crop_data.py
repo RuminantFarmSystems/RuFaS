@@ -83,6 +83,26 @@ class CropData:
         If heat unit scheduling is used for harvesting.
     harvest_heat_fraction : float
         Fraction of potential heat units for optimal growth stage for harvest.
+    optimal_harvest_index : float
+        Optimal harvest index under ideal growth conditions (unitless).
+    minimum_harvest_index : float
+        Minimum harvest index under drought conditions (unitless).
+    yield_phosphorus_fraction : Optional[float]
+        Fraction of phosphorus in yield (unitless).
+    crude_protein_percent : float
+        Percentage of dry matter mass that is dietary crude protein (unitless).
+    non_protein_nitrogen : float
+        Percentage of dry matter mass that is non-protein nitrogen (unitless).
+    starch : float
+        Percentage of dry matter mass that is starch (unitless).
+    adf : float
+        Percentage of dry matter mass that is acid detergent fiber (unitless).
+    ndf : float
+        Percentage of dry matter mass that is neutral detergent fiber (unitless).
+    sugar : float
+        Percentage of dry matter mass that is labile carbohydrate (unitless).
+    ash : float
+        Percentage of dry matter mass that is ash (unitless).
     minimum_temperature : float
         Minimum temperature for plant growth (Celsius).
     optimal_temperature : float
@@ -90,18 +110,19 @@ class CropData:
         species specific values (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     max_leaf_area_index : float
         Maximum leaf area index for the plant (unitless).
-    first_heat_fraction_point : float, default 0.15
+    first_heat_fraction_point : float
         Fraction of growing season for the first point on leaf development curve (unitless).
-    first_leaf_fraction_point : float, default 0.01
+    first_leaf_fraction_point : float
         Fraction of max leaf area index at first point on leaf development curve (unitless).
-    second_heat_fraction_point : float, default 0.50
+    second_heat_fraction_point : float
         Fraction of growing season for the second point on leaf development curve (unitless).
-    second_leaf_fraction_point : float, default 0.95
+    second_leaf_fraction_point : float
         Fraction of max leaf area index at second point on leaf development curve (unitless).
     senescent_heat_fraction : float
         Fraction of potential heat units for plant senescence (unitless).
-    light_use_efficiency : float, default 30
-        Light use efficiency of the plant (dg/MJ).
+    light_use_efficiency : float
+        Light use efficiency of the plant (dg/MJ). Reference SWAT Appendix A - Model Databases, Table A-5 for these
+        values (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     minimum_cover_management_factor : float
         Minimum cover and management factor for water erosion (unitless).
     yield_nitrogen_fraction : Optional[float]
@@ -226,6 +247,16 @@ class CropData:
     lignin_dry_matter_percentage: float = 1.518
     use_heat_scheduling: bool = False
     harvest_heat_fraction: float = 1.10
+    optimal_harvest_index: float = 0.5
+    minimum_harvest_index: float = 0.3
+    yield_phosphorus_fraction: Optional[float] = 0.0
+    crude_protein_percent: float = 12.481,
+    non_protein_nitrogen: float = 2.518
+    starch: float = 72.586
+    adf: float = 3.934
+    ndf: float = 6.134
+    sugar: float = 2.235
+    ash: float = 2.496
 
     # SWAT Table A-3
     minimum_temperature: float = 0

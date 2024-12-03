@@ -120,7 +120,7 @@ class GrowthConstraints:
             0.0
             if not simulate_temp_stress
             else self._determine_temperature_stress(
-                temperature, self.data.minimum_temperature, self.optimal_temperature
+                temperature, self.data.minimum_temperature, self.data.optimal_temperature
             )
         )
         self.nitrogen_stress = (
