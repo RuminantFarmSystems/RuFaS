@@ -60,6 +60,8 @@ v0.9.2
 - [2093](https://github.com/RuminantFarmSystems/MASM/pull/2093) - [minor change] [Testing] Increases tolerance level for comparing values changed in E2E testing results comparisons.
 - [2086](https://github.com/RuminantFarmSystems/MASM/pull/2086) - [minor change] [Animal] Updates default parity fraction. 
 - [1836](https://github.com/RuminantFarmSystems/MASM/pull/1836) - [minor change] [Feed] Updates default prices in default_feed.json using average prices sourced by Kristan (detailed in sheet in PR).
+- [2046](https://github.com/RuminantFarmSystems/MASM/pull/2046) - [major change] [Data Collection App] Integrates the Data Collection App into the RuFaS repository and adds a RuFaS task type to update it.
+
 
 ### v0.9.2
 
