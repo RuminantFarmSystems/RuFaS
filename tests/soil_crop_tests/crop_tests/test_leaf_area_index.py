@@ -209,13 +209,13 @@ def test_grow_canopy(
         growth_factor=0.95,
         max_leaf_area_index=3.0,
         senescent_heat_fraction=0.9,
-    )
-    lai = LeafAreaIndex(
-        data,
         first_heat_fraction_point=0.2,
         second_heat_fraction_point=0.33,
         first_leaf_fraction_point=0.05,
         second_leaf_fraction_point=0.95,
+    )
+    lai = LeafAreaIndex(
+        data,
         previous_leaf_area_index=previous_leaf_area_index,
         previous_optimal_leaf_area_fraction=previous_optimal_leaf_area_fraction,
     )
