@@ -594,9 +594,10 @@ def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
         optimal_phosphorus_fraction=0.02,
         yield_nitrogen_fraction=0.12,
         above_ground_biomass=75.0,
+        yield_phosphorus_fraction=0.0092
     )
 
-    crop = CropManagement(data, harvest_index=3, yield_phosphorus_fraction=0.0092)
+    crop = CropManagement(data, harvest_index=3)
     crop._recalculate_biomass_distribution = MagicMock()
     crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
 

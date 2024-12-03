@@ -10,8 +10,6 @@ class Soybean(CropData):
     """crop data class with default values for soy bean"""
 
     name: str = "default soybean"
-    plant_code: str = "SOYB"
-    scientific_name: str = "Glycine max"
     plant_category: PlantCategory = PlantCategory("warm_annual_legume")
     is_nitrogen_fixer: bool = True
 

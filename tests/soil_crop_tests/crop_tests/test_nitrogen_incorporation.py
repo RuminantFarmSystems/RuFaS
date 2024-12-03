@@ -701,6 +701,9 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         mature_heat_fraction=0.99,
         biomass=122.8,
         biomass_growth_max=999,
+        emergence_nitrogen_fraction=0.71,
+        half_mature_nitrogen_fraction=0.68,
+        mature_nitrogen_fraction=0.60,
     )
     with (
         patch(
@@ -718,9 +721,6 @@ def test_incorporate_nitrogen(nitrates: list[float], depths: list[float], water_
         soil.set_vectorized_layer_attribute("nitrate", nitrates)
         incorp = NitrogenIncorporation(
             data,
-            emergence_nitrogen_fraction=0.71,
-            half_mature_nitrogen_fraction=0.68,
-            mature_nitrogen_fraction=0.60,
             previous_nitrogen=0,
         )
         # mock intermediate functions

@@ -178,6 +178,9 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
         mature_heat_fraction=0.99,
         biomass=122.8,
         biomass_growth_max=999,
+        emergence_phosphorus_fraction=0.71,
+        half_mature_phosphorus_fraction=0.68,
+        mature_phosphorus_fraction=0.60,
     )
     soil = SoilData(field_size=1.55)
     del soil.soil_layers[3]
@@ -187,9 +190,6 @@ def test_incorporate_phosphorus(phosphates: list[float], depths: list[float], ga
     soil.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", phosphates)
     incorp = PhosphorusIncorporation(
         data,
-        emergence_phosphorus_fraction=0.71,
-        half_mature_phosphorus_fraction=0.68,
-        mature_phosphorus_fraction=0.60,
         previous_phosphorus=0,
     )
 
