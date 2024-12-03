@@ -199,7 +199,7 @@ class FeedManager:
     def _setup_available_feeds(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> dict[int, Feed]:
         feed_library = self._process_feed_library(nutrient_standard)
 
-        print(feed_library)
+        print(feed_config)
         raise NotImplementedError
 
     def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[int, dict[str, Any]]:
