@@ -50,6 +50,7 @@ class Feed:
         Price of buying feed from off-farm ($ / kg).
 
     """
+
     rufas_id: int
     Fd_Category: Category
     feed_type: Type
@@ -91,6 +92,7 @@ class Feed:
 @dataclass
 class NASEMFeed(Feed):
     """NASEM-specific representation of a RuFaS feed."""
+
     Name: str
     RUP: float
     sol_prot: float
@@ -154,6 +156,7 @@ class NASEMFeed(Feed):
 @dataclass
 class NRCFeed(Feed):
     """NRC-specific representation of a RuFaS feed."""
+
     non_fiber_carb: float
     PAF: float
 
@@ -189,7 +192,7 @@ class IdealFeeds:
 
     """
 
-    ideal_feeds : dict[int, float]
+    ideal_feeds: dict[int, float]
 
 
 @dataclass
@@ -205,7 +208,7 @@ class RequestedFeed:
 
     """
 
-    requested_feed : dict[int, float]
+    requested_feed: dict[int, float]
 
 
 class PurchaseAllowance:
@@ -233,14 +236,17 @@ class PurchaseAllowance:
 
 class PlanningCycleAllowance(PurchaseAllowance):
     """User-defined limits on feeds that may be purchased between harvests of a crop."""
+
     _purchase_allowance_key: str = "planning_cycle_allowance"
 
 
 class AdvancePurchaseAllowance(PurchaseAllowance):
     """User-defined limits on feeds that may be purchased at the beginning of a ration interval."""
+
     _purchase_allowance_key: str = "advance_purchase_allowance"
 
 
 class RuntimePurchaseAllowance(PurchaseAllowance):
     """User-defined limits on feeds that may be purchased on a daily basis."""
+
     _purchase_allowance_key: str = "runtime_purchase_allowance"
