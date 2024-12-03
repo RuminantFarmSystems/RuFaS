@@ -44,9 +44,9 @@ class Feed:
     ----------
     amount_available : float
         Amount of feed currently or expected to be available (kg).
-    on_farm_price : float
+    on_farm_cost : float
         Price of using the feed that is already on-farm ($ / kg).
-    purchase_price : float
+    purchase_cost : float
         Price of buying feed from off-farm ($ / kg).
 
     """
@@ -84,8 +84,8 @@ class Feed:
     DE: float
 
     amount_available: float
-    on_farm_price: float
-    purchase_price: float
+    on_farm_cost: float
+    purchase_cost: float
 
 
 @dataclass

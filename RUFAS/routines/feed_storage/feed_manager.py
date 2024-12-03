@@ -62,7 +62,7 @@ class FeedManager:
 
     def __init__(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
-        self._available_feeds: dict[int, Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
+        self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(feed_config)
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(feed_config)
 
@@ -196,11 +196,27 @@ class FeedManager:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
         pass
 
-    def _setup_available_feeds(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> dict[int, Feed]:
+    def _setup_available_feeds(self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard) -> list[Feed]:
         feed_library = self._process_feed_library(nutrient_standard)
 
-        print(feed_config)
-        raise NotImplementedError
+        feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
+        available_feeds = []
+        for feed in feed_config:
+            rufas_id = feed["purchased_feed"]
+            try:
+                nutritive_properties = feed_library[rufas_id]
+            except KeyError:
+                pass  # TODO: implement me!
+            new_feed = feed_representation(
+                rufas_id=rufas_id,
+                amount_available=0.0,
+                on_farm_cost=feed["on_farm_cost"],
+                purchase_cost=feed["purchased_feed_cost"],
+                **nutritive_properties,
+            )
+            available_feeds.append(new_feed)
+
+        return available_feeds
 
     def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[int, dict[str, Any]]:
         im = InputManager()
