@@ -177,7 +177,7 @@ class NitrogenIncorporation:
             A trimmed list with an element for each soil layer that is accessible to the plant's roots.
 
         """
-        return layer_list[0: self.data.accessible_soil_layers]
+        return layer_list[0 : self.data.accessible_soil_layers]
 
     def extend_nitrate_uptakes_to_full_profile(self) -> None:
         """
@@ -322,15 +322,19 @@ class NitrogenIncorporation:
             If half_mature_heat_fraction equals mature_heat_fraction.
 
         """
-        info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                    "function": NitrogenIncorporation.determine_nutrient_shape_parameters.__name__}
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation.determine_nutrient_shape_parameters.__name__,
+        }
         om = OutputManager()
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
-            om.add_error("Equal half_mature_heat_fraction and mature_heat_fraction.",
-                         f"half_mature_heat_fraction must not equal mature_heat_fraction,"
-                         f" received mature_heat_fraction is {mature_heat_fraction},"
-                         f" half_mature_heat_fraction is {half_mature_heat_fraction}",
-                         info_map)
+            om.add_error(
+                "Equal half_mature_heat_fraction and mature_heat_fraction.",
+                f"half_mature_heat_fraction must not equal mature_heat_fraction,"
+                f" received mature_heat_fraction is {mature_heat_fraction},"
+                f" half_mature_heat_fraction is {half_mature_heat_fraction}",
+                info_map,
+            )
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
         # 1st shape parameter
         log_half = NitrogenIncorporation._determine_shape_log(
@@ -404,8 +408,10 @@ class NitrogenIncorporation:
         SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
 
         """
-        info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                    "function": NitrogenIncorporation._determine_shape_log.__name__}
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation._determine_shape_log.__name__,
+        }
         om = OutputManager()
         if (
             nitrogen_fraction < 0
@@ -417,56 +423,64 @@ class NitrogenIncorporation:
             or emergence_nitrogen_fraction < 0
             or emergence_nitrogen_fraction > 1
         ):
-            om.add_error("Invalid nitrogen_fraction, heat_fraction, mature_nitrogen_fraction,"
-                         " or emergence_nitrogen_fraction.",
-                         f"One or more of the following fractions are not between 0 and 1,"
-                         f" nitrogen_fraction: {nitrogen_fraction}, heat_fraction: {heat_fraction},"
-                         f" mature_nitrogen_fraction: {mature_nitrogen_fraction},"
-                         f" emergence_nitrogen_fraction: {emergence_nitrogen_fraction}.",
-                         info_map)
+            om.add_error(
+                "Invalid nitrogen_fraction, heat_fraction, mature_nitrogen_fraction,"
+                " or emergence_nitrogen_fraction.",
+                f"One or more of the following fractions are not between 0 and 1,"
+                f" nitrogen_fraction: {nitrogen_fraction}, heat_fraction: {heat_fraction},"
+                f" mature_nitrogen_fraction: {mature_nitrogen_fraction},"
+                f" emergence_nitrogen_fraction: {emergence_nitrogen_fraction}.",
+                info_map,
+            )
             frac_error_msg = (
                 "nitrogen_fraction, heat_fraction, mature_nitrogen_fraction, and"
                 + " emergence_nitrogen_fraction must all be between 0 and 1"
             )
             raise ValueError(frac_error_msg)
         if emergence_nitrogen_fraction == mature_nitrogen_fraction:
-            om.add_error("Invalid value pair for emergence_nitrogen_fraction and mature_nitrogen_fraction.",
-                         f"Equal emergence_nitrogen_fraction and mature_nitrogen_fraction will lead to zero"
-                         f" division error,"
-                         f"emergence_nitrogen_fraction and mature_nitrogen_fraction are both."
-                         f" {emergence_nitrogen_fraction}",
-                         info_map)
+            om.add_error(
+                "Invalid value pair for emergence_nitrogen_fraction and mature_nitrogen_fraction.",
+                f"Equal emergence_nitrogen_fraction and mature_nitrogen_fraction will lead to zero"
+                f" division error,"
+                f"emergence_nitrogen_fraction and mature_nitrogen_fraction are both."
+                f" {emergence_nitrogen_fraction}",
+                info_map,
+            )
             raise ValueError("emergence_nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
         if nitrogen_fraction == emergence_nitrogen_fraction:
-            om.add_error("Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
-                         f"Equal nitrogen_fraction and emergence_nitrogen_fraction will lead to zero division"
-                         f" error, nitrogen_fraction and emergence_nitrogen_fraction are both."
-                         f" {emergence_nitrogen_fraction}.",
-                         info_map)
+            om.add_error(
+                "Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
+                f"Equal nitrogen_fraction and emergence_nitrogen_fraction will lead to zero division"
+                f" error, nitrogen_fraction and emergence_nitrogen_fraction are both."
+                f" {emergence_nitrogen_fraction}.",
+                info_map,
+            )
             raise ValueError("nitrogen_fraction must not be equivalent to emergence_nitrogen_fraction")
         if nitrogen_fraction == mature_nitrogen_fraction:
-            om.add_error("Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction.",
-                         f"Equal nitrogen_fraction and mature_nitrogen_fraction will lead to log(0) calculation"
-                         f" error, nitrogen_fraction and mature_nitrogen_fraction are both."
-                         f" {mature_nitrogen_fraction}.",
-                         info_map)
+            om.add_error(
+                "Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction.",
+                f"Equal nitrogen_fraction and mature_nitrogen_fraction will lead to log(0) calculation"
+                f" error, nitrogen_fraction and mature_nitrogen_fraction are both."
+                f" {mature_nitrogen_fraction}.",
+                info_map,
+            )
             raise ValueError("nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
         if nitrogen_fraction > emergence_nitrogen_fraction:
-            om.add_error("Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
-                         f"nitrogen_fraction must be less than emergence_nitrogen_fraction to avoid ln(-y) "
-                         f"calculations, nitrogen_fraction is {nitrogen_fraction}, emergence_nitrogen_fraction is "
-                         f"{emergence_nitrogen_fraction}.",
-                         info_map)
+            om.add_error(
+                "Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
+                f"nitrogen_fraction must be less than emergence_nitrogen_fraction to avoid ln(-y) "
+                f"calculations, nitrogen_fraction is {nitrogen_fraction}, emergence_nitrogen_fraction is "
+                f"{emergence_nitrogen_fraction}.",
+                info_map,
+            )
             raise ValueError("nitrogen_fraction must be less than emergence_nitrogen_fraction")
         if nitrogen_fraction == 0:
-            om.add_error("Invalid nitrogen_fraction.",
-                         f"nitrogen_fraction must be greater than 0, received 0.",
-                         info_map)
+            om.add_error(
+                "Invalid nitrogen_fraction.", f"nitrogen_fraction must be greater than 0, received 0.", info_map
+            )
             raise ValueError("nitrogen_fraction must be greater than 0")
         if heat_fraction == 0:
-            om.add_error("Invalid heat_fraction.",
-                         f"heat_fraction must be greater than 0, received 0",
-                         info_map)
+            om.add_error("Invalid heat_fraction.", f"heat_fraction must be greater than 0, received 0", info_map)
             raise ValueError("heat_fraction must be greater than 0")
 
         # calculate first component of formula
@@ -476,15 +490,17 @@ class NitrogenIncorporation:
 
         # additional check
         if denominator > 1:  # leads to log(-y)
-            om.add_error("Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction or"
-                         " emergence_nitrogen_fraction and mature_nitrogen_fraction.",
-                         "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
-                         " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
-                         f"is negative. \nIs nitrogen_fraction({nitrogen_fraction}) <"
-                         f" mature_nitrogen_fraction({mature_nitrogen_fraction}) or"
-                         f" emergence_nitrogen_fraction({emergence_nitrogen_fraction}) <"
-                         f" mature_nitrogen_fraction({mature_nitrogen_fraction})?",
-                         info_map)
+            om.add_error(
+                "Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction or"
+                " emergence_nitrogen_fraction and mature_nitrogen_fraction.",
+                "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
+                " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
+                f"is negative. \nIs nitrogen_fraction({nitrogen_fraction}) <"
+                f" mature_nitrogen_fraction({mature_nitrogen_fraction}) or"
+                f" emergence_nitrogen_fraction({emergence_nitrogen_fraction}) <"
+                f" mature_nitrogen_fraction({mature_nitrogen_fraction})?",
+                info_map,
+            )
             raise ValueError(
                 "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
                 + " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
@@ -621,12 +637,14 @@ class NitrogenIncorporation:
 
         """
         if root_depth < 0.0:
-            info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                        "function": NitrogenIncorporation.determine_deepest_accessible_layer.__name__}
+            info_map = {
+                "class": NitrogenIncorporation.__class__.__name__,
+                "function": NitrogenIncorporation.determine_deepest_accessible_layer.__name__,
+            }
             om = OutputManager()
-            om.add_error("Invalid root depth.",
-                         f"Negative root depth is invalid, provided root depth is {root_depth}.",
-                         info_map)
+            om.add_error(
+                "Invalid root depth.", f"Negative root depth is invalid, provided root depth is {root_depth}.", info_map
+            )
             raise ValueError("root_depth cannot be less than zero")
         elif root_depth == 0.0:
             return 0
@@ -677,22 +695,28 @@ class NitrogenIncorporation:
         pseudocode: C.5.C.2, C.5.C.3
 
         """
-        info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                    "function": NitrogenIncorporation.determine_layer_nutrient_uptake_potential.__name__}
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation.determine_layer_nutrient_uptake_potential.__name__,
+        }
         om = OutputManager()
         sorted_boundaries = layer_bounds.copy()
         sorted_boundaries.sort()
         if sorted_boundaries != layer_bounds:
-            om.add_error("Invalid layer boundaries order.",
-                         f"Boundaries must be in ascending order (deeper layers follow shallower ones),"
-                         f" received {layer_bounds}.",
-                         info_map)
+            om.add_error(
+                "Invalid layer boundaries order.",
+                f"Boundaries must be in ascending order (deeper layers follow shallower ones),"
+                f" received {layer_bounds}.",
+                info_map,
+            )
             raise ValueError("boundaries must be in ascending order (deeper layers follow shallower ones)")
         # check that there aren't duplicates (each layer should have a unique depth)
         if len(layer_bounds) != len(set(layer_bounds)):
-            om.add_error("Invalid layer boundaries depth.",
-                         f"Boundaries all have different depth, received {layer_bounds}.",
-                         info_map)
+            om.add_error(
+                "Invalid layer boundaries depth.",
+                f"Boundaries all have different depth, received {layer_bounds}.",
+                info_map,
+            )
             raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
         # calculate results
         boundary_nitrogen = [
@@ -739,13 +763,17 @@ class NitrogenIncorporation:
         SWAT 5:2.3.6, 5:2.3.24
 
         """
-        info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                    "function": NitrogenIncorporation._determine_nitrogen_uptake_to_depth.__name__}
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation._determine_nitrogen_uptake_to_depth.__name__,
+        }
         om = OutputManager()
         if nitrogen_distribution_parameter == 0:
-            om.add_error("Invalid nitrogen_distribution_parameter.",
-                         "Received invalid value 0 for nitrogen_distribution_parameter.",
-                         info_map)
+            om.add_error(
+                "Invalid nitrogen_distribution_parameter.",
+                "Received invalid value 0 for nitrogen_distribution_parameter.",
+                info_map,
+            )
             raise ValueError("nitrogen_distribution_parameter cannot equal 0")
         # calculate results
         if root_depth <= 0:
@@ -812,15 +840,19 @@ class NitrogenIncorporation:
 
         """
         # ensure all list inputs are the same length
-        info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                    "function": NitrogenIncorporation.determine_layer_nutrient_uptake.__name__}
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation.determine_layer_nutrient_uptake.__name__,
+        }
         om = OutputManager()
         if len(layer_uptake_potentials) != len(layer_demands) or len(layer_uptake_potentials) != len(layer_nutrient):
-            om.add_error("Invalid layer_potential, layer_demand, and layer_nitrate length.",
-                         "layer_potential, layer_demand, and layer_nitrate length does not have equal length,"
-                         f"length of layer_potential, layer_demand, and layer_nitrate are"
-                         f" {len(layer_uptake_potentials)}, {len(layer_demands)} and {len(layer_nutrient)}.",
-                         info_map)
+            om.add_error(
+                "Invalid layer_potential, layer_demand, and layer_nitrate length.",
+                "layer_potential, layer_demand, and layer_nitrate length does not have equal length,"
+                f"length of layer_potential, layer_demand, and layer_nitrate are"
+                f" {len(layer_uptake_potentials)}, {len(layer_demands)} and {len(layer_nutrient)}.",
+                info_map,
+            )
             raise ValueError("layer_potential, layer_demand, and layer_nitrate must be the same length")
         # calculate results
         layer_desired = [potential + demand for potential, demand in zip(layer_uptake_potentials, layer_demands)]
@@ -848,13 +880,17 @@ class NitrogenIncorporation:
         SWAT 5:2.3.8, 5:2.3.26
 
         """
-        info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                    "function": NitrogenIncorporation.determine_layer_extracted_resource.__name__}
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation.determine_layer_extracted_resource.__name__,
+        }
         om = OutputManager()
         if len(requests) != len(sources):
-            om.add_error("Invalid requests and sources length.",
-                         f"The length of requests({len(requests)}) and sources({len(sources)}) are unequal.",
-                         info_map)
+            om.add_error(
+                "Invalid requests and sources length.",
+                f"The length of requests({len(requests)}) and sources({len(sources)}) are unequal.",
+                info_map,
+            )
             raise ValueError("requests and sources should be the same length")
         return [NitrogenIncorporation._determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
 
@@ -986,23 +1022,27 @@ class NitrogenIncorporation:
         SWAT 5:2.3.9
 
         """
-        info_map = {"class": NitrogenIncorporation.__class__.__name__,
-                    "function": NitrogenIncorporation._determine_fixed_nitrogen.__name__}
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation._determine_fixed_nitrogen.__name__,
+        }
         om = OutputManager()
         if not 0 <= stage_factor <= 1:
-            om.add_error("Invalid stage_factor.",
-                         f"stage_factor must be between 0 and 1, received {stage_factor}.",
-                         info_map)
+            om.add_error(
+                "Invalid stage_factor.", f"stage_factor must be between 0 and 1, received {stage_factor}.", info_map
+            )
             raise ValueError("stage_factor must be between 0 and 1")
         if not 0 <= water_factor <= 1:
-            om.add_error("Invalid water_factor.",
-                         f"water_factor must be between 0 and 1, received {water_factor}.",
-                         info_map)
+            om.add_error(
+                "Invalid water_factor.", f"water_factor must be between 0 and 1, received {water_factor}.", info_map
+            )
             raise ValueError("water_factor must be between 0 and 1")
         if not 0 <= nitrate_factor <= 1:
-            om.add_error("Invalid nitrate_factor.",
-                         f"nitrate_factor must be between 0 and 1, received {nitrate_factor}.",
-                         info_map)
+            om.add_error(
+                "Invalid nitrate_factor.",
+                f"nitrate_factor must be between 0 and 1, received {nitrate_factor}.",
+                info_map,
+            )
             raise ValueError("nitrate_factor must be between 0 and 1")
 
         fixed = demand * stage_factor * min(water_factor, nitrate_factor, 1)
