@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from datetime import date
 from dataclasses import dataclass
 from enum import Enum
@@ -29,6 +28,11 @@ class Type(Enum):
     VITAMINS = "Vitamins"
     STARTER = "Starter"
     NO = "No"
+
+
+class NutrientStandard(Enum):
+    NASEM = "NASEM"
+    NRC = "NRC"
 
 
 @dataclass

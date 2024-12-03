@@ -5,6 +5,7 @@ from enum import Enum
 
 from RUFAS import routines
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.animal_manager import AnimalManager
@@ -218,7 +219,8 @@ class SimulationEngine:
         feed_class_config = self.im.get_data("feed")
         self.feed = Feed(feed_class_config)
         feed_manager_config = feed_class_config["purchased_feeds"]
-        self.feed_manager = FeedManager(feed_manager_config)
+        nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
+        self.feed_manager = FeedManager(feed_manager_config, nutrient_standard)
 
         manure_class_config = self.im.get_data("manure_management")
         animal_class_config = self.im.get_data("animal")
