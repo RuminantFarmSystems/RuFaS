@@ -6,6 +6,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
     StorageType,
 )
+from RUFAS.data_structures.feed_storage_to_animal_connection import PlanningCycleAllowance, RuntimePurchaseAllowance
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
@@ -56,9 +57,8 @@ class FeedManager:
 
     def __init__(self, feed_config: dict[str, Any]) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
-
-        # TODO: implement all this stuff
-        raise NotImplementedError
+        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(feed_config)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(feed_config)
 
     def _query_result_factory(
         self, crop_category: CropCategory, crop_type: CropType, amount: float

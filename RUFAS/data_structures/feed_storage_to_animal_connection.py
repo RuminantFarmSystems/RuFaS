@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from datetime import date
 from dataclasses import dataclass
 from enum import Enum
@@ -203,32 +204,39 @@ class RequestedFeed:
     requested_feed : dict[int, float]
 
 
-@dataclass
 class PurchaseAllowance:
     """
     Limits on amounts of feeds that may be purchased at a given time.
 
     Attributes
     ----------
-    allowances : dict[str, float]
+    allowances : dict[int, float]
         Amounts of feeds that may be purchased, where the key is the RuFaS Feed ID and the value is the maximum amount
         of that feed (kg).
 
     """
 
-    allowances : dict[int, float]
+    _purchase_allowance_key: str
+
+    def __init__(self, feed_config_data: list[dict[str, int | str]]) -> None:
+        self.allowances = self._setup_purchase_allowance(feed_config_data)
+
+    def _setup_purchase_allowance(self, feed_config_data: list[dict[str, int | str]]) -> dict[int, float]:
+        return {
+            feed_config["purchased_feed"]: feed_config[self._purchase_allowance_key] for feed_config in feed_config_data
+        }
 
 
 class PlanningCycleAllowance(PurchaseAllowance):
     """User-defined limits on feeds that may be purchased between harvests of a crop."""
-    pass
+    _purchase_allowance_key: str = "planning_cycle_allowance"
 
 
 class AdvancePurchaseAllowance(PurchaseAllowance):
     """User-defined limits on feeds that may be purchased at the beginning of a ration interval."""
-    pass
+    _purchase_allowance_key: str = "advance_purchase_allowance"
 
 
 class RuntimePurchaseAllowance(PurchaseAllowance):
     """User-defined limits on feeds that may be purchased on a daily basis."""
-    pass
+    _purchase_allowance_key: str = "runtime_purchase_allowance"
