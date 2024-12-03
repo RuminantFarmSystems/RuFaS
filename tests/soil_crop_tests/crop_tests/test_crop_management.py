@@ -137,8 +137,10 @@ def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
     data = CropData(
         user_harvest_index=harvest,
         water_deficiency=water_def,
+        optimal_harvest_index=0.95,
+        minimum_harvest_index=0.5
     )
-    crop = CropManagement(data, optimal_harvest_index=0.95, minimum_harvest_index=0.5)
+    crop = CropManagement(data)
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heat_frac):
         crop.determine_harvest_index()
 
@@ -235,10 +237,11 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         optimal_phosphorus_fraction=0.02,
         yield_nitrogen_fraction=0.12,
         above_ground_biomass=75.0,
+        yield_phosphorus_fraction=0.0092
     )
     if override:
         data.user_harvest_index = harvest
-    crop = CropManagement(data, harvest_index=harvest, yield_phosphorus_fraction=0.0092)
+    crop = CropManagement(data, harvest_index=harvest)
     crop._recalculate_biomass_distribution = MagicMock()
 
     # act
@@ -321,8 +324,7 @@ def test_store_harvested_crop(
     wet_yield_collected: float,
     expected_fresh_mass: float,
 ) -> None:
-    mock_alfalfa_silage_data.wet_yield_collected = wet_yield_collected
-    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data)
+    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data, wet_yield_collected=wet_yield_collected)
     expected_harvest_crop = HarvestedCrop(
         category=mock_alfalfa_silage_data.crop_category,
         type=mock_alfalfa_silage_data.crop_type,

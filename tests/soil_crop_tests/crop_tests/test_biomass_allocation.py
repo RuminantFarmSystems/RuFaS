@@ -104,8 +104,9 @@ def test_allocate_biomass(light: float, ext: float, conv: float, gfact: float, r
         growth_factor=gfact,
         root_fraction=rfrac,
         biomass=89.0,
+        light_use_efficiency=conv
     )
-    bioal = BiomassAllocation(data, light_extinction=ext, light_use_efficiency=conv)
+    bioal = BiomassAllocation(data, light_extinction=ext)
     bioal.allocate_biomass(light)
 
     # photosynthesize
