@@ -15,12 +15,6 @@ class NitrogenIncorporation:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
-    emergence_nitrogen_fraction : float, default 0.05
-        Nitrogen fraction of biomass at emergence (unitless).
-    half_mature_nitrogen_fraction : float, default 0.02
-        Nitrogen fraction of biomass at half-maturity (unitless).
-    mature_nitrogen_fraction : float, default 0.01
-        Nitrogen fraction of biomass at maturity (unitless).
     nitrogen_distro_param : float, default 10.0
         Nitrogen uptake distribution parameter (unitless).
     nitrogen_shapes : Optional[List[float]], default None
@@ -50,12 +44,6 @@ class NitrogenIncorporation:
     ----------
     data : CropData
         Reference to the provided `CropData` instance or a new default instance.
-    emergence_nitrogen_fraction : float
-        Nitrogen fraction of biomass at emergence (unitless).
-    half_mature_nitrogen_fraction : float
-        Nitrogen fraction of biomass at half-maturity (unitless).
-    mature_nitrogen_fraction : float
-        Nitrogen fraction of biomass at maturity (unitless).
     nitrogen_distro_param : float
         Nitrogen uptake distribution parameter (unitless).
     nitrogen_shapes : Optional[List[float]]
@@ -90,9 +78,6 @@ class NitrogenIncorporation:
     def __init__(
         self,
         crop_data: Optional[CropData] = None,
-        emergence_nitrogen_fraction: float = 0.05,
-        half_mature_nitrogen_fraction: float = 0.02,
-        mature_nitrogen_fraction: float = 0.01,
         nitrogen_distro_param: float = 10.0,
         nitrogen_shapes: Optional[List[float]] = None,
         previous_nitrogen: Optional[float] = None,
@@ -108,12 +93,7 @@ class NitrogenIncorporation:
     ):
         self.data = crop_data or CropData()  # initialize with defaults, if not given
 
-        # SWAT Table A-7
-        self.emergence_nitrogen_fraction = emergence_nitrogen_fraction
-        self.half_mature_nitrogen_fraction = half_mature_nitrogen_fraction
-        self.mature_nitrogen_fraction = mature_nitrogen_fraction
         self.nitrogen_distro_param = nitrogen_distro_param
-
         self.nitrogen_shapes = nitrogen_shapes
         self.previous_nitrogen = previous_nitrogen
         self.potential_nitrogen_uptake = potential_nitrogen_uptake

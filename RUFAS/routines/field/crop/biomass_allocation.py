@@ -22,8 +22,6 @@ class BiomassAllocation:
         Biomass accumulated during the day (kg/ha).
     previous_biomass : Optional[float], default None
         Biomass accumulated on the previous day (kg/ha).
-    light_use_efficiency : float, default 30
-        Light use efficiency of the plant (dg/MJ).
 
     Attributes
     ----------

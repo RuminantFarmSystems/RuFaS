@@ -85,10 +85,23 @@ class CropData:
         Fraction of potential heat units for optimal growth stage for harvest.
     minimum_temperature : float
         Minimum temperature for plant growth (Celsius).
+    optimal_temperature : float
+        Ideal temperature for maximum plant growth (Celsius). See SWAT Appendix A - Model Databases, Table A-3 for
+        species specific values (https://swat.tamu.edu/media/69419/Appendix-A.pdf).
     max_leaf_area_index : float
         Maximum leaf area index for the plant (unitless).
+    first_heat_fraction_point : float, default 0.15
+        Fraction of growing season for the first point on leaf development curve (unitless).
+    first_leaf_fraction_point : float, default 0.01
+        Fraction of max leaf area index at first point on leaf development curve (unitless).
+    second_heat_fraction_point : float, default 0.50
+        Fraction of growing season for the second point on leaf development curve (unitless).
+    second_leaf_fraction_point : float, default 0.95
+        Fraction of max leaf area index at second point on leaf development curve (unitless).
     senescent_heat_fraction : float
         Fraction of potential heat units for plant senescence (unitless).
+    light_use_efficiency : float, default 30
+        Light use efficiency of the plant (dg/MJ).
     minimum_cover_management_factor : float
         Minimum cover and management factor for water erosion (unitless).
     yield_nitrogen_fraction : Optional[float]
@@ -123,6 +136,12 @@ class CropData:
         If the crop is currently growing.
     is_dormant : bool
         If the crop is currently dormant.
+    emergence_nitrogen_fraction : float, default 0.05
+        Nitrogen fraction of biomass at emergence (unitless).
+    half_mature_nitrogen_fraction : float, default 0.02
+        Nitrogen fraction of biomass at half-maturity (unitless).
+    mature_nitrogen_fraction : float, default 0.01
+        Nitrogen fraction of biomass at maturity (unitless).
     half_mature_heat_fraction : float
         Fraction of potential heat units for half maturity (unitless).
     mature_heat_fraction : float
@@ -137,6 +156,12 @@ class CropData:
         Number of soil layers accessible to plant roots (unitless).
     inaccessible_soil_layers : Optional[int]
         Number of soil layers inaccessible to plant roots (unitless).
+    emergence_phosphorus_fraction : float, default 0.005
+        Phosphorus fraction of biomass at emergence (unitless).
+    half_mature_phosphorus_fraction : float, default 0.003
+        Phosphorus fraction of biomass at half-maturity (unitless).
+    mature_phosphorus_fraction : float, default 0.002
+        Phosphorus fraction of biomass at maturity (unitless).
     max_root_depth : float, default 2000
         Maximum depth of roots in the soil (mm).
     cumulative_evaporation : float, default 0.0
@@ -204,9 +229,14 @@ class CropData:
 
     # SWAT Table A-3
     minimum_temperature: float = 0
+    optimal_temperature: float = 25
 
     # SWAT Table A-4
     max_leaf_area_index: float = 4.0
+    first_heat_fraction_point: float = 0.15
+    first_leaf_fraction_point: float = 0.01
+    second_heat_fraction_point: float = 0.50
+    second_leaf_fraction_point: float = 0.95
     senescent_heat_fraction: float = 0.9
 
     # SWAT Table A-8
@@ -220,6 +250,7 @@ class CropData:
     biomass_growth_max: float = 0.0
     above_ground_biomass: float = 0.1
     root_biomass: Optional[float] = 0.0
+    light_use_efficiency: float = 30
 
     # ---- growth constraints
     nitrogen: float = 0.0
@@ -237,6 +268,9 @@ class CropData:
     max_canopy_height: float = 2.5
 
     # ---- nitrogen incorporation
+    emergence_nitrogen_fraction: float = 0.05
+    half_mature_nitrogen_fraction: float = 0.02
+    mature_nitrogen_fraction: float = 0.01
     half_mature_heat_fraction: float = 0.5
     mature_heat_fraction: float = 1.0
     root_depth: float = 1
@@ -244,6 +278,11 @@ class CropData:
     total_soil_layers: Optional[int] = None
     accessible_soil_layers: Optional[int] = None
     inaccessible_soil_layers: Optional[int] = None
+
+    # ---- phosphorus incorporation
+    emergence_phosphorus_fraction: float = 0.005
+    half_mature_phosphorus_fraction: float = 0.003
+    mature_phosphorus_fraction: float = 0.002
 
     # ---- root development
     max_root_depth: float = 2_000
