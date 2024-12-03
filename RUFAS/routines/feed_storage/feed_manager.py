@@ -7,7 +7,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
-    PlanningCycleAllowance, RuntimePurchaseAllowance, Feed, NASEMFeed, NRCFeed, NutrientStandard, Type, Category
+    PlanningCycleAllowance, RuntimePurchaseAllowance, Feed, NASEMFeed, NRCFeed, NutrientStandard, Type, Category, RequestedFeed
 )
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
@@ -137,6 +137,40 @@ class FeedManager:
         """
         pass
 
+    def manage_daily_feed_request(self, requested_feed: RequestedFeed) -> bool:
+        """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
+        current_feed_totals = self._query_available_feed_totals(requested_feed.requested_feed.keys())
+
+        feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
+        feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
+        for feed_id, amount_requested in requested_feed.requested_feed.items():
+            is_fulfillable_with_inventory: bool = amount_requested <= current_feed_totals[feed_id]
+            is_fulfillable_with_purchase: bool = (
+                (amount_requested - current_feed_totals[feed_id]) <= self.runtime_purchase_allowance[feed_id]
+            )
+            is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
+            if is_request_unfulfillable:
+                return False
+            feeds_to_remove_from_inventory[feed_id] = amount_requested
+            if not is_fulfillable_with_inventory:
+                feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
+
+        self.purchase_feed(feeds_to_purchase)
+        self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)  
+
+        return True
+
+    def _query_available_feed_totals(self, query_feed_ids: list[int]) -> dict[int, float]:
+        """Gets the current dry matter mass of each feed ID currently in storage"""
+        feed_totals = {id: 0.0 for id in query_feed_ids}
+
+        for storage in self.active_storages.values():
+            for feed in storage.stored:
+                if feed.rufas_id in feed_totals:
+                    feed_totals[feed.rufas_id] += feed.dry_matter_mass
+
+        return feed_totals
+
     def query_available_feeds(
         self,
         query_crop_types: List[CropType] | None = None,
@@ -194,7 +228,11 @@ class FeedManager:
 
     def purchase_feed(self) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
-        pass
+        pass  # TODO: implement me!
+
+    def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[int, float]) -> None:
+        """Removes feeds from storage in a FIFO manner."""
+        pass  # TODO: implement me!
 
     def _setup_available_feeds(self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard) -> list[Feed]:
         feed_library = self._process_feed_library(nutrient_standard)

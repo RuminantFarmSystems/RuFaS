@@ -207,6 +207,9 @@ class RequestedFeed:
 
     requested_feed : dict[int, float]
 
+    def __add__(self, other):
+        pass  # TODO: implement me
+
 
 class PurchaseAllowance:
     """

@@ -116,6 +116,8 @@ class HarvestedCrop:
 
     Attributes
     ----------
+    rufas_id : int
+        Feed ID that this harvested crop corresponds to.
     category : CropCategory
         The category of the crop (enum).
     type : CropType
@@ -173,6 +175,7 @@ class HarvestedCrop:
 
     """
 
+    rufas_id: int
     category: CropCategory
     type: CropType
     harvest_time: Time
