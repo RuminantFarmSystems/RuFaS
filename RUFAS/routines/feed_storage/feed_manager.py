@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     CropCategory,
@@ -6,7 +6,13 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     HarvestedCrop,
     StorageType,
 )
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    PlanningCycleAllowance, RuntimePurchaseAllowance, Feed, NASEMFeed, NRCFeed, NutrientStandard, Type, Category
+)
+from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
+from RUFAS.util import Utility
+from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
 
 from .baleage import Baleage
@@ -54,8 +60,11 @@ class FeedManager:
         Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
     """
 
-    def __init__(self):
+    def __init__(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
+        self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
+        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(feed_config)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(feed_config)
 
     def _query_result_factory(
         self, crop_category: CropCategory, crop_type: CropType, amount: float
@@ -186,6 +195,42 @@ class FeedManager:
     def purchase_feed(self) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
         pass
+
+    def _setup_available_feeds(self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard) -> list[Feed]:
+        feed_library = self._process_feed_library(nutrient_standard)
+
+        feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
+        available_feeds = []
+        for feed in feed_config:
+            rufas_id = feed["purchased_feed"]
+            try:
+                nutritive_properties = feed_library[rufas_id]
+            except KeyError:
+                pass  # TODO: implement me!
+            new_feed = feed_representation(
+                rufas_id=rufas_id,
+                amount_available=0.0,
+                on_farm_cost=feed["on_farm_cost"],
+                purchase_cost=feed["purchased_feed_cost"],
+                **nutritive_properties,
+            )
+            available_feeds.append(new_feed)
+
+        return available_feeds
+
+    def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[int, dict[str, Any]]:
+        im = InputManager()
+        feed_library = im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
+
+        feed_library = Utility.convert_dict_of_lists_to_dict_of_lists(feed_library)
+
+        feed_library = {feed["rufas_id"]: feed for feed in feed_library}
+        for feed in feed_library.values():
+            del feed["rufas_id"]
+            feed["feed_type"] = Type(feed["feed_type"])
+            feed["Fd_Category"] = Category(feed["Fd_Category"])
+            feed["units"] = MeasurementUnits(feed["units"])
+        return feed_library
 
     # TODO: remove this method after Feed Storage and Animal modules are connected - #1878
     def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:

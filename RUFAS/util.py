@@ -40,6 +40,10 @@ class Utility:
         return result
 
     @staticmethod
+    def convert_dict_of_lists_to_dict_of_lists(dict_of_lists: dict[str, list[Any]]) -> list[dict[str, Any]]:
+        return [dict(zip(dict_of_lists.keys(), values)) for values in zip(*dict_of_lists.values())]
+
+    @staticmethod
     def flatten_keys_to_nested_structure(input_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
         Convert a dictionary with flat, dot-separated keys into a nested structure composed of

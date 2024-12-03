@@ -3610,6 +3610,26 @@
           "type": "number",
           "description": "Cost of Feed (US dollars/kg DM)",
           "minimum": 0
+        },
+        "on_farm_cost": {
+          "type": "number",
+          "description": "Cost of feed that is already on-farm (US dollars/kg DM)",
+          "minimum": 0.00000000000000000000000001
+        },
+        "planning_cycle_allowance": {
+          "type": "number",
+          "description": "Maximum amount of feed that may be purchased between harvests (kg DM).",
+          "minimum": 0.0
+        },
+        "advance_purchase_allowance": {
+          "type": "number",
+          "description": "Maximum amount of feed that may be purchased at the start of a new ration interval (kg DM).",
+          "minimum": 0.0
+        },
+        "runtime_purchase_allowance": {
+          "type": "number",
+          "description": "Maximum amount of feed that may be purchased on a single day (kg DM).",
+          "minimum": 0.0
         }
       }
     },

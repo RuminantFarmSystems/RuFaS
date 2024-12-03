@@ -1,0 +1,172 @@
+{
+    "close_up": [
+        {
+            "id": 2,
+            "ration_percentage": 3.8
+        },
+        {
+            "id": 44,
+            "ration_percentage": 4.1
+        },
+        {
+            "id": 51,
+            "ration_percentage": 40.6
+        },
+        {
+            "id": 94,
+            "ration_percentage": 22.2
+        },
+        {
+            "id": 110,
+            "ration_percentage": 21.5
+        },
+        {
+            "id": 167,
+            "ration_percentage": 5.7
+        },
+        {
+            "id": 231,
+            "ration_percentage": 1.1
+        },
+        {
+            "id": 234,
+            "ration_percentage": 1.0
+        }
+    ],
+    "lac_cow": [
+        {
+            "id": 2,
+            "ration_percentage": 11.7
+        },
+        {
+            "id": 44,
+            "ration_percentage": 11.2
+        },
+        {
+            "id": 51,
+            "ration_percentage": 39.3
+        },
+        {
+            "id": 100,
+            "ration_percentage": 7.5
+        },
+        {
+            "id": 110,
+            "ration_percentage": 13.7
+        },
+        {
+            "id": 167,
+            "ration_percentage": 13.1
+        },
+        {
+            "id": 231,
+            "ration_percentage": 1.8
+        },
+        {
+            "id": 234,
+            "ration_percentage": 1.7
+        }
+    ],
+    "feed_configurations": [
+        {
+            "id": 2,
+            "purchase_price": 0.154,
+            "on_farm_price": 0.00154,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 3.4,
+            "close_up_ration_percentage": 3.8,
+        },
+        {
+            "id": 44,
+            "purchase_price": 0.208,
+            "on_farm_price": 0.00208,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 4.2,
+            "close_up_ration_percentage": 4.1,
+        },
+        {
+            "id": 51,
+            "purchase_price": 0.005,
+            "on_farm_price": 0.00005,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 30.8,
+            "close_up_ration_percentage": 40.6,
+        },
+        {
+            "id": 94,
+            "purchase_price": 0.01,
+            "on_farm_price": 0.0001,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 0.0,
+            "close_up_ration_percentage": 22.2,
+        },
+        {
+            "id": 100,
+            "purchase_price": 0.005,
+            "on_farm_price": 0.00005,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 0.0,
+            "close_up_ration_percentage": 0.0,
+        },
+        {
+            "id": 110,
+            "purchase_price": 0.005,
+            "on_farm_price": 0.00005,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 36.3,
+            "close_up_ration_percentage": 21.5,
+        },
+        {
+            "id": 167,
+            "purchase_price": 0.489,
+            "on_farm_price": 0.00489,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 4.8,
+            "close_up_ration_percentage": 5.7,
+        },
+        {
+            "id": 176,
+            "purchase_price": 0.005,
+            "on_farm_price": 0.00005,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 17.5,
+            "close_up_ration_percentage": 0.0,
+        },
+        {
+            "id": 202,
+            "purchase_price": 0.001,
+            "on_farm_price": 0.00001,
+            "calf_ration_percentage": 50.0,
+            "growing_ration_percentage": 0.0,
+            "close_up_ration_percentage": 3.8,
+        },
+        {
+            "id": 216,
+            "purchase_price": 1.0,
+            "on_farm_price": 0.01,
+            "calf_ration_percentage": 50.0,
+            "growing_ration_percentage": 0.0,
+            "close_up_ration_percentage": 3.8,
+        },
+        {
+            "id": 231,
+            "purchase_price": 0.794,
+            "on_farm_price": 0.00794,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 1.5,
+            "close_up_ration_percentage": 3.8,
+        },
+        {
+            "id": 234,
+            "purchase_price": 0.331,
+            "on_farm_price": 0.0000331,
+            "calf_ration_percentage": 0.0,
+            "growing_ration_percentage": 1.5,
+            "close_up_ration_percentage": 3.8,
+        }
+    ],
+    "user_defined_ration_percentages": {
+        "tolerance": 0.1,
+        "milk_reduction_maximum": 0.5
+    }    
+}
