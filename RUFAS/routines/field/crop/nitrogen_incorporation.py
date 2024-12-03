@@ -407,7 +407,6 @@ class NitrogenIncorporation:
         info_map = {"class": NitrogenIncorporation.__class__.__name__,
                     "function": NitrogenIncorporation._determine_shape_log.__name__}
         om = OutputManager()
-        # throw an error if any parameters do not satisfy [0-1]
         if (
             nitrogen_fraction < 0
             or nitrogen_fraction > 1
@@ -678,13 +677,22 @@ class NitrogenIncorporation:
         pseudocode: C.5.C.2, C.5.C.3
 
         """
-        # check that boundaries are in ascending order
+        info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                    "function": NitrogenIncorporation.determine_layer_nutrient_uptake_potential.__name__}
+        om = OutputManager()
         sorted_boundaries = layer_bounds.copy()
         sorted_boundaries.sort()
         if sorted_boundaries != layer_bounds:
+            om.add_error("Invalid layer boundaries order.",
+                         f"Boundaries must be in ascending order (deeper layers follow shallower ones),"
+                         f" received {layer_bounds}.",
+                         info_map)
             raise ValueError("boundaries must be in ascending order (deeper layers follow shallower ones)")
         # check that there aren't duplicates (each layer should have a unique depth)
         if len(layer_bounds) != len(set(layer_bounds)):
+            om.add_error("Invalid layer boundaries depth.",
+                         f"Boundaries all have different depth, received {layer_bounds}.",
+                         info_map)
             raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
         # calculate results
         boundary_nitrogen = [
@@ -731,8 +739,13 @@ class NitrogenIncorporation:
         SWAT 5:2.3.6, 5:2.3.24
 
         """
-        # error checks
+        info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                    "function": NitrogenIncorporation._determine_nitrogen_uptake_to_depth.__name__}
+        om = OutputManager()
         if nitrogen_distribution_parameter == 0:
+            om.add_error("Invalid nitrogen_distribution_parameter.",
+                         "Received invalid value 0 for nitrogen_distribution_parameter.",
+                         info_map)
             raise ValueError("nitrogen_distribution_parameter cannot equal 0")
         # calculate results
         if root_depth <= 0:
@@ -799,7 +812,15 @@ class NitrogenIncorporation:
 
         """
         # ensure all list inputs are the same length
+        info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                    "function": NitrogenIncorporation.determine_layer_nutrient_uptake.__name__}
+        om = OutputManager()
         if len(layer_uptake_potentials) != len(layer_demands) or len(layer_uptake_potentials) != len(layer_nutrient):
+            om.add_error("Invalid layer_potential, layer_demand, and layer_nitrate length.",
+                         "layer_potential, layer_demand, and layer_nitrate length does not have equal length,"
+                         f"length of layer_potential, layer_demand, and layer_nitrate are"
+                         f" {len(layer_uptake_potentials)}, {len(layer_demands)} and {len(layer_nutrient)}.",
+                         info_map)
             raise ValueError("layer_potential, layer_demand, and layer_nitrate must be the same length")
         # calculate results
         layer_desired = [potential + demand for potential, demand in zip(layer_uptake_potentials, layer_demands)]
@@ -827,7 +848,13 @@ class NitrogenIncorporation:
         SWAT 5:2.3.8, 5:2.3.26
 
         """
+        info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                    "function": NitrogenIncorporation.determine_layer_extracted_resource.__name__}
+        om = OutputManager()
         if len(requests) != len(sources):
+            om.add_error("Invalid requests and sources length.",
+                         f"The length of requests({len(requests)}) and sources({len(sources)}) are unequal.",
+                         info_map)
             raise ValueError("requests and sources should be the same length")
         return [NitrogenIncorporation._determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
 
@@ -959,11 +986,23 @@ class NitrogenIncorporation:
         SWAT 5:2.3.9
 
         """
+        info_map = {"class": NitrogenIncorporation.__class__.__name__,
+                    "function": NitrogenIncorporation._determine_fixed_nitrogen.__name__}
+        om = OutputManager()
         if not 0 <= stage_factor <= 1:
+            om.add_error("Invalid stage_factor.",
+                         f"stage_factor must be between 0 and 1, received {stage_factor}.",
+                         info_map)
             raise ValueError("stage_factor must be between 0 and 1")
         if not 0 <= water_factor <= 1:
+            om.add_error("Invalid water_factor.",
+                         f"water_factor must be between 0 and 1, received {water_factor}.",
+                         info_map)
             raise ValueError("water_factor must be between 0 and 1")
         if not 0 <= nitrate_factor <= 1:
+            om.add_error("Invalid nitrate_factor.",
+                         f"nitrate_factor must be between 0 and 1, received {nitrate_factor}.",
+                         info_map)
             raise ValueError("nitrate_factor must be between 0 and 1")
 
         fixed = demand * stage_factor * min(water_factor, nitrate_factor, 1)
