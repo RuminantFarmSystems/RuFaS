@@ -30,7 +30,7 @@ class WaterDynamics:
         crop_data: Optional[CropData] = None,
         cumulative_evapotranspiration: float = 0.0,
     ):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.data = crop_data or CropData()
         self.cumulative_evapotranspiration = cumulative_evapotranspiration
 
     def cycle_water(

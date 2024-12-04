@@ -64,7 +64,7 @@ class LeafAreaIndex:
         previous_leaf_area_index: Optional[float] = None,
         previous_optimal_leaf_area_fraction: Optional[float] = None,
     ) -> None:
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.data = crop_data or CropData()
         self.lai_shapes = lai_shapes
         self.optimal_leaf_area_fraction = optimal_leaf_area_fraction
         self.canopy_height = canopy_height

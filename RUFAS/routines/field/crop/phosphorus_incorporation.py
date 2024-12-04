@@ -89,7 +89,7 @@ class PhosphorusIncorporation:
         unmnet_phosphorus_demands: Optional[float] = None,
         phosphorus_requests: Optional[float] = None,
     ):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.data = crop_data or CropData()
 
         self.phosphorus_distro_param = phosphorus_distro_param
         self.phosphorus_shapes = phosphorus_shapes

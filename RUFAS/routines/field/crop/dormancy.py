@@ -22,14 +22,14 @@ class Dormancy:
         A reference to the `crop_data` object on which dormancy operations will be conducted.
     minimum_lai_during_dormancy : Optional[float]
         Minimum leaf area index for plants (perennials and trees only).
-        Note: SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
-        now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
-        no information about how this value can be measured or calculated.
 
     Notes
     -----
-    This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
+    - This method is used if the crop remains uncut after reaching maturity. It reduces the crop's biomass
     based on species-specific water content, simulating the natural dry-down process.
+    - SWAT Appendix-A section A.1.12 says that the default 0.75 is from pre-2009 versions of SWAT and users are
+    now allowed to modify this value. But it does not provide values for any of the listed plant species and gives
+    no information about how this value can be measured or calculated.
 
     """
 

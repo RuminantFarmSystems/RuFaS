@@ -91,7 +91,7 @@ class NitrogenIncorporation:
         nitrate_factor: Optional[float] = None,
         fixation_stage_factor: Optional[float] = None,
     ):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.data = crop_data or CropData()
 
         self.nitrogen_distro_param = nitrogen_distro_param
         self.nitrogen_shapes = nitrogen_shapes
@@ -106,7 +106,6 @@ class NitrogenIncorporation:
         self.nitrate_factor = nitrate_factor
         self.fixation_stage_factor = fixation_stage_factor
 
-    # ---- wrapper functions (main routines) ----
     def incorporate_nitrogen(self, soil_data: SoilData) -> None:
         """
         Main nitrogen incorporation function that runs all nitrogen processes and stores nitrogen as biomass.

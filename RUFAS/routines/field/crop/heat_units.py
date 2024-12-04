@@ -17,7 +17,7 @@ class HeatUnits:
     use_heat_unit_temperature : bool, default False
         If alternative heat unit method is used.
     new_heat_units : Optional[float], default None
-        Heat units accumulated on the current day (Celsius*).
+        Heat units accumulated on the current day (Celsius).
     minimum_heat_unit_temperature : Optional[float], default None
         Minimum temperature for heat unit calculations (Celsius).
     maximum_heat_unit_temperature : Optional[float], default None
@@ -59,7 +59,7 @@ class HeatUnits:
         maximum_heat_unit_temperature: Optional[float] = None,
         heat_unit_temperature: Optional[float] = None,
     ) -> None:
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.data = crop_data or CropData()
         self.maximum_temperature = maximum_temperature
         self.use_heat_unit_temperature = use_heat_unit_temperature
         self.new_heat_units = new_heat_units

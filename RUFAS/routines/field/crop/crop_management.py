@@ -115,7 +115,7 @@ class CropManagement:
         root_distribution_param_da: float = 145.0,
         root_distribution_param_c: float = -1.165,
     ) -> None:
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.data = crop_data or CropData()
         self.om = OutputManager()
 
         self.harvest_efficiency = harvest_efficiency

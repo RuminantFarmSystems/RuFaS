@@ -65,7 +65,7 @@ class BiomassAllocation:
         biomass_growth: Optional[float] = None,
         previous_biomass: Optional[float] = None,
     ) -> None:
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+        self.data = crop_data or CropData()
         self.light_extinction = light_extinction
         self.usable_light = usable_light
         self.biomass_growth = biomass_growth
