@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from RUFAS.data_structures.events import FertilizerEvent
 from RUFAS.routines.field.manager.schedule import Schedule
@@ -73,8 +73,8 @@ class FertilizerSchedule(Schedule):
         nitrogen_masses: List[float],
         phosphorus_masses: List[float],
         potassium_masses: List[float],
-        application_depths: List[float] = None,
-        surface_remainder_fractions: List[float] = None,
+        application_depths: List[float] | None = None,
+        surface_remainder_fractions: List[float] | None = None,
         pattern_skip: int = 0,
         pattern_repeat: int = 0,
     ):
@@ -113,13 +113,14 @@ class FertilizerSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        non_negative_parameters = [
+        non_negative_parameters: list[tuple[str, list[Any]] | None] = [
             ("nitrogen masses", self.nitrogen_masses),
             ("phosphorus masses", self.phosphorus_masses),
             ("potassium masses", self.potassium_masses),
             ("application depths", self.application_depths),
         ]
-        fraction_parameters = [("surface remainder fractions", self.surface_remainder_fractions)]
+        fraction_parameters: list[tuple[str, list[Any]] | None]\
+            = [("surface remainder fractions", self.surface_remainder_fractions)]
 
         self._validate_parameters(non_negative_parameters, fraction_parameters, self.years, self.days, self.name)
 
