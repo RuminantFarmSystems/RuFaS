@@ -199,7 +199,7 @@ class FeedManager:
 
     def _query_available_feed_totals(self, query_feed_ids: list[int]) -> dict[int, float]:
         """Gets the current dry matter mass of each feed ID currently in storage"""
-        feed_totals = {id: 0.0 for id in query_feed_ids}
+        feed_totals = {rufas_id: 0.0 for rufas_id in query_feed_ids}
 
         for storage in self.active_storages.values():
             for feed in storage.stored:
