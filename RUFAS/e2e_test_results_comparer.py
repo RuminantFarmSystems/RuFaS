@@ -9,8 +9,7 @@ from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
 
-ResultPathType = namedtuple("ResultPathType", ["domain", "expected_results_path", "actual_results_path"])
-DEFAULT_TOLERANCE = 1e-3
+ResultPathType = namedtuple("ResultPathType", ["domain", "expected_results_path", "actual_results_path", "tolerance"])
 
 
 class E2ETestResultsComparer:
@@ -63,9 +62,9 @@ class E2ETestResultsComparer:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
 
-            diff = DeepDiff(expected_results, actual_results, verbose_level=2, ignore_order=True, significant_digits=6)
+            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=6)
 
-            filtered_diff = E2ETestResultsComparer.filter_insignificant_changes(diff, DEFAULT_TOLERANCE)
+            filtered_diff = E2ETestResultsComparer.filter_insignificant_changes(diff, path_set.tolerance)
 
             is_difference_in_results: bool = False if (filtered_diff == {}) else True
             if is_difference_in_results:
@@ -94,14 +93,15 @@ class E2ETestResultsComparer:
         test_result_paths: list[ResultPathType] = []
         for path_set in result_paths:
             test_result_paths.append(
-                ResultPathType(path_set["domain"], path_set["expected_results_path"], path_set["actual_results_path"])
+                ResultPathType(path_set["domain"], path_set["expected_results_path"], path_set["actual_results_path"],
+                               path_set["tolerance"])
             )
         return test_result_paths
 
     @staticmethod
     def is_significant(change: dict[str, float | str], tolerance: float) -> bool:
         """
-        Determines if a change is significant based on the tolerance.
+        Determines if a numerical change is significant based on the symmetric relative tolerance.
 
         Parameters
         ----------
@@ -113,20 +113,23 @@ class E2ETestResultsComparer:
         Returns
         -------
         bool
-            True if the change is significant, False otherwise.
+            True if the change is both numerical and significant, False otherwise.
         """
         if isinstance(change, dict) and "old_value" in change and "new_value" in change:
             old_value = change["old_value"]
             new_value = change["new_value"]
             if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
+                reference = (abs(new_value) + abs(old_value)) / 2
+                if reference == 0:
+                    return False
                 difference = abs(new_value - old_value)
-                return difference > tolerance
+                return difference > tolerance * reference
         return True
 
     @staticmethod
     def filter_nested(values_changed: dict[str, dict[str, float | str]], tolerance: float) -> None:
         """
-        Recursively filters out insignificant changes from a nested structure.
+        Recursively filters out insignificant numerical changes from a nested structure.
 
         Parameters
         ----------
