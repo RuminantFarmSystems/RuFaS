@@ -12,8 +12,6 @@ class CerealRye(CropData):
     """
 
     name: str = "default cereal_rye"
-    plant_code: str = "RYE"
-    scientific_name: str = "Secale cereale"
     plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
