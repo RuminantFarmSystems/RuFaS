@@ -28,7 +28,7 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
             [0.5],
             [0.5],
             ["coulter-chisel-plow"],
-            "'test_2': expected all planting days to be in range [1, 366], received '[200, 0]'.",
+            "'test_2': expected all days to be in range [1, 366], received '[200, 0]'.",
         ),
         (
             "test_3",
@@ -68,9 +68,12 @@ from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
             [0.5],
             [0.5],
             ["disk-harrow"],
-            "'test_6': expected number of years, days, depths, incorporation and mixing fractions to be equal, received"
-            " '[1990]' years, '[150, 200]' days,  '[100]' tillage depths, '[0.5]' incorporation fractions, '[0.5]' "
-            "mixing fractions and '['disk-harrow']' implements.",
+            "'test_6':  Mismatch in length of parameters. Provided parameters are: "
+            "years=[1990], days=[150, 200], tillage_depths=[100], "
+            "incorporation_fractions=[0.5], mixing_fractions=[0.5], "
+            "implements=[<TillageImplement.DISK_HARROW: 'disk-harrow'>]. Lengths are: "
+            "{'years': 1, 'days': 2, 'tillage_depths': 1, 'incorporation_fractions': 1, "
+            "'mixing_fractions': 1, 'implements': 1}.",
         ),
     ],
 )
@@ -102,23 +105,7 @@ def test_validate_tillage_parameters(
 )
 def test_validate_depths(depths: List[float], expected: bool) -> None:
     """Tests that tillage depths are validated correctly."""
-    actual = TillageSchedule._validate_depths(depths)
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
-    "fracs,expected",
-    [
-        ([0.0, 0.3, 0.99], True),
-        ([0.5, 1.0], True),
-        ([], True),
-        ([-0.01, 0.03], False),
-        ([0.4, 1.1], False),
-    ],
-)
-def test_validate_fractions(fracs: List[float], expected) -> None:
-    """Tests that all fractions passed are valid."""
-    actual = TillageSchedule._validate_fractions(fracs)
+    actual = TillageSchedule.validate_depths(depths)
     assert actual == expected
 
 
@@ -178,12 +165,12 @@ def test_init_tillage_schedule(
             0,
             1,
             [
-                TillageEvent(200, 0.5, 0.45, TillageImplement.SUBSOILER, 1990, 90),
-                TillageEvent(200, 0.5, 0.45, TillageImplement.SUBSOILER, 1990, 120),
-                TillageEvent(300, 0.5, 0.47, TillageImplement.DISK_HARROW, 1990, 200),
-                TillageEvent(200, 0.5, 0.45, TillageImplement.SUBSOILER, 1991, 90),
-                TillageEvent(200, 0.5, 0.45, TillageImplement.SUBSOILER, 1991, 120),
-                TillageEvent(300, 0.5, 0.47, TillageImplement.DISK_HARROW, 1991, 200),
+                TillageEvent(1990, 90, 200, 0.5, 0.45, TillageImplement.SUBSOILER),
+                TillageEvent(1990, 120, 200, 0.5, 0.45, TillageImplement.SUBSOILER),
+                TillageEvent(1990, 200, 300, 0.5, 0.47, TillageImplement.DISK_HARROW),
+                TillageEvent(1991, 90, 200, 0.5, 0.45, TillageImplement.SUBSOILER),
+                TillageEvent(1991, 120, 200, 0.5, 0.45, TillageImplement.SUBSOILER),
+                TillageEvent(1991, 200, 300, 0.5, 0.47, TillageImplement.DISK_HARROW),
             ],
         ),
         (
@@ -196,12 +183,12 @@ def test_init_tillage_schedule(
             2,
             2,
             [
-                TillageEvent(150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW, 1993, 100),
-                TillageEvent(150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW, 1996, 100),
-                TillageEvent(150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW, 1999, 100),
-                TillageEvent(150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW, 2002, 100),
-                TillageEvent(150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW, 2005, 100),
-                TillageEvent(150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW, 2008, 100),
+                TillageEvent(1993, 100, 150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW),
+                TillageEvent(1996, 100, 150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW),
+                TillageEvent(1999, 100, 150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW),
+                TillageEvent(2002, 100, 150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW),
+                TillageEvent(2005, 100, 150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW),
+                TillageEvent(2008, 100, 150, 0.3, 0.6, TillageImplement.COULTER_CHISEL_PLOW),
             ],
         ),
         (
@@ -214,12 +201,19 @@ def test_init_tillage_schedule(
             3,
             2,
             [
-                TillageEvent(150, 0.4, 0.2, TillageImplement.SEEDBED_CONDITIONER, 1991, 120),
-                TillageEvent(45, 0.4, 0.2, TillageImplement.CULTIVATOR, 1992, 135),
-                TillageEvent(150, 0.4, 0.2, TillageImplement.SEEDBED_CONDITIONER, 1996, 120),
-                TillageEvent(45, 0.4, 0.2, TillageImplement.CULTIVATOR, 1997, 135),
-                TillageEvent(150, 0.4, 0.2, TillageImplement.SEEDBED_CONDITIONER, 2001, 120),
-                TillageEvent(45, 0.4, 0.2, TillageImplement.CULTIVATOR, 2002, 135),
+                TillageEvent(1991, 120, 150, 0.4, 0.2, TillageImplement.SEEDBED_CONDITIONER),
+                TillageEvent(1992, 135, 45, 0.4, 0.2, TillageImplement.CULTIVATOR),
+                TillageEvent(1996, 120, 150, 0.4, 0.2, TillageImplement.SEEDBED_CONDITIONER),
+                TillageEvent(1997, 135, 45, 0.4, 0.2, TillageImplement.CULTIVATOR),
+                TillageEvent(
+                    2001,
+                    120,
+                    150,
+                    0.4,
+                    0.2,
+                    TillageImplement.SEEDBED_CONDITIONER,
+                ),
+                TillageEvent(2002, 135, 45, 0.4, 0.2, TillageImplement.CULTIVATOR),
             ],
         ),
     ],
