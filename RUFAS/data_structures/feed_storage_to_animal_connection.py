@@ -42,6 +42,38 @@ class Feed:
 
     Attributes
     ----------
+    rufas_id : int
+    Fd_Category : Category
+    feed_type : Type
+    DM : float
+    ash : float
+    CP : float
+    N_A : float
+    N_B : float
+    N_C : float
+    Kd : float
+    dRUP : float
+    ADICP : float
+    NDICP : float
+    ADF : float
+    NDF : float
+    lignin : float
+    starch : float
+    EE : float
+    calcium : float
+    phosphorus : float
+    magnesium : float
+    potassium : float
+    sodium : float
+    chlorine : float
+    sulfur : float
+    is_fat : bool
+    is_wetforage : float
+    units : MeasurementUnits
+    limit : float
+    lower_limit : float
+    TDN : float
+    DE : float
     amount_available : float
         Amount of feed currently or expected to be available (kg).
     on_farm_cost : float
