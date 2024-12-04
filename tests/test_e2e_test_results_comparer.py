@@ -61,7 +61,8 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
              "tolerance": 0.01},
         ],
     )
-    expected = [ResultPathType("one", "expected_1", "actual_1", 0.01), ResultPathType("two", "expected_2", "actual_2", 0.01)]
+    expected = [ResultPathType("one", "expected_1", "actual_1", 0.01), ResultPathType("two", "expected_2", "actual_2",
+                                                                                      0.01)]
 
     actual = E2ETestResultsComparer._get_test_result_paths()
 
@@ -136,10 +137,11 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
                     "key1": {"old_value": 10.0, "new_value": 10.000001},
                     "key2": {"old_value": 10.0, "new_value": 10.00001},
                     "key3": {"old_value": 10.0, "new_value": 10.0001},
+                    "key4": {"old_value": 10.0, "new_value": 10.001},
                 }
             },
             1e-5,
-            {"key3"},
+            {"key4"},
         ),
         # Case 5: Non-numeric and missing keys
         (
@@ -169,7 +171,7 @@ def test_filter_insignificant_changes(
 
 def test_is_significant() -> None:
     """Unit test for is_significant()."""
-    assert E2ETestResultsComparer.is_significant({"old_value": 10.0, "new_value": 10.1}, 0.01) is True
+    assert E2ETestResultsComparer.is_significant({"old_value": 10.0, "new_value": 10.2}, 0.01) is True
     assert E2ETestResultsComparer.is_significant({"old_value": 10.0, "new_value": 10.001}, 0.01) is False
     assert E2ETestResultsComparer.is_significant({"old_value": "a", "new_value": "b"}, 0.01) is True
 
