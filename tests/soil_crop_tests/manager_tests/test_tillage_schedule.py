@@ -84,7 +84,7 @@ def test_validate_tillage_parameters(
     depths: List[float],
     incorp_fracs: List[float],
     mix_fracs: List[float],
-    implements: List[float],
+    implements: List[str],
     expected: str,
 ) -> None:
     """Tests that errors are raised correctly when invalid input is passed."""

@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 
 import pytest
 
@@ -92,7 +92,7 @@ def test_crop_schedule_init(
     plant_skip: int,
     harvest_skip: int,
     pat_repeat: int,
-    expected: Dict,
+    expected: dict[str, list[Any]],
 ) -> None:
     """Tests that CropSchedule's get initialized correctly."""
     crop_schedule = CropSchedule(
