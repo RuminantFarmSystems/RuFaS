@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, Dict, List
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
@@ -7,6 +8,7 @@ from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
     StorageType,
 )
 from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    IdealFeeds,
     PlanningCycleAllowance,
     RuntimePurchaseAllowance,
     Feed,
@@ -16,6 +18,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import (
     Type,
     Category,
     RequestedFeed,
+    TotalInventory,
 )
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
@@ -164,9 +167,35 @@ class FeedManager:
                 feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
 
         self.purchase_feed(feeds_to_purchase)
-        self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)  
+        self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
 
         return True
+
+    def get_total_inventory(self, inventory_date: date) -> TotalInventory:
+        """Gets the inventory expected to be held in storage at the specified date."""
+        # TODO: project losses at given inventory date, then assess feeds in storage
+        available_feed_rufas_ids = [feed.rufas_id for feed in self._available_feeds]
+
+        available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids)
+
+        for feed in self._available_feeds:
+            feed.amount_available = available_feed_totals.get(feed.rufas_id, 0.0)
+
+        return TotalInventory(available_feeds=self._available_feeds, date=inventory_date)
+
+    def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds) -> None:
+        """
+        Purchases as much of the ideal feeds as possible, while respecting the Planning Allowance, storage capacity,
+        future harvests, budget, etc.
+        """
+        # TODO: respect things other than the Planning Allowance
+        feeds_to_purchase = {
+            rufas_id: min(
+                ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0)
+            ) for rufas_id in ideal_feeds.ideal_feeds.keys()
+        }
+
+        self.purchase_feed(feeds_to_purchase)
 
     def _query_available_feed_totals(self, query_feed_ids: list[int]) -> dict[int, float]:
         """Gets the current dry matter mass of each feed ID currently in storage"""
@@ -236,6 +265,8 @@ class FeedManager:
 
     def purchase_feed(self) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
+        # TODO: this function will take in a `RequestedFeed` or dict[int, float] of feeds to purchase, purchase them,
+        # and put them in storage. It will also record the amounts and money spent on feeds.
         pass  # TODO: implement me!
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[int, float]) -> None:
