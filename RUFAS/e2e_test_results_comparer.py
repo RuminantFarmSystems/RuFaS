@@ -93,8 +93,12 @@ class E2ETestResultsComparer:
         test_result_paths: list[ResultPathType] = []
         for path_set in result_paths:
             test_result_paths.append(
-                ResultPathType(path_set["domain"], path_set["expected_results_path"], path_set["actual_results_path"],
-                               path_set["tolerance"])
+                ResultPathType(
+                    path_set["domain"],
+                    path_set["expected_results_path"],
+                    path_set["actual_results_path"],
+                    path_set["tolerance"],
+                )
             )
         return test_result_paths
 
