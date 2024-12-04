@@ -59,6 +59,8 @@ v0.9.2
 - [2086](https://github.com/RuminantFarmSystems/MASM/pull/2086) - [minor change] [Animal] Updates default parity fraction. 
 - [2118](https://github.com/RuminantFarmSystems/MASM/pull/2118) - [minor change] [Crop and Soil] Removed the usage of input validation methods in HeatUnits. 
 - [1836](https://github.com/RuminantFarmSystems/MASM/pull/1836) - [minor change] [Feed] Updates default prices in default_feed.json using average prices sourced by Kristan (detailed in sheet in PR).
+- [2046](https://github.com/RuminantFarmSystems/MASM/pull/2046) - [major change] [Data Collection App] Integrates the Data Collection App into the RuFaS repository and adds a RuFaS task type to update it.
+
 
 ### v0.9.2
 
