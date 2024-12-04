@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.data_structures.events import TillageEvent
@@ -88,7 +88,7 @@ class TillageSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        fraction_parameters = [
+        fraction_parameters: list[tuple[str, list[Any]] | None] = [
             ("incorporation fractions", self.incorporation_fractions),
             ("mixing fractions", self.mixing_fractions),
         ]
