@@ -487,7 +487,7 @@ class Utility:
         }
 
     @staticmethod
-    def remove_special_chars(input_string: str | list[str] | None) -> str:
+    def remove_special_chars(input_string: str | list[str]) -> str:
         """Function to remove special characters from a string.
 
         Parameters
