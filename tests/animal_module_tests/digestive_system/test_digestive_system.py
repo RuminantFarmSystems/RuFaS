@@ -131,7 +131,7 @@ def test_daily_routine_calf(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
-    assert actual_statistics == {"methane_emission": 15.3, "phosphorus_excreted": 3}
+    assert actual_statistics == {"enteric_methane_emission": 15.3, "phosphorus_excreted": 3}
     assert actual_excretions == expected_excretions
 
     mock_emission.assert_called_once_with("dummy model", 12)
@@ -177,7 +177,7 @@ def test_daily_routine_heifer(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
-    assert actual_statistics == {"methane_emission": 15.3, "phosphorus_excreted": 3}
+    assert actual_statistics == {"enteric_methane_emission": 15.3, "phosphorus_excreted": 3}
     assert actual_excretions == expected_excretions
 
     mock_emission.assert_called_once_with("dummy model", 5.23, {"dm": 0.7})
@@ -223,7 +223,7 @@ def test_daily_routine_cow(
         mock_general_properties, mock_animal_nutrient_property, mock_milk_production_property
     )
 
-    assert actual_statistics == {"methane_emission": 15.3, "phosphorus_excreted": 3}
+    assert actual_statistics == {"enteric_methane_emission": 15.3, "phosphorus_excreted": 3}
     assert actual_excretions == expected_excretions
 
     mock_emission.assert_called_once_with(

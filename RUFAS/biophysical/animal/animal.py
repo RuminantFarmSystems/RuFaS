@@ -11,11 +11,9 @@ from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalS
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
-from RUFAS.biophysical.animal.data_types.digestive_system_inputs import DigestiveSystemInputs
-from RUFAS.biophysical.animal.data_types.growth_inputs import GrowthInputs
-from RUFAS.biophysical.animal.data_types.growth_outputs import GrowthOutputs
-from RUFAS.biophysical.animal.data_types.milk_production_inputs import MilkProductionInputs
-from RUFAS.biophysical.animal.data_types.milk_production_outputs import MilkProductionOutputs
+from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
+from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem

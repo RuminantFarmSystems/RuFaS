@@ -2,8 +2,7 @@ import numpy as np
 
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
-from RUFAS.biophysical.animal.data_types.growth_inputs import GrowthInputs
-from RUFAS.biophysical.animal.data_types.growth_outputs import GrowthOutputs
+from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.animal.life_cycle.animal_events import AnimalEvents
 from RUFAS.time import Time

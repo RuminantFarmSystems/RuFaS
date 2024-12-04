@@ -58,7 +58,7 @@ class Composting(BaseManureTreatment):
     _calculate_carbon_decomposition(total_solid: float) -> float:
         Computes the total carbon decomposition for the current day.
 
-    _calculate_dry_matter_loss(methane_emission: float, carbon_decomposition: float) -> float:
+    _calculate_dry_matter_loss(enteric_methane_emission: float, carbon_decomposition: float) -> float:
         Calculates the total dry matter loss for the current day.
 
     _calculate_nitrogen_loss_to_leaching() -> float:

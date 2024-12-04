@@ -421,3 +421,7 @@ class Pen:
             else:  # feeds and price
                 ration[key] = self.ration_per_animal[key] * num_animals
         return ration
+
+    def _calculate_dry_matter_intake(self) -> None:
+        """Placeholder function to calculate the DMI for each animal on a daily basis."""
+        pass
