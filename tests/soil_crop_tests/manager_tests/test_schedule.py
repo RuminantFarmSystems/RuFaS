@@ -58,6 +58,7 @@ def test_validate_equal_lengths_invalid() -> None:
             "'depth': 2}."
         )
 
+
 @pytest.mark.parametrize(
     "pattern, skip, repeat, expected",
     [

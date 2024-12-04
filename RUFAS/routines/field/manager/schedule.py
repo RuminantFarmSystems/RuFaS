@@ -250,8 +250,8 @@ class Schedule:
             if not Utility.validate_fractions(parameter):
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be in"
-                                    f" range [0.0, 1.0], "
-                                    f"received '{parameter}'."
+                    f" range [0.0, 1.0], "
+                    f"received '{parameter}'."
                 )
 
     @staticmethod
