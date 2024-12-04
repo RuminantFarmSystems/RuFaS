@@ -103,14 +103,15 @@ class E2ETestResultsComparer:
         return test_result_paths
 
     @staticmethod
-    def is_significant(change: dict[str, float | str], tolerance: float) -> bool:
+    def is_significant(changes: dict[str, float | str], tolerance: float) -> bool:
         """
-        Determines if a numerical change is significant based on the symmetric relative tolerance.
+        Determines if a numerical change is significant based if the change between the
+        "old_value" and "new_value" exceeds the specified tolerance.
 
         Parameters
         ----------
-        change : dict[str, float | str]
-            A dictionary representing a change with "old_value" and "new_value".
+        changes : dict[str, float | str]
+            A dictionary representing changes with "old_value" and "new_value".
         tolerance : float
             The threshold for considering a difference as significant.
 
@@ -118,14 +119,18 @@ class E2ETestResultsComparer:
         -------
         bool
             True if the change is both numerical and significant, False otherwise.
+
+        Notes
+        -----
+        The comparison is based on the absolute difference between the "old_value" and "new_value",
+        relative to the "old_value". If the "old_value" is zero, a fallback reference value of 1 is used
+        to ensure the tolerance comparison remains meaningful.
         """
-        if isinstance(change, dict) and "old_value" in change and "new_value" in change:
-            old_value = change["old_value"]
-            new_value = change["new_value"]
+        if isinstance(changes, dict) and "old_value" in changes and "new_value" in changes:
+            old_value = changes["old_value"]
+            new_value = changes["new_value"]
             if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
-                reference = (abs(new_value) + abs(old_value)) / 2
-                if reference == 0:
-                    return False
+                reference = abs(old_value) if abs(old_value) > 0 else 1
                 difference = abs(new_value - old_value)
                 return difference > tolerance * reference
         return True
