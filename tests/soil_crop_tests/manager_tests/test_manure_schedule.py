@@ -130,14 +130,14 @@ from RUFAS.data_structures.manure_types import ManureType
 )
 def test_validate_manure_parameters(
     name: str,
-    years: List[int],
-    days: List[int],
-    nitrogen: List[float],
-    phosphorus: List[float],
-    manure_type: ManureType,
-    field_coverage: List[float],
-    depths: List[float],
-    remainder_fracs: List[float],
+    years: list[int],
+    days: list[int],
+    nitrogen: list[float],
+    phosphorus: list[float],
+    manure_type: list[ManureType],
+    field_coverage: list[float],
+    depths: list[float],
+    remainder_fracs: list[float],
     expected: str,
 ) -> None:
     """Tests that invalid input is caught and raised with the correct error message in the init function."""

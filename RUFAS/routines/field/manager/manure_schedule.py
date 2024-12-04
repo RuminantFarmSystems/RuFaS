@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 
 from RUFAS.data_structures.events import ManureEvent
 from RUFAS.routines.field.manager.schedule import Schedule
@@ -107,12 +107,12 @@ class ManureSchedule(Schedule):
 
         """
         error_header = f"'{self.name}': "
-        non_negative_parameters = [
+        non_negative_parameters: list[tuple[str, list[Any]] | None] = [
             ("nitrogen masses", self.nitrogen_masses),
             ("phosphorus masses", self.phosphorus_masses),
             ("manure application depths", self.application_depths),
         ]
-        fraction_parameters = [
+        fraction_parameters: list[tuple[str, list[Any]] | None] = [
             ("field coverages", self.field_coverages),
             ("surface remainder fractions", self.surface_remainder_fractions),
         ]
