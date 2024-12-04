@@ -119,8 +119,9 @@ class FertilizerSchedule(Schedule):
             ("potassium masses", self.potassium_masses),
             ("application depths", self.application_depths),
         ]
-        fraction_parameters: list[tuple[str, list[Any]] | None]\
-            = [("surface remainder fractions", self.surface_remainder_fractions)]
+        fraction_parameters: list[tuple[str, list[Any]] | None] = [
+            ("surface remainder fractions", self.surface_remainder_fractions)
+        ]
 
         self._validate_parameters(non_negative_parameters, fraction_parameters, self.years, self.days, self.name)
 
