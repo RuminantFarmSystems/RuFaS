@@ -4,7 +4,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -644,3 +644,71 @@ class Utility:
         result_df.to_csv(output_csv_path, index=False)
 
         shutil.rmtree(saved_csv_working_folder)
+
+    @staticmethod
+    def elongate_list(list_to_elongate: list[Any], reference_list_length: int) -> list[Any]:
+        """
+        Takes a list and lengthens it to match the length of the reference list, if the original length was 1.
+
+        Parameters
+        ----------
+        list_to_elongate : list[Any]
+            List to be extended if its length is 1.
+        reference_list_length : int
+            Length of that the list should be extended to, if it its original length is 1.
+
+        Returns
+        -------
+        list[Any]
+            The elongated list.
+
+        Notes
+        -----
+        In the context of Schedule-descendant classes, the reference list length will always be the length of the years
+        list.
+
+        """
+        if len(list_to_elongate) != 1:
+            return list_to_elongate
+        elongated_list = list_to_elongate * reference_list_length
+        return elongated_list
+
+    @staticmethod
+    def determine_if_all_non_negative_values(values: list[int | float]) -> bool:
+        """
+        Checks that all values in a list are >= 0.
+
+        Parameters
+        ----------
+        values : List[Any]
+            List of values to be checked.
+
+        Returns
+        -------
+        bool
+            True if all values are >= 0, False otherwise.
+
+        """
+        return all(value >= 0 for value in values)
+
+    @staticmethod
+    def validate_fractions(fractions: List[float]) -> bool:
+        """
+        Checks that all fractions passed are valid.
+
+        Parameters
+        ----------
+        fractions : List[float]
+            List of fractions to be valid
+
+        Returns
+        -------
+        bool
+            True if all fractions passed are valid, False otherwise.
+
+        Notes
+        -----
+        A fraction is valid if it is in the range[0.0, 1.0]
+
+        """
+        return all(0.0 <= fraction <= 1.0 for fraction in fractions)
