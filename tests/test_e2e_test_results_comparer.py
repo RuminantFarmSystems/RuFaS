@@ -55,14 +55,24 @@ def test_get_test_results_paths(mocker: MockerFixture) -> None:
     get_data = mocker.patch(
         "RUFAS.e2e_test_results_comparer.InputManager.get_data",
         return_value=[
-            {"domain": "one", "expected_results_path": "expected_1", "actual_results_path": "actual_1",
-             "tolerance": 0.01},
-            {"domain": "two", "expected_results_path": "expected_2", "actual_results_path": "actual_2",
-             "tolerance": 0.01},
+            {
+                "domain": "one",
+                "expected_results_path": "expected_1",
+                "actual_results_path": "actual_1",
+                "tolerance": 0.01,
+            },
+            {
+                "domain": "two",
+                "expected_results_path": "expected_2",
+                "actual_results_path": "actual_2",
+                "tolerance": 0.01,
+            },
         ],
     )
-    expected = [ResultPathType("one", "expected_1", "actual_1", 0.01), ResultPathType("two", "expected_2", "actual_2",
-                                                                                      0.01)]
+    expected = [
+        ResultPathType("one", "expected_1", "actual_1", 0.01),
+        ResultPathType("two", "expected_2", "actual_2", 0.01),
+    ]
 
     actual = E2ETestResultsComparer._get_test_result_paths()
 
