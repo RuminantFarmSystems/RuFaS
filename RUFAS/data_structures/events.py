@@ -134,7 +134,6 @@ class HarvestEvent(BaseFieldManagementEvent):
     def __eq__(self, other):
         """Overrides the equality operator for HarvestEvent objects."""
         if isinstance(other, HarvestEvent):
-            # print(super().__eq__(other))
             return (
                 super().__eq__(other)
                 and other.crop_reference == self.crop_reference

@@ -1,3 +1,4 @@
+from copy import copy
 from typing import List, Any, Optional
 
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
@@ -37,7 +38,7 @@ class Schedule:
 
     """
 
-    def __init__(self, name: str, years: List[int], days: List[int], pattern_skip: int = 0, pattern_repeat: int = 0):
+    def __init__(self, name: str, years: list[int], days: list[int], pattern_skip: int = 0, pattern_repeat: int = 0):
         self.name = name
         self.years = years
 
@@ -45,10 +46,10 @@ class Schedule:
 
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
-        Utility.validate_pattern_parameters(self.name, self.pattern_skip, self.pattern_repeat)
+        self.validate_pattern_parameters(self.name, self.pattern_skip, self.pattern_repeat)
 
     @staticmethod
-    def _validate_days(years: List[int], days: List[int]) -> bool:
+    def _validate_days(years: list[int], days: list[int]) -> bool:
         """
         Checks that all values passed for days are in the correct range.
 
@@ -78,7 +79,7 @@ class Schedule:
         return True
 
     @staticmethod
-    def _validate_years(years: List[int]) -> bool:
+    def _validate_years(years: list[int]) -> bool:
         """
         Checks that all years passed are valid and ordered.
 
@@ -128,7 +129,7 @@ class Schedule:
             Number of years to skip.
         pattern_repeat : int
             Number of times the pattern should repeat.
-        heat_scheduled : bool
+        heat_scheduled_harvest : bool
             Flag indicating if heat unit scheduling is utilized for harvesting decisions.
 
         Returns
@@ -137,7 +138,7 @@ class Schedule:
             List of instantiated event objects.
 
         """
-        all_years = Utility.repeat_pattern(years, pattern_skip, pattern_repeat)
+        all_years = self.repeat_pattern(years, pattern_skip, pattern_repeat)
         all_days = days * (pattern_repeat + 1)
         repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes_events]
         all_events = list(zip(all_years, all_days, *repeated_attributes))
@@ -148,7 +149,7 @@ class Schedule:
         return result
 
     @staticmethod
-    def validate_depths(depths: List[float]) -> bool:
+    def validate_depths(depths: list[float]) -> bool:
         """
         Checks that depths passed are all valid.
 
@@ -161,10 +162,6 @@ class Schedule:
         -------
         bool
             True if all tillage depths are valid, False otherwise.
-
-        Notes
-        -----
-        Tillage depths must be > 0.
 
         """
         return all(depth > 0.0 for depth in depths)
@@ -215,9 +212,9 @@ class Schedule:
         Parameters
         ----------
         non_negative_parameters: list[tuple[str, list]]
-            A list of parameters wrapped in a tuple containing their names and values that should be non-negative.
+            A list of tuples containing parameter names and associated non-negative values.
         fraction_parameters: list[tuple[str, list]]
-            A list of parameters wrapped in a tuple containing their names and values that should be fractions.
+            A list of tuples containing parameter names and associated values that should be fractions.
         years: list[int]
             List of event years.
         days: list[int]
@@ -253,6 +250,79 @@ class Schedule:
             if not Utility.validate_fractions(parameter):
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be in"
-                    f" range [0.0, 1.0], "
-                    f"received '{parameter}'."
+                                    f" range [0.0, 1.0], "
+                                    f"received '{parameter}'."
                 )
+
+    @staticmethod
+    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> list[int]:
+        """
+        Extends a pattern of numbers by repeating it a specified number of times. The pattern's differences between
+        consecutive numbers are calculated and used for repetition, with an optional gap (skip) added between each
+        repetition.
+
+        Parameters
+        ----------
+        pattern : List[Union[int, float]]
+            The pattern to be repeated.
+        skip : Union[int, float]
+            Number of steps to skip between repeats (0 if no steps should be skipped).
+        repeat : int
+            Number of times pattern should be repeated.
+
+        Returns
+        -------
+        List[int]
+            The full repeated pattern of numbers.
+
+        Examples
+        --------
+        >>> Schedule.repeat_pattern([1, 3, 5], 1, 2)
+        [1, 3, 5, 7, 9, 11, 13, 15, 17]
+        First pattern [1, 3, 5] -> repeat the pattern with the difference of 2.
+        Second repeated pattern [7, 9, 11] -> With a gap of 1 from last element of the last pattern (5).
+        Third repeated pattern [13, 15, 17] -> Second pattern repetition with the same logic.
+
+        >>> Schedule.repeat_pattern([1, 3, 5], 0, 1)
+        [1, 3, 5, 6, 8, 10]
+
+        >>> Schedule.repeat_pattern([2, 3, 7], 3, 2)
+        [2, 3, 7, 11, 12, 16, 20, 21, 24]
+
+        >>> Schedule.repeat_pattern([1, 2, 3], 0, 1)
+        [1, 2, 3, 4, 5, 6]
+
+        >>> Schedule.repeat_pattern([1, 2, 3], 1, 1)
+        [1, 2, 3, 5, 6, 7]
+
+        """
+        differences = [skip + 1]
+        in_pattern_differences = range(1, len(pattern[1:]) + 1)
+        for difference in in_pattern_differences:
+            differences.append(pattern[difference] - pattern[difference - 1])
+
+        full_pattern = copy(pattern)
+        differences_index = 0
+        number_of_new_values = range(repeat * len(pattern))
+        for _new_value in number_of_new_values:
+            full_pattern.append(full_pattern[-1] + differences[differences_index])
+            differences_index += 1
+            differences_index %= len(pattern)
+        return full_pattern
+
+    @staticmethod
+    def validate_pattern_parameters(name: str, pattern_skip: int, pattern_repeat: int) -> None:
+        """
+        Checks the pattern skip and repeat parameters, if they are not correct raises errors.
+
+        Raises
+        ------
+        ValueError
+            If the skip is < 0.
+            If the repeat is < 0.
+
+        """
+        if pattern_skip < 0:
+            raise ValueError(f"'{name}': expected pattern skip to be >= 0, received '{pattern_skip}'.")
+        if pattern_repeat < 0:
+            raise ValueError(f"'{name}': expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
