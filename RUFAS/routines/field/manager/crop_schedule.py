@@ -171,7 +171,7 @@ class CropSchedule(Schedule):
             )
         )
 
-    def generate_harvest_events(self) -> list:
+    def generate_harvest_events(self) -> list[HarvestEvent]:
         """
         Generates a list of all harvest events that will occur in the crop schedule.
 
