@@ -104,12 +104,12 @@ class Schedule:
         years: list[int],
         days: list[int],
         additional_attributes: Optional[list[Any]],
-        additional_attributes_events: list[list],
-        event_class,
+        additional_attributes_events: list[list[Any]],
+        event_class: Any,
         pattern_skip: int,
         pattern_repeat: int,
         heat_scheduled_harvest: bool,
-    ) -> list:
+    ) -> list[Any]:
         """
         Generic method to generate application events.
 
@@ -167,7 +167,7 @@ class Schedule:
         return all(depth > 0.0 for depth in depths)
 
     @staticmethod
-    def validate_equal_lengths(header: str, **kwargs) -> bool:
+    def validate_equal_lengths(header: str, **kwargs: Any) -> bool:
         """
         Validates that all provided iterables have the same length.
 
@@ -200,8 +200,8 @@ class Schedule:
     @classmethod
     def _validate_parameters(
         cls,
-        non_negative_parameters: list[Optional[tuple[str, list]]],
-        fraction_parameters: list[Optional[tuple[str, list]]],
+        non_negative_parameters: list[Optional[tuple[str, list[Any]]]],
+        fraction_parameters: list[Optional[tuple[str, list[Any]]]],
         years: list[int],
         days: list[int],
         name: str,
