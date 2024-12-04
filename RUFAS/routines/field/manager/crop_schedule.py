@@ -140,7 +140,7 @@ class CropSchedule(Schedule):
         )
 
         last_kills = self.harvest_operations[-1] in FINAL_HARVEST_OPERATIONS
-        others_dont_kill = all(op not in FINAL_HARVEST_OPERATIONS for op in self.harvest_operations[:-1])
+        others_dont_kill = all(self.harvest_operations[:-1]) not in FINAL_HARVEST_OPERATIONS
         only_last_kills = last_kills and others_dont_kill
         if not only_last_kills:
             raise ValueError(
