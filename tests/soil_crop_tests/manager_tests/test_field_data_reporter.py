@@ -13,7 +13,6 @@ from RUFAS.routines.field.manager.field_data_reporter import FieldDataReporter
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil import Soil
 from RUFAS.routines.field.soil.soil_data import SoilData
-from RUFAS.routines.manure.manure_manager import ManureManager
 
 
 @pytest.fixture
@@ -31,13 +30,11 @@ def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: Output
         planting_year=1993,
         root_depth=1,
         biomass=2,
-        usable_light=3,
         biomass_growth_max=4,
     )
     crop = Crop(crop_data)
 
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager)
+    field_1 = Field(field_data=field_data_1)
 
     og = FieldDataReporter([field_1])
     mock_add = mocker.patch.object(og.om, "add_variable", side_effect=output_manager.add_variable)
@@ -52,9 +49,6 @@ def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: Output
     assert pool["FieldDataReporter.send_crop_daily_variables.biomass.field='f1',crop='crop 1',planted=100,1993"][
         "values"
     ] == [2]
-    assert pool["FieldDataReporter.send_crop_daily_variables.usable_light.field='f1',crop='crop 1',planted=100,1993"][
-        "values"
-    ] == [3]
     assert pool[
         (
             "FieldDataReporter.send_crop_daily_variables.biomass_growth_max.field='f1',crop='crop 1',"
@@ -71,8 +65,7 @@ def test_send_soil_layer_daily_variables(mocker: MockerFixture, output_manager: 
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
     field_data_1 = FieldData(name="name 1")
 
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager)
+    field_1 = Field(field_data=field_data_1)
 
     og = FieldDataReporter([field_1])
     layer = LayerData(
@@ -126,8 +119,7 @@ def test_send_vadose_zone_layer_daily_variables(mocker: MockerFixture, output_ma
     )
     soil_data = SoilData(vadose_zone_layer=layer, field_size=6)
     soil = Soil(soil_data=soil_data)
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager, soil=soil)
+    field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
 
     og.send_vadose_zone_layer_daily_variables(field_1)
@@ -175,8 +167,7 @@ def test_send_soil_daily_variables(mocker: MockerFixture, output_manager: Output
     )
     soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
     soil = Soil(soil_data=soil_data)
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager, soil=soil)
+    field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
 
     og.send_soil_daily_variables(field_1)
@@ -214,8 +205,7 @@ def test_send_field_daily_variables(mocker: MockerFixture, output_manager: Outpu
     )
     soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
     soil = Soil(soil_data=soil_data)
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager, soil=soil)
+    field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
 
     og.send_field_daily_variables(field_1)
@@ -236,8 +226,7 @@ def test_send_soil_layer_annual_variables(mocker: MockerFixture, output_manager:
     """Tests that soil layer annual variables are sent correctly."""
     mock_add = mocker.patch.object(output_manager, "add_variable", side_effect=output_manager.add_variable)
     field_data_1 = FieldData(name="name 1")
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager)
+    field_1 = Field(field_data=field_data_1)
 
     og = FieldDataReporter([field_1])
     layer = LayerData(
@@ -299,8 +288,7 @@ def test_send_field_annual_variables(mocker: MockerFixture, output_manager: Outp
     )
     soil_data = SoilData(vadose_zone_layer=layer, field_size=6, water_evaporated=1, water_sublimated=2, cover_type="a")
     soil = Soil(soil_data=soil_data)
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager, soil=soil)
+    field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
     mock_add = mocker.patch.object(og.om, "add_variable", side_effect=output_manager.add_variable)
     og.send_field_annual_variables(field_1)
@@ -340,15 +328,14 @@ def test_send_soil_annual_variables(mocker: MockerFixture, output_manager: Outpu
         annual_eroded_sediment_total=4,
     )
     soil = Soil(soil_data=soil_data)
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager, soil=soil)
+    field_1 = Field(field_data=field_data_1, soil=soil)
     og = FieldDataReporter([field_1])
 
     og.send_soil_annual_variables(field_1)
 
     pool = output_manager.variables_pool
 
-    assert mock_add.call_count == 16
+    assert mock_add.call_count == 18
 
     assert pool["FieldDataReporter.send_soil_annual_variables.annual_water_content_change.field='name 1'"][
         "values"
@@ -372,9 +359,8 @@ def test_send_daily_variables(mocker: MockerFixture, output_manager: OutputManag
     crop_data_2 = CropData(name="crop 2", planting_day=215, planting_year=1993)
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager)
-    field_2 = Field(field_data=field_data_2, manure_manager=mock_manure_manager)
+    field_1 = Field(field_data=field_data_1)
+    field_2 = Field(field_data=field_data_2)
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)
@@ -431,9 +417,8 @@ def test_send_annual_variables(
     crop_1 = Crop(crop_data_1)
     crop_2 = Crop(crop_data_2)
 
-    mock_manure_manager = mocker.create_autospec(ManureManager)
-    field_1 = Field(field_data=field_data_1, manure_manager=mock_manure_manager)
-    field_2 = Field(field_data=field_data_2, manure_manager=mock_manure_manager)
+    field_1 = Field(field_data=field_data_1)
+    field_2 = Field(field_data=field_data_2)
     field_1.crops.append(crop_1)
     field_1.crops.append(crop_2)
     field_2.crops.append(crop_1)

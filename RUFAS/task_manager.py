@@ -8,8 +8,10 @@ from typing import Any, Callable, Dict, List, Tuple
 
 import numpy
 from SALib.sample import ff as fractional_factorial_sampler
-from SALib.sample import saltelli as saltelli_sampler
+from SALib.sample import sobol as sobol_sampler
+from SALib.sample import morris as morris_sampler
 
+from RUFAS.data_collection_app_updater import DataCollectionAppUpdater
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
@@ -36,6 +38,7 @@ class TaskType(Enum):
     END_TO_END_TESTING = "Run e2e testing"
     POST_PROCESSING = "Bypass simulation engine and directly run Output Manager"
     COMPARE_METADATA_PROPERTIES = "Compares 2 metadata properties files and saves the differences in a .txt file"
+    DATA_COLLECTION_APP_UPDATE = "Updates the schema and interface of the Data Collection App"
 
     @staticmethod
     def from_string(input_str: str) -> "TaskType":
@@ -275,12 +278,19 @@ class TaskManager:
         data_types = [data_type_str_to_class_map[input_variable["data_type"]] for input_variable in SA_input_variables]
 
         if multi_run_args["sampler"] == "fractional_factorial":
-            sampled_values = fractional_factorial_sampler.sample(parsed_SA_input_variables)
-        elif multi_run_args["sampler"] == "saltelli_sobol":
-            sampled_values = saltelli_sampler.sample(
+            sampled_values = fractional_factorial_sampler.sample(
+                parsed_SA_input_variables, seed=multi_run_args["random_seed"]
+            )
+        elif multi_run_args["sampler"] == "sobol":
+            sampled_values = sobol_sampler.sample(
                 parsed_SA_input_variables,
-                multi_run_args["saltelli_number"],
-                skip_values=multi_run_args["saltelli_skip"],
+                multi_run_args["sampler_n"],
+                skip_values=multi_run_args["skip_values"],
+                seed=multi_run_args["random_seed"],
+            )
+        elif multi_run_args["sampler"] == "morris":
+            sampled_values = morris_sampler.sample(
+                parsed_SA_input_variables, multi_run_args["sampler_n"], seed=multi_run_args["random_seed"]
             )
         else:
             self.output_manager.add_log(
@@ -368,6 +378,7 @@ class TaskManager:
             TaskType.SIMULATION_SINGLE_RUN: TaskManager._handle_simulation_engine_run_tasks,
             TaskType.POST_PROCESSING: TaskManager._handle_postprocessing_tasks,
             TaskType.END_TO_END_TESTING: TaskManager._handle_end_to_end_testing,
+            TaskType.DATA_COLLECTION_APP_UPDATE: TaskManager._handle_data_collection_app_update,
         }
         try:
             task_type = args.get("task_type")
@@ -743,3 +754,17 @@ class TaskManager:
             should_flush_im_pool=should_flush_im_pool,
             produce_graphics=produce_graphics,
         )
+
+    @staticmethod
+    def _handle_data_collection_app_update(
+        args: Dict[str, Any],
+        input_manager: InputManager,
+        output_manager: OutputManager,
+        task_id: Any,
+        produce_graphics: bool,
+        should_flush_im_pool: bool,
+    ) -> None:
+        """Handler for all methods related to updating the Data Collection App."""
+        dca_updater = DataCollectionAppUpdater()
+
+        dca_updater.update_data_collection_app()
