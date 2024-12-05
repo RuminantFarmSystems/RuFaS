@@ -5687,7 +5687,7 @@
         },
         "tolerance": {
           "type": "number",
-          "description": "The tolerance used to compare expected and actual results for changed values found in the e2e results comparison.",
+          "description": "The relative tolerance used to compare expected and actual results for changed values found in the e2e results comparison.",
           "default": 0.0001,
           "minimum": 0.0
         }
