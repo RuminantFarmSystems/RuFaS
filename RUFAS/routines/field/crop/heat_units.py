@@ -96,8 +96,6 @@ class HeatUnits:
         SWAT 5:1.1, 5:2.1.2
 
         """
-        self._check_absorb_heat_for_input_errors(mean_air_temperature, min_air_temperature, max_air_temperature)
-
         if self.use_heat_unit_temperature:
             self.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
                 max_air_temperature, self.maximum_temperature
@@ -166,41 +164,6 @@ class HeatUnits:
         Add newly acquired heat units to accumulated heat units.
         """
         self.data.accumulated_heat_units += self.new_heat_units
-
-    def _check_absorb_heat_for_input_errors(
-        self,
-        mean_air_temperature: Optional[float] = None,
-        min_air_temperature: Optional[float] = None,
-        max_air_temperature: Optional[float] = None,
-    ) -> None:
-        """
-        Raises errors if inputs given for absorb_heat_units don't make sense with the value of the
-        use_heat_unit_temperature attribute.
-
-        Parameters
-        ----------
-        mean_air_temperature : Optional[float], optional
-            Average air temperature for the day (°C).
-        min_air_temperature : Optional[float], optional
-            Minimum air temperature for the day (°C).
-        max_air_temperature : Optional[float], optional
-            Maximum air temperature for the day (°C).
-
-        Raises
-        ------
-        ValueError
-            If `use_heat_unit_temperature` is True and both `min_air_temperature` and `max_air_temperature` are not
-            provided.
-            If `use_heat_unit_temperature` is False and `mean_air_temperature` is not provided.
-
-        """
-        if self.use_heat_unit_temperature and (min_air_temperature is None or max_air_temperature is None):
-            raise ValueError(
-                "min_air_temperature and max_air_temperature must be provided"
-                + " when use_heat_unit_temperature is True"
-            )
-        if not self.use_heat_unit_temperature and mean_air_temperature is None:
-            raise ValueError("mean_air_temperature must be provided when use_heat_unit_temperature is False")
 
     @staticmethod
     def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
