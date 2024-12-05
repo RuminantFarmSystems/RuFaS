@@ -5,6 +5,7 @@ from typing import Any, Optional
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_genetics.animal_genetics import AnimalGenetics
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
@@ -19,6 +20,7 @@ from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
 from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager
+from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -102,6 +104,8 @@ class HerdManager:
         self.heiferIIs: list[Animal] = []
         self.heiferIIIs: list[Animal] = []
         self.cows: list[Animal] = []
+        self.replacement_market: list[Animal] = []
+
         self.heifers_sold: list[Animal] = []
         self.cows_culled: list[Animal] = []
 
@@ -156,7 +160,8 @@ class HerdManager:
                 self.heiferIs,
                 self.heiferIIs,
                 self.heiferIIIs,
-                self.cows
+                self.cows,
+                self.replacement_market
             ) = herd_factory.initialize_herd()
 
             self.initialize_nutrient_requirements(weather, time, feed)
@@ -180,9 +185,9 @@ class HerdManager:
             AnimalType.DRY_COW: self.cows,
         }
 
-    def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> None:
+    def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> list[HerdManagerOutput]:
         if not self.simulate_animals:
-            return None
+            return []
 
         current_conditions = weather.get_current_day_conditions(time)
         current_temperature = current_conditions.mean_air_temperature
@@ -194,6 +199,10 @@ class HerdManager:
         sold_heiferIIs: list[Animal] = []
         sold_newborn_calves: list[Animal] = []
         sold_and_died_cows: list[Animal] = []
+
+        self.herd_statistics.reset_daily_stats()
+        self.herd_statistics.reset_parity()
+        self.herd_statistics.reset_cull_reason_stats()
 
         # calf update
         for calf in self.calves:
@@ -254,10 +263,15 @@ class HerdManager:
         self._update_sold_heiferIIs(sold_heiferIIs)
         self._update_sold_newborn_calves(sold_newborn_calves)
 
+        removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
+        newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
+
         self._handle_graduated_animals(graduated_animals, feed, current_temperature)
         self._handle_newly_added_animals(newborn_calves, feed, current_temperature)
+        self._handle_newly_added_animals(newly_added_animals, feed, current_temperature)
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
+
 
         self.record_pen_history(time.simulation_day)
 
@@ -269,13 +283,20 @@ class HerdManager:
             if pen.needs_ration_formulation or self.end_ration_interval():
                 self.reformulate_ration_single_pen(pen, current_temperature, feed)
 
-        manure_excretions_output_data = AnimalManureExcretions()
+        herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
-            manure_excretions_output_data += pen.total_manure_excretion
-        AnimalModuleReporter.report_animal_module_manure(manure_excretions_output_data)
+            herd_manager_output.append(HerdManagerOutput(
+                pen_manure=pen.get_manure_data,
+                manure_excretion=pen.total_manure_excretion
+            ))
 
-        # self.life_cycle_manager.daily_milk_production = self.sum_daily_milk(self.cows)
-        AnimalModuleReporter.report_daily_reports(self, feed.available_feeds)
+        self.update_herd_statistics()
+
+        AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
+
+        AnimalModuleReporter.report_daily_reports(self, feed.available_feeds, time.simulation_day)
+
+        return herd_manager_output
 
     def initialize_pens(
             self,
@@ -481,6 +502,75 @@ class HerdManager:
 
         pen.ration = ration_per_pen
         pen.ration_per_animal = ration_per_animal
+
+    def _check_if_heifers_need_to_be_sold(
+        self,
+        simulation_day: int,
+    ) -> list[Animal]:
+        """Checks if any heifers need to be sold.
+
+        If the number of heifers exceeds what is needed for the herd,
+        sell those as replacement
+
+        Args:
+            heiferIIIs: The list of heiferIIIs.
+            cows: The list of cows.
+            animals_removed: The list of animals removed from the herd.
+
+        """
+        animals_removed: list[Animal] = []
+        sell_threshold = 1.03
+        while (len(self.heiferIIIs) + len(self.cows) > self.herd_statistics.herd_num * sell_threshold
+               and len(self.heiferIIIs) > 0):
+            removed_heiferIII = self.heiferIIIs.pop()
+            animals_removed.append(removed_heiferIII)
+            removed_heiferIII.sold_at_day = simulation_day
+            self.herd_statistics.sold_heiferIIIs_info.append(
+                {
+                    "id": removed_heiferIII.id,
+                    "animal_type": removed_heiferIII.animal_type,
+                    "sold_at_day": removed_heiferIII.sold_at_day,
+                    "body_weight": removed_heiferIII.body_weight,
+                    "cull_reason": "NA",
+                    "days_in_milk": "NA",
+                    "parity": "NA",
+                }
+            )
+            self.herd_statistics.sold_heiferIII_oversupply_num += 1
+            self.herd_statistics.heiferIII_num -= 1
+        return animals_removed
+
+    def _check_if_replacement_heifers_needed(
+        self,
+        simulation_day: int
+    ) -> list[Animal]:
+        """Checks if replacement heifers are needed.
+
+        If the number of heifers is less than what is needed for the herd,
+        add replacement heifers.
+
+        Args:
+            sim_day: The current simulation day.
+            heiferIIIs: The list of heiferIIIs.
+            cows: The list of cows.
+            animals_added: The list of animals added to the herd.
+
+        """
+        animals_added: list[Animal] = []
+        buy_threshold = 1.01
+        while (len(self.cows) + len(self.heiferIIIs) + self.herd_statistics.bought_heifer_num <
+               self.herd_statistics.herd_num * buy_threshold and simulation_day > 1):
+            if len(self.replacement_market) == 0:
+                break
+            replacement = self.replacement_market.pop(0)
+            replacement.events.add_event(replacement.days_born, simulation_day, animal_constants.ENTER_HERD)
+            replacement.set_p_purchased()
+            replacement.net_merit = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(
+                replacement.birth_date, replacement.breed
+            )
+            animals_added.append(replacement)
+            self.herd_statistics.bought_heifer_num += 1
+        return animals_added
 
     def _handle_graduated_animals(
         self,
@@ -1081,7 +1171,6 @@ class HerdManager:
         self._update_cow_parity_statistics()
         self._calculate_cow_percentages()
 
-        self._calculate_cull_reason_stats_percent()
         self._update_average_mature_body_weight()
         self._update_average_cow_body_weight()
         self._update_average_cow_parity()
@@ -1216,6 +1305,10 @@ class HerdManager:
             self.herd_statistics.percent_cow_for_parity[parity] = pc(self.herd_statistics.num_cow_for_parity[parity])
 
     def _update_cow_milking_statistics(self) -> None:
+        info_map = {
+            "class": HerdManager.__class__.__name__,
+            "function": HerdManager._update_cow_milking_statistics.__name__,
+        }
         lactating_cows: list[Animal] = [cow for cow in self.cows if cow.is_milking]
         dry_cows: list[Animal] = [cow for cow in self.cows if not cow.is_milking]
         vwp_cows: list[Animal] = [cow for cow in self.cows if cow.days_in_milk < AnimalConfig.voluntary_waiting_period]
@@ -1228,20 +1321,23 @@ class HerdManager:
 
 
         self.herd_statistics.daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in self.cows)
-        self.herd_statistics.dry_cows_daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in dry_cows)
         self.herd_statistics.herd_milk_fat_kg = sum(cow.milk_production.fat_content for cow in lactating_cows)
         self.herd_statistics.herd_milk_fat_percent = (
                                                              self.herd_statistics.herd_milk_fat_kg /
                                                              self.herd_statistics.daily_milk_production
                                                      ) * 100
-        self.herd_statistics.dry_cows_milk_fat_kg = sum(cow.milk_production.fat_content for cow in dry_cows)
         self.herd_statistics.herd_milk_protein_kg = sum(cow.milk_production.true_protein_content for cow in lactating_cows)
         self.herd_statistics.herd_milk_protein_percent = (
                                                                  self.herd_statistics.herd_milk_protein_kg /
                                                                  self.herd_statistics.daily_milk_production
                                                          ) * 100
-        self.herd_statistics.dry_cows_milk_protein_kg = sum(
-            cow.milk_production.true_protein_content for cow in dry_cows)
+
+        dry_cows_daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in dry_cows)
+        dry_cows_milk_fat_kg = sum(cow.milk_production.fat_content for cow in dry_cows)
+        dry_cows_milk_protein_kg = sum(cow.milk_production.true_protein_content for cow in dry_cows)
+        if dry_cows_daily_milk_production > 0 or dry_cows_milk_fat_kg > 0 or dry_cows_milk_protein_kg > 0:
+            om.add_error("Dry cow milking error", "Unexpected milking from dry cows", info_map)
+            raise ValueError("Unexpected milking from dry cows")
 
 
     def _update_cow_pregnancy_statistics(self) -> None:
@@ -1272,9 +1368,7 @@ class HerdManager:
                 "parity": cow.reproduction.calves,
             } for cow in sold_and_died_cows
         ]
-        for cull_reason in self.herd_statistics.cull_reason_stats_range.keys():
-            self.herd_statistics.cull_reason_stats_range[cull_reason] += len([cow for cow in sold_and_died_cows if
-                                                                        cow.cull_reason == cull_reason])
+        for cull_reason in self.herd_statistics.cull_reason_stats.keys():
             self.herd_statistics.cull_reason_stats[cull_reason] += len([cow for cow in sold_and_died_cows if
                                                                         cow.cull_reason == cull_reason])
 
@@ -1300,6 +1394,7 @@ class HerdManager:
                 culled_cows_with_current_parity = [cow for cow in sold_and_died_cows
                                                    if cow.reproduction.calves == current_parity]
             self.herd_statistics.parity_culling_stats_range[parity] += len(culled_cows_with_current_parity)
+        self._calculate_cull_reason_stats_percent()
 
     def _update_sold_heiferIIs(self, sold_heiferIIs: list[Animal]) -> None:
         sum_heifer_culling_age = (

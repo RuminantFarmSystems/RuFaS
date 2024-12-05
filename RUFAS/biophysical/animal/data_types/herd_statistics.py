@@ -65,13 +65,10 @@ class HerdStatistics:
     non_preg_cow_percent = 0.0
 
     daily_milk_production = 0.0
-    dry_cows_daily_milk_production = 0.0
     herd_milk_fat_kg = 0.0
     herd_milk_fat_percent = 0.0
-    dry_cows_milk_fat_kg = 0.0
     herd_milk_protein_kg = 0.0
     herd_milk_protein_percent = 0.0
-    dry_cows_milk_protein_kg = 0.0
     avg_days_in_milk = 0.0
     avg_days_in_preg = 0.0
     avg_cow_body_weight = 0.0
@@ -83,7 +80,6 @@ class HerdStatistics:
     avg_cow_culling_age = 0.0
     avg_mature_body_weight = 0.0
 
-    cull_reason_stats_range: dict[str, int]
     parity_culling_stats_range: dict[str, int]
 
     avg_age_for_calving: dict[str, float]
@@ -99,16 +95,6 @@ class HerdStatistics:
             "greater_than_3": 0.0,
         }
         self.cull_reason_stats = {
-            animal_constants.DEATH_CULL: 0,
-            animal_constants.LOW_PROD_CULL: 0,
-            animal_constants.LAMENESS_CULL: 0,
-            animal_constants.INJURY_CULL: 0,
-            animal_constants.MASTITIS_CULL: 0,
-            animal_constants.DISEASE_CULL: 0,
-            animal_constants.UDDER_CULL: 0,
-            animal_constants.UNKNOWN_CULL: 0,
-        }
-        self.cull_reason_stats_range = {
             animal_constants.DEATH_CULL: 0,
             animal_constants.LOW_PROD_CULL: 0,
             animal_constants.LAMENESS_CULL: 0,
@@ -145,7 +131,7 @@ class HerdStatistics:
         self.sold_cows_info = []
         self.sold_and_died_cows_info = []
 
-    def _reset_daily_stats(self) -> None:
+    def reset_daily_stats(self) -> None:
         """Resets daily-based attributes."""
         self.calf_num = 0
         self.heiferI_num = 0
@@ -206,7 +192,7 @@ class HerdStatistics:
         self.avg_cow_culling_age = 0.0
         self.avg_mature_body_weight = 0.0
 
-    def _reset_parity(self) -> None:
+    def reset_parity(self) -> None:
         """Resets parity-based attributes."""
         for parity in self.num_cow_for_parity:
             self.num_cow_for_parity[parity] = 0
@@ -215,7 +201,7 @@ class HerdStatistics:
             self.avg_age_for_parity[parity] = 0.0
             self.avg_age_for_calving[parity] = 0.0
 
-    def _reset_cull_reason_stats(self) -> None:
+    def reset_cull_reason_stats(self) -> None:
         """Resets cull reason-based attributes."""
         for cull_reason in self.cull_reason_stats:
             self.cull_reason_stats[cull_reason] = 0

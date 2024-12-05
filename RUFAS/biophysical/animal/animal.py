@@ -22,7 +22,7 @@ from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (NewBornCalfValuesTypedDict, CalfValuesTypedDict,
                                                                     HeiferIValuesTypedDict, HeiferIIValuesTypedDict,
-                                                                    CowValuesTypedDict)
+                                                                    CowValuesTypedDict, HeiferIIIValuesTypedDict)
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, HeiferTAISubProtocol, \
     HeiferSynchEDSubProtocol
@@ -146,7 +146,7 @@ class Animal:
         self.mature_body_weight = args.get("mature_body_weight")
         self.events.init_from_string(args.get("events"))
 
-    def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict) -> None:
+    def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict) -> None:
         self._initialize_calf_or_heiferI(args)
         heifer_reproduction_program = HeiferReproductionProtocol(args.get("repro_program"))
         heifer_reproduction_sub_program = None
