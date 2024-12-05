@@ -12,12 +12,36 @@ class HeatUnits:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes. If not provided, a default
         `CropData` instance is initialized with default values.
+    maximum_temperature : float, default 38
+        Maximum temperature for plant growth (Celsius).
+    use_heat_unit_temperature : bool, default False
+        If alternative heat unit method is used.
+    new_heat_units : Optional[float], default None
+        Heat units accumulated on the current day (Celsius).
+    minimum_heat_unit_temperature : Optional[float], default None
+        Minimum temperature for heat unit calculations (Celsius).
+    maximum_heat_unit_temperature : Optional[float], default None
+        Maximum temperature for heat unit calculations (Celsius).
+    heat_unit_temperature : Optional[float], default None
+        Heat unit temperature for alternative method (Celsius).
 
     Attributes
     ----------
     data : CropData
         A reference to the `crop_data` object, used for accessing and updating crop-related data like
         temperature thresholds, accumulated heat units, and growth stages.
+    maximum_temperature : float
+        Maximum temperature for plant growth (Celsius).
+    use_heat_unit_temperature : bool
+        If alternative heat unit method is used.
+    new_heat_units : Optional[float]
+        Heat units accumulated on the current day (Celsius*).
+    minimum_heat_unit_temperature : Optional[float]
+        Minimum temperature for heat unit calculations (Celsius).
+    maximum_heat_unit_temperature : Optional[float]
+        Maximum temperature for heat unit calculations (Celsius).
+    heat_unit_temperature : Optional[float]
+        Heat unit temperature for alternative method (Celsius).
 
     Notes
     -----
@@ -25,8 +49,23 @@ class HeatUnits:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        maximum_temperature: float = 38.0,
+        use_heat_unit_temperature: bool = False,
+        new_heat_units: Optional[float] = None,
+        minimum_heat_unit_temperature: Optional[float] = None,
+        maximum_heat_unit_temperature: Optional[float] = None,
+        heat_unit_temperature: Optional[float] = None,
+    ) -> None:
+        self.data = crop_data or CropData()
+        self.maximum_temperature = maximum_temperature
+        self.use_heat_unit_temperature = use_heat_unit_temperature
+        self.new_heat_units = new_heat_units
+        self.minimum_heat_unit_temperature = minimum_heat_unit_temperature
+        self.maximum_heat_unit_temperature = maximum_heat_unit_temperature
+        self.heat_unit_temperature = heat_unit_temperature
 
     def absorb_heat_units(
         self,
@@ -61,21 +100,19 @@ class HeatUnits:
             self.data.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
                 max_air_temperature, self.data.maximum_temperature
             )
-            self.data.minimum_heat_unit_temperature = HeatUnits._determine_minimum_heat_unit_temperature(
+            self.minimum_heat_unit_temperature = HeatUnits._determine_minimum_heat_unit_temperature(
                 min_air_temperature, self.data.minimum_temperature
             )
-            self.data.heat_unit_temperature = (
-                self.data.minimum_heat_unit_temperature + self.data.maximum_heat_unit_temperature
-            ) / 2
+            self.heat_unit_temperature = (self.minimum_heat_unit_temperature + self.maximum_heat_unit_temperature) / 2
 
-        if self.data.use_heat_unit_temperature or mean_air_temperature is None:
-            use_temp = self.data.heat_unit_temperature
+        if self.use_heat_unit_temperature or mean_air_temperature is None:
+            use_temp = self.heat_unit_temperature
         else:
             use_temp = mean_air_temperature
-        self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.data.maximum_temperature
+        self.data.is_growing = self.data.minimum_temperature <= use_temp <= self.maximum_temperature
         self.accumulate_heat_units(mean_air_temperature)
 
-    def accumulate_heat_units(self, air_temperature: float = None) -> None:
+    def accumulate_heat_units(self, air_temperature: Optional[float] = None) -> None:
         """
         Accumulates heat units during a day based on the air temperature.
 
@@ -105,7 +142,7 @@ class HeatUnits:
         self.assign_new_heat_units(air_temperature)
         self.add_heat_units()
 
-    def assign_new_heat_units(self, air_temperature: float = None) -> None:
+    def assign_new_heat_units(self, air_temperature: Optional[float] = None) -> None:
         """
         Assign new heat units based on whether the alternative accumulation method is to be used.
 
@@ -115,18 +152,18 @@ class HeatUnits:
             The average air temperature during the day (°C).
 
         """
-        if self.data.use_heat_unit_temperature or (air_temperature is None):  # alternative method
-            self.data.new_heat_units = self._determine_new_heat_units(
-                self.data.heat_unit_temperature, self.data.minimum_temperature
+        if self.use_heat_unit_temperature or (air_temperature is None):  # alternative method
+            self.new_heat_units = self._determine_new_heat_units(
+                self.heat_unit_temperature, self.data.minimum_temperature
             )
         else:  # main method
-            self.data.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
+            self.new_heat_units = self._determine_new_heat_units(air_temperature, self.data.minimum_temperature)
 
     def add_heat_units(self) -> None:
         """
         Add newly acquired heat units to accumulated heat units.
         """
-        self.data.accumulated_heat_units += self.data.new_heat_units
+        self.data.accumulated_heat_units += self.new_heat_units
 
     @staticmethod
     def _determine_new_heat_units(temperature: float, min_temperature: float) -> float:
