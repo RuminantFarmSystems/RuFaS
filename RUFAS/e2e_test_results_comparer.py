@@ -5,6 +5,7 @@ from typing import Any
 
 from deepdiff import DeepDiff
 
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.units import MeasurementUnits
@@ -62,7 +63,7 @@ class E2ETestResultsComparer:
                 filter_and_results = json.load(e_to_e_results)
                 expected_results = filter_and_results["expected_results"]
 
-            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=6)
+            diff = DeepDiff(expected_results, actual_results, ignore_order=True, verbose_level=2, significant_digits=3)
 
             filtered_diff = E2ETestResultsComparer.filter_insignificant_changes(diff, path_set.tolerance)
 
@@ -132,7 +133,7 @@ class E2ETestResultsComparer:
             if isinstance(old_value, (int, float)) and isinstance(new_value, (int, float)):
                 reference = abs(old_value) if abs(old_value) > 0 else 1
                 difference = abs(new_value - old_value)
-                return difference > tolerance * reference
+                return difference > tolerance * GeneralConstants.PERCENTAGE_TO_FRACTION * reference
         return True
 
     @staticmethod

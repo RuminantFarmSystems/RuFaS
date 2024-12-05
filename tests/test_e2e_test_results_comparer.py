@@ -107,7 +107,7 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
                     "key2": {"old_value": 50.0, "new_value": 51.0},
                 }
             },
-            1e-3,
+            1e-1,
             {"key2"},
         ),
         # Case 2: Nested dictionary
@@ -122,7 +122,7 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
                     }
                 }
             },
-            1e-7,
+            1e-5,
             {"nested_key"},
         ),
         # Case 3: Empty nested dictionary
@@ -137,7 +137,7 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
                     }
                 }
             },
-            1e-5,
+            1e-3,
             set(),
         ),
         # Case 4: Boundary tolerance
@@ -150,7 +150,7 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
                     "key4": {"old_value": 10.0, "new_value": 10.001},
                 }
             },
-            1e-5,
+            1e-3,
             {"key4"},
         ),
         # Case 5: Non-numeric and missing keys
@@ -163,7 +163,7 @@ def mock_diff_result() -> dict[str, dict[str, dict[str, float]]]:
                     "key4": {},
                 }
             },
-            1e-3,
+            1e-1,
             {"key1", "key2", "key3"},
         ),
     ],
