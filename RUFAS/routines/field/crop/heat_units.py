@@ -96,9 +96,9 @@ class HeatUnits:
         SWAT 5:1.1, 5:2.1.2
 
         """
-        if self.data.use_heat_unit_temperature:
-            self.data.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
-                max_air_temperature, self.data.maximum_temperature
+        if self.use_heat_unit_temperature:
+            self.maximum_heat_unit_temperature = HeatUnits._determine_maximum_heat_unit_temperature(
+                max_air_temperature, self.maximum_temperature
             )
             self.minimum_heat_unit_temperature = HeatUnits._determine_minimum_heat_unit_temperature(
                 min_air_temperature, self.data.minimum_temperature
