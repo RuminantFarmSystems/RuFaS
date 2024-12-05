@@ -20,6 +20,7 @@ A **changelog** is a structured record of changes made to the codebase over time
 ## Changelog Entries
 
 ### Current version
+- [1945](https://github.com/RuminantFarmSystems/MASM/pull/1945) - [minor change] [Animal] Implements Animal Genetics submodule.
 
 v0.9.2
 
@@ -52,6 +53,7 @@ v0.9.2
 - [2057](https://github.com/RuminantFarmSystems/MASM/pull/2057) - [minor change] [Crop & Soil][Manure] Disentangle the Crop & Soil and Manure modules.
 - [2059](https://github.com/RuminantFarmSystems/MASM/pull/2059) - [minor change] [Crop & Soil][GeneralConstants] Update references to constants in Crop and Soil module to use GeneralConstants.
 - [1866](https://github.com/RuminantFarmSystems/MASM/pull/1866) - [minor change] [Metadata] Adds minimums for some Animal module inputs in metadata.
+- [2063](https://github.com/RuminantFarmSystems/MASM/pull/1809) - [minor change] [Feed] Enable user input for bale size (diameter).
 - [2066](https://github.com/RuminantFarmSystems/MASM/pull/2066) - [minor change] [OutputManager] Handles data origins info and enables user control over reporting detail levels.
 - [2069](https://github.com/RuminantFarmSystems/MASM/pull/2069) - [minor change] [Crop & Soil] Flatten the units in SC module.
 - [2076](https://github.com/RuminantFarmSystems/MASM/pull/2076) - [minor change] [Crop & Soil] Removes TODOs from the Crop & Soil module.
@@ -61,6 +63,7 @@ v0.9.2
 - [1836](https://github.com/RuminantFarmSystems/MASM/pull/1836) - [minor change] [Feed] Updates default prices in default_feed.json using average prices sourced by Kristan (detailed in sheet in PR).
 - [2119](https://github.com/RuminantFarmSystems/MASM/pull/2119) - [minor change] [OutputManager] Make the log routing usable by other modules.
 - [2046](https://github.com/RuminantFarmSystems/MASM/pull/2046) - [major change] [Data Collection App] Integrates the Data Collection App into the RuFaS repository and adds a RuFaS task type to update it.
+
 
 ### v0.9.2
 

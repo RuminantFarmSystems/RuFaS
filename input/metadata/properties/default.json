@@ -5842,5 +5842,14 @@
         "type": "number"
       }
     }
+  },
+  "feed_storage_input_properties": {
+    "bale_diameter": {
+        "type": "number",
+        "description": "Diameter of the bale.",
+        "minimum": 0,
+        "maximum": 3,
+        "default": 2.5
+    }
   }
 }
