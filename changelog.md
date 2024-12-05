@@ -56,7 +56,8 @@ v0.9.2
 - [2069](https://github.com/RuminantFarmSystems/MASM/pull/2069) - [minor change] [Crop & Soil] Flatten the units in SC module.
 - [2076](https://github.com/RuminantFarmSystems/MASM/pull/2076) - [minor change] [Crop & Soil] Removes TODOs from the Crop & Soil module.
 - [1785](https://github.com/RuminantFarmSystems/MASM/pull/1785) - [minor change] [TaskManager] Adds sobol and morris samplers, updates argument names.
-- [2086](https://github.com/RuminantFarmSystems/MASM/pull/2086) - [minor change] [Animal] Updates default parity fraction. 
+- [2093](https://github.com/RuminantFarmSystems/MASM/pull/2093) - [minor change] [Testing] Increases tolerance level for comparing values changed in E2E testing results comparisons.
+- [2086](https://github.com/RuminantFarmSystems/MASM/pull/2086) - [minor change] [Animal] Updates default parity fraction.
 - [2118](https://github.com/RuminantFarmSystems/MASM/pull/2118) - [minor change] [Crop and Soil] Removed the usage of input validation methods in HeatUnits. 
 - [2090](https://github.com/RuminantFarmSystems/MASM/pull/2090) - [minor change] [Crop & Soil] Restructures CropData class.
 - [1836](https://github.com/RuminantFarmSystems/MASM/pull/1836) - [minor change] [Feed] Updates default prices in default_feed.json using average prices sourced by Kristan (detailed in sheet in PR).
