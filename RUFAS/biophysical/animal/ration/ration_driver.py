@@ -11,7 +11,8 @@ from RUFAS.biophysical.animal.ration import animal_requirements
 from RUFAS.biophysical.animal.ration.ration_config import RationConfig
 from RUFAS.biophysical.animal.ration.ration_optimizer import RationOptimizer
 from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager as UserDefinedRationManager
-from RUFAS.biophysical.feed.feed import Feed
+# from RUFAS.biophysical.feed.feed import Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import TotalInventory, AdvancePurchaseAllowance, RequestedFeed, NutrientStandard
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
@@ -31,6 +32,9 @@ class RationManager:
     Finally, RationReporter is a suite of methods used to send information to output manager
     (and other submodules of RuFaS)
     """
+
+    _nutrient_standard: NutrientStandard
+    _user_defined_ration_manager = UserDefinedRationManager()
 
     @classmethod
     def formulate_ration(
@@ -73,80 +77,83 @@ class RationManager:
         req = animal_requirements.AnimalRequirements()
         # Use grouping scenario to find the type of each animal in pen
         req.set_requirements(pen, animal_grouping_scenario, False)
+        # TODO: update this section
         if udrm.use_user_defined_ration:
             ration_per_animal, ration_vals = cls.get_user_defined_ration(
                 req, pen, available_feeds, animal_grouping_scenario, sim_day
             )
             return ration_per_animal, ration_vals
 
-        previous_ration = None
-        if hasattr(pen, "ration_per_animal"):
-            previous_ration = pen.ration_per_animal
-        solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
-            req, available_feeds, pen.animal_combination, previous_ration
-        )
-        num_attempts: int = 1
-        if solution and not solution.success:
-            cls.handle_failed_constraints(
-                num_attempts=num_attempts,
-                solution=solution,
-                ration_optimizer=ration_optimizer,
-                ration_config=ration_config,
-                pen=pen,
-                available_feeds=available_feeds,
-                sim_day=sim_day,
-                info_map=info_map,
-            )
+        # TODO: leave this section for the new optimizer implementation
+        raise NotImplementedError("RuFaS ration optimization not implemented. User must define the ration instead.")
+        # previous_ration = None
+        # if hasattr(pen, "ration_per_animal"):
+        #     previous_ration = pen.ration_per_animal
+        # solution, ration_vals, ration_config = ration_optimizer.attempt_optimization(
+        #     req, available_feeds, pen.animal_combination, previous_ration
+        # )
+        # num_attempts: int = 1
+        # if solution and not solution.success:
+        #     cls.handle_failed_constraints(
+        #         num_attempts=num_attempts,
+        #         solution=solution,
+        #         ration_optimizer=ration_optimizer,
+        #         ration_config=ration_config,
+        #         pen=pen,
+        #         available_feeds=available_feeds,
+        #         sim_day=sim_day,
+        #         info_map=info_map,
+        #     )
 
-        if pen.animal_combination == AnimalCombination.LAC_COW:
-            while not solution.success:
-                if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
-                    om.add_error(
-                        "Milk production too low",
-                        (
-                            f"Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
-                            f"Possible solution is to provide additional feed ingredients to "
-                            f"{pen.animal_combination.name}."
-                        ),
-                        info_map,
-                    )
-                    raise ValueError
-                reduction = AnimalModuleConstants.MILK_REDUCTION_KG
-                cls.reduce_milk_production(pen, reduction)
-                req.set_requirements(pen, animal_grouping_scenario, recalc=True)
-                (
-                    solution,
-                    ration_vals,
-                    ration_config,
-                ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
-                num_attempts += 1
-                if solution and not solution.success:
-                    cls.handle_failed_constraints(
-                        num_attempts=num_attempts,
-                        solution=solution,
-                        ration_optimizer=ration_optimizer,
-                        ration_config=ration_config,
-                        pen=pen,
-                        available_feeds=available_feeds,
-                        sim_day=sim_day,
-                        info_map=info_map,
-                    )
+        # if pen.animal_combination == AnimalCombination.LAC_COW:
+        #     while not solution.success:
+        #         if pen.avg_milk < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+        #             om.add_error(
+        #                 "Milk production too low",
+        #                 (
+        #                     f"Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
+        #                     f"Possible solution is to provide additional feed ingredients to "
+        #                     f"{pen.animal_combination.name}."
+        #                 ),
+        #                 info_map,
+        #             )
+        #             raise ValueError
+        #         reduction = AnimalModuleConstants.MILK_REDUCTION_KG
+        #         cls.reduce_milk_production(pen, reduction)
+        #         req.set_requirements(pen, animal_grouping_scenario, recalc=True)
+        #         (
+        #             solution,
+        #             ration_vals,
+        #             ration_config,
+        #         ) = ration_optimizer.attempt_optimization(req, available_feeds, pen.animal_combination, previous_ration)
+        #         num_attempts += 1
+        #         if solution and not solution.success:
+        #             cls.handle_failed_constraints(
+        #                 num_attempts=num_attempts,
+        #                 solution=solution,
+        #                 ration_optimizer=ration_optimizer,
+        #                 ration_config=ration_config,
+        #                 pen=pen,
+        #                 available_feeds=available_feeds,
+        #                 sim_day=sim_day,
+        #                 info_map=info_map,
+        #             )
 
-        if solution is not None and solution.success:
-            ration_per_animal = cls.make_ration_from_solution(available_feeds, solution)
-            return ration_per_animal, ration_vals
-        # safeguard if scipy SLSQP bounds error still occurs after many iterations
-        # using previous cycles ration for this pen
-        elif previous_ration != {}:
-            return previous_ration, ration_vals
-        else:
-            om.add_error(
-                "No previous ration available",
-                f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
-                f"Possible solution is to provide additional feed ingredients to {pen.animal_combination.name}.",
-                info_map,
-            )
-            raise ValueError
+        # if solution is not None and solution.success:
+        #     ration_per_animal = cls.make_ration_from_solution(available_feeds, solution)
+        #     return ration_per_animal, ration_vals
+        # # safeguard if scipy SLSQP bounds error still occurs after many iterations
+        # # using previous cycles ration for this pen
+        # elif previous_ration != {}:
+        #     return previous_ration, ration_vals
+        # else:
+        #     om.add_error(
+        #         "No previous ration available",
+        #         f" Check failed_constraint_summary_for_pen_{pen.id} to see what caused formulation to fail. "
+        #         f"Possible solution is to provide additional feed ingredients to {pen.animal_combination.name}.",
+        #         info_map,
+        #     )
+        #     raise ValueError
 
     @classmethod
     def handle_failed_constraints(
@@ -1233,7 +1240,7 @@ class AvailableFeeds:
         # key = feed_id, val = index of that feed_id in self.feed_id list
         self._feed_id_to_list_idx_dict: Dict[int, int] = {}
 
-    def feed_nutrients(self, feed: Feed) -> None:
+    def feed_nutrients(self, available_feeds: ) -> None:
         """
         Class function that manipulates the available feeds nutrient information
         into list (valid for input in the non-linear program) and populates the
@@ -1243,9 +1250,10 @@ class AvailableFeeds:
             feed: an instance of the Feed class object
         """
         # available feeds dictionary from the feed module
-        available_feeds = feed.available_feeds
-        # dictionary of feed costs
-        feed_costs = feed.feed_costs
+        # available_feeds = feed.available_feeds
+        # # dictionary of feed costs
+        # feed_costs = feed.feed_costs
+
 
         for key, feed in available_feeds.items():
             self.feed_key.append(key)
