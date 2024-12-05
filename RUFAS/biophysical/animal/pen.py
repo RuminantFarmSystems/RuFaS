@@ -171,7 +171,7 @@ class Pen:
 
         Parameters
         ----------
-        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow] 
             The animal to be added to the pen.
         animal_grouping_scenario
         feed
@@ -201,7 +201,7 @@ class Pen:
         """
 
         self.add_new_animals(new_animals)
-        self.calc_daily_walking_dist()
+        self.calculate_daily_walking_distance()
         self.update_animal_combination(animal_combination)
         # self.update_classes_in_pen()
 
@@ -217,6 +217,7 @@ class Pen:
         """
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
+            self._set_animal_nutrient_values(animal)
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
@@ -229,7 +230,7 @@ class Pen:
         """
         self.animal_combination = animal_combination
 
-    def calculate_daily_walking_dist(self) -> None:
+    def calculate_daily_walking_distance(self) -> None:
         """
         Sets the daily walking distance for the cows in the pen (if any).
         """
@@ -237,7 +238,8 @@ class Pen:
         if AnimalType.LAC_COW in animal_types_in_pen or AnimalType.DRY_COW in animal_types_in_pen:
             for animal in list(self.animals_in_pen.values()):
                 if animal.animal_type.is_cow:
-                    animal.calculate_daily_walking_dist(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+                    animal.calculate_daily_walking_distance(
+                        self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     @property
     def average_growth(self) -> float:

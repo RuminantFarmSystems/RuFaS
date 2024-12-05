@@ -109,7 +109,7 @@ class HerdManager:
         self.all_pens: list[Pen] = []
 
         # dictionary: key is animal ID, value is the pen ID that animal is in
-        self.animal_to_pen_id_map: dict[str, Animal] = {}
+        self.animal_to_pen_id_map: dict[int, int] = {}
 
         # alternative option: AnimalGroupingScenario.CALF__GROWING_AND_CLOSE_UP__LACCOW
         self.set_animal_grouping_scenario(AnimalGroupingScenario.CALF__GROWING__CLOSE_UP__LACCOW)
@@ -576,7 +576,7 @@ class HerdManager:
             self.ANIMAL_GROUPING_SCENARIO,
             feed,
             current_temperature,
-            self.phosphorus_concentration_by_animal_class[type(animal)],
+            self.phosphorus_concentration_by_animal_class[animal.animal_type],
         )
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
@@ -1072,11 +1072,21 @@ class HerdManager:
             len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs), len(self.cows)
         )
         self._calculate_herd_percentages()
-        self._calculate_cow_percentages()
-        self._calculate_cull_reason_stats_percent()
-        self._calculate_percent_cow_per_parity()
 
-    def _calculate_herd_percentages(self, total_animal_num: int) -> None:
+        self._update_heifer_reproduction_statistics()
+
+        self._update_cow_reproduction_statistics()
+        self._update_cow_milking_statistics()
+        self._update_cow_pregnancy_statistics()
+        self._update_cow_parity_statistics()
+        self._calculate_cow_percentages()
+
+        self._calculate_cull_reason_stats_percent()
+        self._update_average_mature_body_weight()
+        self._update_average_cow_body_weight()
+        self._update_average_cow_parity()
+
+    def _calculate_herd_percentages(self) -> None:
         """Calculates percentage of each animal class in the herd.
 
         When the total number of animals is 0, it is assumed that the count of
@@ -1243,10 +1253,13 @@ class HerdManager:
             [cow.days_in_pregnancy for cow in pregnant_cows]) / len(pregnant_cows)) if len(pregnant_cows) > 0 else 0
 
     def _update_sold_and_died_cows(self, sold_and_died_cows: list[Animal]) -> None:
-        self.herd_statistics.cow_herd_exit_num += len(sold_and_died_cows)
-        self.herd_statistics.avg_cow_culling_age = (sum(
+        sum_cow_culling_age = self.herd_statistics.avg_cow_culling_age * self.herd_statistics.cow_herd_exit_num + sum(
             [cow.days_born for cow in sold_and_died_cows]
-        ) / len(sold_and_died_cows)) if len(sold_and_died_cows) > 0 else 0
+        )
+        self.herd_statistics.cow_herd_exit_num += len(sold_and_died_cows)
+        self.herd_statistics.avg_cow_culling_age = (
+                sum_cow_culling_age / self.herd_statistics.cow_herd_exit_num
+        ) if self.herd_statistics.cow_herd_exit_num > 0 else 0
 
         self.herd_statistics.sold_and_died_cows_info += [
             {
@@ -1289,6 +1302,11 @@ class HerdManager:
             self.herd_statistics.parity_culling_stats_range[parity] += len(culled_cows_with_current_parity)
 
     def _update_sold_heiferIIs(self, sold_heiferIIs: list[Animal]) -> None:
+        sum_heifer_culling_age = (
+            self.herd_statistics.avg_heifer_culling_age * self.herd_statistics.cow_herd_exit_num
+        ) + sum([heiferII.days_born for heiferII in sold_heiferIIs])
+
+        self.herd_statistics.sold_heiferII_num += len(sold_heiferIIs)
         self.herd_statistics.sold_heiferIIs_info += [
                 {
                     "id": heiferII.id,
@@ -1300,10 +1318,9 @@ class HerdManager:
                     "parity": "NA",
                 }
             for heiferII in sold_heiferIIs]
-        self.herd_statistics.sold_heiferII_num += len(sold_heiferIIs)
-        self.herd_statistics.avg_heifer_culling_age = (sum(
-            [heiferII.days_born for heiferII in sold_heiferIIs]
-        ) / len(sold_heiferIIs)) if len(sold_heiferIIs) > 0 else 0
+        self.herd_statistics.avg_heifer_culling_age = (
+                sum_heifer_culling_age / self.herd_statistics.sold_heiferII_num
+        ) if self.herd_statistics.sold_heiferII_num > 0 else 0
 
     def _update_sold_newborn_calves(self, sold_newborn_calves: list[Animal]) -> None:
         self.herd_statistics.sold_calf_num += len(sold_newborn_calves)

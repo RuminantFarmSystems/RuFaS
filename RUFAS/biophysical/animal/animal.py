@@ -97,9 +97,7 @@ class Animal:
 
         self.cull_reason = ""
 
-        self.animal_statistics = AnimalStatistics()
         self.growth: Growth = Growth()
-        self.animal_statistics: AnimalStatistics = AnimalStatistics()
         self.digestive_system: DigestiveSystem = DigestiveSystem()
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
