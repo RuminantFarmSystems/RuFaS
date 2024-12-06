@@ -63,6 +63,8 @@ v0.9.2
 - [2119](https://github.com/RuminantFarmSystems/MASM/pull/2119) - [minor change] [OutputManager] Make the log routing usable by other modules.
 - [2046](https://github.com/RuminantFarmSystems/MASM/pull/2046) - [major change] [Data Collection App] Integrates the Data Collection App into the RuFaS repository and adds a RuFaS task type to update it.
 - [2075](https://github.com/RuminantFarmSystems/MASM/pull/2075) - [minor change] [Readme] Adds project goals for RuFaS year 2024 - 2025
+- [2067](https://github.com/RuminantFarmSystems/MASM/pull/2067) - [minor change] [EEE] Adds updated feeds emissions sheets, which replaces 0s with the average of neighboring FIPS codes.
+
 ### v0.9.2
 
 - [1968](https://github.com/RuminantFarmSystems/MASM/pull/1968) - [minor change] [Changelog] Move the changelog from a Google sheet into a markdown document in the repository.
