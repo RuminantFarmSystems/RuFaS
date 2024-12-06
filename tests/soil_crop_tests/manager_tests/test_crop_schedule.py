@@ -4,7 +4,7 @@ import pytest
 
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.routines.field.manager.crop_schedule import CropSchedule
-from RUFAS.routines.field.manager.events import HarvestEvent, PlantingEvent
+from RUFAS.data_structures.events import HarvestEvent, PlantingEvent
 
 
 @pytest.mark.parametrize(

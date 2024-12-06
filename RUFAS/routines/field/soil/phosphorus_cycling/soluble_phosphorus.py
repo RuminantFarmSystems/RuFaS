@@ -227,8 +227,6 @@ class SolublePhosphorus:
         -----
         The maximum bound on the Phosphorus concentration of 20 milligrams per liter comes from page 8 of the APLE
         Theoretical documentation, in the paragraph below equations [16].
-        TODO: this equation is in the code, both old RuFaS and SurPhos, but is not in the documentation. Also not clear
-            what the units are, amend this notes section after talking with Pete - issue #448
 
         """
         try:
