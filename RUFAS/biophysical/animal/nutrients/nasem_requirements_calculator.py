@@ -1,6 +1,7 @@
 from numpy import exp
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.general_constants import GeneralConstants
 
@@ -10,7 +11,95 @@ from .energy_requirements_calculator import EnergyRequirementsCalculator
 class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
 
     @classmethod
-    def calculate_energy_requirements(
+    def calculate_requirements(
+        cls,
+        body_weight: float,
+        mature_body_weight: float,
+        day_of_pregnancy: int | None,
+        days_in_milk: int | None,
+        average_daily_gain_heifer: float | None,
+        animal_type: AnimalType,
+        parity: int,
+        calving_interval: int | None,
+        lactating: bool,
+        milk_fat: float,
+        milk_true_protein: float,
+        milk_lactose: float,
+        milk_production: float,
+        body_condition_score_5: int,
+        ndf_percentage: float,
+        housing: float,
+        distance: float,
+    ) -> EnergyNutritionRequirements:
+        maintenance_requirement, gravid_uterine_weight, uterine_weight = cls.calculate_maintentance_energy_requirements(
+            body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
+        )
+        growth_requirement, average_daily_gain, frame_weight_gain = cls.calculate_growth_energy_requirements(
+            body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
+        )
+        pregnancy_requirement, gravid_uterine_weight_gain = cls.calculate_pregnancy_energy_requirements(
+            lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight
+        )
+        lactation_requirement = cls.calculate_lactation_energy_requirements(
+            animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
+        )
+        dry_matter_intake = cls.calculate_dry_matter_intake(
+            body_weight,
+            mature_body_weight,
+            days_in_milk,
+            lactating,
+            lactation_requirement,
+            parity,
+            body_condition_score_5,
+            ndf_percentage,
+        )
+        protein_requirement = cls.calculate_protein_requirement(
+            lactating,
+            body_weight,
+            frame_weight_gain,
+            gravid_uterine_weight_gain,
+            dry_matter_intake,
+            milk_true_protein,
+            milk_production,
+            ndf_percentage,
+        )
+        calcium_requirement = cls.calculate_calcium_requirement(
+            body_weight,
+            mature_body_weight,
+            day_of_pregnancy,
+            average_daily_gain,
+            dry_matter_intake,
+            milk_true_protein,
+            milk_production,
+            parity,
+        )
+        phosphorus_requirement = cls.calculate_phosphorus_requirement(
+            body_weight,
+            mature_body_weight,
+            animal_type,
+            day_of_pregnancy,
+            average_daily_gain,
+            dry_matter_intake,
+            milk_true_protein,
+            milk_production,
+            parity,
+        )
+        activity_requirement = cls.calculate_activity_energy_requirements(body_weight, housing, distance)
+
+        return EnergyNutritionRequirements(
+            maintenance=maintenance_requirement,
+            growth=growth_requirement,
+            pregnancy=pregnancy_requirement,
+            lactation=lactation_requirement,
+            protein=protein_requirement,
+            calcium=calcium_requirement,
+            phosphorus=phosphorus_requirement,
+            dry_matter=dry_matter_intake,
+            activity=activity_requirement,
+        )
+
+    @classmethod
+    def calculate_maintentance_energy_requirements(
         cls, body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, days_in_milk: int | None
     ) -> tuple[float, float, float]:
         """
@@ -389,11 +478,9 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
         if day_of_pregnancy is None:
             Ca_Preg: float = 0.0
         else:
-            Ca_Preg = 0.02456 * exp(
-                (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
-            ) - 0.02456 * exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)) * (
-                body_weight / 715
-            )
+            Ca_Preg = 0.02456 * exp((0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy) - 0.02456 * exp(
+                (0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
+            ) * (body_weight / 715)
         Ca_Lact: float = (0.295 + 0.239 * milk_true_protein) * milk_production
         calcium_requirement: float = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)

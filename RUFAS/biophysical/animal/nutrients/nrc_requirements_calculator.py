@@ -1,6 +1,7 @@
 from numpy import exp
 
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
+from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.general_constants import GeneralConstants
 
@@ -10,7 +11,11 @@ from .energy_requirements_calculator import EnergyRequirementsCalculator
 class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
     @classmethod
-    def calculate_energy_requirements(
+    def calculate_requirements(cls) -> EnergyNutritionRequirements:
+        pass
+
+    @classmethod
+    def calculate_maintentance_energy_requirements(
         cls,
         body_weight: float,
         mature_body_weight: float,

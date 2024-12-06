@@ -1,13 +1,20 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
+
 
 @ABC
 class EnergyRequirementsCalculator:
 
     @classmethod
     @abstractmethod
-    def calculate_energy_requirements(cls, **kwargs: dict[str, Any]) -> tuple[float, float, float]:
+    def calculate_requirements(cls) -> EnergyNutritionRequirements:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def calculate_maintentance_energy_requirements(cls, **kwargs: dict[str, Any]) -> tuple[float, float, float]:
         pass
 
     @classmethod
