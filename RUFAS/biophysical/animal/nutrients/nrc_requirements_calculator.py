@@ -11,8 +11,92 @@ from .energy_requirements_calculator import EnergyRequirementsCalculator
 class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
     @classmethod
-    def calculate_requirements(cls) -> EnergyNutritionRequirements:
-        pass
+    def calculate_requirements(
+        cls,
+        body_weight: float,
+        mature_body_weight: float,
+        day_of_pregnancy: int | None,
+        body_condition_score_5: int,
+        previous_temperature: float | None,
+        animal_type: AnimalType,
+        parity: int,
+        calving_interval: int | None,
+        average_daily_gain_heifer: float | None,
+        milk_fat: float,
+        milk_true_protein: float,
+        milk_lactose: float,
+        milk_production: float,
+        days_in_milk: int | None,
+        net_energy_diet_concentration: float,
+        days_born: float,
+        TDN_percentage: float,
+        housing: float,
+        distance: float,
+    ) -> EnergyNutritionRequirements:
+        maintenance_requirement, conceptus_weight, calf_birth_weight = cls.calculate_maintentance_energy_requirements(
+            body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type
+        )
+        growth_requirement, average_daily_gain, shrunk_body_weight = cls.calculate_growth_energy_requirements(
+            body_weight,
+            mature_body_weight,
+            conceptus_weight,
+            animal_type,
+            parity,
+            calving_interval,
+            average_daily_gain_heifer,
+        )
+        pregnancy_requirement = cls.calculate_pregnancy_energy_requirements(day_of_pregnancy, calf_birth_weight)
+        lactation_requirement = cls.calculate_lactation_energy_requirements(
+            animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
+        )
+        dry_matter_intake = cls.calculate_dry_matter_intake(
+            animal_type,
+            body_weight,
+            day_of_pregnancy,
+            days_in_milk,
+            milk_production,
+            milk_fat,
+            net_energy_diet_concentration,
+            days_born,
+        )
+        protein_requirement = cls.calculate_protein_requirement(
+            body_weight,
+            conceptus_weight,
+            day_of_pregnancy,
+            animal_type,
+            milk_production,
+            milk_true_protein,
+            calf_birth_weight,
+            growth_requirement,
+            average_daily_gain,
+            shrunk_body_weight,
+            dry_matter_intake,
+            TDN_percentage,
+        )
+        calcium_requirement = cls.calculate_calcium_requirement(
+            body_weight, mature_body_weight, day_of_pregnancy, animal_type, average_daily_gain, milk_production
+        )
+        phosphorus_requirement = cls.calculate_phosphorus_requirement(
+            body_weight,
+            mature_body_weight,
+            day_of_pregnancy,
+            milk_production,
+            animal_type,
+            average_daily_gain,
+            dry_matter_intake,
+        )
+        activity_requirement = cls.calculate_activity_energy_requirements(body_weight, housing, distance)
+
+        return EnergyNutritionRequirements(
+            maintenance=maintenance_requirement,
+            growth=growth_requirement,
+            pregnancy=pregnancy_requirement,
+            lactation=lactation_requirement,
+            protein=protein_requirement,
+            calcium=calcium_requirement,
+            phosphorus=phosphorus_requirement,
+            activity=activity_requirement,
+        )
 
     @classmethod
     def calculate_maintentance_energy_requirements(
@@ -455,9 +539,9 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         if day_of_pregnancy is None:
             Ca_preg = 0.0
         elif day_of_pregnancy > 190:
-            Ca_preg = 0.02456 * exp(
-                (0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy
-            ) - 0.02456 * exp((0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+            Ca_preg = 0.02456 * exp((0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy) - 0.02456 * exp(
+                (0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
+            )
         else:
             Ca_preg = 0.0
         if animal_type in [AnimalType.LAC_COW]:
@@ -511,7 +595,7 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
         Returns
         -------
-        float 
+        float
             Phosphorus requirement (grams per day)
 
         References
@@ -526,9 +610,9 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         if day_of_pregnancy is None:
             P_preg: float = 0.0
         elif day_of_pregnancy > 190:
-            P_preg = 0.02743 * exp(
-                (0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy
-            ) - 0.02743 * exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
+            P_preg = 0.02743 * exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy) - 0.02743 * exp(
+                (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
+            )
         else:
             P_preg = 0.0
         if animal_type in [AnimalType.LAC_COW]:
