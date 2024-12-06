@@ -15,6 +15,10 @@ km_radius_start = 50
 # This value should map to one of the options in the feed_source file
 feed_source_choice = "Foods3"
 
+# set this to true if you want to use regional averages for wheat middlings, for known cases where data are missing for some states.
+# NOTE that the resulting files will have a different suffix.
+use_wheat_regional_average = True
+
 ##########################################
 # Load files necessary for interpolation #
 ##########################################
@@ -220,22 +224,32 @@ for idx_county_code, county_code in enumerate(county_codes):
 # Final step to fill in missing state vals for some wheat items #
 #################################################################
 
-for idx_county_code, county_code in enumerate(county_codes):
-    for feed_id in ['193', '197']:
-        if emissions_copy[feed_id][idx_county_code] == 0.0:
-            region_found = str(fips_to_region[fips_to_region["FIPS"] == county_code]["Region"].values[0])
-            if region_found in ["New.England", "Great.Lakes"]:
-                region_found = "Northeast"
-            if region_found in ["Upper.Midwest"]:
-                region_found = "Northern.Plains"
-            regional_average = float(regional_sheet[regional_sheet["region"] == region_found]["wheat"].values[0])
-            emissions_copy.loc[idx_county_code, feed_id] = regional_average
+if use_wheat_regional_average:
+    for idx_county_code, county_code in enumerate(county_codes):
+        for feed_id in ['193', '197']:
+            if emissions_copy[feed_id][idx_county_code] == 0.0:
+                region_found = str(fips_to_region[fips_to_region["FIPS"] == county_code]["Region"].values[0])
+                if region_found in ["New.England", "Great.Lakes"]:
+                    region_found = "Northeast"
+                if region_found in ["Upper.Midwest"]:
+                    region_found = "Northern.Plains"
+                regional_average = float(regional_sheet[regional_sheet["region"] == region_found]["wheat"].values[0])
+                emissions_copy.loc[idx_county_code, feed_id] = regional_average
 
-emissions_copy.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regional_average.csv", index=False)
+    emissions_copy.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regional_average.csv", index=False)
 
-emissions_neighbors_detailed_pd = pd.DataFrame(emissions_neighbors_detailed)
-# emissions_neighbors_detailed_pd.to_csv("emissions_nozeroes_detailed.csv", index=False)
+    emissions_neighbors_detailed_pd = pd.DataFrame(emissions_neighbors_detailed)
+    # emissions_neighbors_detailed_pd.to_csv("emissions_nozeroes_detailed.csv", index=False)
 
-emissions_neighbors_detailed_pd.columns = [
-    'county_code', 'gps_county', 'feed_id', 'neighbor_values', 'neighbor_distances']
-emissions_neighbors_detailed_pd.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regionalavg_detailed.csv", index=False)
+    emissions_neighbors_detailed_pd.columns = [
+        'county_code', 'gps_county', 'feed_id', 'neighbor_values', 'neighbor_distances']
+    emissions_neighbors_detailed_pd.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_regionalavg_detailed.csv", index=False)
+else:
+    emissions_copy.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated.csv", index=False)
+
+    emissions_neighbors_detailed_pd = pd.DataFrame(emissions_neighbors_detailed)
+    # emissions_neighbors_detailed_pd.to_csv("emissions_nozeroes_detailed.csv", index=False)
+
+    emissions_neighbors_detailed_pd.columns = [
+        'county_code', 'gps_county', 'feed_id', 'neighbor_values', 'neighbor_distances']
+    emissions_neighbors_detailed_pd.to_csv(f"helpful_scripts/emissions_interpolation/{EEEname}_interpolated_detailed.csv", index=False)
