@@ -1,3 +1,4 @@
+# flake8: noqa
 import pandas as pd
 import numpy as np
 from math import radians, sin, cos, sqrt, atan2
@@ -22,15 +23,15 @@ use_wheat_regional_average = True
 ##########################################
 # Load files necessary for interpolation #
 ##########################################
-zip_to_latlong_sheet = pd.read_table("helpful_scripts\emissions_interpolation\geonames_US.csv")
+zip_to_latlong_sheet = pd.read_csv(r"helpful_scripts\emissions_interpolation\geonames_US.csv")
 
-fips_to_county_sheet = pd.read_csv("helpful_scripts\emissions_interpolation\COUNTY_ZIP_032010.csv")
+fips_to_county_sheet = pd.read_csv(r"helpful_scripts\emissions_interpolation\COUNTY_ZIP_032010.csv")
 
-feed_source = pd.read_csv("helpful_scripts\emissions_interpolation\Feed Emissions Source RuFaS_Feed_Library_Combined_Final.csv")
+feed_source = pd.read_csv(r"helpful_scripts\emissions_interpolation\Feed Emissions Source RuFaS_Feed_Library_Combined_Final.csv")
 
-fips_to_region = pd.read_csv("helpful_scripts\emissions_interpolation\fips_to_region.csv")
+fips_to_region = pd.read_csv(r"helpful_scripts\emissions_interpolation\fips_to_region.csv")
 
-regional_sheet = pd.read_csv(f"input\data\EEE\{EEEname}_wheat_regional_averages.csv")
+regional_sheet = pd.read_csv(f"helpful_scripts\emissions_interpolation\{EEEname}_wheat_regional_averages.csv")
 
 def get_statecode(county_code):
     return str(county_code).zfill(5)[0:2]
@@ -166,7 +167,7 @@ feed_ids_to_check = feed_source[feed_source['EF_Source'] == feed_source_choice][
 emissions_copy = emissions_doc.copy()
 emissions_neighbors_detailed = []
 
-for idx_county_code, county_code in enumerate(county_codes):
+for idx_county_code, county_code in enumerate(county_codes):  # noqa: C901
     statecode = get_statecode(county_code)
     gps_county = fips_gps_map[idx_county_code]
 
