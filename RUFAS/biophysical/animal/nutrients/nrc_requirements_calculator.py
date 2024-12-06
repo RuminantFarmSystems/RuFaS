@@ -1,6 +1,7 @@
+from .energy_requirements_calculator import EnergyRequirementsCalculator
 
 
-class NRCRequirementsCalculator:
+class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
     @classmethod
     def calculate_energy_requirements(cls) -> tuple[float, float, float]:
