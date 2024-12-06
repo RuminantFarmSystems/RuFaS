@@ -649,6 +649,8 @@ class Field:
             return
 
         if not self.field_data.supplement_manure_nutrient_deficiencies:
+            # TODO update this to check which supplement method is selected "manure", "synthetic fertilizer", "None"
+            # TODO create supplement enum for the above
             warning_name = "Nutrient deficient manure application"
             warning_message = (
                 f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus "
@@ -657,6 +659,9 @@ class Field:
             self.om.add_warning(warning_name, warning_message, info_map)
             return
 
+        # TODO determine type of fertilizer user wants to use (manure or chemical)
+
+        # this is synthetic fertilizer option (currently. Issue #1828 addresses further customization)
         if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
             optimal_mix = self.ONLY_NITROGEN_MIX
         else:
