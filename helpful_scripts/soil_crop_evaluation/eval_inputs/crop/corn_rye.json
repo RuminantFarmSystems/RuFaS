@@ -1,0 +1,28 @@
+{
+  "crop_schedules": [
+    {
+      "crop_species": "corn_silage",
+      "planting_years": [1980],
+      "planting_days": [136],
+      "harvest_years": [1980],
+      "harvest_days": [259],
+      "harvest_operations": ["harvest_kill"],
+      "harvest_type": "scheduled",
+      "pattern_repeat": 24,
+      "planting_skip": 0,
+      "harvesting_skip": 0
+    },
+    {
+      "crop_species": "cereal_rye_silage",
+      "planting_years": [1980],
+      "planting_days": [263],
+      "harvest_years": [1981],
+      "harvest_days": [120],
+      "harvest_operations": ["kill_only"],
+      "harvest_type": "scheduled",
+      "pattern_repeat": 24,
+      "planting_skip": 0,
+      "harvesting_skip": 0
+    }
+  ]
+}
