@@ -20,10 +20,7 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         animal_type: AnimalType,
     ) -> tuple[float, float, float]:
         """
-        Calculates energy requirement for maintenance, conceptus weight, and calf birth weight
-
-        Calculates the estimated energy requirements for maintenance in megacalories per day,
-        as well as conceptus weight (kg) and calf birth weight (kg), according to NRC (2001).
+        Calculates energy requirement for maintenance, conceptus weight, and calf birth weight according to NRC (2001).
 
         Parameters
         ----------
@@ -42,12 +39,8 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
         Returns
         -------
-        net_energy_maintenance : float
-            Net energy requirement for maintenance (mcal/day)
-        conceptus_weight : float
-            Conceptus weight (kg)
-        calf_birth_weight : float
-            Calf birth weight (kg)
+        tuple[float, float, float]
+            Net energy requirement for maintenance (Mcal/day), conceptus weight (kg), and calf birth weight (kg)
 
         Notes
         -----
@@ -85,12 +78,11 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         animal_type: AnimalType,
         parity: int,
         calving_interval: int | None,
-        average_daily_gain_heifer: float | None, 
+        average_daily_gain_heifer: float | None,
     ) -> tuple[float, float, float]:
-        """Calculates energy requirement for growth and associated weight gain parameters.
-
-        The estimated energy requirements for growth in megacalories per day,
-        and average daily gain and estimate of shrunk body weight, in kilograms are calculated according to NRC (2001).
+        """
+        Calculates energy requirement for growth, average daily gain and estimate of shrunk body weight according to NRC
+        (2001).
 
         Parameters
         ----------
@@ -111,17 +103,14 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
         Returns
         -------
-        net_energy_growth : float
-            Net energy requirement for growth (Mcal/d)
-        average_daily_gain : float
-            Average daily gain (grams per day)
-        equivalent_shrunk_body_weight : float
-            Equivalent shrunk body weight (kilograms)
+        tuple[float, float, float]
+            Net energy requirement for growth (Mcal/d), average daily gain (g/d), equivalent shrunk body weight (kg).
 
         References
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
         Chapter 11 "Growth", pp. 234-243, 2001.
+
         """
         # Activity requirements
         # ---------------------
@@ -171,26 +160,25 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
     @classmethod
     def calculate_pregnancy_energy_requirements(cls, day_of_pregnancy: int | None, calf_birth_weight: float) -> float:
-        """Calculates energy requirement for pregnancy according to NRC (2001).
-
-        Calculates the estimated energy requirements for pregnancy in megacalories per day
+        """
+        Calculates energy requirement for pregnancy according to NRC (2001).
 
         Parameters
         ----------
         day_of_pregnancy : int
-            Day of pregnancy (days)
+            Day of pregnancy (days).
         calf_birth_weight : float
-            Calf birth weight (kilograms)
+            Calf birth weight (kg).
 
         Returns
         -------
-        net_energy_pregnancy : float
-            Net energy requirement for pregnancy (Mcal/d)
+        float
+            Net energy requirement for pregnancy (Mcal/d).
 
         Notes
         -----
-        # day_of_pregnancy are counted from 190 day_of_pregnancy once pregnancy is confirmed. Otherwise,
-        this nutritional requirement is assumed to be zero.
+        Day_of_pregnancy are counted from 190 day_of_pregnancy once pregnancy is confirmed. Otherwise, this nutritional
+        requirement is assumed to be zero.
 
         References
         ----------
@@ -222,9 +210,8 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         milk_lactose: float,
         milk_production: float,
     ) -> float:
-        """Calculates energy requirement for lactation according to NRC (2001).
-
-        Calculates the estimated energy requirements for lactation in megacalories per day
+        """
+        Calculates energy requirement for lactation according to NRC (2001).
 
         Parameters
         ----------
@@ -279,9 +266,8 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         dry_matter_intake_estimate: float,
         TDN_conc: float | None = 0.7,
     ) -> float:
-        """Protein requirement for maintenance according to NRC (2001).
-
-        Calculates the estimated total metabolizable protein requirement (MP) in kilograms per day
+        """
+        Calculates the protein requirement for maintenance according to NRC (2001).
 
         Parameters
         ----------
@@ -312,8 +298,8 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
         Returns
         -------
-        metabolizable_protein_requirement : float
-            Metabolizable protein requirement (grams per day)
+        float
+            Metabolizable protein requirement (g/day)
 
         Notes
         -----
@@ -408,9 +394,8 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         average_daily_gain: float,
         milk_production: float,
     ) -> float:
-        """Calculates total Calcium requirement according to NRC (2001).
-
-        Calculates the estimated the total calcium requirement (Ca) in grams per day
+        """
+        Calculates total calcium requirement according to NRC (2001).
 
         Parameters
         ----------
@@ -429,14 +414,13 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
         Returns
         -------
-        calcium_requirement : float
+        float
             Calcium requirement (grams per day)
 
         References
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 106-109. 2001.
-
 
         """
         # C: MINERAL REQUIREMENTS
@@ -500,9 +484,8 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         average_daily_gain: float,
         dry_matter_intake_estimate: float,
     ) -> float:
-        """Calculates total Phosphorus requirement according to NRC (2001).
-
-        Calculates the estimated the total phosphorus requirement (P) in grams per day
+        """
+        Calculates total phosphorus requirement according to NRC (2001).
 
         Parameters
         ----------
@@ -523,13 +506,14 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
 
         Returns
         -------
-        phosphorus_requirement : float
+        float 
             Phosphorus requirement (grams per day)
 
         References
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
+
         """
         P_growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (
             average_daily_gain / 0.96
@@ -568,9 +552,8 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         net_energy_diet_concentration: float,
         days_born: float,
     ) -> float:
-        """Calculates dry matter intake according to NRC (2001).
-
-        Calculates the estimated total dry matter intake in kilograms per day
+        """
+        Calculates dry matter intake according to NRC (2001).
 
         Parameters
         ----------
@@ -645,10 +628,7 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         distance: float,
     ) -> float:
         """
-        Calculates the net energy for activity requirement portion of the energy
-        requirements for animals. This is separate because it must be calculated after
-        grouping due to pen input args and cannot be used individually on an animal. The estimated energy requirements
-         for activity in megacalories per day are calculated following either NRC or NASEM guidelines
+        Calculates the net energy for activity requirement portion of the energy requirements.
 
         Parameters
         ----------
@@ -657,21 +637,18 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         housing : str
             Housing type (Barn or Grazing)
         distance : float
-            Distance walked in meters.
+            Distance walked (m).
 
         Returns
         -------
-        net_energy_activity : float
-            Net energy requirement for activity (mcal/day)
+        float
+            Net energy requirement for activity (Mcal/day)
 
         Notes
         -----
-        Note that both NRC and NASEM calculations use distance walked in kilometers,
-            hence the unit conversion in the code itself.
-
-        Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance.
-        Grazing system and hilly topography will cost additional energy.
-            Grazing is not implemented yet in the current version of code.
+        Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance. Grazing
+        system and hilly topography will cost additional energy. Grazing is not implemented yet in the current version
+        of code.
 
         References
         ----------
