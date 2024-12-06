@@ -14,10 +14,8 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
         cls, body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, days_in_milk: int | None
     ) -> tuple[float, float, float]:
         """
-        Calculates energy requirement for maintenance and two measures of uterine weight
-
-        The estimated energy requirements for maintenance are calculated in megacalories per day,
-        as well as gravid uterine weight and uterine weight in kg, according to NASEM (2021).
+        Calculates energy requirement for maintenance, gravid uterine weight, and uterine weight according to NASEM
+        (2021).
 
         Parameters
         ----------
@@ -32,23 +30,18 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
 
         Returns
         -------
-        net_energy_maintenance : float
-            Net energy requirement for maintenance (mcal/day).
-        gravid_uterine_weight : float
-            Gravid uterine weight (kg).
-        uterine_weight : float
-            Uterine weight (kg).
+        tuple[float, float, float]
+            Net energy requirement for maintenance (Mcal/day), gravid uterine weight (kg), and uterine weight (kg).
 
         Notes
         -----
-        NASEM (2021) does not adjust energy requirements for environmental temperature as it assumes
-        that confinement conditions already provide comfort temperature to the animals.
-        This is something to consider and update for the grazing module
-        Instead of calculating calf_birth_weight, NASEM (2021) also contains standards calf_birth_weight and
-        mature_body_weight (tabulated values) for selected breeds (eg., Holstein)
-        Instead of estimating conceptus_weight, gain in pregnancy tissues is estimated:
-        (gravid_uterine_weight and uterine_weight).
-        day_of_pregnancy (Day of pregnancy) was kept instead of DGest (Day ofgestation) as it is in NASEM (2021) book.
+        NASEM (2021)[1] does not adjust energy requirements for environmental temperature as it assumes that confinement
+        conditions already provide comfort temperature to the animals. This is something to consider and update for the
+        grazing module. Instead of calculating `calf_birth_weight`, NASEM (2021) also contains standards
+        `calf_birth_weight` and mature_body_weight (tabulated values) for selected breeds (eg., Holstein).Instead of
+        estimating conceptus_weight, gain in pregnancy tissues is estimated: `gravid_uterine_weight` and
+        `uterine_weight`. `day_of_pregnancy` (Day of pregnancy) was kept instead of DGest (Day ofgestation) as it is in
+        NASEM (2021) book.
 
         References
         ----------
@@ -82,40 +75,34 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
         parity: int,
         calving_interval: int | None,
     ) -> tuple[float, float, float]:
-        """Calculates energy requirement for growth, and also growth metrics
-
-        Calculates the estimated energy requirements requirements for growth in megacalories per day,
-        and associated growth metrics, according to NASEM (2021).
+        """Calculates energy requirement for growth, and associated growth metrics according to NASEM (2021).
 
         Parameters
         ----------
         body_weight : float
-            Body weight (kilograms)
+            Body weight (kg).
         mature_body_weight : float
-            Mature body weight (kilograms)
+            Mature body weight (kg).
         average_daily_gain_heifer : float
-            Average daily gain (grams per day)
+            Average daily gain (g/day).
         animal_type : AnimalType
-            A type or subtype of animal specified in AnimalType enum
+            A type or subtype of animal specified in AnimalType enum.
         parity : int
-            Parity number (lactation 1, 2.. n)
+            Lactation count of the animal.
         calving_interval : int
-            Calving interval (days)
+            Calving interval (days).
 
         Returns
         -------
-        net_energy_growth : float
-            Net energy requirement for frame growth (Mcal/d)
-        average_daily_gain : float
-            Average daily gain (grams per day)
-        frame_weight_gain : float
-            Frame weight gain refers to the accretion of both fat and protein in carcass (grams per day)
+        tuple[float, float, float]
+            Net energy requirement for frame growth (Mcal/d), average daily gain (g/day), and accretion of both fat and
+            protein in carcass (g/day)
 
         Notes
         -----
-        # In NASEM (2021), body frame gain (fat + protein) corresponds to the true growth and it is part
-        # of the calculation which is further partitioned to body reserves or condition gain (or loss),
-        # and pregnancy-associated gain (considered a pregnancy requirement).
+        In NASEM (2021)[1], body frame gain (fat + protein) corresponds to the true growth and it is part of the
+        calculation which is further partitioned to body reserves or condition gain (or loss), and pregnancy-associated
+        gain (considered a pregnancy requirement).
 
         References
         ----------
@@ -142,7 +129,7 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
             average_daily_gain = 0.0
         EBG = 0.85 * average_daily_gain
         if average_daily_gain == 0:
-            average_daily_gain = 0.00001  # fix to avoid divide by 0 error
+            average_daily_gain = 0.00001
         FatADG = (0.067 + 0.375 * (body_weight / mature_body_weight)) * EBG / average_daily_gain
         ProtADG = (0.201 - 0.081 * (body_weight / mature_body_weight)) * EBG / average_daily_gain
         frame_weight_gain = FatADG + ProtADG
@@ -160,7 +147,8 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
         gravid_uterine_weight: float,
         uterine_weight: float,
     ) -> tuple[float, float]:
-        """Calculates energy requirement for pregnancy and gravid uterine weight gain
+        """
+        Calculates energy requirement for pregnancy and gravid uterine weight gain
 
         Calculates the estimated energy requirements requirements for pregnancy in megacalories per day,
         according to NASEM (2021).
@@ -187,10 +175,10 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
 
         Notes
         -----
-        # Assumptions: tissue contains 0.882 Mcal of energy / kg; an ME to gestation energy efficiency of 0.14;
-        # and ME to net_energy_lactation efficiency of 0.66.MEpreg = Metabolizable energy requirement for pregnancy,
+        Assumptions: tissue contains 0.882 Mcal of energy / kg; an ME to gestation energy efficiency of 0.14;
+        and ME to net_energy_lactation efficiency of 0.66.MEpreg = Metabolizable energy requirement for pregnancy,
             Mcal net_energy_lactation/day
-        # day_of_pregnancy are counted from day 12 of pregnancy once it was confirmed and goes until day 280
+        day_of_pregnancy are counted from day 12 of pregnancy once it was confirmed and goes until day 280
             day_of_pregnancy.
 
         References
