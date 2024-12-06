@@ -585,7 +585,7 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
         cls,
         body_weight: float,
         housing: float,
-        distance
+        distance: float,
     ) -> float:
         """
         Calculates the net energy for activity requirement portion of the energy
