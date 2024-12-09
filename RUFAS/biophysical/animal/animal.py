@@ -12,6 +12,7 @@ from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystemInputs
+from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
@@ -19,6 +20,8 @@ from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
+from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
+from RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator import NRCRequirementsCalculator
 from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (NewBornCalfValuesTypedDict, CalfValuesTypedDict,
                                                                     HeiferIValuesTypedDict, HeiferIIValuesTypedDict,
@@ -112,6 +115,8 @@ class Animal:
             self._initialize_calf_or_heiferI(args)
         else:
             initialize_animal_methods[self.animal_type](args)
+
+        self.requirements: EnergyNutritionRequirements
 
     def _initialize_newborn_calf(self, args: NewBornCalfValuesTypedDict) -> None:
         if AnimalConfig.semen_type == "conventional":
@@ -301,6 +306,51 @@ class Animal:
             self.dead = True
             daily_routines_output.animal_status = AnimalStatus.DEAD
         return daily_routines_output
+
+    def evaluate_requirements(self) -> None:
+        """Evaluates and sets the nutrient and energy requirements for an animal."""
+        # TODO: find out what is going on with all these params.
+        if self.nutrient_standard is NutrientStandard.NASEM:
+            self.requirements = NASEMRequirementsCalculator.calculate_requirements(
+                body_weight=self.body_weight,
+                mature_body_weight=self.mature_body_weight,
+                day_of_pregnancy=self.days_in_pregnancy,
+                days_in_milk=self.days_in_milk,
+                average_daily_gain_heifer=self.heifer_average_daily_gain,
+                animal_type=self.animal_type,
+                parity=self.parity,
+                calving_interval=self.calving_interval,
+                lactating=self.is_milking,
+                milk_fat=self.milk_production.FAT_PERCENT,
+                milk_true_protein=self.milk_production.TRUE_PROTEIN_PERCENT,
+                milk_production=self.milk_production.daily_milk_produced,
+                body_condition_score_5=self.body_condition_score_5,
+                ndf_percentage=self.ndf_percentage,
+                housing=self.housing,
+                distance=self.walking_distance,
+            )
+        else:
+            self.requirements = NRCRequirementsCalculator.calculate_requirements(
+                body_weight=self.body_weight,
+                mature_body_weight=self.mature_body_weight,
+                day_of_pregnancy=self.days_in_pregnancy,
+                days_in_milk=self.days_in_milk,
+                average_daily_gain_heifer=self.heifer_average_daily_gain,
+                animal_type=self.animal_type,
+                parity=self.parity,
+                calving_interval=self.calving_interval,
+                lactating=self.is_milking,
+                milk_fat=self.milk_production.FAT_PERCENT,
+                milk_true_protein=self.milk_production.TRUE_PROTEIN_PERCENT,
+                milk_production=self.milk_production.daily_milk_produced,
+                body_condition_score_5=self.body_condition_score_5,
+                days_born=self.days_born,
+                net_energy_diet_concentration=self.net_energy_diet_concentration,
+                TDN_percentage=self.TDN_percentage,
+                previous_temperature=self.previous_temperature,
+                housing=self.housing,
+                distance=self.walking_distance,
+            )
 
     def _evaluate_calf_for_heiferI(self) -> bool:
         return self.days_born == AnimalConfig.wean_day
