@@ -17,8 +17,6 @@ class Triticale(CropData):
     """
 
     name: str = "default triticale"
-    plant_code: str = "DWHT"
-    scientific_name: str = "Triticum durum"
     plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
