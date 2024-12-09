@@ -36,7 +36,7 @@ class EnergySupplyCalculator:
         ]
 
         discount = cls.calculate_discount(feeds, average_body_weight)
-        actual_tdn_percentage = {feed.info.rufas_id: feed.info.TDN * discount for feed in feeds}
+        actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * discount for feed in feeds}
         actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
 
         metabolizable_energy = cls.calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
@@ -47,6 +47,19 @@ class EnergySupplyCalculator:
         growth_energy = cls.calculate_actual_growth_net_energy(feeds, metabolizable_energy)
         calcium = cls.calculate_calcium_supply(feeds)
         phosphorus = cls.calculate_phosphorus_supply(feeds)
+        dry_matter_intake = sum([feed.amount for feed in feeds])
+        protein = cls.calculate_metabolizable_protein_supply(feeds, dry_matter_intake, actual_tdn_percentages, average_body_weight)
+
+        return EnergyNutritionSupply(
+            metabolizable=metabolizable_energy,
+            maintenance=maintenance_energy,
+            lactation=lactation_energy,
+            growth=growth_energy,
+            protein=protein,
+            calcium=calcium,
+            phosphorus=phosphorus,
+            dry_matter=dry_matter_intake
+        )
 
     @classmethod
     def calculate_discount(cls, feeds: list[FeedInRation], average_body_weight: float) -> float:
@@ -78,7 +91,7 @@ class EnergySupplyCalculator:
     def calculate_actual_metabolizable_energy(
         cls, feeds: list[FeedInRation], actual_digestable_energy: dict[int, float]
     ) -> dict[int, float]:
-        """Calculates the actual metabolizable energy of feeds (Mcal / kg)."""
+        """Calculates the actual metabolizable energy of feeds (Mcal)."""
         actual_metabolizable_energy: dict[int, float] = {}
 
         for feed in feeds:
@@ -99,7 +112,7 @@ class EnergySupplyCalculator:
     def calculate_actual_maintenance_net_energy(
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[int, float]
     ) -> dict[int, float]:
-        """Calculates the actual net energy for maintenance of feeds (Mcal / kg)."""
+        """Calculates the actual net energy for maintenance of feeds (Mcal)."""
         actual_maintenance_net_energy: dict[int, float] = {}
 
         for feed in feeds:
@@ -125,7 +138,7 @@ class EnergySupplyCalculator:
         actual_metabolizable_energy: dict[int, float],
         actual_digestible_energy: dict[int, float],
     ) -> float:
-        """Calculates the actual net energy for lactation of feeds (Mcal / kg)."""
+        """Calculates the actual net energy for lactation of feeds (Mcal)."""
         actual_lactation_net_energy: dict[int, float] = {}
 
         for feed in feeds:
@@ -150,7 +163,7 @@ class EnergySupplyCalculator:
     def calculate_actual_growth_net_energy(
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[int, float]
     ) -> float:
-        """Calculates actual net energy for growth of feeds (Mcal / kg)."""
+        """Calculates actual net energy for growth of feeds (Mcal)."""
         actual_growth_net_energy: dict[int, float] = {}
 
         for feed in feeds:
@@ -172,7 +185,7 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_calcium_supply(cls, feeds: list[FeedInRation]) -> float:
-        """Calculates the calcium supply in the ration (kg)."""
+        """Calculates the calcium supply in the ration (kg)."""  # TODO: check units
         calcium_digestibility: dict[int, float] = {}
 
         for feed in feeds:
@@ -200,7 +213,7 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
-        """Calculates the phosphorus supply in the ration (kg)."""
+        """Calculates the phosphorus supply in the ration (kg)."""  # TODO: check units
         phosphorus_digestibility: dict[int, float] = {}
 
         for feed in feeds:
@@ -228,10 +241,9 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_metabolizable_protein_supply(
-        cls, feeds: list[FeedInRation], actual_tdn_percentages: dict[int, float], average_body_weight: float
+        cls, feeds: list[FeedInRation], dry_matter_intake: float, actual_tdn_percentages: dict[int, float], average_body_weight: float
     ) -> dict[int, float]:
-        """Calculates amount of metabolizable protein in ration (kg)."""
-        dry_matter_intake = sum([feed.amount for feed in feeds])
+        """Calculates amount of metabolizable protein in ration (kg)."""  # TODO: check units
         concentrate_percentage_of_ration = cls._calculate_percentage_of_concentrates(feeds, dry_matter_intake)
         protein_passage_rates = cls._calculate_protein_passage_rates(
             feeds, dry_matter_intake, average_body_weight, concentrate_percentage_of_ration
@@ -274,7 +286,7 @@ class EnergySupplyCalculator:
 
     @classmethod
     def _calculate_percentage_of_concentrates(cls, feeds: list[FeedInRation], dry_matter_intake: float) -> float:
-        """Calculates percentage of dry matter in ration that is concetrate."""
+        """Calculates percentage of dry matter in ration that is concentrate."""
         dry_matter_from_concentrate = sum([feed.amount for feed in feeds if feed.info.feed_type is Type.CONC])
 
         return dry_matter_from_concentrate / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE
@@ -288,7 +300,7 @@ class EnergySupplyCalculator:
         percentage_concentrates: float,
     ) -> dict[int, float]:
         """Calculates the protein passage rate of feeds in ration (percentage / hour)."""
-        protein_passage_rates: dict[int, float]
+        protein_passage_rates: dict[int, float] = {}
 
         for feed in feeds:
             if feed.info.feed_type is Type.CONC:
