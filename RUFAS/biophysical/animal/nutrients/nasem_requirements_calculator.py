@@ -31,6 +31,7 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
         housing: float,
         distance: float,
     ) -> EnergyNutritionRequirements:
+        """Calculates energy and nutrition requirements for an animal using the NASEM methodology."""
         maintenance_requirement, gravid_uterine_weight, uterine_weight = cls.calculate_maintentance_energy_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
         )

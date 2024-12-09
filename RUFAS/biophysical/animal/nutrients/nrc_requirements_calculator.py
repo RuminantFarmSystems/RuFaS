@@ -33,6 +33,7 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         housing: float,
         distance: float,
     ) -> EnergyNutritionRequirements:
+        """Calculates energy and nutrition requirements for an animal using the NRC methodology."""
         maintenance_requirement, conceptus_weight, calf_birth_weight = cls.calculate_maintentance_energy_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type
         )

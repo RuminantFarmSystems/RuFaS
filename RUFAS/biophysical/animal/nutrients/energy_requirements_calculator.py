@@ -9,7 +9,7 @@ class EnergyRequirementsCalculator:
 
     @classmethod
     @abstractmethod
-    def calculate_requirements(cls) -> EnergyNutritionRequirements:
+    def calculate_requirements(cls, **kwargs: dict[str, Any]) -> EnergyNutritionRequirements:
         pass
 
     @classmethod
