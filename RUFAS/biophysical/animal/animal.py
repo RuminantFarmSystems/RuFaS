@@ -29,6 +29,8 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferRepro
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
+from RUFAS.data_structures.feed_storage_to_animal_module_connection import NutrientStandard
+from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 
 
@@ -65,6 +67,8 @@ class Animal:
     sold: bool = False
     sold_at_day: int = sys.maxsize
     wean_weight: float = 0.0
+
+    nutrient_standard: NutrientStandard
 
     @property
     def is_pregnant(self) -> bool:
@@ -179,6 +183,13 @@ class Animal:
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:
         LactationCurve.set_lactation_parameters(time)
+
+    @classmethod
+    def set_nutrient_standard(cls) -> None:
+        """Sets the nutrient standard to be used for the simulation."""
+        im = InputManager()
+        standard = NutrientStandard(im.get_data("config.nutrient_standard"))
+        cls.nutrient_standard = standard
 
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
         self.days_born += 1
