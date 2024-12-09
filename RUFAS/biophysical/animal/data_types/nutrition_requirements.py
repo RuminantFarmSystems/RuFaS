@@ -42,3 +42,15 @@ class EnergyNutritionRequirements:
     dry_matter : float
     activity : float
     essential_amino_acids: EssentialAminoAcidRequirements
+
+    @property
+    def total_energy_requirements(self) -> float:
+        """Total energy requirements for an animal (Mcal)."""
+        return self.maintenance + self.growth + self.pregnancy + self.lactation + self.activity
+
+
+class EnergyNutritionSupply:
+    """
+    Energy and nutrition supply for a ration.
+    """
+    pass
