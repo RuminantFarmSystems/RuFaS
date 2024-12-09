@@ -3,6 +3,7 @@ from numpy import exp
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
 from RUFAS.general_constants import GeneralConstants
 
 from .energy_requirements_calculator import EnergyRequirementsCalculator
@@ -88,6 +89,18 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
         )
         activity_requirement = cls.calculate_activity_energy_requirements(body_weight, housing, distance)
 
+        essential_amino_acids = EssentialAminoAcidRequirements(
+            histidine=0.0,
+            isoleucine=0.0,
+            leucine=0.0,
+            lysine=0.0,
+            methionine=0.0,
+            phenylalanine=0.0,
+            threonine=0.0,
+            thryptophan=0.0,
+            valine=0.0,
+        )
+
         return EnergyNutritionRequirements(
             maintenance=maintenance_requirement,
             growth=growth_requirement,
@@ -97,6 +110,7 @@ class NRCRequirementsCalculator(EnergyRequirementsCalculator):
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
             activity=activity_requirement,
+            essential_amino_acids=essential_amino_acids,
         )
 
     @classmethod

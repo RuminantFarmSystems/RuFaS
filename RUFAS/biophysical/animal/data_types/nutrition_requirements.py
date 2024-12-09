@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
+
 
 @dataclass
 class EnergyNutritionRequirements:
@@ -26,6 +28,8 @@ class EnergyNutritionRequirements:
         Dry matter intake (kg).
     activity : float
         Net energy requirement for activity (Mcal).
+    essential_amino_acids : EssentialAminoAcidRequirements
+        Essential amino acid requirements.
 
     """
     maintenance : float
@@ -37,3 +41,4 @@ class EnergyNutritionRequirements:
     phosphorus : float
     dry_matter : float
     activity : float
+    essential_amino_acids: EssentialAminoAcidRequirements

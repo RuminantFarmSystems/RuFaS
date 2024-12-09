@@ -3,9 +3,13 @@ from numpy import exp
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.ration.amino_acid import AminoAcidCalculator
 from RUFAS.general_constants import GeneralConstants
 
 from .energy_requirements_calculator import EnergyRequirementsCalculator
+
+
+AMINO_ACID_CALCULATOR = AminoAcidCalculator()
 
 
 class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
@@ -87,6 +91,18 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
         )
         activity_requirement = cls.calculate_activity_energy_requirements(body_weight, housing, distance)
 
+        essential_amino_acids = AMINO_ACID_CALCULATOR.calculate_essential_amino_acid_requirements(
+            animal_type=animal_type,
+            lactating=lactating,
+            body_weight=body_weight,
+            frame_weight_gain=frame_weight_gain,
+            gravid_uterine_weight_gain=gravid_uterine_weight_gain,
+            dry_matter_intake_estimate=dry_matter_intake,
+            milk_true_protein=milk_true_protein,
+            milk_production=milk_production,
+            NDF_conc=ndf_percentage
+        )
+
         return EnergyNutritionRequirements(
             maintenance=maintenance_requirement,
             growth=growth_requirement,
@@ -97,6 +113,7 @@ class NASEMRequirementsCalculator(EnergyRequirementsCalculator):
             phosphorus=phosphorus_requirement,
             dry_matter=dry_matter_intake,
             activity=activity_requirement,
+            essential_amino_acids=essential_amino_acids,
         )
 
     @classmethod
