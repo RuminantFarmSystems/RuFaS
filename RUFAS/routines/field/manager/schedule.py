@@ -263,9 +263,9 @@ class Schedule:
 
         Parameters
         ----------
-        pattern : List[Union[int, float]]
+        pattern : List[int | float]
             The pattern to be repeated.
-        skip : Union[int, float]
+        skip : int | float
             Number of steps to skip between repeats (0 if no steps should be skipped).
         repeat : int
             Number of times pattern should be repeated.
@@ -296,6 +296,8 @@ class Schedule:
         [1, 2, 3, 5, 6, 7]
 
         """
+        if not pattern or repeat <= 0:
+            return pattern
         differences = [skip + 1]
         in_pattern_differences = range(1, len(pattern[1:]) + 1)
         for difference in in_pattern_differences:
