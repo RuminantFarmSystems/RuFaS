@@ -10,6 +10,7 @@ from RUFAS.data_structures.feed_storage_to_animal_module_connection import (
 )
 from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionSupply
 from RUFAS.general_constants import GeneralConstants
+from RUFAS.units import MeasurementUnits
 
 
 # FeedInRation = namedtuple("FeedInRation", ["amount", "info"])
@@ -41,34 +42,41 @@ class EnergySupplyCalculator:
             FeedInRation(amount=amount, info=next((feed for feed in feeds_used if feed.rufas_id == rufas_id), None))
             for rufas_id, amount in ration_formulation.items()
         ]
-        total_energy = cls.calculate_total_energy(feeds)
+        pass
+        # total_energy = cls.calculate_total_energy(feeds)
 
-    @classmethod
-    def calculate_total_energy(cls, feeds: list[FeedInRation], average_body_weight: float) -> float:
-        dry_matter_intake = sum([feed.amount for feed in feeds])
+    # @classmethod
+    # def calculate_total_energy_deficit(
+    #     cls, feeds: list[FeedInRation], 
+    # ) -> float:
+    #     """
+    #     Calculates total energy deficit of energy supplied for lactation, maintenance, and growth.
+    #     Result is the amount of energy by which supply exceeded demand.
+    #     """
+        # dry_matter_intake = sum([feed.amount for feed in feeds])
 
-        total_tdn = sum([feed.amount * feed.info.TDN * 0.01 for feed in feeds])
-        tdn_percentage = (
-            total_tdn / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE if dry_matter_intake > 0.0 else 0.0
-        )
+        # total_tdn = sum([feed.amount * feed.info.TDN * 0.01 for feed in feeds])
+        # tdn_percentage = (
+        #     total_tdn / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE if dry_matter_intake > 0.0 else 0.0
+        # )
 
-        somatic_body_weight = average_body_weight * 0.96
+        # somatic_body_weight = average_body_weight * 0.96
 
-        if total_tdn < (0.035 * average_body_weight**0.75):
-            maintenance_dry_matter_intake = 1.0
-        else:
-            maintenance_dry_matter_intake = total_tdn / (0.035 * somatic_body_weight**0.75)
+        # if total_tdn < (0.035 * average_body_weight**0.75):
+        #     maintenance_dry_matter_intake = 1.0
+        # else:
+        #     maintenance_dry_matter_intake = total_tdn / (0.035 * somatic_body_weight**0.75)
 
-        if tdn_percentage < 60.0:
-            discount = 1.0
-        else:
-            discount = (
-                tdn_percentage - ((0.18 * tdn_percentage - 10.3) * (maintenance_dry_matter_intake - 1))
-            ) / tdn_percentage
+        # if tdn_percentage < 60.0:
+        #     discount = 1.0
+        # else:
+        #     discount = (
+        #         tdn_percentage - ((0.18 * tdn_percentage - 10.3) * (maintenance_dry_matter_intake - 1))
+        #     ) / tdn_percentage
 
-        actual_tdn_percentage = {feed.info.rufas_id: feed.info.TDN * discount for feed in feeds}
+        # actual_tdn_percentage = {feed.info.rufas_id: feed.info.TDN * discount for feed in feeds}
 
-        actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
+        # actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
 
     @classmethod
     def calculate_actual_metabolizable_energy(
@@ -87,8 +95,9 @@ class EnergySupplyCalculator:
             else:
                 energy = 1.01 * actual_digestable_energy[feed.info.rufas_id] - 0.45
             actual_metabolizable_energy[feed.info.rufas_id] = energy
+        total = sum([feed.amount * actual_metabolizable_energy[feed.info.rufas_id] for feed in feeds])
 
-        return actual_metabolizable_energy
+        return total
 
     @classmethod
     def calculate_actual_maintenance_net_energy(
@@ -109,8 +118,9 @@ class EnergySupplyCalculator:
                     - 1.12
                 )
             actual_maintenance_net_energy[feed.info.rufas_id] = energy
+        total = sum([feed.amount * actual_maintenance_net_energy[feed.info.rufas_id] for feed in feeds])
 
-        return actual_maintenance_net_energy
+        return total
 
     @classmethod
     def calculate_actual_lactation_net_energy(
@@ -118,7 +128,7 @@ class EnergySupplyCalculator:
         feeds: list[FeedInRation],
         actual_metabolizable_energy: dict[int, float],
         actual_digestible_energy: dict[int, float],
-    ) -> dict[int, float]:
+    ) -> float:
         """Calculates the actual net energy for lactation of feeds (Mcal / kg)."""
         actual_lactation_net_energy: dict[int, float] = {}
 
@@ -136,13 +146,14 @@ class EnergySupplyCalculator:
             else:
                 energy = 0.703 * actual_metabolizable_energy[feed.info.rufas_id] - 0.19
             actual_lactation_net_energy[feed.info.rufas_id] = energy
+        total = sum([feed.amount * actual_lactation_net_energy[feed.info.rufas_id] for feed in feeds])
 
-        return actual_lactation_net_energy
+        return total
 
     @classmethod
     def calculate_actual_growth_net_energy(
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[int, float]
-    ) -> dict[int, float]:
+    ) -> float:
         """Calculates actual net energy for growth of feeds (Mcal / kg)."""
         actual_growth_net_energy: dict[int, float] = {}
 
@@ -159,5 +170,46 @@ class EnergySupplyCalculator:
                     - 1.65
                 )
             actual_growth_net_energy[feed.info.rufas_id] = energy
+        total = sum([feed.amount * actual_growth_net_energy[feed.info.rufas_id] for feed in feeds])
 
-        return actual_growth_net_energy
+        return total
+
+    @classmethod
+    def calculate_calcium_supply(cls, feeds: list[FeedInRation]) -> float:
+        """Calculates the calcium supply in the ration (kg)."""
+        calcium_digestibility: dict[int, float] = {}
+
+        for feed in feeds:
+            if feed.info.feed_type is Type.FORAGE:
+                ca_digestibility = 0.3
+            elif feed.info.feed_type is Type.CONC:
+                ca_digestibility = 0.6
+            elif feed.info.feed_type is Type.MINERAL:
+                ca_digestibility = 0.95
+            else:
+                ca_digestibility = 0.0
+            calcium_digestibility[feed.info.rufas_id] = ca_digestibility
+
+        total = sum([feed.amount * calcium_digestibility[feed.info.rufas_id] * feed.info.calcium * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+
+        return total * GeneralConstants.GRAMS_TO_KG
+
+    @classmethod
+    def calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
+        """Calculates the phosphorus supply in the ration (kg)."""
+        phosphorus_digestibility: dict[int, float] = {}
+
+        for feed in feeds:
+            if feed.info.feed_type is Type.FORAGE:
+                p_digestibility = 0.64
+            elif feed.info.feed_type is Type.CONC:
+                p_digestibility = 0.7
+            elif feed.info.feed_type is Type.MINERAL:
+                p_digestibility = 0.8
+            else:
+                p_digestibility = 0.0
+            phosphorus_digestibility[feed.info.rufas_id] = p_digestibility
+
+        total = sum([feed.amount * phosphorus_digestibility[feed.info.rufas_id] * feed.info.phosphorus * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+
+        return total * GeneralConstants.GRAMS_TO_KG
