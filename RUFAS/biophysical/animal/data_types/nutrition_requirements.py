@@ -46,7 +46,7 @@ class EnergyNutritionRequirements:
 
     @property
     def total_energy_requirements(self) -> float:
-        """Total energy requirements for an animal (Mcal)."""
+        """Total energy requirement for an animal (Mcal)."""
         return self.maintenance + self.growth + self.pregnancy + self.lactation + self.activity
 
 
