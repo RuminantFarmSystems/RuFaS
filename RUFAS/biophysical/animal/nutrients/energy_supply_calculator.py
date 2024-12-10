@@ -1,12 +1,15 @@
 from dataclasses import dataclass
 
-from RUFAS.data_structures.feed_storage_to_animal_module_connection import Feed, Type
+from RUFAS.data_structures.feed_storage_to_animal_module_connection import RUFAS_ID, Feed, Type
 from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionSupply
 from RUFAS.general_constants import GeneralConstants
 
 
 @dataclass
 class FeedInRation:
+    """
+    Defines the amount of feed in a ration (kg) and all the nutritive info associated with it, in a Feed instance.
+    """
     amount: float
     info: Feed
 
@@ -16,7 +19,7 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_energy_nutrient_supply(
-        cls, feeds_used: list[Feed], ration_formulation: dict[int, float], average_body_weight: float
+        cls, feeds_used: list[Feed], ration_formulation: dict[RUFAS_ID, float], body_weight: float
     ) -> EnergyNutritionSupply:
         """
         Calculates the energy and nutrients supplied in a ration.
@@ -25,7 +28,7 @@ class EnergySupplyCalculator:
         ----------
         feeds_used : list[Feed]
             List of feeds that were used to construct the ration formulation.
-        ration_formulation : dict[int, float]
+        ration_formulation : dict[RUFAS_ID, float]
             Maps the RuFaS ID of a feed to the amount fed in a ration (kg dry matter).
 
         """
@@ -34,7 +37,7 @@ class EnergySupplyCalculator:
             for rufas_id, amount in ration_formulation.items()
         ]
 
-        discount = cls.calculate_discount(feeds, average_body_weight)
+        discount = cls.calculate_discount(feeds, body_weight)
         actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * discount for feed in feeds}
         actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
 
@@ -48,7 +51,7 @@ class EnergySupplyCalculator:
         phosphorus = cls.calculate_phosphorus_supply(feeds)
         dry_matter_intake = sum([feed.amount for feed in feeds])
         protein = cls.calculate_metabolizable_protein_supply(
-            feeds, dry_matter_intake, actual_tdn_percentages, average_body_weight
+            feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
         ndf_content = cls._calculate_neutral_detergent_fiber_content(feeds)
 
@@ -65,7 +68,7 @@ class EnergySupplyCalculator:
         )
 
     @classmethod
-    def calculate_discount(cls, feeds: list[FeedInRation], average_body_weight: float) -> float:
+    def calculate_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
         """Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE)."""
         dry_matter_intake = sum([feed.amount for feed in feeds])
 
@@ -74,9 +77,9 @@ class EnergySupplyCalculator:
             total_tdn / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE if dry_matter_intake > 0.0 else 0.0
         )
 
-        somatic_body_weight = average_body_weight * 0.96
+        somatic_body_weight = body_weight * 0.96
 
-        if total_tdn < (0.035 * average_body_weight**0.75):
+        if total_tdn < (0.035 * body_weight**0.75):
             maintenance_dry_matter_intake = 1.0
         else:
             maintenance_dry_matter_intake = total_tdn / (0.035 * somatic_body_weight**0.75)
@@ -92,10 +95,10 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_actual_metabolizable_energy(
-        cls, feeds: list[FeedInRation], actual_digestable_energy: dict[int, float]
-    ) -> dict[int, float]:
+        cls, feeds: list[FeedInRation], actual_digestable_energy: dict[RUFAS_ID, float]
+    ) -> float:
         """Calculates the actual metabolizable energy of feeds (Mcal)."""
-        actual_metabolizable_energy: dict[int, float] = {}
+        actual_metabolizable_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             if feed.info.feed_type is Type.MINERAL:
@@ -113,10 +116,10 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_actual_maintenance_net_energy(
-        cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[int, float]
-    ) -> dict[int, float]:
+        cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
+    ) -> float:
         """Calculates the actual net energy for maintenance of feeds (Mcal)."""
-        actual_maintenance_net_energy: dict[int, float] = {}
+        actual_maintenance_net_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             actual_metabolizable = actual_metabolizable_energy[feed.info.rufas_id]
@@ -138,11 +141,11 @@ class EnergySupplyCalculator:
     def calculate_actual_lactation_net_energy(
         cls,
         feeds: list[FeedInRation],
-        actual_metabolizable_energy: dict[int, float],
-        actual_digestible_energy: dict[int, float],
+        actual_metabolizable_energy: dict[RUFAS_ID, float],
+        actual_digestible_energy: dict[RUFAS_ID, float],
     ) -> float:
         """Calculates the actual net energy for lactation of feeds (Mcal)."""
-        actual_lactation_net_energy: dict[int, float] = {}
+        actual_lactation_net_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             if feed.info.feed_type is Type.MINERAL:
@@ -164,10 +167,10 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_actual_growth_net_energy(
-        cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[int, float]
+        cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """Calculates actual net energy for growth of feeds (Mcal)."""
-        actual_growth_net_energy: dict[int, float] = {}
+        actual_growth_net_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             if feed.info.feed_type is Type.MINERAL:
@@ -189,7 +192,7 @@ class EnergySupplyCalculator:
     @classmethod
     def calculate_calcium_supply(cls, feeds: list[FeedInRation]) -> float:
         """Calculates the calcium supply in the ration (kg)."""  # TODO: check units
-        calcium_digestibility: dict[int, float] = {}
+        calcium_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             if feed.info.feed_type is Type.FORAGE:
@@ -217,7 +220,7 @@ class EnergySupplyCalculator:
     @classmethod
     def calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
         """Calculates the phosphorus supply in the ration (kg)."""  # TODO: check units
-        phosphorus_digestibility: dict[int, float] = {}
+        phosphorus_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             if feed.info.feed_type is Type.FORAGE:
@@ -247,13 +250,13 @@ class EnergySupplyCalculator:
         cls,
         feeds: list[FeedInRation],
         dry_matter_intake: float,
-        actual_tdn_percentages: dict[int, float],
-        average_body_weight: float,
-    ) -> dict[int, float]:
+        actual_tdn_percentages: dict[RUFAS_ID, float],
+        body_weight: float,
+    ) -> float:
         """Calculates amount of metabolizable protein in ration (kg)."""  # TODO: check units
         concentrate_percentage_of_ration = cls._calculate_percentage_of_concentrates(feeds, dry_matter_intake)
         protein_passage_rates = cls._calculate_protein_passage_rates(
-            feeds, dry_matter_intake, average_body_weight, concentrate_percentage_of_ration
+            feeds, dry_matter_intake, body_weight, concentrate_percentage_of_ration
         )
         rdp_percentages = cls._calculate_rumen_degradable_protein_percentages(feeds, protein_passage_rates)
         rup_percentages = cls._calculate_rumen_undegradable_protein_percentages(feeds, rdp_percentages)
@@ -303,29 +306,29 @@ class EnergySupplyCalculator:
         cls,
         feeds: list[FeedInRation],
         dry_matter_intake: float,
-        average_body_weight: float,
+        body_weight: float,
         percentage_concentrates: float,
-    ) -> dict[int, float]:
+    ) -> dict[RUFAS_ID, float]:
         """Calculates the protein passage rate of feeds in ration (percentage / hour)."""
-        protein_passage_rates: dict[int, float] = {}
+        protein_passage_rates: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             if feed.info.feed_type is Type.CONC:
                 rate = (
                     2.904
-                    + 1.375 * (dry_matter_intake / average_body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
+                    + 1.375 * (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
                     - 0.02 * percentage_concentrates
                 )
             elif feed.info.feed_type is Type.FORAGE and feed.info.is_wetforage is False:
                 rate = (
                     3.362
-                    + 0.479 * (dry_matter_intake / average_body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
+                    + 0.479 * (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
                     - 0.017 * feed.info.NDF
                     - 0.007 * percentage_concentrates
                 )
             elif feed.info.is_wetforage is True:
                 rate = (
-                    3.054 + 0.614 * (dry_matter_intake / average_body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
+                    3.054 + 0.614 * (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
                 )
             else:
                 rate = 0.0
@@ -335,10 +338,10 @@ class EnergySupplyCalculator:
 
     @classmethod
     def _calculate_rumen_degradable_protein_percentages(
-        cls, feeds: list[FeedInRation], protein_passage_rates: dict[int, float]
-    ) -> dict[int, float]:
+        cls, feeds: list[FeedInRation], protein_passage_rates: dict[RUFAS_ID, float]
+    ) -> dict[RUFAS_ID, float]:
         """Calculates rumen degradable protein (RDP) percentages of feeds in ration."""
-        rdp_percentages: dict[int, float] = {}
+        rdp_percentages: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             passage_rate = protein_passage_rates[feed.info.rufas_id]
@@ -355,10 +358,10 @@ class EnergySupplyCalculator:
 
     @classmethod
     def _calculate_rumen_undegradable_protein_percentages(
-        cls, feeds: list[FeedInRation], rumen_degradable_protein_percentages: dict[int, float]
-    ) -> dict[int, float]:
+        cls, feeds: list[FeedInRation], rumen_degradable_protein_percentages: dict[RUFAS_ID, float]
+    ) -> dict[RUFAS_ID, float]:
         """Calculates rumen undegradable protein (RUP) percentages of feeds in ration."""
-        rup_percentages: dict[int, float] = {}
+        rup_percentages: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
             rup_percentages[feed.info.rufas_id] = (

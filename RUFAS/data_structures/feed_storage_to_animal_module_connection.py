@@ -4,6 +4,13 @@ from enum import Enum
 from RUFAS.units import MeasurementUnits
 
 
+"""
+Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
+other input files and the RuFaS codebase.
+"""
+RUFAS_ID = int
+
+
 class Category(Enum):
     ANIMAL_PROTEIN = "Animal Protein"
     BY_PRODUCT_OTHER = "By-Product/Other"
@@ -38,9 +45,10 @@ class NutrientStandard(Enum):
 class Feed:
     """
     Base representation of a feed in RuFaS.
+    
     Attributes
     ----------
-    rufas_id : int
+    rufas_id : RUFAS_ID
     Fd_Category : Category
     feed_type : Type
     DM : float
@@ -78,9 +86,10 @@ class Feed:
         Price of using the feed that is already on-farm ($ / kg).
     purchase_cost : float
         Price of buying feed from off-farm ($ / kg).
+    
     """
 
-    rufas_id: int
+    rufas_id: RUFAS_ID
     Fd_Category: Category
     feed_type: Type
     DM: float

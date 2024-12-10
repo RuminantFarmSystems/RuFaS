@@ -6,7 +6,7 @@ from RUFAS.biophysical.animal.data_types.nutrition_requirements import (
     EnergyNutritionSupply,
 )
 from RUFAS.biophysical.animal.nutrients.energy_supply_calculator import EnergySupplyCalculator
-from RUFAS.data_structures.feed_storage_to_animal_module_connection import Feed
+from RUFAS.data_structures.feed_storage_to_animal_module_connection import Feed, RUFAS_ID
 from RUFAS.general_constants import GeneralConstants
 
 
@@ -16,20 +16,19 @@ class EnergyNutritionEvaluator:
     @classmethod
     def evaluate_energy_nutrition_supply(
         cls,
-        ration: dict[int, float],
+        ration: dict[RUFAS_ID, float],
         available_feeds: list[Feed],
         requirements: EnergyNutritionRequirements,
         body_weight: float,
+        is_cow: bool,
     ) -> bool:
         """True if energy and nutrition supplied satisfy the requirements, false otherwise."""
         energy_nutrition_supply = EnergySupplyCalculator.calculate_energy_nutrient_supply(
             available_feeds, ration, body_weight  # TODO: confirm this is average body weight when formulating for a pen
         )  # but an individual body weight when checking for an individual animal
 
-        energy_nutrition_checkers = [
-            cls._check_total_energy_supplied,
+        heifer_energy_nutrition_checkers = {
             cls._check_activity_maintenance_energy_supplied,
-            cls._check_lactation_energy_supplied,
             cls._check_growth_energy_supplied,
             cls._check_calcium_supplied,
             cls._check_phosphorus_supplied,
@@ -37,11 +36,13 @@ class EnergyNutritionEvaluator:
             cls._check_neutral_detergent_fiber_supplied,
             cls._check_fat_content,
             cls._check_dry_matter_intake,
-        ]
-        results = []
-        for checker in energy_nutrition_checkers:
-            result = checker(requirements, energy_nutrition_supply)
-            results.append(result)
+        }
+        cow_energy_nutrition_checkers = heifer_energy_nutrition_checkers + {
+            cls._check_total_energy_supplied, cls._check_lactation_energy_supplied,
+        }
+
+        checkers = cow_energy_nutrition_checkers if is_cow else heifer_energy_nutrition_checkers
+        results = [checker(requirements, energy_nutrition_supply) for checker in checkers]
 
         return all(results)
 
