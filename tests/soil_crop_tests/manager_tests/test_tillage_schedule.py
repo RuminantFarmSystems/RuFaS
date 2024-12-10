@@ -205,14 +205,7 @@ def test_init_tillage_schedule(
                 TillageEvent(45, 0.4, 0.2, TillageImplement.CULTIVATOR, 1992, 135),
                 TillageEvent(150, 0.4, 0.2, TillageImplement.SEEDBED_CONDITIONER, 1996, 120),
                 TillageEvent(45, 0.4, 0.2, TillageImplement.CULTIVATOR, 1997, 135),
-                TillageEvent(
-                    150,
-                    0.4,
-                    0.2,
-                    TillageImplement.SEEDBED_CONDITIONER,
-                    2001,
-                    120
-                ),
+                TillageEvent(150, 0.4, 0.2, TillageImplement.SEEDBED_CONDITIONER, 2001, 120),
                 TillageEvent(45, 0.4, 0.2, TillageImplement.CULTIVATOR, 2002, 135),
             ],
         ),
