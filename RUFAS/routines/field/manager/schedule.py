@@ -169,16 +169,16 @@ class Schedule:
         return all(depth > 0.0 for depth in depths)
 
     @staticmethod
-    def validate_equal_lengths(header: str, **kwargs: Any) -> bool:
+    def validate_equal_lengths(header: str, **kwargs: dict[str, Any]) -> bool:
         """
-        Validates that all provided iterables have the same length.
+        Validates that all provided lists of values have the same length.
 
         Parameters
         ----------
         header: str
             Error header when needs to throw an error.
-        kwargs : list of iterables
-            The iterables to check for length equality.
+        kwargs : dict[str, Any]
+            Key word arguments where the key is the name of the parameter and the value is a list of values.
 
         Returns
         -------
