@@ -1,4 +1,3 @@
-from collections import namedtuple
 from dataclasses import dataclass
 
 from RUFAS.data_structures.feed_storage_to_animal_module_connection import Feed, Type

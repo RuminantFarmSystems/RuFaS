@@ -352,6 +352,8 @@ class Animal:
                 distance=self.walking_distance,
             )
 
+    def check_ration_satifies_requirements(self, ration: dict[int, float]) -> None:
+
     def _evaluate_calf_for_heiferI(self) -> bool:
         return self.days_born == AnimalConfig.wean_day
 
