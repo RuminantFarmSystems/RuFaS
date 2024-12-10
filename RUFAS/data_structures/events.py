@@ -123,9 +123,9 @@ class HarvestEvent(BaseFieldManagementEvent):
     def __init__(
         self,
         crop_reference: str,
+        operation: HarvestOperation = HarvestOperation.HARVEST_KILL,
         year: int = 1,
         day: int = 240,
-        operation: HarvestOperation = HarvestOperation.HARVEST_KILL,
     ):
         super().__init__(year=year, day=day)
         self.crop_reference = crop_reference
@@ -166,12 +166,12 @@ class TillageEvent(BaseFieldManagementEvent):
 
     def __init__(
         self,
+        tillage_depth: float,
+        incorporation_fraction: float,
+        mixing_fraction: float,
+        implement: TillageImplement,
         year: int = 1,
-        day: int = 160,
-        tillage_depth: float = None,
-        incorporation_fraction: float = None,
-        mixing_fraction: float = None,
-        implement: TillageImplement = None,
+        day: int = 160
     ):
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
@@ -226,14 +226,14 @@ class ManureEvent(BaseFieldManagementEvent):
 
     def __init__(
         self,
-        year: int,
-        day: int,
         nitrogen_mass: float,
         phosphorus_mass: float,
         manure_type: ManureType,
         field_coverage: float,
         application_depth: float,
         surface_remainder_fraction: float,
+        year: int,
+        day: int
     ):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
@@ -299,14 +299,14 @@ class FertilizerEvent(BaseFieldManagementEvent):
 
     def __init__(
         self,
-        year: int,
-        day: int,
         mix_name: str,
         nitrogen_mass: float,
         phosphorus_mass: float,
         potassium_mass: float,
         depth: float,
         surface_remainder_fraction: float,
+        year: int,
+        day: int,
     ):
         super().__init__(year=year, day=day)
         self.mix_name = mix_name
