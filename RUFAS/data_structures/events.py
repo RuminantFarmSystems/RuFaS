@@ -171,7 +171,7 @@ class TillageEvent(BaseFieldManagementEvent):
         mixing_fraction: float,
         implement: TillageImplement,
         year: int = 1,
-        day: int = 160
+        day: int = 160,
     ):
         super().__init__(year=year, day=day)
         self.tillage_depth = tillage_depth
@@ -233,7 +233,7 @@ class ManureEvent(BaseFieldManagementEvent):
         application_depth: float,
         surface_remainder_fraction: float,
         year: int,
-        day: int
+        day: int,
     ):
         super().__init__(year=year, day=day)
         self.nitrogen_mass = nitrogen_mass
