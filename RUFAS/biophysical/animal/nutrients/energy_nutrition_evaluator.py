@@ -26,9 +26,24 @@ class EnergyNutritionEvaluator:
             available_feeds, ration, body_weight  # TODO: confirm this is average body weight when formulating for a pen
         )  # but an individual body weight when checking for an individual animal
 
-        total_energy_satisfactory = cls._check_total_energy_supplied(requirements, energy_nutrition_supply)
+        energy_nutrition_checkers = [
+            cls._check_total_energy_supplied,
+            cls._check_activity_maintenance_energy_supplied,
+            cls._check_lactation_energy_supplied,
+            cls._check_growth_energy_supplied,
+            cls._check_calcium_supplied,
+            cls._check_phosphorus_supplied,
+            cls._check_protein_supplied,
+            cls._check_neutral_detergent_fiber_supplied,
+            cls._check_fat_content,
+            cls._check_dry_matter_intake,
+        ]
+        results = []
+        for checker in energy_nutrition_checkers:
+            result = checker(requirements, energy_nutrition_supply)
+            results.append(result)
 
-        pass
+        return all(results)
 
     @classmethod
     def _check_total_energy_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
