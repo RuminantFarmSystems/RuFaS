@@ -290,9 +290,9 @@ def test_check_manure_application_schedule() -> None:
 
     # Arrange
     manure_events = [
-        ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
-        ManureEvent(1992, 120, 90, 25, ManureType.SOLID, 0.9, 0.1, 0.9),
-        ManureEvent(1991, 121, 80, 30, ManureType.LIQUID, 0.85, 0.05, 0.95),
+        ManureEvent(100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0, 1991, 120),
+        ManureEvent(90, 25, ManureType.SOLID, 0.9, 0.1, 0.9, 1992, 120),
+        ManureEvent(80, 30, ManureType.LIQUID, 0.85, 0.05, 0.95, 1991, 121),
     ]
     field = Field(manure_events=manure_events)
     field.field_data = MagicMock()
@@ -2698,47 +2698,47 @@ def test_annual_reset() -> None:
     [
         (
             [
-                TillageEvent(1997, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(1998, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(1999, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7),
             ],
             7,
             1998,
             [
-                TillageEvent(1997, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(1999, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7),
             ],
-            [TillageEvent(1998, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR)],
+            [TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7, )],
         ),
         ([], 7, 1998, [], []),
         (
             [
-                TillageEvent(1997, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(1999, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(2023, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7, ),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7, ),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 2023, 7, ),
             ],
             7,
             1998,
             [
-                TillageEvent(1997, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(1999, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(2023, 7, 10, 0.5, 0.3, TillageImplement.CULTIVATOR),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7, ),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7, ),
+                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 2023, 7, ),
             ],
             [],
         ),
         (
             [
-                TillageEvent(1998, 7, 7, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(1998, 7, 10, 0.5, 0.4, TillageImplement.CULTIVATOR),
-                TillageEvent(1998, 7, 5, 0.5, 0.3, TillageImplement.CULTIVATOR),
+                TillageEvent(7, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7, ),
+                TillageEvent(10, 0.5, 0.4, TillageImplement.CULTIVATOR, 1998, 7, ),
+                TillageEvent(5, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7, ),
             ],
             7,
             1998,
             [],
             [
-                TillageEvent(1998, 7, 7, 0.5, 0.3, TillageImplement.CULTIVATOR),
-                TillageEvent(1998, 7, 10, 0.5, 0.4, TillageImplement.CULTIVATOR),
-                TillageEvent(1998, 7, 5, 0.5, 0.3, TillageImplement.CULTIVATOR),
+                TillageEvent(7, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7, ),
+                TillageEvent(10, 0.5, 0.4, TillageImplement.CULTIVATOR, 1998, 7, ),
+                TillageEvent(5, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7, ),
             ],
         ),
     ],

@@ -70,8 +70,6 @@ class TillageSchedule(Schedule):
 
         self._validate_tillage_parameters()
 
-        self.validate_pattern_parameters(self.name, self.pattern_skip, self.pattern_repeat)
-
     def _validate_tillage_parameters(self) -> None:
         """
         Checks all fields that define the tillage schedule and raises errors if any are invalid.
@@ -94,7 +92,7 @@ class TillageSchedule(Schedule):
         ]
 
         self._validate_parameters([], fraction_parameters, self.years, self.days, self.name)
-        valid_depths = self.validate_depths(self.tillage_depths)
+        valid_depths = self.validate_positive_values(self.tillage_depths)
         if not valid_depths:
             raise ValueError(
                 error_header + f"expected all tillage depths to be > 0.0, received " f"'{self.tillage_depths}'."
