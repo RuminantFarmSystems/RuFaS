@@ -356,7 +356,7 @@ class Animal:
     def is_ration_satisfactory(self, ration: dict[RUFAS_ID, float], available_feeds: list[Feed]) -> bool:
         """True if the ration meets the energy and nutrient requirements of the animal, else False."""
         return EnergyNutritionEvaluator.evaluate_energy_nutrition_supply(
-            ration, available_feeds, self.requirements, self.body_weight, self.animal_type.is_cow, 
+            ration, available_feeds, self.requirements, self.body_weight, self.animal_type.is_cow,
         )
 
     def _evaluate_calf_for_heiferI(self) -> bool:
