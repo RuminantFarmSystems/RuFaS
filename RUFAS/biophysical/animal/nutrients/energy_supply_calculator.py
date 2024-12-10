@@ -47,7 +47,10 @@ class EnergySupplyCalculator:
         calcium = cls.calculate_calcium_supply(feeds)
         phosphorus = cls.calculate_phosphorus_supply(feeds)
         dry_matter_intake = sum([feed.amount for feed in feeds])
-        protein = cls.calculate_metabolizable_protein_supply(feeds, dry_matter_intake, actual_tdn_percentages, average_body_weight)
+        protein = cls.calculate_metabolizable_protein_supply(
+            feeds, dry_matter_intake, actual_tdn_percentages, average_body_weight
+        )
+        ndf_content = cls._calculate_neutral_detergent_fiber_content(feeds)
 
         return EnergyNutritionSupply(
             metabolizable=metabolizable_energy,
@@ -57,7 +60,8 @@ class EnergySupplyCalculator:
             protein=protein,
             calcium=calcium,
             phosphorus=phosphorus,
-            dry_matter=dry_matter_intake
+            dry_matter=dry_matter_intake,
+            ndf_content=ndf_content,
         )
 
     @classmethod
@@ -240,7 +244,11 @@ class EnergySupplyCalculator:
 
     @classmethod
     def calculate_metabolizable_protein_supply(
-        cls, feeds: list[FeedInRation], dry_matter_intake: float, actual_tdn_percentages: dict[int, float], average_body_weight: float
+        cls,
+        feeds: list[FeedInRation],
+        dry_matter_intake: float,
+        actual_tdn_percentages: dict[int, float],
+        average_body_weight: float,
     ) -> dict[int, float]:
         """Calculates amount of metabolizable protein in ration (kg)."""  # TODO: check units
         concentrate_percentage_of_ration = cls._calculate_percentage_of_concentrates(feeds, dry_matter_intake)
@@ -358,3 +366,13 @@ class EnergySupplyCalculator:
             )
 
         return rup_percentages
+
+    @classmethod
+    def _calculate_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
+        """Calculates the neutral detergent fiber (NDF) content of a ration (kg)."""
+        return sum([feed.amount * feed.info.NDF * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+
+    @classmethod
+    def _calculate_fat_content(cls, feeds: list[FeedInRation]) -> float:
+        """Calculates the fat content of a ration (kg)."""
+        return sum([feed.amount * feed.info.EE * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])

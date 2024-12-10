@@ -32,6 +32,7 @@ class EnergyNutritionRequirements:
         Essential amino acid requirements.
 
     """
+
     maintenance: float
     growth: float
     pregnancy: float
@@ -71,9 +72,14 @@ class EnergyNutritionSupply:
     phosphorus : float
         Phosphorus supplied in a ration (g).
     dry_matter : float
-        Total dry matter content of a diet (kg).
+        Total dry matter content of a ration (kg).
+    ndf_content : float
+        Total neutral detergent fiber (NDF) in the ration (kg).
+    fat_content : float
+        Total fat content in the ration (kg).
 
     """
+
     metabolizable: float
     maintenance: float
     lactation: float
@@ -82,3 +88,5 @@ class EnergyNutritionSupply:
     calcium: float
     phosphorus: float
     dry_matter: float
+    ndf_content: float
+    fat_content: float
