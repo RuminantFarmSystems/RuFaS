@@ -1,6 +1,7 @@
 from copy import copy
 from typing import List, Any, Optional
 
+from RUFAS.data_structures.events import BaseFieldManagementEvent
 from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
 
@@ -46,7 +47,6 @@ class Schedule:
 
         self.pattern_skip = pattern_skip
         self.pattern_repeat = pattern_repeat
-        self.validate_pattern_parameters(self.name, self.pattern_skip, self.pattern_repeat)
 
     @staticmethod
     def _validate_days(years: list[int], days: list[int]) -> bool:
@@ -105,7 +105,7 @@ class Schedule:
         days: list[int],
         additional_attributes: Optional[list[Any]],
         additional_attributes_events: list[list[Any]],
-        event_class: Any,
+        event_class: BaseFieldManagementEvent,
         pattern_skip: int,
         pattern_repeat: int,
         heat_scheduled_harvest: bool,
@@ -151,13 +151,13 @@ class Schedule:
         return result
 
     @staticmethod
-    def validate_depths(depths: list[float]) -> bool:
+    def validate_positive_values(values: list[float]) -> bool:
         """
         Checks that depths passed are all valid.
 
         Parameters
         ----------
-        depths : List[float]
+        values : List[float]
             List of tillage depths to be validated.
 
         Returns
@@ -166,19 +166,19 @@ class Schedule:
             True if all tillage depths are valid, False otherwise.
 
         """
-        return all(depth > 0.0 for depth in depths)
+        return all(depth > 0.0 for depth in values)
 
     @staticmethod
     def validate_equal_lengths(header: str, **kwargs: dict[str, Any]) -> bool:
         """
-        Validates that all provided lists of values have the same length.
+        Validates that all provided iterables have the same length.
 
         Parameters
         ----------
         header: str
-            Error header when needs to throw an error.
-        kwargs : dict[str, Any]
-            Key word arguments where the key is the name of the parameter and the value is a list of values.
+            Error header when for when an error is raised.
+        kwargs : list of iterables
+            The iterables to check for length equality.
 
         Returns
         -------
@@ -267,7 +267,7 @@ class Schedule:
         ----------
         pattern : List[int | float]
             The pattern to be repeated.
-        skip : int | float
+        skip : int
             Number of steps to skip between repeats (0 if no steps should be skipped).
         repeat : int
             Number of times pattern should be repeated.

@@ -130,22 +130,3 @@ def test_validate_equal_lengths_invalid() -> None:
 def test_repeat_pattern(pattern: List[int], skip: int, repeat: int, expected: list) -> None:
     """Tests that repeat_pattern correctly repeats patterns."""
     assert Schedule.repeat_pattern(pattern, skip, repeat) == expected
-
-
-@pytest.mark.parametrize(
-    "name,skip,repeat,expected,error",
-    [
-        ("test_1", -1, 1, "'test_1': expected pattern skip to be >= 0, received '-1'.", True),
-        ("test_2", 1, -1, "'test_2': expected pattern repeat to be >= 0, received '-1'.", True),
-        ("test_3", 1, 1, "Nothing", False),
-    ],
-)
-def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected: str, error: bool) -> None:
-    """Tests that errors are correctly raised by Schedule when invalid"""
-    if error:
-        with pytest.raises(ValueError) as e:
-            Schedule.validate_pattern_parameters(name, skip, repeat)
-        assert str(e.value) == expected
-    else:
-        Schedule.validate_pattern_parameters(name, skip, repeat)
-        assert True

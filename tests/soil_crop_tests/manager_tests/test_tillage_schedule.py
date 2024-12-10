@@ -105,7 +105,7 @@ def test_validate_tillage_parameters(
 )
 def test_validate_depths(depths: List[float], expected: bool) -> None:
     """Tests that tillage depths are validated correctly."""
-    actual = TillageSchedule.validate_depths(depths)
+    actual = TillageSchedule.validate_positive_values(depths)
     assert actual == expected
 
 
