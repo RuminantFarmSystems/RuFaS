@@ -22,6 +22,7 @@ from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
 from RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator import NRCRequirementsCalculator
+from RUFAS.biophysical.animal.nutrients.energy_nutrition_evaluator import EnergyNutritionEvaluator
 from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (NewBornCalfValuesTypedDict, CalfValuesTypedDict,
                                                                     HeiferIValuesTypedDict, HeiferIIValuesTypedDict,
@@ -32,7 +33,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferRepro
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
-from RUFAS.data_structures.feed_storage_to_animal_module_connection import NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_module_connection import NutrientStandard, RUFAS_ID, Feed
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 
@@ -352,7 +353,11 @@ class Animal:
                 distance=self.walking_distance,
             )
 
-    def check_ration_satifies_requirements(self, ration: dict[int, float]) -> None:
+    def is_ration_satisfactory(self, ration: dict[RUFAS_ID, float], available_feeds: list[Feed]) -> bool:
+        """True if the ration meets the energy and nutrient requirements of the animal, else False."""
+        return EnergyNutritionEvaluator.evaluate_energy_nutrition_supply(
+            ration, available_feeds, self.requirements, self.body_weight, self.animal_type.is_cow, 
+        )
 
     def _evaluate_calf_for_heiferI(self) -> bool:
         return self.days_born == AnimalConfig.wean_day
