@@ -141,9 +141,11 @@ class Schedule:
         all_years = self.repeat_pattern(years, pattern_skip, pattern_repeat)
         all_days = days * (pattern_repeat + 1)
         repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes_events]
-        all_events = list(zip(all_years, all_days, *repeated_attributes))
+        all_events = list(zip(*repeated_attributes, all_years, all_days))
         if heat_scheduled_harvest:
-            all_events[:] = [harvest for harvest in all_events if harvest[2] in FINAL_HARVEST_OPERATIONS]
+
+            all_events[:] = [harvest for harvest in all_events if harvest[0] in FINAL_HARVEST_OPERATIONS]
+
         result = [event_class(*additional_attributes, *event) for event in all_events]
 
         return result

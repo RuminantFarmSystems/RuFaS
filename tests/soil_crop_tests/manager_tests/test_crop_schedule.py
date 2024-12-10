@@ -290,12 +290,12 @@ def test_generate_planting_events(
             1,
             1,
             [
-                HarvestEvent("test", 1, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 2, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 6, 240, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 8, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 9, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 13, 240, HarvestOperation.HARVEST_KILL),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 1, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 2, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 6, 240),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 8, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 9, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 13, 240),
             ],
         ),
         (
@@ -306,12 +306,12 @@ def test_generate_planting_events(
             2,
             2,
             [
-                HarvestEvent("test", 1, 200, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 1, 260, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 4, 200, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 4, 260, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 7, 200, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 7, 260, HarvestOperation.HARVEST_KILL),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 1, 200),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 1, 260),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 4, 200),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 4, 260),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 7, 200),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 7, 260),
             ],
         ),
         (
@@ -322,9 +322,9 @@ def test_generate_planting_events(
             1,
             2,
             [
-                HarvestEvent("test", 3, 240, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 7, 240, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 11, 240, HarvestOperation.HARVEST_KILL),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 3, 240),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 7, 240),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 11, 240),
             ],
         ),
     ],
@@ -353,5 +353,4 @@ def test_generate_harvest_events(
         repeat,
     )
     actual = crop_sched.generate_harvest_events()
-
     assert expected == actual
