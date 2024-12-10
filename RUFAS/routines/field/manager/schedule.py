@@ -103,8 +103,8 @@ class Schedule:
         self,
         years: list[int],
         days: list[int],
-        additional_attributes: Optional[list[Any]],
-        additional_attributes_events: list[list[Any]],
+        general_attributes: Optional[list[Any]],
+        event_specific_attributes: list[list[Any]],
         event_class: Any,
         pattern_skip: int,
         pattern_repeat: int,
@@ -119,10 +119,10 @@ class Schedule:
             List of years for the schedule.
         days : List[int]
             List of days for the schedule.
-        additional_attributes : List[List]
-            Additional general attributes for the events (e.g., crop reference).
-        additional_attributes_events : List[List]
-            Additional attributes for each of the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
+        general_attributes : List[List]
+            Attributes that apply to all events.
+        event_specific_attributes : List[List]
+            Attributes which are specific to individual events.
         event_class : class
             The class to instantiate for each event.
         pattern_skip : int
