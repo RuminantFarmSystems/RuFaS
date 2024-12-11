@@ -101,7 +101,7 @@ class PlantingEvent(BaseFieldManagementEvent):
             )
         return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Overrides the hash method for PlantingEvent objects."""
         return hash((self.crop_reference, self.year, self.day, self.use_heat_scheduled_harvest))
 
@@ -141,7 +141,7 @@ class HarvestEvent(BaseFieldManagementEvent):
             )
         return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Overrides the hash method for HarvestEvent objects."""
         return hash((self.year, self.day, self.crop_reference, self.operation))
 
@@ -191,7 +191,7 @@ class TillageEvent(BaseFieldManagementEvent):
             )
         return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Overrides the hash method for TillageEvent objects."""
         return hash(
             (self.year, self.day, self.tillage_depth, self.incorporation_fraction, self.mixing_fraction, self.implement)
@@ -257,7 +257,7 @@ class ManureEvent(BaseFieldManagementEvent):
             )
         return False
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Overrides the hash method for ManureEvent objects."""
         return hash(
             (
