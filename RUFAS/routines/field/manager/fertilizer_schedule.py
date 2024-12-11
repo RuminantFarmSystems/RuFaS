@@ -162,6 +162,6 @@ class FertilizerSchedule(Schedule):
                 ],
                 FertilizerEvent,
                 self.pattern_skip,
-                self.pattern_repeat
+                self.pattern_repeat,
             )
         )

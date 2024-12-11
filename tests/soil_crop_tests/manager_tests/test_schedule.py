@@ -141,13 +141,7 @@ def test_prepare_events() -> None:
     pattern_repeat = 1
     schedule = Schedule("test", [1], [1])
 
-    result = schedule.prepare_events(
-        years,
-        days,
-        additional_attributes_events,
-        pattern_skip,
-        pattern_repeat
-    )
+    result = schedule.prepare_events(years, days, additional_attributes_events, pattern_skip, pattern_repeat)
 
     assert result == [
         (1, 3, 2022, 100),
