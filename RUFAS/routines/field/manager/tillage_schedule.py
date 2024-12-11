@@ -126,6 +126,6 @@ class TillageSchedule(Schedule):
                 [self.tillage_depths, self.incorporation_fractions, self.mixing_fractions, self.implements],
                 TillageEvent,
                 self.pattern_skip,
-                self.pattern_repeat
+                self.pattern_repeat,
             )
         )

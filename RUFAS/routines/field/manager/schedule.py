@@ -105,7 +105,7 @@ class Schedule:
         additional_attributes_events: list[list[Any]],
         event_class: Any,
         pattern_skip: int,
-        pattern_repeat: int
+        pattern_repeat: int,
     ) -> list[Any]:
         """
         Generic method to generate application events.
@@ -139,12 +139,14 @@ class Schedule:
 
         return result
 
-    def prepare_events(self,
-                       years: list[int],
-                       days: list[int],
-                       additional_attributes_events: list[list[Any]],
-                       pattern_skip: int,
-                       pattern_repeat: int) -> list[Any]:
+    def prepare_events(
+        self,
+        years: list[int],
+        days: list[int],
+        additional_attributes_events: list[list[Any]],
+        pattern_skip: int,
+        pattern_repeat: int,
+    ) -> list[Any]:
         """
         Prepares the attributes to pass into the event classes constructor.
 
@@ -285,8 +287,8 @@ class Schedule:
             if not Utility.validate_fractions(parameter):
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be in"
-                                    f" range [0.0, 1.0], "
-                                    f"received '{parameter}'."
+                    f" range [0.0, 1.0], "
+                    f"received '{parameter}'."
                 )
 
     @staticmethod

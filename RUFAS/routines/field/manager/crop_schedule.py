@@ -166,7 +166,7 @@ class CropSchedule(Schedule):
                 [],
                 PlantingEvent,
                 self.planting_skip,
-                self.pattern_repeat
+                self.pattern_repeat,
             )
         )
 
@@ -185,12 +185,13 @@ class CropSchedule(Schedule):
         scheduled, which is why this method contains the if block that removes all non-final harvest events.
 
         """
-        all_events = self.prepare_events(self.harvest_years,
-                                         self.harvest_days,
-                                         [self.harvest_operations],
-                                         self.harvesting_skip,
-                                         self.pattern_repeat,
-                                         )
+        all_events = self.prepare_events(
+            self.harvest_years,
+            self.harvest_days,
+            [self.harvest_operations],
+            self.harvesting_skip,
+            self.pattern_repeat,
+        )
         if self.heat_scheduled:
             all_events[:] = [harvest for harvest in all_events if harvest[0] in FINAL_HARVEST_OPERATIONS]
         result = [HarvestEvent(self.crop_reference, *event) for event in all_events]
