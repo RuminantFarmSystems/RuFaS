@@ -52,13 +52,15 @@ class UserDefinedRationManager:
         invalid_ration_found: bool = False
         for animal_combo, ration in cls.user_defined_rations.items():
             total_percentage_of_ration = sum(ration.values())
+            info_map["ration"] = ration
+            info_map["animal_combination"] = animal_combo.value()
             if total_percentage_of_ration != 100.0:
-                info_map["ration"] = ration
-                info_map["animal_combination"] = animal_combo.value()
                 error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to "
                 f"{total_percentage_of_ration}. Simulation will be halted."
                 cls._om.add_error("invalid_user_defined_ration_found", error_msg, info_map)
                 invalid_ration_found = True
+            else:
+                cls._om.add_variable("user_defined_ration", ration, info_map)
 
         if invalid_ration_found:
             raise ValueError("One or more invalid user-defined rations found.")
