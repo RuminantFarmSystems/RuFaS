@@ -197,6 +197,8 @@ class AnimalGenetics:
         of the net merit value, then generates a random value from the distribution as the net merit value.
         """
         birth_year_month = birth_date[:7]
+        import remote_pdb
+        remote_pdb.set_trace("localhost", 4444)
         average = AnimalGenetics.net_merit[breed][birth_year_month]["average"]
         std = AnimalGenetics.net_merit[breed][birth_year_month]["std"]
         return Utility.generate_random_number(average, std)
