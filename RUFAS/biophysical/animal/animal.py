@@ -33,7 +33,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferRepro
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
-from RUFAS.data_structures.feed_storage_to_animal_module_connection import NutrientStandard, RUFAS_ID, Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, RUFAS_ID, Feed
 from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 
@@ -184,7 +184,6 @@ class Animal:
         self.days_in_milk = args.get("days_in_milk", 0)
         self.reproduction.calves = args.get("calves", 0)
         self.reproduction.calving_interval = args.get("calving_interval", 0)
-
 
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:

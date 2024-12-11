@@ -18,7 +18,7 @@ from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
 from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
-from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -63,7 +63,6 @@ class HerdManager:
     def __init__(
         self,
         data: dict[str, Any],
-        feed: Feed,
         weather: Weather,
         time: Time,
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
@@ -77,8 +76,6 @@ class HerdManager:
         ----------
         data : Dict[str, Any]
             dictionary with animal information from the input JSON file
-        feed : Feed
-            instance of the Feed class
         weather : Weather
             instance of the Weather class
         time : Time
@@ -163,7 +160,7 @@ class HerdManager:
                 self.replacement_market
             ) = herd_factory.initialize_herd()
 
-            self.initialize_nutrient_requirements(weather, time, feed)
+            self.initialize_nutrient_requirements(weather, time)
 
             self.allocate_animals_to_pens()
 
@@ -358,7 +355,7 @@ class HerdManager:
 
             self.all_pens.append(pen)
 
-    def initialize_nutrient_requirements(self, weather: Weather, time: Time, feed: Feed) -> None:
+    def initialize_nutrient_requirements(self, weather: Weather, time: Time) -> None:
         """
         Calculates initial nutrient requirements at the beginning of the
         simulation for initial pen allocation. For the nutrient requirements
@@ -367,8 +364,6 @@ class HerdManager:
 
         Parameters
         ----------
-        feed : Feed
-            an instance of the Feed class defined in feed.py
         weather : Weather
             instance of the Weather class
         time : Time
@@ -382,7 +377,7 @@ class HerdManager:
         current_conditions = weather.get_current_day_conditions(time)
         current_temperature = current_conditions.mean_air_temperature
         for calf in self.calves:
-            calf.calc_nutrient_rqmts(feed, current_temperature)
+            calf.calc_nutrient_rqmts(current_temperature)
             calf.p_animal = 0.0072 * calf.body_weight * 1000
 
         for heiferI in self.heiferIs:
