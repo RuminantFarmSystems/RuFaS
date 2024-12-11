@@ -63,9 +63,9 @@ def test_determine_nitrogen_shape_parameters(
         expected_near = mature + 0.00001
         observe = NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-                    NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge)
-                    - NitrogenIncorporation._determine_shape_log(heatfrac, expected_near, mature, emerge)
-            ) / (heatfrac - halfheat)
+            NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge)
+            - NitrogenIncorporation._determine_shape_log(heatfrac, expected_near, mature, emerge)
+        ) / (heatfrac - halfheat)
         expect_1 = NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
