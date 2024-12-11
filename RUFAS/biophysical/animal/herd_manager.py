@@ -18,7 +18,6 @@ from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
 from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
-from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.enums import AnimalCombination
