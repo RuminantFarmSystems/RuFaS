@@ -143,6 +143,7 @@ class HerdManager:
             ]
         }
         self.herd_statistics = HerdStatistics()
+        self.herd_statistics.herd_num = animal_config_data["herd_information"]["herd_num"]
 
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
@@ -189,9 +190,6 @@ class HerdManager:
         }
 
     def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> list[HerdManagerOutput]:
-        if not self.simulate_animals:
-            return []
-
         current_conditions = weather.get_current_day_conditions(time)
         current_temperature = current_conditions.mean_air_temperature
 
@@ -248,7 +246,7 @@ class HerdManager:
         for cow in self.cows:
             cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
             if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
-                newborn_calf = Animal(**cow_routines_output.animal_values)
+                newborn_calf = Animal(args={**cow_routines_output.animal_values})
                 if not (newborn_calf.sold or newborn_calf.culled):
                     newborn_calf.events.add_event(
                         newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
@@ -317,12 +315,12 @@ class HerdManager:
             Dictionary containing information about the manure management scenarios.
 
         """
-
         # Initialize pens from all_pen_data
         for pen_data in all_pen_data:
-            pen_id = pen_data.pop("id")
+            animal_combination_value: int = AnimalCombination[pen_data.get("animal_combination")].value
+            pen_id = pen_data.get('id')
             pen_name = pen_data.get("name", "")
-            animal_combination = AnimalCombination(pen_data.pop("animal_combination"))
+            animal_combination=AnimalCombination(animal_combination_value)
             vertical_dist_to_milking_parlor = pen_data.get("vertical_dist_to_milking_parlor")
             horizontal_dist_to_milking_parlor = pen_data.get("horizontal_dist_to_milking_parlor")
             number_of_stalls = pen_data.get("number_of_stalls")
@@ -330,7 +328,7 @@ class HerdManager:
             pen_type = pen_data.get("pen_type")
             max_stocking_density = pen_data.get("max_stocking_density")
 
-            manure_management_scenario_id = pen_data.pop("manure_management_scenario_id")
+            manure_management_scenario_id = pen_data.get("manure_management_scenario_id")
             manure_management_scenario = [
                 scenario
                 for scenario in manure_management_scenarios
@@ -406,7 +404,6 @@ class HerdManager:
         ]:
             animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
             animals_by_combination[animal_combination].append(animal)
-
         for animal_combination, animals in animals_by_combination.items():
             new_default_pens = self._create_additional_pens_for_potential_space_shortage(
                 num_animals=len(animals),
@@ -571,7 +568,7 @@ class HerdManager:
 
         """
         pen_id = self.animal_to_pen_id_map[animal.id]
-        self.all_pens[pen_id].remove_animal(animal.id)
+        self.all_pens[pen_id].remove_animals_by_ids([animal.id])
         del self.animal_to_pen_id_map[animal.id]
 
     def _add_animal_to_pen_and_id_map(
@@ -955,7 +952,6 @@ class HerdManager:
         None
 
         """
-
         allocation_plan = self.plan_animal_allocation(
             num_animals=len(animals),
             max_spaces_in_pens=[

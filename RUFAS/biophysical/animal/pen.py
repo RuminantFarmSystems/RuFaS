@@ -199,7 +199,6 @@ class Pen:
         animal_combination: AnimalCombination
             an AnimalCombination Enum representing the type of the new animals
         """
-
         self.add_new_animals(new_animals)
         self.calculate_daily_walking_distance()
         self.update_animal_combination(animal_combination)
