@@ -239,6 +239,7 @@ class ProtectedIndoors(Hay):
     """
     Represents protected indoors hay storage, a subclass of Hay.
     """
+
     def __init__(self, capacity: float = float("inf")) -> None:
         super().__init__(capacity)
         self.crude_protein_loss_coefficient = 0.4
