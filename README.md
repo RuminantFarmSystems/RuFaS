@@ -1,7 +1,7 @@
 [![Flake8](https://img.shields.io/badge/Flake8-failed-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 [![Pytest](https://img.shields.io/badge/Pytest-passed-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 [![Coverage](https://img.shields.io/badge/Coverage-96%25-brightgreen)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
-[![Mypy](https://img.shields.io/badge/Mypy-3522%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
+[![Mypy](https://img.shields.io/badge/Mypy-3464%20errors-red)](https://github.com/RuminantFarmSystems/MASM/actions/workflows/combined_format_lint_test_mypy.yml)
 
 # Vision
 To support research and sustainable decision-making in ruminant animal production through a state-of-the-art, open-source modeling environment that is continuously adapting as technology and scientific knowledge advance.
@@ -43,56 +43,118 @@ N/A
 
 Remember, flexibility and creativity are your allies in the grand adventure of project work! 🚀 Each task, whether a solo journey or part of a larger quest, plays a vital role in the epic saga of our project. Approach each with the dedication and spirit they deserve, and together, we will triumph!
 
-# 2024 Road Map
-## Q1 Goals
-### SWE Goals
-* Finish Feed Storage Module (P1)
-  - Fix the issues in the Feed library _Issues_ [1245](https://github.com/RuminantFarmSystems/MASM/issues/1245)
-  - Feed Degradation _Issues_ [1375](https://github.com/RuminantFarmSystems/MASM/issues/1375) [1376](https://github.com/RuminantFarmSystems/MASM/issues/1376) [1377](https://github.com/RuminantFarmSystems/MASM/issues/1377) [1378](https://github.com/RuminantFarmSystems/MASM/issues/1378)
-  - Purchase Feed logic
-* Finish Energy and Emission from EEE Module for FARM ES (Purchased feed emissions and field management fuel) (P0)
-* Implement Scenario Manager (P0)
-* Implement end to end testing (P1)
-* Analyze Animal Module and Plan on action items (P0) _Issues_ [1229](https://github.com/RuminantFarmSystems/MASM/issues/1229) [1232](https://github.com/RuminantFarmSystems/MASM/issues/1232) [1235](https://github.com/RuminantFarmSystems/MASM/issues/1235)
-* Analyze S&C Module and Plan action items (P0) _Issues_ [1230](https://github.com/RuminantFarmSystems/MASM/issues/1230) [1233](https://github.com/RuminantFarmSystems/MASM/issues/1233) [1236](https://github.com/RuminantFarmSystems/MASM/issues/1236)
-* Analyze Manure Module and Plan action items (P0) _Issues_ [1231](https://github.com/RuminantFarmSystems/MASM/issues/1231) [1234](https://github.com/RuminantFarmSystems/MASM/issues/1234) [1237](https://github.com/RuminantFarmSystems/MASM/issues/1237)
-* Un-entangle bio physical modules [document here](https://docs.google.com/document/d/17BVgTnsqwVEZbdNoztIfBQILYJ94inlyXgwCvq9iQQw/edit?usp=sharing)  _Issues_ [1411](https://github.com/RuminantFarmSystems/MASM/issues/1411)
-* Implement IM cross validation (P1)
-* Draft Developer’s Rights and Responsibilities (P2)
-* Fix units across the codebase (P1) _Issues_ [1253](https://github.com/RuminantFarmSystems/MASM/issues/1253) [1254](https://github.com/RuminantFarmSystems/MASM/issues/1254)
-* Revisit website backend (P2)
-### SME Goals
-* Pilot testing reports (P0)
-* Comparison/benchmarking with other estimates of GHG emissions (P0)
-* Develop a set of standard scenarios for end-to-end testing (P0)
-* SA of Animal & C&S module (P1)
-* Evaluation of Manure Module (P1)
-* SA of Manure Module (P1)
-* SA of Feed module (P2)
-* Energy methodology publication (P2)
-* Website (P1)
-* Complete feed module documentation (P1)
-* Develop design doc for automated lactation curve parameter selection implementation in RuFaS (P2)
-* Refine use of equipment (P2)
+# 2025 Road Map
+We adjusted our quarterly target schedule to align with the US federal fiscal year. Moooving forward, the quarters will be:
+* Q1: October 1 to December 31st
+* Q2: January 1 to March 31st
+* Q3: April 1 to June 30th
+* Q4: July 1 to September 30th
 
-## Q2 Goals
-### SWE Goals
-* Finish Economics from EEE Module
-* Finish Energy and Emission from EEE Module (Electricity and Manure Management Fuel)
-* Take actions on the action items from Q1 Animal Module
-* Take actions on the action items from Q1 S&C Module
-* Take actions on the action items from Q1 Manure Module
-* Revisit Time class
-* Un-entangle bio physical modules- (implementation)
-* Finalize Developer’s Rights and Responsibilities
+## Q1 Goals (October 1 - December 31)
 
-### SME Goals
-* Publish SA and evaluation of Animal Module
-* Publish SA and evaluation of Crop and Soil Module
-* Evaluate Manure Module and publish introduction manuscript
-* Animal Health Design Doc development
-* Grazing Design doc development
-* Document Stakeholder Requirements
+### Overall Project Goals
+* Biophysical module disentanglement
+  
+### Animal Module
+* Complete lactation curve manuscript
+* Update and cosolidate scientific documentation
+* Implementation of genetics informed culling
+* New herd initialization method to support footprinting
+* Amino Acid Supply
+* Finish refresh
+  
+### Manure Module
+* Update manure temperature representation to include temperature limits
+* Complete refresh design
+  
+### Soil and Crop Module
+* Debug/improve accuracy of N2O emissions
+* Complete first draft of documentation
+  
+### Feed Storage Module
+* Implement dummy connection with animal module
+* Implement dummy purchased feed logic
+* Review and update Feed Module user inputs
+
+### Energy, Economics, and Emissions (EEE) Module
+* Design economics model
+* Bring field energy use methods up to date
+  
+## Q2 Goals (January 1 to March 31)
+
+### Overall Project Goals
+
+* Scientific documentation - completion, review, and addition to GitHub
+* Data collection app update
+* Finish software orientation series (7 weeks)
+* Website update
+
+### Animal Module
+* Complete SA and manuscript
+* Complete Pilot testing manuscript
+* Complete Sys engineering manuscript
+* Amino Acid supplementation and impact on production
+* Update ration formulation
+* Implmement functional connection with feed inventory
+  
+### Manure Module
+* Complete Scientific Documentation
+* Improve representation of manure surface area and volume
+* Representation of manure imports and exports
+* Implement manure module refresh
+  
+### Soil and Crop Module
+
+* Evaluation of model outputs with experimental datasets
+* Pilot testing reports
+* External review of first draft of documentation
+* Review alignment of documentation with code
+* Improve field management input methods
+* Complete plan for refresh 
+
+### Feed Storage Module
+* Model evaluation
+* Represent feed shrink
+* Connect Feed module with updated Animal Module/Ration Formulation
+* Consistent representation of crops → feeds
+  
+### Energy, Economics, and Emissions (EEE) Module
+* Develop methodology for economics module
+* Test/evaluate economics module
+* Test field energy use methods
+* Design and Implement animal energy use methods
+* Develop methodology, design and implement feed storage energy use methods
+
+## Q3 Goals (April 1 to June 30)
+### Overall Project Goals
+* Publish RuFaS Repository
+  
+### Animal Module
+* Animal Health Submodule Design
+  
+### Manure Module
+* Write and submit peer reviewed publication
+* Represent water evaporation in liquid storage
+* Sensitivity Analysis
+
+### Soil and Crop Module
+* Publication of initial model and evaluation
+* Improve representation of irrigation
+* Add methane emissions from soil
+* Enable Complex combinations of harvesting
+* Implement refresh - timeline TBD dependent on planning progress
+* Consistent representation of crops → feeds
+  
+### Feed Storage Module
+* Representation of multiple storage units for the same feed
+  
+### Energy, Economics, and Emissions (EEE) Module
+* Design and implement manure energy use methods
+  
+## Q4 Goals (July 1 to September 30)
+### Overall Project Goals
+* Prepare for Annual Meeting
+* Finish any tasks that were not finished in Q1-Q3
 
 # Resources
 
