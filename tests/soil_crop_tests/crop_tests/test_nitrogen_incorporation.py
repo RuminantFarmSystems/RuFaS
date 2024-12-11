@@ -10,11 +10,6 @@ from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporati
 from RUFAS.routines.field.soil.soil_data import SoilData
 
 
-@pytest.fixture
-def mock_add(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch.object(OutputManager, "add_error")
-
-
 # --- static function tests ----
 @pytest.mark.parametrize(
     "halfheat,heatfrac,emerge,half,near,mature,should_fail",
@@ -48,11 +43,12 @@ def test_determine_nitrogen_shape_parameters(
     near: float,
     mature: float,
     should_fail: bool,
-    mock_add: MagicMock
+    mocker: MockerFixture
 ) -> None:
     """check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
     correctly"""
-    OutputManager()
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
     if should_fail:
         try:
             NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
@@ -105,9 +101,10 @@ def test_determine_shape_log(heatfrac: float, current: float, mature: float, eme
     ],
 )
 def test_error_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float,
-                                   mock_add: MagicMock) -> None:
+                                   mocker: MockerFixture) -> None:
     """check that determine_shape_log() throws errors when appropriate"""
-    OutputManager()
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(Exception):
         NitrogenIncorporation._determine_shape_log(heatfrac, current, mature, emergence)
     mock_add.assert_called_once()
@@ -173,8 +170,9 @@ def test_determine_deepest_accessible_layer(root: float, depths: float, expect: 
 
 
 @pytest.mark.parametrize("root,depths", [(-1, [0, 1, 2, 3])])  # root < 0
-def test_error_determine_deepest_accessible_layer(root: float, depths: float, mock_add: MagicMock) -> None:
-    OutputManager()
+def test_error_determine_deepest_accessible_layer(root: float, depths: float, mocker: MockerFixture) -> None:
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(ValueError):
         NitrogenIncorporation.determine_deepest_accessible_layer(root, depths)
     mock_add.assert_called_once()
@@ -244,10 +242,11 @@ def test_determine_layer_nitrogen_uptake_potential(
     ],
 )
 def test_error_determine_layer_nitrogen_uptake_potential(
-    bounds: float, demand: float, root_depth: float, ndistro: float, mock_add: MagicMock
+    bounds: float, demand: float, root_depth: float, ndistro: float, mocker: MockerFixture
 ) -> None:
     """check that determine_layer_nitrogen_potential throws an error when soil boundaries are not properly ordered"""
-    OutputManager()
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(Exception):
         NitrogenIncorporation.determine_layer_nutrient_uptake_potential(bounds, demand, root_depth, ndistro)
     mock_add.assert_called_once()
@@ -286,10 +285,11 @@ def test_determine_nitrogen_uptake_to_depth(demand: float, depth: float, root_de
     ],
 )
 def test_error_determine_nitrogen_uptake_to_depth(
-    demand: float, depth: float, root_depth: float, ndistro: float, mock_add: MagicMock
+    demand: float, depth: float, root_depth: float, ndistro: float, mocker: MockerFixture
 ) -> None:
     """ "check that errors are appropriately thrown for determine_surface_nitrogen_uptake()"""
-    OutputManager()
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(Exception):
         NitrogenIncorporation._determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
     mock_add.assert_called_once()
@@ -457,8 +457,9 @@ def test_determine_fixed_nitrogen(demand: float, stage: float, water: float, nit
     ],
 )
 def test_error_determine_fixed_nitrogen(demand: float, stage: float, water: float, nitrate: float,
-                                        mock_add: MagicMock) -> None:
-    OutputManager()
+                                        mocker: MockerFixture) -> None:
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(ValueError):
         NitrogenIncorporation._determine_fixed_nitrogen(demand, stage, water, nitrate)
     mock_add.assert_called_once()
