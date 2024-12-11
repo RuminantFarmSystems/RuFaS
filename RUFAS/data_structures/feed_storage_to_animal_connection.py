@@ -5,6 +5,13 @@ from enum import Enum
 from RUFAS.units import MeasurementUnits
 
 
+"""
+Every feed in RuFaS has a unique integer ID. They are defined in the Feed Library file used, and are used throughout
+other input files and the RuFaS codebase.
+"""
+RUFAS_ID = int
+
+
 class Category(Enum):
     ANIMAL_PROTEIN = "Animal Protein"
     BY_PRODUCT_OTHER = "By-Product/Other"
@@ -42,7 +49,7 @@ class Feed:
 
     Attributes
     ----------
-    rufas_id : int
+    rufas_id : RUFAS_ID
     Fd_Category : Category
     feed_type : Type
     DM : float
@@ -83,7 +90,7 @@ class Feed:
 
     """
 
-    rufas_id: int
+    rufas_id: RUFAS_ID
     Fd_Category: Category
     feed_type: Type
     DM: float

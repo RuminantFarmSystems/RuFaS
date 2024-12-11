@@ -1,7 +1,9 @@
 from typing import Dict
 
+from RUFAS.biophysical.animal.data_types.animal_enums import RationGroupings
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AvailableFeedsTypedDict
 from RUFAS.biophysical.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.enums import AnimalCombination
 
 
@@ -11,12 +13,7 @@ class UserDefinedRationManager(object):
     Methods return rations and change keys in the dict as needed.
     """
 
-    __instance = None
-
-    def __new__(cls):
-        if not hasattr(cls, "instance"):
-            cls.instance = super(UserDefinedRationManager, cls).__new__(cls)
-        return cls.instance
+    user_defined_rations: dict[RationGroupings, dict[RUFAS_ID, float]]
 
     def __init__(self) -> None:
         if UserDefinedRationManager.__instance is None:
