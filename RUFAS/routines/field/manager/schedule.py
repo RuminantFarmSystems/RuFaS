@@ -1,8 +1,6 @@
 from copy import copy
 from typing import List, Any, Optional
 
-from RUFAS.data_structures.events import BaseFieldManagementEvent
-from RUFAS.routines.field.crop.harvest_operations import FINAL_HARVEST_OPERATIONS
 from RUFAS.util import Utility
 
 
