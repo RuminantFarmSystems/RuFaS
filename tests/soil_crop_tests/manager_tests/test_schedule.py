@@ -130,3 +130,28 @@ def test_validate_equal_lengths_invalid() -> None:
 def test_repeat_pattern(pattern: List[int], skip: int, repeat: int, expected: list) -> None:
     """Tests that repeat_pattern correctly repeats patterns."""
     assert Schedule.repeat_pattern(pattern, skip, repeat) == expected
+
+
+def test_prepare_events() -> None:
+    """Test prepare_events to ensure correct event arguments preparation."""
+    years = [2022, 2023]
+    days = [100, 200]
+    additional_attributes_events = [[1, 2], [3, 4]]
+    pattern_skip = 0
+    pattern_repeat = 1
+    schedule = Schedule("test", [1], [1])
+
+    result = schedule.prepare_events(
+        years,
+        days,
+        additional_attributes_events,
+        pattern_skip,
+        pattern_repeat
+    )
+
+    assert result == [
+        (1, 3, 2022, 100),
+        (2, 4, 2023, 200),
+        (1, 3, 2024, 100),
+        (2, 4, 2025, 200),
+    ]

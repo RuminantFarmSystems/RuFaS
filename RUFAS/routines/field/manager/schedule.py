@@ -105,10 +105,9 @@ class Schedule:
         days: list[int],
         additional_attributes: Optional[list[Any]],
         additional_attributes_events: list[list[Any]],
-        event_class: BaseFieldManagementEvent,
+        event_class: Any,
         pattern_skip: int,
-        pattern_repeat: int,
-        heat_scheduled_harvest: bool,
+        pattern_repeat: int
     ) -> list[Any]:
         """
         Generic method to generate application events.
@@ -129,8 +128,6 @@ class Schedule:
             Number of years to skip.
         pattern_repeat : int
             Number of times the pattern should repeat.
-        heat_scheduled_harvest : bool
-            Flag indicating if heat unit scheduling is utilized for harvesting decisions.
 
         Returns
         -------
@@ -138,17 +135,45 @@ class Schedule:
             List of instantiated event objects.
 
         """
-        all_years = self.repeat_pattern(years, pattern_skip, pattern_repeat)
-        all_days = days * (pattern_repeat + 1)
-        repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes_events]
-        all_events = list(zip(*repeated_attributes, all_years, all_days))
-        if heat_scheduled_harvest:
-
-            all_events[:] = [harvest for harvest in all_events if harvest[0] in FINAL_HARVEST_OPERATIONS]
+        all_events = self.prepare_events(years, days, additional_attributes_events, pattern_skip, pattern_repeat)
 
         result = [event_class(*additional_attributes, *event) for event in all_events]
 
         return result
+
+    def prepare_events(self,
+                       years: list[int],
+                       days: list[int],
+                       additional_attributes_events: list[list[Any]],
+                       pattern_skip: int,
+                       pattern_repeat: int) -> list[Any]:
+        """
+        Prepares the attributes to pass into the event classes constructor.
+
+        Parameters
+        ----------
+        years : List[int]
+            List of years for the schedule.
+        days : List[int]
+            List of days for the schedule.
+        additional_attributes_events : List[List]
+            Additional attributes for each of the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
+        pattern_skip : int
+            Number of years to skip.
+        pattern_repeat : int
+            Number of times the pattern should repeat.
+
+        Returns
+        -------
+        list
+            list of prepared event arguments for event initialization.
+
+        """
+        all_years = self.repeat_pattern(years, pattern_skip, pattern_repeat)
+        all_days = days * (pattern_repeat + 1)
+        repeated_attributes = [attr * (pattern_repeat + 1) for attr in additional_attributes_events]
+        all_events = list(zip(*repeated_attributes, all_years, all_days))
+        return all_events
 
     @staticmethod
     def validate_positive_values(values: list[float]) -> bool:
@@ -189,6 +214,16 @@ class Schedule:
         ------
         ValueError
             If the lengths of the provided iterables are not all equal.
+
+        Examples
+        --------
+        >>> Schedule.validate_equal_lengths("example", {"arg1": [1, 2, 3], "arg2": [4, 5, 6]})
+        True
+
+        >>> Schedule.validate_equal_lengths("example", {"arg1": [1, 2, 3], "arg2": [4, 5, 6, 7]})
+        ValueError("example Mismatch in length of parameters. Provided parameters are: arg1=[1, 2, 3], arg2=[4, 5, 6, 7]
+        . Lengths are: {'arg1': 3, 'arg2': 4}.")
+
         """
         lengths = {key: len(value) for key, value in kwargs.items()}
         if len(set(lengths.values())) != 1:
@@ -252,8 +287,8 @@ class Schedule:
             if not Utility.validate_fractions(parameter):
                 raise ValueError(
                     f"'{name}': " + f"expected all {parameter_name} to be in"
-                    f" range [0.0, 1.0], "
-                    f"received '{parameter}'."
+                                    f" range [0.0, 1.0], "
+                                    f"received '{parameter}'."
                 )
 
     @staticmethod
@@ -276,26 +311,6 @@ class Schedule:
         -------
         List[int]
             The full repeated pattern of numbers.
-
-        Examples
-        --------
-        >>> Schedule.repeat_pattern([1, 3, 5], 1, 2)
-        [1, 3, 5, 7, 9, 11, 13, 15, 17]
-        First pattern [1, 3, 5] -> repeat the pattern with the difference of 2.
-        Second repeated pattern [7, 9, 11] -> With a gap of 1 from last element of the last pattern (5).
-        Third repeated pattern [13, 15, 17] -> Second pattern repetition with the same logic.
-
-        >>> Schedule.repeat_pattern([1, 3, 5], 0, 1)
-        [1, 3, 5, 6, 8, 10]
-
-        >>> Schedule.repeat_pattern([2, 3, 7], 3, 2)
-        [2, 3, 7, 11, 12, 16, 20, 21, 24]
-
-        >>> Schedule.repeat_pattern([1, 2, 3], 0, 1)
-        [1, 2, 3, 4, 5, 6]
-
-        >>> Schedule.repeat_pattern([1, 2, 3], 1, 1)
-        [1, 2, 3, 5, 6, 7]
 
         """
         if not pattern or repeat <= 0:

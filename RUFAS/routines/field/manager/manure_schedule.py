@@ -160,7 +160,6 @@ class ManureSchedule(Schedule):
                 ],
                 ManureEvent,
                 self.pattern_skip,
-                self.pattern_repeat,
-                False,
+                self.pattern_repeat
             )
         )
