@@ -1,95 +1,81 @@
-from typing import Dict
+from typing import Any
 
-from RUFAS.biophysical.animal.data_types.animal_enums import RationGroupings
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AvailableFeedsTypedDict
-from RUFAS.biophysical.animal.ration.animal_requirements import AnimalRequirements
+from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
 from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.enums import AnimalCombination
+from RUFAS.general_constants import GeneralConstants
+from RUFAS.output_manager import OutputManager
 
 
-class UserDefinedRationManager(object):
+class UserDefinedRationManager:
     """
     Reads in the user_defined_ration JSON and collects variables as Dicts.
     Methods return rations and change keys in the dict as needed.
+
+    Attributes
+    ----------
+    user_defined_rations : dict[AnimalCombination, dict[RUFAS_ID, float]]
+        Map of animal groupings to ration formulations, where the ration formulation is defined by a mapping from the
+        RuFaS ID of a feed to the percentage it makes up in a ration.
+
     """
 
-    user_defined_rations: dict[RationGroupings, dict[RUFAS_ID, float]]
+    _om = OutputManager()
+    user_defined_rations: dict[AnimalCombination, dict[RUFAS_ID, float]]
 
-    def __init__(self) -> None:
-        if UserDefinedRationManager.__instance is None:
-            UserDefinedRationManager.__instance = self
+    @classmethod
+    def set_user_defined_rations(cls, ration_config: list[dict[str, Any]]) -> None:
+        """Maps the input user-defined rations to Animal combinations."""
+        info_map = {"class": cls.__class__.__name__, "function": cls.set_user_defined_rations.__name__}
 
-            self.use_user_defined_ration = None
+        cls.user_defined_rations = {
+            AnimalCombination.CALF: {},
+            AnimalCombination.GROWING: {},
+            AnimalCombination.CLOSE_UP: {},
+            AnimalCombination.LAC_COW: {},
+        }
+        for feed in ration_config:
+            user_defined_ration_percentages = feed["user_defined_ration_percentages"]
+            cls.user_defined_rations[AnimalCombination.CALF][feed["rufas_id"]] = user_defined_ration_percentages[
+                AnimalCombination.CALF.value()
+            ]
+            cls.user_defined_rations[AnimalCombination.GROWING][feed["rufas_id"]] = user_defined_ration_percentages[
+                AnimalCombination.GROWING.value()
+            ]
+            cls.user_defined_rations[AnimalCombination.CLOSE_UP][feed["rufas_id"]] = user_defined_ration_percentages[
+                AnimalCombination.CLOSE_UP.value()
+            ]
+            cls.user_defined_rations[AnimalCombination.LAC_COW][feed["rufas_id"]] = user_defined_ration_percentages[
+                AnimalCombination.LAC_COW.value()
+            ]
 
-            self.calf_ration: Dict[str, float] = {}
-            self.growing_ration: Dict[str, float] = {}
-            self.close_up_ration: Dict[str, float] = {}
-            self.lactating_cow_ration: Dict[str, float] = {}
+        invalid_ration_found: bool = False
+        for animal_combo, ration in cls.user_defined_rations.items():
+            total_percentage_of_ration = sum(ration.values())
+            if total_percentage_of_ration != 100.0:
+                info_map["ration"] = ration
+                info_map["animal_combination"] = animal_combo.value()
+                error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to "
+                f"{total_percentage_of_ration}. Simulation will be halted."
+                cls._om.add_error("invalid_user_defined_ration_found", error_msg, info_map)
+                invalid_ration_found = True
 
-            self.tolerance: float = 0.0
-            self.milk_reduction_maximum: float = 0.0
+        if invalid_ration_found:
+            raise ValueError("One or more invalid user-defined rations found.")
 
-    @staticmethod
-    def ration_to_use(animal_combination: AnimalCombination) -> Dict[str, float]:
-        """
-        Function outputs the dictionary for a given animal combination from the UserDefinedRationManager class
+    @classmethod
+    def get_user_defined_ration(
+        cls,
+        animal_combination: AnimalCombination,
+        requirements: EnergyNutritionRequirements
+    ) -> dict[RUFAS_ID, float]:
+        """Generate a ration for the given animal type scaled to the estimated dry matter intake requirement."""
+        ration_formulation = cls.user_defined_rations[animal_combination]
 
-        Parameters
-        ----------
-        animal_combination : AnimalCombination
-            AnimalCombination in the given pen
+        ration: dict[RUFAS_ID, float] = {
+            rufas_id: requirements.dry_matter * percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
+            for rufas_id, percentage
+            in ration_formulation.items()
+        }
 
-        Returns
-        -------
-        ration_percents : Dict
-            dictionary of feed ids and their associated percentage of DMI
-        """
-        udrm = UserDefinedRationManager()
-        animal_type = animal_combination.name
-        if animal_type == "LAC_COW":
-            ration_percents = udrm.lactating_cow_ration
-        # elif pen.classes
-        elif animal_type == "GROWING":
-            ration_percents = udrm.growing_ration
-        elif animal_type == "CLOSE_UP":
-            ration_percents = udrm.close_up_ration
-        else:
-            ration_percents = udrm.calf_ration
-        return ration_percents
-
-    @staticmethod
-    def make_ration_from_user_values(
-        ration_percents: Dict[str, float],
-        available_feeds: AvailableFeedsTypedDict,
-        req: AnimalRequirements,
-    ) -> Dict[str, float | str]:
-        """
-        Generate ration dict from user ration percents input,
-        scaled to their estimated dry matter intake (DMI)
-
-        Parameters
-        ----------
-        ration_percents : Dict[str, float]
-            Dictionary of feed ids and their desired percentages of estimated DMI.
-        available_feeds : AvailableFeeds
-            Available feeds dictionary from the Feed class object.
-
-        req : an object of class Requirements
-
-        Returns
-        -------
-        Dict[str, float]
-            dictionary of formulated ration
-
-        """
-        ration = {}
-        for feed_id in range(len(available_feeds["feed_id"])):
-            if available_feeds["feed_key"][feed_id] in ration_percents:
-                ingredient_percentage = ration_percents[available_feeds["feed_key"][feed_id]]
-                ingredient_as_proportion = ingredient_percentage / 100 * req.DMIest_requirement
-                ration[available_feeds["feed_key"][feed_id]] = round(ingredient_as_proportion, 6)
-            else:
-                ration[available_feeds["feed_key"][feed_id]] = 0.0
-        ration["status"] = "Optimal"
-        ration["objective"] = 0.0
         return ration

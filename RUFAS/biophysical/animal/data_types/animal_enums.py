@@ -22,12 +22,3 @@ class AnimalStatus(Enum):
     DEAD = "dead"
     SOLD = "sold"
     CULLED = "culled"
-
-
-class RationGroupings(Enum):
-    """Enum indicating which set of feeds can be used to feed an animal."""
-
-    CALF = "calf"
-    GROWING = "growing"
-    CLOSE_UP = "close up"
-    LACTATING = "lactating"
