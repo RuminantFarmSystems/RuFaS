@@ -6,7 +6,6 @@ import numpy as np
 
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
-from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.enums import AnimalCombination
@@ -959,7 +958,7 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_reports(cls, herd_manager: HerdManager, available_feeds: Dict[str, Dict[str, Any]],
+    def report_daily_reports(cls, herd_manager, available_feeds: Dict[str, Dict[str, Any]],
                              simulation_day: int) -> None:
         """
         Calls all reporter methods that should happen at the end of each day.

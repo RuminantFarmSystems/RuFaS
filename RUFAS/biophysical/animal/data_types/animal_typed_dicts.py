@@ -64,7 +64,8 @@ class CalfValuesTypedDict(TypedDict):
 
     id: int
     breed: str
-    birth_date: date
+    animal_type: str
+    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -80,13 +81,12 @@ class CalfValuesTypedDict(TypedDict):
 class NewBornCalfValuesTypedDict(TypedDict):
     """List of expected keys for calf values dictionary"""
     id: int
-    breed: 'Breed'
-    birth_date: date
+    breed: str
+    animal_type: str
+    birth_date: str
     days_born: int
     birth_weight: float
     initial_phosphorus: float
-    body_weight: float
-    mature_body_weight: float
     net_merit: float
     body_weight_history: NotRequired[list[BodyWeightHistory]]
     pen_history: NotRequired[list[PenHistory]]
@@ -98,7 +98,8 @@ class HeiferIValuesTypedDict(TypedDict):
 
     id: int
     breed: str
-    birth_date: date
+    animal_type: str
+    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -115,7 +116,8 @@ class HeiferIValuesTypedDict(TypedDict):
 class HeiferIIValuesTypedDict(TypedDict):
     id: int
     breed: str
-    birth_date: date
+    animal_type: str
+    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -128,10 +130,10 @@ class HeiferIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    repro_program: HeiferReproductionProtocol
-    repro_sub_protocol: Union[HeiferTAISubProtocol, HeiferSynchEDSubProtocol]
-    tai_method_h: HeiferTAISubProtocol
-    synch_ed_method_h: HeiferSynchEDSubProtocol
+    heifer_repro_program: str
+    heifer_repro_sub_protocol: str
+    tai_method_h: str
+    synch_ed_method_h: str
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -150,7 +152,8 @@ class HeiferIIValuesTypedDict(TypedDict):
 class HeiferIIIValuesTypedDict(TypedDict):
     id: int
     breed: str
-    birth_date: date
+    animal_type: str
+    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -163,10 +166,10 @@ class HeiferIIIValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
-    repro_program: HeiferReproductionProtocol
-    repro_sub_protocol: Union[HeiferTAISubProtocol, HeiferSynchEDSubProtocol]
-    tai_method_h: HeiferTAISubProtocol
-    synch_ed_method_h: HeiferSynchEDSubProtocol
+    heifer_repro_program: str
+    heifer_repro_sub_protocol: str
+    tai_method_h: str
+    synch_ed_method_h: str
 
     estrus_count: NotRequired[int]
     estrus_day: NotRequired[int]
@@ -186,7 +189,8 @@ class CowValuesTypedDict(TypedDict):
     """List of expected keys for cow values dictionary"""
     id: int
     breed: str
-    birth_date: date
+    animal_type: str
+    birth_date: str
     days_born: int
     birth_weight: float
     body_weight: float
@@ -199,11 +203,15 @@ class CowValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: float
 
-    repro_program: CowReproductionProtocol
-    # repro_sub_protocol: Union[CowTAISubProtocol, CowReSynchSubProtocol, CowPreSynchSubProtocol]
-    tai_method_c: CowTAISubProtocol
-    pre_synch_method_: CowPreSynchSubProtocol
-    resynch_method: HeiferSynchEDSubProtocol
+    heifer_repro_program: str
+    heifer_repro_sub_protocol: str
+    tai_method_h: str
+    synch_ed_method_h: str
+
+    cow_repro_program: str
+    tai_method_c: str
+    pre_synch_method_: str
+    resynch_method: str
 
     days_in_milk: NotRequired[int]
     calves: NotRequired[int]

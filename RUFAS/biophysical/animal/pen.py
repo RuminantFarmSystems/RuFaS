@@ -158,35 +158,35 @@ class Pen:
             animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
         }
 
-    def add_animal(
-        self,
-        animal,
-        animal_grouping_scenario,
-        feed,
-        temp,
-        phosphorus_concentration: float,
-    ) -> None:
-        """
-        Add an animal to the pen and adjust the ration accordingly.
-
-        Parameters
-        ----------
-        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow] 
-            The animal to be added to the pen.
-        animal_grouping_scenario
-        feed
-        temp
-        phosphorus_concentration : float
-
-        Returns
-        -------
-        None
-
-        """
-
-        self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
-        self.animals_in_pen[animal.id] = animal
-        self.ration = self._calc_new_ration(len(self.animals_in_pen))
+    # def add_animal(
+    #     self,
+    #     animal,
+    #     animal_grouping_scenario,
+    #     feed,
+    #     temp,
+    #     phosphorus_concentration: float,
+    # ) -> None:
+    #     """
+    #     Add an animal to the pen and adjust the ration accordingly.
+    #
+    #     Parameters
+    #     ----------
+    #     animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+    #         The animal to be added to the pen.
+    #     animal_grouping_scenario
+    #     feed
+    #     temp
+    #     phosphorus_concentration : float
+    #
+    #     Returns
+    #     -------
+    #     None
+    #
+    #     """
+    #
+    #     self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
+    #     self.animals_in_pen[animal.id] = animal
+    #     self.ration = self._calc_new_ration(len(self.animals_in_pen))
 
     def update_animals(self, new_animals: list[Animal], animal_combination: AnimalCombination) -> None:
         """
@@ -334,71 +334,7 @@ class Pen:
         None
 
         """
-        animal_type = animal_grouping_scenario.get_animal_type(animal)
-        if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
-            req = AnimalRequirements()
-            requirements = req.calc_rqmts(
-                body_weight=animal.body_weight,
-                mature_body_weight=animal.mature_body_weight,
-                day_of_pregnancy=animal.days_in_pregnancy,
-                animal_type=animal_type,
-                parity=animal.reproduction.calves,
-                calving_interval=animal.reproduction.calving_interval,
-                milk_true_protein=animal.milk_production.true_protein_content,
-                milk_fat=animal.milk_production.fat_percent,
-                milk_lactose=animal.milk_production.lactose_content,
-                milk_production=animal.milk_production.daily_milk_produced,
-                days_in_milk=animal.days_in_milk,
-                lactating=animal.is_milking,
-                previous_temperature=temperature,
-            )
-            animal.NEmaint_requirement = requirements["NEmaint_requirement"]
-            animal.NEg_requirement = requirements["NEg_requirement"]
-            animal.NEpreg_requirement = requirements["NEpreg_requirement"]
-            animal.NEl_requirement = requirements["NEl_requirement"]
-            animal.MP_requirement = requirements["MP_requirement"]
-            animal.Ca_requirement = requirements["Ca_requirement"]
-            animal.P_requirement = requirements["P_requirement"]
-            animal.DMIest_requirement = requirements["DMIest_requirement"]
-            animal.DNED_requirement = (
-                requirements["NEmaint_requirement"] + requirements["NEl_requirement"]
-            ) / animal.DMIest_requirement
-            animal.DMPD_requirement = (requirements["MP_requirement"]) / animal.DMIest_requirement
-            animal.essential_amino_acid_requirement = requirements["essential_amino_acid_requirement"]
-
-            animal.calculate_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
-
-        if animal_type in [AnimalType.CALF]:
-            if self.avg_nutrient_rqmts:
-                animal.nutrient_rqmts = self.avg_nutrient_rqmts
-            else:
-                animal.calc_nutrient_rqmts(feed, temperature)
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III,
-        ]:
-            if self.avg_nutrient_rqmts:
-                animal.nutrient_rqmts = self.avg_nutrient_rqmts
-            else:
-                animal.set_nutrient_rqmts(temperature, animal_grouping_scenario)
-        else:
-            if self.avg_nutrient_rqmts:
-                animal.nutrient_rqmts = self.avg_nutrient_rqmts
-            else:
-                animal.set_nutrient_rqmts(animal_grouping_scenario)
-
-        if phosphorus_concentration != -1:
-            animal.p_animal = animal.body_weight * phosphorus_concentration
-
-        animal.dry_matter_intake = self.dry_matter_intake
-        animal.set_ration(self.ration_per_animal, self.ration_nutrient_amount["dm"])
-
-        # animal.p_intake = self.avg_p_intake
-        animal.set_p_intake(
-            self.ration_nutrient_amount["phosphorus"],
-            self.ration_nutrient_conc["phosphorus"],
-        )
+        pass
 
     def _calc_new_ration(self, num_animals: int):
         """
@@ -416,13 +352,7 @@ class Pen:
 
         """
 
-        ration = {}
-        for key in self.ration_per_animal:
-            if key == "status":
-                ration[key] = self.ration_per_animal[key]
-            else:  # feeds and price
-                ration[key] = self.ration_per_animal[key] * num_animals
-        return ration
+        pass
 
     def _calculate_dry_matter_intake(self) -> None:
         """Placeholder function to calculate the DMI for each animal on a daily basis."""

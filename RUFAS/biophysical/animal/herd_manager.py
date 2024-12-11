@@ -63,7 +63,6 @@ class HerdManager:
 
     def __init__(
         self,
-        data: dict[str, Any],
         feed: Feed,
         weather: Weather,
         time: Time,
@@ -90,6 +89,10 @@ class HerdManager:
         """
         self.im = InputManager()
         config_data: dict[str, Any] = self.im.get_data("config")
+        animal_config_data: dict[str, Any] = self.im.get_data("animal")
+        manure_management_config_data: list[dict[str, Any]] = self.im.get_data(
+            "manure_management")["manure_management_scenarios"]
+
         AnimalConfig.initialize_animal_config()
 
         # how do we set lactation curve
@@ -141,17 +144,17 @@ class HerdManager:
         }
         self.herd_statistics = HerdStatistics()
 
-        self.housing = data["housing"]
-        self.pasture_concentrate = data["pasture_concentrate"]
+        self.housing = animal_config_data["housing"]
+        self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
         user_defined_ration_manager = UserDefinedRationManager()
-        self.ration_user_input = data["ration"]["user_input"]
+        self.ration_user_input = animal_config_data["ration"]["user_input"]
         user_defined_ration_manager.use_user_defined_ration = self.ration_user_input
 
         # how often a ration is calculated, days
-        self.formulation_interval = data["ration"]["formulation_interval"]
+        self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
 
-        self.initialize_pens(data["pen_information"], data["manure_management_scenarios"])
+        self.initialize_pens(animal_config_data["pen_information"], manure_management_config_data)
 
         if self.simulate_animals:
             herd_factory = HerdFactory()
@@ -168,7 +171,7 @@ class HerdManager:
 
             self.allocate_animals_to_pens()
 
-        self._print_animal_num_warnings(data["herd_information"])
+        self._print_animal_num_warnings(animal_config_data["herd_information"])
 
         self.feeds_emissions_estimator: Optional[PurchasedFeedEmissionsEstimator] = (
             feed_emissions_estimator or PurchasedFeedEmissionsEstimator()
@@ -181,8 +184,8 @@ class HerdManager:
             AnimalType.HEIFER_I: self.heiferIs,
             AnimalType.HEIFER_II: self.heiferIIs,
             AnimalType.HEIFER_III: self.heiferIIIs,
-            AnimalType.LAC_COW: self.cows,
-            AnimalType.DRY_COW: self.cows,
+            AnimalType.LAC_COW: [cow for cow in self.cows if cow.is_milking],
+            AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
 
     def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> list[HerdManagerOutput]:
@@ -280,7 +283,7 @@ class HerdManager:
             self.allocate_animals_to_pens()
 
         for pen in self.all_pens:
-            if pen.needs_ration_formulation or self.end_ration_interval():
+            if pen.needs_ration_formulation or self.end_ration_interval(time.simulation_day):
                 self.reformulate_ration_single_pen(pen, current_temperature, feed)
 
         herd_manager_output: list[HerdManagerOutput] = []
@@ -377,30 +380,7 @@ class HerdManager:
 
         """
 
-        # average vertical & horizontal distance (VD, HD) of pens to the
-        # milking parlor
-        # avg_VD_parlor, avg_HD_parlor = self.avg_pen_dist()
-        current_conditions = weather.get_current_day_conditions(time)
-        current_temperature = current_conditions.mean_air_temperature
-        for calf in self.calves:
-            calf.calc_nutrient_rqmts(feed, current_temperature)
-            calf.p_animal = 0.0072 * calf.body_weight * 1000
-
-        for heiferI in self.heiferIs:
-            heiferI.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
-            heiferI.p_animal = 0.0072 * heiferI.body_weight * 1000
-
-        for heiferII in self.heiferIIs:
-            heiferII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
-            heiferII.p_animal = 0.0072 * heiferII.body_weight * 1000
-
-        for heiferIII in self.heiferIIIs:
-            heiferIII.set_nutrient_rqmts(current_temperature, self.ANIMAL_GROUPING_SCENARIO)
-            heiferIII.p_animal = 0.0072 * heiferIII.body_weight * 1000
-
-        for cow in self.cows:
-            cow.set_nutrient_rqmts(self.ANIMAL_GROUPING_SCENARIO)
-            cow.p_animal = 0.0072 * cow.body_weight * 1000
+        pass
 
     def allocate_animals_to_pens(self) -> None:
         """
@@ -458,50 +438,7 @@ class HerdManager:
             Instance of Pen class.
 
         """
-        available_feeds = AvailableFeeds()
-        available_feeds.feed_nutrients(feed)
-        if not pen.is_populated:
-            return
-        pen.subset_class_feeds(feed)
-        pen_specific_feed_data = available_feeds.get_feed_data_from_feed_ids(pen.allocated_feeds)
-
-        ration_per_animal: dict[str, float | str] = {}
-        ration_vals = {}
-
-        while "status" not in ration_per_animal or ration_per_animal["status"].lower() != "optimal":
-            if pen.animal_combination == AnimalCombination.CALF:
-                ration_per_animal = CalfRationManager.optimize()
-                ration_vals = {"ME_total": 0}
-            else:
-                ration_per_animal, ration_vals = RationManager.formulate_ration(
-                    pen, pen_specific_feed_data, self.ANIMAL_GROUPING_SCENARIO, self.simulation_day
-                )
-
-        # recording ration nutrition information in pen
-        nutrient_amount, nutrient_conc = RationReporter.report_ration(ration_per_animal, feed.available_feeds)
-        pen.ration_nutrient_amount = nutrient_amount
-        pen.ration_nutrient_conc = nutrient_conc
-        pen.MEdiet = ration_vals["ME_total"]
-        pen.dry_matter_intake = nutrient_amount["dm"]
-
-        ration_report = {}
-        ration_report["nutrient_amount"] = nutrient_amount
-        ration_report["nutrient_conc"] = nutrient_conc
-
-        for animal in list(pen.animals_in_pen.values()):
-            animal.set_ration(ration_per_animal, nutrient_amount["dm"])
-            animal.set_p_intake(nutrient_amount["phosphorus"], nutrient_conc["phosphorus"])
-
-        ration_per_pen = {}
-        num_animals = len(pen.animals_in_pen)
-        for key in ration_per_animal:
-            if key == "status":
-                ration_per_pen[key] = ration_per_animal[key]
-            else:
-                ration_per_pen[key] = ration_per_animal[key] * num_animals
-
-        pen.ration = ration_per_pen
-        pen.ration_per_animal = ration_per_animal
+        pass
 
     def _check_if_heifers_need_to_be_sold(
         self,
@@ -661,8 +598,8 @@ class HerdManager:
             self.pens_by_animal_combination[animal_combination],
             key=lambda p: p.current_stocking_density,
         )
-        pen_with_min_stocking_density.add_animal(
-            animal,
+        pen_with_min_stocking_density.update_animals(
+            [animal],
             self.ANIMAL_GROUPING_SCENARIO,
             feed,
             current_temperature,

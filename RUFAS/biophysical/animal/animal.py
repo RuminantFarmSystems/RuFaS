@@ -1,7 +1,7 @@
 import sys
 from datetime import datetime, date
 from random import random
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from scipy.stats import truncnorm
 
@@ -74,18 +74,38 @@ class Animal:
 
     nutrient_standard: NutrientStandard
 
+    calf_not_applicable_properties: set[str] = {
+        "body_weight",
+        "daily_horizontal_distance",
+        "daily_vertical_distance",
+        "dry_matter_intake",
+        "dry_matter_intake_estimation",
+        "events",
+        "nutrient",
+        "nutrient_concentrations",
+        "nutrient_requirements",
+    }
+
+    @property
+    def days_in_milk(self) -> int:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self._days_in_milk
+
     @property
     def is_pregnant(self) -> bool:
         return self.days_in_pregnancy > 0
 
     @property
     def is_milking(self) -> bool:
+        if not self.animal_type.is_cow:
+            return False
         return self.days_in_milk > 0
 
     def __init__(
             self,
-            args: [NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict |
-                   HeiferIIValuesTypedDict] | CowValuesTypedDict) -> None:
+            args: NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict |
+                   HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict | CowValuesTypedDict) -> None:
         initialize_animal_methods = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
@@ -94,7 +114,7 @@ class Animal:
             AnimalType.LAC_COW: self._initialize_cow,
             AnimalType.DRY_COW: self._initialize_cow
         }
-
+        self._days_in_milk: int = 0
         self.id = int(args.get("id"))
         self.breed = Breed(args.get("breed"))
         self.animal_type = AnimalType(args.get("animal_type"))
@@ -109,11 +129,11 @@ class Animal:
         self.digestive_system: DigestiveSystem = DigestiveSystem()
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
-        self.reproduction: Reproduction = Reproduction(do_not_breed=False)
+        self.reproduction: Reproduction = Reproduction()
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
-        if self.animal_type == AnimalType.CALF and "body_weight" in args.keys():
-            self._initialize_calf_or_heiferI(args)
+        if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
+            self._initialize_newborn_calf(args)
         else:
             initialize_animal_methods[self.animal_type](args)
 
@@ -126,14 +146,13 @@ class Animal:
             male_calf_rate = AnimalConfig.male_calf_rate_sexed_semen
         else:
             raise ValueError(f"Unexpected semen type: {AnimalConfig.semen_type}")
-
         self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
 
         if random() < AnimalConfig.still_birth_rate:
             self.culled = True
             self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
 
-        self.sold = True if (self.sex == Sex.FEMALE or random() > AnimalConfig.keep_female_calf_rate) else False
+        self.sold = True if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate) else False
 
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight")
@@ -158,12 +177,12 @@ class Animal:
 
     def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict) -> None:
         self._initialize_calf_or_heiferI(args)
-        heifer_reproduction_program = HeiferReproductionProtocol(args.get("repro_program"))
+        heifer_reproduction_program = HeiferReproductionProtocol(args.get("heifer_repro_program"))
         heifer_reproduction_sub_program = None
         if heifer_reproduction_program == HeiferReproductionProtocol.TAI:
-            heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("repro_sub_protocol"))
+            heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("heifer_repro_sub_protocol"))
         elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
-            heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("repro_sub_protocol"))
+            heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("heifer_repro_sub_protocol"))
         self.days_in_pregnancy = args.get("days_in_pregnancy", 0)
         self.reproduction = Reproduction(
             heifer_reproduction_program=heifer_reproduction_program,
