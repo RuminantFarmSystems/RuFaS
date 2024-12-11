@@ -4,8 +4,7 @@ from typing import Any
 from RUFAS.biophysical.animal.data_types.nutrition_requirements import EnergyNutritionRequirements
 
 
-@ABC
-class EnergyRequirementsCalculator:
+class EnergyRequirementsCalculator(ABC):
 
     @classmethod
     @abstractmethod
