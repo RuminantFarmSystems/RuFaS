@@ -32,13 +32,61 @@ class EnergyNutritionRequirements:
         Essential amino acid requirements.
 
     """
-    maintenance : float
-    growth : float
-    pregnancy : float
-    lactation : float
-    protein : float
-    calcium : float
-    phosphorus : float
-    dry_matter : float
-    activity : float
+
+    maintenance: float
+    growth: float
+    pregnancy: float
+    lactation: float
+    protein: float
+    calcium: float
+    phosphorus: float
+    dry_matter: float
+    activity: float
     essential_amino_acids: EssentialAminoAcidRequirements
+
+    @property
+    def total_energy_requirements(self) -> float:
+        """Total energy requirement for an animal (Mcal)."""
+        return self.maintenance + self.growth + self.pregnancy + self.lactation + self.activity
+
+
+@dataclass
+class EnergyNutritionSupply:
+    """
+    Energy and nutrition supply for a ration.
+
+    Attributes
+    ----------
+    metabolizable : float
+        Total metabolizable energy in a ration (Mcal).
+    maintenance : float
+        Energy available for maintenance in a ration (Mcal).
+    lactation : float
+        Energy available for lactation in a ration (Mcal).
+    growth : float
+        Energy available for growth in a ration (Mcal).
+    protein : float
+        Metabolizable protein supplied in a ration (g).
+    calcium : float
+        Calcium supplied in a ration (g).
+    phosphorus : float
+        Phosphorus supplied in a ration (g).
+    dry_matter : float
+        Total dry matter content of a ration (kg).
+    ndf_content : float
+        Total neutral detergent fiber (NDF) in the ration (kg).
+    fat_content : float
+        Total fat content in the ration (kg).
+
+    """
+
+    metabolizable: float
+    maintenance: float
+    lactation: float
+    growth: float
+    protein: float
+    calcium: float
+    phosphorus: float
+    dry_matter: float
+    ndf_content: float
+    fat_content: float
