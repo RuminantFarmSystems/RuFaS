@@ -4,9 +4,15 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.soil.soil_data import SoilData
+
+
+@pytest.fixture
+def mock_add(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch.object(OutputManager, "add_error")
 
 
 # --- static function tests ----
@@ -42,6 +48,7 @@ def test_determine_nitrogen_shape_parameters(
     near: float,
     mature: float,
     should_fail: bool,
+    mock_add: MagicMock
 ) -> None:
     """check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
     correctly"""
@@ -50,13 +57,14 @@ def test_determine_nitrogen_shape_parameters(
             NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         except ValueError as e:
             assert str(e) == "half_mature_heat_fraction must not equal mature_heat_fraction"
+            mock_add.assert_called_once()
     else:
         expected_near = mature + 0.00001
         observe = NitrogenIncorporation.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-            NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge)
-            - NitrogenIncorporation._determine_shape_log(heatfrac, expected_near, mature, emerge)
-        ) / (heatfrac - halfheat)
+                       NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge)
+                       - NitrogenIncorporation._determine_shape_log(heatfrac, expected_near, mature, emerge)
+                   ) / (heatfrac - halfheat)
         expect_1 = NitrogenIncorporation._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
@@ -95,10 +103,12 @@ def test_determine_shape_log(heatfrac: float, current: float, mature: float, eme
         # (1, 0.3, 0.29, 0.8),  # no error
     ],
 )
-def test_error_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float) -> None:
+def test_error_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float,
+                                   mock_add: MagicMock) -> None:
     """check that determine_shape_log() throws errors when appropriate"""
     with pytest.raises(Exception):
         NitrogenIncorporation._determine_shape_log(heatfrac, current, mature, emergence)
+    mock_add.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -161,9 +171,10 @@ def test_determine_deepest_accessible_layer(root: float, depths: float, expect: 
 
 
 @pytest.mark.parametrize("root,depths", [(-1, [0, 1, 2, 3])])  # root < 0
-def test_error_determine_deepest_accessible_layer(root: float, depths: float) -> None:
+def test_error_determine_deepest_accessible_layer(root: float, depths: float, mock_add: MagicMock) -> None:
     with pytest.raises(ValueError):
         NitrogenIncorporation.determine_deepest_accessible_layer(root, depths)
+    mock_add.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -230,11 +241,12 @@ def test_determine_layer_nitrogen_uptake_potential(
     ],
 )
 def test_error_determine_layer_nitrogen_uptake_potential(
-    bounds: float, demand: float, root_depth: float, ndistro: float
+    bounds: float, demand: float, root_depth: float, ndistro: float, mock_add: MagicMock
 ) -> None:
     """check that determine_layer_nitrogen_potential throws an error when soil boundaries are not properly ordered"""
     with pytest.raises(Exception):
         NitrogenIncorporation.determine_layer_nutrient_uptake_potential(bounds, demand, root_depth, ndistro)
+    mock_add.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -270,11 +282,12 @@ def test_determine_nitrogen_uptake_to_depth(demand: float, depth: float, root_de
     ],
 )
 def test_error_determine_nitrogen_uptake_to_depth(
-    demand: float, depth: float, root_depth: float, ndistro: float
+    demand: float, depth: float, root_depth: float, ndistro: float, mock_add: MagicMock
 ) -> None:
     """ "check that errors are appropriately thrown for determine_surface_nitrogen_uptake()"""
     with pytest.raises(Exception):
         NitrogenIncorporation._determine_nitrogen_uptake_to_depth(demand, depth, root_depth, ndistro)
+    mock_add.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -438,9 +451,11 @@ def test_determine_fixed_nitrogen(demand: float, stage: float, water: float, nit
         (1, 1, 1, 100),  # nitrate > 1
     ],
 )
-def test_error_determine_fixed_nitrogen(demand: float, stage: float, water: float, nitrate: float) -> None:
+def test_error_determine_fixed_nitrogen(demand: float, stage: float, water: float, nitrate: float,
+                                        mock_add: MagicMock) -> None:
     with pytest.raises(ValueError):
         NitrogenIncorporation._determine_fixed_nitrogen(demand, stage, water, nitrate)
+    mock_add.assert_called_once()
 
 
 @pytest.mark.parametrize(
