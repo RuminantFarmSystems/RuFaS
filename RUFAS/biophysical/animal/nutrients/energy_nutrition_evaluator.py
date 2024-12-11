@@ -47,7 +47,7 @@ class EnergyNutritionEvaluator:
         return all(results)
 
     @classmethod
-    def _check_total_energy_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
+    def _check_total_energy_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> float:
         """Checks that total energy supplied meets total demand."""
         energy_supplied: float = max(supply.metabolizable, supply.lactation, supply.lactation)
 
@@ -61,48 +61,42 @@ class EnergyNutritionEvaluator:
             ]
         )
 
-        is_requirement_satisfied = energy_supplied >= total_energy_requirement
-        return is_requirement_satisfied
+        return energy_supplied - total_energy_requirement
 
     @classmethod
     def _check_activity_maintenance_energy_supplied(
         requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply
-    ) -> bool:
+    ) -> float:
         """Checks that energy supplied for maintenance and activity meets demand."""
         energy_requirement = requirements.activity + requirements.maintenance
 
-        is_requirement_satisfied = supply.maintenance >= energy_requirement
-        return is_requirement_satisfied
+        return supply.maintenance - energy_requirement
 
     @classmethod
     def _check_lactation_energy_supplied(
         requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply
-    ) -> bool:
+    ) -> float:
         """Checks that energy supplied for lactation meets requirement for lactation and pregnancy."""
         energy_requirement = requirements.lactation + requirements.pregnancy
 
-        is_requirement_satisfied = supply.lactation >= energy_requirement
-        return is_requirement_satisfied
+        return supply.lactation - energy_requirement
 
     @classmethod
-    def _check_growth_energy_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
+    def _check_growth_energy_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> float:
         """Checks that energy supplied for growth meets the requirement."""
-        is_requirement_satisfied = supply.growth >= requirements.growth
-        return is_requirement_satisfied
+        return supply.growth - requirements.growth
 
     @classmethod
-    def _check_calcium_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
+    def _check_calcium_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> float:
         """Checks that calcium supplied meets the requirement."""
-        is_requirement_satisfied = supply.calcium >= requirements.calcium
-        return is_requirement_satisfied
+        return supply.calcium - requirements.calcium
 
     @classmethod
-    def _check_phosphorus_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
+    def _check_phosphorus_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> float:
         """Checks that phosphorus supplied meets the requirement."""
         requirement = max(requirements.phosphorus, requirements.alternative_phosphorus)  # TODO: add in other P req
 
-        is_requirement_satisfied = supply.phosphorus >= requirement
-        return is_requirement_satisfied
+        return supply.phosphorus - requirement
 
     @classmethod
     def _check_protein_supplied(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
@@ -121,12 +115,11 @@ class EnergyNutritionEvaluator:
         return is_supply_acceptable
 
     @classmethod
-    def _check_fat_content(_: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
+    def _check_fat_content(_: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> float:
         """Checks that the fat content supplied meets the requirement."""
-        fat_percentage = supply.ndf_content / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+        fat_percentage = supply.fat_content / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-        is_requirement_satisfied = fat_percentage >= AnimalModuleConstants.MINIMUM_FAT
-        return is_requirement_satisfied
+        return fat_percentage - AnimalModuleConstants.MINIMUM_FAT
 
     @classmethod
     def _check_dry_matter_intake(requirements: EnergyNutritionRequirements, supply: EnergyNutritionSupply) -> bool:
