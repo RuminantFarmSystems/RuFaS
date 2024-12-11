@@ -43,7 +43,7 @@ def test_determine_nitrogen_shape_parameters(
     near: float,
     mature: float,
     should_fail: bool,
-    mocker: MockerFixture
+    mocker: MockerFixture,
 ) -> None:
     """check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
     correctly"""
@@ -100,8 +100,9 @@ def test_determine_shape_log(heatfrac: float, current: float, mature: float, eme
         # (1, 0.3, 0.29, 0.8),  # no error
     ],
 )
-def test_error_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float,
-                                   mocker: MockerFixture) -> None:
+def test_error_determine_shape_log(
+    heatfrac: float, current: float, mature: float, emergence: float, mocker: MockerFixture
+) -> None:
     """check that determine_shape_log() throws errors when appropriate"""
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
@@ -456,8 +457,9 @@ def test_determine_fixed_nitrogen(demand: float, stage: float, water: float, nit
         (1, 1, 1, 100),  # nitrate > 1
     ],
 )
-def test_error_determine_fixed_nitrogen(demand: float, stage: float, water: float, nitrate: float,
-                                        mocker: MockerFixture) -> None:
+def test_error_determine_fixed_nitrogen(
+    demand: float, stage: float, water: float, nitrate: float, mocker: MockerFixture
+) -> None:
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(ValueError):
