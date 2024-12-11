@@ -48,7 +48,7 @@ def test_determine_nitrogen_shape_parameters(
     near: float,
     mature: float,
     should_fail: bool,
-    mock_add: MagicMock
+    mock_add: MagicMock,
 ) -> None:
     """check that the shape parameters are correctly calculated by determine_nshapes() and that errors were raised
     correctly"""
@@ -104,8 +104,9 @@ def test_determine_shape_log(heatfrac: float, current: float, mature: float, eme
         # (1, 0.3, 0.29, 0.8),  # no error
     ],
 )
-def test_error_determine_shape_log(heatfrac: float, current: float, mature: float, emergence: float,
-                                   mock_add: MagicMock) -> None:
+def test_error_determine_shape_log(
+    heatfrac: float, current: float, mature: float, emergence: float, mock_add: MagicMock
+) -> None:
     """check that determine_shape_log() throws errors when appropriate"""
     OutputManager()
     with pytest.raises(Exception):
@@ -456,8 +457,9 @@ def test_determine_fixed_nitrogen(demand: float, stage: float, water: float, nit
         (1, 1, 1, 100),  # nitrate > 1
     ],
 )
-def test_error_determine_fixed_nitrogen(demand: float, stage: float, water: float, nitrate: float,
-                                        mock_add: MagicMock) -> None:
+def test_error_determine_fixed_nitrogen(
+    demand: float, stage: float, water: float, nitrate: float, mock_add: MagicMock
+) -> None:
     OutputManager()
     with pytest.raises(ValueError):
         NitrogenIncorporation._determine_fixed_nitrogen(demand, stage, water, nitrate)
