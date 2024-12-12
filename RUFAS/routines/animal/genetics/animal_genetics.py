@@ -247,8 +247,12 @@ class AnimalGenetics:
         population variance.
         """
         birth_year_month = str(time.current_calendar_year) + "-" + str(time.current_month).zfill(2)
-        net_merit_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit=True)
-        top_semen_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit=False)
+        net_merit_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(
+            birth_year_month, is_for_net_merit=True
+        )
+        top_semen_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(
+            birth_year_month, is_for_net_merit=False
+        )
         semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed][top_semen_birth_year_month]
         average_net_merit = semen_predicted_transmitting_ability + dam_net_merit_value
         variance = ((AnimalGenetics.net_merit[breed][net_merit_birth_year_month]["std"]) ** 2) / 2
