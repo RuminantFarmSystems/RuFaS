@@ -256,6 +256,24 @@ class AnimalGenetics:
 
     @staticmethod
     def _clamp_birth_year_month_in_data_range(birth_year_month: str, is_for_net_merit: bool) -> str:
+        """
+        Checks if the birth month of an animal is available in either the net merit or top semen data, and clamps the
+        month to the earliest or latest date if the date is not available.
+
+        Parameters
+        ----------
+        birth_year_month : str
+            The year and month of an animal's birth, in the format "YYYY-MM".
+        is_for_net_merit : bool
+            True if the birth month is being checked against the net merit data, False if it is being checked against
+            the top semen data.
+
+        Returns
+        -------
+        str
+            The birth month of the animal, clamped between the earliest and latest dates available.
+
+        """
         if is_for_net_merit:
             earliest_date = AnimalGenetics.year_month_of_first_net_merit_value
             latest_date = AnimalGenetics.year_month_of_last_net_merit_value
