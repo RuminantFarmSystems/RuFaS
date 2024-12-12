@@ -669,17 +669,17 @@ def test_initialize_class_variables(mocker: MockerFixture) -> None:
         "RUFAS.input_manager.InputManager.get_data",
         side_effect=[
             {"year_month": ["2006-01", "2006-12"], "average": [-1000.0, -900.0], "std": [100.0, 110.0]},
-            {"year_month": ["2007-03", "2008-01"], "estimated_PTA": [-620.0, -610.0]}
+            {"year_month": ["2007-03", "2008-01"], "estimated_PTA": [-620.0, -610.0]},
         ],
     )
 
     mock_net_merit_base_change = mocker.patch(
         "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_base_change",
-        wraps=AnimalGenetics.net_merit_base_change
+        wraps=AnimalGenetics.net_merit_base_change,
     )
     mock_net_merit_fill_gap = mocker.patch(
         "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_fill_gap",
-        wraps=AnimalGenetics.net_merit_fill_gap
+        wraps=AnimalGenetics.net_merit_fill_gap,
     )
 
     AnimalGenetics.initialize_class_variables()
@@ -1162,7 +1162,9 @@ def test_assign_net_merit_value_to_animals_entering_herd(
         "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
     mock_clamp_date = mocker.patch.object(
-        AnimalGenetics, "_clamp_birth_year_month_in_data_range", wraps=AnimalGenetics._clamp_birth_year_month_in_data_range
+        AnimalGenetics,
+        "_clamp_birth_year_month_in_data_range",
+        wraps=AnimalGenetics._clamp_birth_year_month_in_data_range,
     )
 
     setup_animal_genetics(mocker)
@@ -1194,7 +1196,9 @@ def test_assign_net_merit_value_to_newborn_calf(
         "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
     mock_clamp_date = mocker.patch.object(
-        AnimalGenetics, "_clamp_birth_year_month_in_data_range", wraps=AnimalGenetics._clamp_birth_year_month_in_data_range
+        AnimalGenetics,
+        "_clamp_birth_year_month_in_data_range",
+        wraps=AnimalGenetics._clamp_birth_year_month_in_data_range,
     )
 
     mock_time = mocker.MagicMock(auto_spec=Time)
@@ -1221,9 +1225,11 @@ def test_assign_net_merit_value_to_newborn_calf(
         ("2000-01", False, "2006-01", True),
         ("2030-01", True, "2024-12", True),
         ("2030-01", False, "2024-12", True),
-    ]
+    ],
 )
-def test_clamp_birth_year_month_in_data_range(birth_year_month: str, is_for_net_merit: bool, expected_year_month: str, expect_error: bool, mocker: MockerFixture) -> None:
+def test_clamp_birth_year_month_in_data_range(
+    birth_year_month: str, is_for_net_merit: bool, expected_year_month: str, expect_error: bool, mocker: MockerFixture
+) -> None:
     """Tests that birth dates of cows are correctly clamped within supported range."""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
