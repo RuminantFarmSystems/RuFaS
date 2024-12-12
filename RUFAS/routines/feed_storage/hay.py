@@ -48,7 +48,7 @@ class Hay(Storage):
 
     def __init__(self, capacity: float = float("inf")) -> None:
         im = InputManager()
-        self.bale_size = im.get_data("feed_management.bale_diameter")
+        self.bale_size: float = im.get_data("feed_management.bale_diameter")
         print(self.bale_size)
         super().__init__(capacity)
         self.acceptable_crops = [
@@ -57,18 +57,6 @@ class Hay(Storage):
             CropCategory.SMALL_GRAIN,
         ]
         self.additional_dry_matter_loss_coefficient = 0.0
-
-    # @property
-    # def bale_size(self) -> float:
-    #     """
-    #     Return the size (diameter) of the hay bale.
-    #
-    #     Returns
-    #     -------
-    #     float
-    #         The diameter of the hay bale (meters).
-    #     """
-    #     return DEFAULT_BALE_DIAMETER
 
     def process_degradations(self, weather: Weather, time: Time) -> None:
         """
