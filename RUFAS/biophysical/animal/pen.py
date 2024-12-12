@@ -1,6 +1,5 @@
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.biophysical.animal.ration.animal_requirements import AnimalRequirements
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -157,36 +156,6 @@ class Pen:
         self.animals_in_pen = {
             animal_id: animal for animal_id, animal in self.animals_in_pen.items() if animal_id not in animal_ids
         }
-
-    # def add_animal(
-    #     self,
-    #     animal,
-    #     animal_grouping_scenario,
-    #     feed,
-    #     temp,
-    #     phosphorus_concentration: float,
-    # ) -> None:
-    #     """
-    #     Add an animal to the pen and adjust the ration accordingly.
-    #
-    #     Parameters
-    #     ----------
-    #     animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-    #         The animal to be added to the pen.
-    #     animal_grouping_scenario
-    #     feed
-    #     temp
-    #     phosphorus_concentration : float
-    #
-    #     Returns
-    #     -------
-    #     None
-    #
-    #     """
-    #
-    #     self._set_animal_nutrient_values(animal, animal_grouping_scenario, feed, temp, phosphorus_concentration)
-    #     self.animals_in_pen[animal.id] = animal
-    #     self.ration = self._calc_new_ration(len(self.animals_in_pen))
 
     def update_animals(self, new_animals: list[Animal], animal_combination: AnimalCombination) -> None:
         """

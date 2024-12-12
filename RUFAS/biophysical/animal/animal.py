@@ -33,38 +33,7 @@ from RUFAS.time import Time
 
 
 class Animal:
-    animal_type: AnimalType
-    birth_date: date
-    birth_weight: float
-    body_weight: float
-    body_weight_history: list[BodyWeightHistory] = []
-    breed: Breed
-    culled: bool = False
-    daily_horizontal_distance: float = 0.0
-    daily_vertical_distance: float = 0.0
-    days_born: int = 0
-    days_in_milk: int = 0
-    days_in_pregnancy: int = 0
-    dead: bool = False
-    dry_matter_intake: float = 0.0
-    dry_matter_intake_estimation: float = 0.0
-    events: AnimalEvents = AnimalEvents()
-    future_cull_date: int = sys.maxsize
-    future_death_date: int = sys.maxsize
-    id: int
-    mature_body_weight: float = 0.0
     metabolizable_energy_intake: float = 0.0
-    net_merit: float
-    nutrient: dict[str, float]
-    nutrient_concentrations: dict[str, float]
-    nutrient_requirements: dict[str, float] = {}
-    pen_history: list[PenHistory] = []
-    ration_formulation = {"objective": 0.00}
-    semen_type: str
-    sex: Sex
-    sold: bool = False
-    sold_at_day: int = sys.maxsize
-    wean_weight: float = 0.0
 
     calf_not_applicable_properties: set[str] = {
         "body_weight",
@@ -106,7 +75,6 @@ class Animal:
             AnimalType.LAC_COW: self._initialize_cow,
             AnimalType.DRY_COW: self._initialize_cow
         }
-        self._days_in_milk: int = 0
         self.id = int(args.get("id"))
         self.breed = Breed(args.get("breed"))
         self.animal_type = AnimalType(args.get("animal_type"))
@@ -116,6 +84,20 @@ class Animal:
         self.net_merit = args.get("net_merit", 0.0)
 
         self.cull_reason = ""
+        self.body_weight_history: list[BodyWeightHistory] = []
+        self.pen_history: list[PenHistory] = []
+        self.sold: bool = False
+        self.dead: bool = False
+        self.sold_at_day: int | None = None
+        self.dry_matter_intake: float = 0.0
+
+        self.events = AnimalEvents()
+        if "events" in args.keys():
+            self.events.init_from_string(args["events"])
+
+        self.nutrient: dict[str, float] = {}
+        self.nutrient_concentrations: dict[str, float] = {}
+        self.nutrient_requirements: dict[str, float] = {}
 
         self.growth: Growth = Growth()
         self.digestive_system: DigestiveSystem = DigestiveSystem()
@@ -123,6 +105,13 @@ class Animal:
         self.nutrients: Nutrients = Nutrients()
         self.reproduction: Reproduction = Reproduction()
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
+
+        self._days_in_milk: int = 0
+        self._days_in_pregnancy: int = 0
+        self._future_cull_date: int | None = None
+        self._future_death_date: int | None = None
+        self._daily_horizontal_distance: float = 0.0
+        self._daily_vertical_distance: float = 0.0
 
         if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
             self._initialize_newborn_calf(args)
