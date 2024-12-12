@@ -165,7 +165,8 @@ def test_calculate_additional_dry_matter_loss(
     expected: float,
 ) -> None:
     """Tests _calculate_additional_dry_matter_loss in Hay."""
-    mocker.patch.object(InputManager, "get_data", return_value=size)
+    im = InputManager()
+    mocker.patch.object(im, "get_data", return_value=size)
     hay = Hay()
     mock_conditions = []
     for i in range(len(rain)):
