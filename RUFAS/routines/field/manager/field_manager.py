@@ -222,6 +222,7 @@ class FieldManager:
                 "N": mix.get("N"),
                 "P": mix.get("P"),
                 "K": mix.get("K"),
+                "ammonium_fraction": mix.get("ammonium_fraction"),
             }
 
         fertilizer_application_schedule = FertilizerSchedule(
