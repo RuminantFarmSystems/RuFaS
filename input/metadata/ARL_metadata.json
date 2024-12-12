@@ -150,7 +150,7 @@
     "feed_management": {
       "title": "Feed Management Dataset",
       "description": "Diameter data of the bale.",
-      "path": "input/data/feed_management/bale_size.json",
+      "path": "input/data/feed_management/default_feed_management.json",
       "type": "json",
       "properties": "feed_storage_input_properties"
     }

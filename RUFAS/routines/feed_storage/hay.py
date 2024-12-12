@@ -25,18 +25,12 @@ PROTECTED_TARPED_ADDITIONAL_LOSS_COEFFICIENT = 0.000_010_8
 UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT = 0.000_06
 
 
-# TODO: remove this default as part of issue #1960
-DEFAULT_BALE_DIAMETER = 1.5
-
-
 class Hay(Storage):
     """
     Represents a Hay storage subclass of Storage.
 
     Attributes
     ----------
-    bale_density : float
-        Density of the hay bale calculated based on its moisture content.
     bale_size : float
         Diameter of the hay bale in meters.
 
@@ -48,7 +42,7 @@ class Hay(Storage):
 
     def __init__(self, capacity: float = float("inf")) -> None:
         im = InputManager()
-        self.bale_size: float = im.get_data("feed_management.bale_diameter")
+        self.bale_size: float = im.get_data("feed_management.hay_bale_diameter")
         print(self.bale_size)
         super().__init__(capacity)
         self.acceptable_crops = [
