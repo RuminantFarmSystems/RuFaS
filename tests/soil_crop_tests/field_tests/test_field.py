@@ -1032,7 +1032,8 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "mix_name,requested_n,requested_p,requested_k,ammonium_fraction,depth,remainder,year,day,field_size,fertilizer_applied",
+    "mix_name,requested_n,requested_p,requested_k,ammonium_fraction,depth,remainder,year,day,field_size,"
+    "fertilizer_applied",
     {
         ("test_mix_1", 80.0, 30.0, 20.0, 0.0, 0.0, 1.0, 1993, 100, 3.1, True),
         ("test_mix_2", 150.0, 89.0, 20.0, 0.5, 25.0, 0.89, 2001, 240, 1.3, True),
@@ -1112,7 +1113,7 @@ def test_execute_fertilizer_application_error(field_name: str, mix_name: str, av
         field_data=FieldData(name=field_name),
         fertilizer_mixes=available_mixes,
     )
-    with pytest.raises(KeyError) as e:
+    with pytest.raises(KeyError):
         field._execute_fertilizer_application(mix_name, 10.0, 10.0, 10.0, 0.0, 1.0, 1994, 120)
 
 
