@@ -52,8 +52,6 @@ class FertilizerApplication:
             Mass of phosphorus applied to the soil (kg).
         nitrogen_applied : float
             Mass of nitrogen applied to the soil (kg).
-        fertilizer_mass : float
-            Total mass of fertilizer application (kg).
         ammonium_fraction : float
             Fraction of inorganic nitrogen mass applied that is ammonium (unitless).
         application_depth : float
