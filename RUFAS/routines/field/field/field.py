@@ -133,8 +133,8 @@ class Field:
         self.fertilizer_events = fertilizer_events or []
 
         self.available_fertilizer_mixes = fertilizer_mixes or {}
-        self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0}
-        self.available_fertilizer_mixes["26_4_24"] = {"N": 0.26, "P": 0.04, "K": 0.24}
+        self.available_fertilizer_mixes["100_0_0"] = {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0}
+        self.available_fertilizer_mixes["26_4_24"] = {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0}
 
         self.ONLY_NITROGEN_MIX = "100_0_0"
         self.tiller = TillageApplication(self.field_data, self.soil.data)
@@ -313,14 +313,12 @@ class Field:
         potassium_applied = fertilizer_applied.get("potassium_mass")
 
         inorganic_nitrogen_fraction = nitrogen_applied / total_mass_applied
-        ammonium_fraction = 0.0
         organic_nitrogen_fraction = 0.0
-
         self.fertilizer_applicator.apply_fertilizer(
             phosphorus_applied,
             total_mass_applied,
             inorganic_nitrogen_fraction,
-            ammonium_fraction,
+            fertilizer_mix.get("ammonium_fraction"),
             organic_nitrogen_fraction,
             application_depth,
             surface_remainder_fraction,
