@@ -45,7 +45,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
-      "path": "input/data/crop/default_rotation.json",
+      "path": "input/data/crop/ARL_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
@@ -181,6 +181,13 @@
       "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
+    },
+    "feed_management": {
+      "title": "Feed Management Dataset",
+      "description": "Feed management data.",
+      "path": "input/data/feed_management/default_feed_management.json",
+      "type": "json",
+      "properties": "feed_storage_input_properties"
     }
   },
   "cross-validation": {}
