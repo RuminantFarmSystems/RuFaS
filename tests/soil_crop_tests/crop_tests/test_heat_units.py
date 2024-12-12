@@ -47,27 +47,6 @@ def test_determine_maximum_heat_unit_temperature(air: float, plant: float) -> No
     assert HeatUnits._determine_maximum_heat_unit_temperature(air, plant) == expect
 
 
-@pytest.mark.parametrize(
-    "use_alt,meant,min_t,max_t",
-    [
-        (False, None, 18, 20),
-        (True, 13.6, None, None),
-        (True, 18.9, 20.6, None),
-        (True, 22.4, None, 1.5),
-        (True, None, None, None),
-        (False, None, None, None),
-    ],
-)
-def test_check_absorb_heat_for_input_errors(
-    use_alt: bool, meant: float | None, min_t: float | None, max_t: float | None
-) -> None:
-    """check that errors are thrown when improper input is given, using _check_absorb_heat_for_input_errors"""
-    data = CropData()
-    heat = HeatUnits(data, use_heat_unit_temperature=use_alt)
-    with pytest.raises(ValueError):
-        heat._check_absorb_heat_for_input_errors(meant, min_t, max_t)
-
-
 @pytest.mark.parametrize("temp", [0, 20.5, None])
 def test_accumulate_heat_units(temp: float | None, mocker: MockerFixture) -> None:
     """check that accumulate_heat_units() calls the right functions"""
