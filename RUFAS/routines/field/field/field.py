@@ -298,6 +298,7 @@ class Field:
         nitrogen_fraction = fertilizer_mix.get("N")
         phosphorus_fraction = fertilizer_mix.get("P")
         potassium_fraction = fertilizer_mix.get("K")
+        ammonium_fraction = fertilizer_mix.get("ammonium_fraction")
 
         fertilizer_applied = self._formulate_fertilizer_required(
             nitrogen_fraction,
@@ -312,14 +313,10 @@ class Field:
         nitrogen_applied = fertilizer_applied.get("nitrogen_mass")
         potassium_applied = fertilizer_applied.get("potassium_mass")
 
-        inorganic_nitrogen_fraction = nitrogen_applied / total_mass_applied
-        organic_nitrogen_fraction = 0.0
         self.fertilizer_applicator.apply_fertilizer(
             phosphorus_applied,
-            total_mass_applied,
-            inorganic_nitrogen_fraction,
-            fertilizer_mix.get("ammonium_fraction"),
-            organic_nitrogen_fraction,
+            nitrogen_applied,
+            ammonium_fraction,
             application_depth,
             surface_remainder_fraction,
             self.field_data.field_size,
@@ -331,6 +328,7 @@ class Field:
             nitrogen_applied,
             phosphorus_applied,
             potassium_applied,
+            ammonium_fraction,
             application_depth,
             surface_remainder_fraction,
             year,
@@ -444,6 +442,7 @@ class Field:
         nitrogen_mass: float,
         phosphorus_mass: float,
         potassium_mass: float,
+        ammonium_fraction: float,
         application_depth: float,
         surface_remainder_fraction: float,
         year: int,
@@ -464,6 +463,8 @@ class Field:
             The mass of phosphorus applied (kg).
         potassium_mass : float
             The mass of potassium applied (kg).
+        ammonium_fraction : float
+            Fraction of requested nitrogen which is ammonium and not nitrate (unitless).
         application_depth : float
             Depth at which fertilizer is injected into the soil (mm).
         surface_remainder_fraction : float
@@ -479,6 +480,7 @@ class Field:
             "nitrogen": MeasurementUnits.KILOGRAMS,
             "phosphorus": MeasurementUnits.KILOGRAMS,
             "potassium": MeasurementUnits.KILOGRAMS,
+            "ammonium_fraction": MeasurementUnits.UNITLESS,
             "application_depth": MeasurementUnits.MILLIMETERS,
             "surface_remainder_fraction": MeasurementUnits.UNITLESS,
             "year": MeasurementUnits.CALENDAR_YEAR,
@@ -499,6 +501,7 @@ class Field:
             "nitrogen": nitrogen_mass,
             "phosphorus": phosphorus_mass,
             "potassium": potassium_mass,
+            "ammonium_fraction": ammonium_fraction,
             "application_depth": application_depth,
             "surface_remainder_fraction": surface_remainder_fraction,
             "year": year,
