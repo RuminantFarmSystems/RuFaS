@@ -69,8 +69,8 @@ def test_field_init_defaults():
     assert field.tillage_events is None
     assert field.manure_events == []
     assert field.available_fertilizer_mixes == {
-        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
-        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
+        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
+        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
     }
     assert field.ONLY_NITROGEN_MIX == "100_0_0"
     assert isinstance(field.fertilizer_applicator, FertilizerApplication)
@@ -1354,11 +1354,11 @@ def test_formulate_fertilizer_required(
 
 
 @pytest.mark.parametrize(
-    "mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,depth,remainder,year,day,"
+    "mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,ammonium_fraction,depth,remainder,year,day,"
     "field_name,field_size",
     [
-        ("mix_1", 100, 20, 20, 20, 35.0, 0.8, 1992, 90, "field_1", 1.4),
-        ("mix_2", 30, 10, 3, 3, 0.0, 1.0, 1994, 120, "field_2", 4.3),
+        ("mix_1", 100, 20, 20, 20, 0.5, 35.0, 0.8, 1992, 90, "field_1", 1.4),
+        ("mix_2", 30, 10, 3, 3, 0.1, 0.0, 1.0, 1994, 120, "field_2", 4.3),
     ],
 )
 def test_record_fertilizer_application(
@@ -1367,6 +1367,7 @@ def test_record_fertilizer_application(
     nitrogen_mass: float,
     phosphorus_mass: float,
     potassium_mass: float,
+    ammonium_fraction: float,
     depth: float,
     remainder: float,
     year: int,
@@ -1390,6 +1391,7 @@ def test_record_fertilizer_application(
             nitrogen_mass,
             phosphorus_mass,
             potassium_mass,
+            ammonium_fraction,
             depth,
             remainder,
             year,
@@ -1403,6 +1405,7 @@ def test_record_fertilizer_application(
         "nitrogen": MeasurementUnits.KILOGRAMS.value,
         "phosphorus": MeasurementUnits.KILOGRAMS.value,
         "potassium": MeasurementUnits.KILOGRAMS.value,
+        "ammonium_fraction": MeasurementUnits.UNITLESS.value,
         "application_depth": MeasurementUnits.MILLIMETERS.value,
         "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
         "year": MeasurementUnits.CALENDAR_YEAR.value,
@@ -1418,6 +1421,7 @@ def test_record_fertilizer_application(
         "nitrogen": nitrogen_mass,
         "phosphorus": phosphorus_mass,
         "potassium": potassium_mass,
+        "ammonium_fraction": ammonium_fraction,
         "application_depth": depth,
         "surface_remainder_fraction": remainder,
         "year": year,
