@@ -49,6 +49,7 @@ class Hay(Storage):
     def __init__(self, capacity: float = float("inf")) -> None:
         im = InputManager()
         self.bale_size = im.get_data("feed_management.bale_diameter")
+        print(self.bale_size)
         super().__init__(capacity)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
