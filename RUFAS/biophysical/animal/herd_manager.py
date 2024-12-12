@@ -211,7 +211,7 @@ class HerdManager:
             if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(calf)
             elif calf_daily_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+                AnimalStatus.DEAD, AnimalStatus.SOLD
             ]:
                 removed_animals.append(calf)
         # heiferI update
@@ -220,7 +220,7 @@ class HerdManager:
             if heiferI_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferI)
             elif heiferI_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+                AnimalStatus.DEAD, AnimalStatus.SOLD
             ]:
                 removed_animals.append(heiferI)
         # heiferII update
@@ -229,7 +229,7 @@ class HerdManager:
             if heiferII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferII)
             elif heiferII_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+                AnimalStatus.DEAD, AnimalStatus.SOLD
             ]:
                 removed_animals.append(heiferII)
                 sold_heiferIIs.append(heiferII)
@@ -239,7 +239,7 @@ class HerdManager:
             if heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferIII)
             elif heiferIII_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+                AnimalStatus.DEAD, AnimalStatus.SOLD
             ]:
                 removed_animals.append(heiferIII)
         # cow update
@@ -247,16 +247,16 @@ class HerdManager:
             cow_routines_output: DailyRoutinesOutput = cow.daily_routines(time)
             if cow_routines_output.animal_status == AnimalStatus.NEW_CALF_BORN:
                 newborn_calf = Animal(args={**cow_routines_output.animal_values})
-                if not (newborn_calf.sold or newborn_calf.culled):
+                if not newborn_calf.sold:
                     newborn_calf.events.add_event(
                         newborn_calf.days_born, time.simulation_day, animal_constants.ENTER_HERD
                     )
                     newborn_calves.append(newborn_calf)
-                if newborn_calf.sold:
+                else:
                     sold_newborn_calves.append(newborn_calf)
 
             elif cow_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.CULLED, AnimalStatus.SOLD
+                AnimalStatus.DEAD, AnimalStatus.SOLD
             ]:
                 removed_animals.append(cow)
                 sold_and_died_cows.append(cow)

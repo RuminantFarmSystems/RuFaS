@@ -21,4 +21,3 @@ class AnimalStatus(Enum):
     NEW_CALF_BORN = "new calf born"
     DEAD = "dead"
     SOLD = "sold"
-    CULLED = "culled"
