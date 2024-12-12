@@ -293,7 +293,9 @@ def test_annual_update_routine(fields: List[Field]) -> None:
         ),
         (
             {
-                "available_fertilizer_mixes": [{"name": "barnyard_fert", "N": 0.4, "P": 0.2, "K": 0.1, "ammonium_fraction": 0.3}],
+                "available_fertilizer_mixes": [
+                    {"name": "barnyard_fert", "N": 0.4, "P": 0.2, "K": 0.1, "ammonium_fraction": 0.3}
+                ],
                 "mix_names": ["barnyard_fert"],
                 "years": [2010],
                 "days": [200],

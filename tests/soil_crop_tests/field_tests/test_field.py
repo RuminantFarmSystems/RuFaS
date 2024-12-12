@@ -1100,16 +1100,8 @@ def test_execute_fertilizer_application(
 @pytest.mark.parametrize(
     "field_name,mix_name,available_mixes",
     [
-        (
-            "test_field_1",
-            "halo_alien_mix",
-            {}
-        ),
-        (
-            "test_field_2",
-            "101_0_0",
-            {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12, "ammonium_fraction": 0.0}}
-        ),
+        ("test_field_1", "halo_alien_mix", {}),
+        ("test_field_2", "101_0_0", {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12, "ammonium_fraction": 0.0}}),
     ],
 )
 def test_execute_fertilizer_application_error(field_name: str, mix_name: str, available_mixes: Dict) -> None:
