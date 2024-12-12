@@ -71,8 +71,8 @@ class AnimalGenetics:
             }
         }
 
-        cls.year_month_of_first_top_semen_value = min(cls.net_merit[SUPPORTED_BREED].keys())
-        cls.year_month_of_last_top_semen_value = max(cls.net_merit[SUPPORTED_BREED].keys())
+        cls.year_month_of_first_top_semen_value = min(cls.top_semen[SUPPORTED_BREED].keys())
+        cls.year_month_of_last_top_semen_value = max(cls.top_semen[SUPPORTED_BREED].keys())
 
     @staticmethod
     def net_merit_base_change(
@@ -212,31 +212,7 @@ class AnimalGenetics:
         of the net merit value, then generates a random value from the distribution as the net merit value.
         """
         birth_year_month = birth_date[:7]
-        is_birth_date_in_range = (
-            AnimalGenetics.year_month_of_first_net_merit_value
-            <= birth_year_month
-            <= AnimalGenetics.year_month_of_last_net_merit_value
-        )
-        if not is_birth_date_in_range:
-            clamped_birth_year_month = min(
-                max(AnimalGenetics.year_month_of_first_net_merit_value, birth_year_month),
-                AnimalGenetics.year_month_of_last_net_merit_value,
-            )
-            om = OutputManager()
-            info_map = {
-                "class": AnimalGenetics.__class__.__name__,
-                "function": AnimalGenetics.assign_net_merit_value_to_animals_entering_herd.__name__,
-                "birth_year_month": birth_year_month,
-                "first_net_merit_value_date": AnimalGenetics.year_month_of_first_net_merit_value,
-                "last_net_merit_value_date": AnimalGenetics.year_month_of_last_net_merit_value,
-            }
-            om.add_error(
-                "Animal birthdate out of range for animal genetics data",
-                f"No net merit data for {birth_year_month}, using data from closest available date: "
-                f"{clamped_birth_year_month}",
-                info_map,
-            )
-            birth_year_month = clamped_birth_year_month
+        birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit=True)
         average = AnimalGenetics.net_merit[breed][birth_year_month]["average"]
         std = AnimalGenetics.net_merit[breed][birth_year_month]["std"]
         return Utility.generate_random_number(average, std)
@@ -271,32 +247,40 @@ class AnimalGenetics:
         population variance.
         """
         birth_year_month = str(time.current_calendar_year) + "-" + str(time.current_month).zfill(2)
-        is_birth_date_in_range = (
-            AnimalGenetics.year_month_of_first_top_semen_value
-            <= birth_year_month
-            <= AnimalGenetics.year_month_of_last_top_semen_value
-        )
+        net_merit_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit=True)
+        top_semen_birth_year_month = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit=False)
+        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed][top_semen_birth_year_month]
+        average_net_merit = semen_predicted_transmitting_ability + dam_net_merit_value
+        variance = ((AnimalGenetics.net_merit[breed][net_merit_birth_year_month]["std"]) ** 2) / 2
+        return Utility.generate_random_number(average_net_merit, sqrt(variance))
+
+    @staticmethod
+    def _clamp_birth_year_month_in_data_range(birth_year_month: str, is_for_net_merit: bool) -> str:
+        if is_for_net_merit:
+            earliest_date = AnimalGenetics.year_month_of_first_net_merit_value
+            latest_date = AnimalGenetics.year_month_of_last_net_merit_value
+            data_type = "net merit"
+        else:
+            earliest_date = AnimalGenetics.year_month_of_first_top_semen_value
+            latest_date = AnimalGenetics.year_month_of_last_top_semen_value
+            data_type = "top semen"
+        is_birth_date_in_range = earliest_date <= birth_year_month <= latest_date
         if not is_birth_date_in_range:
-            clamped_birth_year_month = min(
-                max(AnimalGenetics.year_month_of_first_top_semen_value, birth_year_month),
-                AnimalGenetics.year_month_of_last_top_semen_value,
-            )
+            clamped_birth_year_month = min(max(earliest_date, birth_year_month), latest_date)
             om = OutputManager()
             info_map = {
                 "class": AnimalGenetics.__class__.__name__,
-                "function": AnimalGenetics.assign_net_merit_value_to_newborn_calf.__name__,
+                "function": AnimalGenetics._clamp_birth_year_month_in_data_range.__name__,
                 "birth_year_month": birth_year_month,
-                "first_top_semen_value_date": AnimalGenetics.year_month_of_first_top_semen_value,
-                "last_top_semen_value_date": AnimalGenetics.year_month_of_last_top_semen_value,
+                "date_of_earliest_data": earliest_date,
+                "date_of_latest_data": latest_date,
+                "type_of_genetic_data": data_type,
             }
             om.add_error(
                 "Animal birthdate out of range for animal genetics data",
-                f"No top semen data for {birth_year_month}, using data from closest available date: "
+                f"No {data_type} data for {birth_year_month}, using data from closest available date: "
                 f"{clamped_birth_year_month}",
                 info_map,
             )
             birth_year_month = clamped_birth_year_month
-        semen_predicted_transmitting_ability: float = AnimalGenetics.top_semen[breed][birth_year_month]
-        average_net_merit = semen_predicted_transmitting_ability + dam_net_merit_value
-        variance = ((AnimalGenetics.net_merit[breed][birth_year_month]["std"]) ** 2) / 2
-        return Utility.generate_random_number(average_net_merit, sqrt(variance))
+        return birth_year_month

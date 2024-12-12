@@ -663,28 +663,39 @@ def setup_animal_genetics(mocker: MockerFixture):
     AnimalGenetics.initialize_class_variables()
 
 
-# def test_initialize_class_variables(mocker: MockerFixture) -> None:
-#     mock_im_init = mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
-#     mock_im_get_data = mocker.patch(
-#         "RUFAS.input_manager.InputManager.get_data",
-#         side_effect=[{"year_month": [], "average": [], "std": []}, {"year_month": [], "estimated_PTA": []}],
-#     )
+def test_initialize_class_variables(mocker: MockerFixture) -> None:
+    mock_im_init = mocker.patch("RUFAS.input_manager.InputManager.__init__", return_value=None)
+    mock_im_get_data = mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data",
+        side_effect=[
+            {"year_month": ["2006-01", "2006-12"], "average": [-1000.0, -900.0], "std": [100.0, 110.0]},
+            {"year_month": ["2007-03", "2008-01"], "estimated_PTA": [-620.0, -610.0]}
+        ],
+    )
 
-#     mock_net_merit_base_change = mocker.patch(
-#         "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_base_change"
-#     )
-#     mock_net_merit_fill_gap = mocker.patch(
-#         "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_fill_gap"
-#     )
+    mock_net_merit_base_change = mocker.patch(
+        "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_base_change",
+        wraps=AnimalGenetics.net_merit_base_change
+    )
+    mock_net_merit_fill_gap = mocker.patch(
+        "RUFAS.routines.animal.genetics.animal_genetics.AnimalGenetics.net_merit_fill_gap",
+        wraps=AnimalGenetics.net_merit_fill_gap
+    )
 
-#     AnimalGenetics.initialize_class_variables()
+    AnimalGenetics.initialize_class_variables()
 
-#     im_get_data_call_list = [call("animal_net_merit"), call("animal_top_listing_semen")]
-#     mock_im_init.assert_called_once()
-#     mock_im_get_data.assert_has_calls(im_get_data_call_list)
+    im_get_data_call_list = [call("animal_net_merit"), call("animal_top_listing_semen")]
+    mock_im_init.assert_called_once()
+    mock_im_get_data.assert_has_calls(im_get_data_call_list)
 
-#     mock_net_merit_base_change.assert_called_once()
-#     mock_net_merit_fill_gap.assert_called_once()
+    mock_net_merit_base_change.assert_called_once()
+    mock_net_merit_fill_gap.assert_called_once()
+
+    assert AnimalGenetics.year_month_of_first_net_merit_value == "2006-01"
+    assert AnimalGenetics.year_month_of_last_net_merit_value == "2007-01"
+
+    assert AnimalGenetics.year_month_of_first_top_semen_value == "2007-03"
+    assert AnimalGenetics.year_month_of_last_top_semen_value == "2008-01"
 
 
 @pytest.mark.parametrize(
@@ -1139,8 +1150,6 @@ def test_net_merit_fill_gap(
         ("2021-03-01", "HO", (87.38263818749999, 238.4551655034612)),
         ("2022-10-04", "HO", (211.54508712499998, 332.7844850437559)),
         ("2024-06-28", "HO", (336.174572125, 353.4989587814793)),
-        ("2000-01-01", "HO", (-489.025404, 190.5395008512324)),
-        ("2030-01-01", "HO", (387.71458325, 364.4961663811087)),
     ],
 )
 def test_assign_net_merit_value_to_animals_entering_herd(
@@ -1152,11 +1161,15 @@ def test_assign_net_merit_value_to_animals_entering_herd(
     mock_generate_random_number = mocker.patch(
         "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
+    mock_clamp_date = mocker.patch.object(
+        AnimalGenetics, "_clamp_birth_year_month_in_data_range", wraps=AnimalGenetics._clamp_birth_year_month_in_data_range
+    )
 
     setup_animal_genetics(mocker)
     result = AnimalGenetics.assign_net_merit_value_to_animals_entering_herd(birth_date, breed)
     assert result == expected_value
     mock_generate_random_number.assert_called_once_with(expected_value[0], expected_value[1])
+    mock_clamp_date.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -1180,6 +1193,9 @@ def test_assign_net_merit_value_to_newborn_calf(
     mock_generate_random_number = mocker.patch(
         "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
     )
+    mock_clamp_date = mocker.patch.object(
+        AnimalGenetics, "_clamp_birth_year_month_in_data_range", wraps=AnimalGenetics._clamp_birth_year_month_in_data_range
+    )
 
     mock_time = mocker.MagicMock(auto_spec=Time)
     mock_time.current_calendar_year = int(birth_date[:4])
@@ -1193,31 +1209,27 @@ def test_assign_net_merit_value_to_newborn_calf(
     result = AnimalGenetics.assign_net_merit_value_to_newborn_calf(mock_time, breed, dam_net_merit_value)
     assert result == (expected_mean, expected_std)
     mock_generate_random_number.assert_called_once_with(expected_mean, expected_std)
+    assert mock_clamp_date.call_count == 2
 
 
 @pytest.mark.parametrize(
-    "birth_date, breed, dam_net_merit_value, expected_mean, expected_std",
+    "birth_year_month, is_for_net_merit, expected_year_month, expect_error",
     [
-        ("2000-01-01", "HO", -1000.0, -1620.7267157, 134.73177313580638),
-        ("2030-01-01", "HO", 500.0, 1990.683824, 257.73771096458205),
-    ],
+        ("2008-01", True, "2008-01", False),
+        ("2008-01", False, "2008-01", False),
+        ("2000-01", True, "2006-02", True),
+        ("2000-01", False, "2006-01", True),
+        ("2030-01", True, "2024-12", True),
+        ("2030-01", False, "2024-12", True),
+    ]
 )
-def test_assign_net_merit_value_to_newborn_calf_out_of_date_range(
-    birth_date: str, breed: str, dam_net_merit_value: float, expected_mean: float, expected_std: float, mocker: MockerFixture
-) -> None:
-    """Tests that closest genetic data is used for calf born outside of the range of actually supported data."""
-    mock_generate_random_number = mocker.patch(
-        "RUFAS.util.Utility.generate_random_number", side_effect=lambda avg, std: (avg, std)
-    )
+def test_clamp_birth_year_month_in_data_range(birth_year_month: str, is_for_net_merit: bool, expected_year_month: str, expect_error: bool, mocker: MockerFixture) -> None:
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
-    mock_time = mocker.MagicMock(auto_spec=Time)
-    mock_time.current_calendar_year = int(birth_date[:4])
-    mock_time.current_month = int(birth_date[5:7])
+    actual = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit)
 
-    setup_animal_genetics(mocker)
-
-    result = AnimalGenetics.assign_net_merit_value_to_newborn_calf(mock_time, breed, dam_net_merit_value)
-    assert result == (expected_mean, expected_std)
-    mock_generate_random_number.assert_called_once_with(expected_mean, expected_std)
-    mock_add_error.assert_called_once()
+    assert actual == expected_year_month
+    if expect_error:
+        mock_add_error.assert_called_once()
+    else:
+        mock_add_error.assert_not_called()
