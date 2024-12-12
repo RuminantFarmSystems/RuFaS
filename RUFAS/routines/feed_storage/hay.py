@@ -5,7 +5,7 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 from .storage import Storage
-from ...input_manager import InputManager
+from RUFAS.input_manager import InputManager
 
 """
 This final moisture percentage that expected to be contained in a hay crop. References Feed Storage Scientific
