@@ -1224,6 +1224,7 @@ def test_assign_net_merit_value_to_newborn_calf(
     ]
 )
 def test_clamp_birth_year_month_in_data_range(birth_year_month: str, is_for_net_merit: bool, expected_year_month: str, expect_error: bool, mocker: MockerFixture) -> None:
+    """Tests that birth dates of cows are correctly clamped within supported range."""
     mock_add_error = mocker.patch("RUFAS.output_manager.OutputManager.add_error")
 
     actual = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit)
