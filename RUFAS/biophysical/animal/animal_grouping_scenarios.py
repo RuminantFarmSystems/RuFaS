@@ -168,7 +168,7 @@ class AnimalGroupingScenario(Enum):
 
         """
 
-        return Animal.type  # type: ignore
+        return animal.animal_type  # type: ignore
 
     def find_animal_combination(self, animal: Animal) -> AnimalCombination:
         """

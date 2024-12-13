@@ -17,6 +17,7 @@ from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutpu
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
+from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
@@ -39,38 +40,7 @@ from RUFAS.time import Time
 
 
 class Animal:
-    animal_type: AnimalType
-    birth_date: date
-    birth_weight: float
-    body_weight: float
-    body_weight_history: list[BodyWeightHistory] = []
-    breed: Breed
-    culled: bool = False
-    daily_horizontal_distance: float = 0.0
-    daily_vertical_distance: float = 0.0
-    days_born: int = 0
-    days_in_milk: int = 0
-    days_in_pregnancy: int = 0
-    dead: bool = False
-    dry_matter_intake: float = 0.0
-    dry_matter_intake_estimation: float = 0.0
-    events: AnimalEvents = AnimalEvents()
-    future_cull_date: int = sys.maxsize
-    future_death_date: int = sys.maxsize
-    id: int
-    mature_body_weight: float = 0.0
     metabolizable_energy_intake: float = 0.0
-    net_merit: float
-    nutrient: dict[str, float]
-    nutrient_concentrations: dict[str, float]
-    nutrient_requirements: dict[str, float] = {}
-    pen_history: list[PenHistory] = []
-    ration_formulation = {"objective": 0.00}
-    semen_type: str
-    sex: Sex
-    sold: bool = False
-    sold_at_day: int = sys.maxsize
-    wean_weight: float = 0.0
 
     nutrient_standard: NutrientStandard
 
@@ -92,8 +62,28 @@ class Animal:
             raise TypeError()
         return self._days_in_milk
 
+    @days_in_milk.setter
+    def days_in_milk(self, days_in_milk: int) -> None:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self._days_in_milk = days_in_milk
+
+    @property
+    def days_in_pregnancy(self) -> int:
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        return self._days_in_pregnancy
+
+    @days_in_pregnancy.setter
+    def days_in_pregnancy(self, days_in_pregnancy: int) -> None:
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise TypeError()
+        self._days_in_pregnancy = days_in_pregnancy
+
     @property
     def is_pregnant(self) -> bool:
+        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+            raise False
         return self.days_in_pregnancy > 0
 
     @property
@@ -101,6 +91,54 @@ class Animal:
         if not self.animal_type.is_cow:
             return False
         return self.days_in_milk > 0
+
+    @property
+    def future_cull_date(self) -> int:
+        if not self.animal_type.is_cow:
+            return sys.maxsize
+        return self._future_cull_date
+
+    @future_cull_date.setter
+    def future_cull_date(self, future_cull_date: int) -> None:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self._future_cull_date = future_cull_date
+
+    @property
+    def future_death_date(self) -> int:
+        if not self.animal_type.is_cow:
+            return sys.maxsize
+        return self._future_death_date
+
+    @future_death_date.setter
+    def future_death_date(self, future_death_date: int) -> None:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self._future_death_date = future_death_date
+
+    @property
+    def daily_horizontal_distance(self) -> float:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self._daily_horizontal_distance
+
+    @daily_horizontal_distance.setter
+    def daily_horizontal_distance(self, daily_horizontal_distance: float) -> None:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self._daily_horizontal_distance = daily_horizontal_distance
+
+    @property
+    def daily_vertical_distance(self) -> float:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self._daily_vertical_distance
+
+    @daily_vertical_distance.setter
+    def daily_vertical_distance(self, daily_vertical_distance: float) -> None:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self._daily_vertical_distance = daily_vertical_distance
 
     def __init__(
             self,
@@ -114,7 +152,6 @@ class Animal:
             AnimalType.LAC_COW: self._initialize_cow,
             AnimalType.DRY_COW: self._initialize_cow
         }
-        self._days_in_milk: int = 0
         self.id = int(args.get("id"))
         self.breed = Breed(args.get("breed"))
         self.animal_type = AnimalType(args.get("animal_type"))
@@ -124,6 +161,20 @@ class Animal:
         self.net_merit = args.get("net_merit", 0.0)
 
         self.cull_reason = ""
+        self.body_weight_history: list[BodyWeightHistory] = []
+        self.pen_history: list[PenHistory] = []
+        self.sold: bool = False
+        self.dead: bool = False
+        self.sold_at_day: int | None = None
+        self.dry_matter_intake: float = 0.0
+
+        self.events = AnimalEvents()
+        if "events" in args.keys():
+            self.events.init_from_string(args["events"])
+
+        self.nutrient: dict[str, float] = {}
+        self.nutrient_concentrations: dict[str, float] = {}
+        self.nutrient_requirements: dict[str, float] = {}
 
         self.growth: Growth = Growth()
         self.digestive_system: DigestiveSystem = DigestiveSystem()
@@ -131,6 +182,13 @@ class Animal:
         self.nutrients: Nutrients = Nutrients()
         self.reproduction: Reproduction = Reproduction()
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
+
+        self._days_in_milk: int = 0
+        self._days_in_pregnancy: int = 0
+        self._future_cull_date: int | None = None
+        self._future_death_date: int | None = None
+        self._daily_horizontal_distance: float = 0.0
+        self._daily_vertical_distance: float = 0.0
 
         if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
             self._initialize_newborn_calf(args)
@@ -149,7 +207,7 @@ class Animal:
         self.sex = Sex.MALE if random() < male_calf_rate else Sex.FEMALE
 
         if random() < AnimalConfig.still_birth_rate:
-            self.culled = True
+            self.sold = True
             self.events.add_event(0, 0, animal_constants.STILL_BIRTH)
 
         self.sold = True if (self.sex == Sex.MALE or random() > AnimalConfig.keep_female_calf_rate) else False
@@ -166,7 +224,6 @@ class Animal:
         self.nutrients.total_phosphorus_in_animal = args.get("initial_phosphorus")
 
     def _initialize_calf_or_heiferI(self, args: CalfValuesTypedDict | HeiferIValuesTypedDict) -> None:
-        self.culled = False
         self.sold = False
         self.sex = Sex.FEMALE
         self.birth_weight = args.get("birth_weight")
@@ -290,14 +347,14 @@ class Animal:
             reproduction_inputs, time)
 
 
-        daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update()
+        daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update(time.simulation_day)
         if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
             daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
             daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
 
         return daily_routines_output
 
-    def animal_life_stage_update(self) -> DailyRoutinesOutput:
+    def animal_life_stage_update(self, simulation_day: int) -> DailyRoutinesOutput:
         daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
                 animal_status=AnimalStatus.REMAIN,
                 animal_values=self.get_animal_values()
@@ -313,15 +370,22 @@ class Animal:
                 self._transition_heiferII_to_heiferIII()
                 daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
             else:
-                self.culled = True
-                daily_routines_output.animal_status = AnimalStatus.CULLED
+                self.sold = True
+                daily_routines_output.animal_status = AnimalStatus.SOLD
         elif self.animal_type == AnimalType.HEIFER_III and self._evaluate_heiferIII_for_cow():
             self._transition_heiferIII_to_cow()
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+        elif self.animal_type == AnimalType.LAC_COW and self.is_milking == False:
+            self.animal_type = AnimalType.DRY_COW
+            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
+        elif self.animal_type == AnimalType.DRY_COW and self.is_milking == True:
+            self.animal_type = AnimalType.LAC_COW
+            daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
 
         if self.days_born == self.future_cull_date:
-            self.culled = True
-            daily_routines_output.animal_status = AnimalStatus.CULLED
+            self.sold = True
+            self.sold_at_day = simulation_day
+            daily_routines_output.animal_status = AnimalStatus.SOLD
         if self.days_born == self.future_death_date:
             self.dead = True
             daily_routines_output.animal_status = AnimalStatus.DEAD
