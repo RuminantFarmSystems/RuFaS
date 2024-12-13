@@ -1074,8 +1074,12 @@ class HerdManager:
             Pen that requires ration reformulation.
         current_temperature : float
             Current temperature.
+
         """
-        pass
+        for animal in pen.animals_in_pen.values():
+            animal.evaluate_requirements()
+
+        # TODO: formulate ration based on animal requirements.
 
     def update_herd_statistics(self) -> None:
         (
