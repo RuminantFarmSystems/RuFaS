@@ -404,10 +404,8 @@ class NitrogenIncorporation:
             }
             om = OutputManager()
             om.add_error(
-                "Equal half_mature_heat_fraction and mature_heat_fraction.",
-                f"half_mature_heat_fraction must not equal mature_heat_fraction,"
-                f" received mature_heat_fraction is {mature_heat_fraction},"
-                f" half_mature_heat_fraction is {half_mature_heat_fraction}",
+                "A crop's half mature heat fraction and mature heat fraction are equal.",
+                f"Half mature heat fraction and mature heat fraction are both {mature_heat_fraction}, this results in a divide by zero error."
                 info_map,
             )
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
