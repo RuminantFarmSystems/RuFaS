@@ -497,12 +497,8 @@ class NitrogenIncorporation:
             or emergence_nitrogen_fraction > 1
         ):
             om.add_error(
-                "Invalid nitrogen_fraction, heat_fraction, mature_nitrogen_fraction,"
-                " or emergence_nitrogen_fraction.",
-                f"One or more of the following fractions are not between 0 and 1,"
-                f" nitrogen_fraction: {nitrogen_fraction}, heat_fraction: {heat_fraction},"
-                f" mature_nitrogen_fraction: {mature_nitrogen_fraction},"
-                f" emergence_nitrogen_fraction: {emergence_nitrogen_fraction}.",
+                "Received invalid fractional value",
+                f"All following values must be in the range (0, 1), received {nitrogen_fraction=}, {heat_fraction=}, {mature_nitrogen_fraction=}, {emergence_nitrogen_fraction=}.",
                 info_map,
             )
             frac_error_msg = (
