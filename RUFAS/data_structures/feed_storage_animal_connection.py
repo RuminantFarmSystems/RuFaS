@@ -72,7 +72,7 @@ class Feed:
     Kd : float
         Feed degradation rate of B fraction (% h). TODO: percent per hour?
     dRUP : float
-        Digested rumen undegradable protein (% of Rumen Undigestable Protein).
+        Digested rumen undegradable protein (% of rumen undigestable protein).
     ADICP : float
         Acid detergent insoluble nitrogen multiplied by 6.25 (% dry matter).
     NDICP : float
@@ -182,8 +182,8 @@ class NASEMFeed(Feed):
     FA : float
         Fatty acids (% dry matter).
     DE_Base : float
-        Digestible energy standard (Mcal/kg).
-    copper : float
+        Digestible energy standard (Mcal/kg). TODO: if using NASEM feeds, should DE_Base always be used instead of DE?
+    copper : float  TODO: add descriptiosn to these.
     iron : float
     manganese : float
     zinc : float
