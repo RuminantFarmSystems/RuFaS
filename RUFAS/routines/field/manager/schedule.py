@@ -191,7 +191,7 @@ class Schedule:
             True if all tillage depths are valid, False otherwise.
 
         """
-        return all(depth > 0.0 for depth in values)
+        return all(value > 0.0 for value in values)
 
     @staticmethod
     def validate_equal_lengths(header: str, **kwargs: Any) -> bool:
