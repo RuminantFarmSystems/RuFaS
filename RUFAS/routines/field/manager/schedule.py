@@ -292,7 +292,7 @@ class Schedule:
                 )
 
     @staticmethod
-    def repeat_pattern(pattern: List[int], skip: int = 0, repeat: int = 0) -> list[int]:
+    def repeat_pattern(pattern: List[int | float], skip: int = 0, repeat: int = 0) -> list[int]:
         """
         Extends a pattern of numbers by repeating it a specified number of times. The pattern's differences between
         consecutive numbers are calculated and used for repetition, with an optional gap (skip) added between each
