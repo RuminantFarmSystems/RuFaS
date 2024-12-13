@@ -12,6 +12,7 @@ RUFAS_ID = int
 
 
 class Category(Enum):
+    """NASEM and NRC categorizations of feeds."""
     ANIMAL_PROTEIN = "Animal Protein"
     BY_PRODUCT_OTHER = "By-Product/Other"
     CALF_LIQUID_FEED = "Calf Liquid Feed"
@@ -26,6 +27,7 @@ class Category(Enum):
 
 
 class Type(Enum):
+    """NASEM and NRC types of feeds."""
     AMINOACIDS = "Aminoacids"
     FORAGE = "Forage"
     CONC = "Conc"
@@ -37,6 +39,7 @@ class Type(Enum):
 
 
 class NutrientStandard(Enum):
+    """The nutrient standards supported in RuFaS."""
     NASEM = "NASEM"
     NRC = "NRC"
 
@@ -49,37 +52,69 @@ class Feed:
     Attributes
     ----------
     rufas_id : RUFAS_ID
+        Unique integer identifier for feeds used within the RuFaS model.
     Fd_Category : Category
+        Feed category.
     feed_type : Type
+        General type or category of the feed.
     DM : float
+        Dry matter content of the feed (% dry matter). TODO: wut??
     ash : float
+        Ash contents (% dry matter).
     CP : float
+        Crude protein content of the feed (% dry matter).
     N_A : float
+        Nitrogen Fraction A (% crude protein).
     N_B : float
+        Nitrogen Fraction B (% crude protein).
     N_C : float
+        Nitrogen Fraction C (% crude protein).
     Kd : float
+        Feed degradation rate of B fraction (% h). TODO: percent per hour?
     dRUP : float
+        Digested rumen undegradable protein (% of Rumen Undigestable Protein).
     ADICP : float
+        Acid detergent insoluble nitrogen multiplied by 6.25 (% dry matter).
     NDICP : float
+        Neutral detergent insoluble nitrogen multiplied by 6.25 (% dry matter).
     ADF : float
+        Acid detergent fiber (% dry matter).
     NDF : float
+        Neutral detergent fiber (% dry matter).
     lignin : float
+        Acid detergent lignin (% dry matter).
     starch : float
+        Starch (%). TODO: percentage of what, dry matter?
     EE : float
+        Ether extract (% dry matter).
     calcium : float
+        Calcium (% dry matter).
     phosphorus : float
+        Phosphorus (% dry matter).
     magnesium : float
+        Magnesium (% dry matter).
     potassium : float
+        Potassium (% dry matter).
     sodium : float
+        Sodium (% dry matter).
     chlorine : float
+        Chlorine (% dry matter).
     sulfur : float
+        Sulphur (% dry matter).
     is_fat : bool
+        Identifier of fat type feed.
     is_wetforage : float
+        Identifier of wet forage type feed.
     units : MeasurementUnits
+        TODO: document this! Also, is it possible to just have one unit for all feeds, preferable kg?
     limit : float
+        TODO: document this. Also, limits by animal type?
     lower_limit : float
+        TODO: document this. Also, limits by animal type?
     TDN : float
+        Total digestible nutrients (% dry matter).
     DE : float
+        Digestible energy (Mcal / kg).
     amount_available : float
         Amount of feed currently or expected to be available (kg).
     on_farm_cost : float
@@ -270,7 +305,7 @@ class NRCFeed(Feed):
     Attributes
     ----------
     non_fiber_carb : float
-        Non fiber carbohydrates (% DM).
+        Non fiber carbohydrates (% dry matter).
     PAF : float
         Processing adjustment factor.
 
