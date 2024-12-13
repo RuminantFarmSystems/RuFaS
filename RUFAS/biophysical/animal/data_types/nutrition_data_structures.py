@@ -153,6 +153,9 @@ class NutritionEvaluationResults:
     @property
     def is_valid_cow_ration(self) -> bool:
         """True if evaluated supply meets requirements for cows, else false."""
+        if self.total_energy is None or self.lactation is None:
+            return False
+
         non_negative_fields = {
             self.total_energy, self.maintenance, self.lactation, self.growth, self.calcium, self.phosphorus
         }
