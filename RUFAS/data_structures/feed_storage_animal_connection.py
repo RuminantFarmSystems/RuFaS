@@ -45,7 +45,7 @@ class NutrientStandard(Enum):
 class Feed:
     """
     Base representation of a feed in RuFaS.
-    
+
     Attributes
     ----------
     rufas_id : RUFAS_ID
@@ -86,7 +86,7 @@ class Feed:
         Price of using the feed that is already on-farm ($ / kg).
     purchase_cost : float
         Price of buying feed from off-farm ($ / kg).
-    
+
     """
 
     rufas_id: RUFAS_ID
@@ -129,7 +129,78 @@ class Feed:
 
 @dataclass
 class NASEMFeed(Feed):
-    """NASEM-specific representation of a RuFaS feed."""
+    """
+    NASEM-specific representation of a RuFaS feed.
+
+    Attributes
+    ----------
+    Name : str
+        Feed name.
+    RUP : float
+        Rumen undegradable protein (% crude protein).
+    sol_prot : float
+        Soluble protein (% crude protein).
+    NDF48 : float
+        In vitro 48-hour digestibility (% Neutral Detergent Fiber).
+    WSC : float
+        Water soluble carbohydrates (% dry matter).
+    FA : float
+        Fatty acids (% dry matter).
+    DE_Base : float
+        Digestible energy standard (Mcal/kg).
+    copper : float
+    iron : float
+    manganese : float
+    zinc : float
+    molibdenum : float
+    chromium : float
+    cobalt : float
+    iodine : float
+    selenium : float
+    arginine : float
+    histidine : float
+    isoleucine : float
+    leucine : float
+    lysine : float
+    methionine : float
+    phenylalanine : float
+    threonine : float
+    triptophan : float
+    valine : float
+    C120_FA : float
+    C140_FA : float
+    C160_FA : float
+    C161_FA : float
+    C180_FA : float
+    C181t_FA : float
+    C181c_FA : float
+    C182_FA : float
+    C183_FA : float
+    otherFA_FA : float
+    NPN_source : float
+    starch_digested : float
+    FA_dig : float
+    P_inorg : float
+    P_org : float
+    B_Carotene : float
+    biotin : float
+    choline : float
+    niacin : float
+    Vit_A : float
+    Vit_D : float
+    Vit_E : float
+    Abs_calcium : float
+    Abs_phosphorus : float
+    Abs_sodium : float
+    Abs_chloride : float
+    Abs_potassium : float
+    Abs_copper : float
+    Abs_iron : float
+    Abs_magnesium : float
+    Abs_manganesum : float
+    Abs_zinc : float
+
+    """
 
     Name: str
     RUP: float
@@ -195,6 +266,14 @@ class NASEMFeed(Feed):
 class NRCFeed(Feed):
     """
     NRC-specific representation of a RuFaS feed.
+
+    Attributes
+    ----------
+    non_fiber_carb : float
+        Non fiber carbohydrates (% DM).
+    PAF : float
+        Processing adjustment factor.
+
     """
 
     non_fiber_carb: float
