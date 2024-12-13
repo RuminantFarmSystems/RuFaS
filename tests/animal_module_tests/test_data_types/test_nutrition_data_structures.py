@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionEvaluationResults, NutritionRequirements, NutritionSupply
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionEvaluationResults, NutritionRequirements
 
 
 @pytest.fixture
@@ -9,13 +9,6 @@ def requirements(mocker: MockerFixture) -> NutritionRequirements:
     """Nutrition requirements fixture."""
     mocker.patch.object(NutritionRequirements, "__init__", return_value=None)
     return NutritionRequirements()
-
-
-@pytest.fixture
-def supply(mocker: MockerFixture) -> NutritionSupply:
-    """Nutrition supply fixture."""
-    mocker.patch.object(NutritionSupply, "__init__", return_value=None)
-    return NutritionSupply()
 
 
 @pytest.fixture
@@ -38,5 +31,58 @@ def test_total_energy_requirement(requirements: NutritionRequirements, maintenan
     requirements.activity = activity
 
     actual = requirements.total_energy_requirement
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "protein,ndf,fat,dry_matter,expected",
+    ([0.0, 0.0, 0.0, 0.0, True], [1.0, 0.0, 0.0, 0.0, False], [0.0, 0.0, -3.0, 0.0, False])
+)
+def test_clamped_values_are_valid(evaluation: NutritionEvaluationResults, protein: float, ndf: float, fat: float, dry_matter: float, expected: bool) -> None:
+    """Test that clamped values are checked correctly."""
+    evaluation.protein = protein
+    evaluation.ndf = ndf
+    evaluation.fat = fat
+    evaluation.dry_matter = dry_matter
+
+    actual = evaluation._clamped_values_are_valid
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "maint,growth,calcium,phos,expected",
+    [(20.0, 0.0, 1.0, 2.0, True), (0.0, 0.0, 0.0, 0.0, True), (-10.0, 30.0, 2.0, 1.0, False)]
+)
+def test_is_valid_heifer_ration(evaluation: NutritionEvaluationResults, maint: float, growth: float, calcium: float, phos: float, expected: float) -> None:
+    """Test that results correctly indicate whether heifer ration is valid."""
+    evaluation.protein, evaluation.ndf, evaluation.fat, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
+    evaluation.total_energy, evaluation.lactation = None, None
+    evaluation.maintenance = maint
+    evaluation.growth = growth
+    evaluation.calcium = calcium
+    evaluation.phosphorus = phos
+
+    actual = evaluation.is_valid_heifer_ration
+
+    assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "total,maint,lactation,growth,calcium,phos,expected",
+    [(30.0, 20.0, 0.0, 0.0, 1.0, 2.0, True), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, True), (30.0, -10.0, 20.0, 30.0, 2.0, 1.0, False), (None, 10.0, 13.0, 10.0, 20.0, 15.0, False)]
+)
+def test_is_valid_cow_ration(evaluation: NutritionEvaluationResults, total: float | None, maint: float, lactation: float, growth: float, calcium: float, phos: float, expected: float) -> None:
+    """Test that results correctly indicate whether cow ration is valid."""
+    evaluation.protein, evaluation.ndf, evaluation.fat, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
+    evaluation.total_energy = total
+    evaluation.maintenance = maint
+    evaluation.lactation = lactation
+    evaluation.growth = growth
+    evaluation.calcium = calcium
+    evaluation.phosphorus = phos
+
+    actual = evaluation.is_valid_cow_ration
 
     assert actual == expected
