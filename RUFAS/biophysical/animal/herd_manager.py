@@ -188,6 +188,11 @@ class HerdManager:
             AnimalType.LAC_COW: [cow for cow in self.cows if cow.is_milking],
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
+    
+    @property
+    def all_animals(self) -> list[Animal]:
+        """Gathers all simulated animals into a single list."""
+        return self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows
 
     def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> list[HerdManagerOutput]:
         current_conditions = weather.get_current_day_conditions(time)
@@ -360,25 +365,13 @@ class HerdManager:
 
             self.all_pens.append(pen)
 
-    def initialize_nutrient_requirements(self, weather: Weather, time: Time, feed: Feed) -> None:
+    def initialize_nutrient_requirements(self) -> None:
         """
-        Calculates initial nutrient requirements at the beginning of the
-        simulation for initial pen allocation. For the nutrient requirements
-        of cows, the average walking distance of all the pens initialized
-        is used.
-
-        Parameters
-        ----------
-        feed : Feed
-            an instance of the Feed class defined in feed.py
-        weather : Weather
-            instance of the Weather class
-        time : Time
-            instance of the Time class
-
+        Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation. For the
+        nutrient requirements of cows, the average walking distance of all the pens initialized is used.
         """
-
-        pass
+        for animal in self.all_animals:
+            animal.evaluate_requirements()
 
     def allocate_animals_to_pens(self) -> None:
         """
