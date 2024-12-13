@@ -178,17 +178,17 @@ class Schedule:
     @staticmethod
     def validate_positive_values(values: list[float]) -> bool:
         """
-        Checks that depths passed are all valid.
+        Checks that values passed are greater than 0.
 
         Parameters
         ----------
         values : List[float]
-            List of tillage depths to be validated.
+            List of values to be validated.
 
         Returns
         -------
         bool
-            True if all tillage depths are valid, False otherwise.
+            True if all values are greater than 0, False otherwise.
 
         """
         return all(value > 0.0 for value in values)
