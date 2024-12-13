@@ -2,7 +2,9 @@ from math import exp, log, sqrt
 from unittest.mock import PropertyMock, patch
 
 import pytest
+from pytest_mock import MockerFixture
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.leaf_area_index import LeafAreaIndex
 
@@ -110,10 +112,14 @@ def test_determine_lai_shapes(heatfrac1: float, heatfrac2: float, areafrac1: flo
         (0.3, 0.3, 0.2, 0.4),  # heatfrac1 = heatfrac2 -- division by zero
     ],
 )
-def test_error_determine_lai_shape(heatfrac1: float, heatfrac2: float, areafrac1: float, areafrac2: float) -> None:
+def test_error_determine_lai_shape(heatfrac1: float, heatfrac2: float, areafrac1: float, areafrac2: float,
+                                   mocker: MockerFixture) -> None:
     """check that invalid input to test_error_calc_shape_parameters throws errors"""
+    om = OutputManager()
+    mock_add = mocker.patch.object(om, "add_error")
     with pytest.raises(ValueError):
         LeafAreaIndex._determine_lai_shapes(heatfrac1, heatfrac2, areafrac1, areafrac2)
+    mock_add.assert_called_once()
 
 
 @pytest.mark.parametrize(
