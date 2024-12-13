@@ -405,7 +405,8 @@ class NitrogenIncorporation:
             om = OutputManager()
             om.add_error(
                 "A crop's half mature heat fraction and mature heat fraction are equal.",
-                f"Half mature heat fraction and mature heat fraction are both {mature_heat_fraction}, this results in a divide by zero error."
+                f"Half mature heat fraction and mature heat fraction are both {mature_heat_fraction},"
+                f" this results in a divide by zero error.",
                 info_map,
             )
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
@@ -498,7 +499,8 @@ class NitrogenIncorporation:
         ):
             om.add_error(
                 "Received invalid fractional value",
-                f"All following values must be in the range (0, 1), received {nitrogen_fraction=}, {heat_fraction=}, {mature_nitrogen_fraction=}, {emergence_nitrogen_fraction=}.",
+                f"All following values must be in the range (0, 1), received {nitrogen_fraction=}, {heat_fraction=}"
+                f", {mature_nitrogen_fraction=}, {emergence_nitrogen_fraction=}.",
                 info_map,
             )
             frac_error_msg = (
@@ -564,7 +566,7 @@ class NitrogenIncorporation:
                 " emergence_nitrogen_fraction and mature_nitrogen_fraction.",
                 "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
                 " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
-                f"is negative. \nIs nitrogen_fraction({nitrogen_fraction}) <"
+                f"is negative, which will leads to log(-y) calculation. \nIs nitrogen_fraction({nitrogen_fraction}) <"
                 f" mature_nitrogen_fraction({mature_nitrogen_fraction}) or"
                 f" emergence_nitrogen_fraction({emergence_nitrogen_fraction}) <"
                 f" mature_nitrogen_fraction({mature_nitrogen_fraction})?",
@@ -840,7 +842,8 @@ class NitrogenIncorporation:
         if nitrogen_distribution_parameter == 0:
             om.add_error(
                 "Invalid nitrogen_distribution_parameter.",
-                "Received invalid value 0 for nitrogen_distribution_parameter.",
+                "Received invalid value 0 for nitrogen_distribution_parameter. 0 nitrogen_distribution_parameter"
+                " will lead to exp(0) calculation.",
                 info_map,
             )
             raise ValueError("nitrogen_distribution_parameter cannot equal 0")
