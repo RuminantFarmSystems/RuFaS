@@ -397,12 +397,12 @@ class NitrogenIncorporation:
             If half_mature_heat_fraction equals mature_heat_fraction.
 
         """
-        info_map = {
-            "class": NitrogenIncorporation.__class__.__name__,
-            "function": NitrogenIncorporation.determine_nutrient_shape_parameters.__name__,
-        }
-        om = OutputManager()
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
+            info_map = {
+                "class": NitrogenIncorporation.__class__.__name__,
+                "function": NitrogenIncorporation.determine_nutrient_shape_parameters.__name__,
+            }
+            om = OutputManager()
             om.add_error(
                 "Equal half_mature_heat_fraction and mature_heat_fraction.",
                 f"half_mature_heat_fraction must not equal mature_heat_fraction,"
