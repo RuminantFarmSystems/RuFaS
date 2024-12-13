@@ -112,8 +112,9 @@ def test_determine_lai_shapes(heatfrac1: float, heatfrac2: float, areafrac1: flo
         (0.3, 0.3, 0.2, 0.4),  # heatfrac1 = heatfrac2 -- division by zero
     ],
 )
-def test_error_determine_lai_shape(heatfrac1: float, heatfrac2: float, areafrac1: float, areafrac2: float,
-                                   mocker: MockerFixture) -> None:
+def test_error_determine_lai_shape(
+    heatfrac1: float, heatfrac2: float, areafrac1: float, areafrac2: float, mocker: MockerFixture
+) -> None:
     """check that invalid input to test_error_calc_shape_parameters throws errors"""
     om = OutputManager()
     mock_add = mocker.patch.object(om, "add_error")
