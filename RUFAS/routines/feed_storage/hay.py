@@ -240,7 +240,9 @@ class ProtectedIndoors(Hay):
     Represents protected indoors hay storage, a subclass of Hay.
     """
 
-    pass
+    def __init__(self, capacity: float = float("inf")) -> None:
+        super().__init__(capacity)
+        self.crude_protein_loss_coefficient = 0.4
 
 
 class ProtectedWrapped(Hay):
@@ -277,4 +279,3 @@ class Unprotected(Hay):
         super().__init__(capacity)
         self.additional_dry_matter_loss_coefficient = UNPROTECTED_OUTDOOR_ADDITIONAL_LOSS_COEFFICIENT
         self.ndf_loss_coefficient = 0.17
-        self.crude_protein_loss_coefficient = 0.4
