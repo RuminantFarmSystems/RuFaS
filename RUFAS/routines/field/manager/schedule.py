@@ -1,5 +1,5 @@
 from copy import copy
-from typing import List, Any, Optional
+from typing import Any, Optional
 
 from RUFAS.util import Utility
 
@@ -13,9 +13,9 @@ class Schedule:
     ----------
     name : str
         The name of the schedule, serving as a unique identifier.
-    years : List[int]
+    years : list[int]
         The years in which scheduled events are to occur.
-    days : List[int]
+    days : list[int]
         The Julian days corresponding to each event within the specified years.
     pattern_skip : int, optional, default 0.0
         The number of years to skip between repetitions of the schedule.
@@ -26,9 +26,9 @@ class Schedule:
     ----------
     name : str
         Name of the schedule, uniquely identifying it within the simulation.
-    years : List[int]
+    years : list[int]
         List of years during which the scheduled events will occur.
-    days : List[int]
+    days : list[int]
         Elongated list of days to ensure a day value for each specified year, aligning with the `years` attribute.
     pattern_skip : int
         Specifies the interval of years between each cycle of the schedule.
@@ -53,9 +53,9 @@ class Schedule:
 
         Parameters
         ----------
-        years : List[int]
+        years : list[int]
             Calendar year(s) in which this event will occur.
-        days : List[int]
+        days : list[int]
             Julian day(s) in which this event will occur.
 
         Returns
@@ -112,15 +112,15 @@ class Schedule:
 
         Parameters
         ----------
-        years : List[int]
+        years : list[int]
             List of years for the schedule.
-        days : List[int]
+        days : list[int]
             List of days for the schedule.
-        additional_attributes : List[List]
+        additional_attributes : list[List]
             Additional general attributes for the events (e.g., crop reference).
-        additional_attributes_events : List[List]
+        additional_attributes_events : list[List]
             Additional attributes for each of the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
-        event_class : class
+        event_class : Any
             The class to instantiate for each event.
         pattern_skip : int
             Number of years to skip.
@@ -152,11 +152,11 @@ class Schedule:
 
         Parameters
         ----------
-        years : List[int]
+        years : list[int]
             List of years for the schedule.
-        days : List[int]
+        days : list[int]
             List of days for the schedule.
-        additional_attributes_events : List[List]
+        additional_attributes_events : list[list]
             Additional attributes for each of the events (e.g., nitrogen_mass, phosphorus_mass, etc.).
         pattern_skip : int
             Number of years to skip.
@@ -182,8 +182,8 @@ class Schedule:
 
         Parameters
         ----------
-        values : List[float]
-            List of values to be validated.
+        values : list[float]
+            list of values to be validated.
 
         Returns
         -------
@@ -253,9 +253,9 @@ class Schedule:
         fraction_parameters: list[tuple[str, list]]
             A list of tuples containing parameter names and associated values that should be fractions.
         years: list[int]
-            List of event years.
+            list of event years.
         days: list[int]
-            List of event days.
+            list of event days.
         name : str
             The name of the schedule, serving as a unique identifier.
 
@@ -292,7 +292,7 @@ class Schedule:
                 )
 
     @staticmethod
-    def repeat_pattern(pattern: List[int | float], skip: int = 0, repeat: int = 0) -> list[int]:
+    def repeat_pattern(pattern: list[int | float], skip: int = 0, repeat: int = 0) -> list[int]:
         """
         Extends a pattern of numbers by repeating it a specified number of times. The pattern's differences between
         consecutive numbers are calculated and used for repetition, with an optional gap (skip) added between each
@@ -300,7 +300,7 @@ class Schedule:
 
         Parameters
         ----------
-        pattern : List[int | float]
+        pattern : list[int | float]
             The pattern to be repeated.
         skip : int
             Number of steps to skip between repeats (0 if no steps should be skipped).
@@ -309,7 +309,7 @@ class Schedule:
 
         Returns
         -------
-        List[int]
+        list[int]
             The full repeated pattern of numbers.
 
         """
