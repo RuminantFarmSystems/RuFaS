@@ -1,81 +1,8 @@
-from typing import Any, List
+from typing import List
 
 import pytest
 
 from RUFAS.routines.field.manager.schedule import Schedule
-
-
-def test_repeat_pattern() -> None:
-    """Tests that repeat_pattern correctly repeats patterns."""
-    assert Schedule._repeat_pattern([1, 3, 5], 1, 3) == [
-        1,
-        3,
-        5,
-        7,
-        9,
-        11,
-        13,
-        15,
-        17,
-        19,
-        21,
-        23,
-    ]
-    assert Schedule._repeat_pattern([1, 3, 5], 0, 1) == [1, 3, 5, 6, 8, 10]
-    assert Schedule._repeat_pattern([2, 3, 7], 3, 2) == [
-        2,
-        3,
-        7,
-        11,
-        12,
-        16,
-        20,
-        21,
-        25,
-    ]
-    assert Schedule._repeat_pattern([2, 3, 7], 0, 0) == [2, 3, 7]
-
-    assert Schedule._repeat_pattern([2], 0, 0) == [2]
-    assert Schedule._repeat_pattern([2], 3, 1) == [2, 6]
-    assert Schedule._repeat_pattern([2], 0, 5) == [2, 3, 4, 5, 6, 7]
-
-    assert Schedule._repeat_pattern([2, 3, 3], 2, 3) == [
-        2,
-        3,
-        3,
-        6,
-        7,
-        7,
-        10,
-        11,
-        11,
-        14,
-        15,
-        15,
-    ]
-    assert Schedule._repeat_pattern([1, 1], 0, 4) == [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
-    assert Schedule._repeat_pattern([1, 1, 3], 3, 1) == [1, 1, 3, 7, 7, 9]
-
-    assert Schedule._repeat_pattern([], 0, 0) == []
-    assert Schedule._repeat_pattern([], 3, 7) == []
-
-
-@pytest.mark.parametrize(
-    "test_list,length,expected",
-    [
-        ([], 3, []),
-        ([], 0, []),
-        ([1, 2], 1, [1, 2]),
-        ([1.0, 2.0], 5, [1.0, 2.0]),
-        (["test"], 4, ["test", "test", "test", "test"]),
-        ([3], 1, [3]),
-        ([5], 5, [5, 5, 5, 5, 5]),
-    ],
-)
-def test_elongate_list(test_list: List[Any], length: int, expected: List[Any]) -> None:
-    """Check that lists are elongated correctly."""
-    actual = Schedule._elongate_list(test_list, length)
-    assert actual == expected
 
 
 @pytest.mark.parametrize(
@@ -112,21 +39,113 @@ def test_validate_years(years: List[int], expected: bool) -> None:
     assert actual == expected
 
 
+def test_validate_equal_lengths_valid() -> None:
+    """Test that the validation for valid parameter length are valid."""
+    assert Schedule.validate_equal_lengths(
+        "valid tests", year=[2023, 2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2, 5.2]
+    )
+
+
+def test_validate_equal_lengths_invalid() -> None:
+    """Test that the validation for invalid parameter length are valid."""
+    try:
+        Schedule.validate_equal_lengths("invalid tests", year=[2023, 2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2])
+        assert False
+    except ValueError as e:
+        assert e.args[0] == (
+            "invalid tests Mismatch in length of parameters. Provided parameters are: year=[2023, "
+            "2024, 2025], day=[1, 3, 64], depth=[1.1, 1.2]. Lengths are: {'year': 3, 'day': 3, "
+            "'depth': 2}."
+        )
+
+
 @pytest.mark.parametrize(
-    "name,skip,repeat,expected",
+    "pattern, skip, repeat, expected",
     [
-        ("test_1", -1, 1, "'test_1': expected pattern skip to be >= 0, received '-1'."),
         (
-            "test_2",
+            [1, 3, 5],
             1,
-            -1,
-            "'test_2': expected pattern repeat to be >= 0, received '-1'.",
+            3,
+            [
+                1,
+                3,
+                5,
+                7,
+                9,
+                11,
+                13,
+                15,
+                17,
+                19,
+                21,
+                23,
+            ],
         ),
+        ([1, 3, 5], 0, 1, [1, 3, 5, 6, 8, 10]),
+        (
+            [2, 3, 7],
+            3,
+            2,
+            [
+                2,
+                3,
+                7,
+                11,
+                12,
+                16,
+                20,
+                21,
+                25,
+            ],
+        ),
+        ([2, 3, 7], 0, 0, [2, 3, 7]),
+        ([2], 0, 0, [2]),
+        ([2], 3, 1, [2, 6]),
+        ([2], 0, 5, [2, 3, 4, 5, 6, 7]),
+        (
+            [2, 3, 3],
+            2,
+            3,
+            [
+                2,
+                3,
+                3,
+                6,
+                7,
+                7,
+                10,
+                11,
+                11,
+                14,
+                15,
+                15,
+            ],
+        ),
+        ([1, 1], 0, 4, [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]),
+        ([1, 1, 3], 3, 1, [1, 1, 3, 7, 7, 9]),
+        ([], 0, 0, []),
+        ([], 3, 7, []),
     ],
 )
-def test_validate_pattern_parameters(name: str, skip: int, repeat: int, expected: str) -> None:
-    """Tests that errors are correctly raised by Schedule when invalid"""
-    with pytest.raises(ValueError) as e:
-        test = Schedule(name, [], [], skip, repeat)
-        test._validate_pattern_parameters()
-    assert str(e.value) == expected
+def test_repeat_pattern(pattern: List[int], skip: int, repeat: int, expected: list) -> None:
+    """Tests that repeat_pattern correctly repeats patterns."""
+    assert Schedule.repeat_pattern(pattern, skip, repeat) == expected
+
+
+def test_prepare_events() -> None:
+    """Test prepare_events to ensure correct event arguments preparation."""
+    years = [2022, 2023]
+    days = [100, 200]
+    additional_attributes_events = [[1, 2], [3, 4]]
+    pattern_skip = 0
+    pattern_repeat = 1
+    schedule = Schedule("test", [1], [1])
+
+    result = schedule.prepare_events(years, days, additional_attributes_events, pattern_skip, pattern_repeat)
+
+    assert result == [
+        (1, 3, 2022, 100),
+        (2, 4, 2023, 200),
+        (1, 3, 2024, 100),
+        (2, 4, 2025, 200),
+    ]
