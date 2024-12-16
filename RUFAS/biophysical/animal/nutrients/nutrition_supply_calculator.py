@@ -136,11 +136,11 @@ class NutritionSupplyCalculator:
     ) -> float:
         """
         Calculates the actual net energy for maintenance of feeds (Mcal).
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.8]-[A.Heifer.E.8]
-        
+
         """
         actual_maintenance_net_energy: dict[RUFAS_ID, float] = {}
 
