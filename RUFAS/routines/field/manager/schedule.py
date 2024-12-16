@@ -328,20 +328,3 @@ class Schedule:
             differences_index += 1
             differences_index %= len(pattern)
         return full_pattern
-
-    @staticmethod
-    def validate_pattern_parameters(name: str, pattern_skip: int, pattern_repeat: int) -> None:
-        """
-        Checks the pattern skip and repeat parameters, if they are not correct raises errors.
-
-        Raises
-        ------
-        ValueError
-            If the skip is < 0.
-            If the repeat is < 0.
-
-        """
-        if pattern_skip < 0:
-            raise ValueError(f"'{name}': expected pattern skip to be >= 0, received '{pattern_skip}'.")
-        if pattern_repeat < 0:
-            raise ValueError(f"'{name}': expected pattern repeat to be >= 0, received '{pattern_repeat}'.")
