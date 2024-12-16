@@ -362,32 +362,29 @@ class NutritionSupplyCalculator:
     ) -> dict[RUFAS_ID, float]:
         """
         Calculates the protein passage rate of feeds in ration (percentage / hour).
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.10]-[A.Heifer.E.10]
-        
+
         """
         protein_passage_rates: dict[RUFAS_ID, float] = {}
 
+        percentage_feed_of_body_weight = (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
         for feed in feeds:
             if feed.info.feed_type is Type.CONC:
                 rate = (
                     2.904
-                    + 1.375 * (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
-                    - 0.02 * percentage_concentrates
+                    + 1.375 * percentage_feed_of_body_weight - 0.02 * percentage_concentrates
                 )
             elif feed.info.feed_type is Type.FORAGE and feed.info.is_wetforage is False:
                 rate = (
                     3.362
-                    + 0.479 * (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
-                    - 0.017 * feed.info.NDF
+                    + 0.479 * percentage_feed_of_body_weight - 0.017 * feed.info.NDF
                     - 0.007 * percentage_concentrates
                 )
             elif feed.info.is_wetforage is True:
-                rate = (
-                    3.054 + 0.614 * (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
-                )
+                rate = 3.054 + 0.614 * percentage_feed_of_body_weight
             else:
                 rate = 0.0
             protein_passage_rates[feed.info.rufas_id] = rate

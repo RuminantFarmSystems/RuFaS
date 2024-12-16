@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import FeedInRation, NutritionSupplyCalculator
-from RUFAS.data_structures.feed_storage_animal_connection import Feed, RUFAS_ID
+from RUFAS.data_structures.feed_storage_animal_connection import Feed, RUFAS_ID, Type
 
 
 @pytest.fixture
@@ -12,6 +12,28 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
     feed_1, feed_2, feed_3 = Feed(), Feed(), Feed()
     feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id = 1, 2, 3
     return [feed_1, feed_2, feed_3]
+
+
+@pytest.mark.parametrize(
+    "ndf, dry_matter_intake, weight, concentrates, feed_type, is_wet, expected",
+    [
+        ((1.3, 2.0, 0.5), 30.0, 500.0, 1.0, Type.CONC, False, {1: 11.134, 2: 11.134, 3: 11.134}),
+        ((2.3, 1.8, 3.5), 35.0, 600.0, 1.1, Type.FORAGE, False, {1: 6.1093667, 2: 6.1178667, 3: 6.0889667}),
+        ((1.0, 1.0, 1.0), 50.0, 600.0, 0.5, Type.MINERAL, True, {1: 8.170667, 2: 8.170667, 3: 8.170667}),
+        ((1.0, 1.0, 1.0), 50.0, 600.0, 0.5, Type.MINERAL, False, {1: 0.0, 2: 0.0, 3: 0.0}),
+
+    ]
+)
+def test_calculate_protein_passage_rates(feeds: tuple[Feed, Feed, Feed], ndf: tuple[float, float, float], dry_matter_intake: float, weight: float, concentrates: float, feed_type: Type, is_wet: bool, expected: dict[RUFAS_ID, float]) -> None:
+    """Test that protein passage rates are calculated correctly."""
+    feeds[0].NDF, feeds[1].NDF, feeds[2].NDF = ndf
+    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_type, feed_type, feed_type
+    feeds[0].is_wetforage, feeds[1].is_wetforage, feeds[2].is_wetforage = is_wet, is_wet, is_wet
+    feeds_in_ration = [FeedInRation(1.0, feeds[0]), FeedInRation(1.0, feeds[1]), FeedInRation(1.0, feeds[2])]
+
+    actual = NutritionSupplyCalculator._calculate_protein_passage_rates(feeds_in_ration, dry_matter_intake, weight, concentrates)
+
+    assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize(
