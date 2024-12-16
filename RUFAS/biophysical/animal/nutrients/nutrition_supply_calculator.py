@@ -201,7 +201,7 @@ class NutritionSupplyCalculator:
     ) -> float:
         """
         Calculates actual net energy for growth of feeds (Mcal).
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.9]-[A.Heifer.E.9]
