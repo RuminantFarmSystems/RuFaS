@@ -15,6 +15,49 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 
 
 @pytest.mark.parametrize(
+    "amounts, feed_types, is_fat, de, ee, actual_digestable, expected",
+    [
+        (
+            (30.0, 31.0, 20.0),
+            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (True, True, False),
+            (100.0, 115.0, 130.0),
+            (1.1, 1.8, 2.0),
+            {3: 90.0},
+            {1: 0.0, 2: 115.0, 3: 130.85},
+        ),
+        (
+            (20.0, 11.0, 40.0),
+            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (True, False, False),
+            (90.0, 99.0, 108.0),
+            (1.1, 1.8, 3.5),
+            {2: 110.0, 3: 130.0},
+            {1: 0.0, 2: 99.54, 3: 131.298965},
+        ),
+    ],
+)
+def test_calculate_actual_metabolizable_energy(
+    feeds: tuple[Feed, Feed, Feed],
+    amounts: tuple[float, float, float],
+    feed_types: tuple[Type, Type, Type],
+    is_fat: tuple[bool, bool, bool],
+    ee: tuple[float, float, float],
+    actual_digestable: dict[RUFAS_ID, float],
+    expected: dict[RUFAS_ID, float],
+) -> None:
+    """Test that actual net energy needed for lactation is calculated correctly."""
+    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types
+    feeds[0].is_fat, feeds[1].is_fat, feeds[2].is_fat = is_fat
+    feeds[0].EE, feeds[1].EE, feeds[2].EE = ee
+    feeds_in_ration = [
+        FeedInRation(amounts[0], feeds[0]),
+        FeedInRation(amounts[1], feeds[1]),
+        FeedInRation(amounts[2], feeds[2]),
+    ]
+
+
+@pytest.mark.parametrize(
     "amounts, is_fat, actual_metabolizable, expected",
     [
         (
