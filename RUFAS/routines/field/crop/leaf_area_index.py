@@ -267,7 +267,7 @@ class LeafAreaIndex:
             om.add_error(
                 "Invalid first and second heat fraction combination.",
                 f"First_heat_fraction cannot be exactly equal to second_heat_fractions,"
-                f" got: first heat fraction: {first_heat_fraction} and second heat fraction: {second_heat_fraction}.",
+                f" got first heat fraction equal to second heat fraction: {second_heat_fraction}.",
                 info_map,
             )
             raise ValueError("first_heat_fraction cannot be exactly equal to second_heat_fractions")
