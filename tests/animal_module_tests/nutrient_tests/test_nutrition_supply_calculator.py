@@ -17,12 +17,20 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 @pytest.mark.parametrize(
     "cp, kd, nb, na, protein_passage_rates, expected",
     [
-        ((4.0, 6.0, 5.0), (10.0, 9.0, 12.0), (21.0, 40.0, 50.0), (30.0, 60.0, 20.0), {1: 3.0, 2: 4.5, 3: 1.2}, {1: , 2: , 3: })
+        ((4.0, 6.0, 5.0), (10.0, 9.0, 12.0), (21.0, 40.0, 50.0), (30.0, 60.0, 20.0), {1: 3.0, 2: 4.5, 3: 1.2}, {1: 1.846154, 2: 5.200000, 3: 3.272727})
     ]
 )
 def test_calculated_rdp_percentages(feeds: tuple[Feed, Feed, Feed], cp: tuple[float, float, float], kd: tuple[float, float, float], nb: tuple[float, float, float], na: tuple[float, float, float], protein_passage_rates: dict[RUFAS_ID, float], expected: dict[RUFAS_ID, float]) -> None:
     """Test that Rumen Degradable Protein percentages are calculated correctly."""
-    
+    feeds[0].CP, feeds[1].CP, feeds[2].CP = cp
+    feeds[0].Kd, feeds[1].Kd, feeds[2].Kd = kd
+    feeds[0].N_B, feeds[1].N_B, feeds[2].N_B = nb
+    feeds[0].N_A, feeds[1].N_A, feeds[2].N_A = na
+    feeds_in_ration = [FeedInRation(1.0, feeds[0]), FeedInRation(1.0, feeds[1]), FeedInRation(1.0, feeds[2])]
+
+    actual = NutritionSupplyCalculator._calculate_rumen_degradable_protein_percentages(feeds_in_ration, protein_passage_rates)
+
+    assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize(
