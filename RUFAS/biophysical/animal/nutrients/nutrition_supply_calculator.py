@@ -14,11 +14,11 @@ class FeedInRation:
     info: Feed
 
 
-class EnergySupplyCalculator:
+class NutritionSupplyCalculator:
     """Calculates the energy and nutrients supplied by a ration."""
 
     @classmethod
-    def calculate_energy_nutrient_supply(
+    def calculate_nutrient_supply(
         cls, feeds_used: list[Feed], ration_formulation: dict[RUFAS_ID, float], body_weight: float
     ) -> NutritionSupply:
         """
@@ -73,11 +73,11 @@ class EnergySupplyCalculator:
     def _calculate_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
         """
         Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE).
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.1-3]-[A.Heifer.E.1-3]
-        
+
         """
         dry_matter_intake = sum([feed.amount for feed in feeds])
 
