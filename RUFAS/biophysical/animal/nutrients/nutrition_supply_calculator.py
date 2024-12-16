@@ -400,11 +400,11 @@ class NutritionSupplyCalculator:
     ) -> dict[RUFAS_ID, float]:
         """
         Calculates rumen degradable protein (RDP) percentages of feeds in ration.
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.11]-[A.Heifer.E.11]
-        
+
         """
         rdp_percentages: dict[RUFAS_ID, float] = {}
 

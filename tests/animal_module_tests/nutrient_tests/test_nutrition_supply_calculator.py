@@ -15,6 +15,17 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 
 
 @pytest.mark.parametrize(
+    "cp, kd, nb, na, protein_passage_rates, expected",
+    [
+        ((4.0, 6.0, 5.0), (10.0, 9.0, 12.0), (21.0, 40.0, 50.0), (30.0, 60.0, 20.0), {1: 3.0, 2: 4.5, 3: 1.2}, {1: , 2: , 3: })
+    ]
+)
+def test_calculated_rdp_percentages(feeds: tuple[Feed, Feed, Feed], cp: tuple[float, float, float], kd: tuple[float, float, float], nb: tuple[float, float, float], na: tuple[float, float, float], protein_passage_rates: dict[RUFAS_ID, float], expected: dict[RUFAS_ID, float]) -> None:
+    """Test that Rumen Degradable Protein percentages are calculated correctly."""
+    
+
+
+@pytest.mark.parametrize(
     "cp, rdp_percentages, expected",
     [
         ((15.0, 20.0, 4.0), {1: 3.0, 2: 4.0, 3: 0.5}, {1: 12.0, 2: 16.0, 3: 3.5}),
