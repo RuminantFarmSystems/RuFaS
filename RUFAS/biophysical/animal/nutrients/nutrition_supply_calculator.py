@@ -71,7 +71,14 @@ class EnergySupplyCalculator:
 
     @classmethod
     def _calculate_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
-        """Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE)."""
+        """
+        Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE).
+        
+        References
+        ----------
+        Animal Scientific Documentation [A.Cow.E.1-3]-[A.Heifer.E.1-3]
+        
+        """
         dry_matter_intake = sum([feed.amount for feed in feeds])
 
         total_tdn = sum([feed.amount * feed.info.TDN * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
@@ -99,7 +106,14 @@ class EnergySupplyCalculator:
     def _calculate_actual_metabolizable_energy(
         cls, feeds: list[FeedInRation], actual_digestable_energy: dict[RUFAS_ID, float]
     ) -> float:
-        """Calculates the actual metabolizable energy of feeds (Mcal)."""
+        """
+        Calculates the actual metabolizable energy of feeds (Mcal).
+
+        References
+        ----------
+        Animal Scientific Documentation [A.Cow.E.6]-[A.Heifer.E.6]
+
+        """
         actual_metabolizable_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
@@ -120,7 +134,14 @@ class EnergySupplyCalculator:
     def _calculate_actual_maintenance_net_energy(
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
-        """Calculates the actual net energy for maintenance of feeds (Mcal)."""
+        """
+        Calculates the actual net energy for maintenance of feeds (Mcal).
+        
+        References
+        ----------
+        Animal Scientific Documentation [A.Cow.E.8]-[A.Heifer.E.8]
+        
+        """
         actual_maintenance_net_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
@@ -146,7 +167,14 @@ class EnergySupplyCalculator:
         actual_metabolizable_energy: dict[RUFAS_ID, float],
         actual_digestible_energy: dict[RUFAS_ID, float],
     ) -> float:
-        """Calculates the actual net energy for lactation of feeds (Mcal)."""
+        """
+        Calculates the actual net energy for lactation of feeds (Mcal).
+
+        References
+        ----------
+        Animal Scientific Documentation [A.Cow.E.7]-[A.Heifer.E.7]
+
+        """
         actual_lactation_net_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
