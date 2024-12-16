@@ -24,7 +24,7 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
             (100.0, 115.0, 130.0),
             (1.1, 1.8, 2.0),
             {3: 90.0},
-            {1: 0.0, 2: 115.0, 3: 130.85},
+            {1: 0.0, 2: 115.0, 3: 90.45},
         ),
         (
             (20.0, 11.0, 40.0),
@@ -33,7 +33,7 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
             (90.0, 99.0, 108.0),
             (1.1, 1.8, 3.5),
             {2: 110.0, 3: 130.0},
-            {1: 0.0, 2: 99.54, 3: 131.298965},
+            {1: 0.0, 2: 110.65, 3: 131.298965},
         ),
     ],
 )
@@ -42,6 +42,7 @@ def test_calculate_actual_metabolizable_energy(
     amounts: tuple[float, float, float],
     feed_types: tuple[Type, Type, Type],
     is_fat: tuple[bool, bool, bool],
+    de: tuple[float, float, float],
     ee: tuple[float, float, float],
     actual_digestable: dict[RUFAS_ID, float],
     expected: dict[RUFAS_ID, float],
@@ -49,12 +50,17 @@ def test_calculate_actual_metabolizable_energy(
     """Test that actual net energy needed for lactation is calculated correctly."""
     feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types
     feeds[0].is_fat, feeds[1].is_fat, feeds[2].is_fat = is_fat
+    feeds[0].DE, feeds[1].DE, feeds[2].DE = de
     feeds[0].EE, feeds[1].EE, feeds[2].EE = ee
     feeds_in_ration = [
         FeedInRation(amounts[0], feeds[0]),
         FeedInRation(amounts[1], feeds[1]),
         FeedInRation(amounts[2], feeds[2]),
     ]
+
+    actual = NutritionSupplyCalculator._calculate_actual_metabolizable_energy(feeds_in_ration, actual_digestable)
+
+    assert pytest.approx(actual) == expected
 
 
 @pytest.mark.parametrize(
