@@ -15,6 +15,34 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 
 
 @pytest.mark.parametrize(
+    "amounts, feed_types, ca, expected",
+    [
+        ((30.0, 33.0, 20.0), (Type.FORAGE, Type.CONC, Type.FORAGE), (0.9, 1.1, 0.22), 0.000312),
+        ((20.0, 23.0, 15.0), (Type.CONC, Type.MINERAL, Type.VITAMINS), (1.2, 0.95, 0.5), 0.000351575),
+    ],
+)
+def test_calculate_calcium_supply(
+    feeds: tuple[Feed, Feed, Feed],
+    amounts: tuple[float, float, float],
+    feed_types: tuple[Type, Type, Type],
+    ca: tuple[float, float, float],
+    expected: float,
+) -> None:
+    """Test that the supply of calcium in a ration is calculated correctly."""
+    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types[0], feed_types[1], feed_types[2]
+    feeds[0].calcium, feeds[1].calcium, feeds[2].calcium = ca[0], ca[1], ca[2]
+    feeds_in_ration = [
+        FeedInRation(amounts[0], feeds[0]),
+        FeedInRation(amounts[1], feeds[1]),
+        FeedInRation(amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_calcium_supply(feeds_in_ration)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
     "amounts, feed_types, phos, expected",
     [
         ((30.0, 33.0, 20.0), (Type.FORAGE, Type.CONC, Type.FORAGE), (0.9, 1.1, 0.22), 0.00045506),
