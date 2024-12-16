@@ -15,6 +15,30 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 
 
 @pytest.mark.parametrize(
+    "dry_matter, amounts, actual_tdn, weight, drup, expected",
+    [
+        (50.0, {1: 25.0, 2: 24.0, 3: 0.75}, {1: 1.3, 2: 2.33, 3: 3.1}, 450.0, {1: 70.0, 2: 80.0, 3: 77.0}, 412.32484)
+    ]
+)
+def test_calculate_metabolizable_protein_supply(feeds: tuple[Feed, Feed, Feed], mocker: MockerFixture, dry_matter: float, amounts: dict[RUFAS_ID, float], actual_tdn: dict[RUFAS_ID, float], weight: float, drup: tuple[float, float, float], expected: float) -> float:
+    """Test that the metabolizable protein content of a ration is calculated correctly."""
+    feeds[0].dRUP, feeds[1].dRUP, feeds[2].dRUP = drup
+    feeds_in_ration = [FeedInRation(amounts[1], feeds[0]), FeedInRation(amounts[2], feeds[1]), FeedInRation(amounts[3], feeds[2])]
+    mock_calc_conc = mocker.patch.object(NutritionSupplyCalculator, "_calculate_percentage_of_concentrates", return_value=1.1)
+    mock_calc_rates = mocker.patch.object(NutritionSupplyCalculator, "_calculate_protein_passage_rates", return_value={1: 4.0, 2: 5.0, 3: 4.5})
+    mock_calc_rdp = mocker.patch.object(NutritionSupplyCalculator, "_calculate_rumen_degradable_protein_percentages", return_value={1: 1.8, 2: 1.6, 3: 2.1})
+    mock_calc_rup = mocker.patch.object(NutritionSupplyCalculator, "_calculate_rumen_undegradable_protein_percentages", return_value={1: 10.0, 2: 15.0, 3: 17.0})
+
+    actual = NutritionSupplyCalculator._calculate_metabolizable_protein_supply(feeds_in_ration, dry_matter, actual_tdn, weight)
+
+    assert pytest.approx(actual) == expected
+    mock_calc_conc.assert_called_once_with(feeds_in_ration, dry_matter)
+    mock_calc_rates.assert_called_once_with(feeds_in_ration, dry_matter, weight, 1.1)
+    mock_calc_rdp.assert_called_once_with(feeds_in_ration, {1: 4.0, 2: 5.0, 3: 4.5})
+    mock_calc_rup.assert_called_once()
+
+
+@pytest.mark.parametrize(
     "ndf, dry_matter_intake, weight, concentrates, feed_type, is_wet, expected",
     [
         ((1.3, 2.0, 0.5), 30.0, 500.0, 1.0, Type.CONC, False, {1: 11.134, 2: 11.134, 3: 11.134}),
