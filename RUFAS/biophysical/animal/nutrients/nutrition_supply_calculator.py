@@ -42,6 +42,8 @@ class NutritionSupplyCalculator:
         actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
 
         metabolizable_energy = cls._calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
+        total_metabolizable_energy = sum([energy for energy in metabolizable_energy.values()])
+
         maintenance_energy = cls._calculate_actual_maintenance_net_energy(feeds, metabolizable_energy)
         lactation_energy = cls._calculate_actual_lactation_net_energy(
             feeds, metabolizable_energy, actual_digestible_energy
@@ -57,7 +59,7 @@ class NutritionSupplyCalculator:
         fat_content = cls._calculate_fat_content(feeds)
 
         return NutritionSupply(
-            metabolizable=metabolizable_energy,
+            metabolizable=total_metabolizable_energy,
             maintenance=maintenance_energy,
             lactation=lactation_energy,
             growth=growth_energy,
@@ -105,7 +107,7 @@ class NutritionSupplyCalculator:
     @classmethod
     def _calculate_actual_metabolizable_energy(
         cls, feeds: list[FeedInRation], actual_digestable_energy: dict[RUFAS_ID, float]
-    ) -> float:
+    ) -> dict[RUFAS_ID, float]:
         """
         Calculates the actual metabolizable energy of feeds (Mcal).
 
@@ -126,9 +128,8 @@ class NutritionSupplyCalculator:
             else:
                 energy = 1.01 * actual_digestable_energy[feed.info.rufas_id] - 0.45
             actual_metabolizable_energy[feed.info.rufas_id] = energy
-        total = sum([feed.amount * actual_metabolizable_energy[feed.info.rufas_id] for feed in feeds])
 
-        return total
+        return actual_metabolizable_energy
 
     @classmethod
     def _calculate_actual_maintenance_net_energy(
