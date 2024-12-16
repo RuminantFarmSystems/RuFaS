@@ -1,0 +1,307 @@
+﻿RuFaS ID, feed_name, description, type, units,Old RuFaS ID,Comp_location,EF_Source
+1,ALFALFA,Meal,Forage,kg,1,NRC_and_NASEM,Foods3
+2,ALMOND,Hulls,Conc,kg,2,NRC_and_NASEM,LEIF
+3,APPLE,"Pomace, wet",Conc,kg,3,NRC_and_NASEM,None
+4,BAKERY BYPRODUCT,Byproduct meal,Conc,kg,4,NRC_and_NASEM,LEIF
+5,BAKERY BYPRODUCT,"Bread, waste",Conc,kg,5,NRC_and_NASEM,LEIF
+6,BAKERY BYPRODUCT,Cereal byproduct,Conc,kg,6,NRC_and_NASEM,LEIF
+7,BAKERY BYPRODUCT,Cookie byproduct,Conc,kg,7,NRC_and_NASEM,LEIF
+8,BARLEY,"Grain, rolled",Conc,kg,8,NRC_and_NASEM,National
+9,BARLEY,"Grain, steam-rolled",Conc,kg,,----,National
+10,BARLEY,Barley hay,Forage,kg,,----,None
+11,BARLEY,Malt sprouts,Conc,kg,,NRC_and_NASEM,LEIF
+12,BARLEY,"Silage, headed",Forage,kg,10,NRC_and_NASEM,National
+13,BARLEY,"Silage, mid maturity",Forage,kg,,----,National
+14,BARLEY,"Silage, vegetative",Forage,kg,,----,National
+15,"BEET, SUGAR",Pulp dried,Conc,kg,11,NRC_and_NASEM,National
+16,"BEET, SUGAR","Pulp dried, molasses added ",Conc,kg,,----,National
+17,"BEET, SUGAR",Pulp wet,Conc,kg,,----,National
+18,BERMUDAGRASS,Hay,Forage,kg,12,NRC_and_NASEM,National
+19,BERMUDAGRASS,"Tifton-85, hay, 3-4wk growth",Forage,kg,13,NRC_only,National
+20,BERMUDAGRASS,"Silage, mature",Forage,kg,,----,National
+21,BERMUDAGRASS,"Silage, mid maturity",Forage,kg,,----,National
+22,BLOOD,"Meal, high dRUP",Conc,kg,14,NRC_and_NASEM,National
+23,BLOOD,"Meal, low dRUP",Conc,kg,15,NRC_and_NASEM,National
+24,BREWERS GRAINS,Dried,Conc,kg,16,NRC_and_NASEM,LEIF
+25,BREWERS GRAINS,Wet,Conc,kg,17,NRC_and_NASEM,LEIF
+26,BREWERS YEAST,Dried,Conc,kg,,----,None
+27,BREWERS YEAST,Wet,Conc,kg,,----,None
+28,CANDY,"Not chocolate, byproduct",Conc,kg,,----,LEIF
+29,CANDY,"High protein, byproduct",Conc,kg,,----,None
+30,CANOLA,Seed,Conc,kg,18,NRC_and_NASEM,LEIF
+31,CANOLA,Meal,Conc,kg,19,NRC_and_NASEM,LEIF
+32,CHOCOLATE,Byproduct,Conc,kg,20,NRC_and_NASEM,LEIF
+33,CITRUS,Pulp dried,Conc,kg,21,NRC_and_NASEM,LEIF
+34,CITRUS,Pulp wet,Conc,kg,,----,LEIF
+35,"CORN, YELLOW",Cobs,Conc,kg,22,NRC_and_NASEM,None
+36,"CORN, YELLOW","Gluten feed, dried",Conc,kg,24,NRC_and_NASEM,LEIF
+37,"CORN, YELLOW","Gluten feed, wet ",Conc,kg,,----,LEIF
+38,"CORN, YELLOW",Germ ,Conc,kg,,----,LEIF
+39,"CORN, YELLOW",Germ meal,Conc,kg,,----,LEIF
+40,"CORN, YELLOW","Grain and cob, dry, ground",Conc,kg,,NRC_and_NASEM,Foods3
+41,"CORN, YELLOW","Grain and cob, high moisture, ground",Conc,kg,,NRC_only,Foods3
+42,"CORN, YELLOW","Gluten meal, dried",Conc,kg,25,NRC_and_NASEM,LEIF
+43,"CORN, YELLOW","Grain, cracked, dry",Conc,kg,26,NRC_and_NASEM,Foods3
+44,"CORN, YELLOW","Grain, ground, dry",Conc,kg,27,NRC_and_NASEM,Foods3
+45,"CORN, YELLOW","Corn grain dry, fine grind",Conc,kg,,----,Foods3
+46,"CORN, YELLOW","Grain, ground, high moisture",Conc,kg,,NRC_and_NASEM,Foods3
+47,"CORN, YELLOW","Grain, steam-flaked",Conc,kg,28,NRC_and_NASEM,Foods3
+48,"CORN, YELLOW","Grain, rolled, high moisture",Conc,kg,29,NRC_only,Foods3
+49,"CORN, YELLOW",Hominy feed,Conc,kg,33,NRC_and_NASEM,LEIF
+50,"CORN, YELLOW","Corn silage, immature",Forage,kg,35,NRC_and_NASEM,Foods3
+51,"CORN, YELLOW","Corn silage, mid maturity",Forage,kg,36 (use for ID=34 if purchased),NRC_and_NASEM,Foods3
+52,"CORN, YELLOW","Corn silage, mature",Forage,kg,37,NRC_and_NASEM,Foods3
+53,"CORN, YELLOW","Corn stalks, ensiled, low DM",Forage,kg,,----,Foods3
+54,"CORN, YELLOW","Corn stalks, ensiled, high DM",Forage,kg,,----,Foods3
+55,"CORN, YELLOW","Corn, ear w husk, stlk, hi fbr",Conc,kg,,----,Foods3
+56,"CORN, YELLOW","Corn, ear, huks, stlk, low fbr",Conc,kg,,----,Foods3
+57,COTTON SEED,Gin trash ,Conc,kg,,----,None
+58,COTTON SEED,Whole  ,Conc,kg,38,NRC_and_NASEM,LEIF
+59,COTTON SEED,Hulls,Conc,kg,39,NRC_and_NASEM,LEIF
+60,COTTON SEED,Meal,Conc,kg,40,NRC_and_NASEM,LEIF
+61,DISTILLERY BYPRODUCT,"DDGS, high fat",Conc,kg,,----,Foods3
+62,DISTILLERY BYPRODUCT,"DDGS, high protein",Conc,kg,23,----,Foods3
+63,DISTILLERY BYPRODUCT,"DDGS, low fat",Conc,kg,,----,Foods3
+64,DISTILLERY BYPRODUCT,DGS modified,Conc,kg,,----,Foods3
+65,DISTILLERY BYPRODUCT,DGS wet,Conc,kg,,----,Foods3
+66,DISTILLERY BYPRODUCT,Distillers solubles,Conc,kg,,NRC_and_NASEM,Foods3
+67,FATS AND OILS,Calcium soaps,Conc,kg,41,NRC_and_NASEM,National
+68,FATS AND OILS,"Fat, canola oil",Conc,kg,,----,None
+69,FATS AND OILS,"Fat, corn oil",Conc,kg,,----,None
+70,FATS AND OILS,"Fat, cottonseed oil",Conc,kg,,----,None
+71,FATS AND OILS,"Fat, safflower oil",Conc,kg,,----,None
+72,FATS AND OILS,"Fat, lard",Conc,kg,,----,National
+73,FATS AND OILS,"Fat, flaxseed oil",Conc,kg,,----,None
+74,FATS AND OILS,"Fat, soybean oil",Conc,kg,,----,None
+75,FATS AND OILS,"Fat, sunflower oil",Conc,kg,,----,None
+76,FATS AND OILS,Vegetable oil,Conc,kg,45,NRC_only,National
+77,FATS AND OILS,Hydrolyzed tallow fatty acids,Conc,kg,42,NRC_only,National
+78,FATS AND OILS,Partially hydrogenated tallow,Conc,kg,43,NRC_only,National
+79,FATS AND OILS,Tallow,Conc,kg,44,NRC_and_NASEM,National
+80,FEATHERS,Hydrolyzed meal,Conc,kg,46,NRC_and_NASEM,National
+81,FEATHERS,Hydrolyzed meal with some viscera,Conc,kg,47,NRC_only,National
+82,FISH BYPRODUCTS,"Anchovy, meal, mech.",Conc,kg,48,NRC_only,National
+83,FISH BYPRODUCTS,"Menhaden, meal, mech.",Conc,kg,49,NRC_and_NASEM,National
+84,FRUIT AND VEGETABLE,"Byproduct, wet",Conc,kg,,----,None
+85,GLYCEROL,Glycerol,Conc,kg,,----,None
+86,GRAIN SCREENINGS,Source unknown ,Conc,kg,,----,None
+87,"GRASSES, COOL SEASON","Hay, all samples",Forage,kg,52,NRC_only,National
+88,"GRASSES, COOL SEASON","Hay, mature",Forage,kg,53,NRC_and_NASEM,National
+89,"GRASSES, COOL SEASON","Hay, mid mature",Forage,kg,54,NRC_and_NASEM,National
+90,"GRASSES, COOL SEASON","Hay, immature",Forage,kg,55,NRC_only,National
+91,"GRASSES, COOL SEASON","Silage, all samples",Forage,kg,56 (use for ID=57 if purchased),NRC_and_NASEM,National
+92,"GRASSES, COOL SEASON",Pasture,Forage,kg,50,NRC_and_NASEM,National
+93,GRASS-Legume MIXTURES Pr. GR.Â  (17-22% Hcel.),"Hay, immature",Forage,kg,62,NRC_only,National
+94,GRASS-Legume MIXTURES Pr. GR.Â  (17-22% Hcel.),"Hay, mid-maturity",Forage,kg,63 (use for ID=61 if purchased),NRC_and_NASEM,National
+95,GRASS-Legume MIXTURES Pr. GR.Â  (17-22% Hcel.),"Hay, mature",Forage,kg,64,NRC_and_NASEM,National
+96,GRASS-Legume MIXTURES Pr. GR.Â  (17-22% Hcel.),"Silage, immature",Forage,kg,66,NRC_only,National
+97,GRASS-Legume MIXTURES Pr. GR.Â  (17-22% Hcel.),"Silage, mid-maturity",Forage,kg,67 (use for ID=65 if purchased),NRC_and_NASEM,National
+98,GRASS-Legume MIXTURES Pr. GR.Â  (17-22% Hcel.),"Silage, mature",Forage,kg,68,NRC_only,National
+99,Mixed grass-legume (12-15% Hcel.),Hay,Forage,kg,71,NRC_and_NASEM,National
+100,Mixed grass-legume (12-15% Hcel.),Silage,Forage,kg,67,NRC_and_NASEM,National
+101,Mixed grass-legume (12-15% Hcel.),Pasture ,Forage,kg,,----,None
+102,Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.),"Hay, mature",Forage,kg,80,NRC_and_NASEM,National
+103,Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.),"Hay, immature",Forage,kg,78,NRC_and_NASEM,National
+104,Grass-LEGUME MIXTURES Pr. LG. (10-13% HCEL.),Silage,Forage,kg,67,NRC_and_NASEM,National
+105,"LEGUMES, FORAGE","Pasture, intensively managed",Forage,kg,85,NRC_and_NASEM,Foods3
+106,"LEGUMES, FORAGE","Hay, immature",Forage,kg,88,NRC_and_NASEM,Foods3
+107,"LEGUMES, FORAGE","Hay, mid maturity",Forage,kg,89,NRC_and_NASEM,Foods3
+108,"LEGUMES, FORAGE","Hay, mature",Forage,kg,90,NRC_and_NASEM,Foods3
+109,"LEGUMES, FORAGE","Silage, immature",Forage,kg,93,NRC_and_NASEM,Foods3
+110,"LEGUMES, FORAGE","Silage, mid maturity",Forage,kg,94,NRC_and_NASEM,Foods3
+111,"LEGUMES, FORAGE","Silage, mature",Forage,kg,95,NRC_only,Foods3
+112,LINSEED (FLAX),"Meal, solvent",Conc,kg,96,NRC_and_NASEM,National
+113,LINSEED (FLAXSEED),Grain,Conc,kg,,----,None
+114,MEAT,"Meal, rendered",Conc,kg,97,NRC_only,National
+115,MEAT,"Meat and bone, rendered",Conc,kg,98,NRC_and_NASEM,National
+116,MILLET,Hay,Forage,kg,,----,None
+117,MILLET,Silage,Forage,kg,,----,None
+118,MOLASSES,Beet sugar,Conc,kg,99,NRC_only,LEIF
+119,MOLASSES,Sugarcane,Conc,kg,100,NRC_and_NASEM,LEIF
+120,OATS,"Grain, rolled",Conc,kg,101,NRC_and_NASEM,National
+121,OATS,"Hay, headed",Forage,kg,102,NRC_and_NASEM,National
+122,OATS,Hulls,Conc,kg,,----,None
+123,OATS,"Silage, headed (mature)",Forage,kg,,NRC_only,National
+124,OATS,"Silage, mid-maturity",Forage,kg,103,----,National
+125,OATS,"Silage, immature",Forage,kg,,----,National
+126,PEAS,Hay,Forage,kg,,----,None
+127,PEAS,Silage,Forage,kg,,----,None
+128,PEAS,Peas,Conc,kg,,----,None
+129,PEANUT,"Meal, solvent",Conc,kg,104,NRC_and_NASEM,National
+130,PEANUT,Hay,Forage,kg,,----,None
+131,PEANUT,Hulls,Conc,kg,,----,None
+132,PEANUT,Skins,Conc,kg,,----,None
+133,PEANUT,Peanuts,Conc,kg,,----,None
+134,PINEAPPLE,Cannery waste,Conc,kg,,----,None
+135,POTATO,Byproduct meal,Conc,kg,105,NRC_and_NASEM,National
+136,POTATO,Byproduct ,Conc,kg,,----,None
+137,POULTRY,Byproduct meal,Conc,kg,,----,None
+138,RICE,Bran,Conc,kg,106,NRC_and_NASEM,None
+139,RICE,"Bran, deffated ",Conc,kg,,----,None
+140,RICE,Hulls,Conc,kg,,----,None
+141,RICE,"Silage, headed",Forage,kg,,----,None
+142,RICE,"Silage, vegetative",Forage,kg,,----,None
+143,RICE,Grain,Conc,kg,,----,None
+144,"RYE, ANNUAL","Silage, vegetative (mature)",Forage,kg,107,NRC_and_NASEM,National
+145,"RYE, ANNUAL","Fresh, immature",Forage,kg,,----,None
+146,"RYE, ANNUAL","Fresh, mid-maturity",Forage,kg,,----,None
+147,"RYE, ANNUAL","Hay, immature",Forage,kg,,----,None
+148,"RYE, ANNUAL","Hay, mature",Forage,kg,,----,None
+149,"RYE, ANNUAL","Silage, immature",Forage,kg,,----,None
+150,"RYE, ANNUAL","Silage, mid-maturity",Forage,kg,,----,None
+151,"RYE, ANNUAL","Hay, mid-maturity",Forage,kg,,----,None
+152,"RYE, ANNUAL",Grain,Conc,kg,108,----,None
+153,SAFFLOWER,"Meal, solvent",Conc,kg,,NRC_and_NASEM,LEIF
+154,"SORGHUM, GRAIN TYPE","Grain, dry rolled",Conc,kg,109,NRC_and_NASEM,None
+155,"SORGHUM, GRAIN TYPE","Grain, steam-flaked",Conc,kg,110,NRC_and_NASEM,None
+156,"SORGHUM, GRAIN TYPE","Silage, mature",Forage,kg,111,NRC_and_NASEM,None
+157,"SORGHUM, GRAIN TYPE",Hay,Forage,kg,,----,None
+158,"SORGHUM, GRAIN TYPE","forage silage, immature ",Forage,kg,,----,None
+159,"SORGHUM, GRAIN TYPE","Sorghum soybean,silage",Forage,kg,,----,None
+160,"SORGHUM, SUDAN TYPE",Hay,Forage,kg,112,NRC_and_NASEM,None
+161,"SORGHUM, SUDAN TYPE",Silage,Forage,kg,113,NRC_and_NASEM,None
+162,SOYBEAN,Hay,Forage,kg,,----,None
+163,SOYBEAN,Hulls,Conc,kg,114,NRC_and_NASEM,LEIF
+164,SOYBEAN,"Meal, expellers",Conc,kg,115,NRC_and_NASEM,Foods3
+165,SOYBEAN,"Meal, nonenzymatically browned",Conc,kg,116,NRC_only,Foods3
+166,SOYBEAN,"Meal, solvent, 44% CP",Conc,kg,117,NRC_only,Foods3
+167,SOYBEAN,"Meal, solvent, 48% CP",Conc,kg,118,NRC_and_NASEM,Foods3
+168,SOYBEAN,"Meal, extruded",Conc,kg,,----,Foods3
+169,SOYBEAN,"Seeds, whole",Conc,kg,119,NRC_and_NASEM,Foods3
+170,SOYBEAN,"Seeds, whole roasted",Conc,kg,120,NRC_and_NASEM,Foods3
+171,SOYBEAN,Silage,Forage,Kg,,----,Foods3
+172,SOYBEAN,"Silage, early maturity",Forage,kg,121,NRC_only,Foods3
+173,SPELT ,Grain,Conc,kg,,----,None
+174,SUDAN GRASS,"Hay, mature",Forage,kg,,----,None
+175,SUDAN GRASS,"Hay, mid-maturity",Forage,kg,,----,None
+176,SUDAN GRASS,"Silage, mature",Forage,kg,,NASEM_only,None
+177,SUDAN GRASS,"Silage, mid-maturity",Forage,kg,,----,None
+178,SUGAR ,Sugar ,Conc,kg,,----,None
+179,SUGARCANE,"Bagasse, hay",Forage,kg,,----,None
+180,SUGARCANE,"Bagasse, silage",Forage,kg,,----,None
+181,SUNFLOWER,"Meal, solvent",Conc,kg,122,NRC_and_NASEM,National
+182,SUNFLOWER,"Oil seeds, whole",Conc,kg,123,NRC_and_NASEM,National
+183,SUNFLOWER,Silage,Forage,kg,,----,National
+184,SWEET CORN,Cannery waste,Conc,kg,,----,LEIF
+185,TAPIOCA,Cassava,Conc,kg,,----,None
+186,TOMATO,Pomace,Conc,kg,124,NRC_and_NASEM,None
+187,TRITICALE,"Silage, headed (mature)",Forage,kg,125,NRC_and_NASEM,National
+188,TRITICALE,"Silage, mid-maturity",Forage,kg,,----,None
+189,TRITICALE,Grain,Conc,kg,,----,None
+190,TRITICALE,Hay,Forage,kg,,----,None
+191,TRITICALE,Plus pea silage,Forage,kg,,----,None
+192,UREA,Urea,Conc,kg,,----,None
+193,WHEAT,Bran,Conc,kg,126,NRC_and_NASEM,Foods3
+194,WHEAT,"Grain, rolled",Conc,kg,127,NRC_and_NASEM,National
+195,WHEAT,"Hay, headed",Forage,kg,128,NRC_and_NASEM,National
+196,WHEAT,"Hay, vegetative",Forage,kg,,----,None
+197,WHEAT,Middlings,Conc,kg,129,NRC_and_NASEM,Foods3
+198,WHEAT,"Silage, early head",Forage,kg,130,NRC_and_NASEM,National
+199,WHEAT,"Silage, vegetative",Forage,kg,,----,None
+200,WHEAT,Straw,Forage,kg,131,NRC_and_NASEM,National
+201,MILK,"Skim, dried powder",Milk,kg,133,NRC_and_NASEM,National
+202,Whole Milk,Whole Milk,Milk,kg,155,NRC_and_NASEM,National
+203,Milk Replacer,Milk Replacer,Milk,kg,156,NRC_and_NASEM,National
+204,Casein,Casein,Milk,kg,,----,None
+205,Milk replacer 20 CP 20 fat,Replacer,Milk,kg,,----,None
+206,Milk replacer 26 CP 17 fat,Replacer,Milk,kg,,----,None
+207,"Skim milk, fresh",Skimmed,Milk,kg,,----,None
+208,WHEY,Delactosed,Milk,kg,,----,None
+209,WHEY,"Dry, cattle",Milk,kg,,----,LEIF
+210,WHEY,"Wet, cattle",Milk,kg,132,NRC_and_NASEM,LEIF
+211,WHEY,Permeate,Milk,kg,,----,LEIF
+212,WHEY,Protein concentrate,Milk,kg,,----,None
+213,Calf grower 14CP (Fed to calves only),Grower,Milk,kg,157,----,None
+214,Calf starter 18CP low starch (Fed to calves only),Starter,Milk,kg,,----,None
+215,Calf grower 16CP (Fed to calves only),Grower,Milk,kg,,----,None
+216,Calf starter 18CP high starch (Fed to calves only),Starter,Milk,kg,,NRC_and_NASEM,None
+217,Calf starter 22CP med starch (Fed to calves only),Starter,Milk,kg,,----,None
+218,Calf starter 22CP high starch (Fed to calves only),Starter,Milk,kg,,----,None
+219,RUMEN PROTECTED AA,Arg,Aminoacids,kg,,----,None
+220,RUMEN PROTECTED AA, His,Aminoacids,kg,,----,None
+221,RUMEN PROTECTED AA, Ile,Aminoacids,kg,,----,None
+222,RUMEN PROTECTED AA, Leu,Aminoacids,kg,,----,None
+223,RUMEN PROTECTED AA, Lys,Aminoacids,kg,,----,None
+224,RUMEN PROTECTED AA, Met,Aminoacids,kg,,----,None
+225,RUMEN PROTECTED AA, Phe,Aminoacids,kg,,----,None
+226,RUMEN PROTECTED AA, Thr,Aminoacids,kg,,----,None
+227,RUMEN PROTECTED AA, Trp,Aminoacids,kg,,----,None
+228,RUMEN PROTECTED AA, Val,Aminoacids,kg,,----,None
+229,Bone Meal,Steamed,Mineral,kg,134,NRC_and_NASEM,National
+230,Calcium carbonate,CaCO3,Mineral,kg,135,NRC_and_NASEM,National
+231,"Dicalcium Phosphate, dibasic",CaHPO4,Mineral,kg,136,NRC_and_NASEM,National
+232,Calcium Phosphate monobasic,Ca(H2PO4)2,Mineral,kg,137,NRC_and_NASEM,National
+233,"Calcium Sulfate, dihydrate",CaSO4.2H2O,Mineral,kg,138,NRC_and_NASEM,National
+234,"Limestone, ground",NA,Mineral,kg,139,NRC_and_NASEM,National
+235,"Limestone, dolomite",NA,Mineral,kg,140,NRC_and_NASEM,National
+236,Magnesium Oxide,MgO,Mineral,kg,141,NRC_and_NASEM,National
+237,Potassium Chloride,KCl,Mineral,kg,142,NRC_and_NASEM,National
+238,Phosphate rock,NA,Mineral,kg,143,NRC_only,National
+239,Sodium Choride,NaCl,Mineral,kg,144,NRC_and_NASEM,National
+240,Sodium Bicarbonate,NaHCO3,Mineral,kg,145,NRC_and_NASEM,National
+241,"Sodium Phosphate, Monohydrate",NaH2PO4.H2O,Mineral,kg,146,NRC_and_NASEM,National
+242,Sodium Sulfate decahydrate,Na2SO4.10H2O,Mineral,kg,147,NRC_and_NASEM,National
+243,Potassium Sulfate,K2SO4,Mineral,kg,148,NRC_and_NASEM,National
+244,Ammonium Sulfate,(NH4)2SO4,Mineral,kg,149,NRC_and_NASEM,National
+245,"Ammonium Phosphate, dibasic",(NH4)H2PO4,Mineral,kg,150,NRC_and_NASEM,National
+246,Ammonium Chloride,NA,Mineral,kg,151,NRC_and_NASEM,National
+247,Calcium Choride dihydrate,CaCl2.2H2O,Mineral,kg,152,NRC_and_NASEM,National
+248,"Calcium Choride,anhydrous",CaCl2,Mineral,kg,153,NRC_and_NASEM,National
+249,Calcium hydroxide,Ca(OH)2,Mineral,kg,,NASEM_only,None
+250,Calcium oxide,CaO,Mineral,kg,,NASEM_only,None
+251,"Magnesium Chloride, Hexahydrate",MgCl2.6H2O,Mineral,kg,154,NRC_and_NASEM,National
+252,Oystershell,Mineral,Mineral,kg,,NASEM_only,None
+253,Magnesium carbonate,Mineral,Mineral,kg,,NASEM_only,None
+254,Magnesium hydroxide,Mineral,Mineral,kg,,NASEM_only,None
+255,Magnesium sulfate (7H2O),Mineral,Mineral,kg,,NASEM_only,None
+256,Ammonium phosphate (monobasic),Mineral,Mineral,kg,,NASEM_only,None
+257,"Phosphate, Curacao",Mineral,Mineral,kg,,NASEM_only,None
+258,"Phosphate, defluorinated",Mineral,Mineral,kg,,NASEM_only,None
+259,Phosphoric acid,Mineral,Mineral,kg,,NASEM_only,None
+260,Sodium tripolyphosphate,Mineral,Mineral,kg,,NASEM_only,None
+261,Potassium bicarbonate,Mineral,Mineral,kg,,NASEM_only,None
+262,Potassium carbonate,Mineral,Mineral,kg,,NASEM_only,None
+263,Potassium iodide,Mineral,Mineral,kg,,NASEM_only,None
+264,Sodium carbonate (H2O),Mineral,Mineral,kg,,NASEM_only,None
+265,Sodium sesquicarbonate (2H2O),Mineral,Mineral,kg,,NASEM_only,None
+266,Cobalt carbonate,Mineral,Mineral,kg,,NASEM_only,None
+267,Cobalt carbonate (6H2O),Mineral,Mineral,kg,,NASEM_only,None
+268,Cobalt chloride (6H2O),Mineral,Mineral,kg,,NASEM_only,None
+269,Cobalt sulfate (7H2O),Mineral,Mineral,kg,,NASEM_only,None
+270,Cobalt organic generic,Mineral,Mineral,kg,,NASEM_only,None
+271,Copper chloride (2H2O),Mineral,Mineral,kg,,NASEM_only,None
+272,Copper sulfate (5H2O),Mineral,Mineral,kg,,NASEM_only,None
+273,Copper oxide,Mineral,Mineral,kg,,NASEM_only,None
+274,"Copper organic, generic",Mineral,Mineral,kg,,NASEM_only,None
+275,EDDI,Mineral,Mineral,kg,,NASEM_only,None
+276,Calcium iodate,Mineral,Mineral,kg,,NASEM_only,None
+277,Ferrous sulfate (7H2O),Mineral,Mineral,kg,,NASEM_only,None
+278,Ferrous sulfate (H2O),Mineral,Mineral,kg,,NASEM_only,None
+279,Ferrous carbonate,Mineral,Mineral,kg,,NASEM_only,None
+280,Iron oxide,Mineral,Mineral,kg,,NASEM_only,None
+281,"Iron, organic generic",Mineral,Mineral,kg,,NASEM_only,None
+282,Manganese chloride,Mineral,Mineral,kg,,NASEM_only,None
+283,Manganese chloride (4H2O),Mineral,Mineral,kg,,NASEM_only,None
+284,Manganese carbonate,Mineral,Mineral,kg,,NASEM_only,None
+285,Manganese sulfate (H2O),Mineral,Mineral,kg,,NASEM_only,None
+286,Manganese sulfate (5H2O),Mineral,Mineral,kg,,NASEM_only,None
+287,Manganese oxide,Mineral,Mineral,kg,,NASEM_only,None
+288,Manganese organic generic,Mineral,Mineral,kg,,NASEM_only,None
+289,"Selenite, sodium",Mineral,Mineral,kg,,NASEM_only,None
+290,"Selenate, sodium (10 H2O)",Mineral,Mineral,kg,,NASEM_only,None
+291,"Selenium yeast, generic",Mineral,Mineral,kg,,NASEM_only,None
+292,Zinc carbonate,Mineral,Mineral,kg,,NASEM_only,None
+293,Zinc chloride,Mineral,Mineral,kg,,NASEM_only,None
+294,Zinc oxide,Mineral,Mineral,kg,,NASEM_only,None
+295,Zinc sulfate (H2O),Mineral,Mineral,kg,,NASEM_only,None
+296,"Zinc, organic generic",Mineral,Mineral,kg,,NASEM_only,None
+297,Vit A premix,Vitamins,Vitamins,kg,,NASEM_only,None
+298,Vit D premix,Vitamins,Vitamins,kg,,NASEM_only,None
+299,Vit E premix,Vitamins,Vitamins,kg,,NASEM_only,None
+300,"VitTM Premix, generic",Vitamins,Vitamins,kg,,NASEM_only,None
+301,FARM ES Mineral Mix,Mineral,Mineral,kg,,NRC_and_NASEM,National
+302,FARM ES Midwest BP Blend,Byproduct mix,conc,kg,,NRC_and_NASEM,LEIF
+303,FARM ES Northeast BP Blend,Byproduct Mix,conc,kg,,NRC_and_NASEM,LEIF
+304,FARM ES South BP Blend,Byproduct Mix,conc,kg,,NRC_and_NASEM,LEIF
+305,FARM ES West BP Blend,Byproduct Mix,conc,kg,,NRC_and_NASEM,LEIF
+306,AMINO PLUS,RUP additive,conc,kg,,NRC_and_NASEM,None
