@@ -15,11 +15,73 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 
 
 @pytest.mark.parametrize(
+    "amounts, feed_types, is_fat, ee, actual_metabolizable, actual_digestable, expected",
+    [
+        (
+            (30.0, 31.0, 20.0),
+            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (True, True, False),
+            (1.1, 1.8, 2.0),
+            {3: 90.0},
+            {2: 110.0},
+            3989.6,
+        ),
+        (
+            (20.0, 11.0, 40.0),
+            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (True, False, False),
+            (1.1, 1.8, 3.5),
+            {2: 110.0, 3: 130.0},
+            {},
+            4499.179,
+        ),
+    ],
+)
+def test_calculate_actual_lactation_net_energy(
+    feeds: tuple[Feed, Feed, Feed],
+    amounts: tuple[float, float, float],
+    feed_types: tuple[Type, Type, Type],
+    is_fat: tuple[bool, bool, bool],
+    ee: tuple[float, float, float],
+    actual_metabolizable: dict[RUFAS_ID, float],
+    actual_digestable: dict[RUFAS_ID, float],
+    expected: float,
+) -> None:
+    """Tests that actual net energy needed for lactation is calculated correctly."""
+    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types
+    feeds[0].is_fat, feeds[1].is_fat, feeds[2].is_fat = is_fat
+    feeds[0].EE, feeds[1].EE, feeds[2].EE = ee
+    feeds_in_ration = [
+        FeedInRation(amounts[0], feeds[0]),
+        FeedInRation(amounts[1], feeds[1]),
+        FeedInRation(amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_actual_lactation_net_energy(
+        feeds_in_ration, actual_metabolizable, actual_digestable
+    )
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
     "amounts, feed_types, is_fat, actual_metabolizable_energy, expected",
     [
-        ((30.0, 31.0, 20.0), (Type.MINERAL, Type.FORAGE, Type.CONC), (True, True, False), {1: 100.0, 2: 120.0, 3: 90.0}, 154257.0),
-        ((20.0, 11.0, 40.0), (Type.MINERAL, Type.FORAGE, Type.CONC), (True, False, False), {1: 60.0, 2: 110.0, 3: 130.0}, 1118990.85)
-    ]
+        (
+            (30.0, 31.0, 20.0),
+            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (True, True, False),
+            {1: 100.0, 2: 120.0, 3: 90.0},
+            154257.0,
+        ),
+        (
+            (20.0, 11.0, 40.0),
+            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (True, False, False),
+            {1: 60.0, 2: 110.0, 3: 130.0},
+            1118990.85,
+        ),
+    ],
 )
 def test_calculate_actual_growth_net_energy(
     feeds: tuple[Feed, Feed, Feed],
@@ -30,8 +92,8 @@ def test_calculate_actual_growth_net_energy(
     expected: float,
 ) -> None:
     """Test that actual net energy for growth is calculated correctly."""
-    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types[0], feed_types[1], feed_types[2]
-    feeds[0].is_fat, feeds[1].is_fat, feeds[2].is_fat = is_fat[0], is_fat[1], is_fat[2]
+    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types
+    feeds[0].is_fat, feeds[1].is_fat, feeds[2].is_fat = is_fat
     feeds_in_ration = [
         FeedInRation(amounts[0], feeds[0]),
         FeedInRation(amounts[1], feeds[1]),
