@@ -11,7 +11,7 @@ other input files and the RuFaS codebase.
 RUFAS_ID = int
 
 
-class Category(Enum):
+class FeedCategorization(Enum):
     """NASEM and NRC categorizations of feeds."""
     ANIMAL_PROTEIN = "Animal Protein"
     BY_PRODUCT_OTHER = "By-Product/Other"
@@ -26,7 +26,7 @@ class Category(Enum):
     VITAMIN_MINERAL = "Vitamin/Mineral"
 
 
-class Type(Enum):
+class FeedComponentType(Enum):
     """NASEM and NRC types of feeds."""
     AMINOACIDS = "Aminoacids"
     FORAGE = "Forage"
@@ -53,9 +53,9 @@ class Feed:
     ----------
     rufas_id : RUFAS_ID
         Unique integer identifier for feeds used within the RuFaS model.
-    Fd_Category : Category
+    Fd_Category : FeedCategorization
         Feed category.
-    feed_type : Type
+    feed_type : FeedComponentType
         General type or category of the feed.
     DM : float
         Dry matter content of the feed (% dry matter). TODO: wut??
@@ -125,8 +125,8 @@ class Feed:
     """
 
     rufas_id: RUFAS_ID
-    Fd_Category: Category
-    feed_type: Type
+    Fd_Category: FeedCategorization
+    feed_type: FeedComponentType
     DM: float
     ash: float
     CP: float
