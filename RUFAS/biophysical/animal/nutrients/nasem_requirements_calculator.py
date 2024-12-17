@@ -125,7 +125,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             milk_production,
             parity,
         )
-        phosphorus_requirement = cls.calculate_phosphorus_requirement(
+        phosphorus_requirement = cls._calculate_phosphorus_requirement(
             body_weight,
             mature_body_weight,
             animal_type,
@@ -536,7 +536,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
 
     @classmethod
-    def calculate_phosphorus_requirement(
+    def _calculate_phosphorus_requirement(
         cls,
         body_weight: float,
         mature_body_weight: float,
@@ -588,24 +588,21 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         """
         if animal_type in [AnimalType.LAC_COW]:
-            P_Maint: float = 1.0 * dry_matter_intake_estimate + 0.0006 * body_weight
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III,
-            AnimalType.DRY_COW,
-        ]:
-            P_Maint = 0.8 * dry_matter_intake_estimate + 0.0006 * body_weight
+            maintenance_req: float = dry_matter_intake_estimate + 0.0006 * body_weight
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
+            maintenance_req = 0.8 * dry_matter_intake_estimate + 0.0006 * body_weight
         else:
-            P_Maint = 0.0
+            maintenance_req = 0.0
+
         if parity <= 2:
-            P_Growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
+            growth_req: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight**-0.22) * average_daily_gain
         else:
-            P_Growth = 0.0
+            growth_req = 0.0
+
         if day_of_pregnancy is None or day_of_pregnancy < 190:
-            P_Preg: float = 0.0
+            pregnancy_req: float = 0.0
         else:
-            P_Preg = (
+            pregnancy_req = (
                 (
                     0.02743 * exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy)
                     - 0.02743 * exp((0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1))
@@ -613,11 +610,14 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
                 * body_weight
                 / 715
             )
-        if milk_true_protein is None or milk_production is None:
-            P_Lact: float = 0.0
+
+        if milk_true_protein == 0.0 or milk_production == 0.0:
+            lactation_req: float = 0.0
         else:
-            P_Lact = milk_production * (0.49 + 0.13 * milk_true_protein)
-        phosphorus_requirement: float = P_Maint + P_Growth + P_Preg + P_Lact
+            lactation_req = milk_production * (0.49 + 0.13 * milk_true_protein)
+
+        phosphorus_requirement: float = maintenance_req + growth_req + pregnancy_req + lactation_req
+
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
     @classmethod
