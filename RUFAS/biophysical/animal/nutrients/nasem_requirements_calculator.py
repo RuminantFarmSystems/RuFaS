@@ -92,7 +92,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         pregnancy_requirement, gravid_uterine_weight_gain = cls.calculate_pregnancy_energy_requirements(
             lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight
         )
-        lactation_requirement = cls.calculate_lactation_energy_requirements(
+        lactation_requirement = cls._calculate_lactation_energy_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
         )
         dry_matter_intake = cls._calculate_dry_matter_intake(
@@ -344,53 +344,6 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             gravid_uterine_weight_gain = (0.0243 - (0.0000245 * day_of_pregnancy)) * gravid_uterine_weight
         net_energy_pregnancy = gravid_uterine_weight_gain * (0.882 / 0.14) * 0.66
         return net_energy_pregnancy, gravid_uterine_weight_gain
-
-    @classmethod
-    def calculate_lactation_energy_requirements(
-        cls,
-        animal_type: AnimalType,
-        milk_fat: float,
-        milk_true_protein: float,
-        milk_lactose: float,
-        milk_production: float,
-    ) -> float:
-        """
-        Calculates energy requirement for lactation according to NASEM (2021).
-
-        Parameters
-        ----------
-        animal_type : AnimalType
-            A type or subtype of animal specified in the AnimalType enum
-        milk_fat : float
-            Fat content of milk (%)
-        milk_true_protein : float
-            True protein contents in milk (%)
-        milk_lactose : float
-            Lactose contents in milk (%)
-        milk_production: float
-            Daily milk yield (kg).
-
-        Returns
-        -------
-        net_energy_lactation : float
-            Net energy requirement for lactation (Mcal)
-
-        Notes
-        -----
-        Same calculations as done in the NRC (2001). Requirements are based on milk yield and composition.
-
-        References
-        ----------
-        .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
-            8th edition." National Academic Press, Chapter 3 "Energy", pp. 30, 2021.
-
-        """
-        if animal_type in [AnimalType.LAC_COW]:
-            milk_energy_Mcal_per_kg = 0.0929 * milk_fat + (0.0547 / 0.93) * milk_true_protein + 0.0395 * milk_lactose
-            net_energy_lactation = milk_energy_Mcal_per_kg * milk_production
-        else:
-            net_energy_lactation = 0.0
-        return net_energy_lactation
 
     @classmethod
     def _calculate_protein_requirement(
