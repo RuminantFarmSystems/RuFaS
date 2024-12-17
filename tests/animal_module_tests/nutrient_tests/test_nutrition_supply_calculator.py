@@ -8,7 +8,7 @@ from RUFAS.data_structures.feed_storage_animal_connection import Feed, RUFAS_ID,
 
 @pytest.fixture
 def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
-    """Mock feeds to be used for testing."""
+    """Mock feeds used for testing."""
     mocker.patch.object(Feed, "__init__", return_value=None)
     feed_1, feed_2, feed_3 = Feed(), Feed(), Feed()
     feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id = 1, 2, 3
