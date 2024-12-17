@@ -68,7 +68,7 @@ class AnimalModuleConstants:
     """Minimum estimated DMI instituted for all animals, kg/day"""
 
     MINIMUM_DAILY_DMI_RATIO: float = 0.01
-    """Minimum estimated DMI (kg/day), as a percentage of body_weight in kg"""
+    """Minimum estimated DMI (kg/day), as a fraction of body_weight in kg"""
 
     MINIMUM_DMI_LACT: float = 2.0
     """Minimum estimated DMI for lactating cows, kg/day. Note that in the dataset used to generate the equation,
