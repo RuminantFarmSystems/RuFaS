@@ -510,11 +510,9 @@ class NitrogenIncorporation:
             raise ValueError(frac_error_msg)
         if emergence_nitrogen_fraction == mature_nitrogen_fraction:
             om.add_error(
-                "Invalid value pair for emergence_nitrogen_fraction and mature_nitrogen_fraction.",
-                f"Equal emergence_nitrogen_fraction and mature_nitrogen_fraction will lead to zero"
-                f" division error,"
-                f"emergence_nitrogen_fraction and mature_nitrogen_fraction are both."
-                f" {emergence_nitrogen_fraction}",
+                "A crop's emergence_nitrogen_fraction and mature_nitrogen_fraction are equal.",
+                f"The emergence_nitrogen_fraction and mature_nitrogen_fraction are both"
+                f" {emergence_nitrogen_fraction}, this results in a divide by zero error.",
                 info_map,
             )
             raise ValueError("emergence_nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
