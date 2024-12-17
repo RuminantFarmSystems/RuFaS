@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from matplotlib.figure import Axes, Figure
+import matplotlib.dates as mdates
 
 from RUFAS.util import Utility
 
@@ -553,18 +554,39 @@ class GraphGenerator:
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
+        simulation_start_date = self.time.start_date
+        # prepare dates for x-axis
+        num_days = max(len(values) for values in data.values())  # Number of days based on data length
+        dates = [simulation_start_date + datetime.timedelta(days=i) for i in range(num_days)]
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
+        fig, ax = plt.subplots()
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
-            indices_list = list(range(len(values_tuple[0])))
-            plot_function(indices_list, values_tuple)
+            # indices_list = list(range(len(values_tuple[0])))
+            # plot_function(indices_list, values_tuple)
+            ax.xaxis_date()
+            plot_function(dates, values_tuple)
         else:
             for value in data.values():
                 if not mask_values:
-                    plot_function(value)
+                    # plot_function(value)
+                    plot_function(dates, value)
                 else:
                     indices, masked_values = self._mask_values(value)
-                    plot_function(indices, masked_values)
+                    masked_dates = [dates[i] for i in indices]
+                    # plot_function(indices, masked_values)
+                    plot_function(masked_dates, masked_values)
+        # Customize the x-axis date format
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%j/%Y'))  # Day of year / Year format
+        plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
+
+        # Add labels and title
+        plt.xlabel("Calendar Day")
+        plt.ylabel("Values")
+        plt.title("Simulation Data Over Time")
+
+        plt.tight_layout()
+        plt.show()
 
     def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
         """
