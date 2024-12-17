@@ -95,7 +95,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         lactation_requirement = cls.calculate_lactation_energy_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
         )
-        dry_matter_intake = cls.calculate_dry_matter_intake(
+        dry_matter_intake = cls._calculate_dry_matter_intake(
             body_weight,
             mature_body_weight,
             days_in_milk,
@@ -621,7 +621,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         return max(phosphorus_requirement, AnimalModuleConstants.MINIMUM_PHOSPHORUS)
 
     @classmethod
-    def calculate_dry_matter_intake(
+    def _calculate_dry_matter_intake(
         cls,
         body_weight: float,
         mature_body_weight: float,
@@ -641,10 +641,10 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Body weight (kg)
         mature_body_weight : float
             Mature body weight (kg)
-        days_in_milk : int
+        days_in_milk : int | None
             Days in milk (days)
         lactating : bool
-            Physiological condition (conditional)
+            True if animal is lactating, else false.
         net_energy_lactation : float
             Net energy for lactation
         parity : int
@@ -673,9 +673,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         """
         if lactating:
-            parity_adjustment_factor = 0
-            if parity > 1:
-                parity_adjustment_factor = 1
+            parity_adjustment_factor = 1 if parity > 1 else 0
             dry_matter_intake_estimate = (
                 (3.7 + parity_adjustment_factor * 5.7)
                 + 0.305 * net_energy_lactation
