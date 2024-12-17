@@ -5,6 +5,32 @@ from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NAS
 
 
 @pytest.mark.parametrize(
+    "lact, weight, frame_gain, gravid_gain, dmi, true_protein, milk, ndf, expected",
+    [
+        (True, 490.0, 100.0, 500.0, 45.0, 1.2, 25.0, 50.0, 190887.068472),
+        (False, 490.0, 100.0, 500.0, 45.0, 0.0, 0.0, 50.0, 190462.225718),
+    ],
+)
+def test_calculate_protein_requirement(
+    lact: bool,
+    weight: float,
+    frame_gain: float,
+    gravid_gain: float,
+    dmi: float,
+    true_protein: float,
+    milk: float,
+    ndf: float,
+    expected: float,
+) -> None:
+    """Test that the protein requirement is calculated correctly."""
+    actual = NASEMRequirementsCalculator._calculate_protein_requirement(
+        lact, weight, frame_gain, gravid_gain, dmi, true_protein, milk, ndf
+    )
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
     "weight, mature_weight, day_preg, avg_gain, dmi, true_protein, milk, parity, expected",
     [
         (450.0, 555.0, 100, 3.1, 50.0, 3.0, 31.0, 1, 79.634005),
