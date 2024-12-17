@@ -360,7 +360,7 @@ def test_calculate_metabolizable_protein_supply(
     weight: float,
     drup: tuple[float, float, float],
     expected: float,
-) -> float:
+) -> None:
     """Test that the metabolizable protein content of a ration is calculated correctly."""
     feeds[0].dRUP, feeds[1].dRUP, feeds[2].dRUP = drup
     feeds_in_ration = [
@@ -408,7 +408,7 @@ def test_calculate_percentage_of_concentrates(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
     dry_matter: float,
-    feed_types: tuple[Type],
+    feed_types: tuple[Type, Type, Type],
     expected: float,
 ) -> None:
     """Test that the percentage of a ration made up of concentrates is calculated correclty."""

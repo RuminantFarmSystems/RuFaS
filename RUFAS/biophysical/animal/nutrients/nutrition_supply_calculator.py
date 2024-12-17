@@ -103,7 +103,7 @@ class NutritionSupplyCalculator:
         somatic_body_weight = body_weight * 0.96
         maintenance_dry_matter_intake = total_tdn / (0.035 * somatic_body_weight**0.75)
 
-        discount = (
+        discount: float = (
             tdn_percentage - ((0.18 * tdn_percentage - 10.3) * (maintenance_dry_matter_intake - 1))
         ) / tdn_percentage
 
