@@ -10,6 +10,7 @@ class FeedInRation:
     """
     Defines the amount of feed in a ration (kg) and all the nutritive info associated with it, in a Feed instance.
     """
+
     amount: float
     info: Feed
 
@@ -88,19 +89,18 @@ class NutritionSupplyCalculator:
             total_tdn / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE if dry_matter_intake > 0.0 else 0.0
         )
 
-        somatic_body_weight = body_weight * 0.96
+        if tdn_percentage < 60.0:
+            return 1.0
 
         if total_tdn < (0.035 * body_weight**0.75):
-            maintenance_dry_matter_intake = 1.0
-        else:
-            maintenance_dry_matter_intake = total_tdn / (0.035 * somatic_body_weight**0.75)
+            return 1.0
 
-        if tdn_percentage < 60.0:
-            discount = 1.0
-        else:
-            discount = (
-                tdn_percentage - ((0.18 * tdn_percentage - 10.3) * (maintenance_dry_matter_intake - 1))
-            ) / tdn_percentage
+        somatic_body_weight = body_weight * 0.96
+        maintenance_dry_matter_intake = total_tdn / (0.035 * somatic_body_weight**0.75)
+
+        discount = (
+            tdn_percentage - ((0.18 * tdn_percentage - 10.3) * (maintenance_dry_matter_intake - 1))
+        ) / tdn_percentage
 
         return discount
 
@@ -300,11 +300,11 @@ class NutritionSupplyCalculator:
     ) -> float:
         """
         Calculates amount of metabolizable protein in ration (kg).
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.13]-[A.Cow.E.13], [A.Cow.E.14]-[A.Heifer.E.14], [A.Cow.E.15]
-        
+
         """  # TODO: check units
         concentrate_percentage_of_ration = cls._calculate_percentage_of_concentrates(feeds, dry_matter_intake)
         protein_passage_rates = cls._calculate_protein_passage_rates(
@@ -374,14 +374,12 @@ class NutritionSupplyCalculator:
         percentage_feed_of_body_weight = (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
         for feed in feeds:
             if feed.info.feed_type is Type.CONC:
-                rate = (
-                    2.904
-                    + 1.375 * percentage_feed_of_body_weight - 0.02 * percentage_concentrates
-                )
+                rate = 2.904 + 1.375 * percentage_feed_of_body_weight - 0.02 * percentage_concentrates
             elif feed.info.feed_type is Type.FORAGE and feed.info.is_wetforage is False:
                 rate = (
                     3.362
-                    + 0.479 * percentage_feed_of_body_weight - 0.017 * feed.info.NDF
+                    + 0.479 * percentage_feed_of_body_weight
+                    - 0.017 * feed.info.NDF
                     - 0.007 * percentage_concentrates
                 )
             elif feed.info.is_wetforage is True:
