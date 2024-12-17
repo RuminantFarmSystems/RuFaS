@@ -1,6 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import FeedInRation, NutritionSupplyCalculator
 from RUFAS.data_structures.feed_storage_animal_connection import Feed, RUFAS_ID, Type
 
@@ -12,6 +13,77 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
     feed_1, feed_2, feed_3 = Feed(), Feed(), Feed()
     feed_1.rufas_id, feed_2.rufas_id, feed_3.rufas_id = 1, 2, 3
     return (feed_1, feed_2, feed_3)
+
+
+@pytest.mark.parametrize(
+    "ration, weight, tdn, de, expected_supply",
+    [
+        (
+            {1: 20.0, 2: 30.0, 3: 4.0},
+            550.0,
+            (60.0, 10.0, 70.0),
+            (22.0, 40.0, 30.0),
+            NutritionSupply(
+                metabolizable=450.0,
+                maintenance=1000.0,
+                lactation=1100.0,
+                growth=1200.0,
+                protein=1.7,
+                calcium=1.5,
+                phosphorus=1.6,
+                dry_matter=54.0,
+                ndf_content=10.0,
+                fat_content=11.0,
+            ),
+        )
+    ],
+)
+def test_calculate_nutrient_supply(
+    feeds: list[Feed],
+    mocker: MockerFixture,
+    ration: dict[RUFAS_ID, float],
+    weight: float,
+    tdn: tuple[float, float, float],
+    de: tuple[float, float, float],
+    expected_supply: NutritionSupply,
+) -> None:
+    """Test that the nutritive and energy content of a ration is calculated correctly."""
+    feeds[0].TDN, feeds[1].TDN, feeds[2].TDN = tdn
+    feeds[0].DE, feeds[1].DE, feeds[2].DE = de
+    discount = mocker.patch.object(NutritionSupplyCalculator, "_calculate_discount", return_value=0.3)
+    metabolizable = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
+    )
+    maintenance = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_actual_maintenance_net_energy", return_value=1000.0
+    )
+    lactation = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_actual_lactation_net_energy", return_value=1100.0
+    )
+    growth = mocker.patch.object(NutritionSupplyCalculator, "_calculate_actual_growth_net_energy", return_value=1200.0)
+    calcium = mocker.patch.object(NutritionSupplyCalculator, "_calculate_calcium_supply", return_value=1.5)
+    phosphorus = mocker.patch.object(NutritionSupplyCalculator, "_calculate_phosphorus_supply", return_value=1.6)
+    protein = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_metabolizable_protein_supply", return_value=1.7
+    )
+    ndf = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_neutral_detergent_fiber_content", return_value=10.0
+    )
+    fat = mocker.patch.object(NutritionSupplyCalculator, "_calculate_fat_content", return_value=11.0)
+
+    actual = NutritionSupplyCalculator.calculate_nutrient_supply(feeds, ration, weight)
+
+    assert actual == expected_supply
+    discount.assert_called_once()
+    metabolizable.assert_called_once()
+    maintenance.assert_called_once()
+    lactation.assert_called_once()
+    growth.assert_called_once()
+    calcium.assert_called_once()
+    phosphorus.assert_called_once()
+    protein.assert_called_once()
+    ndf.assert_called_once()
+    fat.assert_called_once()
 
 
 @pytest.mark.parametrize(
