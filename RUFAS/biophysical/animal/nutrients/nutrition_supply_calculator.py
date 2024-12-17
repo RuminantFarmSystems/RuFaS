@@ -307,7 +307,7 @@ class NutritionSupplyCalculator:
         Returns
         -------
         float
-            Total calcium supply in the ration (kg).
+            Total digestable calcium supply in the ration (kg).
 
         References
         ----------
@@ -352,9 +352,13 @@ class NutritionSupplyCalculator:
         Returns
         -------
         float
-            Total phosphorus supply in the ration (kg).
+            Total digestable phosphorus supply in the ration (kg).
 
-        """  # TODO: check units, find references in Scientific docs
+        References
+        ----------
+        Animal Scientific Documentation [A.Cow.E.17]-[A.Heifer.E.17]
+
+        """  # TODO: check units
         phosphorus_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
@@ -410,8 +414,15 @@ class NutritionSupplyCalculator:
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.13]-[A.Cow.E.13], [A.Cow.E.14]-[A.Heifer.E.14], [A.Cow.E.15]
+        .. [1] National Research Council. 2001. Nutrient Requirements of Dairy Cattle: Seventh Revised Edition, 2001.
+               Washington, DC: The National Academies Press. https://doi.org/10.17226/9825.
 
-        """  # TODO: check units
+        Notes
+        -----
+        Endogenous metabolizable protein is calculated from the dry matter intake, but the units of the protein are
+        grams while the dry matter intake is in kilograms, see page 319 of [1].
+
+        """
         concentrate_percentage_of_ration = cls._calculate_percentage_of_concentrates(feeds, dry_matter_intake)
         protein_passage_rates = cls._calculate_protein_passage_rates(
             feeds, dry_matter_intake, body_weight, concentrate_percentage_of_ration
@@ -449,8 +460,10 @@ class NutritionSupplyCalculator:
             ]
         )
         ration_rup_content *= GeneralConstants.KG_TO_GRAMS
-        # TODO: check units
-        return metabolizable_bacterial_protein_production + ration_rup_content + 0.4 * 11.8 * dry_matter_intake
+
+        endogenous_metabolizable_protein = 0.4 * 11.8 * dry_matter_intake
+
+        return metabolizable_bacterial_protein_production + ration_rup_content + endogenous_metabolizable_protein
 
     @classmethod
     def _calculate_percentage_of_concentrates(cls, feeds: list[FeedInRation], dry_matter_intake: float) -> float:
