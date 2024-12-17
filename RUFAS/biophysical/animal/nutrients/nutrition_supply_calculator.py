@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from RUFAS.data_structures.feed_storage_animal_connection import RUFAS_ID, Feed, Type
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, FeedComponentType
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.general_constants import GeneralConstants
 
@@ -148,7 +148,7 @@ class NutritionSupplyCalculator:
         actual_metabolizable_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
-            if feed.info.feed_type is Type.MINERAL:
+            if feed.info.feed_type is FeedComponentType.MINERAL:
                 energy = 0.0
             elif feed.info.is_fat is True:
                 energy = feed.info.DE
@@ -234,7 +234,7 @@ class NutritionSupplyCalculator:
         actual_lactation_net_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
-            if feed.info.feed_type is Type.MINERAL:
+            if feed.info.feed_type is FeedComponentType.MINERAL:
                 energy = 0.0
             elif feed.info.is_fat is True:
                 energy = 0.8 * actual_digestible_energy[feed.info.rufas_id]
@@ -278,7 +278,7 @@ class NutritionSupplyCalculator:
         actual_growth_net_energy: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
-            if feed.info.feed_type is Type.MINERAL:
+            if feed.info.feed_type is FeedComponentType.MINERAL:
                 energy = 0.0
             elif feed.info.is_fat is True:
                 energy = 0.55 * actual_metabolizable_energy[feed.info.rufas_id]
@@ -317,11 +317,11 @@ class NutritionSupplyCalculator:
         calcium_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
-            if feed.info.feed_type is Type.FORAGE:
+            if feed.info.feed_type is FeedComponentType.FORAGE:
                 ca_digestibility = 0.3
-            elif feed.info.feed_type is Type.CONC:
+            elif feed.info.feed_type is FeedComponentType.CONC:
                 ca_digestibility = 0.6
-            elif feed.info.feed_type is Type.MINERAL:
+            elif feed.info.feed_type is FeedComponentType.MINERAL:
                 ca_digestibility = 0.95
             else:
                 ca_digestibility = 0.0
@@ -358,11 +358,11 @@ class NutritionSupplyCalculator:
         phosphorus_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
-            if feed.info.feed_type is Type.FORAGE:
+            if feed.info.feed_type is FeedComponentType.FORAGE:
                 p_digestibility = 0.64
-            elif feed.info.feed_type is Type.CONC:
+            elif feed.info.feed_type is FeedComponentType.CONC:
                 p_digestibility = 0.7
-            elif feed.info.feed_type is Type.MINERAL:
+            elif feed.info.feed_type is FeedComponentType.MINERAL:
                 p_digestibility = 0.8
             else:
                 p_digestibility = 0.0
@@ -470,7 +470,9 @@ class NutritionSupplyCalculator:
             Percentage of the ration's dry matter which is made up of concentrates.
 
         """
-        dry_matter_from_concentrate = sum([feed.amount for feed in feeds if feed.info.feed_type is Type.CONC])
+        dry_matter_from_concentrate = sum(
+            [feed.amount for feed in feeds if feed.info.feed_type is FeedComponentType.CONC]
+        )
 
         return dry_matter_from_concentrate / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE
 
@@ -510,9 +512,9 @@ class NutritionSupplyCalculator:
 
         percentage_feed_of_body_weight = (dry_matter_intake / body_weight) * GeneralConstants.FRACTION_TO_PERCENTAGE
         for feed in feeds:
-            if feed.info.feed_type is Type.CONC:
+            if feed.info.feed_type is FeedComponentType.CONC:
                 rate = 2.904 + 1.375 * percentage_feed_of_body_weight - 0.02 * percentage_concentrates
-            elif feed.info.feed_type is Type.FORAGE and feed.info.is_wetforage is False:
+            elif feed.info.feed_type is FeedComponentType.FORAGE and feed.info.is_wetforage is False:
                 rate = (
                     3.362
                     + 0.479 * percentage_feed_of_body_weight
