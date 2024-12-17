@@ -32,6 +32,11 @@ class NutritionSupplyCalculator:
         ration_formulation : dict[RUFAS_ID, float]
             Maps the RuFaS ID of a feed to the amount fed in a ration (kg dry matter).
 
+        Returns
+        -------
+        NutritionSupply
+            NutritionSupply instance containing the energy and nutritive content of the given ration.
+
         """
         feeds = [
             FeedInRation(amount=amount, info=next((feed for feed in feeds_used if feed.rufas_id == rufas_id), None))
