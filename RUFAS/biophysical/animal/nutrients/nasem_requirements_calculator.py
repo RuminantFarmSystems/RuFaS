@@ -105,7 +105,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             body_condition_score_5,
             ndf_percentage,
         )
-        protein_requirement = cls.calculate_protein_requirement(
+        protein_requirement = cls._calculate_protein_requirement(
             lactating,
             body_weight,
             frame_weight_gain,
@@ -393,7 +393,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         return net_energy_lactation
 
     @classmethod
-    def calculate_protein_requirement(
+    def _calculate_protein_requirement(
         cls,
         lactating: bool,
         body_weight: float,
@@ -410,13 +410,13 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         lactating : bool
-            Physiological condition
+            True if the animal is lactating, else false.
         body_weight : float
             Body weight (kg)
         frame_weight_gain : float
             Frame weight gain refers to the accretion of both fat and protein in carcass (g)
         gravid_uterine_weight_gain : float
-            Daiy energy Requirement associated to increased gain of reproductive tissues as pregnancy advances (Mcal)
+            Daily energy requirement associated with increased gain of reproductive tissues as pregnancy advances (Mcal)
         dry_matter_intake_estimate : float
             Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg)
         milk_true_protein : float
@@ -438,14 +438,15 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         The MP is defined as the sum of rumen undegraded protein (RUP + microbial protein (MCP).
         MP requirements for maintenance includes: scurf + endogenous urinary loss + metabolic fecal protein.
         Current versions of RuFaS code for both NRC and NASEM do not split MP into physiological functions.
-        NPscurf: Net protein requirement for scurf, g
-        NPEndUrin: Net protein requirement for endogenous urinary excretion, g
-        CPMFP: Crude protein in metabolic fecal protein, g
-        NPMFP: Net protein requirement for metabolic fecal protein, g
-        NPGrowth: Net protein requirement for body frame weight gain, g
-        NPGest: Net protein requirement for pregnancy, g
-        NPMilk: Net protein in milk, or milk true protein yield, g
-        TargetEffMP: Proposed target efficiencies of converting metabolizable protein to export proteins and body gain.
+        - scurf_net_protein_req: Net protein requirement for scurf, g
+        - endogenous_urine_protein_req: Net protein requirement for endogenous urinary excretion, g
+        - metabolic_fecal_crude_protein_req: Crude protein in metabolic fecal protein, g
+        - net_metabolic_fecal_crude_protein_req: Net protein requirement for metabolic fecal protein, g
+        - frame_growth_net_req: Net protein requirement for body frame weight gain, g
+        - gestation_net_protein_req: Net protein requirement for pregnancy, g
+        - milk_net_protein_req: Net protein in milk, or milk true protein yield, g
+        - target_efficiencies_metabolic_protein: Proposed target efficiencies of converting metabolizable protein to
+            export proteins and body gain.
 
         References
         ----------
@@ -453,22 +454,31 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             8th edition." National Academic Press, Chapter 6 "Protein", pp. 69-104, 2021.
 
         """
-        NPscurf: float = 0.20 * body_weight ** (0.60) * 0.85
-        NPEndUrin: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
-        CPMFP: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
-        NPMFP: float = CPMFP * 0.73
-        NPGrowth: float = frame_weight_gain * 0.11 * 0.86
-        NPGest: float = gravid_uterine_weight_gain * 125
-        NPMilk: float = (milk_true_protein / 100) * milk_production * GeneralConstants.KG_TO_GRAMS
-        TargetEffMP: float = 0.69
+        scurf_net_protein_req: float = 0.20 * body_weight ** (0.60) * 0.85
+        endogenous_urine_protein_req: float = 53 * GeneralConstants.NITROGEN_TO_PROTEIN * body_weight * 0.001
+        metabolic_fecal_crude_protein_req: float = (11.62 + 0.134 * NDF_conc) * dry_matter_intake_estimate
+        net_metabolic_fecal_crude_protein_req: float = metabolic_fecal_crude_protein_req * 0.73
+        frame_growth_net_req: float = frame_weight_gain * 0.11 * 0.86
+        gestation_net_protein_req: float = gravid_uterine_weight_gain * 125
+        milk_net_protein_req: float = (
+            milk_true_protein * GeneralConstants.PERCENTAGE_TO_FRACTION * milk_production * GeneralConstants.KG_TO_GRAMS
+        )
+        target_efficiencies_metabolic_protein: float = 0.69
+
         if lactating:
             metabolizable_protein_requirement: float = (
-                ((NPscurf + NPMFP + NPMilk + NPGrowth) / TargetEffMP) + (NPGest / 0.33) + NPEndUrin
-            )
+                scurf_net_protein_req
+                + net_metabolic_fecal_crude_protein_req
+                + milk_net_protein_req
+                + frame_growth_net_req
+            ) / target_efficiencies_metabolic_protein
         else:
             metabolizable_protein_requirement = (
-                (NPscurf + NPMFP) / TargetEffMP + (NPGest / 0.33) + (NPGrowth / 0.40) + NPEndUrin
-            )
+                scurf_net_protein_req + net_metabolic_fecal_crude_protein_req
+            ) / target_efficiencies_metabolic_protein + (frame_growth_net_req / 0.40)
+
+        metabolizable_protein_requirement += (gestation_net_protein_req / 0.33) + endogenous_urine_protein_req
+
         return metabolizable_protein_requirement
 
     @classmethod
