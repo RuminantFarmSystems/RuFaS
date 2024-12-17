@@ -15,6 +15,34 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 
 
 @pytest.mark.parametrize(
+    "amounts, tdn, weight, expected",
+    [
+        ((40.0, 10.0, 0.5), (30.0, 55.0, 77.0), 515.0, 1.0),
+        ((30.0, 20.0, 10.0), (90.0, 88.0, 60.0), 600.0, 0.346347),
+        ((1.0, 1.0, 1.0), (61.0, 61.0, 61.0), 700.0, 1.0),
+    ],
+)
+def test_calculate_discount(
+    feeds: tuple[Feed, Feed, Feed],
+    amounts: tuple[float, float, float],
+    tdn: tuple[float, float, float],
+    weight: float,
+    expected: float,
+) -> None:
+    """Test that discount for Total Digestable Nutrients (TDN) and Digestible Energy (DE) are calculated correctly."""
+    feeds[0].TDN, feeds[1].TDN, feeds[2].TDN = tdn
+    feeds_in_ration = [
+        FeedInRation(amounts[0], feeds[0]),
+        FeedInRation(amounts[1], feeds[1]),
+        FeedInRation(amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_discount(feeds_in_ration, weight)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
     "amounts, feed_types, is_fat, de, ee, actual_digestable, expected",
     [
         (
