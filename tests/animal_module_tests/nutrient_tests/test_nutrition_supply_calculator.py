@@ -397,6 +397,34 @@ def test_calculate_metabolizable_protein_supply(
 
 
 @pytest.mark.parametrize(
+    "amounts, dry_matter, feed_types, expected",
+    [
+        ((20.0, 30.0, 0.5), 50.5, (Type.FORAGE, Type.FORAGE, Type.CONC), 0.990099),
+        ((10.0, 33.0, 10.0), 53.0, (Type.FORAGE, Type.CONC, Type.FORAGE), 62.264151),
+        ((20.0, 30.0, 15.0), 65.0, (Type.FORAGE, Type.MINERAL, Type.VITAMINS), 0.0),
+    ],
+)
+def test_calculate_percentage_of_concentrates(
+    feeds: tuple[Feed, Feed, Feed],
+    amounts: tuple[float, float, float],
+    dry_matter: float,
+    feed_types: tuple[Type],
+    expected: float,
+) -> None:
+    """Test that the percentage of a ration made up of concentrates is calculated correclty."""
+    feeds[0].feed_type, feeds[1].feed_type, feeds[2].feed_type = feed_types
+    feeds_in_ration = [
+        FeedInRation(amounts[0], feeds[0]),
+        FeedInRation(amounts[1], feeds[1]),
+        FeedInRation(amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_percentage_of_concentrates(feeds_in_ration, dry_matter)
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
     "ndf, dry_matter_intake, weight, concentrates, feed_type, is_wet, expected",
     [
         ((1.3, 2.0, 0.5), 30.0, 500.0, 1.0, Type.CONC, False, {1: 11.134, 2: 11.134, 3: 11.134}),
@@ -433,15 +461,15 @@ def test_calculate_protein_passage_rates(
     [
         (
             (4.0, 6.0, 5.0),
-            (10.0, 9.0, 12.0),
+            (10.0, 0.0, 12.0),
             (21.0, 40.0, 50.0),
             (30.0, 60.0, 20.0),
-            {1: 3.0, 2: 4.5, 3: 1.2},
-            {1: 1.846154, 2: 5.200000, 3: 3.272727},
+            {1: 3.0, 2: 0.0, 3: 1.2},
+            {1: 1.846154, 2: 0.0, 3: 3.272727},
         )
     ],
 )
-def test_calculated_rdp_percentages(
+def test_calculate_rumen_degradable_protein_percentages(
     feeds: tuple[Feed, Feed, Feed],
     cp: tuple[float, float, float],
     kd: tuple[float, float, float],
@@ -471,7 +499,7 @@ def test_calculated_rdp_percentages(
         ((20.0, 3.0, 12.0), {1: 15.0, 2: 3.0, 3: 5.0}, {1: 5.0, 2: 0.0, 3: 7.0}),
     ],
 )
-def test_calculate_rup_percentages(
+def test_calculate_rumen_undegradable_protein_percentages(
     feeds: tuple[Feed, Feed, Feed],
     cp: tuple[float, float, float],
     rdp_percentages: dict[RUFAS_ID, float],
