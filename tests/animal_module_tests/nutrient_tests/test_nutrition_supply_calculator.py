@@ -3,7 +3,7 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import FeedInRation, NutritionSupplyCalculator
-from RUFAS.data_structures.feed_storage_animal_connection import Feed, RUFAS_ID, Type
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RUFAS_ID, FeedComponentType
 
 
 @pytest.fixture
@@ -119,7 +119,7 @@ def test_calculate_discount(
     [
         (
             (30.0, 31.0, 20.0),
-            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (FeedComponentType.MINERAL, FeedComponentType.FORAGE, FeedComponentType.CONC),
             (True, True, False),
             (100.0, 115.0, 130.0),
             (1.1, 1.8, 2.0),
@@ -128,7 +128,7 @@ def test_calculate_discount(
         ),
         (
             (20.0, 11.0, 40.0),
-            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (FeedComponentType.MINERAL, FeedComponentType.FORAGE, FeedComponentType.CONC),
             (True, False, False),
             (90.0, 99.0, 108.0),
             (1.1, 1.8, 3.5),
@@ -140,7 +140,7 @@ def test_calculate_discount(
 def test_calculate_actual_metabolizable_energy(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
-    feed_types: tuple[Type, Type, Type],
+    feed_types: tuple[FeedComponentType, FeedComponentType, FeedComponentType],
     is_fat: tuple[bool, bool, bool],
     de: tuple[float, float, float],
     ee: tuple[float, float, float],
@@ -205,7 +205,7 @@ def test_calculate_actual_maintenance_net_energy(
     [
         (
             (30.0, 31.0, 20.0),
-            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (FeedComponentType.MINERAL, FeedComponentType.FORAGE, FeedComponentType.CONC),
             (True, True, False),
             (1.1, 1.8, 2.0),
             {3: 90.0},
@@ -214,7 +214,7 @@ def test_calculate_actual_maintenance_net_energy(
         ),
         (
             (20.0, 11.0, 40.0),
-            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (FeedComponentType.MINERAL, FeedComponentType.FORAGE, FeedComponentType.CONC),
             (True, False, False),
             (1.1, 1.8, 3.5),
             {2: 110.0, 3: 130.0},
@@ -226,7 +226,7 @@ def test_calculate_actual_maintenance_net_energy(
 def test_calculate_actual_lactation_net_energy(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
-    feed_types: tuple[Type, Type, Type],
+    feed_types: tuple[FeedComponentType, FeedComponentType, FeedComponentType],
     is_fat: tuple[bool, bool, bool],
     ee: tuple[float, float, float],
     actual_metabolizable: dict[RUFAS_ID, float],
@@ -255,14 +255,14 @@ def test_calculate_actual_lactation_net_energy(
     [
         (
             (30.0, 31.0, 20.0),
-            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (FeedComponentType.MINERAL, FeedComponentType.FORAGE, FeedComponentType.CONC),
             (True, True, False),
             {1: 100.0, 2: 120.0, 3: 90.0},
             154257.0,
         ),
         (
             (20.0, 11.0, 40.0),
-            (Type.MINERAL, Type.FORAGE, Type.CONC),
+            (FeedComponentType.MINERAL, FeedComponentType.FORAGE, FeedComponentType.CONC),
             (True, False, False),
             {1: 60.0, 2: 110.0, 3: 130.0},
             1118990.85,
@@ -272,7 +272,7 @@ def test_calculate_actual_lactation_net_energy(
 def test_calculate_actual_growth_net_energy(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
-    feed_types: tuple[Type, Type, Type],
+    feed_types: tuple[FeedComponentType, FeedComponentType, FeedComponentType],
     is_fat: tuple[bool, bool, bool],
     actual_metabolizable_energy: dict[RUFAS_ID, float],
     expected: float,
@@ -294,14 +294,24 @@ def test_calculate_actual_growth_net_energy(
 @pytest.mark.parametrize(
     "amounts, feed_types, ca, expected",
     [
-        ((30.0, 33.0, 20.0), (Type.FORAGE, Type.CONC, Type.FORAGE), (0.9, 1.1, 0.22), 0.000312),
-        ((20.0, 23.0, 15.0), (Type.CONC, Type.MINERAL, Type.VITAMINS), (1.2, 0.95, 0.5), 0.000351575),
+        (
+            (30.0, 33.0, 20.0),
+            (FeedComponentType.FORAGE, FeedComponentType.CONC, FeedComponentType.FORAGE),
+            (0.9, 1.1, 0.22),
+            0.000312,
+        ),
+        (
+            (20.0, 23.0, 15.0),
+            (FeedComponentType.CONC, FeedComponentType.MINERAL, FeedComponentType.VITAMINS),
+            (1.2, 0.95, 0.5),
+            0.000351575,
+        ),
     ],
 )
 def test_calculate_calcium_supply(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
-    feed_types: tuple[Type, Type, Type],
+    feed_types: tuple[FeedComponentType, FeedComponentType, FeedComponentType],
     ca: tuple[float, float, float],
     expected: float,
 ) -> None:
@@ -322,14 +332,24 @@ def test_calculate_calcium_supply(
 @pytest.mark.parametrize(
     "amounts, feed_types, phos, expected",
     [
-        ((30.0, 33.0, 20.0), (Type.FORAGE, Type.CONC, Type.FORAGE), (0.9, 1.1, 0.22), 0.00045506),
-        ((20.0, 23.0, 15.0), (Type.CONC, Type.MINERAL, Type.VITAMINS), (1.2, 0.95, 0.5), 0.0003428),
+        (
+            (30.0, 33.0, 20.0),
+            (FeedComponentType.FORAGE, FeedComponentType.CONC, FeedComponentType.FORAGE),
+            (0.9, 1.1, 0.22),
+            0.00045506,
+        ),
+        (
+            (20.0, 23.0, 15.0),
+            (FeedComponentType.CONC, FeedComponentType.MINERAL, FeedComponentType.VITAMINS),
+            (1.2, 0.95, 0.5),
+            0.0003428,
+        ),
     ],
 )
 def test_calculate_phosphorus_supply(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
-    feed_types: tuple[Type, Type, Type],
+    feed_types: tuple[FeedComponentType, FeedComponentType, FeedComponentType],
     phos: tuple[float, float, float],
     expected: float,
 ) -> None:
@@ -399,16 +419,31 @@ def test_calculate_metabolizable_protein_supply(
 @pytest.mark.parametrize(
     "amounts, dry_matter, feed_types, expected",
     [
-        ((20.0, 30.0, 0.5), 50.5, (Type.FORAGE, Type.FORAGE, Type.CONC), 0.990099),
-        ((10.0, 33.0, 10.0), 53.0, (Type.FORAGE, Type.CONC, Type.FORAGE), 62.264151),
-        ((20.0, 30.0, 15.0), 65.0, (Type.FORAGE, Type.MINERAL, Type.VITAMINS), 0.0),
+        (
+            (20.0, 30.0, 0.5),
+            50.5,
+            (FeedComponentType.FORAGE, FeedComponentType.FORAGE, FeedComponentType.CONC),
+            0.990099,
+        ),
+        (
+            (10.0, 33.0, 10.0),
+            53.0,
+            (FeedComponentType.FORAGE, FeedComponentType.CONC, FeedComponentType.FORAGE),
+            62.264151,
+        ),
+        (
+            (20.0, 30.0, 15.0),
+            65.0,
+            (FeedComponentType.FORAGE, FeedComponentType.MINERAL, FeedComponentType.VITAMINS),
+            0.0,
+        ),
     ],
 )
 def test_calculate_percentage_of_concentrates(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
     dry_matter: float,
-    feed_types: tuple[Type, Type, Type],
+    feed_types: tuple[FeedComponentType, FeedComponentType, FeedComponentType],
     expected: float,
 ) -> None:
     """Test that the percentage of a ration made up of concentrates is calculated correclty."""
@@ -427,10 +462,18 @@ def test_calculate_percentage_of_concentrates(
 @pytest.mark.parametrize(
     "ndf, dry_matter_intake, weight, concentrates, feed_type, is_wet, expected",
     [
-        ((1.3, 2.0, 0.5), 30.0, 500.0, 1.0, Type.CONC, False, {1: 11.134, 2: 11.134, 3: 11.134}),
-        ((2.3, 1.8, 3.5), 35.0, 600.0, 1.1, Type.FORAGE, False, {1: 6.1093667, 2: 6.1178667, 3: 6.0889667}),
-        ((1.0, 1.0, 1.0), 50.0, 600.0, 0.5, Type.MINERAL, True, {1: 8.170667, 2: 8.170667, 3: 8.170667}),
-        ((1.0, 1.0, 1.0), 50.0, 600.0, 0.5, Type.MINERAL, False, {1: 0.0, 2: 0.0, 3: 0.0}),
+        ((1.3, 2.0, 0.5), 30.0, 500.0, 1.0, FeedComponentType.CONC, False, {1: 11.134, 2: 11.134, 3: 11.134}),
+        (
+            (2.3, 1.8, 3.5),
+            35.0,
+            600.0,
+            1.1,
+            FeedComponentType.FORAGE,
+            False,
+            {1: 6.1093667, 2: 6.1178667, 3: 6.0889667},
+        ),
+        ((1.0, 1.0, 1.0), 50.0, 600.0, 0.5, FeedComponentType.MINERAL, True, {1: 8.170667, 2: 8.170667, 3: 8.170667}),
+        ((1.0, 1.0, 1.0), 50.0, 600.0, 0.5, FeedComponentType.MINERAL, False, {1: 0.0, 2: 0.0, 3: 0.0}),
     ],
 )
 def test_calculate_protein_passage_rates(
@@ -439,7 +482,7 @@ def test_calculate_protein_passage_rates(
     dry_matter_intake: float,
     weight: float,
     concentrates: float,
-    feed_type: Type,
+    feed_type: FeedComponentType,
     is_wet: bool,
     expected: dict[RUFAS_ID, float],
 ) -> None:
