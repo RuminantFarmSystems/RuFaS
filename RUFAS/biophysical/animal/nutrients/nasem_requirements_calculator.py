@@ -115,7 +115,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             milk_production,
             ndf_percentage,
         )
-        calcium_requirement = cls.calculate_calcium_requirement(
+        calcium_requirement = cls._calculate_calcium_requirement(
             body_weight,
             mature_body_weight,
             day_of_pregnancy,
@@ -472,7 +472,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         return metabolizable_protein_requirement
 
     @classmethod
-    def calculate_calcium_requirement(
+    def _calculate_calcium_requirement(
         cls,
         body_weight: float,
         mature_body_weight: float,
@@ -492,7 +492,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             Body weight (kg)
         mature_body_weight : float
             Mature body weight (kg)
-        day_of_pregnancy : int
+        day_of_pregnancy : int | None
             Day of pregnancy (days)
         average_daily_gain : float
             Average daily gain (g)
@@ -520,19 +520,23 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             8th edition." National Academic Press, Chapter 7 "Minerals" pp. 106-110, 2021.
 
         """
-        Ca_Maint: float = 0.90 * dry_matter_intake_estimate
+        maintenance_req: float = 0.90 * dry_matter_intake_estimate
+
         if parity <= 2:
-            Ca_Growth: float = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
+            growth_req: float = ((9.83 * mature_body_weight**-0.22) * body_weight**-0.22) * average_daily_gain
         else:
-            Ca_Growth = 0.0
+            growth_req = 0.0
+
         if day_of_pregnancy is None:
-            Ca_Preg: float = 0.0
+            pregnancy_req: float = 0.0
         else:
-            Ca_Preg = 0.02456 * exp((0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy) - 0.02456 * exp(
+            pregnancy_req = 0.02456 * exp((0.05581 - 0.00007 * day_of_pregnancy) * day_of_pregnancy) - 0.02456 * exp(
                 (0.05581 - 0.00007 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
             ) * (body_weight / 715)
-        Ca_Lact: float = (0.295 + 0.239 * milk_true_protein) * milk_production
-        calcium_requirement: float = Ca_Maint + Ca_Growth + Ca_Preg + Ca_Lact
+
+        lactation_req: float = (0.295 + 0.239 * milk_true_protein) * milk_production
+
+        calcium_requirement: float = maintenance_req + growth_req + pregnancy_req + lactation_req
         return max(calcium_requirement, AnimalModuleConstants.MINIMUM_CALCIUM)
 
     @classmethod
@@ -611,10 +615,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
                 / 715
             )
 
-        if milk_true_protein == 0.0 or milk_production == 0.0:
-            lactation_req: float = 0.0
-        else:
-            lactation_req = milk_production * (0.49 + 0.13 * milk_true_protein)
+        lactation_req = milk_production * (0.49 + 0.13 * milk_true_protein)
 
         phosphorus_requirement: float = maintenance_req + growth_req + pregnancy_req + lactation_req
 

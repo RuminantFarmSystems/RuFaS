@@ -5,6 +5,32 @@ from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NAS
 
 
 @pytest.mark.parametrize(
+    "weight, mature_weight, day_preg, avg_gain, dmi, true_protein, milk, parity, expected",
+    [
+        (450.0, 555.0, 100, 3.1, 50.0, 3.0, 31.0, 1, 79.634005),
+        (560.0, 560.0, None, 0.0, 40.0, 0.0, 0.0, 3, 36.0),
+    ],
+)
+def test_calculate_calcium_requirement(
+    weight: float,
+    mature_weight: float,
+    day_preg: int | None,
+    avg_gain: float,
+    dmi: float,
+    true_protein: float,
+    milk: float,
+    parity: int,
+    expected: float,
+) -> None:
+    """Test that calcium requirement is calculated correctly."""
+    actual = NASEMRequirementsCalculator._calculate_calcium_requirement(
+        weight, mature_weight, day_preg, avg_gain, dmi, true_protein, milk, parity
+    )
+
+    assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
     "weight, mature_weight, type, day_preg, avg_gain, dmi, true_protein, milk, parity, expected",
     [
         (500.0, 650.0, AnimalType.LAC_COW, 200, 4.0, 45.0, 3.0, 29.0, 3, 72.330420),
