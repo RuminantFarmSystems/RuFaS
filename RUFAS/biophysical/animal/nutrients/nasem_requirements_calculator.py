@@ -136,7 +136,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             milk_production,
             parity,
         )
-        activity_requirement = cls.calculate_activity_energy_requirements(body_weight, housing, distance)
+        activity_requirement = cls._calculate_activity_energy_requirements(body_weight, housing, distance)
 
         essential_amino_acids = AMINO_ACID_CALCULATOR.calculate_essential_amino_acid_requirements(
             animal_type=animal_type,
@@ -287,7 +287,6 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         ProtADG = (0.201 - 0.081 * (body_weight / mature_body_weight)) * EBG / average_daily_gain
         frame_weight_gain = FatADG + ProtADG
         REFADG = (9.4 * FatADG + 5.55 * ProtADG) * average_daily_gain
-        # MEFrameADG = REFADG / 0.4  # Possible future use for this calc, see docstring notes
         net_energy_growth = REFADG / 0.61
         return net_energy_growth, average_daily_gain, frame_weight_gain
 
@@ -447,7 +446,6 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         NPGest: Net protein requirement for pregnancy, g
         NPMilk: Net protein in milk, or milk true protein yield, g
         TargetEffMP: Proposed target efficiencies of converting metabolizable protein to export proteins and body gain.
-        # TODO Include equations for estimating requirement for Non-Essential Aminoacids (NEAA) GitHub Issue #1210
 
         References
         ----------
@@ -705,7 +703,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         )
 
     @classmethod
-    def calculate_activity_energy_requirements(
+    def _calculate_activity_energy_requirements(
         cls,
         body_weight: float,
         housing: float,
