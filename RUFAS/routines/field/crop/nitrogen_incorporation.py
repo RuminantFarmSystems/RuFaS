@@ -542,9 +542,7 @@ class NitrogenIncorporation:
             )
             raise ValueError("nitrogen_fraction must be less than emergence_nitrogen_fraction")
         if nitrogen_fraction == 0:
-            om.add_error(
-                "Invalid nitrogen_fraction.", "nitrogen_fraction can not be 0.", info_map
-            )
+            om.add_error("Invalid nitrogen_fraction.", "nitrogen_fraction can not be 0.", info_map)
             raise ValueError("nitrogen_fraction must be greater than 0")
         if heat_fraction == 0:
             om.add_error("Invalid heat_fraction.", "heat_fraction can not be 0.", info_map)
