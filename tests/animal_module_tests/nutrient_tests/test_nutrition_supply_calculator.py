@@ -115,7 +115,7 @@ def test_calculate_discount(
 
 
 @pytest.mark.parametrize(
-    "amounts, feed_types, is_fat, de, ee, actual_digestable, expected",
+    "amounts, feed_types, is_fat, de, ee, actual_digestible, expected",
     [
         (
             (30.0, 31.0, 20.0),
@@ -144,7 +144,7 @@ def test_calculate_actual_metabolizable_energy(
     is_fat: tuple[bool, bool, bool],
     de: tuple[float, float, float],
     ee: tuple[float, float, float],
-    actual_digestable: dict[RUFAS_ID, float],
+    actual_digestible: dict[RUFAS_ID, float],
     expected: dict[RUFAS_ID, float],
 ) -> None:
     """Test that actual net energy needed for lactation is calculated correctly."""
@@ -158,7 +158,7 @@ def test_calculate_actual_metabolizable_energy(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_actual_metabolizable_energy(feeds_in_ration, actual_digestable)
+    actual = NutritionSupplyCalculator._calculate_actual_metabolizable_energy(feeds_in_ration, actual_digestible)
 
     assert pytest.approx(actual) == expected
 
@@ -201,7 +201,7 @@ def test_calculate_actual_maintenance_net_energy(
 
 
 @pytest.mark.parametrize(
-    "amounts, feed_types, is_fat, ee, actual_metabolizable, actual_digestable, expected",
+    "amounts, feed_types, is_fat, ee, actual_metabolizable, actual_digestible, expected",
     [
         (
             (30.0, 31.0, 20.0),
@@ -230,7 +230,7 @@ def test_calculate_actual_lactation_net_energy(
     is_fat: tuple[bool, bool, bool],
     ee: tuple[float, float, float],
     actual_metabolizable: dict[RUFAS_ID, float],
-    actual_digestable: dict[RUFAS_ID, float],
+    actual_digestible: dict[RUFAS_ID, float],
     expected: float,
 ) -> None:
     """Test that actual net energy needed for lactation is calculated correctly."""
@@ -244,7 +244,7 @@ def test_calculate_actual_lactation_net_energy(
     ]
 
     actual = NutritionSupplyCalculator._calculate_actual_lactation_net_energy(
-        feeds_in_ration, actual_metabolizable, actual_digestable
+        feeds_in_ration, actual_metabolizable, actual_digestible
     )
 
     assert pytest.approx(actual) == expected
