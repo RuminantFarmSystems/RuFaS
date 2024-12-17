@@ -82,6 +82,18 @@ class NutritionSupplyCalculator:
         """
         Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE).
 
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        body_weight : float
+            Body weight of an animal (kg).
+
+        Returns
+        -------
+        float
+            Discount used to calculate the actual TDN and DE content of feeds in the ration.
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.1-3]-[A.Heifer.E.1-3]
@@ -114,7 +126,19 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], actual_digestable_energy: dict[RUFAS_ID, float]
     ) -> dict[RUFAS_ID, float]:
         """
-        Calculates the actual metabolizable energy of feeds (Mcal).
+        Calculates the actual metabolizable energy of feeds.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        actual_digestable_energy : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the discounted digestable energy content (Mcal) of the corresponding feed.
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal).
 
         References
         ----------
@@ -141,7 +165,19 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
-        Calculates the actual net energy for maintenance of feeds (Mcal).
+        Calculates the actual net energy for maintenance of feeds.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        actual_metabolizable_energy : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+
+        Returns
+        -------
+        float
+            Total actual net energy available for maintenance in the ration (Mcal).
 
         References
         ----------
@@ -174,7 +210,21 @@ class NutritionSupplyCalculator:
         actual_digestible_energy: dict[RUFAS_ID, float],
     ) -> float:
         """
-        Calculates the actual net energy for lactation of feeds (Mcal).
+        Calculates the actual net energy for lactation of feeds.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        actual_digestable_energy : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the discounted digestable energy content (Mcal) of the feed.
+        actual_metabolizable : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+
+        Returns
+        -------
+        float
+            Total actual net energy available for lactation in the ration (Mcal).
 
         References
         ----------
@@ -206,7 +256,19 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
-        Calculates actual net energy for growth of feeds (Mcal).
+        Calculates actual net energy for growth of feeds.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        actual_metabolizable : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+
+        Returns
+        -------
+        float
+            Total actual net energy available for growth in the ration (Mcal).
 
         References
         ----------
@@ -235,7 +297,17 @@ class NutritionSupplyCalculator:
     @classmethod
     def _calculate_calcium_supply(cls, feeds: list[FeedInRation]) -> float:
         """
-        Calculates the calcium supply in the ration (kg).
+        Calculates the calcium supply in the ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total calcium supply in the ration (kg).
 
         References
         ----------
@@ -269,7 +341,20 @@ class NutritionSupplyCalculator:
 
     @classmethod
     def _calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
-        """Calculates the phosphorus supply in the ration (kg)."""  # TODO: check units, find references in Scientific docs
+        """
+        Calculates the phosphorus supply in the ration (kg).
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total phosphorus supply in the ration (kg).
+
+        """  # TODO: check units, find references in Scientific docs
         phosphorus_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
@@ -305,6 +390,22 @@ class NutritionSupplyCalculator:
     ) -> float:
         """
         Calculates amount of metabolizable protein in ration (kg).
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        dry_matter_intake : float
+            Total dry matter contained in the ration (kg).
+        actual_tdn_percentages : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to the discounted Total Digestable Nutrition (TDN) percentage of the feed.
+        body_weight : float
+            The body weight of an animal (kg).
+
+        Returns
+        -------
+        float
+            Total metabolizable protein in the ration (g).
 
         References
         ----------
@@ -353,7 +454,22 @@ class NutritionSupplyCalculator:
 
     @classmethod
     def _calculate_percentage_of_concentrates(cls, feeds: list[FeedInRation], dry_matter_intake: float) -> float:
-        """Calculates percentage of dry matter in ration that is concentrate."""
+        """
+        Calculates percentage of dry matter in ration that is concentrate.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        dry_matter_intake : float
+            Total dry matter contained in the ration (kg).
+
+        Returns
+        -------
+        float
+            Percentage of the ration's dry matter which is made up of concentrates.
+
+        """
         dry_matter_from_concentrate = sum([feed.amount for feed in feeds if feed.info.feed_type is Type.CONC])
 
         return dry_matter_from_concentrate / dry_matter_intake * GeneralConstants.FRACTION_TO_PERCENTAGE
@@ -367,7 +483,23 @@ class NutritionSupplyCalculator:
         percentage_concentrates: float,
     ) -> dict[RUFAS_ID, float]:
         """
-        Calculates the protein passage rate of feeds in ration (percentage / hour).
+        Calculates the protein passage rate of feeds in ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        dry_matter_intake : float
+            Total dry matter contained in the ration (kg).
+        body_weight : float
+            The body weight of an animal (kg).
+        percentage_concetrates : dict[RUFAS_ID, float]
+            Percentage of the ration's dry matter which is made up of concentrates.
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
 
         References
         ----------
@@ -402,6 +534,18 @@ class NutritionSupplyCalculator:
         """
         Calculates rumen degradable protein (RDP) percentages of feeds in ration.
 
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        protein_passage_rates : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to protein passage rates (percentage / hour).
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to RDP percentages.
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.11]-[A.Heifer.E.11]
@@ -429,6 +573,18 @@ class NutritionSupplyCalculator:
         """
         Calculates rumen undegradable protein (RUP) percentages of feeds in ration.
 
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        rumen_degradable_protein_percentages : dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to RDP percentages.
+
+        Returns
+        -------
+        dict[RUFAS_ID, float]
+            Mapping of RuFaS Feed IDs to RUP percentages.
+
         References
         ----------
         Animal Scientific documentation [A.Cow.E.12]-[A.Cow.E.12]
@@ -445,10 +601,36 @@ class NutritionSupplyCalculator:
 
     @classmethod
     def _calculate_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
-        """Calculates the neutral detergent fiber (NDF) content of a ration (kg)."""
+        """
+        Calculates the neutral detergent fiber (NDF) content of a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total supply of NDF in a ration (kg).
+
+        """
         return sum([feed.amount * feed.info.NDF * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
 
     @classmethod
     def _calculate_fat_content(cls, feeds: list[FeedInRation]) -> float:
-        """Calculates the fat content of a ration (kg)."""
+        """
+        Calculates the fat content of a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total supply of fat in a ration (kg).
+
+        """
         return sum([feed.amount * feed.info.EE * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
