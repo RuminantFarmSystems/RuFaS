@@ -918,7 +918,7 @@ class NitrogenIncorporation:
         if len(layer_uptake_potentials) != len(layer_demands) or len(layer_uptake_potentials) != len(layer_nutrient):
             om.add_error(
                 "Invalid layer_potential, layer_demand, and layer_nitrate length.",
-                "layer_potential, layer_demand, and layer_nitrate length does not have equal length,"
+                "layer_potential, layer_demand, and layer_nitrate length do not have equal length,"
                 f"length of layer_potential, layer_demand, and layer_nitrate are"
                 f" {len(layer_uptake_potentials)}, {len(layer_demands)} and {len(layer_nutrient)}.",
                 info_map,
