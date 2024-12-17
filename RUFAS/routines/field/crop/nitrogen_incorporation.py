@@ -518,38 +518,36 @@ class NitrogenIncorporation:
             raise ValueError("emergence_nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
         if nitrogen_fraction == emergence_nitrogen_fraction:
             om.add_error(
-                "Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
-                f"Equal nitrogen_fraction and emergence_nitrogen_fraction will lead to zero division"
-                f" error, nitrogen_fraction and emergence_nitrogen_fraction are both."
-                f" {emergence_nitrogen_fraction}.",
+                "A crop's emergence_nitrogen_fraction and nitrogen_fraction are equal.",
+                f"The emergence_nitrogen_fraction and nitrogen_fraction are both"
+                f" {emergence_nitrogen_fraction}, this results in a divide by zero error.",
                 info_map,
             )
             raise ValueError("nitrogen_fraction must not be equivalent to emergence_nitrogen_fraction")
         if nitrogen_fraction == mature_nitrogen_fraction:
             om.add_error(
-                "Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction.",
-                f"Equal nitrogen_fraction and mature_nitrogen_fraction will lead to log(0) calculation"
-                f" error, nitrogen_fraction and mature_nitrogen_fraction are both."
-                f" {mature_nitrogen_fraction}.",
+                "A crop's nitrogen_fraction and mature_nitrogen_fraction are equal.",
+                f"The nitrogen_fraction and mature_nitrogen_fraction are both"
+                f" {mature_nitrogen_fraction}, this results in a divide by zero error.",
                 info_map,
             )
             raise ValueError("nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
         if nitrogen_fraction > emergence_nitrogen_fraction:
             om.add_error(
-                "Invalid value pair for nitrogen_fraction and emergence_nitrogen_fraction.",
-                f"nitrogen_fraction must be less than emergence_nitrogen_fraction to avoid ln(-y) "
-                f"calculations, nitrogen_fraction is {nitrogen_fraction}, emergence_nitrogen_fraction is "
-                f"{emergence_nitrogen_fraction}.",
+                "A crop's nitrogen_fraction is greater than emergence_nitrogen_fraction.",
+                f"The nitrogen_fraction is greater than mature_nitrogen_fraction,"
+                f" nitrogen_fraction is {mature_nitrogen_fraction} and mature_nitrogen_fraction is"
+                f" {emergence_nitrogen_fraction}, this results in ln(-y) calculation.",
                 info_map,
             )
             raise ValueError("nitrogen_fraction must be less than emergence_nitrogen_fraction")
         if nitrogen_fraction == 0:
             om.add_error(
-                "Invalid nitrogen_fraction.", "nitrogen_fraction must be greater than 0, received 0.", info_map
+                "Invalid nitrogen_fraction.", "nitrogen_fraction can not be 0.", info_map
             )
             raise ValueError("nitrogen_fraction must be greater than 0")
         if heat_fraction == 0:
-            om.add_error("Invalid heat_fraction.", "heat_fraction must be greater than 0, received 0", info_map)
+            om.add_error("Invalid heat_fraction.", "heat_fraction can not be 0.", info_map)
             raise ValueError("heat_fraction must be greater than 0")
 
         # calculate first component of formula
@@ -561,7 +559,7 @@ class NitrogenIncorporation:
         if denominator > 1:  # leads to log(-y)
             om.add_error(
                 "Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction or"
-                " emergence_nitrogen_fraction and mature_nitrogen_fraction.",
+                " emergence_nitrogen_fraction and mature_nitrogen_fraction or both pairs.",
                 "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
                 " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
                 f"is negative, which will leads to log(-y) calculation. \nIs nitrogen_fraction({nitrogen_fraction}) <"
@@ -712,7 +710,7 @@ class NitrogenIncorporation:
             }
             om = OutputManager()
             om.add_error(
-                "Invalid root depth.", f"Negative root depth is invalid, provided root depth is {root_depth}.", info_map
+                "Invalid root depth.", f"Root depth must be >= 0, provided root depth is {root_depth}.", info_map
             )
             raise ValueError("root_depth cannot be less than zero")
         elif root_depth == 0.0:
