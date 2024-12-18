@@ -23,7 +23,9 @@ class NutritionRequirements:
     calcium : float
         Calcium requirement (g).
     phosphorus : float
-        Phosphorus requirement (g).
+        Phosphorus requirement calculated with either the NASEM or NRC methodologies (g).
+    secondary_phosphorus : float
+        Phosphorus requirement calculated with the dedicated animal phosphorus submodule (g).
     dry_matter : float
         Dry matter intake (kg).
     activity : float
@@ -40,6 +42,7 @@ class NutritionRequirements:
     protein: float
     calcium: float
     phosphorus: float
+    secondary_phosphorus: float
     dry_matter: float
     activity: float
     essential_amino_acids: EssentialAminoAcidRequirements
