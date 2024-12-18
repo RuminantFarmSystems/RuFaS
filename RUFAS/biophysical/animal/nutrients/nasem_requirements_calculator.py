@@ -89,7 +89,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         growth_requirement, average_daily_gain, frame_weight_gain = cls.calculate_growth_energy_requirements(
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
         )
-        pregnancy_requirement, gravid_uterine_weight_gain = cls.calculate_pregnancy_energy_requirements(
+        pregnancy_requirement, gravid_uterine_weight_gain = cls._calculate_pregnancy_energy_requirements(
             lactating, day_of_pregnancy, days_in_milk, gravid_uterine_weight, uterine_weight
         )
         lactation_requirement = cls._calculate_lactation_energy_requirements(
@@ -291,7 +291,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         return net_energy_growth, average_daily_gain, frame_weight_gain
 
     @classmethod
-    def calculate_pregnancy_energy_requirements(
+    def _calculate_pregnancy_energy_requirements(
         cls,
         lactating: bool,
         day_of_pregnancy: int | None,
