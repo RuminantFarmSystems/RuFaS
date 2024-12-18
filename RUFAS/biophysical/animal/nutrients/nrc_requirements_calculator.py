@@ -10,6 +10,7 @@ from .nutrition_requirements_calculator import NutritionRequirementsCalculator
 
 
 class NRCRequirementsCalculator(NutritionRequirementsCalculator):
+    """Animal requirements calculator class, based on NRC's methodology."""
 
     @classmethod
     def calculate_requirements(
