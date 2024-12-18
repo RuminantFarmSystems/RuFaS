@@ -6,6 +6,10 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import Nutrit
 
 
 class NutritionRequirementsCalculator(ABC):
+    """
+    Defines the interface for animal nutritional requirements calculation, and logic shared between the NASEM and NRC
+    equations.
+    """
 
     @classmethod
     @abstractmethod
