@@ -35,10 +35,10 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         TDN_percentage: float,
     ) -> NutritionRequirements:
         """Calculates energy and nutrition requirements for an animal using the NRC methodology."""
-        maintenance_requirement, conceptus_weight, calf_birth_weight = cls.calculate_maintentance_energy_requirements(
+        maintenance_requirement, conceptus_weight, calf_birth_weight = cls._calculate_maintentance_energy_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type
         )
-        growth_requirement, average_daily_gain, shrunk_body_weight = cls.calculate_growth_energy_requirements(
+        growth_requirement, average_daily_gain, shrunk_body_weight = cls._calculate_growth_energy_requirements(
             body_weight,
             mature_body_weight,
             conceptus_weight,
@@ -47,7 +47,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             calving_interval,
             average_daily_gain_heifer,
         )
-        pregnancy_requirement = cls.calculate_pregnancy_energy_requirements(day_of_pregnancy, calf_birth_weight)
+        pregnancy_requirement = cls._calculate_pregnancy_energy_requirements(day_of_pregnancy, calf_birth_weight)
         lactation_requirement = cls.calculate_lactation_energy_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
         )
@@ -114,7 +114,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         )
 
     @classmethod
-    def calculate_maintentance_energy_requirements(
+    def _calculate_maintentance_energy_requirements(
         cls,
         body_weight: float,
         mature_body_weight: float,
@@ -125,6 +125,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     ) -> tuple[float, float, float]:
         """
         Calculates energy requirement for maintenance, conceptus weight, and calf birth weight according to NRC (2001).
+
         Parameters
         ----------
         body_weight : float
@@ -139,37 +140,39 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Adjustment for previous temperature
         animal_type : AnimalType
             A type or subtype of animal specified in the AnimalType enum
+
         Returns
         -------
         tuple[float, float, float]
             Net energy requirement for maintenance (Mcal/day), conceptus weight (kg), and calf birth weight (kg)
+
         Notes
         -----
         Energy requirements for activity are not included within calculations for maintenance.
+
         References
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
         Chapter 2 "Energy",pp. 18-25, 2001.
+
         """
         calf_birth_weight = mature_body_weight * 0.06275 if day_of_pregnancy else 0.0
         conceptus_weight = 0.0
         if day_of_pregnancy and day_of_pregnancy > 190:
             conceptus_weight = (18 + (day_of_pregnancy - 190) * 0.665) * (calf_birth_weight / 45)
+
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
             net_energy_maintenance = 0.08 * (body_weight - conceptus_weight) ** 0.75
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III,
-        ]:
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
             body_condition_score_9 = (body_condition_score_5 - 1) * 2 + 1
             net_energy_maintenance = (body_weight - conceptus_weight) ** (0.75) * (
                 0.086 * (0.8 + (body_condition_score_9 - 1) * 0.05)
             ) + 0.0007 * (20 - previous_temperature)
+
         return net_energy_maintenance, conceptus_weight, calf_birth_weight
 
     @classmethod
-    def calculate_growth_energy_requirements(
+    def _calculate_growth_energy_requirements(
         cls,
         body_weight: float,
         mature_body_weight: float,
@@ -182,6 +185,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         """
         Calculates energy requirement for growth, average daily gain and estimate of shrunk body weight according to NRC
         (2001).
+
         Parameters
         ----------
         body_weight : float
@@ -198,97 +202,81 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Calving interval (days)
         average_daily_gain_heifer : float
             Average daily gain (grams per day)
+
         Returns
         -------
         tuple[float, float, float]
             Net energy requirement for growth (Mcal/d), average daily gain (g/d), equivalent shrunk body weight (kg).
+
         References
         ----------
+        Animal Scientific Documentation [A.Cow.A.7]-[A.Cow.A.14], [A.Heifer.A.8]-[A.Heifer.A.15]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
-        Chapter 11 "Growth", pp. 234-243, 2001.
+            Chapter 11 "Growth", pp. 234-243, 2001.
+
         """
-        # Activity requirements
-        # ---------------------
-        # Activity requirements must be calculated after grouping and thus is in a
-        # separate function
-        # Growth requirements
-        # ---------------------
-        # [A.Cow.A.7]-[A.Heifer.A.8]
-        # Mature shrunk body weight (kg)
-        MSBW = 0.96 * mature_body_weight
-        # [A.Cow.A.8]-[A.Heifer.A.9]
-        # Shrunk body weight (kg)
-        SBW = 0.96 * body_weight
-        # [A.Cow.A.9]-[A.Heifer.A.10]
-        # Empty body weight (kg)
-        # EBW = 0.891 * SBW
-        # [A.Cow.A.10]-[A.Heifer.A.11]
-        # Equivalent shrunk body weight (kg)
-        equivalent_shrunk_body_weight = (SBW - conceptus_weight) * (478 / MSBW)
-        # [A.Cow.A.11]
-        # Average Daily Gain (kg)
+        mature_shrunk_body_weight = 0.96 * mature_body_weight
+
+        shrunk_body_weight = 0.96 * body_weight
+
+        equivalent_shrunk_body_weight = (shrunk_body_weight - conceptus_weight) * (478 / mature_shrunk_body_weight)
+
         if animal_type in [AnimalType.LAC_COW, AnimalType.DRY_COW]:
             if parity == 1 and calving_interval != 0:
-                average_daily_gain = ((0.92 - 0.82) * MSBW) / calving_interval
+                average_daily_gain = ((0.92 - 0.82) * mature_shrunk_body_weight) / calving_interval
             elif parity == 2 and calving_interval != 0:
-                average_daily_gain = ((1 - 0.92) * MSBW) / calving_interval
+                average_daily_gain = ((1 - 0.92) * mature_shrunk_body_weight) / calving_interval
             else:
                 average_daily_gain = 0.0
-        # [A.Heifer.A.12]
-        # Average Daily Gain (kg)
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III,
-        ]:
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
             average_daily_gain = max(average_daily_gain_heifer, 0.0)
-        # [A.Cow.A.12]-[A.Heifer.A.13]
-        # Equivalent empty weight gain (kg)
-        EQEBG = 0.956 * average_daily_gain
-        # [A.Cow.A.13]-[A.Heifer.A.14]
-        # Equivalent shrunk body weight (kg)
-        EQEBW = 0.891 * equivalent_shrunk_body_weight
-        # [A.Cow.A.14]-[A.Heifer.A.15]
-        # Net energy for growth requirement (Mcal)
-        net_energy_growth = 0.0635 * EQEBW**0.75 * EQEBG**1.097
+
+        equivalent_empty_gain = 0.956 * average_daily_gain
+
+        equivalent_shrunk_body_weight = 0.891 * equivalent_shrunk_body_weight
+
+        net_energy_growth = 0.0635 * equivalent_shrunk_body_weight**0.75 * equivalent_empty_gain**1.097
         return net_energy_growth, average_daily_gain, equivalent_shrunk_body_weight
 
     @classmethod
-    def calculate_pregnancy_energy_requirements(cls, day_of_pregnancy: int | None, calf_birth_weight: float) -> float:
+    def _calculate_pregnancy_energy_requirements(cls, day_of_pregnancy: int | None, calf_birth_weight: float) -> float:
         """
         Calculates energy requirement for pregnancy according to NRC (2001).
+
         Parameters
         ----------
         day_of_pregnancy : int
             Day of pregnancy (days).
         calf_birth_weight : float
             Calf birth weight (kg).
+
         Returns
         -------
         float
             Net energy requirement for pregnancy (Mcal/d).
+
         Notes
         -----
         Day_of_pregnancy are counted from 190 day_of_pregnancy once pregnancy is confirmed. Otherwise, this nutritional
         requirement is assumed to be zero.
+
         References
         ----------
+        Animal Scientific Documentation [A.Cow.A.15]-[A.Heifer.A.16], [A.Cow.A.16]-[A.Heifer.A.17]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
             National Academic Press, Chapter 2 "Energy", pp. 21-22, 2001.
+
         """
-        # Pregnancy requirement
-        # ---------------------
-        # [A.Cow.A.15]-[A.Heifer.A.16]
-        # Metabolizable energy requirement for pregnancy (Mcal)
         if day_of_pregnancy is None:
-            MEpreg = 0.0
+            metabolizable_energy_pregnancy_req = 0.0
         elif day_of_pregnancy > 190:
-            MEpreg = (2 * 0.00159 * day_of_pregnancy - 0.0352) * (calf_birth_weight / (45 * 0.14))
+            metabolizable_energy_pregnancy_req = (2 * 0.00159 * day_of_pregnancy - 0.0352) * (
+                calf_birth_weight / (45 * 0.14)
+            )
         else:
-            MEpreg = 0.0
-        # [A.Cow.A.16]-[A.Heifer.A.17]
-        # Net energy requirement for pregnancy (Mcal)
-        net_energy_pregnancy = MEpreg * 0.64
+            metabolizable_energy_pregnancy_req = 0.0
+
+        net_energy_pregnancy = metabolizable_energy_pregnancy_req * 0.64
         return net_energy_pregnancy
 
     @classmethod
@@ -309,7 +297,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     ) -> float:
         """
         Calculates the protein requirement for maintenance according to NRC (2001).
-        
+
         Parameters
         ----------
         body_weight : float
@@ -336,12 +324,12 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d)
         TDN_conc:
             Concentration (percent value) of Total Digestible Nutrients in previously fed ration.
-        
+
         Returns
         -------
         float
             Metabolizable protein requirement (g/day)
-        
+
         Notes
         -----
         bacteria_estimate: Bacteria metabolizable protein production, g
@@ -352,13 +340,13 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         metabolizable_growth: Metabolizable protein requirement for growth, g
         pregnancy: Metabolizable protein requirement for pregnancy, g
         lactation: Metabolizable protein requirement for lactation, g
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.B.1] through [A.Cow.B.7], [A.Heifer.B.1] through [A.Heifer.B.6]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition."
             National Academic Press, Chapter 5 "Protein and Amino acids",pp. 67-69. 2001;
-        
+
         """
 
         bacteria_estimate = dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * TDN_conc * 0.13
@@ -397,12 +385,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
 
         if animal_type in [AnimalType.LAC_COW]:
             metabolizable_protein_requirement = maintenance + metabolizable_growth + pregnancy + lactation
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III,
-            AnimalType.DRY_COW
-        ]:
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
             metabolizable_protein_requirement = maintenance + metabolizable_growth + pregnancy
         return metabolizable_protein_requirement
 
@@ -418,7 +401,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     ) -> float:
         """
         Calculates total calcium requirement according to NRC (2001).
-        
+
         Parameters
         ----------
         body_weight : float
@@ -433,33 +416,29 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Average daily gain (grams per day)
         milk_production: float
             Milk yield (kg/d)
-        
+
         Returns
         -------
         float
             Calcium requirement (grams per day)
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.C.1]-[A.Heifer.C.1], [A.Cow.C.2]-[A.Heifer.C.2],
             [A.Cow.C.3]-[A.Heifer.C.3], [A.Cow.C.4]-[A.Heifer.C.4], [A.Cow.C.5]
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 106-109. 2001.
-        
+
         """
         if animal_type in [AnimalType.LAC_COW]:
             maintenance = 0.031 * body_weight + 0.08 * (body_weight / 100)
         elif animal_type in [AnimalType.DRY_COW]:
             maintenance = 0.0154 * body_weight + 0.08 * (body_weight / 100)
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III
-        ]:
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III]:
             maintenance = 0.0154 * body_weight + 0.08 * (body_weight / 100)
-        
+
         growth = 9.83 * mature_body_weight**0.22 * body_weight ** (-0.22) * (average_daily_gain / 0.96)
-        
+
         if day_of_pregnancy is None:
             pregnancy = 0.0
         elif day_of_pregnancy > 190:
@@ -468,18 +447,13 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             )
         else:
             pregnancy = 0.0
-        
+
         if animal_type in [AnimalType.LAC_COW]:
             lactation = 1.22 * milk_production
             calcium_requirement: float = maintenance + growth + pregnancy + lactation
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III,
-            AnimalType.DRY_COW
-        ]:
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
             calcium_requirement = maintenance + growth + pregnancy
-        
+
         return calcium_requirement
 
     @classmethod
@@ -495,7 +469,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     ) -> float:
         """
         Calculates total phosphorus requirement according to NRC (2001).
-        
+
         Parameters
         ----------
         body_weight : float
@@ -512,17 +486,17 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Average daily gain (grams per day)
         dry_matter_intake_estimate : float
             Estimated dry matter intake (kg/d)
-        
+
         Returns
         -------
         float
             Phosphorus requirement (grams per day)
-        
+
         References
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
             Chapter 6 "Minerals",pp. 109-118. 2001.
-        
+
         """
         P_growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (
             average_daily_gain / 0.96
@@ -539,12 +513,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             P_maint: float = 1 * dry_matter_intake_estimate + 0.002 * body_weight
             P_lact: float = 0.9 * milk_production
             phosphorus_requirement: float = P_growth + P_preg + P_lact + P_maint
-        elif animal_type in [
-            AnimalType.HEIFER_I,
-            AnimalType.HEIFER_II,
-            AnimalType.HEIFER_III,
-            AnimalType.DRY_COW
-        ]:
+        elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
             P_maint = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
             phosphorus_requirement = P_growth + P_preg + P_maint
         return phosphorus_requirement
@@ -563,7 +532,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     ) -> float:
         """
         Calculates dry matter intake according to NRC (2001).
-        
+
         Parameters
         ----------
         animal_type : AnimalType
@@ -582,17 +551,17 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Metabolizable energy density of formulated ration
         days_born : float
             number of days since birth
-        
+
         Returns
         -------
         dry_matter_intake_estimate : float
             Dry matter intake (kilograms per day)
-        
+
         Notes
         -----
         The sum of dry matter intake of each feed is assumed to be less than
         dry matter intake estimation (Sum of Feed < dry_matter_intake_estimate).
-        
+
         References
         ----------
         .. [1] National Research Council, "Nutrient Requirements of Dairy Cattle, 7th edition." National Academic Press,
@@ -622,6 +591,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             if day_of_pregnancy and day_of_pregnancy >= 210:
                 adjustment_factor = 1 + ((210 - day_of_pregnancy) * 0.0025)
                 dry_matter_intake_estimate -= adjustment_factor
+
         return max(
             dry_matter_intake_estimate,
             AnimalModuleConstants.MINIMUM_DAILY_DMI_RATIO * body_weight,
@@ -637,7 +607,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     ) -> float:
         """
         Calculates the net energy for activity requirement portion of the energy requirements.
-        
+
         Parameters
         ----------
         body_weight : float
@@ -646,24 +616,24 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Housing type (Barn or Grazing)
         distance : float
             Distance walked (m).
-        
+
         Returns
         -------
         float
             Net energy requirement for activity (Mcal/day)
-        
+
         Notes
         -----
         Activity requirement (net_energy_activity) is proportional to body weight and daily walking distance. Grazing
         system and hilly topography will cost additional energy. Grazing is not implemented yet in the current version
         of code.
-        
+
         References
         ----------
         Animal Scientific Documentation [A.Cow.A.4]-[A.Heifer.A.5], [A.Cow.A.6]-[A.Heifer.A.7]
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
             8th edition." National Academic Press, Chapter 3 "Energy", pp. 30-31, 2021.
-        
+
         """
         distance_km = distance * GeneralConstants.M_TO_KM
         if housing == "Grazing":
