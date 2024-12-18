@@ -220,12 +220,14 @@ class GraphGenerator:
 
             figure_width = 10
             figure_height = 6
-            fig, _ = plt.subplots(figsize=(figure_width, figure_height))
+            fig, ax = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
 
             mask_values = graph_details.get("mask_values", False)
-            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()), mask_values)
+            use_calendar_dates = graph_details.get("use_calendar_dates", False)
+            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()), mask_values, ax,
+                             use_calendar_dates)
             if graph_details.get("title"):
                 corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
                 graph_details["title"] = corrected_graph_title
@@ -527,9 +529,11 @@ class GraphGenerator:
     def _draw_graph(
         self,
         graph_type: str | list[str],
-        data: Dict[str, List[int | float]],
-        selected_variables: Optional[List[str]] = None,
+        data: dict[str, list[int | float]],
+        selected_variables: Optional[list[str]] = None,
         mask_values: bool = False,
+        ax: Axes = None,
+        use_calendar_dates: bool = False,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -538,9 +542,9 @@ class GraphGenerator:
         ----------
         graph_type : str
             The type of graph to draw.
-        data : Dict[str, List[int | float]]
+        data : dict[str, list[int | float]]
             The data to use for plotting.
-        selected_variables : Optional[List[str]]
+        selected_variables : Optional[list[str]]
             If it is present and the data is a list of dicts,
             it selects the variables to be plotted.
         mask_values : bool, default False
@@ -554,39 +558,31 @@ class GraphGenerator:
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
-        simulation_start_date = self.time.start_date
-        # prepare dates for x-axis
-        num_days = max(len(values) for values in data.values())  # Number of days based on data length
-        dates = [simulation_start_date + datetime.timedelta(days=i) for i in range(num_days)]
+        dates_in_data_range = [self.time.start_date + datetime.timedelta(days=i)
+                               for i in range(max(len(v) for v in data.values()))]
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
-        fig, ax = plt.subplots()
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
             # indices_list = list(range(len(values_tuple[0])))
             # plot_function(indices_list, values_tuple)
             ax.xaxis_date()
-            plot_function(dates, values_tuple)
+            plot_function(dates_in_data_range[:len(values_tuple[0])], values_tuple)
         else:
             for value in data.values():
                 if not mask_values:
                     # plot_function(value)
-                    plot_function(dates, value)
+
+                    plot_function(dates_in_data_range[:len(value)], value)
                 else:
-                    indices, masked_values = self._mask_values(value)
-                    masked_dates = [dates[i] for i in indices]
+                    indices, masked_values = self._mask_values(data.values())
+                    masked_dates = [dates_in_data_range[i] for i in indices]
                     # plot_function(indices, masked_values)
                     plot_function(masked_dates, masked_values)
-        # Customize the x-axis date format
+
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%j/%Y'))  # Day of year / Year format
         plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
-
-        # Add labels and title
         plt.xlabel("Calendar Day")
         plt.ylabel("Values")
-        plt.title("Simulation Data Over Time")
-
-        plt.tight_layout()
-        plt.show()
 
     def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
         """
