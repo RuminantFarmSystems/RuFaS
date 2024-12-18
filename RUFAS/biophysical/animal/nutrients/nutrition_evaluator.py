@@ -9,7 +9,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RUFAS_
 from RUFAS.general_constants import GeneralConstants
 
 
-class EnergyNutritionEvaluator:
+class NutritionEvaluator:
     """Checks if energy and nutrients supplied in a ration satisfy the demand for an individual animal."""
 
     @classmethod
@@ -316,7 +316,7 @@ class EnergyNutritionEvaluator:
         -------
         float
             Amount by which supplied dry matter under- or overshoots the required dry matter range (kg).
-        
+
         """
         lower_dry_matter_limit = requirements.dry_matter * (1.0 - AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
         upper_dry_matter_limit = requirements.dry_matter * (1.0 + AnimalModuleConstants.DMI_CONSTRAINT_FRACTION)
