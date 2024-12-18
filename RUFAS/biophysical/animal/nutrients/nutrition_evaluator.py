@@ -26,8 +26,6 @@ class NutritionEvaluator:
             Energy and nutrition requirements of an animal against which the nutrient supply will be compared.
         supply : NutritionSupply
             Energy and nutrition supply against which an animal's nutrient requirements will be compared.
-        body_weight : float
-            Body weight of the animal consuming the given ration.
         is_cow : bool
             True if the animal consuming the ration is a cow, false if it is a heifer.
 
