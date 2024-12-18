@@ -58,7 +58,7 @@ class Feed:
     feed_type : FeedComponentType
         General type or category of the feed.
     DM : float
-        Dry matter content of the feed (% dry matter). TODO: wut??
+        Percentage of fresh mass that is dry matter of the feed.
     ash : float
         Ash contents (% dry matter).
     CP : float
