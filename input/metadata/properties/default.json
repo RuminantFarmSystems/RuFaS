@@ -5410,9 +5410,10 @@
       "default": 0
     },
     "supplement_manure_nutrient_deficiencies": {
-      "type": "bool",
+      "type": "string",
       "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
-      "default": false
+      "default": "None",
+      "pattern": "^(manure|synthetic fertilizer|None)$"
     },
     "simulate_water_stress": {
       "type": "bool",
