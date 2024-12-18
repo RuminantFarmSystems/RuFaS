@@ -307,13 +307,13 @@ class NutritionSupplyCalculator:
         Returns
         -------
         float
-            Total digestible calcium supply in the ration (kg).
+            Total digestible calcium supply in the ration (g).
 
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.16]-[A.Heifer.E.16]
 
-        """  # TODO: check units
+        """
         calcium_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
@@ -337,7 +337,7 @@ class NutritionSupplyCalculator:
             ]
         )
 
-        return total * GeneralConstants.GRAMS_TO_KG
+        return total * GeneralConstants.KG_TO_GRAMS
 
     @classmethod
     def _calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
@@ -352,13 +352,13 @@ class NutritionSupplyCalculator:
         Returns
         -------
         float
-            Total digestible phosphorus supply in the ration (kg).
+            Total digestible phosphorus supply in the ration (g).
 
         References
         ----------
         Animal Scientific Documentation [A.Cow.E.17]-[A.Heifer.E.17]
 
-        """  # TODO: check units
+        """
         phosphorus_digestibility: dict[RUFAS_ID, float] = {}
 
         for feed in feeds:
@@ -382,7 +382,7 @@ class NutritionSupplyCalculator:
             ]
         )
 
-        return total * GeneralConstants.GRAMS_TO_KG
+        return total * GeneralConstants.KG_TO_GRAMS
 
     @classmethod
     def _calculate_metabolizable_protein_supply(
