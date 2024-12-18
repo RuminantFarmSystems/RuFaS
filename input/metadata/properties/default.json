@@ -5413,7 +5413,7 @@
       "type": "string",
       "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
       "default": "None",
-      "pattern": "^(manure|synthetic fertilizer|None)$"
+      "pattern": "^(manure|synthetic fertilizer|none)$"
     },
     "simulate_water_stress": {
       "type": "bool",
