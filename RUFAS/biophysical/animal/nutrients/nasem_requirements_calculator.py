@@ -83,10 +83,12 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             NutritionRequirements instance containing all the required amounts of energy and nutrition.
 
         """
-        maintenance_requirement, gravid_uterine_weight, uterine_weight = cls.calculate_maintentance_energy_requirements(
-            body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
+        maintenance_requirement, gravid_uterine_weight, uterine_weight = (
+            cls._calculate_maintentance_energy_requirements(
+                body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
+            )
         )
-        growth_requirement, average_daily_gain, frame_weight_gain = cls.calculate_growth_energy_requirements(
+        growth_requirement, average_daily_gain, frame_weight_gain = cls._calculate_growth_energy_requirements(
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
         )
         pregnancy_requirement, gravid_uterine_weight_gain = cls._calculate_pregnancy_energy_requirements(
@@ -164,7 +166,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         )
 
     @classmethod
-    def calculate_maintentance_energy_requirements(
+    def _calculate_maintentance_energy_requirements(
         cls, body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, days_in_milk: int | None
     ) -> tuple[float, float, float]:
         """
@@ -219,7 +221,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         return net_energy_maintenance, gravid_uterine_weight, uterine_weight
 
     @classmethod
-    def calculate_growth_energy_requirements(
+    def _calculate_growth_energy_requirements(
         cls,
         body_weight: float,
         mature_body_weight: float,
