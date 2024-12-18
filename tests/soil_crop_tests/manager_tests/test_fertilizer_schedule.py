@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 
 import pytest
 
@@ -55,7 +55,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [0.0],
             [1.0],
-            "'test_4': expected all phosphorus masses to be >= 0, received '[10, -15]'.",
+            "'test_4': expected all phosphorus masses to be in >= 0, received '[10, -15]'.",
         ),
         (
             "test_5",
@@ -67,7 +67,7 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [-30.0, 30.0],
             [0.8],
-            "'test_5': expected all application depths to be >= 0, received '[-30.0, 30.0]'.",
+            "'test_5': expected all application depths to be in >= 0, received '[-30.0, 30.0]'.",
         ),
         (
             "test_6",
@@ -91,11 +91,14 @@ from RUFAS.routines.field.manager.fertilizer_schedule import FertilizerSchedule
             [10],
             [0.0],
             [1.0],
-            "'test_7': expected equal numbers of fertilizer application parameters, received "
-            "'[1999, 2000, 2001]' years, '[100, 100, 100]' days, '['mix_5', 'mix_5', 'mix_5']' "
-            "mix names, '[15, 15]' nitrogen masses, '[10, 10, 10]' phosphorus masses, '[10, 10, 10]' potassium masses, "
-            "'[0.0, 0.0, 0.0]' application depths, and '[1.0, 1.0, 1.0]' surface remainder "
-            "fractions.",
+            "'test_7':  Mismatch in length of parameters. Provided parameters are: "
+            "years=[1999, 2000, 2001], days=[100, 100, 100], mix_names=['mix_5', 'mix_5', "
+            "'mix_5'], nitrogen_masses=[15, 15], phosphorus_masses=[10, 10, 10], "
+            "potassium_masses=[10, 10, 10], application_depths=[0.0, 0.0, 0.0], "
+            "surface_remainder_fractions=[1.0, 1.0, 1.0]. Lengths are: {'years': 3, "
+            "'days': 3, 'mix_names': 3, 'nitrogen_masses': 2, 'phosphorus_masses': 3, "
+            "'potassium_masses': 3, 'application_depths': 3, "
+            "'surface_remainder_fractions': 3}.",
         ),
     ],
 )
@@ -118,22 +121,6 @@ def test_validate_fertilizer_parameters(
 
 
 @pytest.mark.parametrize(
-    "values,expected",
-    [
-        ([1, 3, 4], True),
-        ([0.0, 1.2, 3.8], True),
-        ([], True),
-        ([-0.1, 0.1], False),
-        ([-2, -4], False),
-    ],
-)
-def test_determine_if_all_non_negative_values(values: List[Any], expected: bool) -> None:
-    """Tests that lists are correctly checked for negative values."""
-    actual = FertilizerSchedule._determine_if_all_non_negative_values(values)
-    assert actual == expected
-
-
-@pytest.mark.parametrize(
     "mixes,years,days,nitrogen,phosphorus,potassium,depths,fractions,skip,repeat,expected",
     [
         (
@@ -148,12 +135,12 @@ def test_determine_if_all_non_negative_values(values: List[Any], expected: bool)
             1,
             2,
             [
-                FertilizerEvent("mix_1", 1990, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 1993, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 1995, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 1998, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 2000, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
-                FertilizerEvent("mix_1", 2003, 100, 10.0, 10.0, 10.0, 30.0, 0.8),
+                FertilizerEvent("mix_1", 10.0, 10.0, 10.0, 30.0, 0.8, 1990, 100),
+                FertilizerEvent("mix_1", 10.0, 10.0, 10.0, 30.0, 0.8, 1993, 100),
+                FertilizerEvent("mix_1", 10.0, 10.0, 10.0, 30.0, 0.8, 1995, 100),
+                FertilizerEvent("mix_1", 10.0, 10.0, 10.0, 30.0, 0.8, 1998, 100),
+                FertilizerEvent("mix_1", 10.0, 10.0, 10.0, 30.0, 0.8, 2000, 100),
+                FertilizerEvent("mix_1", 10.0, 10.0, 10.0, 30.0, 0.8, 2003, 100),
             ],
         ),
         (
@@ -168,12 +155,12 @@ def test_determine_if_all_non_negative_values(values: List[Any], expected: bool)
             0,
             1,
             [
-                FertilizerEvent("mix_1", 1991, 150, 15.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1991, 240, 8.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1992, 90, 20.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1993, 150, 15.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1993, 240, 8.0, 10.0, 6.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1994, 90, 20.0, 10.0, 6.0, 0.0, 1.0),
+                FertilizerEvent("mix_1", 15.0, 10.0, 6.0, 0.0, 1.0, 1991, 150),
+                FertilizerEvent("mix_2", 8.0, 10.0, 6.0, 0.0, 1.0, 1991, 240),
+                FertilizerEvent("mix_1", 20.0, 10.0, 6.0, 0.0, 1.0, 1992, 90),
+                FertilizerEvent("mix_1", 15.0, 10.0, 6.0, 0.0, 1.0, 1993, 150),
+                FertilizerEvent("mix_2", 8.0, 10.0, 6.0, 0.0, 1.0, 1993, 240),
+                FertilizerEvent("mix_1", 20.0, 10.0, 6.0, 0.0, 1.0, 1994, 90),
             ],
         ),
         (
@@ -188,12 +175,12 @@ def test_determine_if_all_non_negative_values(values: List[Any], expected: bool)
             0,
             2,
             [
-                FertilizerEvent("mix_3", 1995, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_4", 1996, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_3", 1997, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_4", 1998, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_3", 1999, 100, 10.0, 25.0, 8.0, 0.0, 1.0),
-                FertilizerEvent("mix_4", 2000, 100, 20.0, 10.0, 8.0, 0.0, 1.0),
+                FertilizerEvent("mix_3", 10.0, 25.0, 8.0, 0.0, 1.0, 1995, 100),
+                FertilizerEvent("mix_4", 20.0, 10.0, 8.0, 0.0, 1.0, 1996, 100),
+                FertilizerEvent("mix_3", 10.0, 25.0, 8.0, 0.0, 1.0, 1997, 100),
+                FertilizerEvent("mix_4", 20.0, 10.0, 8.0, 0.0, 1.0, 1998, 100),
+                FertilizerEvent("mix_3", 10.0, 25.0, 8.0, 0.0, 1.0, 1999, 100),
+                FertilizerEvent("mix_4", 20.0, 10.0, 8.0, 0.0, 1.0, 2000, 100),
             ],
         ),
         (
@@ -208,12 +195,12 @@ def test_determine_if_all_non_negative_values(values: List[Any], expected: bool)
             0,
             1,
             [
-                FertilizerEvent("mix_1", 1991, 150, 15.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1991, 240, 8.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1992, 90, 20.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1993, 150, 15.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_2", 1993, 240, 8.0, 10.0, 5.0, 0.0, 1.0),
-                FertilizerEvent("mix_1", 1994, 90, 20.0, 10.0, 5.0, 0.0, 1.0),
+                FertilizerEvent("mix_1", 15.0, 10.0, 5.0, 0.0, 1.0, 1991, 150),
+                FertilizerEvent("mix_2", 8.0, 10.0, 5.0, 0.0, 1.0, 1991, 240),
+                FertilizerEvent("mix_1", 20.0, 10.0, 5.0, 0.0, 1.0, 1992, 90),
+                FertilizerEvent("mix_1", 15.0, 10.0, 5.0, 0.0, 1.0, 1993, 150),
+                FertilizerEvent("mix_2", 8.0, 10.0, 5.0, 0.0, 1.0, 1993, 240),
+                FertilizerEvent("mix_1", 20.0, 10.0, 5.0, 0.0, 1.0, 1994, 90),
             ],
         ),
     ],
@@ -229,7 +216,7 @@ def test_generate_fertilizer_events(
     fractions: List[float],
     skip: int,
     repeat: int,
-    expected: str,
+    expected: list[FertilizerEvent],
 ) -> None:
     """Tests that FertilizerEvents are properly generated by FertilizerSchedules."""
     fert_sched = FertilizerSchedule(
