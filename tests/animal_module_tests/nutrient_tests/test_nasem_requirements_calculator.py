@@ -4,6 +4,19 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
 
 
+def 
+
+
+def test_calculate_growth_energy_requirements() -> None:
+    """Test that energy requirements for growth are calculated correctly."""
+    pass
+
+
+def test_calculate_pregnancy_energy_requirements() -> None:
+    """Test that energy requirements for pregnancy are calculated correctly."""
+    pass
+
+
 @pytest.mark.parametrize(
     "lact, weight, frame_gain, gravid_gain, dmi, true_protein, milk, ndf, expected",
     [
