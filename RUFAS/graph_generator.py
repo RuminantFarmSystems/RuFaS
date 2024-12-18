@@ -92,7 +92,6 @@ UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = [
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
     "canvas": Figure.set_canvas,
-    "constrained_layout": Figure.set_constrained_layout,
     "dpi": Figure.set_dpi,
     "edgecolor": Figure.set_edgecolor,
     "figheight": Figure.set_figheight,
@@ -102,7 +101,6 @@ FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "frameon": Figure.set_frameon,
     "snap": Figure.set_snap,
     "subplot_adjust": Figure.subplots_adjust,
-    "tight_layout": Figure.set_tight_layout,
     "zorder": Figure.set_zorder,
 }
 
@@ -227,10 +225,10 @@ class GraphGenerator:
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
             self._draw_graph(
-                graph_details["type"], prepared_data, list(prepared_data.keys()), mask_values, ax, use_calendar_dates
+                graph_details["type"], prepared_data, list(prepared_data.keys()), ax, mask_values, use_calendar_dates
             )
             if graph_details.get("title"):
-                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
                 graph_details["title"] = corrected_graph_title
             if not graph_details.get("legend"):
                 graph_details = self._set_graph_legend(graph_details, prepared_data)
@@ -530,11 +528,11 @@ class GraphGenerator:
 
     def _draw_graph(
         self,
-        graph_type: str | list[str],
+        graph_type: str,
         data: dict[str, list[int | float]],
         selected_variables: list[str],
+        ax: Axes,
         mask_values: bool = False,
-        ax: Axes = None,
         use_calendar_dates: bool = False,
     ) -> None:
         """
@@ -568,7 +566,7 @@ class GraphGenerator:
         ]
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
 
-        def get_x_values(values_length):
+        def get_x_values(values_length: int) -> list[int]:
             """Get appropriate x-axis values based on user choice."""
             return dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
 

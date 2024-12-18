@@ -239,7 +239,7 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
     graph_generator._draw_graph.assert_called_once_with(
-        "plot", prepared_data, list(prepared_data.keys()), False, mock_ax, False
+        "plot", prepared_data, list(prepared_data.keys()), mock_ax, False, False
     )
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
@@ -422,7 +422,7 @@ def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator, mocker: 
     with patch.dict(
         "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"stackplot": MagicMock()}
     ) as mock_plot_functions_dict:
-        graph_generator._draw_graph("stackplot", data, selected_variables, False, mock_ax, False)
+        graph_generator._draw_graph("stackplot", data, selected_variables, mock_ax, False, False)
 
         mock_plot_functions_dict["stackplot"].assert_called_once_with(
             list(range(len(data["key1"]))), (data["key1"], data["key2"])
