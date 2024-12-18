@@ -589,6 +589,8 @@ class GraphGenerator:
             ax.xaxis.set_major_formatter(mdates.DateFormatter("%j/%Y"))
             plt.xlabel("Calendar Day")
             plt.xticks(rotation=45)
+        else:
+            plt.xlabel("Simulation Day")
 
     def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
         """
