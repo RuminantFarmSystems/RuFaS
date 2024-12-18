@@ -1231,8 +1231,8 @@ class AnimalRequirements:
         References
         ----------
         .. [1] The National Academies of Sciences, Engineering, and Medicine "Nutrient Requirements of Dairy Cattle,
-            8th edition." National Academic Press, Chapter 3 "Energy", pp. 30, 2021.
-        .. [2] 
+            8th edition."
+            National Academic Press, Chapter 3 "Energy", pp. 30, 2021.
 
         """
         if animal_type in [AnimalType.LAC_COW]:
