@@ -1,0 +1,19 @@
+{
+  "parallel_workers": 4,
+  "tasks": [
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/AnaerobicLagoon12mo_cool_metadata.json",
+      "output_prefix": "AL-12mo",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/SlurryStorage12mo_cool_metadata.json",
+      "output_prefix": "SS-12mo",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    }
+  ]
+}
