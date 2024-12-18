@@ -1,4 +1,4 @@
-def test_evaluate_energy_nutrition_supply() -> None:
+def test_evaluate_nutrition_supply() -> None:
     """Tests that energy and nutrition supplied in ration is correctly compared against an animal's requirements."""
     pass
 

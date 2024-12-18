@@ -4,8 +4,6 @@ from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
     NutritionSupply,
     NutritionEvaluationResults,
 )
-from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RUFAS_ID
 from RUFAS.general_constants import GeneralConstants
 
 
@@ -13,12 +11,10 @@ class NutritionEvaluator:
     """Checks if energy and nutrients supplied in a ration satisfy the demand for an individual animal."""
 
     @classmethod
-    def evaluate_energy_nutrition_supply(
+    def evaluate_nutrition_supply(
         cls,
-        ration: dict[RUFAS_ID, float],
-        available_feeds: list[Feed],
         requirements: NutritionRequirements,
-        body_weight: float,
+        supply: NutritionSupply,
         is_cow: bool,
     ) -> tuple[bool, NutritionEvaluationResults]:
         """
@@ -26,12 +22,10 @@ class NutritionEvaluator:
 
         Parameters
         ----------
-        ration : dict[RUFAS_ID, float]
-            Maps the RuFaS Feed ID to the amount of that feed in a ration (kg dry matter).
-        available_feeds : list[Feed]
-            List of available feeds which were used to create the ration.
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal against which the ration's nutrient supply will be compared.
+            Energy and nutrition requirements of an animal against which the nutrient supply will be compared.
+        supply : NutritionSupply
+            Energy and nutrition supply against which an animal's nutrient requirements will be compared.
         body_weight : float
             Body weight of the animal consuming the given ration.
         is_cow : bool
@@ -44,10 +38,6 @@ class NutritionEvaluator:
             requirements, and an object containing a summary of all energy and nutrient surpluses and deficiencies.
 
         """
-        energy_nutrition_supply = NutritionSupplyCalculator.calculate_nutrient_supply(
-            available_feeds, ration, body_weight
-        )
-
         heifer_energy_nutrition_checkers = {
             "maintenance": cls._check_activity_maintenance_energy_supplied,
             "growth": cls._check_growth_energy_supplied,
@@ -64,7 +54,7 @@ class NutritionEvaluator:
         }
 
         checkers = cow_energy_nutrition_checkers if is_cow else heifer_energy_nutrition_checkers
-        results = {name: method(requirements, energy_nutrition_supply) for name, method in checkers.items()}
+        results = {name: method(requirements, supply) for name, method in checkers.items()}
 
         evaluation = NutritionEvaluationResults(
             total_energy=results.get("total_energy"),
