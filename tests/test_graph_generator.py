@@ -238,8 +238,9 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     assert mock_log_pool == graph_generator.generate_graph(
         filtered_pool, graph_details, filter_file_name, graphics_dir, True
     )
-    graph_generator._draw_graph.assert_called_once_with("plot", prepared_data, list(prepared_data.keys()), False,
-                                                        mock_ax, False)
+    graph_generator._draw_graph.assert_called_once_with(
+        "plot", prepared_data, list(prepared_data.keys()), False, mock_ax, False
+    )
     graph_generator._customize_graph.assert_called_once()
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
     mock_remove_special_chars.assert_called_once()
@@ -438,17 +439,23 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: Mocker
     graph_generator.time = mock_time
     mock_ax = mocker.MagicMock()
     mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
-    masker = mocker.patch("RUFAS.graph_generator.GraphGenerator._mask_values", return_value=(masked_indices, masked_values))
+    masker = mocker.patch(
+        "RUFAS.graph_generator.GraphGenerator._mask_values", return_value=(masked_indices, masked_values)
+    )
 
     with patch.dict(
         "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
     ) as mock_plot_functions_dict:
-        graph_generator._draw_graph("plot", data, list(data.keys()), mask_values=False, ax=mock_ax, use_calendar_dates=False)
+        graph_generator._draw_graph(
+            "plot", data, list(data.keys()), mask_values=False, ax=mock_ax, use_calendar_dates=False
+        )
 
         for key, value in data.items():
             mock_plot_functions_dict["plot"].assert_any_call(indices, value)
 
-        graph_generator._draw_graph("plot", data, list(data.keys()), mask_values=True, ax=mock_ax, use_calendar_dates=False)
+        graph_generator._draw_graph(
+            "plot", data, list(data.keys()), mask_values=True, ax=mock_ax, use_calendar_dates=False
+        )
 
         for key, value in data.items():
             mock_plot_functions_dict["plot"].assert_any_call(masked_indices, masked_values)

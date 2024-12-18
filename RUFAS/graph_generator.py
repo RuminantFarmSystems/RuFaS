@@ -226,8 +226,9 @@ class GraphGenerator:
 
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
-            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()), mask_values, ax,
-                             use_calendar_dates)
+            self._draw_graph(
+                graph_details["type"], prepared_data, list(prepared_data.keys()), mask_values, ax, use_calendar_dates
+            )
             if graph_details.get("title"):
                 corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
                 graph_details["title"] = corrected_graph_title
@@ -562,8 +563,9 @@ class GraphGenerator:
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
-        dates_in_data_range = [self.time.start_date + datetime.timedelta(days=i)
-                               for i in range(max(len(v) for v in data.values()))]
+        dates_in_data_range = [
+            self.time.start_date + datetime.timedelta(days=i) for i in range(max(len(v) for v in data.values()))
+        ]
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
 
         def get_x_values(values_length):
@@ -584,7 +586,7 @@ class GraphGenerator:
                     x_values = get_x_values(len(value))
                     plot_function(x_values, value)
         if use_calendar_dates:
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%j/%Y'))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%j/%Y"))
             plt.xlabel("Calendar Day")
             plt.xticks(rotation=45)
 
