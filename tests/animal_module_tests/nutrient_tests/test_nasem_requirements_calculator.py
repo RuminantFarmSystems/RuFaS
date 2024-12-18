@@ -4,7 +4,14 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
 
 
-def 
+def test_calculate_requirements() -> None:
+    """Test that the energy and nutritional requirements of an animal are calculated correctly."""
+    pass
+
+
+def test_calculate_maintentance_energy_requirements() -> None:
+    """Test that energy requirements for maintenance are calculated correctly."""
+    pass
 
 
 def test_calculate_growth_energy_requirements() -> None:
