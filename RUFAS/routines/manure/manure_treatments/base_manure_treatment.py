@@ -254,7 +254,7 @@ class BaseManureTreatment(ABC):
         pass
 
     @staticmethod
-    def _determine_outdoor_storage_temperature(air_temperature: float) -> float:
+    def _determine_outdoor_storage_temperature( air_temperature: float, manure_treatment_type) -> float:
         """Determines the temperature of the manure in outdoor liquid and slurry storages.
 
         Parameters
@@ -277,7 +277,10 @@ class BaseManureTreatment(ABC):
         (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and maximum liquid manure
         temperatures in outdoor clay pit and concrete tank manure storages.
         """
-        return float(np.clip(air_temperature, 0.0, 35.0))
+        if manure_treatment_type.name == 'ANAEROBIC_LAGOON':
+            return float(np.clip(air_temperature, 10.0, 35.0))
+        else:
+            return float(np.clip(air_temperature, 0.0, 35.0))
 
     def calc_methane_emission(self, *args, **kwargs) -> float:
         """Calculates the methane emission of the manure treatment.

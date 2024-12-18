@@ -14,6 +14,20 @@
       "output_prefix": "SS-12mo",
       "log_verbosity": "errors",
       "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/AnaerobicLagoon6mo_cool_metadata.json",
+      "output_prefix": "AL-6mo",
+      "log_verbosity": "errors",
+      "random_seed": 42
+    },
+    {
+      "task_type": "SIMULATION_SINGLE_RUN",
+      "metadata_file_path": "input/metadata/SlurryStorage6mo_cool_metadata.json",
+      "output_prefix": "SS-6mo",
+      "log_verbosity": "errors",
+      "random_seed": 42
     }
   ]
 }

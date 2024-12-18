@@ -45,7 +45,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         air_temperature = self._get_current_day_average_temperature_celsius()
-        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        stored_manure_temperature = self._determine_outdoor_storage_temperature(air_temperature, self.config.manure_treatment_type)
         # fmt: off
         methane_emission, methane_emission_from_degradable_volatile_solids = (
             GasEmissionsCalculator.calculate_liquid_storage_methane(
@@ -79,7 +79,7 @@ class AnaerobicLagoon(BaseManureTreatment):
 
         """
         air_temperature = self._get_current_day_average_temperature_celsius()
-        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature)
+        storage_temperature = self._determine_outdoor_storage_temperature(air_temperature, self.config.manure_treatment_type)
         storage_ammonia_emission = GasEmissionsCalculator.calculate_liquid_storage_ammonia_emission(
             num_animals=self._current_pen.num_animals,
             manure_total_ammoniacal_nitrogen=self._accumulated_output.liquid_manure_total_ammoniacal_nitrogen,
