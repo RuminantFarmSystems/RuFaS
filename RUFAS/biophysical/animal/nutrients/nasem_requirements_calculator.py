@@ -9,10 +9,12 @@ from RUFAS.general_constants import GeneralConstants
 from .nutrition_requirements_calculator import NutritionRequirementsCalculator
 
 
+"""Calculator for the amino acid requirements of an animal."""
 AMINO_ACID_CALCULATOR = AminoAcidCalculator()
 
 
 class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
+    """Animal requirements calculator class, based on NASEM's methodology."""
 
     @classmethod
     def calculate_requirements(
