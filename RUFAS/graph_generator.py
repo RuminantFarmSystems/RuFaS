@@ -439,9 +439,10 @@ class GraphGenerator:
                 "use_fill_value_at_end",
                 "mask_values",
                 "is_aggregated_report_data",
+                "use_calendar_dates",
             ]
         )
-        graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
+        graph_filter_validation_logs: list[dict[str, str | dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
             "function": self._validate_graph_filter.__name__,
