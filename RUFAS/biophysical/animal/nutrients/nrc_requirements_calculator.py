@@ -498,24 +498,25 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             Chapter 6 "Minerals",pp. 109-118. 2001.
 
         """
-        P_growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (
-            average_daily_gain / 0.96
-        )
+        growth: float = (1.2 + 4.635 * mature_body_weight**0.22 * body_weight ** (-0.22)) * (average_daily_gain / 0.96)
+
         if day_of_pregnancy is None:
-            P_preg: float = 0.0
+            pregnancy: float = 0.0
         elif day_of_pregnancy > 190:
-            P_preg = 0.02743 * exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy) - 0.02743 * exp(
+            pregnancy = 0.02743 * exp((0.05527 - 0.000075 * day_of_pregnancy) * day_of_pregnancy) - 0.02743 * exp(
                 (0.05527 - 0.000075 * (day_of_pregnancy - 1)) * (day_of_pregnancy - 1)
             )
         else:
-            P_preg = 0.0
+            pregnancy = 0.0
+
         if animal_type in [AnimalType.LAC_COW]:
-            P_maint: float = 1 * dry_matter_intake_estimate + 0.002 * body_weight
-            P_lact: float = 0.9 * milk_production
-            phosphorus_requirement: float = P_growth + P_preg + P_lact + P_maint
+            maintenance: float = 1 * dry_matter_intake_estimate + 0.002 * body_weight
+            lactation: float = 0.9 * milk_production
+            phosphorus_requirement: float = growth + pregnancy + lactation + maintenance
         elif animal_type in [AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.DRY_COW]:
-            P_maint = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
-            phosphorus_requirement = P_growth + P_preg + P_maint
+            maintenance = 0.8 * dry_matter_intake_estimate + 0.002 * body_weight
+            phosphorus_requirement = growth + pregnancy + maintenance
+
         return phosphorus_requirement
 
     @classmethod
