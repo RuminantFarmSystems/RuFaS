@@ -298,13 +298,19 @@ def test_calculate_actual_growth_net_energy(
             (30.0, 33.0, 20.0),
             (FeedComponentType.FORAGE, FeedComponentType.CONC, FeedComponentType.FORAGE),
             (0.9, 1.1, 0.22),
-            0.000312,
+            312.0,
         ),
         (
             (20.0, 23.0, 15.0),
             (FeedComponentType.CONC, FeedComponentType.MINERAL, FeedComponentType.VITAMINS),
             (1.2, 0.95, 0.5),
-            0.000351575,
+            351.575,
+        ),
+        (
+            (20.0, 20.0, 20.0),
+            (FeedComponentType.MINERAL, FeedComponentType.MINERAL, FeedComponentType.MINERAL),
+            (100.0, 100.0, 100.0),
+            57000.0,
         ),
     ],
 )
@@ -336,13 +342,19 @@ def test_calculate_calcium_supply(
             (30.0, 33.0, 20.0),
             (FeedComponentType.FORAGE, FeedComponentType.CONC, FeedComponentType.FORAGE),
             (0.9, 1.1, 0.22),
-            0.00045506,
+            455.06,
         ),
         (
             (20.0, 23.0, 15.0),
             (FeedComponentType.CONC, FeedComponentType.MINERAL, FeedComponentType.VITAMINS),
             (1.2, 0.95, 0.5),
-            0.0003428,
+            342.8,
+        ),
+        (
+            (20.0, 20.0, 20.0),
+            (FeedComponentType.MINERAL, FeedComponentType.MINERAL, FeedComponentType.MINERAL),
+            (100.0, 100.0, 100.0),
+            48_000.0,
         ),
     ],
 )
