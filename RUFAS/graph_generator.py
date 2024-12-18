@@ -2,7 +2,7 @@ import datetime
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -210,7 +210,7 @@ class GraphGenerator:
                     filtered_pool, graph_details.get("title", "Untitled graph")
                 )
                 graph_details["variables"] = list(updated_pool.keys())
-            prepared_data: Dict[str, List[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
+            prepared_data: dict[str, list[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
             non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
             all_logs = non_numeric_data_logs + graph_filter_validation_logs + var_units_logs
 
@@ -530,7 +530,7 @@ class GraphGenerator:
         self,
         graph_type: str | list[str],
         data: dict[str, list[int | float]],
-        selected_variables: Optional[list[str]] = None,
+        selected_variables: list[str],
         mask_values: bool = False,
         ax: Axes = None,
         use_calendar_dates: bool = False,
@@ -544,12 +544,15 @@ class GraphGenerator:
             The type of graph to draw.
         data : dict[str, list[int | float]]
             The data to use for plotting.
-        selected_variables : Optional[list[str]]
-            If it is present and the data is a list of dicts,
-            it selects the variables to be plotted.
+        selected_variables : list[str]
+            The variables selected to be plotted.
         mask_values : bool, default False
             Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
             values.
+        ax : Axes, default None
+            The matplotlib Axes object to plot the graph on.
+        use_calendar_dates : bool, default False
+            Whether to use calendar dates on the x-axis.
 
         Raises
         ------
@@ -561,28 +564,28 @@ class GraphGenerator:
         dates_in_data_range = [self.time.start_date + datetime.timedelta(days=i)
                                for i in range(max(len(v) for v in data.values()))]
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
+
+        def get_x_values(values_length):
+            """Get appropriate x-axis values based on user choice."""
+            return dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
+
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
-            # indices_list = list(range(len(values_tuple[0])))
-            # plot_function(indices_list, values_tuple)
-            ax.xaxis_date()
-            plot_function(dates_in_data_range[:len(values_tuple[0])], values_tuple)
+            x_values = get_x_values(len(values_tuple[0]))
+            plot_function(x_values, values_tuple)
         else:
             for value in data.values():
-                if not mask_values:
-                    # plot_function(value)
-
-                    plot_function(dates_in_data_range[:len(value)], value)
+                if mask_values:
+                    indices, masked_values = self._mask_values(value)
+                    x_values = get_x_values(len(indices))
+                    plot_function(x_values, masked_values)
                 else:
-                    indices, masked_values = self._mask_values(data.values())
-                    masked_dates = [dates_in_data_range[i] for i in indices]
-                    # plot_function(indices, masked_values)
-                    plot_function(masked_dates, masked_values)
-
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%j/%Y'))  # Day of year / Year format
-        plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
-        plt.xlabel("Calendar Day")
-        plt.ylabel("Values")
+                    x_values = get_x_values(len(value))
+                    plot_function(x_values, value)
+        if use_calendar_dates:
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%j/%Y'))
+            plt.xlabel("Calendar Day")
+            plt.xticks(rotation=45)
 
     def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
         """
