@@ -52,6 +52,40 @@ class NutritionRequirements:
         """Total energy requirement for an animal (Mcal)."""
         return self.maintenance + self.growth + self.pregnancy + self.lactation + self.activity
 
+    def __add__(self, other: "NutritionRequirements") -> "NutritionRequirements":
+        """Add two NutritionRequirements objects together."""
+        return NutritionRequirements(
+            maintenance=self.maintenance + other.maintenance,
+            growth=self.growth + other.growth,
+            pregnancy=self.pregnancy + other.pregnancy,
+            lactation=self.lactation + other.lactation,
+            protein=self.protein + other.protein,
+            calcium=self.calcium + other.calcium,
+            phosphorus=self.phosphorus + other.phosphorus,
+            secondary_phosphorus=self.secondary_phosphorus + other.secondary_phosphorus,
+            dry_matter=self.dry_matter + other.dry_matter,
+            activity=self.activity + other.activity,
+            essential_amino_acids=self.essential_amino_acids + other.essential_amino_acids,
+        )
+
+    def __truediv__(self, divisor: float) -> "NutritionRequirements":
+        """Divide all NutritionRequirements values by a scalar."""
+        if divisor == 0.0:
+            raise ZeroDivisionError("Cannot divide NutritionRequirements by zero.")
+        return NutritionRequirements(
+            maintenance=self.maintenance / divisor,
+            growth=self.growth / divisor,
+            pregnancy=self.pregnancy / divisor,
+            lactation=self.lactation / divisor,
+            protein=self.protein / divisor,
+            calcium=self.calcium / divisor,
+            phosphorus=self.phosphorus / divisor,
+            secondary_phosphorus=self.secondary_phosphorus / divisor,
+            dry_matter=self.dry_matter / divisor,
+            activity=self.activity / divisor,
+            essential_amino_acids=self.essential_amino_acids / divisor,
+        )
+
 
 @dataclass
 class NutritionSupply:
