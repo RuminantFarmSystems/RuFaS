@@ -1,5 +1,6 @@
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionEvaluationResults, NutritionSupply
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
@@ -7,7 +8,6 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
-from RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator import NutritionRequirementsCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
@@ -317,14 +317,32 @@ class Pen:
         """
         pass
 
-    def formulate_new_ration(self, is_ration_defined_by_user: bool, available_feeds: list[Feed]) -> None:
-        """Calculate new ration for the pen based on the number of animals in the pen."""
+    @property
+    def average_milk_production(self) -> float:
+        """
+        Calculate the average milk production for the cows in the pen.
+
+        Returns
+        -------
+        float
+            The average milk production reduction for the cows in the pen (kg).
+
+        """
+        return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / len(self.cows_in_pen)
+
+    def use_user_defined_ration(self, available_feeds: list[Feed]) -> None:
+        """
+        Calculate new ration for the pen based on the number of animals in the pen.
+
+        Parameters
+        ----------
+        available_feeds : list[Feed]
+            List of available feeds to be used in the ration formulation.
+
+        """
         animal_combination = self.animal_combination
         average_animal_requirements: NutritionRequirements = self.average_animal_requirements
-        if is_ration_defined_by_user:
-            ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, average_animal_requirements)
-        else:
-            pass  # TODO: implement ration optimizer
+        ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, average_animal_requirements)
 
         total_nutrient_evaluation_results = NutritionEvaluationResults(
             total_energy=0.0,
@@ -337,22 +355,33 @@ class Pen:
             ndf=0.0,
             fat=0.0,
         )
+        is_milk_production_sufficient = True
         for animal in self.animals_in_pen.values():
             nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
                 feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
             )
 
             animal.set_nutrition_requirements()
-            is_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+            is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                 animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
             )
 
-            while not is_adequate:
-                animal.lower_outputs()
+            while not is_ration_adequate and is_milk_production_sufficient:
+                if self.animal_combination is AnimalCombination.LAC_COW:
+                    is_production_reduced: bool = animal.reduce_milk_production()
+                    if not is_production_reduced:
+                        break
+
                 animal.set_nutrition_requirements()
-                is_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+                is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
                 )
+
+                if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                    is_milk_production_sufficient = True
+                    break
+
+            animal.nutrition_supply = nutrition_supply
             total_nutrient_evaluation_results += evaluation_result
 
         self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values())

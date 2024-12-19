@@ -7,6 +7,7 @@ from scipy.stats import truncnorm
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex, AnimalStatus
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
@@ -15,7 +16,7 @@ from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionSupply
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
@@ -189,7 +190,8 @@ class Animal:
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
         self._reproduction: Reproduction = Reproduction()
-        self.nutrition_requirements: NutritionRequirements = self.get_nutrition_requirements()
+        self.nutrition_requirements: NutritionRequirements = self.calculate_nutrition_requirements()
+        self.nutrition_supply: NutritionSupply = NutritionSupply()
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
@@ -273,6 +275,21 @@ class Animal:
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:
         LactationCurve.set_lactation_parameters(time)
+
+    def reduce_milk_production(self) -> bool:
+        """
+        Attempts reduction of milk production.
+
+        Returns
+        -------
+        bool
+            True if the reduction was successful, False otherwise.
+
+        """
+        if self.milk_production.milk_production_reduction + AnimalModuleConstants.MILK_REDUCTION_KG > 1.0:
+            return False
+        self.milk_production.milk_production_reduction += AnimalModuleConstants.MILK_REDUCTION_KG
+        return True
 
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
         self.days_born += 1
@@ -573,9 +590,9 @@ class Animal:
         self, housing: str, walking_distance: float, previous_temperature: float
     ) -> NutritionRequirements:
         """Sets the nutrition requirements for an animal."""
-        self.nutrition_requirements = self.get_nutrition_requirements(housing, walking_distance, previous_temperature)
+        self.nutrition_requirements = self.calculate_nutrition_requirements(housing, walking_distance, previous_temperature)
 
-    def get_nutrition_requirements(
+    def calculate_nutrition_requirements(
         self, housing: str, walking_distance: float, previous_temperature: float
     ) -> NutritionRequirements:
         """
