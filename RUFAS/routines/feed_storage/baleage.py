@@ -3,14 +3,10 @@ from RUFAS.weather import Weather
 
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory
 from .storage import Storage
-
+from RUFAS.input_manager import InputManager
 
 """Number of days over which baled crops dry down after storage."""
 INITIAL_LOSS_PERIOD = 30
-
-
-"""Defines the final moisture level that baleage will dry down to. TODO: make this value a user input - #2038"""
-DEFAULT_FINAL_MOISTURE_PERCENTAGE = 50.0
 
 
 class Baleage(Storage):
@@ -30,6 +26,9 @@ class Baleage(Storage):
 
     def __init__(self, capacity: float = float("inf")):
         super().__init__(capacity)
+        im = InputManager()
+        self.post_wilting_moisture_percentage: float = im.get_data("feed_management.post_wilting_moisture_percentage")
+        print(self.post_wilting_moisture_percentage)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
             CropCategory.GRASS,
@@ -50,7 +49,7 @@ class Baleage(Storage):
             Time instance tracking the current time of the simulation.
 
         """
-        self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, DEFAULT_FINAL_MOISTURE_PERCENTAGE)
+        self._process_moisture_loss(time, INITIAL_LOSS_PERIOD, self.post_wilting_moisture_percentage)
 
         super().process_degradations(weather, time)
 
