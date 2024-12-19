@@ -45,7 +45,7 @@
     "crop": {
       "title": "Crop data",
       "description": "Crop selection and detailed rotation schedules.",
-      "path": "input/data/crop/ARL_rotation.json",
+      "path": "input/data/crop/default_rotation.json",
       "type": "json",
       "properties": "crop_schedule_properties"
     },
