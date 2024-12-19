@@ -13,9 +13,12 @@ from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionEvaluationResults, NutritionSupply
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
+from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
+from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
 from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
 from RUFAS.biophysical.feed.feed import Feed
@@ -1086,10 +1089,7 @@ class HerdManager:
             Current temperature.
         
         """
-        # animal_combination = pen.animal_combination
-        # if self.is_ration_defined_by_user:
-        #     ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, )
-        pass
+        pen.formulate_new_ration()
 
 
     def update_herd_statistics(self) -> None:

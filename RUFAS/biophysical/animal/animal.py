@@ -569,6 +569,12 @@ class Animal:
         self.daily_vertical_distance = 2 * vertical_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
         self.daily_horizontal_distance = 2 * horizontal_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
 
+    def set_nutrition_requirements(
+        self, housing: str, walking_distance: float, previous_temperature: float
+    ) -> NutritionRequirements:
+        """Sets the nutrition requirements for an animal."""
+        self.nutrition_requirements = self.get_nutrition_requirements(housing, walking_distance, previous_temperature)
+
     def get_nutrition_requirements(
         self, housing: str, walking_distance: float, previous_temperature: float
     ) -> NutritionRequirements:

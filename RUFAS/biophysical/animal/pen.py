@@ -1,10 +1,14 @@
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionEvaluationResults, NutritionSupply
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
+from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
+from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
+from RUFAS.biophysical.animal.nutrients.nutrition_requirements_calculator import NutritionRequirementsCalculator
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 
@@ -227,8 +231,8 @@ class Pen:
     @property
     def average_animal_requirements(self) -> NutritionRequirements:
         """Calculates the average nutrient requirements of all animals in the pen."""
-        animal_requirements = [
-            animal.nutrients for animal in self.animals_in_pen.values()
+        animal_requirements: NutritionRequirements = [
+            animal.nutrition_requirements for animal in self.animals_in_pen.values()
         ]
         return sum(animal_requirements) / len(self.animals_in_pen)
 
@@ -313,23 +317,45 @@ class Pen:
         """
         pass
 
-    def _calc_new_ration(self, num_animals: int):
-        """
-        Calculate the new ration for the pen based on the number of animals in the pen.
+    def formulate_new_ration(self, is_ration_defined_by_user: bool, available_feeds: list[Feed]) -> None:
+        """Calculate new ration for the pen based on the number of animals in the pen."""
+        animal_combination = self.animal_combination
+        average_animal_requirements: NutritionRequirements = self.average_animal_requirements
+        if is_ration_defined_by_user:
+            ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, average_animal_requirements)
+        else:
+            pass  # TODO: implement ration optimizer
 
-        Parameters
-        ----------
-        num_animals : int
-            The number of animals in the pen.
+        total_nutrient_evaluation_results = NutritionEvaluationResults(
+            total_energy=0.0,
+            maintenance=0.0,
+            growth=0.0,
+            protein=0.0,
+            calcium=0.0,
+            phosphorus=0.0,
+            dry_matter=0.0,
+            ndf=0.0,
+            fat=0.0,
+        )
+        for animal in self.animals_in_pen.values():
+            nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
+                feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
+            )
 
-        Returns
-        -------
-        ration : Dict[str, Union[float, str]]
-            The new ration for the pen.
+            animal.set_nutrition_requirements()
+            is_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+                animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
+            )
 
-        """
+            while not is_adequate:
+                animal.lower_outputs()
+                animal.set_nutrition_requirements()
+                is_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+                    animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
+                )
+            total_nutrient_evaluation_results += evaluation_result
 
-        pass
+        self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values())
 
     def _calculate_dry_matter_intake(self) -> None:
         """Placeholder function to calculate the DMI for each animal on a daily basis."""

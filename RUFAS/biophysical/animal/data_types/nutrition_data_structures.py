@@ -199,3 +199,24 @@ class NutritionEvaluationResults:
         valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
 
         return valid_non_negative_fields and self._clamped_values_are_valid
+
+    def __add__(self, other: "NutritionEvaluationResults") -> "NutritionEvaluationResults":
+        """Add two NutritionEvaluationResults objects together."""
+        total_energy = self.total_energy if self.total_energy is not None else 0.0
+        other_total_energy = other.total_energy if other.total_energy is not None else 0.0
+
+        lactation = self.lactation if self.lactation is not None else 0.0
+        other_lactation = other.lactation if other.lactation is not None else 0.0
+
+        return NutritionEvaluationResults(
+            total_energy=total_energy + other_total_energy,
+            maintenance=self.maintenance + other.maintenance,
+            lactation=lactation + other_lactation,
+            growth=self.growth + other.growth,
+            protein=self.protein + other.protein,
+            calcium=self.calcium + other.calcium,
+            phosphorus=self.phosphorus + other.phosphorus,
+            dry_matter=self.dry_matter + other.dry_matter,
+            ndf=self.ndf + other.ndf,
+            fat=self.fat + other.fat,
+        )
