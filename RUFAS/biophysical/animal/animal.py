@@ -34,19 +34,22 @@ from RUFAS.time import Time
 
 
 class Animal:
+    """
+    DO NOT USE THE PROPERTIES THAT START WITH '_'. INSTEAD, USE THE FUNCTIONS THAT ARE DECORATED WITH @property.
+    """
     metabolizable_energy_intake: float = 0.0
 
-    calf_not_applicable_properties: set[str] = {
-        "body_weight",
-        "daily_horizontal_distance",
-        "daily_vertical_distance",
-        "dry_matter_intake",
-        "dry_matter_intake_estimation",
-        "events",
-        "nutrient",
-        "nutrient_concentrations",
-        "nutrient_requirements",
-    }
+    # calf_not_applicable_properties: set[str] = {
+    #     "body_weight",
+    #     "daily_horizontal_distance",
+    #     "daily_vertical_distance",
+    #     "dry_matter_intake",
+    #     "dry_matter_intake_estimation",
+    #     "events",
+    #     "nutrient",
+    #     "nutrient_concentrations",
+    #     "nutrient_requirements",
+    # }
 
     @property
     def days_in_milk(self) -> int:
@@ -74,7 +77,8 @@ class Animal:
 
     @property
     def is_pregnant(self) -> bool:
-        if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
+        if self.animal_type in {AnimalType.CALF, AnimalType.HEIFER_I}:
+            # check which is more time efficient [] or {} or ()
             raise False
         return self.days_in_pregnancy > 0
 
@@ -132,6 +136,14 @@ class Animal:
             raise TypeError()
         self._daily_vertical_distance = daily_vertical_distance
 
+    @property
+    def reproduction(self) -> Reproduction:
+        return self._reproduction
+
+    @reproduction.setter
+    def reproduction(self, reproduction: Reproduction) -> None:
+        self._reproduction = reproduction
+
     def __init__(
             self,
             args: NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict |
@@ -158,11 +170,10 @@ class Animal:
         self.sold: bool = False
         self.dead: bool = False
         self.sold_at_day: int | None = None
+        # remove sold and dead to use sold_at_day and dead_at_day instead
         self.dry_matter_intake: float = 0.0
 
         self.events = AnimalEvents()
-        if "events" in args.keys():
-            self.events.init_from_string(args["events"])
 
         self.nutrient: dict[str, float] = {}
         self.nutrient_concentrations: dict[str, float] = {}
@@ -172,7 +183,8 @@ class Animal:
         self.digestive_system: DigestiveSystem = DigestiveSystem()
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
-        self.reproduction: Reproduction = Reproduction()
+        self._reproduction: Reproduction = Reproduction()
+
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
         self._days_in_milk: int = 0
