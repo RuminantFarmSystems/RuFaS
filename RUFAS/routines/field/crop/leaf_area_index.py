@@ -259,7 +259,7 @@ class LeafAreaIndex:
         if not 0 < second_leaf_fraction < 1:
             om.add_error(
                 "Invalid second leaf fraction",
-                f"Second_leaf_fraction must be in the range (0, 1), got: {second_leaf_fraction}.",
+                f"'second_leaf_fraction' must be between 0 and 1 (exclusive), got: {second_leaf_fraction}.",
                 info_map,
             )
             raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
