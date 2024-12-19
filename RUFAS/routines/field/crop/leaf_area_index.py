@@ -1,6 +1,7 @@
 from math import exp, log, sqrt
 from typing import List, Optional
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 
 
@@ -229,15 +230,46 @@ class LeafAreaIndex:
             A list of shape coefficients used in the optimal LAI formula.
 
         """
+        info_map = {
+            "class": LeafAreaIndex.__class__.__name__,
+            "function": LeafAreaIndex._determine_lai_shapes.__name__,
+        }
+        om = OutputManager()
         if first_heat_fraction <= 0:
+            om.add_error(
+                "Invalid first heat fraction",
+                f"First heat fraction should be greater than 0, got: {first_heat_fraction}.",
+                info_map,
+            )
             raise ValueError("first_heat_fraction must be greater than 0")
         if second_heat_fraction <= 0:
+            om.add_error(
+                "Invalid second heat fraction",
+                f"Second heat fraction should be greater than 0, got: {second_heat_fraction}.",
+                info_map,
+            )
             raise ValueError("second_heat_fraction must be greater than 0")
         if not 0 < first_leaf_fraction < 1:
+            om.add_error(
+                "Invalid first leaf fraction",
+                f"'first_leaf_fraction' must be between 0 and 1 (exclusive), got: {first_leaf_fraction}.",
+                info_map,
+            )
             raise ValueError("first_leaf_fraction must not be greater than 0 or less than 1")
         if not 0 < second_leaf_fraction < 1:
+            om.add_error(
+                "Invalid second leaf fraction",
+                f"'second_leaf_fraction' must be between 0 and 1 (exclusive), got: {second_leaf_fraction}.",
+                info_map,
+            )
             raise ValueError("second_leaf_fraction must not be greater than 0 or less than 1")
         if first_heat_fraction == second_heat_fraction:
+            om.add_error(
+                "Invalid first and second heat fraction combination.",
+                f"First_heat_fraction cannot be exactly equal to second_heat_fractions,"
+                f" got first heat fraction equal to second heat fraction: {second_heat_fraction}.",
+                info_map,
+            )
             raise ValueError("first_heat_fraction cannot be exactly equal to second_heat_fractions")
 
         first_log = LeafAreaIndex._calc_shape_log(first_heat_fraction, first_leaf_fraction)
