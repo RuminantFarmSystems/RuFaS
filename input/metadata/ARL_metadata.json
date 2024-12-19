@@ -146,6 +146,13 @@
       "path": "input/metadata/properties/default.json",
       "type": "json",
       "properties": "NA"
+    },
+    "feed_management": {
+      "title": "Feed Management Dataset",
+      "description": "Diameter data of the bale.",
+      "path": "input/data/feed_management/default_feed_management.json",
+      "type": "json",
+      "properties": "feed_storage_input_properties"
     }
   },
   "cross-validation": {}
