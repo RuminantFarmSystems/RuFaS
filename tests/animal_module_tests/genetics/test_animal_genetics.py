@@ -1218,27 +1218,42 @@ def test_assign_net_merit_value_to_newborn_calf(
 
 
 @pytest.mark.parametrize(
-    "birth_year_month, is_for_net_merit, expected_year_month, expect_error",
+    "birth_year_month, is_for_net_merit, expected_year_month",
     [
-        ("2008-01", True, "2008-01", False),
-        ("2008-01", False, "2008-01", False),
-        ("2000-01", True, "2006-02", True),
-        ("2000-01", False, "2006-01", True),
-        ("2030-01", True, "2024-12", True),
-        ("2030-01", False, "2024-12", True),
+        ("2008-01", True, "2008-01"),
+        ("2008-01", False, "2008-01"),
+        ("2000-01", True, "2006-02"),
+        ("2000-01", False, "2006-01"),
+        ("2030-01", True, "2024-12"),
+        ("2030-01", False, "2024-12"),
     ],
 )
 def test_clamp_birth_year_month_in_data_range(
-    birth_year_month: str, is_for_net_merit: bool, expected_year_month: str, expect_error: bool, mocker: MockerFixture
+    birth_year_month: str, is_for_net_merit: bool, expected_year_month: str
 ) -> None:
     """Tests that birth dates of cows are correctly clamped within supported range."""
+    actual = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit)
+
+    assert actual == expected_year_month
+
+
+@pytest.mark.parametrize(
+    "birth_year_month, is_for_net_merit, expected_year_month",
+    [
+        ("2000-01", True, "2006-02"),
+        ("2000-01", False, "2006-01"),
+        ("2030-01", True, "2024-12"),
+        ("2030-01", False, "2024-12"),
+    ],
+)
+def test_clamp_birth_year_month_in_data_range_error(
+    birth_year_month: str, is_for_net_merit: bool, expected_year_month: str, mocker: MockerFixture
+) -> None:
+    """Tests that error is raised when birth date of a cow is not in the available genetic data."""
     om = OutputManager()
     mock_add_error = mocker.patch.object(om, "add_error")
 
     actual = AnimalGenetics._clamp_birth_year_month_in_data_range(birth_year_month, is_for_net_merit)
 
     assert actual == expected_year_month
-    if expect_error:
-        mock_add_error.assert_called_once()
-    else:
-        mock_add_error.assert_not_called()
+    mock_add_error.assert_called_once()
