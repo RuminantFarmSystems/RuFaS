@@ -1,5 +1,6 @@
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -222,6 +223,14 @@ class Pen:
         for animal in self.animals_in_pen.values():
             total_manure_excretion += animal.digestive_system.manure_excretion
         return total_manure_excretion
+    
+    @property
+    def average_animal_requirements(self) -> NutritionRequirements:
+        """Calculates the average nutrient requirements of all animals in the pen."""
+        animal_requirements = [
+            animal.nutrients for animal in self.animals_in_pen.values()
+        ]
+        return sum(animal_requirements) / len(self.animals_in_pen)
 
     def update_daily_walking_distance(self) -> None:
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:

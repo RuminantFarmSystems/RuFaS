@@ -15,11 +15,14 @@ from RUFAS.biophysical.animal.data_types.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.data_types.growth import GrowthInputs, GrowthOutputs
 from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.nutrients_inputs import NutrientsInputs
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
 from RUFAS.biophysical.animal.data_types.reproduction import ReproductionInputs, ReproductionOutputs
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
+from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
+from RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator import NRCRequirementsCalculator
 from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (NewBornCalfValuesTypedDict, CalfValuesTypedDict,
                                                                     HeiferIValuesTypedDict, HeiferIIValuesTypedDict,
@@ -30,6 +33,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferRepro
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.time import Time
 
 
@@ -38,6 +42,7 @@ class Animal:
     DO NOT USE THE PROPERTIES THAT START WITH '_'. INSTEAD, USE THE FUNCTIONS THAT ARE DECORATED WITH @property.
     """
     metabolizable_energy_intake: float = 0.0
+    nutrient_standard: NutrientStandard
 
     # calf_not_applicable_properties: set[str] = {
     #     "body_weight",
@@ -184,6 +189,7 @@ class Animal:
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
         self._reproduction: Reproduction = Reproduction()
+        self.nutrition_requirements: NutritionRequirements = self.get_nutrition_requirements()
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
@@ -562,3 +568,75 @@ class Animal:
             raise ValueError("Cannot calculate daily walking distance for animal types other than cow.")
         self.daily_vertical_distance = 2 * vertical_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
         self.daily_horizontal_distance = 2 * horizontal_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
+
+    def get_nutrition_requirements(
+        self, housing: str, walking_distance: float, previous_temperature: float
+    ) -> NutritionRequirements:
+        """
+        Gets the nutrition requirements for an animal.
+        
+        Parameters
+        ----------
+        housing : str
+            The housing type of the animal, either "barn" or "grazing".
+        walking_distance : float
+            The walking distance to the milking parlor (m).
+        previous_temperature : float
+            The previous day's temperature (C).
+
+        Returns
+        -------
+        NutritionRequirements
+            The nutrition requirements for the animal.
+        
+        """
+        if self.animal_type is AnimalType.CALF:
+            pass  # TODO: implement calf nutrition managment
+        
+        days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
+        days_in_milk = self.days_in_milk if self.is_milking else None
+        average_daily_heifer_gain = self.average_daily_gain if self.animal_type.is_heifer else None  # TODO: average_daily_gain for heifers
+        if self.nutrient_standard is NutrientStandard.NASEM:
+            requirements = NASEMRequirementsCalculator.calculate_requirements(
+                body_weight=self.body_weight,
+                mature_body_weight=self.mature_body_weight,
+                days_in_pregancy=days_in_pregancy,
+                body_condition_score_5=self.body_condition_score_5,  # TODO: body condition score 5.
+                days_in_milk=days_in_milk,
+                average_daily_heifer_gain=average_daily_heifer_gain,
+                animal_type=self.animal_type,
+                parity=self.reproduction.calves,  # TODO: calves
+                calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
+                milk_fat=self.milk_production.fat_percent,
+                milk_true_protein=self.milk_production.true_protein_percent,
+                milk_lactose=self.milk_production.lactose_percent,
+                milk_production=self.milk_production.daily_milk_produced,
+                housing=housing,
+                distance=walking_distance,
+                lactating=self.is_milking,
+                ndf_percentage=self.previous_ration.ndf_percentage,  # TODO: ration and NDF percentage
+            )
+        else:
+            requirements = NRCRequirementsCalculator.calculate_requirements(
+                body_weight=self.body_weight,
+                mature_body_weight=self.mature_body_weight,
+                days_in_pregancy=days_in_pregancy,
+                body_condition_score_5=self.body_condition_score_5,  # TODO: body condition score 5.
+                days_in_milk=days_in_milk,
+                average_daily_heifer_gain=average_daily_heifer_gain,
+                animal_type=self.animal_type,
+                parity=self.reproduction.calves,  # TODO: calves
+                calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
+                milk_fat=self.milk_production.fat_percent,
+                milk_true_protein=self.milk_production.true_protein_percent,
+                milk_lactose=self.milk_production.lactose_percent,
+                milk_production=self.milk_production.daily_milk_produced,
+                housing=housing,
+                distance=walking_distance,
+                previous_temperature=previous_temperature,
+                net_energy_diet_concentration=self.ration.net_energy_diet_concentration,
+                days_born=self.days_born,
+                TDN_percentage=self.previous_ration.tdn_percentage,  # TODO: ration and TDN percentage
+            )
+
+        return requirements

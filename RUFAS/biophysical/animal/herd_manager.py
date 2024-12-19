@@ -19,7 +19,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
 from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
 from RUFAS.biophysical.feed.feed import Feed
-from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -127,7 +127,6 @@ class HerdManager:
             AnimalCombination.CALF: [],
             AnimalCombination.GROWING: [],
             AnimalCombination.CLOSE_UP: [],
-            AnimalCombination.GROWING_AND_CLOSE_UP: [],
             AnimalCombination.LAC_COW: [],
         }
 
@@ -151,6 +150,10 @@ class HerdManager:
         user_defined_ration_manager = UserDefinedRationManager()
         self.ration_user_input = animal_config_data["ration"]["user_input"]
         user_defined_ration_manager.use_user_defined_ration = self.ration_user_input
+        self.is_ration_defined_by_user = animal_config_data["ration"]["user_input"]
+        if self.is_ration_defined_by_user:
+            ration_feed_config = self.im.get_data("feed")
+            UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
@@ -1071,7 +1074,7 @@ class HerdManager:
             or simulation_day == 0
         )
 
-    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
+    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float) -> None:
         """
         Reformulates ration for a single pen.
 
@@ -1081,8 +1084,13 @@ class HerdManager:
             Pen that requires ration reformulation.
         current_temperature : float
             Current temperature.
+        
         """
+        # animal_combination = pen.animal_combination
+        # if self.is_ration_defined_by_user:
+        #     ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, )
         pass
+
 
     def update_herd_statistics(self) -> None:
         (
