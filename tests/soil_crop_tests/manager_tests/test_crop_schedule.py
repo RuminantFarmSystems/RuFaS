@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import List, Any
 
 import pytest
 
@@ -92,7 +92,7 @@ def test_crop_schedule_init(
     plant_skip: int,
     harvest_skip: int,
     pat_repeat: int,
-    expected: Dict,
+    expected: dict[str, list[Any]],
 ) -> None:
     """Tests that CropSchedule's get initialized correctly."""
     crop_schedule = CropSchedule(
@@ -135,14 +135,14 @@ def test_crop_schedule_init(
             "test_2",
             [1998, 1999, 2000],
             [200, 200, 367],
-            "'test_2': expected all planting days to be in range [1, 366], " "received '[200, 200, 367]'.",
+            "'test_2': expected all days to be in range [1, 366], received '[200, 200, " "367]'.",
         ),
         (
             "test_3",
             [1997, 1998],
             [90, 120, 90],
-            "'test_3': expected number of planting years and days to be the same, "
-            "received '[1997, 1998]' years and '[90, 120, 90]' days.",
+            "test_3 Mismatch in length of parameters. Provided parameters are: planting_years=[1997, 1998],"
+            " planting_days=[90, 120, 90]. Lengths are: {'planting_years': 2, 'planting_days': 3}.",
         ),
     ],
 )
@@ -151,6 +151,7 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
     with pytest.raises(ValueError) as e:
         test = CropSchedule(name, "test_crop", years, days, [2000], [240], ["harvest_kill"], False, 1, 1)
         test._validate_planting_parameters()
+        print(e.value)
     assert str(e.value) == expected
 
 
@@ -162,23 +163,27 @@ def test_validate_planting_parameters(name: str, years: List[int], days: List[in
             [1996, 1993],
             [200],
             ["harvest_kill"],
-            "'test_1': expected all harvest years to be > 0 and in non-descending order, received '[1996, 1993]'.",
+            "'test_1': expected all years to be > 0 and in non-descending order, received " "'[1996, 1993]'.",
         ),
         (
             "test_2",
             [1999, 2000],
             [200, 0],
             ["harvest_kill"],
-            "'test_2': expected all harvest days to be in range [1, 366], received '[200, 0]'.",
+            "'test_2': expected all days to be in range [1, 366], received '[200, 0]'.",
         ),
         (
             "test_3",
             [1998, 1999, 2000],
             [200, 200],
             ["harvest_only", "harvest_kill"],
-            "'test_3': expected number of values for harvest years, days, and operations to be equal, received "
-            "'[1998, 1999, 2000]' years, '[200, 200]' days, and '[<HarvestOperation.HARVEST_ONLY: 'harvest_only'>, "
-            "<HarvestOperation.HARVEST_KILL: 'harvest_kill'>]' operations.",
+            (
+                "test_3 Mismatch in length of parameters. Provided parameters are: "
+                "planting_years=[1998, 1999, 2000], planting_days=[200, 200], "
+                "harvest_operations=[<HarvestOperation.HARVEST_ONLY: 'harvest_only'>, "
+                "<HarvestOperation.HARVEST_KILL: 'harvest_kill'>]. Lengths are: "
+                "{'planting_years': 3, 'planting_days': 2, 'harvest_operations': 2}."
+            ),
         ),
         (
             "test_4",
@@ -211,12 +216,12 @@ def test_validate_harvest_parameters(
             1,
             1,
             [
-                PlantingEvent("test_crop", 1, 120, False),
-                PlantingEvent("test_crop", 3, 100, False),
-                PlantingEvent("test_crop", 4, 100, False),
-                PlantingEvent("test_crop", 6, 120, False),
-                PlantingEvent("test_crop", 8, 100, False),
-                PlantingEvent("test_crop", 9, 100, False),
+                PlantingEvent("test_crop", False, 1, 120),
+                PlantingEvent("test_crop", False, 3, 100),
+                PlantingEvent("test_crop", False, 4, 100),
+                PlantingEvent("test_crop", False, 6, 120),
+                PlantingEvent("test_crop", False, 8, 100),
+                PlantingEvent("test_crop", False, 9, 100),
             ],
         ),
         (
@@ -226,12 +231,12 @@ def test_validate_harvest_parameters(
             2,
             2,
             [
-                PlantingEvent("test_crop", 2, 115, True),
-                PlantingEvent("test_crop", 4, 115, True),
-                PlantingEvent("test_crop", 7, 115, True),
-                PlantingEvent("test_crop", 9, 115, True),
-                PlantingEvent("test_crop", 12, 115, True),
-                PlantingEvent("test_crop", 14, 115, True),
+                PlantingEvent("test_crop", True, 2, 115),
+                PlantingEvent("test_crop", True, 4, 115),
+                PlantingEvent("test_crop", True, 7, 115),
+                PlantingEvent("test_crop", True, 9, 115),
+                PlantingEvent("test_crop", True, 12, 115),
+                PlantingEvent("test_crop", True, 14, 115),
             ],
         ),
         (
@@ -241,9 +246,9 @@ def test_validate_harvest_parameters(
             2,
             0,
             [
-                PlantingEvent("test_crop", 1, 120, False),
-                PlantingEvent("test_crop", 2, 120, False),
-                PlantingEvent("test_crop", 5, 110, False),
+                PlantingEvent("test_crop", False, 1, 120),
+                PlantingEvent("test_crop", False, 2, 120),
+                PlantingEvent("test_crop", False, 5, 110),
             ],
         ),
     ],
@@ -285,12 +290,12 @@ def test_generate_planting_events(
             1,
             1,
             [
-                HarvestEvent("test", 1, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 2, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 6, 240, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 8, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 9, 245, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 13, 240, HarvestOperation.HARVEST_KILL),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 1, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 2, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 6, 240),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 8, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 9, 245),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 13, 240),
             ],
         ),
         (
@@ -301,12 +306,12 @@ def test_generate_planting_events(
             2,
             2,
             [
-                HarvestEvent("test", 1, 200, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 1, 260, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 4, 200, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 4, 260, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 7, 200, HarvestOperation.HARVEST_ONLY),
-                HarvestEvent("test", 7, 260, HarvestOperation.HARVEST_KILL),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 1, 200),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 1, 260),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 4, 200),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 4, 260),
+                HarvestEvent("test", HarvestOperation.HARVEST_ONLY, 7, 200),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 7, 260),
             ],
         ),
         (
@@ -317,9 +322,9 @@ def test_generate_planting_events(
             1,
             2,
             [
-                HarvestEvent("test", 3, 240, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 7, 240, HarvestOperation.HARVEST_KILL),
-                HarvestEvent("test", 11, 240, HarvestOperation.HARVEST_KILL),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 3, 240),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 7, 240),
+                HarvestEvent("test", HarvestOperation.HARVEST_KILL, 11, 240),
             ],
         ),
     ],
@@ -348,4 +353,4 @@ def test_generate_harvest_events(
         repeat,
     )
     actual = crop_sched.generate_harvest_events()
-    assert actual == expected
+    assert expected == actual
