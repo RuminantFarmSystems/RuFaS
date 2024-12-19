@@ -195,6 +195,7 @@
       "path": "input/data/feed_management/default_feed_management.json",
       "type": "json",
       "properties": "feed_storage_input_properties"
-    }
+    },
+    "cross-validation": {}
   }
 }
