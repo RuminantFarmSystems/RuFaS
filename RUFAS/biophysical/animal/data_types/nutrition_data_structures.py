@@ -100,11 +100,12 @@ class NutritionEvaluationResults:
     Attributes
     ----------
     total_energy : float | None
-        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers.
+        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers TODO: add explanation for this.
     maintenance : float
         Surplus or deficit of energy in a ration for maintenance (Mcal).
     lactation : float | None
-        Surplus or deficit of lactation in a ration (Mcal). Necessary to know for cows, not heifers.
+        Surplus or deficit of lactation in a ration (Mcal). This value is None when evaluating nutrition requirements of
+        heifers, because they are never lactating.
     growth : float
         Surplus or deficit of energy in a ration for growth (Mcal).
     protein : float
@@ -158,9 +159,6 @@ class NutritionEvaluationResults:
         if self.total_energy is None or self.lactation is None:
             return False
 
-        non_negative_fields = {
-            self.total_energy, self.maintenance, self.lactation, self.growth, self.calcium, self.phosphorus
-        }
-        valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
+        valid_non_negative_fields = all([field >= 0.0 for field in {self.total_energy, self.lactation}])
 
-        return valid_non_negative_fields and self._are_clamped_values_acceptable
+        return valid_non_negative_fields and self._are_clamped_values_acceptable and self.is_valid_heifer_ration
