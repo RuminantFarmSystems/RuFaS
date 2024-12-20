@@ -136,7 +136,7 @@ class NutritionEvaluationResults:
     fat: float
 
     @property
-    def _clamped_values_are_valid(self) -> bool:
+    def _clamped_values_are_acceptable(self) -> bool:
         """Checks that values which must be in a certain range are in that range."""
         clamped_values = [self.protein, self.ndf, self.fat, self.dry_matter]
         return all([value == 0.0 for value in clamped_values])
