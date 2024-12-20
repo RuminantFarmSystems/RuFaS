@@ -119,7 +119,7 @@ class NutritionEvaluationResults:
     ndf : float
         Surplus or deficit of neutral detergent fiber (NDF) in a ration. If NDF is within acceptable bounds, this value will be 0.0.
     fat : float
-        Surplus or deficit of fat percentage in a ration. If fat percentage was acceptable, this value is 0.0.
+        Surplus or deficit of fat percentage in a ration. If fat percentage is within acceptable bounds, this value will be 0.0.
     is_valid_heifer_ration
     is_valid_cow_ration
 
