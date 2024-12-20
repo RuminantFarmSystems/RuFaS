@@ -2,13 +2,14 @@ import datetime
 import os
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from matplotlib.figure import Axes, Figure
+import matplotlib.dates as mdates
 
 from RUFAS.util import Utility
 
@@ -91,7 +92,6 @@ UNSUPPORTED_GRAPH_FUNCTIONS: List[str] = [
 FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "align_labels": Figure.align_labels,
     "canvas": Figure.set_canvas,
-    "constrained_layout": Figure.set_constrained_layout,
     "dpi": Figure.set_dpi,
     "edgecolor": Figure.set_edgecolor,
     "figheight": Figure.set_figheight,
@@ -101,7 +101,6 @@ FIGURE_SETTERS: Dict[str, FUNCTION_TYPE] = {
     "frameon": Figure.set_frameon,
     "snap": Figure.set_snap,
     "subplot_adjust": Figure.subplots_adjust,
-    "tight_layout": Figure.set_tight_layout,
     "zorder": Figure.set_zorder,
 }
 
@@ -209,7 +208,7 @@ class GraphGenerator:
                     filtered_pool, graph_details.get("title", "Untitled graph")
                 )
                 graph_details["variables"] = list(updated_pool.keys())
-            prepared_data: Dict[str, List[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
+            prepared_data: dict[str, list[Any]] = {key: updated_pool[key]["values"] for key in updated_pool.keys()}
             non_numeric_data_logs = self._log_non_numerical_data(updated_pool, graph_details)
             all_logs = non_numeric_data_logs + graph_filter_validation_logs + var_units_logs
 
@@ -219,14 +218,17 @@ class GraphGenerator:
 
             figure_width = 10
             figure_height = 6
-            fig, _ = plt.subplots(figsize=(figure_width, figure_height))
+            fig, ax = plt.subplots(figsize=(figure_width, figure_height))
             ratio_of_graph_to_legend = 0.65
             plt.subplots_adjust(right=ratio_of_graph_to_legend)
 
             mask_values = graph_details.get("mask_values", False)
-            self._draw_graph(graph_details["type"], prepared_data, list(prepared_data.keys()), mask_values)
+            use_calendar_dates = graph_details.get("use_calendar_dates", False)
+            self._draw_graph(
+                graph_details["type"], prepared_data, list(prepared_data.keys()), ax, mask_values, use_calendar_dates
+            )
             if graph_details.get("title"):
-                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title"))
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
                 graph_details["title"] = corrected_graph_title
             if not graph_details.get("legend"):
                 graph_details = self._set_graph_legend(graph_details, prepared_data)
@@ -436,9 +438,10 @@ class GraphGenerator:
                 "use_fill_value_at_end",
                 "mask_values",
                 "is_aggregated_report_data",
+                "use_calendar_dates",
             ]
         )
-        graph_filter_validation_logs: List[Dict[str, str | Dict[str, str]]] = []
+        graph_filter_validation_logs: list[dict[str, str | dict[str, str]]] = []
         info_map = {
             "class": self.__class__.__name__,
             "function": self._validate_graph_filter.__name__,
@@ -525,10 +528,12 @@ class GraphGenerator:
 
     def _draw_graph(
         self,
-        graph_type: str | list[str],
-        data: Dict[str, List[int | float]],
-        selected_variables: Optional[List[str]] = None,
+        graph_type: str,
+        data: dict[str, list[int | float]],
+        selected_variables: list[str],
+        ax: Axes,
         mask_values: bool = False,
+        use_calendar_dates: bool = False,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -537,14 +542,17 @@ class GraphGenerator:
         ----------
         graph_type : str
             The type of graph to draw.
-        data : Dict[str, List[int | float]]
+        data : dict[str, list[int | float]]
             The data to use for plotting.
-        selected_variables : Optional[List[str]]
-            If it is present and the data is a list of dicts,
-            it selects the variables to be plotted.
+        selected_variables : list[str]
+            The variables selected to be plotted.
         mask_values : bool, default False
             Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
             values.
+        ax : Axes, default None
+            The matplotlib Axes object to plot the graph on.
+        use_calendar_dates : bool, default False
+            Whether to use calendar dates on the x-axis.
 
         Raises
         ------
@@ -553,18 +561,34 @@ class GraphGenerator:
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
+        dates_in_data_range = [
+            self.time.start_date + datetime.timedelta(days=i) for i in range(max(len(v) for v in data.values()))
+        ]
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
+
+        def get_x_values(values_length: int) -> list[int]:
+            """Get appropriate x-axis values based on user choice."""
+            return dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
+
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
-            indices_list = list(range(len(values_tuple[0])))
-            plot_function(indices_list, values_tuple)
+            x_values = get_x_values(len(values_tuple[0]))
+            plot_function(x_values, values_tuple)
         else:
             for value in data.values():
-                if not mask_values:
-                    plot_function(value)
-                else:
+                if mask_values:
                     indices, masked_values = self._mask_values(value)
-                    plot_function(indices, masked_values)
+                    x_values = get_x_values(len(indices))
+                    plot_function(x_values, masked_values)
+                else:
+                    x_values = get_x_values(len(value))
+                    plot_function(x_values, value)
+        if use_calendar_dates:
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%j/%Y"))
+            plt.xlabel("Calendar Day")
+            plt.xticks(rotation=45)
+        else:
+            plt.xlabel("Simulation Day")
 
     def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
         """
