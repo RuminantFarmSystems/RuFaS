@@ -21,9 +21,9 @@ from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEval
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
 from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
-from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -150,9 +150,6 @@ class HerdManager:
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
-        user_defined_ration_manager = UserDefinedRationManager()
-        self.ration_user_input = animal_config_data["ration"]["user_input"]
-        user_defined_ration_manager.use_user_defined_ration = self.ration_user_input
         self.is_ration_defined_by_user = animal_config_data["ration"]["user_input"]
         if self.is_ration_defined_by_user:
             ration_feed_config = self.im.get_data("feed")
@@ -195,7 +192,25 @@ class HerdManager:
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
 
-    def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> list[HerdManagerOutput]:
+    def daily_routines(self, available_feeds: list[Feed], weather: Weather, time: Time) -> list[HerdManagerOutput]:
+        """
+        Executes the daily routines for the animals in the herd.
+
+        Parameters
+        ----------
+        available_feeds : List[Feed]
+            List of available feeds.
+        weather : Weather
+            Instance of the Weather class.
+        time : Time
+            Instance of the Time class.
+
+        Returns
+        -------
+        List[HerdManagerOutput]
+            A list of HerdManagerOutput objects.
+        
+        """
         current_conditions = weather.get_current_day_conditions(time)
         current_temperature = current_conditions.mean_air_temperature
 
@@ -273,21 +288,20 @@ class HerdManager:
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
 
-        self._handle_graduated_animals(graduated_animals, feed, current_temperature)
-        self._handle_newly_added_animals(newborn_calves, feed, current_temperature)
-        self._handle_newly_added_animals(newly_added_animals, feed, current_temperature)
+        self._handle_graduated_animals(graduated_animals)
+        self._handle_newly_added_animals(newborn_calves)
+        self._handle_newly_added_animals(newly_added_animals)
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
-
         self.record_pen_history(time.simulation_day)
 
-        if self.end_ration_interval(time.simulation_day):
+        if is_end_of_ration_interval := self.end_ration_interval(time.simulation_day) is True:
             self.clear_pens()
             self.allocate_animals_to_pens()
 
         for pen in self.all_pens:
-            if pen.needs_ration_formulation or self.end_ration_interval(time.simulation_day):
+            if pen.needs_ration_formulation or is_end_of_ration_interval:
                 self.reformulate_ration_single_pen(pen, current_temperature, feed)
 
         herd_manager_output: list[HerdManagerOutput] = []
@@ -301,7 +315,7 @@ class HerdManager:
 
         AnimalModuleReporter.report_animal_module_manure(herd_manager_output)
 
-        AnimalModuleReporter.report_daily_reports(self, feed.available_feeds, time.simulation_day)
+        AnimalModuleReporter.report_daily_reports(self, available_feeds, time.simulation_day)
 
         return herd_manager_output
 
@@ -366,25 +380,20 @@ class HerdManager:
 
             self.all_pens.append(pen)
 
-    def initialize_nutrient_requirements(self, weather: Weather, time: Time, feed: Feed) -> None:
+    def initialize_nutrient_requirements(self, weather: Weather, time: Time) -> None:
         """
-        Calculates initial nutrient requirements at the beginning of the
-        simulation for initial pen allocation. For the nutrient requirements
-        of cows, the average walking distance of all the pens initialized
-        is used.
+        Calculates initial nutrient requirements at the beginning of the simulation for initial pen allocation.
 
         Parameters
         ----------
-        feed : Feed
-            an instance of the Feed class defined in feed.py
         weather : Weather
             instance of the Weather class
         time : Time
             instance of the Time class
 
         """
-
-        pass
+        for pen in self.all_pens:
+            pen.set_animal_nutritional_requirements(weather.get_current_day_conditions(time).mean_air_temperature)
 
     def allocate_animals_to_pens(self) -> None:
         """
@@ -514,9 +523,7 @@ class HerdManager:
 
     def _handle_graduated_animals(
         self,
-        graduated_animals: list[Animal],
-        feed: Feed,
-        current_temperature: float,
+        graduated_animals: list[Animal]
     ) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
@@ -531,20 +538,14 @@ class HerdManager:
         animals_snapshot_after_update : Dict[str, set | Dict]
             Snapshot of the animals after the update. This should be a dictionary with the same
             structure as animals_snapshot_before_update.
-        feed : Feed
-            instance of the Feed class defined in feed.py.
-        current_temperature : float
-            The temperature on the current day.
 
         """
         for animal in graduated_animals:
-            self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
+            self._add_animal_to_pen_and_id_map(animal)
 
     def _handle_newly_added_animals(
         self,
         new_animals: list[Animal],
-        feed: Feed,
-        current_temperature: float,
     ) -> None:
         """
         For all new animals, adds animal to a pen, and updates the pen id map.
@@ -553,14 +554,10 @@ class HerdManager:
         ----------
         animal : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
             One of the possible animal types.
-        feed : Feed
-            instance of the Feed class defined in feed.py.
-        current_temperature : float
-            The temperature on the current day.
 
         """
         for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(animal, feed, current_temperature)
+            self._add_animal_to_pen_and_id_map(animal)
             self.animals_by_type[animal.animal_type].append(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
@@ -579,9 +576,7 @@ class HerdManager:
 
     def _add_animal_to_pen_and_id_map(
         self,
-        animal: Animal,
-        feed: Feed,
-        current_temperature: float,
+        animal: Animal
     ) -> None:
         """
         Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
@@ -590,10 +585,6 @@ class HerdManager:
         ----------
         animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
             One of the possible animal types.
-        feed : Feed
-            instance of the Feed class defined in feed.py.
-        current_temperature : float
-            The temperature on the current day.
 
         """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
@@ -601,13 +592,7 @@ class HerdManager:
             self.pens_by_animal_combination[animal_combination],
             key=lambda p: p.current_stocking_density,
         )
-        pen_with_min_stocking_density.update_animals(
-            [animal],
-            self.ANIMAL_GROUPING_SCENARIO,
-            feed,
-            current_temperature,
-            self.phosphorus_concentration_by_animal_class[animal.animal_type],
-        )
+        pen_with_min_stocking_density.update_animals([animal], self.ANIMAL_GROUPING_SCENARIO)
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def _sort_cows_before_allocation(self) -> None:
@@ -1077,7 +1062,7 @@ class HerdManager:
             or simulation_day == 0
         )
 
-    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float) -> None:
+    def reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
         """
         Reformulates ration for a single pen.
 
@@ -1085,11 +1070,15 @@ class HerdManager:
         ----------
         pen : Pen
             Pen that requires ration reformulation.
+        available_feeds : List[Feed]
+            List of available feeds.
         current_temperature : float
-            Current temperature.
-        
+            Current temperature (C).
+
         """
-        pen.formulate_new_ration()
+        pen.set_animal_nutritional_requirements(current_temperature)
+
+        pen.use_user_defined_ration(available_feeds)
 
 
     def update_herd_statistics(self) -> None:

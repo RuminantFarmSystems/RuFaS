@@ -289,33 +289,22 @@ class Pen:
             num_stalls=self.num_stalls,
         )
 
-
-    def _set_animal_nutrient_values(
-        self,
-        animal: Animal,
-        animal_grouping_scenario: AnimalGroupingScenario,
-        feed: Feed,
-        temperature: float,
-        phosphorus_concentration: float
-    ) -> None:
+    def set_animal_nutritional_requirements(self, temperature: float) -> None:
         """
-        Set the nutrient values for the animal.
+        Set the nutritional requirements for all animals in the pen.
 
         Parameters
         ----------
-        animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
-            The animal to set the nutrient values for.
-        animal_grouping_scenario
-        temperature
-        temp
-        phosphorus_concentration : float
-
-        Returns
-        -------
-        None
+        temperature : float
+            The temperature of the pen (C).
 
         """
-        pass
+        for animal in self.animals_in_pen.values():
+            animal.set_nutrition_requirements(
+                housing=self.housing_type,
+                walking_distance=self.calculate_daily_walking_distance(),  # TODO: Make this function return distance
+                previous_temperature=temperature,
+            )
 
     @property
     def average_milk_production(self) -> float:
