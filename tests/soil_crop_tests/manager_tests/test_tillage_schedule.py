@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.data_structures.events import TillageEvent
 from RUFAS.routines.field.manager.tillage_schedule import TillageSchedule
 
