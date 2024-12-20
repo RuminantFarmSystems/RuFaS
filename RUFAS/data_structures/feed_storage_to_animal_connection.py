@@ -104,7 +104,7 @@ class Feed:
     is_fat : bool
         Identifier of fat type feed.
     is_wetforage : float
-        Identifier of wet forage type feed.
+        Identifier of wet forage type feed (unitless).
     units : MeasurementUnits
         TODO: document this! Also, is it possible to just have one unit for all feeds, preferable kg?
     limit : float
