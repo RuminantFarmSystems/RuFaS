@@ -102,7 +102,7 @@ class Feed:
     sulfur : float
         Sulphur (% dry matter).
     is_fat : bool
-        Identifier of fat type feed.
+        Identifier of fat type feed (unitless).
     is_wetforage : float
         Identifier of wet forage type feed (unitless).
     units : MeasurementUnits
