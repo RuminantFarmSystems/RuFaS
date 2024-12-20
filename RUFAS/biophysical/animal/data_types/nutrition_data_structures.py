@@ -108,8 +108,7 @@ class NutritionEvaluationResults:
     growth : float
         Surplus or deficit of energy in a ration for growth (Mcal).
     protein : float
-        Amount of metabolizable protein by which a ration was outside the acceptable bounds (g). If protein was
-        acceptable, this value is 0.0.
+        Amount of metabolizable protein by which a ration was outside the acceptable bounds (g). If protein is within acceptable bounds, this value will be 0.0.
     calcium : float
         Surplus or deficit of calcium in a ration (g).
     phosphorus : float
