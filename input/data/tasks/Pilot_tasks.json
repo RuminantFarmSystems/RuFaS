@@ -4,72 +4,55 @@
 
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f19",
-      "metadata_file_path": "input/metadata/c2f11_metadata.json",
+      "output_prefix": "c1f1",
+      "metadata_file_path": "input/metadata/c1f1_metadata.json",
       "log_verbosity": "errors",
       "random_seed": 0,
       "multi_run_counts": 4
     },
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f22",
-      "metadata_file_path": "input/metadata/c2f22_metadata.json",
+      "output_prefix": "c1f2",
+      "metadata_file_path": "input/metadata/c1f2_metadata.json",
       "log_verbosity": "errors",
       "random_seed": 0,
       "multi_run_counts": 4
     },
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f23",
-      "metadata_file_path": "input/metadata/c2f23_metadata.json",
+      "output_prefix": "c1f3",
+      "metadata_file_path": "input/metadata/c1f3_metadata.json",
       "log_verbosity": "errors",
       "random_seed": 0,
       "multi_run_counts": 4
     },
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f25",
-      "metadata_file_path": "input/metadata/c2f25_metadata.json",
+      "output_prefix": "c1f4",
+      "metadata_file_path": "input/metadata/c1f4_metadata.json",
       "log_verbosity": "errors",
       "random_seed": 0,
       "multi_run_counts": 4
     },
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f24",
-      "metadata_file_path": "input/metadata/c2f24_metadata.json",
+      "output_prefix": "c2f1",
+      "metadata_file_path": "input/metadata/c2f1_metadata.json",
+      "log_verbosity": "errors",
+      "random_seed": 0,
+      "multi_run_counts": 4
+    },{
+      "task_type": "SIMULATION_MULTI_RUN",
+      "output_prefix": "c2f2",
+      "metadata_file_path": "input/metadata/c2f2_metadata.json",
       "log_verbosity": "errors",
       "random_seed": 0,
       "multi_run_counts": 4
     },
     {
       "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f26",
-      "metadata_file_path": "input/metadata/c2f26_metadata.json",
-      "log_verbosity": "errors",
-      "random_seed": 0,
-      "multi_run_counts": 4
-    },
-    {
-      "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f27",
-      "metadata_file_path": "input/metadata/c2f27_metadata.json",
-      "log_verbosity": "errors",
-      "random_seed": 0,
-      "multi_run_counts": 4
-    },
-    {
-      "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f21",
-      "metadata_file_path": "input/metadata/c2f21_metadata.json",
-      "log_verbosity": "errors",
-      "random_seed": 0,
-      "multi_run_counts": 4
-    },
-    {
-      "task_type": "SIMULATION_MULTI_RUN",
-      "output_prefix": "c2f20",
-      "metadata_file_path": "input/metadata/c2f20_metadata.json",
+      "output_prefix": "c2f3",
+      "metadata_file_path": "input/metadata/c2f3_metadata.json",
       "log_verbosity": "errors",
       "random_seed": 0,
       "multi_run_counts": 4
