@@ -54,7 +54,7 @@ class Feed:
     rufas_id : RUFAS_ID
         Unique integer identifier for feeds used within the RuFaS model (unitless).
     Fd_Category : FeedCategorization
-        Feed category.
+        Feed category (unitless).
     feed_type : FeedComponentType
         General type or category of the feed.
     DM : float
