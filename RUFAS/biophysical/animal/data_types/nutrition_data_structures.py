@@ -25,7 +25,7 @@ class NutritionRequirements:
     phosphorus : float
         Phosphorus requirement (g).
     dry_matter : float
-        Dry matter intake (kg).
+        Dry matter intake requirement (kg).
     activity : float
         Net energy requirement for activity (Mcal).
     essential_amino_acids : EssentialAminoAcidRequirements
