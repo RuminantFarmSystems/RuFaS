@@ -4,6 +4,7 @@ from enum import Enum
 class TillageImplement(Enum):
     """
     Defines the supported tillage implements for RuFaS.
+
     Attributes
     ----------
     SUBSOILER : str
