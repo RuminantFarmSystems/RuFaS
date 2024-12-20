@@ -5842,5 +5842,14 @@
         "type": "number"
       }
     }
+  },
+  "feed_storage_input_properties": {
+    "hay_bale_diameter": {
+        "type": "number",
+        "description": "Diameter of hay bales (meters).",
+        "minimum": 0.5,
+        "maximum": 4,
+        "default": 2.5
+    }
   }
 }
