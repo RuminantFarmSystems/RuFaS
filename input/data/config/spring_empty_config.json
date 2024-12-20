@@ -1,7 +1,7 @@
 {
-    "start_date": "2014:100",
-    "end_date": "2017:101",
-    "set_seed": true,
+    "start_date": "2014:244",
+    "end_date": "2017:245",
+    "random_seed": 42,
     "simulate_animals": true,
     "nutrient_standard": "NASEM",
     "FIPS_county_code": 55025,

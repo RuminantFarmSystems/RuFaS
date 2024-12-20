@@ -277,7 +277,7 @@ class BaseManureTreatment(ABC):
         (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and maximum liquid manure
         temperatures in outdoor clay pit and concrete tank manure storages.
         """
-        air_temperature = 10
+        #air_temperature = 10
         if manure_treatment_type.name == 'ANAEROBIC_LAGOON':
             return float(np.clip(air_temperature, 10.0, 35.0))
         else:
@@ -374,7 +374,7 @@ class BaseManureTreatment(ABC):
                 self.minimum_solid_manure_total_volatile_solids = self._accumulated_output.solid_manure_total_volatile_solids * minpercent
                 self.minimum_sludge_manure_total_solids = self._accumulated_output.sludge_manure_total_solids * minpercent
                 self.minimum_sludge_manure_total_volatile_solids = self._accumulated_output.sludge_manure_total_volatile_solids * minpercent
-                self.minimum_liquid_manure_total_solids = self._accumulated_output.liquid_manure_total_solids * minpercent
+                self.minimum_liquid_manure_total_volatile_solids = self._accumulated_output.liquid_manure_total_volatile_solids * minpercent
                 self.minimum_liquid_manure_total_degradable_volatile_solids = self._accumulated_output.liquid_manure_total_degradable_volatile_solids * minpercent
                 self.minimum_liquid_manure_total_non_degradable_volatile_solids = self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids * minpercent
 
@@ -395,7 +395,7 @@ class BaseManureTreatment(ABC):
                 self._accumulated_output.liquid_manure_daily_volume += self.minimum_liquid_manure_daily_volume
                 self._accumulated_output.solid_manure_daily_mass += self.minimum_solid_manure_daily_mass
 
-                self._accumulated_output.liquid_manure_total_solids += self.minimum_liquid_manure_total_solids
+                self._accumulated_output.liquid_manure_total_volatile_solids += self.minimum_liquid_manure_total_volatile_solids
                 self._accumulated_output.sludge_manure_total_volatile_solids += self.minimum_sludge_manure_total_volatile_solids
                 self._accumulated_output.sludge_manure_total_solids += self.minimum_sludge_manure_total_solids
                 self._accumulated_output.solid_manure_total_volatile_solids += self.minimum_solid_manure_total_volatile_solids

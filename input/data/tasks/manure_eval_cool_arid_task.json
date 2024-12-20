@@ -3,56 +3,56 @@
   "tasks": [
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/AnaerobicLagoon12mo_cool_metadata.json",
+      "metadata_file_path": "input/metadata/AnaerobicLagoon12mo_cool_arid_metadata.json",
       "output_prefix": "AL-12mo",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/SlurryStorage12mo_cool_metadata.json",
+      "metadata_file_path": "input/metadata/SlurryStorage12mo_cool_arid_metadata.json",
       "output_prefix": "SS-12mo",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/AnaerobicLagoon6mo_cool_metadata.json",
+      "metadata_file_path": "input/metadata/AnaerobicLagoon6mo_cool_arid_metadata.json",
       "output_prefix": "AL-6mo",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/SlurryStorage6mo_cool_metadata.json",
+      "metadata_file_path": "input/metadata/SlurryStorage6mo_cool_arid_metadata.json",
       "output_prefix": "SS-6mo",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/AnaerobicLagoon12mo_cool_metadata_spr_empty.json",
+      "metadata_file_path": "input/metadata/AnaerobicLagoon12mo_cool_arid_metadata_spr_empty.json",
       "output_prefix": "AL-12mo_SPR",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/SlurryStorage12mo_cool_metadata_spr_empty.json",
+      "metadata_file_path": "input/metadata/SlurryStorage12mo_cool_arid_metadata_spr_empty.json",
       "output_prefix": "SS-12mo_SPR",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/AnaerobicLagoon6mo_cool_metadata_spr_empty.json",
+      "metadata_file_path": "input/metadata/AnaerobicLagoon6mo_cool_arid_metadata_spr_empty.json",
       "output_prefix": "AL-6mo_SPR",
       "log_verbosity": "errors",
       "random_seed": 42
     },
     {
       "task_type": "SIMULATION_SINGLE_RUN",
-      "metadata_file_path": "input/metadata/SlurryStorage6mo_cool_metadata_spr_empty.json",
+      "metadata_file_path": "input/metadata/SlurryStorage6mo_cool_arid_metadata_spr_empty.json",
       "output_prefix": "SS-6mo_SPR",
       "log_verbosity": "errors",
       "random_seed": 42
