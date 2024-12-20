@@ -355,7 +355,7 @@ class Pen:
             ndf=0.0,
             fat=0.0,
         )
-        is_milk_production_sufficient = True
+        is_sufficient_for_milk_production = False
         for animal in self.animals_in_pen.values():
             nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
                 feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
@@ -366,8 +366,8 @@ class Pen:
                 animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
             )
 
-            while not is_ration_adequate and is_milk_production_sufficient:
-                if self.animal_combination is AnimalCombination.LAC_COW:
+            while not is_ration_adequate and is_sufficient_for_milk_production:
+                if self.animal_combination == AnimalCombination.LAC_COW:
                     is_production_reduced: bool = animal.reduce_milk_production()
                     if not is_production_reduced:
                         break
@@ -378,7 +378,7 @@ class Pen:
                 )
 
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
-                    is_milk_production_sufficient = True
+                    is_sufficient_for_milk_production = True
                     break
 
             animal.nutrition_supply = nutrition_supply

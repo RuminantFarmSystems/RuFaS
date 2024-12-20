@@ -220,3 +220,23 @@ class NutritionEvaluationResults:
             ndf=self.ndf + other.ndf,
             fat=self.fat + other.fat,
         )
+
+    def __truediv__(self, divisor: float | int) -> "NutritionEvaluationResults":
+        """Divide all NutritionEvaluationResults values by a scalar."""
+        if divisor == 0.0:
+            raise ZeroDivisionError("Cannot divide NutritionEvaluationResults by zero.")
+        total_energy = self.total_energy if self.total_energy is not None else 0.0
+        lactation = self.lactation if self.lactation is not None else 0.0
+
+        return NutritionEvaluationResults(
+            total_energy=total_energy / divisor,
+            maintenance=self.maintenance / divisor,
+            lactation=lactation / divisor,
+            growth=self.growth / divisor,
+            protein=self.protein / divisor,
+            calcium=self.calcium / divisor,
+            phosphorus=self.phosphorus / divisor,
+            dry_matter=self.dry_matter / divisor,
+            ndf=self.ndf / divisor,
+            fat=self.fat / divisor,
+        )
