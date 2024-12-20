@@ -56,7 +56,7 @@ class Feed:
     Fd_Category : FeedCategorization
         Feed category (unitless).
     feed_type : FeedComponentType
-        General type or category of the feed.
+        General type or category of the feed (unitless).
     DM : float
         Percentage of fresh mass that is dry matter of the feed.
     ash : float
