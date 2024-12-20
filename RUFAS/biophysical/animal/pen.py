@@ -339,6 +339,19 @@ class Pen:
         available_feeds : list[Feed]
             List of available feeds to be used in the ration formulation.
 
+        Notes
+        -----
+        The average nutrition requirements of the pen are calculated, and then used to determine the ration given to
+        each animal. Then ration is checked against the nutrition requirements of every individual animal in the pen. If
+        the animal is a lactating cow and the ration does not meet its requirements, then its milk production is reduced
+        until one of three conditions is met:
+        1. The ration meets the animal's requirement.
+        2. The milk production of the animal is reduced by the maximum amount allowed.
+        3. The average milk production of the pen falls below the minimum allowable average milk production.
+
+        If the animal is not a lactating cow, the outcomes of that animal are not affected and its nutrition
+        requirements are not met.
+
         """
         animal_combination = self.animal_combination
         average_animal_requirements: NutritionRequirements = self.average_animal_requirements
@@ -355,30 +368,28 @@ class Pen:
             ndf=0.0,
             fat=0.0,
         )
-        is_sufficient_for_milk_production = False
+        ration_sufficient_for_milk_production = True
         for animal in self.animals_in_pen.values():
-            nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
-            )
-
-            animal.set_nutrition_requirements()
-            is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
-                animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
-            )
-
-            while not is_ration_adequate and is_sufficient_for_milk_production:
-                if self.animal_combination == AnimalCombination.LAC_COW:
-                    is_production_reduced: bool = animal.reduce_milk_production()
-                    if not is_production_reduced:
-                        break
+            while ration_sufficient_for_milk_production:
+                nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
+                    feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
+                )
 
                 animal.set_nutrition_requirements()
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
                 )
 
+                if is_ration_adequate is True:
+                    break
+
+                if self.animal_combination == AnimalCombination.LAC_COW:
+                    is_production_reduced: bool = animal.reduce_milk_production()
+                    if not is_production_reduced:
+                        break
+
                 if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
-                    is_sufficient_for_milk_production = True
+                    ration_sufficient_for_milk_production = False
                     break
 
             animal.nutrition_supply = nutrition_supply
