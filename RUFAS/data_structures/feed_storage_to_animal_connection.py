@@ -52,7 +52,7 @@ class Feed:
     Attributes
     ----------
     rufas_id : RUFAS_ID
-        Unique integer identifier for feeds used within the RuFaS model.
+        Unique integer identifier for feeds used within the RuFaS model (unitless).
     Fd_Category : FeedCategorization
         Feed category.
     feed_type : FeedComponentType
