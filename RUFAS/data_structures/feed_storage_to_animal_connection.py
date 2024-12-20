@@ -170,7 +170,7 @@ class NASEMFeed(Feed):
     Attributes
     ----------
     Name : str
-        Feed name.
+        Feed name (unitless).
     RUP : float
         Rumen undegradable protein (% crude protein).
     sol_prot : float
