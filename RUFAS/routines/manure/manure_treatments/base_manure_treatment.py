@@ -277,6 +277,7 @@ class BaseManureTreatment(ABC):
         (https://doi.org/10.1016/j.compag.2021.106234) who observed similar minimum and maximum liquid manure
         temperatures in outdoor clay pit and concrete tank manure storages.
         """
+        air_temperature = 10
         if manure_treatment_type.name == 'ANAEROBIC_LAGOON':
             return float(np.clip(air_temperature, 10.0, 35.0))
         else:
@@ -362,7 +363,21 @@ class BaseManureTreatment(ABC):
             The daily output from the manure treatment system.
 
         """
+        empty_tweak = True
+        minpercent = 0.25
+
         if self._sim_day % self.storage_time_period == 0:
+            if empty_tweak and "lagoon" in str(type(self)) and not hasattr(self, "minimum_allowed") and self._sim_day > 30:
+                self.minimum_daily_final_manure_volume = self._accumulated_output.daily_final_manure_volume * minpercent
+                self.minimum_liquid_manure_daily_volume = self._accumulated_output.liquid_manure_daily_volume * minpercent
+                self.minimum_solid_manure_daily_mass = self._accumulated_output.solid_manure_daily_mass * minpercent
+                self.minimum_solid_manure_total_volatile_solids = self._accumulated_output.solid_manure_total_volatile_solids * minpercent
+                self.minimum_sludge_manure_total_solids = self._accumulated_output.sludge_manure_total_solids * minpercent
+                self.minimum_sludge_manure_total_volatile_solids = self._accumulated_output.sludge_manure_total_volatile_solids * minpercent
+                self.minimum_liquid_manure_total_solids = self._accumulated_output.liquid_manure_total_solids * minpercent
+                self.minimum_liquid_manure_total_degradable_volatile_solids = self._accumulated_output.liquid_manure_total_degradable_volatile_solids * minpercent
+                self.minimum_liquid_manure_total_non_degradable_volatile_solids = self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids * minpercent
+
             if self._accumulated_output.pen_id >= 0:
                 ManureModuleOutputManagerHelper.add_dataclass_object(
                     self._accumulated_output,
@@ -375,6 +390,17 @@ class BaseManureTreatment(ABC):
                     },
                 )
             self._accumulated_output = manure_treatment_daily_output.clone()
+            if empty_tweak and "lagoon" in str(type(self)) and self._sim_day > 30:
+                self._accumulated_output.daily_final_manure_volume += self.minimum_daily_final_manure_volume
+                self._accumulated_output.liquid_manure_daily_volume += self.minimum_liquid_manure_daily_volume
+                self._accumulated_output.solid_manure_daily_mass += self.minimum_solid_manure_daily_mass
+
+                self._accumulated_output.liquid_manure_total_solids += self.minimum_liquid_manure_total_solids
+                self._accumulated_output.sludge_manure_total_volatile_solids += self.minimum_sludge_manure_total_volatile_solids
+                self._accumulated_output.sludge_manure_total_solids += self.minimum_sludge_manure_total_solids
+                self._accumulated_output.solid_manure_total_volatile_solids += self.minimum_solid_manure_total_volatile_solids
+                self._accumulated_output.liquid_manure_total_degradable_volatile_solids += self.minimum_liquid_manure_total_degradable_volatile_solids
+                self._accumulated_output.liquid_manure_total_non_degradable_volatile_solids += self.minimum_liquid_manure_total_non_degradable_volatile_solids
         else:
             self._accumulated_output += manure_treatment_daily_output
 
