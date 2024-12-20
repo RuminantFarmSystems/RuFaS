@@ -114,8 +114,8 @@ class NutritionEvaluationResults:
     phosphorus : float
         Surplus or deficit of phosphorus in a ration (g).
     dry_matter : float
-        Amount of dry matter by which a ration was outside the acceptable bounds (kg). If dry matter was acceptable,
-        this value is 0.0.
+        Amount of dry matter by which a ration was outside the acceptable bounds (kg). If dry matter is within acceptable bounds,
+        this value will be 0.0.
     ndf : float
         Surplus or deficit of neutral detergent fiber (NDF) in a ration. If NDF was acceptable, this valus is 0.0.
     fat : float
