@@ -225,7 +225,8 @@ class GraphGenerator:
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
             self._draw_graph(
-                graph_details["type"], prepared_data, list(prepared_data.keys()), ax, mask_values, use_calendar_dates
+                graph_details["type"], prepared_data, list(prepared_data.keys()), ax, mask_values, use_calendar_dates,
+                graph_details.get("slice_start", None), graph_details.get("slice_end", None)
             )
             if graph_details.get("title"):
                 corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
@@ -534,6 +535,8 @@ class GraphGenerator:
         ax: Axes,
         mask_values: bool = False,
         use_calendar_dates: bool = False,
+        slice_start: int | None = None,
+        slice_end: int | None = None,
     ) -> None:
         """
         Draw the graph based on the provided graph type and data.
@@ -549,10 +552,14 @@ class GraphGenerator:
         mask_values : bool, default False
             Whether data that will be plotted with non-tuple based functions should be masked to remove None or NaN
             values.
-        ax : Axes, default None
+        ax : Axes
             The matplotlib Axes object to plot the graph on.
         use_calendar_dates : bool, default False
             Whether to use calendar dates on the x-axis.
+        slice_start : int, default None
+            The starting index of the data to plot.
+        slice_end : int, default None
+            The ending index of the data to plot.
 
         Raises
         ------
@@ -561,14 +568,27 @@ class GraphGenerator:
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
-        dates_in_data_range = [
-            self.time.start_date + datetime.timedelta(days=i) for i in range(max(len(v) for v in data.values()))
-        ]
+        max_data_length = max(len(v) for v in data.values())
+        if slice_start is not None:
+            if slice_start < 0:
+                slice_start = max(0, self.time.simulation_length_days + slice_start)
+            if slice_end is None or slice_end > self.time.simulation_length_days:
+                slice_end = self.time.simulation_length_days
+            elif slice_end < 0:
+                slice_end = max(0, self.time.simulation_length_days + slice_end)
+            dates_in_data_range = [
+                self.time.convert_simulation_day_to_date(i) for i in range(slice_start, slice_end)
+            ]
+        else:
+            dates_in_data_range = [
+                self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)
+            ]
         plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
 
-        def get_x_values(values_length: int) -> list[int]:
-            """Get appropriate x-axis values based on user choice."""
-            return dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
+        get_x_values : Callable[[int], list[int]] = (
+            lambda values_length: dates_in_data_range[:values_length] if use_calendar_dates else
+            list(range(values_length))
+        )
 
         if graph_type in TUPLE_BASED_FUNCTIONS:
             values_tuple = tuple(data[variable] for variable in selected_variables)
