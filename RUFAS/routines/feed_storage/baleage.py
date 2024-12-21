@@ -17,6 +17,8 @@ class Baleage(Storage):
     ----------
     bale_density : float
         Density of the bale, calculated based on the dry matter.
+    post_wilting_moisture_percentage : float
+        The post-wilting moisture level that baleage will dry down to (unitless).
 
     Methods
     -------
@@ -28,7 +30,6 @@ class Baleage(Storage):
         super().__init__(capacity)
         im = InputManager()
         self.post_wilting_moisture_percentage: float = im.get_data("feed_management.post_wilting_moisture_percentage")
-        print(self.post_wilting_moisture_percentage)
         self.acceptable_crops = [
             CropCategory.ALFALFA,
             CropCategory.GRASS,
