@@ -188,7 +188,14 @@
       "path": "input/data/field/default_field.json",
       "type": "json",
       "properties": "field_properties"
-    }
-  },
-  "cross-validation": {}
+    },
+    "feed_management": {
+      "title": "Feed Management Dataset",
+      "description": "Feed management data.",
+      "path": "input/data/feed_management/default_feed_management.json",
+      "type": "json",
+      "properties": "feed_storage_input_properties"
+    },
+    "cross-validation": {}
+  }
 }
