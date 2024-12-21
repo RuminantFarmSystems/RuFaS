@@ -543,7 +543,7 @@
           "description": "Defines probabilities and distributions for death and six health-related reasons (feet-and-leg, injury, mastitis, disease, udder, unknown) an animal might be removed (culled) from the herd.",
           "cull_day_count": {
             "type": "array",
-            "description": "Defines breakpoints that partition the cumulative distribution function (CDF) for culling probabilities into segments. These values correspond to the 'cull_day_prob' array, allowing for more accurate definition of the CDF.", 
+            "description": "Defines breakpoints that partition the cumulative distribution function (CDF) for culling probabilities into segments. These values correspond to the 'cull_day_prob' array, allowing for more accurate definition of the CDF.The numbers in the array represent days into the lactation (days in milk).", 
             "properties": {
               "type": "number",
               "minimum": 0
@@ -554,7 +554,7 @@
             "description": "Cull probabilities due to feet-and-leg-related health issues.",
             "probability": {
               "type": "number",
-              "description": "Conditional probability that a culled animal is removed due to feet-and-leg-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six  culling reasons equals 1.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to feet-and-leg-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six  culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
@@ -573,7 +573,7 @@
             "description": "Cull probabilities due to injury-related health issues.",
             "probability": {
               "type": "number",
-              "description": "Conditional probability that a culled animal is removed due to injury-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to injury-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
@@ -592,7 +592,7 @@
             "description": "Cull probabilities due to mastitis-related health issues.",
             "probability": {
               "type": "number",
-              "description": "Conditional probability that a culled animal is removed due to mastitis-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to mastitis-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
@@ -611,7 +611,7 @@
             "description": "Cull probabilities due to disease-related health issues.",
             "probability": {
               "type": "number",
-              "description": "Conditional probability that a culled animal is removed due to general disease-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to general disease-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
@@ -630,7 +630,7 @@
             "description": "Cull probabilities due to udder-related health issues.",
             "probability": {
               "type": "number",
-              "description": "Conditional probability that a culled animal is removed due to udder-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to udder-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
@@ -649,7 +649,7 @@
             "description": "Cull probabilities due to other health issues.",
             "probability": {
               "type": "number",
-              "description": "Conditional probability that a culled animal is removed due to unknown reasons. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to unknown reasons. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
@@ -678,7 +678,7 @@
             "description": "Cull Probability, by Parity",
             "properties": {
               "type": "number",
-              "description": "Cull Probability, by Parity -- The probability of culling for cows of a single parity (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
+              "description": "Cull Probability, by Parity Group -- The probability of culling for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total). Culling refers to removal from the herd while alive.",
               "minimum": 0,
               "maximum": 1
             }
