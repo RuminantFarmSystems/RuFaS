@@ -52,11 +52,11 @@ class Feed:
     Attributes
     ----------
     rufas_id : RUFAS_ID
-        Unique integer identifier for feeds used within the RuFaS model.
+        Unique integer identifier for feeds used within the RuFaS model (unitless).
     Fd_Category : FeedCategorization
-        Feed category.
+        Feed category (unitless).
     feed_type : FeedComponentType
-        General type or category of the feed.
+        General type or category of the feed (unitless).
     DM : float
         Percentage of fresh mass that is dry matter of the feed.
     ash : float
@@ -102,9 +102,9 @@ class Feed:
     sulfur : float
         Sulphur (% dry matter).
     is_fat : bool
-        Identifier of fat type feed.
+        Identifier of fat type feed (unitless).
     is_wetforage : float
-        Identifier of wet forage type feed.
+        Identifier of wet forage type feed (unitless).
     units : MeasurementUnits
         TODO: document this! Also, is it possible to just have one unit for all feeds, preferable kg?
     limit : float
@@ -170,7 +170,7 @@ class NASEMFeed(Feed):
     Attributes
     ----------
     Name : str
-        Feed name.
+        Feed name (unitless).
     RUP : float
         Rumen undegradable protein (% crude protein).
     sol_prot : float

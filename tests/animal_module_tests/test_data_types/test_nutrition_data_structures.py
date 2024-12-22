@@ -1,7 +1,10 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionEvaluationResults, NutritionRequirements
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
+    NutritionEvaluationResults,
+    NutritionRequirements,
+)
 
 
 @pytest.fixture
@@ -20,9 +23,17 @@ def evaluation(mocker: MockerFixture) -> NutritionEvaluationResults:
 
 @pytest.mark.parametrize(
     "maintenance,growth,pregnancy,lactation,activity,expected",
-    [(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), (10.0, 20.0, 30.0, 40.0, 50.0, 150.0)]
+    [(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), (10.0, 20.0, 30.0, 40.0, 50.0, 150.0)],
 )
-def test_total_energy_requirement(requirements: NutritionRequirements, maintenance: float, growth: float, pregnancy: float, lactation: float, activity: float, expected: float) -> None:
+def test_total_energy_requirement(
+    requirements: NutritionRequirements,
+    maintenance: float,
+    growth: float,
+    pregnancy: float,
+    lactation: float,
+    activity: float,
+    expected: float,
+) -> None:
     """Test that total energy requirement is calculated correctly."""
     requirements.maintenance = maintenance
     requirements.growth = growth
@@ -37,25 +48,29 @@ def test_total_energy_requirement(requirements: NutritionRequirements, maintenan
 
 @pytest.mark.parametrize(
     "protein,ndf,fat,dry_matter,expected",
-    ([0.0, 0.0, 0.0, 0.0, True], [1.0, 0.0, 0.0, 0.0, False], [0.0, 0.0, -3.0, 0.0, False])
+    ([0.0, 0.0, 0.0, 0.0, True], [1.0, 0.0, 0.0, 0.0, False], [0.0, 0.0, -3.0, 0.0, False]),
 )
-def test_clamped_values_are_valid(evaluation: NutritionEvaluationResults, protein: float, ndf: float, fat: float, dry_matter: float, expected: bool) -> None:
+def test_are_clamped_values_acceptable(
+    evaluation: NutritionEvaluationResults, protein: float, ndf: float, fat: float, dry_matter: float, expected: bool
+) -> None:
     """Test that clamped values are checked correctly."""
     evaluation.protein = protein
     evaluation.ndf = ndf
     evaluation.fat = fat
     evaluation.dry_matter = dry_matter
 
-    actual = evaluation._clamped_values_are_valid
+    actual = evaluation._are_clamped_values_acceptable
 
     assert actual == expected
 
 
 @pytest.mark.parametrize(
     "maint,growth,calcium,phos,expected",
-    [(20.0, 0.0, 1.0, 2.0, True), (0.0, 0.0, 0.0, 0.0, True), (-10.0, 30.0, 2.0, 1.0, False)]
+    [(20.0, 0.0, 1.0, 2.0, True), (0.0, 0.0, 0.0, 0.0, True), (-10.0, 30.0, 2.0, 1.0, False)],
 )
-def test_is_valid_heifer_ration(evaluation: NutritionEvaluationResults, maint: float, growth: float, calcium: float, phos: float, expected: float) -> None:
+def test_is_valid_heifer_ration(
+    evaluation: NutritionEvaluationResults, maint: float, growth: float, calcium: float, phos: float, expected: float
+) -> None:
     """Test that results correctly indicate whether heifer ration is valid."""
     evaluation.protein, evaluation.ndf, evaluation.fat, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
     evaluation.total_energy, evaluation.lactation = None, None
@@ -71,9 +86,23 @@ def test_is_valid_heifer_ration(evaluation: NutritionEvaluationResults, maint: f
 
 @pytest.mark.parametrize(
     "total,maint,lactation,growth,calcium,phos,expected",
-    [(30.0, 20.0, 0.0, 0.0, 1.0, 2.0, True), (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, True), (30.0, -10.0, 20.0, 30.0, 2.0, 1.0, False), (None, 10.0, 13.0, 10.0, 20.0, 15.0, False)]
+    [
+        (30.0, 20.0, 0.0, 0.0, 1.0, 2.0, True),
+        (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, True),
+        (30.0, -10.0, 20.0, 30.0, 2.0, 1.0, False),
+        (None, 10.0, 13.0, 10.0, 20.0, 15.0, False),
+    ],
 )
-def test_is_valid_cow_ration(evaluation: NutritionEvaluationResults, total: float | None, maint: float, lactation: float, growth: float, calcium: float, phos: float, expected: float) -> None:
+def test_is_valid_cow_ration(
+    evaluation: NutritionEvaluationResults,
+    total: float | None,
+    maint: float,
+    lactation: float,
+    growth: float,
+    calcium: float,
+    phos: float,
+    expected: float,
+) -> None:
     """Test that results correctly indicate whether cow ration is valid."""
     evaluation.protein, evaluation.ndf, evaluation.fat, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
     evaluation.total_energy = total
