@@ -25,7 +25,7 @@ class NutritionRequirements:
     phosphorus : float
         Phosphorus requirement (g).
     dry_matter : float
-        Dry matter intake (kg).
+        Dry matter intake requirement (kg).
     activity : float
         Net energy requirement for activity (Mcal).
     essential_amino_acids : EssentialAminoAcidRequirements
@@ -100,27 +100,30 @@ class NutritionEvaluationResults:
     Attributes
     ----------
     total_energy : float | None
-        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers.
+        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers TODO: add explanation for this.
     maintenance : float
         Surplus or deficit of energy in a ration for maintenance (Mcal).
     lactation : float | None
-        Surplus or deficit of lactation in a ration (Mcal). Necessary to know for cows, not heifers.
+        Surplus or deficit of lactation in a ration (Mcal). This value is None when evaluating nutrition requirements of
+        heifers, because they are never lactating.
     growth : float
         Surplus or deficit of energy in a ration for growth (Mcal).
     protein : float
-        Amount of metabolizable protein by which a ration was outside the acceptable bounds (g). If protein was
-        acceptable, this value is 0.0.
+        Amount of metabolizable protein by which a ration was outside the acceptable bounds (g). If protein is within
+        acceptable bounds, this value will be 0.0.
     calcium : float
         Surplus or deficit of calcium in a ration (g).
     phosphorus : float
         Surplus or deficit of phosphorus in a ration (g).
     dry_matter : float
-        Amount of dry matter by which a ration was outside the acceptable bounds (kg). If dry matter was acceptable,
-        this value is 0.0.
+        Amount of dry matter by which a ration was outside the acceptable bounds (kg). If dry matter is within
+        acceptable bounds, this value will be 0.0.
     ndf : float
-        Surplus or deficit of neutral detergent fiber (NDF) in a ration. If NDF was acceptable, this valus is 0.0.
+        Surplus or deficit of neutral detergent fiber (NDF) in a ration. If NDF is within acceptable bounds, this value
+        will be 0.0.
     fat : float
-        Surplus or deficit of fat percentage in a ration. If fat percentage was acceptable, this value is 0.0.
+        Surplus or deficit of fat percentage in a ration. If fat percentage is within acceptable bounds, this value will
+        be 0.0.
     is_valid_heifer_ration
     is_valid_cow_ration
 
@@ -137,7 +140,7 @@ class NutritionEvaluationResults:
     fat: float
 
     @property
-    def _clamped_values_are_valid(self) -> bool:
+    def _are_clamped_values_acceptable(self) -> bool:
         """Checks that values which must be in a certain range are in that range."""
         clamped_values = [self.protein, self.ndf, self.fat, self.dry_matter]
         return all([value == 0.0 for value in clamped_values])
@@ -148,7 +151,7 @@ class NutritionEvaluationResults:
         non_negative_fields = {self.maintenance, self.growth, self.calcium, self.phosphorus}
         valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
 
-        return valid_non_negative_fields and self._clamped_values_are_valid
+        return valid_non_negative_fields and self._are_clamped_values_acceptable
 
     @property
     def is_valid_cow_ration(self) -> bool:
@@ -156,9 +159,6 @@ class NutritionEvaluationResults:
         if self.total_energy is None or self.lactation is None:
             return False
 
-        non_negative_fields = {
-            self.total_energy, self.maintenance, self.lactation, self.growth, self.calcium, self.phosphorus
-        }
-        valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
+        valid_non_negative_fields = all([field >= 0.0 for field in {self.total_energy, self.lactation}])
 
-        return valid_non_negative_fields and self._clamped_values_are_valid
+        return valid_non_negative_fields and self._are_clamped_values_acceptable and self.is_valid_heifer_ration
