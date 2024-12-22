@@ -150,9 +150,6 @@ class HerdManager:
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
-        user_defined_ration_manager = UserDefinedRationManager()
-        self.ration_user_input = animal_config_data["ration"]["user_input"]
-        user_defined_ration_manager.use_user_defined_ration = self.ration_user_input
         self.is_ration_defined_by_user = animal_config_data["ration"]["user_input"]
         if self.is_ration_defined_by_user:
             ration_feed_config = self.im.get_data("feed")
@@ -195,7 +192,7 @@ class HerdManager:
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
 
-    def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> list[HerdManagerOutput]:
+    def daily_routines(self, available_feeds: list[Feed], weather: Weather, time: Time) -> list[HerdManagerOutput]:
         current_conditions = weather.get_current_day_conditions(time)
         current_temperature = current_conditions.mean_air_temperature
 
@@ -288,7 +285,7 @@ class HerdManager:
 
         for pen in self.all_pens:
             if pen.needs_ration_formulation or self.end_ration_interval(time.simulation_day):
-                self.reformulate_ration_single_pen(pen, current_temperature, feed)
+                self.reformulate_ration_single_pen(pen, available_feeds, current_conditions.mean_air_temperature)
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
@@ -1077,7 +1074,7 @@ class HerdManager:
             or simulation_day == 0
         )
 
-    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float) -> None:
+    def reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
         """
         Reformulates ration for a single pen.
 
@@ -1089,7 +1086,10 @@ class HerdManager:
             Current temperature.
         
         """
-        pen.formulate_new_ration()
+        if self.is_ration_defined_by_user is True:
+            pen.use_user_defined_ration(available_feeds, current_temperature)
+        else:
+            pen.formulate_optimized_ration(available_feeds)
 
 
     def update_herd_statistics(self) -> None:
