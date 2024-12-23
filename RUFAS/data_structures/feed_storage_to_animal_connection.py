@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
@@ -366,7 +367,14 @@ class RequestedFeed:
     requested_feed: dict[RUFAS_ID, float]
 
     def __add__(self, other: "RequestedFeed") -> "RequestedFeed":
-        pass  # TODO: implement me
+        if not isinstance(other, RequestedFeed):
+            raise NotImplementedError
+
+        combined_feed = defaultdict(float, self.requested_feed)
+        for feed_id, amount in other.requested_feed.items():
+            combined_feed[feed_id] += amount
+
+        return RequestedFeed(dict(combined_feed))
 
 
 class PurchaseAllowance:
