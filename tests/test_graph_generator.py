@@ -528,12 +528,12 @@ def test_draw_graph_sliced_data(graph_generator: GraphGenerator, mocker: MockerF
 @pytest.mark.parametrize(
     "user_input, expected_format",
     [
-        ("day_of_year", "%j/%Y"),    # Valid input: Day of Year / Year
+        ("day_of_year", "%j/%Y"),  # Valid input: Day of Year / Year
         ("day_month_year", "%d/%m/%Y"),  # Valid input: Day / Month / Year
         ("unknown_format", "%d/%m/%Y"),  # Invalid input: Default fallback
-        ("", "%d/%m/%Y"),           # Edge case: Empty string
-        (None, "%d/%m/%Y"),         # Edge case: None input
-        (12345, "%d/%m/%Y"),        # Edge case: Non-string input
+        ("", "%d/%m/%Y"),  # Edge case: Empty string
+        (None, "%d/%m/%Y"),  # Edge case: None input
+        (12345, "%d/%m/%Y"),  # Edge case: Non-string input
     ],
 )
 def test_get_date_formatter(user_input: str | None, expected_format: str) -> None:
