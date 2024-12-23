@@ -185,11 +185,13 @@ class CalfRationManager:
 
         if cls.milk_type == CalfMilkType.WHOLE:
             whole_milk_intake = 0.1 * birth_weight * whole_milk.DM * GeneralConstants.PERCENTAGE_TO_FRACTION
-            milk_replacer_intake = 0.0
+            whole_milk_metabolizable_energy = 0.96 * whole_milk.DE
+            milk_replacer_intake, milk_replacer_metabolizable_energy = 0.0, 0.0
             milk_intake_wean = whole_milk_intake * wean_fraction
         else:
-            whole_milk_intake = 0.0
+            whole_milk_intake, whole_milk_metabolizable_energy = 0.0, 0.0
             milk_replacer_intake = 0.1 * birth_weight * milk_replacer.DM * GeneralConstants.PERCENTAGE_TO_FRACTION
+            milk_replacer_metabolizable_energy = 0.96 * milk_replacer.DE
             milk_intake_wean = milk_replacer_intake * wean_fraction
 
         if body_weight <= 50.0:
@@ -201,8 +203,6 @@ class CalfRationManager:
 
         dry_matter_intake = whole_milk_intake + milk_replacer_intake + starter_intake
 
-        whole_milk_metabolizable_energy = 0.96 * whole_milk.DE
-        milk_replacer_metabolizable_energy = 0.96 * milk_replacer.DE
         starter_metabolizable_energy = (1.01 * starter.DE - 0.45) + 0.0046 * (starter.DE - 3)
 
         milk_me_intake = (
@@ -221,7 +221,7 @@ class CalfRationManager:
         starter_cp_intake = GeneralConstants.PERCENTAGE_TO_FRACTION * starter.CP * starter_intake
         total_cp_intake = milk_cp_intake + starter_cp_intake
 
-        adp_intake = (0.93 * milk_cp_intake / total_cp_intake + 0.75 * starter_cp_intake / total_cp_intake) * 1000
+        adp_intake = (0.93 * milk_cp_intake / total_cp_intake + 0.75 * starter_cp_intake / total_cp_intake) * GeneralConstants.KG_TO_GRAMS
 
         milk_proportion = (whole_milk_intake + milk_replacer_intake) / dry_matter_intake
         starter_proportion = starter_intake / dry_matter_intake
