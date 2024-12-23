@@ -193,7 +193,7 @@ class FeedManager:
 
         self.purchase_feed(feeds_to_purchase)
 
-    def _query_available_feed_totals(self, query_feed_ids: list[int]) -> dict[int, float]:
+    def _query_available_feed_totals(self, query_feed_ids: list[RUFAS_ID]) -> dict[RUFAS_ID, float]:
         """Gets the current dry matter mass of each feed ID currently in storage"""
         feed_totals = {rufas_id: 0.0 for rufas_id in query_feed_ids}
 
@@ -299,7 +299,7 @@ class FeedManager:
             im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
         )
 
-        feed_library = Utility.convert_dict_of_lists_to_dict_of_lists(feed_library)
+        feed_library = Utility.convert_dict_of_lists_to_list_of_dicts(feed_library)
 
         feed_library = {feed["rufas_id"]: feed for feed in feed_library}
         for feed in feed_library.values():

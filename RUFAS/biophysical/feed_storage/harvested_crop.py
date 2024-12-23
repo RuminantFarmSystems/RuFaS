@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 
@@ -16,6 +17,8 @@ class HarvestedCrop:
 
     Attributes
     ----------
+    rufas_id : RUFAS_ID
+        Unique identifier for the RuFaS feed that this crop is associated with.
     category : CropCategory
         The category of the crop (enum).
     type : CropType
@@ -73,6 +76,7 @@ class HarvestedCrop:
 
     """
 
+    rufas_id: RUFAS_ID
     category: CropCategory
     type: CropType
     harvest_time: Time
