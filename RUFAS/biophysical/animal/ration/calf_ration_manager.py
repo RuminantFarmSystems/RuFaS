@@ -1,6 +1,13 @@
-# from .hardcoded_ration import get_ration
 import math
 from typing import Any, Dict
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
+from RUFAS.general_constants import GeneralConstants
+
+
+"""RuFaS IDs for supported calf feeds."""
+WHOLE_MILK_ID = 202
+MILK_REPLACER_ID = 203
+STARTER_ID = 216
 
 
 class CalfRationManager:
@@ -185,116 +192,87 @@ class CalfRationManager:
     @classmethod
     def calc_intake(
         cls,
-        calf,
-        feed: Dict[str, float],
+        birth_weight: float,
+        body_weight: float,
         wean_day: int,
         wean_length: int,
         milk_type: str,
-    ) -> Dict[str, float]:
+        available_feeds: list[Feed]
+    ) -> dict[str, float]:
         """
-        Calculating calf intake values.
-
+        Calculates the amounts of whole milk, milk replacer, and starter that a calf consumes.
 
         Parameters
         ----------
-        calf : Calf
-            Calf object
-        feed : Dict[str, float]
-            Instance of Feed class defined in feed.py.
+        birth_weight : float
+            Birth weight of the calf (kg).
+        body_weight : float
+            Body weight of the calf (kg).
         wean_day : int
             Number of days after birth that calf is fully weaned from milk (or replacer).
         wean_length : int
-            Wean length of the calf, in days.
+            Wean length of the calf (days).
         milk_type : string
             Either "whole" or "replacer".
+        available_feeds : list[Feed]
+            List of feeds available to the calf.
 
         Returns
         -------
-        Dict[str, float]
-            Dictionary of intake values.
+        dict[str, float]
+            Amounts of feed taken in by calf and nutritive content of the intake.
+
+        References
+        ----------
+        Animal Scientific Documentation [A.1B]
 
         """
-        # nutrient composition of feeds from the feed library
-        whole_milk_id = 202
-        milk_replacer_id = 203
-        starter_id = 216
-        calf_feeds = feed.calf_feeds
 
-        whole_milk_dm = calf_feeds[whole_milk_id]["DM"]
-        whole_milk_cp = calf_feeds[whole_milk_id]["CP"]
-        de_key = "DE_Base" if "DE_Base" in calf_feeds[whole_milk_id].keys() else "DE"
-        whole_milk_de = calf_feeds[whole_milk_id][de_key]
-        milk_replacer_de = calf_feeds[milk_replacer_id][de_key]
-        starter_de = calf_feeds[starter_id][de_key]
+        whole_milk = next(feed for feed in available_feeds if feed.rufas_id == WHOLE_MILK_ID)
+        milk_replacer = next(feed for feed in available_feeds if feed.rufas_id == MILK_REPLACER_ID)
+        starter = next(feed for feed in available_feeds if feed.rufas_id == STARTER_ID)
 
-        # [A.1B.C.1]
-        whole_milk_me = 0.96 * whole_milk_de
+        whole_milk_metabolizable_energy = 0.96 * whole_milk.DE
+        milk_replacer_metabolizable_energy = 0.96 * milk_replacer.DE
+        starter_metabolizable_energy = (1.01 * starter.DE - 0.45) + 0.0046 * (starter.DE - 3)
 
-        milk_replacer_dm = calf_feeds[milk_replacer_id]["DM"]
-        milk_replacer_cp = calf_feeds[milk_replacer_id]["CP"]
-        # [A.1B.C.1]
-        milk_replacer_me = 0.96 * milk_replacer_de
-
-        starter_cp = calf_feeds[starter_id]["CP"]
-        starter_ee = calf_feeds[starter_id]["EE"]
-        # [A.1B.C.2]
-        starter_me = (1.01 * starter_de - 0.45) + 0.0046 * (starter_ee - 3)
+        wean_start = wean_day - wean_length - 1
+        milk_reduct = round(0.5 * wean_length)
+        wean_fraction = (1 - milk_reduct / (wean_length + 1))
 
         if milk_type == "whole":
-            milk_replacer_dm = 0
+            whole_milk_intake = 0.1 * birth_weight * whole_milk.DM * 0.01
+            milk_replacer_intake = 0.0
+            milk_intake_wean = whole_milk_intake * wean_fraction
         else:
-            whole_milk_dm = 0
+            whole_milk_intake = 0.0
+            milk_replacer_intake = 0.1 * birth_weight * 0.15 * milk_replacer.DM * 0.01
+            milk_intake_wean = milk_replacer_intake * wean_fraction
 
-        # milk-based feed intake
-        # [A.1B.A.1]
-        whole_milk_intake = 0.1 * calf.birth_weight * whole_milk_dm * 0.01
-        # [A.1B.A.2]
-        milk_replacer_intake = 0.1 * calf.birth_weight * 0.15 * milk_replacer_dm * 0.01
-
-        # starter intake
-        # [A.1B.A.3]
-        if calf.body_weight <= 69.365:
-            starter_intake = -0.24783 + 0.0049567 * calf.body_weight
+        if body_weight <= 69.365:
+            starter_intake = -0.24783 + 0.0049567 * body_weight
         else:
-            starter_intake = -6.2263 + 0.091145 * calf.body_weight
+            starter_intake = -6.2263 + 0.091145 * body_weight
 
-        # reduction in intake during weaning
-        # [A.1B.B.1]
-        wean_start = wean_day - wean_length - 1
-        # [A.1B.B.2]
-        milk_reduct = round(0.5 * wean_length)
+        dry_matter_intake = whole_milk_intake + milk_replacer_intake + starter_intake
 
-        # [A.1B.B.3]
-        if whole_milk_intake != 0:
-            milk_intake_wean = whole_milk_intake * (1 - milk_reduct / (wean_length + 1))
-        else:
-            milk_intake_wean = milk_replacer_intake * (1 - milk_reduct / (wean_length + 1))
+        milk_me_intake = whole_milk_metabolizable_energy * whole_milk_intake + milk_replacer_metabolizable_energy * milk_replacer_intake
+        starter_me_intake = starter_metabolizable_energy * starter_intake
+        me_intake = milk_me_intake + starter_me_intake
 
-        # [A.1B.D.1]
-        dm_intake = whole_milk_intake + milk_replacer_intake + starter_intake
-        # [A.1B.C.4]
-        me_intake = (
-            whole_milk_me * whole_milk_intake + milk_replacer_me * milk_replacer_intake + starter_me * starter_intake
+        milk_me_proportion = milk_me_intake / me_intake
+        starter_me_proportion = starter_me_intake / me_intake
+
+        milk_cp_intake = GeneralConstants.PERCENTAGE_TO_FRACTION * (
+            whole_milk.CP * whole_milk_intake + milk_replacer.CP * milk_replacer_intake
         )
-        # [A.1B.E.1]
-        cp_intake = 0.01 * (
-            whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake + starter_cp * starter_intake
-        )
+        starter_cp_intake = GeneralConstants.PERCENTAGE_TO_FRACTION * starter.CP * starter_intake
+        total_cp_intake = milk_cp_intake + starter_cp_intake
 
-        # [A.1B.C.5]
-        milk_me_proportion = (whole_milk_intake * whole_milk_me + milk_replacer_intake * milk_replacer_me) / me_intake
-        # [A.1B.C.6]
-        starter_me_proportion = starter_intake * starter_me / me_intake
+        adp_intake = (0.93 * milk_cp_intake / total_cp_intake + 0.75 * starter_cp_intake / total_cp_intake) * 1000
 
-        # [A.1B.E.2]
-        milk_cp_intake = 0.01 * (whole_milk_cp * whole_milk_intake + milk_replacer_cp * milk_replacer_intake)
-        starter_cp_intake = 0.01 * starter_cp * starter_intake
-        adp_intake = (0.93 * milk_cp_intake / cp_intake + 0.75 * starter_cp_intake / cp_intake) * 1000
-
-        # [A.1B.D.2]
-        milk_proportion = (whole_milk_intake + milk_replacer_intake) / dm_intake
-        # [A.1B.D.3]
-        starter_proportion = starter_intake / dm_intake
+        milk_proportion = (whole_milk_intake + milk_replacer_intake) / dry_matter_intake
+        starter_proportion = starter_intake / dry_matter_intake
 
         animal_intake = {
             "whole_milk_intake": whole_milk_intake,
@@ -303,9 +281,9 @@ class CalfRationManager:
             "wean_start": wean_start,
             "milk_reduction": milk_reduct,
             "milk_intake_wean": milk_intake_wean,
-            "dm_intake": dm_intake,
+            "dry_matter_intake": dry_matter_intake,
             "me_intake": me_intake,
-            "cp_intake": cp_intake,
+            "cp_intake": total_cp_intake,
             "adp_intake": adp_intake,
             "milk_me_proportion": milk_me_proportion,
             "starter_me_proportion": starter_me_proportion,
