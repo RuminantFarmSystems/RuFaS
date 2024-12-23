@@ -463,6 +463,67 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: Mocker
     assert masker.call_count == 2
 
 
+def test_draw_graph_sliced_data(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    """Tests _draw_graph with in the GraphGenerator with sliced data."""
+    data = {
+        "key1": [2, 3, 4],
+        "key2": [8, 9, 10],
+    }
+    slice_start = 1
+    slice_end = 4
+    expected_indices = [
+        datetime.datetime(2020, 1, 2),
+        datetime.datetime(2020, 1, 3),
+        datetime.datetime(2020, 1, 4),
+    ]
+
+    mock_time = MagicMock()
+    mock_time.start_date = datetime.datetime(2020, 1, 1)
+    mock_time.convert_slice_to_simulation_day.side_effect = lambda x: x
+    mock_time.convert_simulation_day_to_date.side_effect = lambda x: mock_time.start_date + datetime.timedelta(days=x)
+    graph_generator.time = mock_time
+
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+    masker = mocker.patch(
+        "RUFAS.graph_generator.GraphGenerator._mask_values",
+        side_effect=lambda values: (expected_indices, values),
+    )
+
+    with patch.dict(
+        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
+    ) as mock_plot_functions_dict:
+        graph_generator._draw_graph(
+            "plot",
+            data,
+            list(data.keys()),
+            mask_values=False,
+            ax=mock_ax,
+            use_calendar_dates=True,
+            slice_start=slice_start,
+            slice_end=slice_end,
+        )
+
+        mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key1"])
+        mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key2"])
+
+        graph_generator._draw_graph(
+            "plot",
+            data,
+            list(data.keys()),
+            mask_values=True,
+            ax=mock_ax,
+            use_calendar_dates=True,
+            slice_start=slice_start,
+            slice_end=slice_end,
+        )
+
+        mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key1"])
+        mock_plot_functions_dict["plot"].assert_any_call(expected_indices, data["key2"])
+
+    assert masker.call_count == 2
+
+
 def test_mask_values(graph_generator: GraphGenerator) -> None:
     """Tests _mask_values in the GraphGenerator."""
     values_one = [1, 2, 3, 4]
