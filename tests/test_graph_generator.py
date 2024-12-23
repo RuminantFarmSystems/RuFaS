@@ -378,7 +378,8 @@ def test_generate_legend_keys(
         ({}, {}, []),
     ],
 )
-def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend):
+def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend
+                          ) -> None:
     result = graph_generator._set_graph_legend(graph_details, prepared_data)
     assert result["legend"] == expected_legend
 
@@ -667,7 +668,7 @@ def test_log_non_numerical_data(
 )
 def test_validate_graph_filter(
     graph_generator: GraphGenerator,
-    graph_details: Dict[str, str],
+    graph_details: dict[str, str],
     expected_length: int,
     expected_message: str,
 ) -> None:
@@ -726,7 +727,7 @@ def test_add_var_units(
     graph_title: str,
     expected_output: dict[str, dict[str, list[Any]]],
     expected_logs: list[dict[str, str | dict[str, str]]],
-):
+) -> None:
     """Test for the _add_var_units() method in graph_generator.py"""
     updated_pool, logs = graph_generator._add_var_units(filtered_pool, graph_title)
     assert updated_pool == expected_output
