@@ -10,16 +10,13 @@ from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingSce
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
-from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
-from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
 from RUFAS.biophysical.feed.feed import Feed
-from RUFAS.biophysical.animal.ration.user_defined_ration import UserDefinedRationManager
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -127,7 +124,6 @@ class HerdManager:
             AnimalCombination.CALF: [],
             AnimalCombination.GROWING: [],
             AnimalCombination.CLOSE_UP: [],
-            AnimalCombination.GROWING_AND_CLOSE_UP: [],
             AnimalCombination.LAC_COW: [],
         }
 
@@ -148,9 +144,10 @@ class HerdManager:
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
-        user_defined_ration_manager = UserDefinedRationManager()
-        self.ration_user_input = animal_config_data["ration"]["user_input"]
-        user_defined_ration_manager.use_user_defined_ration = self.ration_user_input
+        self.is_ration_defined_by_user = animal_config_data["ration"]["user_input"]
+        if self.is_ration_defined_by_user:
+            ration_feed_config = self.im.get_data("feed")
+            UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
@@ -189,7 +186,7 @@ class HerdManager:
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
 
-    def daily_routines(self, feed: Feed, weather: Weather, time: Time) -> list[HerdManagerOutput]:
+    def daily_routines(self, available_feeds: list[Feed], weather: Weather, time: Time) -> list[HerdManagerOutput]:
         current_conditions = weather.get_current_day_conditions(time)
         current_temperature = current_conditions.mean_air_temperature
 
@@ -282,7 +279,7 @@ class HerdManager:
 
         for pen in self.all_pens:
             if pen.needs_ration_formulation or self.end_ration_interval(time.simulation_day):
-                self.reformulate_ration_single_pen(pen, current_temperature, feed)
+                self.reformulate_ration_single_pen(pen, available_feeds, current_conditions.mean_air_temperature)
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
@@ -1071,7 +1068,7 @@ class HerdManager:
             or simulation_day == 0
         )
 
-    def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
+    def reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
         """
         Reformulates ration for a single pen.
 
@@ -1081,8 +1078,13 @@ class HerdManager:
             Pen that requires ration reformulation.
         current_temperature : float
             Current temperature.
+        
         """
-        pass
+        if self.is_ration_defined_by_user is True:
+            pen.use_user_defined_ration(available_feeds, current_temperature)
+        else:
+            pen.formulate_optimized_ration(available_feeds)
+
 
     def update_herd_statistics(self) -> None:
         (

@@ -1,9 +1,14 @@
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
+from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionEvaluationResults, NutritionSupply
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
+from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
+from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
+from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 
@@ -222,6 +227,14 @@ class Pen:
         for animal in self.animals_in_pen.values():
             total_manure_excretion += animal.digestive_system.manure_excretion
         return total_manure_excretion
+    
+    @property
+    def average_animal_requirements(self) -> NutritionRequirements:
+        """Calculates the average nutrient requirements of all animals in the pen."""
+        animal_requirements: NutritionRequirements = [
+            animal.nutrition_requirements for animal in self.animals_in_pen.values()
+        ]
+        return sum(animal_requirements) / len(self.animals_in_pen)
 
     def update_daily_walking_distance(self) -> None:
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
@@ -304,23 +317,93 @@ class Pen:
         """
         pass
 
-    def _calc_new_ration(self, num_animals: int):
+    @property
+    def average_milk_production(self) -> float:
         """
-        Calculate the new ration for the pen based on the number of animals in the pen.
-
-        Parameters
-        ----------
-        num_animals : int
-            The number of animals in the pen.
+        Calculate the average milk production for the cows in the pen.
 
         Returns
         -------
-        ration : Dict[str, Union[float, str]]
-            The new ration for the pen.
+        float
+            The average milk production reduction for the cows in the pen (kg).
 
         """
+        return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / len(self.cows_in_pen)
 
-        pass
+    def formulate_optimized_ration(self, _available_feeds: list[Feed]) -> None:
+        """Formulates a ration while optimizing for multiple goals."""
+        raise NotImplementedError("Non-user defined ration not implemented yet.")
+
+    def use_user_defined_ration(self, available_feeds: list[Feed], temperature: float) -> None:
+        """
+        Calculate new ration for the pen based on the number of animals in the pen.
+
+        Parameters
+        ----------
+        available_feeds : list[Feed]
+            List of available feeds to be used in the ration formulation.
+        temperature : float
+            Temperature of the animals' environment (°C).
+
+        Notes
+        -----
+        The average nutrition requirements of the pen are calculated, and then used to determine the ration given to
+        each animal. Then ration is checked against the nutrition requirements of every individual animal in the pen. If
+        the animal is a lactating cow and the ration does not meet its requirements, then its milk production is reduced
+        until one of three conditions is met:
+        1. The ration meets the animal's requirement.
+        2. The milk production of the animal is reduced by the maximum amount allowed.
+        3. The average milk production of the pen falls below the minimum allowable average milk production.
+
+        If the animal is not a lactating cow, the outcomes of that animal are not affected and its nutrition
+        requirements are not met.
+
+        """
+        animal_combination = self.animal_combination
+        average_animal_requirements: NutritionRequirements = self.average_animal_requirements
+        ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, average_animal_requirements)
+
+        total_nutrient_evaluation_results = NutritionEvaluationResults(
+            total_energy=0.0,
+            maintenance=0.0,
+            growth=0.0,
+            protein=0.0,
+            calcium=0.0,
+            phosphorus=0.0,
+            dry_matter=0.0,
+            ndf=0.0,
+            fat=0.0,
+        )
+        ration_sufficient_for_milk_production = True
+        for animal in self.animals_in_pen.values():
+            while ration_sufficient_for_milk_production:
+                nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
+                    feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
+                )
+
+                animal.set_nutrition_requirements(  # TODO: Calculate and set walking distance to parlor.
+                    housing=self.housing_type, walking_distance=self.walking_distance, previous_temperature=temperature
+                )
+                is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
+                    animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
+                )
+
+                if is_ration_adequate is True:
+                    break
+
+                if self.animal_combination == AnimalCombination.LAC_COW:
+                    is_production_reduced: bool = animal.reduce_milk_production()
+                    if not is_production_reduced:
+                        break
+
+                if self.average_milk_production < AnimalModuleConstants.MINIMUM_AVG_PEN_MILK:
+                    ration_sufficient_for_milk_production = False
+                    break
+
+            animal.nutrition_supply = nutrition_supply
+            total_nutrient_evaluation_results += evaluation_result
+
+        self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values())
 
     def _calculate_dry_matter_intake(self) -> None:
         """Placeholder function to calculate the DMI for each animal on a daily basis."""

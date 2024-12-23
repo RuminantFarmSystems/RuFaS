@@ -15,13 +15,10 @@ class AnimalCombination(Enum):
         Represents a pen with heiferIII and dry cows only.
     LAC_COW: int
         Represents a pen with lactating cows only.
-    GROWING_AND_CLOSE_UP: int
-        Represents a pen with all heifers and dry cows only.
 
     """
 
-    CALF = 0  # calves
-    GROWING = 1  # heiferIs, heiferIIs
-    CLOSE_UP = 2  # heiferIIIs, dry cows
-    LAC_COW = 3  # lactating cows
-    GROWING_AND_CLOSE_UP = 4  # all heifers and dry cows
+    CALF = "calf"
+    GROWING = "growing"
+    CLOSE_UP = "close_up"
+    LAC_COW = "lactating"

@@ -52,6 +52,40 @@ class NutritionRequirements:
         """Total energy requirement for an animal (Mcal)."""
         return self.maintenance + self.growth + self.pregnancy + self.lactation + self.activity
 
+    def __add__(self, other: "NutritionRequirements") -> "NutritionRequirements":
+        """Add two NutritionRequirements objects together."""
+        return NutritionRequirements(
+            maintenance=self.maintenance + other.maintenance,
+            growth=self.growth + other.growth,
+            pregnancy=self.pregnancy + other.pregnancy,
+            lactation=self.lactation + other.lactation,
+            protein=self.protein + other.protein,
+            calcium=self.calcium + other.calcium,
+            phosphorus=self.phosphorus + other.phosphorus,
+            secondary_phosphorus=self.secondary_phosphorus + other.secondary_phosphorus,
+            dry_matter=self.dry_matter + other.dry_matter,
+            activity=self.activity + other.activity,
+            essential_amino_acids=self.essential_amino_acids + other.essential_amino_acids,
+        )
+
+    def __truediv__(self, divisor: float) -> "NutritionRequirements":
+        """Divide all NutritionRequirements values by a scalar."""
+        if divisor == 0.0:
+            raise ZeroDivisionError("Cannot divide NutritionRequirements by zero.")
+        return NutritionRequirements(
+            maintenance=self.maintenance / divisor,
+            growth=self.growth / divisor,
+            pregnancy=self.pregnancy / divisor,
+            lactation=self.lactation / divisor,
+            protein=self.protein / divisor,
+            calcium=self.calcium / divisor,
+            phosphorus=self.phosphorus / divisor,
+            secondary_phosphorus=self.secondary_phosphorus / divisor,
+            dry_matter=self.dry_matter / divisor,
+            activity=self.activity / divisor,
+            essential_amino_acids=self.essential_amino_acids / divisor,
+        )
+
 
 @dataclass
 class NutritionSupply:
@@ -165,3 +199,44 @@ class NutritionEvaluationResults:
         valid_non_negative_fields = all([field >= 0.0 for field in {self.total_energy, self.lactation}])
 
         return valid_non_negative_fields and self._are_clamped_values_acceptable and self.is_valid_heifer_ration
+
+    def __add__(self, other: "NutritionEvaluationResults") -> "NutritionEvaluationResults":
+        """Add two NutritionEvaluationResults objects together."""
+        total_energy = self.total_energy if self.total_energy is not None else 0.0
+        other_total_energy = other.total_energy if other.total_energy is not None else 0.0
+
+        lactation = self.lactation if self.lactation is not None else 0.0
+        other_lactation = other.lactation if other.lactation is not None else 0.0
+
+        return NutritionEvaluationResults(
+            total_energy=total_energy + other_total_energy,
+            maintenance=self.maintenance + other.maintenance,
+            lactation=lactation + other_lactation,
+            growth=self.growth + other.growth,
+            protein=self.protein + other.protein,
+            calcium=self.calcium + other.calcium,
+            phosphorus=self.phosphorus + other.phosphorus,
+            dry_matter=self.dry_matter + other.dry_matter,
+            ndf=self.ndf + other.ndf,
+            fat=self.fat + other.fat,
+        )
+
+    def __truediv__(self, divisor: float | int) -> "NutritionEvaluationResults":
+        """Divide all NutritionEvaluationResults values by a scalar."""
+        if divisor == 0.0:
+            raise ZeroDivisionError("Cannot divide NutritionEvaluationResults by zero.")
+        total_energy = self.total_energy if self.total_energy is not None else 0.0
+        lactation = self.lactation if self.lactation is not None else 0.0
+
+        return NutritionEvaluationResults(
+            total_energy=total_energy / divisor,
+            maintenance=self.maintenance / divisor,
+            lactation=lactation / divisor,
+            growth=self.growth / divisor,
+            protein=self.protein / divisor,
+            calcium=self.calcium / divisor,
+            phosphorus=self.phosphorus / divisor,
+            dry_matter=self.dry_matter / divisor,
+            ndf=self.ndf / divisor,
+            fat=self.fat / divisor,
+        )

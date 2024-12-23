@@ -24,6 +24,36 @@ class EssentialAminoAcidRequirements(TypedDict):
     thryptophan: float
     valine: float
 
+    def __add__(self, other: "EssentialAminoAcidRequirements") -> "EssentialAminoAcidRequirements":
+        """Adds two EssentialAminoAcidRequirements objects together."""
+        return EssentialAminoAcidRequirements(
+            histidine=self["histidine"] + other["histidine"],
+            isoleucine=self["isoleucine"] + other["isoleucine"],
+            leucine=self["leucine"] + other["leucine"],
+            lysine=self["lysine"] + other["lysine"],
+            methionine=self["methionine"] + other["methionine"],
+            phenylalanine=self["phenylalanine"] + other["phenylalanine"],
+            threonine=self["threonine"] + other["threonine"],
+            thryptophan=self["thryptophan"] + other["thryptophan"],
+            valine=self["valine"] + other["valine"],
+        )
+
+    def __truediv__(self, other: float) -> "EssentialAminoAcidRequirements":
+        """Divide all EssentialAminoAcidRequirements values by a scalar."""
+        if other == 0.0:
+            raise ZeroDivisionError("Cannot divide EssentialAminoAcidRequirements by zero.")
+        return EssentialAminoAcidRequirements(
+            histidine=self["histidine"] / other,
+            isoleucine=self["isoleucine"] / other,
+            leucine=self["leucine"] / other,
+            lysine=self["lysine"] / other,
+            methionine=self["methionine"] / other,
+            phenylalanine=self["phenylalanine"] / other,
+            threonine=self["threonine"] / other,
+            thryptophan=self["thryptophan"] / other,
+            valine=self["valine"] / other,
+        )
+
 
 AMINO_ACID_COMPOSITION: Dict[str, AminoAcidComposition] = {
     "arginine": {
