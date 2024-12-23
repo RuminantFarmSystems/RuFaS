@@ -544,7 +544,7 @@ class GraphGenerator:
         ax: Axes,
         mask_values: bool = False,
         use_calendar_dates: bool = False,
-        date_format: str = None,
+        date_format: str | None = None,
         slice_start: int | None = None,
         slice_end: int | None = None,
     ) -> None:
