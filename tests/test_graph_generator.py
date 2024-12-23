@@ -378,8 +378,7 @@ def test_generate_legend_keys(
         ({}, {}, []),
     ],
 )
-def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend
-                          ) -> None:
+def test_set_graph_legend(graph_generator: GraphGenerator, graph_details, prepared_data, expected_legend) -> None:
     result = graph_generator._set_graph_legend(graph_details, prepared_data)
     assert result["legend"] == expected_legend
 
