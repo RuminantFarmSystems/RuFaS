@@ -1,4 +1,5 @@
 import math
+from enum import Enum
 from typing import Any, Dict
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
 from RUFAS.general_constants import GeneralConstants
@@ -10,12 +11,34 @@ MILK_REPLACER_ID = 203
 STARTER_ID = 216
 
 
+class CalfMilkType(Enum):
+    """Calf milk types."""
+
+    WHOLE = "whole"
+    REPLACER = "replacer"
+
+
 class CalfRationManager:
     """
     Calf ration formulation is distinct from other animal types, and managed separately.
     Note that the ration formulated is a fixed ration; requirements used only for reporting
 
     """
+
+    milk_type: CalfMilkType
+
+    @classmethod
+    def set_milk_type(cls, milk_type: CalfMilkType) -> None:
+        """
+        Set the milk type for the calf.
+
+        Parameters
+        ----------
+        milk_type : CalfMilkType
+            The type of milk being fed to the calf.
+
+        """
+        cls.milk_type = milk_type
 
     @classmethod
     def _get_ration(cls) -> Dict[str, float | str]:
@@ -191,13 +214,7 @@ class CalfRationManager:
 
     @classmethod
     def calc_intake(
-        cls,
-        birth_weight: float,
-        body_weight: float,
-        wean_day: int,
-        wean_length: int,
-        milk_type: str,
-        available_feeds: list[Feed]
+        cls, birth_weight: float, body_weight: float, wean_day: int, wean_length: int, available_feeds: list[Feed]
     ) -> dict[str, float]:
         """
         Calculates the amounts of whole milk, milk replacer, and starter that a calf consumes.
@@ -212,8 +229,6 @@ class CalfRationManager:
             Number of days after birth that calf is fully weaned from milk (or replacer).
         wean_length : int
             Wean length of the calf (days).
-        milk_type : string
-            Either "whole" or "replacer".
         available_feeds : list[Feed]
             List of feeds available to the calf.
 
@@ -238,25 +253,30 @@ class CalfRationManager:
 
         wean_start = wean_day - wean_length - 1
         milk_reduct = round(0.5 * wean_length)
-        wean_fraction = (1 - milk_reduct / (wean_length + 1))
+        wean_fraction = 1 - milk_reduct / (wean_length + 1)
 
-        if milk_type == "whole":
-            whole_milk_intake = 0.1 * birth_weight * whole_milk.DM * 0.01
+        if cls.milk_type == CalfMilkType.WHOLE:
+            whole_milk_intake = 0.1 * birth_weight * whole_milk.DM * GeneralConstants.PERCENTAGE_TO_FRACTION
             milk_replacer_intake = 0.0
             milk_intake_wean = whole_milk_intake * wean_fraction
         else:
             whole_milk_intake = 0.0
-            milk_replacer_intake = 0.1 * birth_weight * 0.15 * milk_replacer.DM * 0.01
+            milk_replacer_intake = 0.1 * birth_weight * milk_replacer.DM * GeneralConstants.PERCENTAGE_TO_FRACTION
             milk_intake_wean = milk_replacer_intake * wean_fraction
 
-        if body_weight <= 69.365:
+        if body_weight <= 50.0:
+            starter_intake = 0.01
+        elif 50.0 < body_weight <= 69.365:
             starter_intake = -0.24783 + 0.0049567 * body_weight
         else:
             starter_intake = -6.2263 + 0.091145 * body_weight
 
         dry_matter_intake = whole_milk_intake + milk_replacer_intake + starter_intake
 
-        milk_me_intake = whole_milk_metabolizable_energy * whole_milk_intake + milk_replacer_metabolizable_energy * milk_replacer_intake
+        milk_me_intake = (
+            whole_milk_metabolizable_energy * whole_milk_intake
+            + milk_replacer_metabolizable_energy * milk_replacer_intake
+        )
         starter_me_intake = starter_metabolizable_energy * starter_intake
         me_intake = milk_me_intake + starter_me_intake
 
