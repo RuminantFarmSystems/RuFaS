@@ -17,7 +17,7 @@ from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -276,9 +276,11 @@ class HerdManager:
             self.clear_pens()
             self.allocate_animals_to_pens()
 
+        total_requested_feed = RequestedFeed({})
         for pen in self.all_pens:
             if pen.needs_ration_formulation or is_end_of_ration_interval:
                 self.reformulate_ration_single_pen(pen, available_feeds, current_temperature)
+            total_requested_feed += pen.get_requested_feed()
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
@@ -293,7 +295,7 @@ class HerdManager:
 
         AnimalModuleReporter.report_daily_reports(self, available_feeds, time.simulation_day)
 
-        return herd_manager_output
+        return herd_manager_output, total_requested_feed
 
     def initialize_pens(
             self,

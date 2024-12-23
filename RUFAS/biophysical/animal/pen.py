@@ -2,8 +2,8 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionEvaluationResults, NutritionSupply
-from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
+from RUFAS.data_structures.feed_storage_to_animal_connection import RequestedFeed
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.pen_statistics import PenStatistics
 from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
@@ -393,6 +393,22 @@ class Pen:
             total_nutrient_evaluation_results += evaluation_result
 
         self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values())
+        self.ration = ration
+
+    def get_requested_feed(self) -> RequestedFeed:
+        """
+        Returns the requested feed for the pen.
+
+        Returns
+        -------
+        RequestedFeed
+            The requested feed for the pen.
+
+        """
+        ration_for_all_animals = {
+            rufas_id: amount * len(self.animals_in_pen) for rufas_id, amount in self.ration.items()
+        }
+        return RequestedFeed(requested_feed=ration_for_all_animals)
 
     def _calculate_dry_matter_intake(self) -> None:
         """Placeholder function to calculate the DMI for each animal on a daily basis."""

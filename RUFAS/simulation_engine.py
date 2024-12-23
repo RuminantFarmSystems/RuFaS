@@ -4,12 +4,12 @@ import time as timer
 from enum import Enum
 
 from RUFAS import routines
+from RUFAS.biophysical.animal.herd_manager import HerdManager
+from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
-from RUFAS.routines.feed.feed import Feed
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
@@ -122,18 +122,12 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-
-        # TODO: remove this code after Animal and Feed Storage modules are connected - #1878
-        if self.is_end_to_end_test_run:
-            process_degradations_today = self.time.current_julian_day % FEED_DEGRADATION_INTERVAL_LENGTH == 0
-            if process_degradations_today:
-                self.feed_manager.process_degradations(self.weather, self.time)
-
-        self.animal_manager.daily_updates(self.feed, self.weather, self.time)
-        all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
+ 
+        _, requested_feed = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.weather, self.time)
+        all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
         self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
         self.field_manager.daily_update_routine(self.weather, self.time)
-        routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
+        _ = self.feed_manager.manage_daily_feed_request(requested_feed)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -189,25 +183,20 @@ class SimulationEngine:
         weather_data = self.im.get_data("weather")
         self.om.time = self.time
         self.weather = Weather(weather_data, self.time)
-        self.feed_manager = FeedManager()
 
+        nutrient_standard = NutrientStandard(self.im.get_data("config.nutrient_standard"))
         feed_class_config = self.im.get_data("feed")
-        self.feed = Feed(feed_class_config)
+        self.feed_manager = FeedManager(feed_class_config, nutrient_standard)
 
         manure_class_config = self.im.get_data("manure_management")
         animal_class_config = self.im.get_data("animal")
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
-        self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
-        all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
+        self.herd_manager = HerdManager(animal_class_config, self.feed, self.weather, self.time)
+        all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager = ManureManager(
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
         )
 
         self.field_manager = FieldManager(manure_manager=self.manure_manager, feed_manager=self.feed_manager)
-
-        # TODO: remove the below code after Animal and Feed Storage modules are connected - #1878
-        if self.is_end_to_end_test_run:
-            end_to_end_testing_inputs = self.im.get_data("end_to_end_testing_inputs")
-            self.feed_manager.setup_stored_feeds(end_to_end_testing_inputs, self.time)
