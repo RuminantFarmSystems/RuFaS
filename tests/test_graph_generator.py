@@ -412,7 +412,7 @@ def test_draw_graph_exception(graph_generator: GraphGenerator, mocker: MockerFix
 
 
 def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
+    data: dict[str, list[int | float]] = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
     selected_variables = ["key1", "key2"]
     mock_ax = mocker.MagicMock()
     mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
@@ -430,7 +430,7 @@ def test_draw_graph_success_tuple_plot(graph_generator: GraphGenerator, mocker: 
 
 
 def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    data = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
+    data: dict[str, list[int | float]] = {"key1": [1, 2, 3, 4], "key2": [5, 6, 7, 8]}
     indices = [0, 1, 2, 3]
     masked_indices = indices
     masked_values = [1, 2, 3, 4]
@@ -465,7 +465,7 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: Mocker
 
 def test_draw_graph_sliced_data(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
     """Tests _draw_graph with in the GraphGenerator with sliced data."""
-    data = {
+    data: dict[str, list[int | float]] = {
         "key1": [2, 3, 4],
         "key2": [8, 9, 10],
     }
