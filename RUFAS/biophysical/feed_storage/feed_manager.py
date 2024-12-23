@@ -1,8 +1,26 @@
+from datetime import date
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Any
 
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    FeedCategorization,
+    FeedComponentType,
+    Feed,
+    RUFAS_ID,
+    NASEMFeed,
+    NRCFeed,
+    NutrientStandard,
+    PlanningCycleAllowance,
+    RuntimePurchaseAllowance,
+    RequestedFeed,
+    TotalInventory,
+    IdealFeeds,
+)
+from RUFAS.input_manager import InputManager
 from RUFAS.time import Time
 from RUFAS.weather import Weather
+from RUFAS.util import Utility
+from RUFAS.units import MeasurementUnits
 
 from .baleage import Baleage
 from .enums import CropCategory, CropType
@@ -53,8 +71,11 @@ class FeedManager:
         Containts the list of active storage units in the simulation and their mapping from StorageType(Enum).
     """
 
-    def __init__(self):
+    def __init__(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
+        self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
+        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(feed_config)
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(feed_config)
 
     def _query_result_factory(
         self, crop_category: CropCategory, crop_type: CropType, amount: float
@@ -126,6 +147,63 @@ class FeedManager:
         """
         pass
 
+    def manage_daily_feed_request(self, requested_feed: RequestedFeed) -> bool:
+        """Returns true if requested feeds can be provided, either through on-farm feeds or by purchasing."""
+        current_feed_totals = self._query_available_feed_totals(requested_feed.requested_feed.keys())
+
+        feeds_to_remove_from_inventory = {id: 0.0 for id in requested_feed.requested_feed.keys()}
+        feeds_to_purchase = {id: 0.0 for id in requested_feed.requested_feed.keys()}
+        for feed_id, amount_requested in requested_feed.requested_feed.items():
+            is_fulfillable_with_inventory: bool = amount_requested <= current_feed_totals[feed_id]
+            is_fulfillable_with_purchase: bool = (
+                amount_requested - current_feed_totals[feed_id]
+            ) <= self.runtime_purchase_allowance[feed_id]
+            is_request_unfulfillable = not is_fulfillable_with_inventory and not is_fulfillable_with_purchase
+            if is_request_unfulfillable:
+                return False
+            feeds_to_remove_from_inventory[feed_id] = amount_requested
+            if not is_fulfillable_with_inventory:
+                feeds_to_purchase[feed_id] = amount_requested - current_feed_totals[feed_id]
+
+        self.purchase_feed(feeds_to_purchase)
+        self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
+
+    def get_total_inventory(self, inventory_date: date) -> TotalInventory:
+        """Gets the inventory expected to be held in storage at the specified date."""
+        # TODO: project losses at given inventory date, then assess feeds in storage
+        available_feed_rufas_ids = [feed.rufas_id for feed in self._available_feeds]
+
+        available_feed_totals = self._query_available_feed_totals(available_feed_rufas_ids)
+
+        for feed in self._available_feeds:
+            feed.amount_available = available_feed_totals.get(feed.rufas_id, 0.0)
+
+        return TotalInventory(available_feeds=self._available_feeds, date=inventory_date)
+
+    def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds) -> None:
+        """
+        Purchases as much of the ideal feeds as possible, while respecting the Planning Allowance, storage capacity,
+        future harvests, budget, etc.
+        """
+        # TODO: respect things other than the Planning Allowance
+        feeds_to_purchase = {
+            rufas_id: min(ideal_feeds[rufas_id], self.planning_cycle_allowance.allowances.get(rufas_id, 0.0))
+            for rufas_id in ideal_feeds.ideal_feeds.keys()
+        }
+
+        self.purchase_feed(feeds_to_purchase)
+
+    def _query_available_feed_totals(self, query_feed_ids: list[int]) -> dict[int, float]:
+        """Gets the current dry matter mass of each feed ID currently in storage"""
+        feed_totals = {rufas_id: 0.0 for rufas_id in query_feed_ids}
+
+        for storage in self.active_storages.values():
+            for feed in storage.stored:
+                if feed.rufas_id in feed_totals:
+                    feed_totals[feed.rufas_id] += feed.dry_matter_mass
+
+        return feed_totals
+
     def query_available_feeds(
         self,
         query_crop_types: List[CropType] | None = None,
@@ -183,7 +261,53 @@ class FeedManager:
 
     def purchase_feed(self) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
-        pass
+        # TODO: this function will take in a `RequestedFeed` or dict[RUFAS_ID, float] of feeds to purchase, purchase them,
+        # and put them in storage. It will also record the amounts and money spent on feeds.
+        pass  # TODO: implement me!
+
+    def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
+        """Removes feeds from storage in a FIFO manner."""
+        pass  # TODO: implement me!
+
+    def _setup_available_feeds(
+        self, feed_config: list[dict[str, Any]], nutrient_standard: NutrientStandard
+    ) -> list[Feed]:
+        feed_library = self._process_feed_library(nutrient_standard)
+
+        feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
+        available_feeds = []
+        for feed in feed_config:
+            rufas_id = feed["purchased_feed"]
+            try:
+                nutritive_properties = feed_library[rufas_id]
+            except KeyError:
+                pass  # TODO: implement me!
+            new_feed = feed_representation(
+                rufas_id=rufas_id,
+                amount_available=0.0,
+                on_farm_cost=feed["on_farm_cost"],
+                purchase_cost=feed["purchased_feed_cost"],
+                **nutritive_properties,
+            )
+            available_feeds.append(new_feed)
+
+        return available_feeds
+
+    def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[int, dict[str, Any]]:
+        im = InputManager()
+        feed_library = (
+            im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
+        )
+
+        feed_library = Utility.convert_dict_of_lists_to_dict_of_lists(feed_library)
+
+        feed_library = {feed["rufas_id"]: feed for feed in feed_library}
+        for feed in feed_library.values():
+            del feed["rufas_id"]
+            feed["feed_type"] = FeedComponentType(feed["feed_type"])
+            feed["Fd_Category"] = FeedCategorization(feed["Fd_Category"])
+            feed["units"] = MeasurementUnits(feed["units"])
+        return feed_library
 
     # TODO: remove this method after Feed Storage and Animal modules are connected - #1878
     def setup_stored_feeds(self, feeds_info: dict[str, dict[str, str | float]], time: Time) -> None:
