@@ -41,7 +41,7 @@ def test_check_phosphorus_supplied() -> None:
     pass
 
 
-def test_check_protein_supplied() -> bool:
+def test_check_protein_supplied() -> None:
     """Tests that protein supplied in ration is correctly compared against an animal's protein requirement."""
     pass
 
