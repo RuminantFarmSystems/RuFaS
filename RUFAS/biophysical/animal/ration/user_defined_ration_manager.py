@@ -72,6 +72,13 @@ class UserDefinedRationManager:
         if invalid_ration_found:
             raise ValueError("One or more invalid user-defined rations found.")
 
+        cls.user_defined_rations[AnimalCombination.GROWING_AND_CLOSE_UP] = cls.user_defined_rations[AnimalCombination.CLOSE_UP]
+        cls._om.add_log(
+            "growing_and_close_up_user_defined_rations",
+            "Pens with growing and close-up cows will use the user-defined ration for close-up pens",
+            info_map
+        )
+
     @classmethod
     def get_user_defined_ration(
         cls, animal_combination: AnimalCombination, requirements: NutritionRequirements,

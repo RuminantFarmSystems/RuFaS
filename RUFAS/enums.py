@@ -7,14 +7,16 @@ class AnimalCombination(Enum):
 
     Attributes
     ----------
-    CALF: int
+    CALF : str
         Represents a calf-only pen.
-    GROWING: int
+    GROWING : str
         Represents a pen with growing heiferI and heiferII only.
-    CLOSE_UP: int
+    CLOSE_UP : str
         Represents a pen with heiferIII and dry cows only.
-    LAC_COW: int
+    LAC_COW : str
         Represents a pen with lactating cows only.
+    GROWING_AND_CLOSE_UP : str
+        Represents a pen with heifer Is, IIs, IIIs and dry cows.
 
     """
 
@@ -22,3 +24,4 @@ class AnimalCombination(Enum):
     GROWING = "growing"
     CLOSE_UP = "close_up"
     LAC_COW = "lactating"
+    GROWING_AND_CLOSE_UP = "growing and close_up"
