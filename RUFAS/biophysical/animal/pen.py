@@ -1,7 +1,11 @@
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingScenario
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionEvaluationResults, NutritionSupply
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import (
+    NutritionRequirements,
+    NutritionEvaluationResults,
+    NutritionSupply,
+)
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
@@ -136,8 +140,11 @@ class Pen:
 
     @property
     def cows_in_pen(self) -> list[Animal]:
-        return [animal for animal in self.animals_in_pen.values()
-                if animal.animal_type == AnimalType.LAC_COW or animal.animal_type == AnimalType.DRY_COW]
+        return [
+            animal
+            for animal in self.animals_in_pen.values()
+            if animal.animal_type == AnimalType.LAC_COW or animal.animal_type == AnimalType.DRY_COW
+        ]
 
     def remove_animals_by_ids(self, animal_ids: list[int]) -> None:
         """
@@ -212,7 +219,8 @@ class Pen:
             for animal in list(self.animals_in_pen.values()):
                 if animal.animal_type.is_cow:
                     animal.calculate_daily_walking_distance(
-                        self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+                        self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
+                    )
 
     @property
     def average_growth(self) -> float:
@@ -227,7 +235,7 @@ class Pen:
         for animal in self.animals_in_pen.values():
             total_manure_excretion += animal.digestive_system.manure_excretion
         return total_manure_excretion
-    
+
     @property
     def average_animal_requirements(self) -> NutritionRequirements:
         """Calculates the average nutrient requirements of all animals in the pen."""
@@ -289,14 +297,13 @@ class Pen:
             num_stalls=self.num_stalls,
         )
 
-
     def _set_animal_nutrient_values(
         self,
         animal: Animal,
         animal_grouping_scenario: AnimalGroupingScenario,
         feed: Feed,
         temperature: float,
-        phosphorus_concentration: float
+        phosphorus_concentration: float,
     ) -> None:
         """
         Set the nutrient values for the animal.
@@ -382,7 +389,10 @@ class Pen:
                 )
 
                 animal.set_nutrition_requirements(  # TODO: Calculate and set walking distance to parlor.
-                    housing=self.housing_type, walking_distance=self.walking_distance, previous_temperature=temperature
+                    housing=self.housing_type,
+                    walking_distance=self.walking_distance,
+                    previous_temperature=temperature,
+                    available_feeds=available_feeds,
                 )
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow

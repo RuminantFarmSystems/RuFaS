@@ -25,16 +25,24 @@ from RUFAS.biophysical.animal.nutrients.nutrients import Nutrients
 from RUFAS.biophysical.animal.nutrients.nasem_requirements_calculator import NASEMRequirementsCalculator
 from RUFAS.biophysical.animal.nutrients.nrc_requirements_calculator import NRCRequirementsCalculator
 from RUFAS.biophysical.animal.data_types.animal_statistics import AnimalStatistics
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (NewBornCalfValuesTypedDict, CalfValuesTypedDict,
-                                                                    HeiferIValuesTypedDict, HeiferIIValuesTypedDict,
-                                                                    CowValuesTypedDict, HeiferIIIValuesTypedDict)
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
+    NewBornCalfValuesTypedDict,
+    CalfValuesTypedDict,
+    HeiferIValuesTypedDict,
+    HeiferIIValuesTypedDict,
+    CowValuesTypedDict,
+    HeiferIIIValuesTypedDict,
+)
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, HeiferTAISubProtocol, \
-    HeiferSynchEDSubProtocol
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
+    HeiferReproductionProtocol,
+    HeiferTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+)
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
-from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
 from RUFAS.time import Time
 
 
@@ -42,6 +50,7 @@ class Animal:
     """
     DO NOT USE THE PROPERTIES THAT START WITH '_'. INSTEAD, USE THE FUNCTIONS THAT ARE DECORATED WITH @property.
     """
+
     metabolizable_energy_intake: float = 0.0
     nutrient_standard: NutrientStandard
 
@@ -151,16 +160,23 @@ class Animal:
         self._reproduction = reproduction
 
     def __init__(
-            self,
-            args: NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict |
-                   HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict | CowValuesTypedDict) -> None:
+        self,
+        args: (
+            NewBornCalfValuesTypedDict
+            | CalfValuesTypedDict
+            | HeiferIValuesTypedDict
+            | HeiferIIValuesTypedDict
+            | HeiferIIIValuesTypedDict
+            | CowValuesTypedDict
+        ),
+    ) -> None:
         initialize_animal_methods = {
             AnimalType.CALF: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_I: self._initialize_calf_or_heiferI,
             AnimalType.HEIFER_II: self._initialize_heiferII_or_heiferIII,
             AnimalType.HEIFER_III: self._initialize_heiferII_or_heiferIII,
             AnimalType.LAC_COW: self._initialize_cow,
-            AnimalType.DRY_COW: self._initialize_cow
+            AnimalType.DRY_COW: self._initialize_cow,
         }
         self.id = int(args.get("id"))
         self.breed = Breed(args.get("breed"))
@@ -201,7 +217,7 @@ class Animal:
             dry_matter=0.0,
             phosphorus=0.0,
             ndf_content=0.0,
-            fat_content=0.0
+            fat_content=0.0,
         )
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
@@ -236,12 +252,14 @@ class Animal:
         self.birth_weight = args.get("birth_weight")
         self.body_weight = args.get("birth_weight")
         self.wean_weight = 0.0
-        self.mature_body_weight = float(truncnorm.rvs(
-            -animal_constants.STDI,
-            animal_constants.STDI,
-            AnimalConfig.average_mature_body_weight,
-            AnimalConfig.std_mature_body_weight,
-        ))
+        self.mature_body_weight = float(
+            truncnorm.rvs(
+                -animal_constants.STDI,
+                animal_constants.STDI,
+                AnimalConfig.average_mature_body_weight,
+                AnimalConfig.std_mature_body_weight,
+            )
+        )
         self.nutrients.total_phosphorus_in_animal = args.get("initial_phosphorus")
 
     def _initialize_calf_or_heiferI(self, args: CalfValuesTypedDict | HeiferIValuesTypedDict) -> None:
@@ -271,17 +289,17 @@ class Animal:
             abortion_day=args.get("abortion_day", 0),
             conception_rate=args.get("conception_rate", 0),
             gestation_length=args.get("gestation_length", 0),
-            calf_birth_weight=args.get("calf_birth_weight", 0)
+            calf_birth_weight=args.get("calf_birth_weight", 0),
         )
         self.nutrients.phosphorus_for_gestation_required_for_calf = args.get(
-            "phosphorus_for_gestation_required_for_calf", 0)
+            "phosphorus_for_gestation_required_for_calf", 0
+        )
 
     def _initialize_cow(self, args: CowValuesTypedDict) -> None:
         self._initialize_heiferII_or_heiferIII(args)
         self.days_in_milk = args.get("days_in_milk", 0)
         self.reproduction.calves = args.get("calves", 0)
         self.reproduction.calving_interval = args.get("calving_interval", 0)
-
 
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:
@@ -331,14 +349,13 @@ class Animal:
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
-
         milk_production_inputs = MilkProductionInputs(
             days_in_milk=self.days_in_milk,
             days_born=self.days_born,
             days_in_pregnancy=self.days_in_pregnancy,
         )
-        milk_production_outputs: MilkProductionOutputs = (
-            self.milk_production.perform_daily_milking_update(milk_production_inputs, time)
+        milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
+            milk_production_inputs, time
         )
         self.days_in_milk = milk_production_outputs.days_in_milk
         self.events += milk_production_outputs.events
@@ -355,7 +372,7 @@ class Animal:
             gestation_length=self.reproduction.gestation_length,
             calf_birth_weight=self.reproduction.calf_birth_weight,
             calves=self.reproduction.calves,
-            calving_interval=self.reproduction.calving_interval
+            calving_interval=self.reproduction.calving_interval,
         )
         growth_outputs: GrowthOutputs = self.growth.evaluate_body_weight_change(growth_inputs, time)
         self.body_weight = growth_outputs.body_weight
@@ -370,11 +387,9 @@ class Animal:
             days_in_pregnancy=self.days_in_pregnancy,
             days_in_milk=self.days_in_milk,
             net_merit=self.net_merit,
-            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf
+            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
         )
-        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(
-            reproduction_inputs, time)
-
+        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 
         daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update(time.simulation_day)
         if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
@@ -385,9 +400,8 @@ class Animal:
 
     def animal_life_stage_update(self, simulation_day: int) -> DailyRoutinesOutput:
         daily_routines_output: DailyRoutinesOutput = DailyRoutinesOutput(
-                animal_status=AnimalStatus.REMAIN,
-                animal_values=self.get_animal_values()
-            )
+            animal_status=AnimalStatus.REMAIN, animal_values=self.get_animal_values()
+        )
         if self.animal_type == AnimalType.CALF and self._evaluate_calf_for_heiferI():
             self._transition_calf_to_heiferI()
             daily_routines_output.animal_status = AnimalStatus.LIFE_STAGE_CHANGED
@@ -430,14 +444,11 @@ class Animal:
         return (
             self.days_born > AnimalConfig.heifer_breed_start_day
             and self.is_pregnant
-            and self.days_in_pregnancy
-            > (self.reproduction.gestation_length - AnimalConfig.heifer_prefresh_day)
+            and self.days_in_pregnancy > (self.reproduction.gestation_length - AnimalConfig.heifer_prefresh_day)
         )
 
     def _evaluate_heiferII_for_culling(self) -> bool:
-        return (not self.is_pregnant) and (
-            self.days_born > AnimalConfig.heifer_reproduction_cull_day
-        )
+        return (not self.is_pregnant) and (self.days_born > AnimalConfig.heifer_reproduction_cull_day)
 
     def _evaluate_heiferIII_for_cow(self) -> bool:
         return self.days_born == self.reproduction.gestation_length
@@ -480,7 +491,7 @@ class Animal:
             AnimalType.HEIFER_II: self._get_heiferII_values,
             AnimalType.HEIFER_III: self._get_heiferIII_values,
             AnimalType.DRY_COW: self._get_cow_values,
-            AnimalType.LAC_COW: self._get_cow_values
+            AnimalType.LAC_COW: self._get_cow_values,
         }
         return mapping[self.animal_type]()
 
@@ -572,14 +583,20 @@ class Animal:
         last_pen = self.pen_history[-1]["pen"] if len(self.pen_history) > 0 else None
         if last_pen is None or last_pen != current_pen:
             self.pen_history.append(
-                PenHistory(start_date=current_day, end_date=current_day, pen=current_pen,
-                           animal_types_in_pen=list(animal_types_in_pen))
+                PenHistory(
+                    start_date=current_day,
+                    end_date=current_day,
+                    pen=current_pen,
+                    animal_types_in_pen=list(animal_types_in_pen),
+                )
             )
         else:  # last_pen == curr_pen
             self.pen_history[-1]["end_date"] = current_day
             self.pen_history[-1]["animal_types_in_pen"] = list(animal_types_in_pen)
 
-    def calculate_daily_walking_distance(self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float) -> float:
+    def calculate_daily_walking_distance(
+        self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float
+    ) -> float:
         """
         Calculates and sets the animal's daily vertical and horizontal
         walking distance (DVD and DHD).
@@ -598,17 +615,19 @@ class Animal:
         self.daily_horizontal_distance = 2 * horizontal_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
 
     def set_nutrition_requirements(
-        self, housing: str, walking_distance: float, previous_temperature: float
+        self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
     ) -> NutritionRequirements:
         """Sets the nutrition requirements for an animal."""
-        self.nutrition_requirements = self.calculate_nutrition_requirements(housing, walking_distance, previous_temperature)
+        self.nutrition_requirements = self.calculate_nutrition_requirements(
+            housing, walking_distance, previous_temperature
+        )
 
     def calculate_nutrition_requirements(
-        self, housing: str, walking_distance: float, previous_temperature: float
+        self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
     ) -> NutritionRequirements:
         """
         Gets the nutrition requirements for an animal.
-        
+
         Parameters
         ----------
         housing : str
@@ -617,19 +636,23 @@ class Animal:
             The walking distance to the milking parlor (m).
         previous_temperature : float
             The previous day's temperature (C).
+        available_feeds : list[Feed]
+            List of feeds available for ration formulation. Only needed for calf nutrition calculation.
 
         Returns
         -------
         NutritionRequirements
             The nutrition requirements for the animal.
-        
+
         """
         if self.animal_type is AnimalType.CALF:
-            pass  # TODO: implement calf nutrition managment
-        
+            pass  # TODO: calves requirements are implemented in PR #2153, which is not merged yet.
+
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
-        average_daily_heifer_gain = self.average_daily_gain if self.animal_type.is_heifer else None  # TODO: average_daily_gain for heifers
+        average_daily_heifer_gain = (
+            self.average_daily_gain if self.animal_type.is_heifer else None
+        )  # TODO: average_daily_gain for heifers
         if self.nutrient_standard is NutrientStandard.NASEM:
             requirements = NASEMRequirementsCalculator.calculate_requirements(
                 body_weight=self.body_weight,
