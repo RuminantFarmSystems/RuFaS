@@ -224,6 +224,7 @@ class GraphGenerator:
 
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
+            date_format = graph_details.get("date_format", None)
             self._draw_graph(
                 graph_details["type"],
                 prepared_data,
@@ -231,6 +232,7 @@ class GraphGenerator:
                 ax,
                 mask_values,
                 use_calendar_dates,
+                date_format,
                 graph_details.get("slice_start", None),
                 graph_details.get("slice_end", None),
             )
@@ -446,6 +448,7 @@ class GraphGenerator:
                 "mask_values",
                 "is_aggregated_report_data",
                 "use_calendar_dates",
+                "date_format",
             ]
         )
         graph_filter_validation_logs: list[dict[str, str | dict[str, str]]] = []
@@ -541,6 +544,7 @@ class GraphGenerator:
         ax: Axes,
         mask_values: bool = False,
         use_calendar_dates: bool = False,
+        date_format: str = None,
         slice_start: int | None = None,
         slice_end: int | None = None,
     ) -> None:
@@ -562,6 +566,8 @@ class GraphGenerator:
             The matplotlib Axes object to plot the graph on.
         use_calendar_dates : bool, default False
             Whether to use calendar dates on the x-axis.
+        date_format : str, default None
+            The user-requested format to use for the date on the x-axis.
         slice_start : int, default None
             The starting index of the data to plot.
         slice_end : int, default None
@@ -603,11 +609,40 @@ class GraphGenerator:
                     x_values = get_x_values(len(value))
                     plot_function(x_values, value)
         if use_calendar_dates:
-            ax.xaxis.set_major_formatter(mdates.DateFormatter("%j/%Y"))
-            plt.xlabel("Calendar Day")
+            ax.xaxis.set_major_formatter(self.get_date_formatter(date_format))
+            plt.xlabel("Calendar Date")
             plt.xticks(rotation=45)
         else:
             plt.xlabel("Simulation Day")
+
+    @staticmethod
+    def get_date_formatter(date_format: str | None) -> mdates.DateFormatter:
+        """
+        Get a `matplotlib.dates.DateFormatter` instance for the requested date format.
+
+        Parameters
+        ----------
+        date_format : str
+            The format requested by the user. Supported values are:
+            - "day_of_year": Formats dates as day of year / year (e.g., "123/2024").
+            - "day_month_year": Formats dates as day / month / year (e.g., "23/12/2024").
+
+        Returns
+        -------
+        matplotlib.dates.DateFormatter
+            A `DateFormatter` instance for the specified format.
+
+        """
+        format_mapping = {
+            "day_of_year": "%j/%Y",
+            "day_month_year": "%d/%m/%Y",
+        }
+
+        date_format = format_mapping.get(date_format, None)
+        if date_format is None:
+            return mdates.DateFormatter("%d/%m/%Y")
+
+        return mdates.DateFormatter(date_format)
 
     def _mask_values(self, values: list[Any]) -> tuple[npt.NDArray[Any], npt.NDArray[np.float32]]:
         """
