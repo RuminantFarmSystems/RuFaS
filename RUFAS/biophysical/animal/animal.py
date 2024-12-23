@@ -34,6 +34,7 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferRepro
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
+from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.time import Time
 
@@ -604,7 +605,7 @@ class Animal:
         self.nutrition_requirements = self.calculate_nutrition_requirements(housing, walking_distance, previous_temperature)
 
     def calculate_nutrition_requirements(
-        self, housing: str, walking_distance: float, previous_temperature: float
+        self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
     ) -> NutritionRequirements:
         """
         Gets the nutrition requirements for an animal.
@@ -617,6 +618,8 @@ class Animal:
             The walking distance to the milking parlor (m).
         previous_temperature : float
             The previous day's temperature (C).
+        available_feeds : list[Feed]
+            List of feeds available for ration formulation. Only needed for calf nutrition calculation.
 
         Returns
         -------
@@ -625,7 +628,10 @@ class Animal:
         
         """
         if self.animal_type is AnimalType.CALF:
-            pass  # TODO: implement calf nutrition managment
+            calf_intake = CalfRationManager.calc_intake(
+                self.birth_weight, self.body_weight, AnimalConfig.wean_day, AnimalConfig.wean_length, available_feeds
+            )  # TODO: wean length
+            calf_requirements = CalfRationManager.calc_requirements()
         
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
