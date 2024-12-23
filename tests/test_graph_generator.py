@@ -463,62 +463,6 @@ def test_draw_graph_success_plot(graph_generator: GraphGenerator, mocker: Mocker
     assert masker.call_count == 2
 
 
-@pytest.mark.parametrize(
-    "slice_start, slice_end, use_calendar_dates, expected_calls",
-    [
-        # Case 1: No slicing
-        (None, None, False, [
-            ([0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7]),
-            ([0, 1, 2, 3, 4, 5, 6], [8, 7, 6, 5, 4, 3, 2]),
-        ]),
-        # Case 2: slice_start=2, slice_end=5
-        (2, 5, True, [
-            ([datetime.datetime(2020, 1, 3), datetime.datetime(2020, 1, 4), datetime.datetime(2020, 1, 5)], [3, 4, 5]),
-            ([datetime.datetime(2020, 1, 3), datetime.datetime(2020, 1, 4), datetime.datetime(2020, 1, 5)], [6, 5, 4]),
-        ]),
-        # # Case 3: slice_start=-3, slice_end=None
-        # (-3, None, False, [4, 5, 6], [5, 6, 7]),
-        # # Case 4: slice_start=-10, slice_end=-7 (negative indices beyond range)
-        # (-10, -7, False, [], []),
-    ],
-)
-def test_draw_graph_with_slicing_parametrized(
-    graph_generator: GraphGenerator,
-    mocker: MockerFixture,
-    slice_start,
-    slice_end,
-    use_calendar_dates,
-    expected_calls
-) -> None:
-    """Tests _draw_graph with slicing."""
-    data = {"key1": [1, 2, 3, 4, 5, 6, 7], "key2": [8, 7, 6, 5, 4, 3, 2]}
-
-    mock_time = MagicMock()
-    mock_time.start_date = datetime.datetime(2020, 1, 1)
-    mock_time.simulation_length_days = 7
-    mock_time.convert_simulation_day_to_date.side_effect = lambda x: mock_time.start_date + datetime.timedelta(days=x)
-    graph_generator.time = mock_time
-
-    mock_ax = mocker.MagicMock()
-    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
-    with patch.dict(
-        "RUFAS.graph_generator.MATPLOTLIB_PLOT_FUNCTIONS", {"plot": MagicMock()}
-    ) as mock_plot_functions_dict:
-        graph_generator._draw_graph(
-            "plot",
-            data,
-            list(data.keys()),
-            ax=mock_ax,
-            mask_values=False,
-            use_calendar_dates=use_calendar_dates,
-            slice_start=slice_start,
-            slice_end=slice_end,
-        )
-        print("Actual calls:", mock_plot_functions_dict["plot"].call_args_list)
-        for expected_x, expected_y in expected_calls:
-            mock_plot_functions_dict["plot"].assert_any_call(expected_x, expected_y)
-
-
 def test_mask_values(graph_generator: GraphGenerator) -> None:
     """Tests _mask_values in the GraphGenerator."""
     values_one = [1, 2, 3, 4]

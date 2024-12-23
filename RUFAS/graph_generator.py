@@ -568,22 +568,18 @@ class GraphGenerator:
         """
         if graph_type not in MATPLOTLIB_PLOT_FUNCTIONS:
             raise ValueError(f"Unsupported graph type: {graph_type}")
+        plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
         max_data_length = max(len(v) for v in data.values())
         if slice_start is not None:
-            if slice_start < 0:
-                slice_start = max(0, self.time.simulation_length_days + slice_start)
-            if slice_end is None or slice_end > self.time.simulation_length_days:
-                slice_end = self.time.simulation_length_days
-            elif slice_end < 0:
-                slice_end = max(0, self.time.simulation_length_days + slice_end)
+            slice_start_sim_day = self.time.convert_slice_to_simulation_day(slice_start)
+            slice_end_sim_day = self.time.convert_slice_to_simulation_day(slice_end)
             dates_in_data_range = [
-                self.time.convert_simulation_day_to_date(i) for i in range(slice_start, slice_end)
+                self.time.convert_simulation_day_to_date(i) for i in range(slice_start_sim_day, slice_end_sim_day)
             ]
         else:
             dates_in_data_range = [
                 self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)
             ]
-        plot_function = MATPLOTLIB_PLOT_FUNCTIONS[graph_type]
 
         get_x_values : Callable[[int], list[int]] = (
             lambda values_length: dates_in_data_range[:values_length] if use_calendar_dates else
