@@ -179,10 +179,6 @@ class CalfRationManager:
         milk_replacer = next(feed for feed in available_feeds if feed.rufas_id == MILK_REPLACER_ID)
         starter = next(feed for feed in available_feeds if feed.rufas_id == STARTER_ID)
 
-        whole_milk_metabolizable_energy = 0.96 * whole_milk.DE
-        milk_replacer_metabolizable_energy = 0.96 * milk_replacer.DE
-        starter_metabolizable_energy = (1.01 * starter.DE - 0.45) + 0.0046 * (starter.DE - 3)
-
         wean_start = wean_day - wean_length - 1
         milk_reduct = round(0.5 * wean_length)
         wean_fraction = 1 - milk_reduct / (wean_length + 1)
@@ -204,6 +200,10 @@ class CalfRationManager:
             starter_intake = -6.2263 + 0.091145 * body_weight
 
         dry_matter_intake = whole_milk_intake + milk_replacer_intake + starter_intake
+
+        whole_milk_metabolizable_energy = 0.96 * whole_milk.DE
+        milk_replacer_metabolizable_energy = 0.96 * milk_replacer.DE
+        starter_metabolizable_energy = (1.01 * starter.DE - 0.45) + 0.0046 * (starter.DE - 3)
 
         milk_me_intake = (
             whole_milk_metabolizable_energy * whole_milk_intake
