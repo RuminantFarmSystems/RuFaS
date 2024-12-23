@@ -77,6 +77,11 @@ class FeedManager:
         self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(feed_config)
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(feed_config)
 
+    @property
+    def available_feeds(self) -> list[Feed]:
+        """Returns the list of available feeds."""
+        return self._available_feeds
+
     def _query_result_factory(
         self, crop_category: CropCategory, crop_type: CropType, amount: float
     ) -> QUERY_RESULT_DATA_TYPE:
@@ -281,7 +286,7 @@ class FeedManager:
             try:
                 nutritive_properties = feed_library[rufas_id]
             except KeyError:
-                pass  # TODO: implement me!
+                raise KeyError(f"Feed with RUFAS ID '{rufas_id}' not found in the feed library.")
             new_feed = feed_representation(
                 rufas_id=rufas_id,
                 amount_available=0.0,
@@ -293,7 +298,7 @@ class FeedManager:
 
         return available_feeds
 
-    def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[int, dict[str, Any]]:
+    def _process_feed_library(self, nutrient_standard: NutrientStandard) -> dict[RUFAS_ID, dict[str, Any]]:
         im = InputManager()
         feed_library = (
             im.get_data("NASEM_Comp") if nutrient_standard is NutrientStandard.NASEM else im.get_data("NRC_Comp")
