@@ -147,6 +147,26 @@ class Time:
         first_day_of_year = datetime(year, 1, 1)
         return first_day_of_year + timedelta(days=day - 1)
 
+    def convert_slice_to_simulation_day(self, slice_day: int) -> int:
+        """
+        Converts the slice day to a simulation day.
+
+        Parameters
+        ----------
+        slice_day: int
+            The slice day to convert to a simulation day.
+
+        Returns
+        -------
+        int
+            The simulation day that corresponds to the slice day.
+        """
+        if slice_day == 0:
+            return 1
+        if slice_day < 0:
+            return self.simulation_length_days + slice_day + 1
+        return slice_day
+
     def __str__(self) -> str:
         return (
             f"Year: {self.current_simulation_year}, Day: {self.current_julian_day}. "
