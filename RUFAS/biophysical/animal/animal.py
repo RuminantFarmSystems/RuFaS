@@ -271,6 +271,8 @@ class Animal:
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
         self.days_born += 1
 
+        daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update(time.simulation_day)
+
         nutrients_inputs = NutrientsInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,
@@ -328,24 +330,23 @@ class Animal:
         self.events += growth_outputs.events
         self.reproduction.conceptus_weight = growth_outputs.conceptus_weight
 
-        reproduction_inputs = ReproductionInputs(
-            animal_type=self.animal_type,
-            body_weight=self.body_weight,
-            breed=self.breed,
-            days_born=self.days_born,
-            days_in_pregnancy=self.days_in_pregnancy,
-            days_in_milk=self.days_in_milk,
-            net_merit=self.net_merit,
-            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf
-        )
-        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(
-            reproduction_inputs, time)
+        if self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow:
+            reproduction_inputs = ReproductionInputs(
+                animal_type=self.animal_type,
+                body_weight=self.body_weight,
+                breed=self.breed,
+                days_born=self.days_born,
+                days_in_pregnancy=self.days_in_pregnancy,
+                days_in_milk=self.days_in_milk,
+                net_merit=self.net_merit,
+                phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf
+            )
+            reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(
+                reproduction_inputs, time)
 
-
-        daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update(time.simulation_day)
-        if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
-            daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
-            daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
+            if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
+                daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
+                daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
 
         return daily_routines_output
 

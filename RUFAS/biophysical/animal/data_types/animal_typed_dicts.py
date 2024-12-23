@@ -73,6 +73,7 @@ class CalfValuesTypedDict(TypedDict):
     mature_body_weight: float
     events: str
     net_merit: float
+    initial_phosphorus: NotRequired[float]
     body_weight_history: NotRequired[list[BodyWeightHistory]]
     pen_history: NotRequired[list[PenHistory]]
     conceptus_weight: NotRequired[float]
