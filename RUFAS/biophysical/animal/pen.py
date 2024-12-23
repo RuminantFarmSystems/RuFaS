@@ -319,7 +319,11 @@ class Pen:
         """
         return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / len(self.cows_in_pen)
 
-    def use_user_defined_ration(self, available_feeds: list[Feed]) -> None:
+    def formulate_optimized_ration(self, _available_feeds: list[Feed]) -> None:
+        """Formulates a ration while optimizing for multiple goals."""
+        raise NotImplementedError("Non-user defined ration not implemented yet.")
+
+    def use_user_defined_ration(self, available_feeds: list[Feed], temperature: float) -> None:
         """
         Calculate new ration for the pen based on the number of animals in the pen.
 
@@ -327,6 +331,8 @@ class Pen:
         ----------
         available_feeds : list[Feed]
             List of available feeds to be used in the ration formulation.
+        temperature : float
+            Temperature of the animals' environment (°C).
 
         Notes
         -----
@@ -364,7 +370,9 @@ class Pen:
                     feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
                 )
 
-                animal.set_nutrition_requirements()
+                animal.set_nutrition_requirements(  # TODO: Calculate and set walking distance to parlor.
+                    housing=self.housing_type, walking_distance=self.walking_distance, previous_temperature=temperature
+                )
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
                 )

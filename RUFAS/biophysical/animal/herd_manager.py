@@ -10,17 +10,12 @@ from RUFAS.biophysical.animal.animal_grouping_scenarios import AnimalGroupingSce
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_enums import AnimalStatus
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
-from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements, NutritionEvaluationResults, NutritionSupply
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
-from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEvaluator
-from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
-from RUFAS.biophysical.animal.ration.calf_ration import CalfRationManager
-from RUFAS.biophysical.animal.ration.ration_driver import AvailableFeeds, RationManager, RationReporter
+from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
@@ -193,24 +188,6 @@ class HerdManager:
         }
 
     def daily_routines(self, available_feeds: list[Feed], weather: Weather, time: Time) -> list[HerdManagerOutput]:
-        """
-        Executes the daily routines for the animals in the herd.
-
-        Parameters
-        ----------
-        available_feeds : List[Feed]
-            List of available feeds.
-        weather : Weather
-            Instance of the Weather class.
-        time : Time
-            Instance of the Time class.
-
-        Returns
-        -------
-        List[HerdManagerOutput]
-            A list of HerdManagerOutput objects.
-        
-        """
         current_conditions = weather.get_current_day_conditions(time)
         current_temperature = current_conditions.mean_air_temperature
 
@@ -301,8 +278,8 @@ class HerdManager:
             self.allocate_animals_to_pens()
 
         for pen in self.all_pens:
-            if pen.needs_ration_formulation or is_end_of_ration_interval:
-                self.reformulate_ration_single_pen(pen, current_temperature, feed)
+            if pen.needs_ration_formulation or self.end_ration_interval(time.simulation_day):
+                self.reformulate_ration_single_pen(pen, available_feeds, current_conditions.mean_air_temperature)
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
@@ -1076,9 +1053,10 @@ class HerdManager:
             Current temperature (C).
 
         """
-        pen.set_animal_nutritional_requirements(current_temperature)
-
-        pen.use_user_defined_ration(available_feeds)
+        if self.is_ration_defined_by_user is True:
+            pen.use_user_defined_ration(available_feeds, current_temperature)
+        else:
+            pen.formulate_optimized_ration(available_feeds)
 
 
     def update_herd_statistics(self) -> None:
