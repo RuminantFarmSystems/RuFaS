@@ -217,11 +217,13 @@ def test_convert_year_jday_to_date(
         (150, 100, 150),
     ],
 )
-def test_convert_slice_to_simulation_day(slice_day: int, simulation_length_days: int, expected_sim_day: int,
-                                         mocker: MockerFixture) -> None:
+def test_convert_slice_to_simulation_day(
+    slice_day: int, simulation_length_days: int, expected_sim_day: int, mocker: MockerFixture
+) -> None:
     """Test convert_slice_to_simulation_day for various slice_day inputs."""
-    mocker.patch("RUFAS.input_manager.InputManager.get_data",
-                 return_value={"start_date": "2023:1", "end_date": "2023:100"})
+    mocker.patch(
+        "RUFAS.input_manager.InputManager.get_data", return_value={"start_date": "2023:1", "end_date": "2023:100"}
+    )
     mock_time = Time()
 
     mock_time.simulation_length_days = simulation_length_days

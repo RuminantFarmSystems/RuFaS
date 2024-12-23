@@ -225,8 +225,14 @@ class GraphGenerator:
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
             self._draw_graph(
-                graph_details["type"], prepared_data, list(prepared_data.keys()), ax, mask_values, use_calendar_dates,
-                graph_details.get("slice_start", None), graph_details.get("slice_end", None)
+                graph_details["type"],
+                prepared_data,
+                list(prepared_data.keys()),
+                ax,
+                mask_values,
+                use_calendar_dates,
+                graph_details.get("slice_start", None),
+                graph_details.get("slice_end", None),
             )
             if graph_details.get("title"):
                 corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
@@ -577,13 +583,10 @@ class GraphGenerator:
                 self.time.convert_simulation_day_to_date(i) for i in range(slice_start_sim_day, slice_end_sim_day)
             ]
         else:
-            dates_in_data_range = [
-                self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)
-            ]
+            dates_in_data_range = [self.time.start_date + datetime.timedelta(days=i) for i in range(max_data_length)]
 
-        get_x_values : Callable[[int], list[int]] = (
-            lambda values_length: dates_in_data_range[:values_length] if use_calendar_dates else
-            list(range(values_length))
+        get_x_values: Callable[[int], list[int]] = lambda values_length: (
+            dates_in_data_range[:values_length] if use_calendar_dates else list(range(values_length))
         )
 
         if graph_type in TUPLE_BASED_FUNCTIONS:
