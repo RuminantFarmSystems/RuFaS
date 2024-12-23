@@ -21,9 +21,8 @@ class CalfMilkType(Enum):
 
 class CalfRationManager:
     """
-    Calf ration formulation is distinct from other animal types, and managed separately.
-    Note that the ration formulated is a fixed ration; requirements used only for reporting
-
+    Calf ration formulation is distinct from other animal types, and managed separately. Calf nutrition requirements are
+    calculated based on the calf's nutritional intake.
     """
 
     milk_type: CalfMilkType
