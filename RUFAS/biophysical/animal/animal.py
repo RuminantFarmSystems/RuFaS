@@ -1,7 +1,7 @@
 import sys
-from datetime import datetime, date
+from datetime import datetime
 from random import random
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from scipy.stats import truncnorm
 
@@ -191,7 +191,18 @@ class Animal:
         self.nutrients: Nutrients = Nutrients()
         self._reproduction: Reproduction = Reproduction()
         self.nutrition_requirements: NutritionRequirements = self.calculate_nutrition_requirements()
-        self.nutrition_supply: NutritionSupply = NutritionSupply()
+        self.nutrition_supply: NutritionSupply = NutritionSupply(
+            metabolizable=0.0,
+            maintenance=0.0,
+            lactation=0.0,
+            growth=0.0,
+            protein=0.0,
+            calcium=0.0,
+            dry_matter=0.0,
+            phosphorus=0.0,
+            ndf_content=0.0,
+            fat_content=0.0
+        )
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
