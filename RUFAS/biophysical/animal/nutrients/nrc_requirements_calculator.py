@@ -34,6 +34,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         net_energy_diet_concentration: float,
         days_born: float,
         TDN_percentage: float,
+        secondary_phosphorus_requirement: float,
     ) -> NutritionRequirements:
         """Calculates energy and nutrition requirements for an animal using the NRC methodology."""
         maintenance_requirement, conceptus_weight, calf_birth_weight = cls._calculate_maintentance_energy_requirements(
@@ -102,7 +103,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             valine=0.0,
         )
 
-        return NutritionRequirementsCalculator(
+        return NutritionRequirements(
             maintenance=maintenance_requirement,
             growth=growth_requirement,
             pregnancy=pregnancy_requirement,
@@ -110,6 +111,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             protein=protein_requirement,
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
+            secondary_phosphorus=secondary_phosphorus_requirement,
             activity=activity_requirement,
             essential_amino_acids=essential_amino_acids,
         )

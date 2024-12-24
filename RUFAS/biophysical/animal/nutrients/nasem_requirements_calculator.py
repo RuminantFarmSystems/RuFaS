@@ -36,6 +36,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         distance: float,
         lactating: bool,
         ndf_percentage: float,
+        secondary_phosphorus_requirement: float,
     ) -> NutritionRequirements:
         """
         Calculates energy and nutrition requirements for an animal using the NASEM methodology.
@@ -162,6 +163,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             protein=protein_requirement,
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
+            secondary_phosphorus=secondary_phosphorus_requirement,
             dry_matter=dry_matter_intake,
             activity=activity_requirement,
             essential_amino_acids=essential_amino_acids,

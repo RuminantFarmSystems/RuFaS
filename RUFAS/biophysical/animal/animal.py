@@ -219,18 +219,7 @@ class Animal:
         self.nutrients: Nutrients = Nutrients()
         self._reproduction: Reproduction = Reproduction()
         self.nutrition_requirements: NutritionRequirements = self.calculate_nutrition_requirements()
-        self.nutrition_supply: NutritionSupply = NutritionSupply(
-            metabolizable=0.0,
-            maintenance=0.0,
-            lactation=0.0,
-            growth=0.0,
-            protein=0.0,
-            calcium=0.0,
-            dry_matter=0.0,
-            phosphorus=0.0,
-            ndf_content=0.0,
-            fat_content=0.0,
-        )
+        self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
@@ -703,6 +692,7 @@ class Animal:
                 distance=walking_distance,
                 lactating=self.is_milking,
                 ndf_percentage=ndf_percentage,
+                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement
             )
         else:
             requirements = NRCRequirementsCalculator.calculate_requirements(
@@ -725,6 +715,7 @@ class Animal:
                 net_energy_diet_concentration=net_energy_diet_conc,
                 days_born=self.days_born,
                 TDN_percentage=tdn_percentage,
+                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement
             )
 
         return requirements
