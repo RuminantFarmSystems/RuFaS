@@ -48,7 +48,7 @@ class NutritionSupplyCalculator:
         actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
 
         metabolizable_energy = cls._calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
-        total_metabolizable_energy = sum([energy for energy in metabolizable_energy.values()])
+        total_metabolizable_energy = sum([feed.amount * metabolizable_energy[feed.info.rufas_id] for feed in feeds])
 
         maintenance_energy = cls._calculate_actual_maintenance_net_energy(feeds, metabolizable_energy)
         lactation_energy = cls._calculate_actual_lactation_net_energy(
@@ -141,12 +141,12 @@ class NutritionSupplyCalculator:
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_digestible_energy : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal) of the corresponding feed.
+            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal / kg) of the corresponding feed.
 
         Returns
         -------
         dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal).
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal / kg).
 
         References
         ----------
@@ -173,14 +173,14 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
-        Calculates the actual net energy for maintenance of feeds.
+        Calculates the actual net energy of the ration available to use for maintenance.
 
         Parameters
         ----------
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_metabolizable_energy : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.
 
         Returns
         -------
@@ -218,16 +218,16 @@ class NutritionSupplyCalculator:
         actual_digestible_energy: dict[RUFAS_ID, float],
     ) -> float:
         """
-        Calculates the actual net energy for lactation of feeds.
+        Calculates the actual net energy of the ration available to use for lactation.
 
         Parameters
         ----------
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_digestible_energy : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal / kg) of the feed.
         actual_metabolizable : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.
 
         Returns
         -------
@@ -264,14 +264,14 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
-        Calculates actual net energy for growth of feeds.
+        Calculates the actual net energy of the ration available to use for growth.
 
         Parameters
         ----------
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_metabolizable : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.
 
         Returns
         -------
@@ -326,14 +326,14 @@ class NutritionSupplyCalculator:
 
         for feed in feeds:
             if feed.info.feed_type is FeedComponentType.FORAGE:
-                ca_digestibility = 0.3
+                digestibility = 0.3
             elif feed.info.feed_type is FeedComponentType.CONC:
-                ca_digestibility = 0.6
+                digestibility = 0.6
             elif feed.info.feed_type is FeedComponentType.MINERAL:
-                ca_digestibility = 0.95
+                digestibility = 0.95
             else:
-                ca_digestibility = 0.0
-            calcium_digestibility[feed.info.rufas_id] = ca_digestibility
+                digestibility = 0.0
+            calcium_digestibility[feed.info.rufas_id] = digestibility
 
         total = sum(
             [
@@ -350,7 +350,7 @@ class NutritionSupplyCalculator:
     @classmethod
     def _calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
         """
-        Calculates the phosphorus supply in the ration (kg).
+        Calculates the phosphorus supply in the ration.
 
         Parameters
         ----------
@@ -371,14 +371,14 @@ class NutritionSupplyCalculator:
 
         for feed in feeds:
             if feed.info.feed_type is FeedComponentType.FORAGE:
-                p_digestibility = 0.64
+                digestibility = 0.64
             elif feed.info.feed_type is FeedComponentType.CONC:
-                p_digestibility = 0.7
+                digestibility = 0.7
             elif feed.info.feed_type is FeedComponentType.MINERAL:
-                p_digestibility = 0.8
+                digestibility = 0.8
             else:
-                p_digestibility = 0.0
-            phosphorus_digestibility[feed.info.rufas_id] = p_digestibility
+                digestibility = 0.0
+            phosphorus_digestibility[feed.info.rufas_id] = digestibility
 
         total = sum(
             [
@@ -401,7 +401,7 @@ class NutritionSupplyCalculator:
         body_weight: float,
     ) -> float:
         """
-        Calculates amount of metabolizable protein in ration (kg).
+        Calculates amount of metabolizable protein in ration.
 
         Parameters
         ----------
