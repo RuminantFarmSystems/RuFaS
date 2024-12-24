@@ -315,7 +315,10 @@ class Animal:
             True if the reduction was successful, False otherwise.
 
         """
-        if self.milk_production.milk_production_reduction + AnimalModuleConstants.MILK_REDUCTION_KG > 1.0:
+        is_milk_reduction_too_high = (
+            self.milk_production.milk_production_reduction + AnimalModuleConstants.MILK_REDUCTION_KG
+        ) > AnimalModuleConstants.MAXIMUM_MILK_REDUCTION
+        if is_milk_reduction_too_high is True:
             return False
         self.milk_production.milk_production_reduction += AnimalModuleConstants.MILK_REDUCTION_KG
         return True
@@ -651,7 +654,7 @@ class Animal:
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
         average_daily_heifer_gain = (
-            self.average_daily_gain if self.animal_type.is_heifer else None
+            self.growth.average_daily_gain if self.animal_type.is_heifer else None
         )  # TODO: average_daily_gain for heifers
         if self.nutrient_standard is NutrientStandard.NASEM:
             requirements = NASEMRequirementsCalculator.calculate_requirements(
