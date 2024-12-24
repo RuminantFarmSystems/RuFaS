@@ -185,6 +185,7 @@ class Animal:
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
         self.net_merit = args.get("net_merit", 0.0)
+        self.body_condition_score_5 = AnimalModuleConstants.DEFAULT_BODY_CONDITION_SCORE_5
 
         self.cull_reason = ""
         self.body_weight_history: list[BodyWeightHistory] = []
@@ -653,17 +654,22 @@ class Animal:
 
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
-        average_daily_heifer_gain = (
-            self.growth.average_daily_gain if self.animal_type.is_heifer else None
-        )  # TODO: average_daily_gain for heifers
+
+        if self.previous_ration is None:
+            ndf_percentage = AnimalModuleConstants.DEFAULT_NDF_PERCENTAGE
+            tdn_percentage = AnimalModuleConstants.DEFAULT_TDN_PERCENTAGE
+            net_energy_diet_conc = AnimalModuleConstants.DEFAULT_NET_ENERGY_DIET_CONCENTRATION
+        else:
+            raise NotImplementedError("Previous ration is not implemented!")
+
         if self.nutrient_standard is NutrientStandard.NASEM:
             requirements = NASEMRequirementsCalculator.calculate_requirements(
                 body_weight=self.body_weight,
                 mature_body_weight=self.mature_body_weight,
                 days_in_pregancy=days_in_pregancy,
-                body_condition_score_5=self.body_condition_score_5,  # TODO: body condition score 5.
+                body_condition_score_5=self.body_condition_score_5,
                 days_in_milk=days_in_milk,
-                average_daily_heifer_gain=average_daily_heifer_gain,
+                average_daily_heifer_gain=self.growth.daily_growth,
                 animal_type=self.animal_type,
                 parity=self.reproduction.calves,  # TODO: calves
                 calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
@@ -674,16 +680,16 @@ class Animal:
                 housing=housing,
                 distance=walking_distance,
                 lactating=self.is_milking,
-                ndf_percentage=self.previous_ration.ndf_percentage,  # TODO: ration and NDF percentage
+                ndf_percentage=ndf_percentage,
             )
         else:
             requirements = NRCRequirementsCalculator.calculate_requirements(
                 body_weight=self.body_weight,
                 mature_body_weight=self.mature_body_weight,
                 days_in_pregancy=days_in_pregancy,
-                body_condition_score_5=self.body_condition_score_5,  # TODO: body condition score 5.
+                body_condition_score_5=self.body_condition_score_5,
                 days_in_milk=days_in_milk,
-                average_daily_heifer_gain=average_daily_heifer_gain,
+                average_daily_heifer_gain=self.growth.daily_growth,
                 animal_type=self.animal_type,
                 parity=self.reproduction.calves,  # TODO: calves
                 calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
@@ -694,9 +700,9 @@ class Animal:
                 housing=housing,
                 distance=walking_distance,
                 previous_temperature=previous_temperature,
-                net_energy_diet_concentration=self.ration.net_energy_diet_concentration,
+                net_energy_diet_concentration=net_energy_diet_conc,
                 days_born=self.days_born,
-                TDN_percentage=self.previous_ration.tdn_percentage,  # TODO: ration and TDN percentage
+                TDN_percentage=tdn_percentage,
             )
 
         return requirements
