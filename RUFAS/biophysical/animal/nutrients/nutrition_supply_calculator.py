@@ -165,7 +165,7 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
-        Calculates the actual net energy for maintenance of feeds.
+        Calculates the actual net energy of the ration available to use for maintenance.
 
         Parameters
         ----------
@@ -210,7 +210,7 @@ class NutritionSupplyCalculator:
         actual_digestible_energy: dict[RUFAS_ID, float],
     ) -> float:
         """
-        Calculates the actual net energy for lactation of feeds.
+        Calculates the actual net energy of the ration available to use for lactation.
 
         Parameters
         ----------
@@ -256,7 +256,7 @@ class NutritionSupplyCalculator:
         cls, feeds: list[FeedInRation], actual_metabolizable_energy: dict[RUFAS_ID, float]
     ) -> float:
         """
-        Calculates actual net energy for growth of feeds.
+        Calculates the actual net energy of the ration available to use for growth.
 
         Parameters
         ----------
@@ -318,14 +318,14 @@ class NutritionSupplyCalculator:
 
         for feed in feeds:
             if feed.info.feed_type is FeedComponentType.FORAGE:
-                ca_digestibility = 0.3
+                digestibility = 0.3
             elif feed.info.feed_type is FeedComponentType.CONC:
-                ca_digestibility = 0.6
+                digestibility = 0.6
             elif feed.info.feed_type is FeedComponentType.MINERAL:
-                ca_digestibility = 0.95
+                digestibility = 0.95
             else:
-                ca_digestibility = 0.0
-            calcium_digestibility[feed.info.rufas_id] = ca_digestibility
+                digestibility = 0.0
+            calcium_digestibility[feed.info.rufas_id] = digestibility
 
         total = sum(
             [
@@ -342,7 +342,7 @@ class NutritionSupplyCalculator:
     @classmethod
     def _calculate_phosphorus_supply(cls, feeds: list[FeedInRation]) -> float:
         """
-        Calculates the phosphorus supply in the ration (kg).
+        Calculates the phosphorus supply in the ration.
 
         Parameters
         ----------
@@ -363,14 +363,14 @@ class NutritionSupplyCalculator:
 
         for feed in feeds:
             if feed.info.feed_type is FeedComponentType.FORAGE:
-                p_digestibility = 0.64
+                digestibility = 0.64
             elif feed.info.feed_type is FeedComponentType.CONC:
-                p_digestibility = 0.7
+                digestibility = 0.7
             elif feed.info.feed_type is FeedComponentType.MINERAL:
-                p_digestibility = 0.8
+                digestibility = 0.8
             else:
-                p_digestibility = 0.0
-            phosphorus_digestibility[feed.info.rufas_id] = p_digestibility
+                digestibility = 0.0
+            phosphorus_digestibility[feed.info.rufas_id] = digestibility
 
         total = sum(
             [
@@ -393,7 +393,7 @@ class NutritionSupplyCalculator:
         body_weight: float,
     ) -> float:
         """
-        Calculates amount of metabolizable protein in ration (kg).
+        Calculates amount of metabolizable protein in ration.
 
         Parameters
         ----------
