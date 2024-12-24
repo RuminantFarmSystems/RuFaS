@@ -160,7 +160,7 @@ class Animal:
         return self._daily_distance
 
     @daily_distance.setter
-    def daily_vertical_distance(self, daily_distance: float) -> None:
+    def daily_distance(self, daily_distance: float) -> None:
         if not self.animal_type.is_cow:
             raise TypeError()
         self._daily_distance = daily_distance
