@@ -225,7 +225,7 @@ class Pen:
     def update_daily_walking_distance(self) -> None:
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
             for animal in self.cows_in_pen:
-                animal.calculate_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+                animal.set_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     @property
     def average_phosphorus_requirements(self) -> float:
@@ -367,9 +367,11 @@ class Pen:
                     feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
                 )
 
-                animal.set_nutrition_requirements(  # TODO: Calculate and set walking distance to parlor.
+                walking_distance = animal.daily_distance if self.animal_combination == AnimalCombination.LAC_COW else 0.0
+
+                animal.set_nutrition_requirements(
                     housing=self.housing_type,
-                    walking_distance=self.walking_distance,
+                    walking_distance=walking_distance,
                     previous_temperature=temperature,
                     available_feeds=available_feeds,
                 )

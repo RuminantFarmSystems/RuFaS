@@ -4,6 +4,7 @@ from random import random
 from typing import Any, Callable
 
 from scipy.stats import truncnorm
+from numpy import sqrt
 
 from RUFAS.biophysical.animal import animal_constants
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
@@ -153,6 +154,18 @@ class Animal:
         self._daily_vertical_distance = daily_vertical_distance
 
     @property
+    def daily_distance(self) -> float:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        return self._daily_distance
+
+    @daily_distance.setter
+    def daily_vertical_distance(self, daily_distance: float) -> None:
+        if not self.animal_type.is_cow:
+            raise TypeError()
+        self._daily_distance = daily_distance
+
+    @property
     def reproduction(self) -> Reproduction:
         return self._reproduction
 
@@ -227,6 +240,7 @@ class Animal:
         self._future_death_date: int | None = None
         self._daily_horizontal_distance: float = 0.0
         self._daily_vertical_distance: float = 0.0
+        self._daily_distance: float = 0.0
 
         if self.animal_type == AnimalType.CALF and "body_weight" not in args.keys():
             self._initialize_newborn_calf(args)
@@ -596,9 +610,9 @@ class Animal:
             self.pen_history[-1]["end_date"] = current_day
             self.pen_history[-1]["animal_types_in_pen"] = list(animal_types_in_pen)
 
-    def calculate_daily_walking_distance(
+    def set_daily_walking_distance(
         self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float
-    ) -> float:
+    ) -> None:
         """
         Calculates and sets the animal's daily vertical and horizontal
         walking distance (DVD and DHD).
@@ -608,13 +622,14 @@ class Animal:
         vertical_dist_to_parlor : float
             Vertical distance to milking parlor (km).
         horizontal_dist_to_parlor : float
-            Horizontal distance to milking parlor, km.
+            Horizontal distance to milking parlor (km).
 
         """
         if not self.animal_type.is_cow:
             raise ValueError("Cannot calculate daily walking distance for animal types other than cow.")
         self.daily_vertical_distance = 2 * vertical_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
         self.daily_horizontal_distance = 2 * horizontal_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
+        self.daily_distance = sqrt(self.daily_vertical_distance ** 2 + self.daily_horizontal_distance ** 2)
 
     def set_nutrition_requirements(
         self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
