@@ -61,7 +61,7 @@ class NutritionSupplyCalculator:
         protein = cls._calculate_metabolizable_protein_supply(
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
-        nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "lignin", "ash", "potassium"]
+        nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "TDN", "lignin", "ash", "potassium"]
         nutrient_contents = {
             nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in nutrients_to_calculate
         }
@@ -79,6 +79,7 @@ class NutritionSupplyCalculator:
             fat_content=nutrient_contents["EE"],
             crude_protein=nutrient_contents["CP"],
             adf_content=nutrient_contents["ADF"],
+            tdn_content=nutrient_contents["TDN"],
             lignin_content=nutrient_contents["lignin"],
             ash_content=nutrient_contents["ash"],
             potassium_content=nutrient_contents["potassium"],

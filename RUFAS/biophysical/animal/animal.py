@@ -658,9 +658,16 @@ class Animal:
             tdn_percentage = AnimalModuleConstants.DEFAULT_TDN_PERCENTAGE
             net_energy_diet_conc = AnimalModuleConstants.DEFAULT_NET_ENERGY_DIET_CONCENTRATION
         else:
-            ndf_percentage = self.previous_nutrition_supply.ndf_content / self.previous_nutrition_supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
-            # tdn_percentage = 
-            net_energy_diet_conc = self.previous_nutrition_supply.metabolizable / self.previous_nutrition_supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+            previous_dmi = self.previous_nutrition_supply.dry_matter
+            ndf_percentage = (
+                self.previous_nutrition_supply.ndf_content / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+            )
+            tdn_percentage = (
+                self.previous_nutrition_supply.tdn_content / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+            )
+            net_energy_diet_conc = (
+                self.previous_nutrition_supply.metabolizable / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+            )
 
         if self.nutrient_standard is NutrientStandard.NASEM:
             requirements = NASEMRequirementsCalculator.calculate_requirements(

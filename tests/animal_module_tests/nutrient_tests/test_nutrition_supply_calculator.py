@@ -36,6 +36,7 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
                 fat_content=10.0,
                 crude_protein=10.0,
                 adf_content=10.0,
+                tdn_content=10.0,
                 lignin_content=10.0,
                 ash_content=10.0,
                 potassium_content=10.0,
@@ -86,7 +87,7 @@ def test_calculate_nutrient_supply(
     calcium.assert_called_once()
     phosphorus.assert_called_once()
     protein.assert_called_once()
-    assert nutritive_content.call_count == 7
+    assert nutritive_content.call_count == 8
 
 
 @pytest.mark.parametrize(
@@ -574,11 +575,14 @@ def test_calculate_rumen_undegradable_protein_percentages(
     assert actual == expected
 
 
-@pytest.mark.parametrize("name, nutrient, feed_amounts, expected", [
-    ("NDF", (1.3, 2.0, 0.5), (20.0, 5.0, 10.0), 0.41),
-    ("EE", (1.1, 4.0, 5.0), (10.0, 20.0, 30.0), 2.41),
-    ("CP", (0.0, 0.0, 0.0), (40.0, 20.0, 10.0), 0.0),
-])
+@pytest.mark.parametrize(
+    "name, nutrient, feed_amounts, expected",
+    [
+        ("NDF", (1.3, 2.0, 0.5), (20.0, 5.0, 10.0), 0.41),
+        ("EE", (1.1, 4.0, 5.0), (10.0, 20.0, 30.0), 2.41),
+        ("CP", (0.0, 0.0, 0.0), (40.0, 20.0, 10.0), 0.0),
+    ],
+)
 def test_calculate_nutrient_content(
     feeds: tuple[Feed, Feed, Feed],
     name: str,

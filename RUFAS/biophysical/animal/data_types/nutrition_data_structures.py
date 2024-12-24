@@ -119,6 +119,8 @@ class NutritionSupply:
         Amount of crude protein in a ration (kg).
     adf_content : float
         Amount of Acid Detergent Fiber (ADF) in a ration (kg).
+    tdn_content : float
+        Amount of Total Digestible Nutrients (TDN) in a ration (kg).
     lignin_content : float
         Amount of lignin in a ration (kg).
     ash_content : float
@@ -142,6 +144,7 @@ class NutritionSupply:
     fat_content: float
     crude_protein: float
     adf_content: float
+    tdn_content: float
     lignin_content: float
     ash_content: float
     potassium_content: float
@@ -166,6 +169,7 @@ class NutritionSupply:
             fat_content=self.fat_content + other.fat_content,
             crude_protein=self.crude_protein + other.crude_protein,
             adf_content=self.adf_content + other.adf_content,
+            tdn_content=self.tdn_content + other.tdn_content,
             lignin_content=self.lignin_content + other.lignin_content,
             ash_content=self.ash_content + other.ash_content,
             potassium_content=self.potassium_content + other.potassium_content,
@@ -189,6 +193,7 @@ class NutritionSupply:
             fat_content=self.fat_content / divisor,
             crude_protein=self.crude_protein / divisor,
             adf_content=self.adf_content / divisor,
+            tdn_content=self.tdn_content / divisor,
             lignin_content=self.lignin_content / divisor,
             ash_content=self.ash_content / divisor,
             potassium_content=self.potassium_content / divisor,
@@ -209,6 +214,7 @@ class NutritionSupply:
             fat_content=0.0,
             crude_protein=0.0,
             adf_content=0.0,
+            tdn_content=0.0,
             lignin_content=0.0,
             ash_content=0.0,
             potassium_content=0.0,
@@ -251,6 +257,7 @@ class NutritionEvaluationResults:
     is_valid_cow_ration
 
     """
+
     total_energy: float | None
     maintenance: float
     lactation: float | None
@@ -325,4 +332,19 @@ class NutritionEvaluationResults:
             dry_matter=self.dry_matter / divisor,
             ndf=self.ndf / divisor,
             fat=self.fat / divisor,
+        )
+
+    def make_empty_evaluation_results(cls) -> "NutritionEvaluationResults":
+        """Manufactures an empty NutritionEvaluationResults object."""
+        return NutritionEvaluationResults(
+            total_energy=0.0,
+            maintenance=0.0,
+            lactation=0.0,
+            growth=0.0,
+            protein=0.0,
+            calcium=0.0,
+            phosphorus=0.0,
+            dry_matter=0.0,
+            ndf=0.0,
+            fat=0.0,
         )
