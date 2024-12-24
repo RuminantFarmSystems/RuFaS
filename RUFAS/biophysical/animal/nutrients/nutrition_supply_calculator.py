@@ -61,8 +61,10 @@ class NutritionSupplyCalculator:
         protein = cls._calculate_metabolizable_protein_supply(
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
-        ndf_content = cls._calculate_neutral_detergent_fiber_content(feeds)
-        fat_content = cls._calculate_fat_content(feeds)
+        nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "lignin", "ash", "potassium"]
+        nutrient_contents = {
+            nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in nutrients_to_calculate
+        }
 
         return NutritionSupply(
             metabolizable=total_metabolizable_energy,
@@ -73,8 +75,13 @@ class NutritionSupplyCalculator:
             calcium=calcium,
             phosphorus=phosphorus,
             dry_matter=dry_matter_intake,
-            ndf_content=ndf_content,
-            fat_content=fat_content,
+            ndf_content=nutrient_contents["NDF"],
+            fat_content=nutrient_contents["EE"],
+            crude_protein=nutrient_contents["CP"],
+            adf_content=nutrient_contents["ADF"],
+            lignin_content=nutrient_contents["lignin"],
+            ash_content=nutrient_contents["ash"],
+            potassium_content=nutrient_contents["potassium"],
         )
 
     @classmethod
@@ -615,37 +622,23 @@ class NutritionSupplyCalculator:
         return rup_percentages
 
     @classmethod
-    def _calculate_neutral_detergent_fiber_content(cls, feeds: list[FeedInRation]) -> float:
+    def _calculate_nutritive_content(cls, feeds: list[FeedInRation], nutrient: str) -> float:
         """
-        Calculates the neutral detergent fiber (NDF) content of a ration.
+        Calculates the content of a specific nutrient ration.
 
         Parameters
         ----------
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
+        nutrient : str
+            Name of the nutrient.
 
         Returns
         -------
         float
-            Total supply of NDF in a ration (kg).
+            Total supply of nutrient in a ration (kg).
 
         """
-        return sum([feed.amount * feed.info.NDF * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
-
-    @classmethod
-    def _calculate_fat_content(cls, feeds: list[FeedInRation]) -> float:
-        """
-        Calculates the fat content of a ration.
-
-        Parameters
-        ----------
-        feeds : list[FeedInRation]
-            List of feeds in ration, including the amount and nutritive properties.
-
-        Returns
-        -------
-        float
-            Total supply of fat in a ration (kg).
-
-        """
-        return sum([feed.amount * feed.info.EE * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+        return sum(
+            [feed.amount * getattr(feed.info, nutrient) * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds]
+        )

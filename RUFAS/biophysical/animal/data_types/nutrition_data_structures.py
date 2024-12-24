@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
+from RUFAS.general_constants import GeneralConstants
 
 
 @dataclass
@@ -114,6 +115,18 @@ class NutritionSupply:
         Total neutral detergent fiber (NDF) in the ration (kg).
     fat_content : float
         Total fat content in the ration (kg).
+    crude_protein : float
+        Amount of crude protein in a ration (kg).
+    adf_content : float
+        Amount of Acid Detergent Fiber (ADF) in a ration (kg).
+    lignin_content : float
+        Amount of lignin in a ration (kg).
+    ash_content : float
+        Amount of ash in a ration (kg).
+    potassium_content : float
+        Amount of potassium in a ration (kg).
+    nitrogen_content : float
+        Amount of nitrogen in a ration (kg). This value is derived from the crude protein content.
 
     """
 
@@ -127,6 +140,79 @@ class NutritionSupply:
     dry_matter: float
     ndf_content: float
     fat_content: float
+    crude_protein: float
+    adf_content: float
+    lignin_content: float
+    ash_content: float
+    potassium_content: float
+    nitrogen_content: float = field(init=False)
+
+    def __post_init__(self) -> None:
+        """Sets the nitrogen content of a ration based on the crude protein content."""
+        self.nitrogen_content = self.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
+
+    def __add__(self, other: "NutritionSupply") -> "NutritionSupply":
+        """Add two NutritionSupply objects together."""
+        return NutritionSupply(
+            metabolizable=self.metabolizable + other.metabolizable,
+            maintenance=self.maintenance + other.maintenance,
+            lactation=self.lactation + other.lactation,
+            growth=self.growth + other.growth,
+            protein=self.protein + other.protein,
+            calcium=self.calcium + other.calcium,
+            phosphorus=self.phosphorus + other.phosphorus,
+            dry_matter=self.dry_matter + other.dry_matter,
+            ndf_content=self.ndf_content + other.ndf_content,
+            fat_content=self.fat_content + other.fat_content,
+            crude_protein=self.crude_protein + other.crude_protein,
+            adf_content=self.adf_content + other.adf_content,
+            lignin_content=self.lignin_content + other.lignin_content,
+            ash_content=self.ash_content + other.ash_content,
+            potassium_content=self.potassium_content + other.potassium_content,
+        )
+
+    def __truediv__(self, divisor: float | int) -> "NutritionSupply":
+        """Divides a NutritionSupply object by a scalar."""
+        if divisor == 0.0:
+            raise ZeroDivisionError("Cannot divide NutritionSupply by zero.")
+
+        return NutritionSupply(
+            metabolizable=self.metabolizable / divisor,
+            maintenance=self.maintenance / divisor,
+            lactation=self.lactation / divisor,
+            growth=self.growth / divisor,
+            protein=self.protein / divisor,
+            calcium=self.calcium / divisor,
+            phosphorus=self.phosphorus / divisor,
+            dry_matter=self.dry_matter / divisor,
+            ndf_content=self.ndf_content / divisor,
+            fat_content=self.fat_content / divisor,
+            crude_protein=self.crude_protein / divisor,
+            adf_content=self.adf_content / divisor,
+            lignin_content=self.lignin_content / divisor,
+            ash_content=self.ash_content / divisor,
+            potassium_content=self.potassium_content / divisor,
+        )
+
+    def make_empty_nutrition_supply(cls) -> "NutritionSupply":
+        """Manufactures an empty NutritionSupply object."""
+        return NutritionSupply(
+            metabolizable=0.0,
+            maintenance=0.0,
+            lactation=0.0,
+            growth=0.0,
+            protein=0.0,
+            calcium=0.0,
+            phosphorus=0.0,
+            dry_matter=0.0,
+            ndf_content=0.0,
+            fat_content=0.0,
+            crude_protein=0.0,
+            adf_content=0.0,
+            lignin_content=0.0,
+            ash_content=0.0,
+            potassium_content=0.0,
+        )
 
 
 @dataclass

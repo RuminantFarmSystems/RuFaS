@@ -33,7 +33,12 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
                 phosphorus=1.6,
                 dry_matter=54.0,
                 ndf_content=10.0,
-                fat_content=11.0,
+                fat_content=10.0,
+                crude_protein=10.0,
+                adf_content=10.0,
+                lignin_content=10.0,
+                ash_content=10.0,
+                potassium_content=10.0,
             ),
         )
     ],
@@ -66,10 +71,9 @@ def test_calculate_nutrient_supply(
     protein = mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_metabolizable_protein_supply", return_value=1.7
     )
-    ndf = mocker.patch.object(
-        NutritionSupplyCalculator, "_calculate_neutral_detergent_fiber_content", return_value=10.0
+    nutritive_content = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_nutritive_content", return_value=10.0
     )
-    fat = mocker.patch.object(NutritionSupplyCalculator, "_calculate_fat_content", return_value=11.0)
 
     actual = NutritionSupplyCalculator.calculate_nutrient_supply(feeds, ration, weight)
 
@@ -82,8 +86,7 @@ def test_calculate_nutrient_supply(
     calcium.assert_called_once()
     phosphorus.assert_called_once()
     protein.assert_called_once()
-    ndf.assert_called_once()
-    fat.assert_called_once()
+    assert nutritive_content.call_count == 7
 
 
 @pytest.mark.parametrize(
@@ -571,48 +574,28 @@ def test_calculate_rumen_undegradable_protein_percentages(
     assert actual == expected
 
 
-@pytest.mark.parametrize("ndf, feed_amounts, expected", [((1.3, 2.0, 0.5), (20.0, 5.0, 10.0), 0.41)])
-def test_calculate_ndf_content(
+@pytest.mark.parametrize("name, nutrient, feed_amounts, expected", [
+    ("NDF", (1.3, 2.0, 0.5), (20.0, 5.0, 10.0), 0.41),
+    ("EE", (1.1, 4.0, 5.0), (10.0, 20.0, 30.0), 2.41),
+    ("CP", (0.0, 0.0, 0.0), (40.0, 20.0, 10.0), 0.0),
+])
+def test_calculate_nutrient_content(
     feeds: tuple[Feed, Feed, Feed],
-    ndf: tuple[float, float, float],
+    name: str,
+    nutrient: tuple[float, float, float],
     feed_amounts: tuple[float, float, float],
     expected: float,
 ) -> None:
-    """Test that Neutral Detergent Fiber of a ration is calculated correctly."""
-    feeds[0].NDF, feeds[1].NDF, feeds[2].NDF = ndf
+    """Test that the nutrient content of a ration is calculated correctly."""
+    setattr(feeds[0], name, nutrient[0])
+    setattr(feeds[1], name, nutrient[1])
+    setattr(feeds[2], name, nutrient[2])
     feeds_in_ration = [
         FeedInRation(feed_amounts[0], feeds[0]),
         FeedInRation(feed_amounts[1], feeds[1]),
         FeedInRation(feed_amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_neutral_detergent_fiber_content(feeds_in_ration)
-
-    assert pytest.approx(actual) == expected
-
-
-@pytest.mark.parametrize(
-    "ee, feed_amounts, expected",
-    [
-        ((2.1, 1.0, 0.0), (10.0, 20.0, 0.5), 0.41),
-        ((0.0, 0.0, 0.0), (20.0, 20.0, 20.0), 0.0),
-        ((3.0, 3.0, 3.0), (10.0, 20.0, 15.0), 1.35),
-    ],
-)
-def test_calculate_fat_content(
-    feeds: tuple[Feed, Feed, Feed],
-    ee: tuple[float, float, float],
-    feed_amounts: tuple[float, float, float],
-    expected: float,
-) -> None:
-    """Test that fat content of a ration is calculated correctly."""
-    feeds[0].EE, feeds[1].EE, feeds[2].EE = ee
-    feeds_in_ration = [
-        FeedInRation(feed_amounts[0], feeds[0]),
-        FeedInRation(feed_amounts[1], feeds[1]),
-        FeedInRation(feed_amounts[2], feeds[2]),
-    ]
-
-    actual = NutritionSupplyCalculator._calculate_fat_content(feeds_in_ration)
+    actual = NutritionSupplyCalculator._calculate_nutritive_content(feeds_in_ration, name)
 
     assert pytest.approx(actual) == expected
