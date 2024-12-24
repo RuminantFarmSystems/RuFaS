@@ -48,7 +48,7 @@ class NutritionSupplyCalculator:
         actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
 
         metabolizable_energy = cls._calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
-        total_metabolizable_energy = sum([energy for energy in metabolizable_energy.values()])
+        total_metabolizable_energy = sum([feed.amount * metabolizable_energy[feed.info.rufas_id] for feed in feeds])
 
         maintenance_energy = cls._calculate_actual_maintenance_net_energy(feeds, metabolizable_energy)
         lactation_energy = cls._calculate_actual_lactation_net_energy(
@@ -133,12 +133,12 @@ class NutritionSupplyCalculator:
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_digestible_energy : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal) of the corresponding feed.
+            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal / kg) of the corresponding feed.
 
         Returns
         -------
         dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal).
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content of the corresponding feed (Mcal / kg).
 
         References
         ----------
@@ -172,7 +172,7 @@ class NutritionSupplyCalculator:
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_metabolizable_energy : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.
 
         Returns
         -------
@@ -217,9 +217,9 @@ class NutritionSupplyCalculator:
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_digestible_energy : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the discounted digestible energy content (Mcal / kg) of the feed.
         actual_metabolizable : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.
 
         Returns
         -------
@@ -263,7 +263,7 @@ class NutritionSupplyCalculator:
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
         actual_metabolizable : dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal) of the feed.
+            Mapping of RuFaS Feed IDs to the actual metabolizable energy content (Mcal / kg) of the feed.
 
         Returns
         -------
