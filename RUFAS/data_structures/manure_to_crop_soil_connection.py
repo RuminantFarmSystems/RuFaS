@@ -132,3 +132,9 @@ class ManureEventNutrientRequestResults(NamedTuple):
     field_name: str
     event: ManureEvent
     nutrient_request_results: Optional[NutrientRequestResults]
+
+
+class ManureNutrientDeficiencyOption(Enum):
+    """An enumeration of options for handling nutrient deficiencies in manure requests."""
+    EXTERNAL_MANURE = "external_manure"
+    SYNTHETIC_FERTILIZER = "synthetic_fertilizer"

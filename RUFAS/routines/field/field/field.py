@@ -15,6 +15,7 @@ from RUFAS.data_structures.events import (
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
+    ManureNutrientDeficiencyOption,
     NutrientRequest,
     NutrientRequestResults,
 )
@@ -574,55 +575,8 @@ class Field:
             supplied_nitrogen = manure_supplied.nitrogen
             supplied_phosphorus = manure_supplied.phosphorus
 
-            total_inorganic_nitrogen_fraction = (
-                manure_supplied.nitrogen / manure_supplied.dry_matter
-            ) * manure_supplied.inorganic_nitrogen_fraction
-            total_organic_nitrogen_fraction = (
-                manure_supplied.nitrogen / manure_supplied.dry_matter
-            ) * manure_supplied.organic_nitrogen_fraction
-
-            invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
-                application_depth > 0.0 and surface_remainder_fraction == 1.0
-            )
-
-            error_name = "manure_application_error"
-            if invalid_depth_and_remainder_fraction:
-                self._record_nutrient_application_error(
-                    application_depth, surface_remainder_fraction, error_name, year, day
-                )
-                application_depth = 0.0
-                surface_remainder_fraction = 1.0
-
-            if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
-                self._record_nutrient_application_error(application_depth, None, error_name, year, day)
-                application_depth = self.soil.data.soil_layers[-1].bottom_depth
-
-            self.manure_applicator.apply_machine_manure(
-                dry_matter_mass=manure_supplied.dry_matter,
-                dry_matter_fraction=manure_supplied.dry_matter_fraction,
-                total_phosphorus_mass=manure_supplied.phosphorus,
-                field_coverage=field_coverage,
-                application_depth=application_depth,
-                surface_remainder_fraction=surface_remainder_fraction,
-                field_size=self.field_data.field_size,
-                inorganic_nitrogen_fraction=total_inorganic_nitrogen_fraction,
-                ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
-                organic_nitrogen_fraction=total_organic_nitrogen_fraction,
-                water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
-            )
-
-            self._record_manure_application(
-                dry_matter_mass=manure_supplied.dry_matter,
-                dry_matter_fraction=manure_supplied.dry_matter_fraction,
-                field_coverage=field_coverage,
-                nitrogen=manure_supplied.nitrogen,
-                phosphorus=manure_supplied.phosphorus,
-                potassium=None,
-                application_depth=application_depth,
-                surface_remainder_fraction=surface_remainder_fraction,
-                year=year,
-                day=day,
-                output_name="manure_application",
+            application_depth, surface_remainder_fraction = self._apply_supplied_manure(
+                field_coverage, application_depth, surface_remainder_fraction, year, day, manure_supplied
             )
         else:
             supplied_nitrogen = 0.0
@@ -649,8 +603,6 @@ class Field:
             return
 
         if not self.field_data.supplement_manure_nutrient_deficiencies:
-            # TODO update this to check which supplement method is selected "manure", "synthetic fertilizer", "None"
-            # TODO create supplement enum for the above
             warning_name = "Nutrient deficient manure application"
             warning_message = (
                 f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus "
@@ -658,28 +610,90 @@ class Field:
             )
             self.om.add_warning(warning_name, warning_message, info_map)
             return
-
-        # TODO determine type of fertilizer user wants to use (manure or chemical)
-
-        # this is synthetic fertilizer option (currently. Issue #1828 addresses further customization)
-        if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
-            optimal_mix = self.ONLY_NITROGEN_MIX
-        else:
-            optimal_mix = self._determine_optimal_fertilizer_mix(
+        elif self.field_data.supplement_manure_option == ManureNutrientDeficiencyOption.EXTERNAL_MANURE:
+            self._execute_supplemental_manure_application(
                 unmet_nitrogen_demand,
                 unmet_phosphorus_demand,
-                self.available_fertilizer_mixes,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
             )
-        self._execute_fertilizer_application(
-            optimal_mix,
-            unmet_nitrogen_demand,
-            unmet_phosphorus_demand,
-            0,
-            application_depth,
-            surface_remainder_fraction,
-            year,
-            day,
+        else:
+            # this is synthetic fertilizer option (currently. Issue #1828 addresses further customization)
+            if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
+                optimal_mix = self.ONLY_NITROGEN_MIX
+            else:
+                optimal_mix = self._determine_optimal_fertilizer_mix(
+                    unmet_nitrogen_demand,
+                    unmet_phosphorus_demand,
+                    self.available_fertilizer_mixes,
+                )
+            self._execute_fertilizer_application(
+                optimal_mix,
+                unmet_nitrogen_demand,
+                unmet_phosphorus_demand,
+                0,
+                application_depth,
+                surface_remainder_fraction,
+                year,
+                day,
+            )
+
+    def _apply_supplied_manure(self, field_coverage, application_depth, surface_remainder_fraction, year, day,
+                               manure_supplied):
+        total_inorganic_nitrogen_fraction = (
+            manure_supplied.nitrogen / manure_supplied.dry_matter
+        ) * manure_supplied.inorganic_nitrogen_fraction
+        total_organic_nitrogen_fraction = (
+            manure_supplied.nitrogen / manure_supplied.dry_matter
+        ) * manure_supplied.organic_nitrogen_fraction
+
+        invalid_depth_and_remainder_fraction = (application_depth == 0.0 and surface_remainder_fraction != 1.0) or (
+            application_depth > 0.0 and surface_remainder_fraction == 1.0
         )
+
+        error_name = "manure_application_error"
+        if invalid_depth_and_remainder_fraction:
+            self._record_nutrient_application_error(
+                application_depth, surface_remainder_fraction, error_name, year, day
+            )
+            application_depth = 0.0
+            surface_remainder_fraction = 1.0
+
+        if application_depth > self.soil.data.soil_layers[-1].bottom_depth:
+            self._record_nutrient_application_error(application_depth, None, error_name, year, day)
+            application_depth = self.soil.data.soil_layers[-1].bottom_depth
+
+        self.manure_applicator.apply_machine_manure(
+            dry_matter_mass=manure_supplied.dry_matter,
+            dry_matter_fraction=manure_supplied.dry_matter_fraction,
+            total_phosphorus_mass=manure_supplied.phosphorus,
+            field_coverage=field_coverage,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            field_size=self.field_data.field_size,
+            inorganic_nitrogen_fraction=total_inorganic_nitrogen_fraction,
+            ammonium_fraction=manure_supplied.ammonium_nitrogen_fraction,
+            organic_nitrogen_fraction=total_organic_nitrogen_fraction,
+            water_extractable_inorganic_phosphorus_fraction=manure_supplied.inorganic_phosphorus_fraction,
+        )
+
+        self._record_manure_application(
+            dry_matter_mass=manure_supplied.dry_matter,
+            dry_matter_fraction=manure_supplied.dry_matter_fraction,
+            field_coverage=field_coverage,
+            nitrogen=manure_supplied.nitrogen,
+            phosphorus=manure_supplied.phosphorus,
+            potassium=None,
+            application_depth=application_depth,
+            surface_remainder_fraction=surface_remainder_fraction,
+            year=year,
+            day=day,
+            output_name="manure_application",
+        )
+
+        return application_depth, surface_remainder_fraction
 
     def _record_manure_application(
         self,

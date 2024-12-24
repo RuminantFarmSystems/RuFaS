@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from RUFAS.data_structures.manure_to_crop_soil_connection import ManureNutrientDeficiencyOption
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.routines.field.crop.dormancy import Dormancy
 
@@ -35,7 +36,10 @@ class FieldData:
     field_size : float, default=1.0
         Size of the field (ha).
     supplement_manure_nutrient_deficiencies : bool, default=False
-        Supplement manure applications that do not meet requested nutrient amount with chemical fertilizers.
+        Supplement manure applications that do not meet requested nutrient amount with either chemical fertilizers or
+        external manure.
+    supplement_manure_option : Enum, default=ManureNutrientDeficiencyOption.EXTERNAL_MANURE
+        The option to use when supplementing manure applications that do not meet requested nutrient amount.
     watering_amount_in_liters : float, optional
         User-supplied amount of water to be applied to the field over a specified interval of days (liters).
     watering_amount_in_mm : float, default=0.0
@@ -82,6 +86,7 @@ class FieldData:
     seasonal_high_water_table: bool = False
     field_size: float = 1.0
     supplement_manure_nutrient_deficiencies: bool = False
+    supplement_manure_option: ManureNutrientDeficiencyOption = ManureNutrientDeficiencyOption.EXTERNAL_MANURE
 
     # --- Irrigation variables ---
     watering_amount_in_liters: Optional[float] = None
