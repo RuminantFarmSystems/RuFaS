@@ -43,6 +43,7 @@ from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
+from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
 
 
@@ -194,13 +195,10 @@ class Animal:
         self.dead: bool = False
         self.sold_at_day: int | None = None
         # remove sold and dead to use sold_at_day and dead_at_day instead
-        self.dry_matter_intake: float = 0.0
-
         self.events = AnimalEvents()
 
-        self.nutrient: dict[str, float] = {}
-        self.nutrient_concentrations: dict[str, float] = {}
-        self.nutrient_requirements: dict[str, float] = {}
+        self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
+        self.previous_nutrition_supply: NutritionSupply | None = None
 
         self.growth: Growth = Growth()
         self.digestive_system: DigestiveSystem = DigestiveSystem()
@@ -655,12 +653,14 @@ class Animal:
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
 
-        if self.previous_ration is None:
+        if self.previous_nutrition_supply is None:
             ndf_percentage = AnimalModuleConstants.DEFAULT_NDF_PERCENTAGE
             tdn_percentage = AnimalModuleConstants.DEFAULT_TDN_PERCENTAGE
             net_energy_diet_conc = AnimalModuleConstants.DEFAULT_NET_ENERGY_DIET_CONCENTRATION
         else:
-            raise NotImplementedError("Previous ration is not implemented!")
+            ndf_percentage = self.previous_nutrition_supply.ndf_content / self.previous_nutrition_supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+            # tdn_percentage = 
+            net_energy_diet_conc = self.previous_nutrition_supply.metabolizable / self.previous_nutrition_supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
         if self.nutrient_standard is NutrientStandard.NASEM:
             requirements = NASEMRequirementsCalculator.calculate_requirements(

@@ -14,6 +14,7 @@ from RUFAS.biophysical.animal.nutrients.nutrition_evaluator import NutritionEval
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import NutritionSupplyCalculator
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.pen_manure_data import PenManureData
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.enums import AnimalCombination
 
 
@@ -54,32 +55,9 @@ class Pen:
 
         self.animals_in_pen: dict[int, Animal] = {}
 
-        self.ration = {}
-        self.ration_per_animal = {}
-        self.ration_nutrient_amount = {
-            "dm": 0.0,
-            "CP": 0.0,
-            "ADF": 0.0,
-            "NDF": 0.0,
-            "lignin": 0.0,
-            "ash": 0.0,
-            "phosphorus": 0.0,
-            "potassium": 0.0,
-            "N": 0.0,
-        }
-        self.ration_nutrient_concentration = {
-            "dm": 0.0,
-            "CP": 0.0,
-            "ADF": 0.0,
-            "NDF": 0.0,
-            "lignin": 0.0,
-            "ash": 0.0,
-            "phosphorus": 0.0,
-            "potassium": 0.0,
-            "N": 0.0,
-        }
-        self.dry_matter_intake = 0.0
-        self.MEdiet = 0.0
+        self.ration: dict[RUFAS_ID, float] = {}
+        self.average_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
+        self.average_nutrient_evaluation: NutritionEvaluationResults = NutritionEvaluationResults.make_empty_evaluation_results()
 
         # set of all the ids for the feeds allocated for this pen object
         self.allocated_feeds = set()
@@ -382,6 +360,7 @@ class Pen:
             fat=0.0,
         )
         ration_sufficient_for_milk_production = True
+        total_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
         for animal in self.animals_in_pen.values():
             while ration_sufficient_for_milk_production:
                 nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
@@ -410,11 +389,11 @@ class Pen:
                     ration_sufficient_for_milk_production = False
                     break
 
+            animal.previous_nutrition_supply = animal.nutrition_supply
             animal.nutrition_supply = nutrition_supply
+            total_nutrition_supply += nutrition_supply
             total_nutrient_evaluation_results += evaluation_result
 
         self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values())
-
-    def _calculate_dry_matter_intake(self) -> None:
-        """Placeholder function to calculate the DMI for each animal on a daily basis."""
-        pass
+        self.average_nutrition_supply = total_nutrition_supply / len(self.animals_in_pen.values())
+        self.ration = ration
