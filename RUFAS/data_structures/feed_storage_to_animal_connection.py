@@ -84,7 +84,7 @@ class Feed:
     lignin : float
         Acid detergent lignin (% dry matter).
     starch : float
-        Starch (%). TODO: percentage of what, dry matter?
+        Starch (% dry matter).
     EE : float
         Ether extract (% dry matter).
     calcium : float
