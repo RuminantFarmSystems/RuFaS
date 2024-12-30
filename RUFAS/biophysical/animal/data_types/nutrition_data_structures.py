@@ -10,15 +10,15 @@ class NutritionRequirements:
 
     Attributes
     ----------
-    maintenance : float
+    maintenance_energy : float
         Net energy requirement for maintenance (Mcal).
-    growth : float
+    growth_energy : float
         Net energy requirement for growth (Mcal).
-    pregnancy : float
+    pregnancy_energy : float
         Net energy requirement for pregnancy (Mcal).
-    lactation : float
+    lactation_energy : float
         Net energy requirement for lactation (Mcal).
-    protein : float
+    metabolizable_protein : float
         Metabolizable protein requirement (g).
     calcium : float
         Calcium requirement (g).
@@ -26,22 +26,21 @@ class NutritionRequirements:
         Phosphorus requirement (g).
     dry_matter : float
         Dry matter intake requirement (kg).
-    activity : float
+    activity_energy : float
         Net energy requirement for activity (Mcal).
     essential_amino_acids : EssentialAminoAcidRequirements
         Essential amino acid requirements.
 
     """
-
-    maintenance: float
-    growth: float
-    pregnancy: float
-    lactation: float
-    protein: float
+    maintenance_energy: float
+    growth_energy: float
+    pregnancy_energy: float
+    lactation_energy: float
+    metabolizable_protein: float
     calcium: float
     phosphorus: float
     dry_matter: float
-    activity: float
+    activity_energy: float
     essential_amino_acids: EssentialAminoAcidRequirements
 
     @property
@@ -57,39 +56,38 @@ class NutritionSupply:
 
     Attributes
     ----------
-    metabolizable : float
+    metabolizable_energy : float
         Total metabolizable energy in a ration (Mcal).
-    maintenance : float
+    maintenance_energy : float
         Energy available for maintenance in a ration (Mcal).
-    lactation : float
+    lactation_energy : float
         Energy available for lactation in a ration (Mcal).
-    growth : float
+    growth_energy : float
         Energy available for growth in a ration (Mcal).
-    protein : float
+    metabolizable_protein : float
         Metabolizable protein supplied in a ration (g).
     calcium : float
         Calcium supplied in a ration (g).
     phosphorus : float
         Phosphorus supplied in a ration (g).
     dry_matter : float
-        Total dry matter content of a ration (kg).
-    ndf_content : float
-        Total neutral detergent fiber (NDF) in the ration (kg).
-    fat_content : float
-        Total fat content in the ration (kg).
+        Total dry matter supply of a ration (kg).
+    ndf_supply : float
+        Total neutral detergent fiber (NDF) supplied by the ration (kg).
+    fat_supply : float
+        Total fat supplied by the ration (kg).
 
     """
-
-    metabolizable: float
-    maintenance: float
-    lactation: float
-    growth: float
-    protein: float
+    metabolizable_energy: float
+    maintenance_energy: float
+    lactation_energy: float
+    growth_energy: float
+    metabolizable_protein: float
     calcium: float
     phosphorus: float
     dry_matter: float
-    ndf_content: float
-    fat_content: float
+    ndf_supply: float
+    fat_supply: float
 
 
 @dataclass
@@ -101,14 +99,14 @@ class NutritionEvaluationResults:
     ----------
     total_energy : float | None
         Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers TODO: add explanation for this.
-    maintenance : float
+    maintenance_energy : float
         Surplus or deficit of energy in a ration for maintenance (Mcal).
-    lactation : float | None
+    lactation_energy : float | None
         Surplus or deficit of lactation in a ration (Mcal). This value is None when evaluating nutrition requirements of
         heifers, because they are never lactating.
-    growth : float
+    growth_energy : float
         Surplus or deficit of energy in a ration for growth (Mcal).
-    protein : float
+    metabolizable_protein : float
         Amount of metabolizable protein by which a ration was outside the acceptable bounds (g). If protein is within
         acceptable bounds, this value will be 0.0.
     calcium : float
@@ -121,34 +119,36 @@ class NutritionEvaluationResults:
     ndf : float
         Surplus or deficit of neutral detergent fiber (NDF) in a ration. If NDF is within acceptable bounds, this value
         will be 0.0.
-    fat : float
+    fat_percent : float
         Surplus or deficit of fat percentage in a ration. If fat percentage is within acceptable bounds, this value will
         be 0.0.
-    is_valid_heifer_ration
-    is_valid_cow_ration
+    is_valid_heifer_ration : bool
+        True if evaluated nutrient supply meets requirements for heifers, else false.
+    is_valid_cow_ration : bool
+        True if evaluated nutrient supply meets requirements for cows, else false.
 
     """
     total_energy: float | None
-    maintenance: float
-    lactation: float | None
-    growth: float
-    protein: float
+    maintenance_energy: float
+    lactation_energy: float | None
+    growth_energy: float
+    metabolizable_protein: float
     calcium: float
     phosphorus: float
     dry_matter: float
     ndf: float
-    fat: float
+    fat_percent: float
 
     @property
     def _are_clamped_values_acceptable(self) -> bool:
         """Checks that values which must be in a certain range are in that range."""
-        clamped_values = [self.protein, self.ndf, self.fat, self.dry_matter]
+        clamped_values = [self.metabolizable_protein, self.ndf, self.fat_percent, self.dry_matter]
         return all([value == 0.0 for value in clamped_values])
 
     @property
     def is_valid_heifer_ration(self) -> bool:
         """True if evaluated supply meets requirements for heifers, else false."""
-        non_negative_fields = {self.maintenance, self.growth, self.calcium, self.phosphorus}
+        non_negative_fields = {self.maintenance_energy, self.growth_energy, self.calcium, self.phosphorus}
         valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
 
         return valid_non_negative_fields and self._are_clamped_values_acceptable
@@ -156,9 +156,9 @@ class NutritionEvaluationResults:
     @property
     def is_valid_cow_ration(self) -> bool:
         """True if evaluated supply meets requirements for cows, else false."""
-        if self.total_energy is None or self.lactation is None:
+        if self.total_energy is None or self.lactation_energy is None:
             return False
 
-        valid_non_negative_fields = all([field >= 0.0 for field in {self.total_energy, self.lactation}])
+        valid_non_negative_fields = all([field >= 0.0 for field in {self.total_energy, self.lactation_energy}])
 
         return valid_non_negative_fields and self._are_clamped_values_acceptable and self.is_valid_heifer_ration
