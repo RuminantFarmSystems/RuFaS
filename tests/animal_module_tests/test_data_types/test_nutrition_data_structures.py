@@ -35,11 +35,11 @@ def test_total_energy_requirement(
     expected: float,
 ) -> None:
     """Test that total energy requirement is calculated correctly."""
-    requirements.maintenance = maintenance
-    requirements.growth = growth
-    requirements.pregnancy = pregnancy
-    requirements.lactation = lactation
-    requirements.activity = activity
+    requirements.maintenance_energy = maintenance
+    requirements.growth_energy = growth
+    requirements.pregnancy_energy = pregnancy
+    requirements.lactation_energy = lactation
+    requirements.activity_energy = activity
 
     actual = requirements.total_energy_requirement
 
@@ -54,9 +54,9 @@ def test_are_clamped_values_acceptable(
     evaluation: NutritionEvaluationResults, protein: float, ndf: float, fat: float, dry_matter: float, expected: bool
 ) -> None:
     """Test that clamped values are checked correctly."""
-    evaluation.protein = protein
-    evaluation.ndf = ndf
-    evaluation.fat = fat
+    evaluation.metabolizable_protein = protein
+    evaluation.ndf_percent = ndf
+    evaluation.fat_percent = fat
     evaluation.dry_matter = dry_matter
 
     actual = evaluation._are_clamped_values_acceptable
@@ -72,10 +72,15 @@ def test_is_valid_heifer_ration(
     evaluation: NutritionEvaluationResults, maint: float, growth: float, calcium: float, phos: float, expected: float
 ) -> None:
     """Test that results correctly indicate whether heifer ration is valid."""
-    evaluation.protein, evaluation.ndf, evaluation.fat, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
-    evaluation.total_energy, evaluation.lactation = None, None
-    evaluation.maintenance = maint
-    evaluation.growth = growth
+    evaluation.metabolizable_protein, evaluation.ndf_percent, evaluation.fat_percent, evaluation.dry_matter = (
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    )
+    evaluation.total_energy, evaluation.lactation_energy = None, None
+    evaluation.maintenance_energy = maint
+    evaluation.growth_energy = growth
     evaluation.calcium = calcium
     evaluation.phosphorus = phos
 
@@ -104,11 +109,16 @@ def test_is_valid_cow_ration(
     expected: float,
 ) -> None:
     """Test that results correctly indicate whether cow ration is valid."""
-    evaluation.protein, evaluation.ndf, evaluation.fat, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
+    evaluation.metabolizable_protein, evaluation.ndf_percent, evaluation.fat_percent, evaluation.dry_matter = (
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    )
     evaluation.total_energy = total
-    evaluation.maintenance = maint
-    evaluation.lactation = lactation
-    evaluation.growth = growth
+    evaluation.maintenance_energy = maint
+    evaluation.lactation_energy = lactation
+    evaluation.growth_energy = growth
     evaluation.calcium = calcium
     evaluation.phosphorus = phos
 

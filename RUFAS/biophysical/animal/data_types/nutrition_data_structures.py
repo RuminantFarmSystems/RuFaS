@@ -11,15 +11,15 @@ class NutritionRequirements:
 
     Attributes
     ----------
-    maintenance : float
+    maintenance_energy : float
         Net energy requirement for maintenance (Mcal).
-    growth : float
+    growth_energy : float
         Net energy requirement for growth (Mcal).
-    pregnancy : float
+    pregnancy_energy : float
         Net energy requirement for pregnancy (Mcal).
-    lactation : float
+    lactation_energy : float
         Net energy requirement for lactation (Mcal).
-    protein : float
+    metabolizable_protein : float
         Metabolizable protein requirement (g).
     calcium : float
         Calcium requirement (g).
@@ -29,43 +29,49 @@ class NutritionRequirements:
         Phosphorus requirement calculated with the dedicated animal phosphorus submodule (g).
     dry_matter : float
         Dry matter intake requirement (kg).
-    activity : float
+    activity_energy : float
         Net energy requirement for activity (Mcal).
     essential_amino_acids : EssentialAminoAcidRequirements
         Essential amino acid requirements.
 
     """
 
-    maintenance: float
-    growth: float
-    pregnancy: float
-    lactation: float
-    protein: float
+    maintenance_energy: float
+    growth_energy: float
+    pregnancy_energy: float
+    lactation_energy: float
+    metabolizable_protein: float
     calcium: float
     phosphorus: float
     secondary_phosphorus: float
     dry_matter: float
-    activity: float
+    activity_energy: float
     essential_amino_acids: EssentialAminoAcidRequirements
 
     @property
     def total_energy_requirement(self) -> float:
         """Total energy requirement for an animal (Mcal)."""
-        return self.maintenance + self.growth + self.pregnancy + self.lactation + self.activity
+        return (
+            self.maintenance_energy
+            + self.growth_energy
+            + self.pregnancy_energy
+            + self.lactation_energy
+            + self.activity_energy
+        )
 
     def __add__(self, other: "NutritionRequirements") -> "NutritionRequirements":
         """Add two NutritionRequirements objects together."""
         return NutritionRequirements(
-            maintenance=self.maintenance + other.maintenance,
-            growth=self.growth + other.growth,
-            pregnancy=self.pregnancy + other.pregnancy,
-            lactation=self.lactation + other.lactation,
-            protein=self.protein + other.protein,
+            maintenance_energy=self.maintenance_energy + other.maintenance_energy,
+            growth_energy=self.growth_energy + other.growth_energy,
+            pregnancy_energy=self.pregnancy_energy + other.pregnancy_energy,
+            lactation_energy=self.lactation_energy + other.lactation_energy,
+            metabolizable_protein=self.metabolizable_protein + other.metabolizable_protein,
             calcium=self.calcium + other.calcium,
             phosphorus=self.phosphorus + other.phosphorus,
             secondary_phosphorus=self.secondary_phosphorus + other.secondary_phosphorus,
             dry_matter=self.dry_matter + other.dry_matter,
-            activity=self.activity + other.activity,
+            activity_energy=self.activity_energy + other.activity_energy,
             essential_amino_acids=self.essential_amino_acids + other.essential_amino_acids,
         )
 
@@ -74,16 +80,16 @@ class NutritionRequirements:
         if divisor == 0.0:
             raise ZeroDivisionError("Cannot divide NutritionRequirements by zero.")
         return NutritionRequirements(
-            maintenance=self.maintenance / divisor,
-            growth=self.growth / divisor,
-            pregnancy=self.pregnancy / divisor,
-            lactation=self.lactation / divisor,
-            protein=self.protein / divisor,
+            maintenance_energy=self.maintenance_energy / divisor,
+            growth_energy=self.growth_energy / divisor,
+            pregnancy_energy=self.pregnancy_energy / divisor,
+            lactation_energy=self.lactation_energy / divisor,
+            metabolizable_protein=self.metabolizable_protein / divisor,
             calcium=self.calcium / divisor,
             phosphorus=self.phosphorus / divisor,
             secondary_phosphorus=self.secondary_phosphorus / divisor,
             dry_matter=self.dry_matter / divisor,
-            activity=self.activity / divisor,
+            activity=self.activity_energy / divisor,
             essential_amino_acids=self.essential_amino_acids / divisor,
         )
 
@@ -95,84 +101,84 @@ class NutritionSupply:
 
     Attributes
     ----------
-    metabolizable : float
+    metabolizable_energy : float
         Total metabolizable energy in a ration (Mcal).
-    maintenance : float
+    maintenance_energy : float
         Energy available for maintenance in a ration (Mcal).
-    lactation : float
+    lactation_energy : float
         Energy available for lactation in a ration (Mcal).
-    growth : float
+    growth_energy : float
         Energy available for growth in a ration (Mcal).
-    protein : float
+    metabolizable_protein : float
         Metabolizable protein supplied in a ration (g).
     calcium : float
         Calcium supplied in a ration (g).
     phosphorus : float
         Phosphorus supplied in a ration (g).
     dry_matter : float
-        Total dry matter content of a ration (kg).
-    ndf_content : float
-        Total neutral detergent fiber (NDF) in the ration (kg).
-    fat_content : float
-        Total fat content in the ration (kg).
+        Total dry matter supply of a ration (kg).
+    ndf_supply : float
+        Total neutral detergent fiber (NDF) supplied by the ration (kg).
+    fat_supply : float
+        Total fat supplied by the ration (kg).
     crude_protein : float
-        Amount of crude protein in a ration (kg).
-    adf_content : float
-        Amount of Acid Detergent Fiber (ADF) in a ration (kg).
-    tdn_content : float
-        Amount of Total Digestible Nutrients (TDN) in a ration (kg).
-    lignin_content : float
-        Amount of lignin in a ration (kg).
-    ash_content : float
-        Amount of ash in a ration (kg).
-    potassium_content : float
-        Amount of potassium in a ration (kg).
-    nitrogen_content : float
-        Amount of nitrogen in a ration (kg). This value is derived from the crude protein content.
+        Total crude protein supplied by the ration (kg).
+    adf_supply : float
+        Total Acid Detergent Fiber (ADF) supplied by the ration (kg).
+    tdn_supply : float
+        Total Digestible Nutrients (TDN) supplied by the ration (kg).
+    lignin_supply : float
+        Total lignin supplied by the ration (kg).
+    ash_supply : float
+        Total ash supplied by the ration (kg).
+    potassium_supply : float
+        Total potassium supplied by the ration (kg).
+    nitrogen_supply : float
+        Total nitrogen supplied by the ration (kg). This value is derived from the crude protein supply.
 
     """
 
-    metabolizable: float
-    maintenance: float
-    lactation: float
-    growth: float
-    protein: float
+    metabolizable_energy: float
+    maintenance_energy: float
+    lactation_energy: float
+    growth_energy: float
+    metabolizable_protein: float
     calcium: float
     phosphorus: float
     dry_matter: float
-    ndf_content: float
-    fat_content: float
+    ndf_supply: float
+    fat_supply: float
     crude_protein: float
-    adf_content: float
-    tdn_content: float
-    lignin_content: float
-    ash_content: float
-    potassium_content: float
-    nitrogen_content: float = field(init=False)
+    adf_supply: float
+    tdn_supply: float
+    lignin_supply: float
+    ash_supply: float
+    potassium_supply: float
+    nitrogen_supply: float = field(init=False)
 
     def __post_init__(self) -> None:
-        """Sets the nitrogen content of a ration based on the crude protein content."""
-        self.nitrogen_content = self.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
+        """Sets the nitrogen supply of a ration based on the crude protein supply."""
+        self.nitrogen_supply = self.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
 
     def __add__(self, other: "NutritionSupply") -> "NutritionSupply":
         """Add two NutritionSupply objects together."""
         return NutritionSupply(
-            metabolizable=self.metabolizable + other.metabolizable,
-            maintenance=self.maintenance + other.maintenance,
-            lactation=self.lactation + other.lactation,
-            growth=self.growth + other.growth,
-            protein=self.protein + other.protein,
+            metabolizable_energy=self.metabolizable_energy + other.metabolizable_energy,
+            maintenance_energy=self.maintenance_energy + other.maintenance_energy,
+            lactation_energy=self.lactation_energy + other.lactation_energy,
+            growth_energy=self.growth_energy + other.growth_energy,
+            metabolizable_protein=self.metabolizable_protein + other.metabolizable_protein,
             calcium=self.calcium + other.calcium,
             phosphorus=self.phosphorus + other.phosphorus,
             dry_matter=self.dry_matter + other.dry_matter,
-            ndf_content=self.ndf_content + other.ndf_content,
-            fat_content=self.fat_content + other.fat_content,
+            ndf_supply=self.ndf_supply + other.ndf_supply,
+            fat_supply=self.fat_supply + other.fat_supply,
             crude_protein=self.crude_protein + other.crude_protein,
-            adf_content=self.adf_content + other.adf_content,
-            tdn_content=self.tdn_content + other.tdn_content,
-            lignin_content=self.lignin_content + other.lignin_content,
-            ash_content=self.ash_content + other.ash_content,
-            potassium_content=self.potassium_content + other.potassium_content,
+            adf_supply=self.adf_supply + other.adf_supply,
+            tdn_supply=self.tdn_supply + other.tdn_supply,
+            lignin_supply=self.lignin_supply + other.lignin_supply,
+            ash_supply=self.ash_supply + other.ash_supply,
+            potassium_supply=self.potassium_supply + other.potassium_supply,
         )
 
     def __truediv__(self, divisor: float | int) -> "NutritionSupply":
@@ -181,43 +187,43 @@ class NutritionSupply:
             raise ZeroDivisionError("Cannot divide NutritionSupply by zero.")
 
         return NutritionSupply(
-            metabolizable=self.metabolizable / divisor,
-            maintenance=self.maintenance / divisor,
-            lactation=self.lactation / divisor,
-            growth=self.growth / divisor,
-            protein=self.protein / divisor,
+            metabolizable_energy=self.metabolizable_energy / divisor,
+            maintenance_energy=self.maintenance_energy / divisor,
+            lactalactation_energytion=self.lactation_energy / divisor,
+            growth_energy=self.growth_energy / divisor,
+            metabolizable_protein=self.metabolizable_protein / divisor,
             calcium=self.calcium / divisor,
             phosphorus=self.phosphorus / divisor,
             dry_matter=self.dry_matter / divisor,
-            ndf_content=self.ndf_content / divisor,
-            fat_content=self.fat_content / divisor,
+            ndf_supply=self.ndf_supply / divisor,
+            fat_supply=self.fat_supply / divisor,
             crude_protein=self.crude_protein / divisor,
-            adf_content=self.adf_content / divisor,
-            tdn_content=self.tdn_content / divisor,
-            lignin_content=self.lignin_content / divisor,
-            ash_content=self.ash_content / divisor,
-            potassium_content=self.potassium_content / divisor,
+            adf_supply=self.adf_supply / divisor,
+            tdn_supply=self.tdn_supply / divisor,
+            lignin_supply=self.lignin_supply / divisor,
+            ash_supply=self.ash_supply / divisor,
+            potassium_supply=self.potassium_supply / divisor,
         )
 
     def make_empty_nutrition_supply(cls) -> "NutritionSupply":
         """Manufactures an empty NutritionSupply object."""
         return NutritionSupply(
-            metabolizable=0.0,
-            maintenance=0.0,
-            lactation=0.0,
-            growth=0.0,
-            protein=0.0,
+            metabolizable_energy=0.0,
+            maintenance_energy=0.0,
+            lactation_energy=0.0,
+            growth_energy=0.0,
+            metabolizable_protein=0.0,
             calcium=0.0,
             phosphorus=0.0,
             dry_matter=0.0,
-            ndf_content=0.0,
-            fat_content=0.0,
+            ndf_supply=0.0,
+            fat_supply=0.0,
             crude_protein=0.0,
-            adf_content=0.0,
-            tdn_content=0.0,
-            lignin_content=0.0,
-            ash_content=0.0,
-            potassium_content=0.0,
+            adf_supply=0.0,
+            tdn_supply=0.0,
+            lignin_supply=0.0,
+            ash_supply=0.0,
+            potassium_supply=0.0,
         )
 
 
@@ -229,15 +235,17 @@ class NutritionEvaluationResults:
     Attributes
     ----------
     total_energy : float | None
-        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers TODO: add explanation for this.
-    maintenance : float
+        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers because it
+        accounts for some energy demands that are not relevant to all heifers (for example, lactation for growing
+        heifers).
+    maintenance_energy : float
         Surplus or deficit of energy in a ration for maintenance (Mcal).
-    lactation : float | None
+    lactation_energy : float | None
         Surplus or deficit of lactation in a ration (Mcal). This value is None when evaluating nutrition requirements of
         heifers, because they are never lactating.
-    growth : float
+    growth_energy : float
         Surplus or deficit of energy in a ration for growth (Mcal).
-    protein : float
+    metabolizable_protein : float
         Amount of metabolizable protein by which a ration was outside the acceptable bounds (g). If protein is within
         acceptable bounds, this value will be 0.0.
     calcium : float
@@ -247,38 +255,40 @@ class NutritionEvaluationResults:
     dry_matter : float
         Amount of dry matter by which a ration was outside the acceptable bounds (kg). If dry matter is within
         acceptable bounds, this value will be 0.0.
-    ndf : float
-        Surplus or deficit of neutral detergent fiber (NDF) in a ration. If NDF is within acceptable bounds, this value
-        will be 0.0.
-    fat : float
+    ndf_percentage : float
+        Surplus or deficit of neutral detergent fiber (NDF) percentage in a ration. If NDF percentage is within
+        acceptable bounds, this value will be 0.0.
+    fat_percent : float
         Surplus or deficit of fat percentage in a ration. If fat percentage is within acceptable bounds, this value will
         be 0.0.
-    is_valid_heifer_ration
-    is_valid_cow_ration
+    is_valid_heifer_ration : bool
+        True if evaluated nutrient supply meets requirements for heifers, else false.
+    is_valid_cow_ration : bool
+        True if evaluated nutrient supply meets requirements for cows, else false.
 
     """
 
     total_energy: float | None
-    maintenance: float
-    lactation: float | None
-    growth: float
-    protein: float
+    maintenance_energy: float
+    lactation_energy: float | None
+    growth_energy: float
+    metabolizable_protein: float
     calcium: float
     phosphorus: float
     dry_matter: float
-    ndf: float
-    fat: float
+    ndf_percent: float
+    fat_percent: float
 
     @property
     def _are_clamped_values_acceptable(self) -> bool:
         """Checks that values which must be in a certain range are in that range."""
-        clamped_values = [self.protein, self.ndf, self.fat, self.dry_matter]
+        clamped_values = [self.metabolizable_protein, self.ndf_percent, self.fat_percent, self.dry_matter]
         return all([value == 0.0 for value in clamped_values])
 
     @property
     def is_valid_heifer_ration(self) -> bool:
         """True if evaluated supply meets requirements for heifers, else false."""
-        non_negative_fields = {self.maintenance, self.growth, self.calcium, self.phosphorus}
+        non_negative_fields = {self.maintenance_energy, self.growth_energy, self.calcium, self.phosphorus}
         valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
 
         return valid_non_negative_fields and self._are_clamped_values_acceptable
@@ -286,10 +296,10 @@ class NutritionEvaluationResults:
     @property
     def is_valid_cow_ration(self) -> bool:
         """True if evaluated supply meets requirements for cows, else false."""
-        if self.total_energy is None or self.lactation is None:
+        if self.total_energy is None or self.lactation_energy is None:
             return False
 
-        valid_non_negative_fields = all([field >= 0.0 for field in {self.total_energy, self.lactation}])
+        valid_non_negative_fields = all([field >= 0.0 for field in {self.total_energy, self.lactation_energy}])
 
         return valid_non_negative_fields and self._are_clamped_values_acceptable and self.is_valid_heifer_ration
 
@@ -298,20 +308,20 @@ class NutritionEvaluationResults:
         total_energy = self.total_energy if self.total_energy is not None else 0.0
         other_total_energy = other.total_energy if other.total_energy is not None else 0.0
 
-        lactation = self.lactation if self.lactation is not None else 0.0
-        other_lactation = other.lactation if other.lactation is not None else 0.0
+        lactation = self.lactation_energy if self.lactation_energy is not None else 0.0
+        other_lactation = other.lactation_energy if other.lactation_energy is not None else 0.0
 
         return NutritionEvaluationResults(
             total_energy=total_energy + other_total_energy,
-            maintenance=self.maintenance + other.maintenance,
-            lactation=lactation + other_lactation,
-            growth=self.growth + other.growth,
-            protein=self.protein + other.protein,
+            maintenance_energy=self.maintenance_energy + other.maintenance_energy,
+            lactation_energy=lactation + other_lactation,
+            growth_energy=self.growth_energy + other.growth_energy,
+            metabolizable_protein=self.metabolizable_protein + other.metabolizable_protein,
             calcium=self.calcium + other.calcium,
             phosphorus=self.phosphorus + other.phosphorus,
             dry_matter=self.dry_matter + other.dry_matter,
-            ndf=self.ndf + other.ndf,
-            fat=self.fat + other.fat,
+            ndf_percent=self.ndf_percent + other.ndf_percent,
+            fat_percent=self.fat_percent + other.fat_percent,
         )
 
     def __truediv__(self, divisor: float | int) -> "NutritionEvaluationResults":
@@ -319,32 +329,32 @@ class NutritionEvaluationResults:
         if divisor == 0.0:
             raise ZeroDivisionError("Cannot divide NutritionEvaluationResults by zero.")
         total_energy = self.total_energy if self.total_energy is not None else 0.0
-        lactation = self.lactation if self.lactation is not None else 0.0
+        lactation = self.lactation_energy if self.lactation_energy is not None else 0.0
 
         return NutritionEvaluationResults(
             total_energy=total_energy / divisor,
-            maintenance=self.maintenance / divisor,
-            lactation=lactation / divisor,
-            growth=self.growth / divisor,
-            protein=self.protein / divisor,
+            maintenance_energy=self.maintenance_energy / divisor,
+            lactation_energy=lactation / divisor,
+            growth_energy=self.growth_energy / divisor,
+            metabolizable_protein=self.metabolizable_protein / divisor,
             calcium=self.calcium / divisor,
             phosphorus=self.phosphorus / divisor,
             dry_matter=self.dry_matter / divisor,
-            ndf=self.ndf / divisor,
-            fat=self.fat / divisor,
+            ndf_percent=self.ndf_percent / divisor,
+            fat_percent=self.fat_percent / divisor,
         )
 
     def make_empty_evaluation_results(cls) -> "NutritionEvaluationResults":
         """Manufactures an empty NutritionEvaluationResults object."""
         return NutritionEvaluationResults(
             total_energy=0.0,
-            maintenance=0.0,
-            lactation=0.0,
-            growth=0.0,
-            protein=0.0,
+            maintenance_energy=0.0,
+            lactation_energy=0.0,
+            growth_energy=0.0,
+            metabolizable_protein=0.0,
             calcium=0.0,
             phosphorus=0.0,
             dry_matter=0.0,
-            ndf=0.0,
-            fat=0.0,
+            ndf_percent=0.0,
+            fat_percent=0.0,
         )

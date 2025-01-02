@@ -104,15 +104,15 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         )
 
         return NutritionRequirements(
-            maintenance=maintenance_requirement,
-            growth=growth_requirement,
-            pregnancy=pregnancy_requirement,
-            lactation=lactation_requirement,
-            protein=protein_requirement,
+            maintenance_energy=maintenance_requirement,
+            growth_energy=growth_requirement,
+            pregnancy_energy=pregnancy_requirement,
+            lactation_energy=lactation_requirement,
+            metabolizable_protein=protein_requirement,
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
             secondary_phosphorus=secondary_phosphorus_requirement,
-            activity=activity_requirement,
+            activity_energy=activity_requirement,
             essential_amino_acids=essential_amino_acids,
         )
 
@@ -359,7 +359,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             + 4.1 * (body_weight - conceptus_weight) ** 0.5
             + (
                 dry_matter_intake_estimate * GeneralConstants.KG_TO_GRAMS * 0.03
-                - 0.5 * (bacteria_estimate / 0.68 - bacteria_estimate)
+                - 0.5 * (bacteria_estimate / 0.8 - bacteria_estimate)
             )
             + 0.4 * 11.8 * dry_matter_intake_estimate / 0.67
         )
