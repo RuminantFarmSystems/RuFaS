@@ -24,16 +24,16 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
             (60.0, 10.0, 70.0),
             (22.0, 40.0, 30.0),
             NutritionSupply(
-                metabolizable=7_300.0,
-                maintenance=1_000.0,
-                lactation=1_100.0,
-                growth=1_200.0,
-                protein=1.7,
+                metabolizable_energy=7_300.0,
+                maintenance_energy=1_000.0,
+                lactation_energy=1_100.0,
+                growth_energy=1_200.0,
+                metabolizable_protein=1.7,
                 calcium=1.5,
                 phosphorus=1.6,
                 dry_matter=54.0,
-                ndf_content=10.0,
-                fat_content=11.0,
+                ndf_supply=10.0,
+                fat_supply=11.0,
             ),
         )
     ],
@@ -50,7 +50,7 @@ def test_calculate_nutrient_supply(
     """Test that the nutritive and energy content of a ration is calculated correctly."""
     feeds[0].TDN, feeds[1].TDN, feeds[2].TDN = tdn
     feeds[0].DE, feeds[1].DE, feeds[2].DE = de
-    discount = mocker.patch.object(NutritionSupplyCalculator, "_calculate_discount", return_value=0.3)
+    discount = mocker.patch.object(NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3)
     metabolizable = mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
     )
@@ -94,7 +94,7 @@ def test_calculate_nutrient_supply(
         ((1.0, 1.0, 1.0), (61.0, 61.0, 61.0), 700.0, 1.0),
     ],
 )
-def test_calculate_discount(
+def test_calculate_nutrient_intake_discount(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
     tdn: tuple[float, float, float],
@@ -109,7 +109,7 @@ def test_calculate_discount(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_discount(feeds_in_ration, weight)
+    actual = NutritionSupplyCalculator._calculate_nutrient_intake_discount(feeds_in_ration, weight)
 
     assert pytest.approx(actual) == expected
 
@@ -133,7 +133,7 @@ def test_calculate_discount(
             (90.0, 99.0, 108.0),
             (1.1, 1.8, 3.5),
             {2: 110.0, 3: 130.0},
-            {1: 0.0, 2: 110.65, 3: 131.298965},
+            {1: 0.0, 2: 110.65, 3: 130.8523},
         ),
     ],
 )
