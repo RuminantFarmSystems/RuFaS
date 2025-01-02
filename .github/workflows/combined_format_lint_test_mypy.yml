@@ -42,9 +42,9 @@ jobs:
             BASE_BRANCH="dev"
             git fetch origin $BASE_BRANCH
           fi
-          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
-          echo "All Changed Files: $ALL_CHANGED_FILES"
-          echo "ALL_CHANGED_FILES=$ALL_CHANGED_FILES" >> $GITHUB_ENV
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD | grep -v 'changelog.md' | tr '\n' ' ')
+          echo "All Changed Files (excluding changelog.md): $ALL_CHANGED_FILES"
+          echo "ALL_CHANGED_FILES=\"$ALL_CHANGED_FILES\"" >> $GITHUB_ENV
 
           MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
           echo "Modified Files Only (excluding deleted): $MODIFIED_FILES_ONLY"
