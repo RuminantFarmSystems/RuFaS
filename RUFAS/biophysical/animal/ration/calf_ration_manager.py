@@ -2,14 +2,14 @@ from enum import Enum
 
 from numpy import exp, log
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed
 from RUFAS.general_constants import GeneralConstants
 
 
 """RuFaS IDs for supported calf feeds."""
-WHOLE_MILK_ID = 202
-MILK_REPLACER_ID = 203
-STARTER_ID = 216
+WHOLE_MILK_ID: RUFAS_ID = 202
+MILK_REPLACER_ID: RUFAS_ID = 203
+STARTER_ID: RUFAS_ID = 216
 
 
 class CalfMilkType(Enum):
