@@ -56,14 +56,14 @@ class NutritionEvaluator:
 
         evaluation = NutritionEvaluationResults(
             total_energy=results.get("total_energy"),
-            maintenance=results["maintentance"],
-            lactation=results.get("lactation"),
-            growth=results["growth"],
+            maintenance_energy=results["maintentance"],
+            lactation_energy=results.get("lactation"),
+            growth_energy=results["growth"],
             calcium=results["calcium"],
             phosphorus=results["phosphorus"],
-            protein=results["protein"],
+            metabolizable_protein=results["protein"],
             ndf=results["ndf"],
-            fat=results["fat"],
+            fat_percent=results["fat"],
             dry_matter=results["dry_matter"],
         )
 
@@ -88,15 +88,15 @@ class NutritionEvaluator:
             Difference between the total energy supplied and the total energy required (Mcal).
 
         """
-        energy_supplied: float = max(supply.maintenance, supply.lactation, supply.growth)
+        energy_supplied: float = max(supply.maintenance_energy, supply.lactation_energy, supply.growth_energy)
 
         total_energy_requirement = sum(
             [
-                requirements.lactation,
-                requirements.growth,
-                requirements.maintenance,
-                requirements.activity,
-                requirements.pregnancy,
+                requirements.lactation_energy,
+                requirements.growth_energy,
+                requirements.maintenance_energy,
+                requirements.activity_energy,
+                requirements.pregnancy_energy,
             ]
         )
 
@@ -122,9 +122,9 @@ class NutritionEvaluator:
             Difference between the maintenance energy supplied and the maintenance energy required (Mcal).
 
         """
-        energy_requirement = requirements.activity + requirements.maintenance
+        energy_requirement = requirements.activity_energy + requirements.maintenance_energy
 
-        return supply.maintenance - energy_requirement
+        return supply.maintenance_energy - energy_requirement
 
     @classmethod
     def _check_lactation_energy_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
@@ -144,9 +144,9 @@ class NutritionEvaluator:
             Difference between the lactation energy supplied and the lactation energy required (Mcal).
 
         """
-        energy_requirement = requirements.lactation + requirements.pregnancy
+        energy_requirement = requirements.lactation_energy + requirements.pregnancy_energy
 
-        return supply.lactation - energy_requirement
+        return supply.lactation_energy - energy_requirement
 
     @classmethod
     def _check_growth_energy_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
@@ -166,7 +166,7 @@ class NutritionEvaluator:
             Difference between the growth energy supplied and the growth energy required (Mcal).
 
         """
-        return supply.growth - requirements.growth
+        return supply.growth_energy - requirements.growth_energy
 
     @classmethod
     def _check_calcium_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
@@ -228,12 +228,12 @@ class NutritionEvaluator:
             Amount by which supplied protein under- or overshoots the required protein range (g).
 
         """
-        upper_protein_limit = requirements.protein * AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR
+        upper_protein_limit = requirements.metabolizable_protein * AnimalModuleConstants.PROTEIN_UPPER_LIMIT_FACTOR
 
-        if supply.protein < requirements.protein:
-            return supply.protein - requirements.protein
-        elif supply.protein > upper_protein_limit:
-            return supply.protein - upper_protein_limit
+        if supply.metabolizable_protein < requirements.metabolizable_protein:
+            return supply.metabolizable_protein - requirements.metabolizable_protein
+        elif supply.metabolizable_protein > upper_protein_limit:
+            return supply.metabolizable_protein - upper_protein_limit
         else:
             return 0.0
 
@@ -256,7 +256,7 @@ class NutritionEvaluator:
             Percentage by which supplied NDF under- or overshoots the required NDF range.
 
         """
-        ndf_percentage = supply.ndf_content / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+        ndf_percentage = supply.ndf_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
         if ndf_percentage < AnimalModuleConstants.MINIMUM_NDF:
             return ndf_percentage - AnimalModuleConstants.MINIMUM_NDF
@@ -283,7 +283,7 @@ class NutritionEvaluator:
             Difference between the phosphorus supplied and the phosphorus required (g).
 
         """
-        fat_percentage = supply.fat_content / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+        fat_percentage = supply.fat_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
         return fat_percentage - AnimalModuleConstants.MINIMUM_FAT
 
