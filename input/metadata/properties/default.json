@@ -5849,5 +5849,21 @@
         "type": "number"
       }
     }
+  },
+  "feed_storage_input_properties": {
+    "hay_bale_diameter": {
+        "type": "number",
+        "description": "Diameter of hay bales (meters).",
+        "minimum": 0.5,
+        "maximum": 4,
+        "default": 2.5
+    },
+    "post_wilting_moisture_percentage": {
+        "type": "number",
+        "description": "The post-wilting moisture level that baleage will dry down to.",
+        "minimum": 30,
+        "maximum": 60,
+        "default": 45
+    }
   }
 }
