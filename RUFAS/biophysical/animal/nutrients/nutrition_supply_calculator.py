@@ -43,9 +43,9 @@ class NutritionSupplyCalculator:
             for rufas_id, amount in ration_formulation.items()
         ]
 
-        discount = cls._calculate_discount(feeds, body_weight)
-        actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * discount for feed in feeds}
-        actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
+        intake_nutrient_discount = cls._calculate_nutrient_intake_discount(feeds, body_weight)
+        actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * intake_nutrient_discount for feed in feeds}
+        actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * intake_nutrient_discount for feed in feeds}
 
         metabolizable_energy = cls._calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
         total_metabolizable_energy = sum([feed.amount * metabolizable_energy[feed.info.rufas_id] for feed in feeds])
@@ -65,20 +65,20 @@ class NutritionSupplyCalculator:
         fat_content = cls._calculate_fat_content(feeds)
 
         return NutritionSupply(
-            metabolizable=total_metabolizable_energy,
-            maintenance=maintenance_energy,
-            lactation=lactation_energy,
-            growth=growth_energy,
-            protein=protein,
+            metabolizable_energy=total_metabolizable_energy,
+            maintenance_energy=maintenance_energy,
+            lactation_energy=lactation_energy,
+            growth_energy=growth_energy,
+            metabolizable_protein=protein,
             calcium=calcium,
             phosphorus=phosphorus,
             dry_matter=dry_matter_intake,
-            ndf_content=ndf_content,
-            fat_content=fat_content,
+            ndf_supply=ndf_content,
+            fat_supply=fat_content,
         )
 
     @classmethod
-    def _calculate_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
+    def _calculate_nutrient_intake_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
         """
         Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE).
 
@@ -153,7 +153,7 @@ class NutritionSupplyCalculator:
             elif feed.info.is_fat is True:
                 energy = feed.info.DE
             elif feed.info.EE >= 3.0:
-                energy = 1.01 * actual_digestible_energy[feed.info.rufas_id] - 0.45 * 0.0046 * (feed.info.EE - 3.0)
+                energy = 1.01 * actual_digestible_energy[feed.info.rufas_id] - 0.45 + 0.0046 * (feed.info.EE - 3.0)
             else:
                 energy = 1.01 * actual_digestible_energy[feed.info.rufas_id] - 0.45
             actual_metabolizable_energy[feed.info.rufas_id] = energy
@@ -443,11 +443,9 @@ class NutritionSupplyCalculator:
             ]
         )
 
-        metabolizable_protein_tdn = ration_tdn_content * 0.13 * GeneralConstants.KG_TO_GRAMS
-        metabolizable_protein_rdp = ration_rdp_content * 0.85 * GeneralConstants.KG_TO_GRAMS
-        metabolizable_bacterial_protein_production = float(
-            0.64 * min(metabolizable_protein_tdn, metabolizable_protein_rdp)
-        )
+        microbial_protein_tdn = ration_tdn_content * 0.13 * GeneralConstants.KG_TO_GRAMS
+        microbial_protein_rdp = ration_rdp_content * 0.85 * GeneralConstants.KG_TO_GRAMS
+        metabolizable_microbial_protein_production = float(0.64 * min(microbial_protein_tdn, microbial_protein_rdp))
 
         ration_rup_content = sum(
             [
@@ -463,7 +461,7 @@ class NutritionSupplyCalculator:
 
         endogenous_metabolizable_protein = 0.4 * 11.8 * dry_matter_intake
 
-        return metabolizable_bacterial_protein_production + ration_rup_content + endogenous_metabolizable_protein
+        return metabolizable_microbial_protein_production + ration_rup_content + endogenous_metabolizable_protein
 
     @classmethod
     def _calculate_percentage_of_concentrates(cls, feeds: list[FeedInRation], dry_matter_intake: float) -> float:
