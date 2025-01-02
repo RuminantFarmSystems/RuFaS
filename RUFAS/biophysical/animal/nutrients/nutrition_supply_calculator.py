@@ -43,9 +43,9 @@ class NutritionSupplyCalculator:
             for rufas_id, amount in ration_formulation.items()
         ]
 
-        discount = cls._calculate_discount(feeds, body_weight)
-        actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * discount for feed in feeds}
-        actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * discount for feed in feeds}
+        intake_nutrient_discount = cls._calculate_nutrient_intake_discount(feeds, body_weight)
+        actual_tdn_percentages = {feed.info.rufas_id: feed.info.TDN * intake_nutrient_discount for feed in feeds}
+        actual_digestible_energy = {feed.info.rufas_id: feed.info.DE * intake_nutrient_discount for feed in feeds}
 
         metabolizable_energy = cls._calculate_actual_metabolizable_energy(feeds, actual_digestible_energy)
         total_metabolizable_energy = sum([feed.amount * metabolizable_energy[feed.info.rufas_id] for feed in feeds])
@@ -78,7 +78,7 @@ class NutritionSupplyCalculator:
         )
 
     @classmethod
-    def _calculate_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
+    def _calculate_nutrient_intake_discount(cls, feeds: list[FeedInRation], body_weight: float) -> float:
         """
         Calculates discount applied to Total Digestible Nutrients (TDN) and Digestible Energy (DE).
 
