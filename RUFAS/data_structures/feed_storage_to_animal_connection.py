@@ -70,7 +70,7 @@ class Feed:
     N_C : float
         Nitrogen Fraction C (% crude protein).
     Kd : float
-        Feed degradation rate of B fraction (% h). TODO: percent per hour?
+        Feed degradation rate of B fraction (% per hour).
     dRUP : float
         Digested rumen undegradable protein (% of rumen undigestable protein).
     ADICP : float

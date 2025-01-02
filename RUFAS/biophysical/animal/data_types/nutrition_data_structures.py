@@ -46,7 +46,7 @@ class NutritionRequirements:
     @property
     def total_energy_requirement(self) -> float:
         """Total energy requirement for an animal (Mcal)."""
-        return self.maintenance + self.growth + self.pregnancy + self.lactation + self.activity
+        return self.maintenance_energy + self.growth_energy + self.pregnancy_energy + self.lactation_energy + self.activity_energy
 
 
 @dataclass
