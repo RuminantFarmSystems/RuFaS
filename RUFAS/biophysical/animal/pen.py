@@ -197,9 +197,7 @@ class Pen:
         if AnimalType.LAC_COW in animal_types_in_pen or AnimalType.DRY_COW in animal_types_in_pen:
             for animal in list(self.animals_in_pen.values()):
                 if animal.animal_type.is_cow:
-                    animal.calculate_daily_walking_distance(
-                        self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
-                    )
+                    animal.set_daily_walking_distance(self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
 
     @property
     def average_growth(self) -> float:
@@ -289,7 +287,7 @@ class Pen:
         for animal in self.animals_in_pen.values():
             animal.set_nutrition_requirements(
                 housing=self.housing_type,
-                walking_distance=self.calculate_daily_walking_distance(),  # TODO: Make this function return distance
+                walking_distance=animal.daily_distance,
                 previous_temperature=temperature,
             )
 
