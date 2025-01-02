@@ -182,7 +182,7 @@ class NASEMFeed(Feed):
     FA : float
         Fatty acids (% dry matter).
     DE_Base : float
-        Digestible energy standard (Mcal/kg). TODO: if using NASEM feeds, should DE_Base always be used instead of DE?
+        Digestible energy standard (Mcal / kg).
     copper : float  TODO: add descriptiosn to these.
     iron : float
     manganese : float
