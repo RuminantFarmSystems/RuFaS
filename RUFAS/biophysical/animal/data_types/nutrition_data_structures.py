@@ -129,9 +129,9 @@ class NutritionEvaluationResults:
     dry_matter : float
         Amount of dry matter by which a ration was outside the acceptable bounds (kg). If dry matter is within
         acceptable bounds, this value will be 0.0.
-    ndf : float
-        Surplus or deficit of neutral detergent fiber (NDF) in a ration. If NDF is within acceptable bounds, this value
-        will be 0.0.
+    ndf_percentage : float
+        Surplus or deficit of neutral detergent fiber (NDF) percentage in a ration. If NDF percentage is within
+        acceptable bounds, this value will be 0.0.
     fat_percent : float
         Surplus or deficit of fat percentage in a ration. If fat percentage is within acceptable bounds, this value will
         be 0.0.
@@ -150,13 +150,13 @@ class NutritionEvaluationResults:
     calcium: float
     phosphorus: float
     dry_matter: float
-    ndf: float
+    ndf_percent: float
     fat_percent: float
 
     @property
     def _are_clamped_values_acceptable(self) -> bool:
         """Checks that values which must be in a certain range are in that range."""
-        clamped_values = [self.metabolizable_protein, self.ndf, self.fat_percent, self.dry_matter]
+        clamped_values = [self.metabolizable_protein, self.ndf_percent, self.fat_percent, self.dry_matter]
         return all([value == 0.0 for value in clamped_values])
 
     @property

@@ -55,7 +55,7 @@ def test_are_clamped_values_acceptable(
 ) -> None:
     """Test that clamped values are checked correctly."""
     evaluation.metabolizable_protein = protein
-    evaluation.ndf = ndf
+    evaluation.ndf_percent = ndf
     evaluation.fat_percent = fat
     evaluation.dry_matter = dry_matter
 
@@ -72,7 +72,12 @@ def test_is_valid_heifer_ration(
     evaluation: NutritionEvaluationResults, maint: float, growth: float, calcium: float, phos: float, expected: float
 ) -> None:
     """Test that results correctly indicate whether heifer ration is valid."""
-    evaluation.metabolizable_protein, evaluation.ndf, evaluation.fat_percent, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
+    evaluation.metabolizable_protein, evaluation.ndf_percent, evaluation.fat_percent, evaluation.dry_matter = (
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    )
     evaluation.total_energy, evaluation.lactation_energy = None, None
     evaluation.maintenance_energy = maint
     evaluation.growth_energy = growth
@@ -104,7 +109,12 @@ def test_is_valid_cow_ration(
     expected: float,
 ) -> None:
     """Test that results correctly indicate whether cow ration is valid."""
-    evaluation.metabolizable_protein, evaluation.ndf, evaluation.fat_percent, evaluation.dry_matter = 0.0, 0.0, 0.0, 0.0
+    evaluation.metabolizable_protein, evaluation.ndf_percent, evaluation.fat_percent, evaluation.dry_matter = (
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    )
     evaluation.total_energy = total
     evaluation.maintenance_energy = maint
     evaluation.lactation_energy = lactation
