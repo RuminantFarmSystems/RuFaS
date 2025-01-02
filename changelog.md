@@ -71,6 +71,7 @@ v0.9.2
 - [2120](https://github.com/RuminantFarmSystems/MASM/pull/2120) - [minor change] [Crop and Soil] Log errors to OM before throwing errors in NitrogenIncorporation.
 - [2133](https://github.com/RuminantFarmSystems/MASM/pull/2133) - [minor change] [Animal] Use closest available genetic data for animals entering the herd or being initialized as calves. 
 - [2137](https://github.com/RuminantFarmSystems/MASM/pull/2137) - [minor change] [Feed] Make post_wilting_moisture_percentage and user input. 
+- [2156](https://github.com/RuminantFarmSystems/MASM/pull/2156) - [minor change] [Feed] Fixed test_process_degradations in test_silage.py. 
 
 
 ### v0.9.2
