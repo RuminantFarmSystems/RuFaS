@@ -13,6 +13,7 @@ RUFAS_ID = int
 
 class FeedCategorization(Enum):
     """NASEM and NRC categorizations of feeds."""
+
     ANIMAL_PROTEIN = "Animal Protein"
     BY_PRODUCT_OTHER = "By-Product/Other"
     CALF_LIQUID_FEED = "Calf Liquid Feed"
@@ -28,6 +29,7 @@ class FeedCategorization(Enum):
 
 class FeedComponentType(Enum):
     """NASEM and NRC types of feeds."""
+
     AMINOACIDS = "Aminoacids"
     FORAGE = "Forage"
     CONC = "Conc"
@@ -40,6 +42,7 @@ class FeedComponentType(Enum):
 
 class NutrientStandard(Enum):
     """The nutrient standards supported in RuFaS."""
+
     NASEM = "NASEM"
     NRC = "NRC"
 
