@@ -43,7 +43,7 @@ jobs:
             git fetch origin $BASE_BRANCH
           fi
           ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
-          echo "ALL_CHANGED_FILES=$ALL_CHANGED_FILES" >> $GITHUB_ENV
+
           echo "All Changed Files: $ALL_CHANGED_FILES"
 
           MODIFIED_FILES_ONLY=$(git diff --name-only --diff-filter=ACM origin/$BASE_BRANCH HEAD)
