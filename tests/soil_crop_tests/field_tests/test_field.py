@@ -11,8 +11,8 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequestResults,
 )
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
