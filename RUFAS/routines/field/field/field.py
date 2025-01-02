@@ -15,7 +15,7 @@ from RUFAS.data_structures.events import (
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
-    ManureNutrientDeficiencyOption,
+    ManureNutrientSupplementOption,
     NutrientRequest,
     NutrientRequestResults,
 )
@@ -610,7 +610,7 @@ class Field:
             )
             self.om.add_warning(warning_name, warning_message, info_map)
             return
-        elif self.field_data.supplement_manure_option == ManureNutrientDeficiencyOption.EXTERNAL_MANURE:
+        elif self.field_data.supplement_manure_option == ManureNutrientSupplementOption.EXTERNAL_MANURE:
             self._execute_supplemental_manure_application(
                 unmet_nitrogen_demand,
                 unmet_phosphorus_demand,
@@ -619,7 +619,7 @@ class Field:
                 year,
                 day,
             )
-        elif self.field_data.supplement_manure_option == ManureNutrientDeficiencyOption.SYNTHETIC_FERTILIZER:
+        elif self.field_data.supplement_manure_option == ManureNutrientSupplementOption.SYNTHETIC_FERTILIZER:
             # this is synthetic fertilizer option (currently. Issue #1828 addresses further customization)
             if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
                 optimal_mix = self.ONLY_NITROGEN_MIX

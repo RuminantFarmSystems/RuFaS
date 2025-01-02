@@ -135,7 +135,7 @@ class ManureEventNutrientRequestResults(NamedTuple):
     nutrient_request_results: Optional[NutrientRequestResults]
 
 
-class ManureNutrientDeficiencyOption(Enum):
+class ManureNutrientSupplementOption(Enum):
     """An enumeration of options for handling nutrient deficiencies in manure requests."""
     EXTERNAL_MANURE = "external_manure"
     SYNTHETIC_FERTILIZER = "synthetic_fertilizer"
