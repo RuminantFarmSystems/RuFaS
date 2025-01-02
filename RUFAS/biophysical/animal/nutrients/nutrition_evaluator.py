@@ -62,7 +62,7 @@ class NutritionEvaluator:
             calcium=results["calcium"],
             phosphorus=results["phosphorus"],
             metabolizable_protein=results["protein"],
-            ndf=results["ndf"],
+            ndf_percent=results["ndf"],
             fat_percent=results["fat"],
             dry_matter=results["dry_matter"],
         )
