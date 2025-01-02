@@ -619,7 +619,7 @@ class Field:
                 year,
                 day,
             )
-        else:
+        elif self.field_data.supplement_manure_option == ManureNutrientDeficiencyOption.SYNTHETIC_FERTILIZER:
             # this is synthetic fertilizer option (currently. Issue #1828 addresses further customization)
             if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
                 optimal_mix = self.ONLY_NITROGEN_MIX
@@ -639,6 +639,14 @@ class Field:
                 year,
                 day,
             )
+        else:
+            warning_name = "Invalid manure nutrient deficiency option."
+            warning_message = (
+                f"Manure nutrient deficiency option '{self.field_data.supplement_manure_option}' is not valid. "
+                "Manure application will not be supplemented."
+            )
+            self.om.add_warning(warning_name, warning_message, info_map)
+            return
 
     def _apply_supplied_manure(self, field_coverage, application_depth, surface_remainder_fraction, year, day,
                                manure_supplied):

@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import NamedTuple, Optional
 from dataclasses import dataclass, fields
 from RUFAS.data_structures.events import ManureEvent
