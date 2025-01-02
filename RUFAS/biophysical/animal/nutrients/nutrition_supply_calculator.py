@@ -153,7 +153,7 @@ class NutritionSupplyCalculator:
             elif feed.info.is_fat is True:
                 energy = feed.info.DE
             elif feed.info.EE >= 3.0:
-                energy = 1.01 * actual_digestible_energy[feed.info.rufas_id] - 0.45 * 0.0046 * (feed.info.EE - 3.0)
+                energy = 1.01 * actual_digestible_energy[feed.info.rufas_id] - 0.45 + 0.0046 * (feed.info.EE - 3.0)
             else:
                 energy = 1.01 * actual_digestible_energy[feed.info.rufas_id] - 0.45
             actual_metabolizable_energy[feed.info.rufas_id] = energy
@@ -443,11 +443,9 @@ class NutritionSupplyCalculator:
             ]
         )
 
-        metabolizable_protein_tdn = ration_tdn_content * 0.13 * GeneralConstants.KG_TO_GRAMS
-        metabolizable_protein_rdp = ration_rdp_content * 0.85 * GeneralConstants.KG_TO_GRAMS
-        metabolizable_bacterial_protein_production = float(
-            0.64 * min(metabolizable_protein_tdn, metabolizable_protein_rdp)
-        )
+        microbial_protein_tdn = ration_tdn_content * 0.13 * GeneralConstants.KG_TO_GRAMS
+        microbial_protein_rdp = ration_rdp_content * 0.85 * GeneralConstants.KG_TO_GRAMS
+        metabolizable_microbial_protein_production = float(0.64 * min(microbial_protein_tdn, microbial_protein_rdp))
 
         ration_rup_content = sum(
             [
@@ -463,7 +461,7 @@ class NutritionSupplyCalculator:
 
         endogenous_metabolizable_protein = 0.4 * 11.8 * dry_matter_intake
 
-        return metabolizable_bacterial_protein_production + ration_rup_content + endogenous_metabolizable_protein
+        return metabolizable_microbial_protein_production + ration_rup_content + endogenous_metabolizable_protein
 
     @classmethod
     def _calculate_percentage_of_concentrates(cls, feeds: list[FeedInRation], dry_matter_intake: float) -> float:
