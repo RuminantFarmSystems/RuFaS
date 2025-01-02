@@ -50,11 +50,9 @@ jobs:
           echo "Modified Files Only (excluding deleted): $MODIFIED_FILES_ONLY"
 
           FILES=$(echo "$MODIFIED_FILES_ONLY" | grep '\.py$' | tr '\n' ' ')
-          echo "h1"
           echo "FILES=$FILES" >> $GITHUB_ENV
 
           OTHER_FILES=$(echo "$MODIFIED_FILES_ONLY" | grep -v '\.py$' | tr '\n' ' ')
-          echo "h2"
           echo "OTHER_FILES=$OTHER_FILES" >> $GITHUB_ENV
 
       - name: Check for Unauthorized Changes
