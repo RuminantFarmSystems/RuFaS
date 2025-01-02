@@ -2,7 +2,7 @@
   "files": {
     "config": {
       "title": "Config Data",
-      "description": "Configuration file for general simulation parameters.",
+      "description": "Configuration file for general simulation parameters and a trivial change.",
       "path": "input/data/config/default_config.json",
       "type": "json",
       "properties": "config_properties"
