@@ -126,7 +126,7 @@ class SimulationEngine:
         if harvested_crops:
             self.feed_manager.add_harvested_crops(harvested_crops)
             ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
-            were_ideal_feeds_purchased = self.feed_manager.purchase_ideal_feeds(ideal_feeds)
+            were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
             if not were_ideal_feeds_purchased:
                 pass  # TODO: log warning
 
@@ -134,16 +134,31 @@ class SimulationEngine:
         if is_time_to_recalculate_max_daily_feeds:
             total_inventory = self.feed_manager.get_total_inventory()
             self.herd_manager.update_max_daily_feeds(total_inventory)
+        
+        is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
+        if is_time_to_reformulate_ration:
+            self._formulate_ration()
 
-        _, requested_feed = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.weather, self.time)
-        all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
-        self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
-        _ = self.feed_manager.manage_daily_feed_request(requested_feed)
+        requested_feed = self.herd_manager.collect_daily_feed_request()
+        is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed)
+        if not is_ok_to_feed_animals:
+            self._formulate_ration()
+        all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.weather, self.time)
+        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
 
         self._advance_time()
+
+    def _formulate_ration(self) -> None:
+        """
+        Formulates the ration for the animals.
+        """
+        self.next_ration_reformulation = self.time.current_date + self.ration_reformulation_interval_length
+        total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)
+        requested_feed = self.herd_manager.reformulate_rations(total_inventory)
+        self.feed_manager.manage_ration_interval_purchases(requested_feed)
 
     def _advance_time(self) -> None:
         """
@@ -152,10 +167,6 @@ class SimulationEngine:
 
         self.time.advance()
         self.animal_manager.simulation_day += 1
-
-    def _run_pre_annual_routines(self) -> None:
-        """TODO GitHub issue #137"""
-        routines.annual_feed_routine(self.feed)
 
     def _run_post_annual_routines(self) -> None:
         """
