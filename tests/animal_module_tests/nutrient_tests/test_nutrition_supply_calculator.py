@@ -50,7 +50,7 @@ def test_calculate_nutrient_supply(
     """Test that the nutritive and energy content of a ration is calculated correctly."""
     feeds[0].TDN, feeds[1].TDN, feeds[2].TDN = tdn
     feeds[0].DE, feeds[1].DE, feeds[2].DE = de
-    discount = mocker.patch.object(NutritionSupplyCalculator, "_calculate_discount", return_value=0.3)
+    discount = mocker.patch.object(NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3)
     metabolizable = mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
     )
@@ -94,7 +94,7 @@ def test_calculate_nutrient_supply(
         ((1.0, 1.0, 1.0), (61.0, 61.0, 61.0), 700.0, 1.0),
     ],
 )
-def test_calculate_discount(
+def test_calculate_nutrient_intake_discount(
     feeds: tuple[Feed, Feed, Feed],
     amounts: tuple[float, float, float],
     tdn: tuple[float, float, float],
@@ -109,7 +109,7 @@ def test_calculate_discount(
         FeedInRation(amounts[2], feeds[2]),
     ]
 
-    actual = NutritionSupplyCalculator._calculate_discount(feeds_in_ration, weight)
+    actual = NutritionSupplyCalculator._calculate_nutrient_intake_discount(feeds_in_ration, weight)
 
     assert pytest.approx(actual) == expected
 
