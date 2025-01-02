@@ -54,11 +54,11 @@ class Feed:
     Attributes
     ----------
     rufas_id : RUFAS_ID
-        Unique integer identifier for feeds used within the RuFaS model.
+        Unique integer identifier for feeds used within the RuFaS model (unitless).
     Fd_Category : FeedCategorization
-        Feed category.
+        Feed category (unitless).
     feed_type : FeedComponentType
-        General type or category of the feed.
+        General type or category of the feed (unitless).
     DM : float
         Percentage of fresh mass that is dry matter of the feed.
     ash : float
@@ -72,7 +72,7 @@ class Feed:
     N_C : float
         Nitrogen Fraction C (% crude protein).
     Kd : float
-        Feed degradation rate of B fraction (% h). TODO: percent per hour?
+        Feed degradation rate of B fraction (% per hour).
     dRUP : float
         Digested rumen undegradable protein (% of rumen undigestable protein).
     ADICP : float
@@ -86,7 +86,7 @@ class Feed:
     lignin : float
         Acid detergent lignin (% dry matter).
     starch : float
-        Starch (%). TODO: percentage of what, dry matter?
+        Starch (% dry matter).
     EE : float
         Ether extract (% dry matter).
     calcium : float
@@ -104,15 +104,15 @@ class Feed:
     sulfur : float
         Sulphur (% dry matter).
     is_fat : bool
-        Identifier of fat type feed.
-    is_wetforage : float
-        Identifier of wet forage type feed.
+        Identifier of fat type feed (unitless).
+    is_wetforage : bool
+        Identifier of wet forage type feed (unitless).
     units : MeasurementUnits
-        TODO: document this! Also, is it possible to just have one unit for all feeds, preferable kg?
+        The units with which the feed is measured.
     limit : float
-        TODO: document this. Also, limits by animal type?
+        Upper limit of feed that is allowed to be used in a single animal's diet (kg).
     lower_limit : float
-        TODO: document this. Also, limits by animal type?
+        Lower limit of feed that is allowed to be used in a single animal's diet (kg).
     TDN : float
         Total digestible nutrients (% dry matter).
     DE : float
@@ -152,7 +152,7 @@ class Feed:
     chlorine: float
     sulfur: float
     is_fat: bool
-    is_wetforage: float
+    is_wetforage: bool
     units: MeasurementUnits
     limit: float
     lower_limit: float
@@ -172,7 +172,7 @@ class NASEMFeed(Feed):
     Attributes
     ----------
     Name : str
-        Feed name.
+        Feed name (unitless).
     RUP : float
         Rumen undegradable protein (% crude protein).
     sol_prot : float
@@ -184,8 +184,8 @@ class NASEMFeed(Feed):
     FA : float
         Fatty acids (% dry matter).
     DE_Base : float
-        Digestible energy standard (Mcal/kg). TODO: if using NASEM feeds, should DE_Base always be used instead of DE?
-    copper : float  TODO: add descriptiosn to these.
+        Digestible energy standard (Mcal / kg).
+    copper : float
     iron : float
     manganese : float
     zinc : float
