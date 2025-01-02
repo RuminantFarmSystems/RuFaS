@@ -32,6 +32,7 @@ class NutritionRequirements:
         Essential amino acid requirements.
 
     """
+
     maintenance_energy: float
     growth_energy: float
     pregnancy_energy: float
@@ -46,7 +47,13 @@ class NutritionRequirements:
     @property
     def total_energy_requirement(self) -> float:
         """Total energy requirement for an animal (Mcal)."""
-        return self.maintenance_energy + self.growth_energy + self.pregnancy_energy + self.lactation_energy + self.activity_energy
+        return (
+            self.maintenance_energy
+            + self.growth_energy
+            + self.pregnancy_energy
+            + self.lactation_energy
+            + self.activity_energy
+        )
 
 
 @dataclass
@@ -78,6 +85,7 @@ class NutritionSupply:
         Total fat supplied by the ration (kg).
 
     """
+
     metabolizable_energy: float
     maintenance_energy: float
     lactation_energy: float
@@ -128,6 +136,7 @@ class NutritionEvaluationResults:
         True if evaluated nutrient supply meets requirements for cows, else false.
 
     """
+
     total_energy: float | None
     maintenance_energy: float
     lactation_energy: float | None
