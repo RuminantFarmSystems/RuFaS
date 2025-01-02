@@ -106,7 +106,9 @@ class NutritionEvaluationResults:
     Attributes
     ----------
     total_energy : float | None
-        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers TODO: add explanation for this.
+        Surplus or deficit of total energy in a ration (Mcal). Necessary to know for cows, not heifers because it
+        accounts for some energy demands that are not relevant to all heifers (for example, lactation for growing
+        heifers).
     maintenance_energy : float
         Surplus or deficit of energy in a ration for maintenance (Mcal).
     lactation_energy : float | None
