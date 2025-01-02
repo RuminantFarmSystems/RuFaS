@@ -609,16 +609,6 @@ class Field:
                 f"deficient by {unmet_phosphorus_demand} kg."
             )
             self.om.add_warning(warning_name, warning_message, info_map)
-            return
-        elif self.field_data.supplement_manure_option == ManureNutrientSupplementOption.EXTERNAL_MANURE:
-            self._execute_supplemental_manure_application(
-                unmet_nitrogen_demand,
-                unmet_phosphorus_demand,
-                application_depth,
-                surface_remainder_fraction,
-                year,
-                day,
-            )
         elif self.field_data.supplement_manure_option == ManureNutrientSupplementOption.SYNTHETIC_FERTILIZER:
             # this is synthetic fertilizer option (currently. Issue #1828 addresses further customization)
             if unmet_nitrogen_demand > 0.0 and unmet_phosphorus_demand == 0.0:
@@ -646,7 +636,6 @@ class Field:
                 "Manure application will not be supplemented."
             )
             self.om.add_warning(warning_name, warning_message, info_map)
-            return
 
     def _apply_supplied_manure(self, field_coverage, application_depth, surface_remainder_fraction, year, day,
                                manure_supplied):
@@ -971,10 +960,15 @@ class Field:
             self.om.add_warning("Manure Application Warning", log_message, info_map)
             return None
 
+        use_supplemental_manure = (
+            self.field_data.supplement_manure_option == ManureNutrientSupplementOption.EXTERNAL_MANURE
+        )
+
         return NutrientRequest(
             nitrogen=event.nitrogen_mass,
             phosphorus=event.phosphorus_mass,
             manure_type=event.manure_type,
+            use_supplemental_manure=use_supplemental_manure,
         )
 
     def _check_crop_harvest_schedule(
