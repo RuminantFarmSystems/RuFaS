@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 
 
@@ -26,3 +27,10 @@ class GrowthInputs:
     @property
     def is_milking(self) -> bool:
         return self.days_in_milk > 0
+
+
+@dataclass
+class GrowthOutputs:
+    body_weight: float
+    conceptus_weight: float
+    events: AnimalEvents

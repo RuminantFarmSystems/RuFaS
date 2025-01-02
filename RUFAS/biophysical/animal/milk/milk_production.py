@@ -6,8 +6,7 @@ from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.animal_constants import DRY
 from RUFAS.biophysical.animal.animal_module_constants import AnimalModuleConstants
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
-from RUFAS.biophysical.animal.data_types.milk_production_inputs import MilkProductionInputs
-from RUFAS.biophysical.animal.data_types.milk_production_outputs import MilkProductionOutputs
+from RUFAS.biophysical.animal.data_types.milk_production import MilkProductionInputs, MilkProductionOutputs
 from RUFAS.biophysical.animal.data_types.milk_production_record import MilkProductionRecord
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time

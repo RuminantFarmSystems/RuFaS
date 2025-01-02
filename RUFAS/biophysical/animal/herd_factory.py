@@ -9,7 +9,6 @@ from tqdm import tqdm
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
-from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager

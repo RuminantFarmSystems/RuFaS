@@ -8,7 +8,7 @@ class AnimalStatistics:
 
     phosphorus_excreted : float
         The total amount of phosphorus excreted by the given animal (g).
-    methane_emission : float
+    enteric_methane_emission : float
         The total amount of enteric methane produced by the given animal (g/day).
 
     """
