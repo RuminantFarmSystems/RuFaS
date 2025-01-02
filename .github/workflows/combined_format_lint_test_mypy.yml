@@ -75,6 +75,7 @@ jobs:
             "input/data/soil/default_soil_2.json"
             "input/data/tillage_schedule/default_tillage_schedule.json"
           )
+          ALL_CHANGED_FILES=$(git diff --name-only origin/$BASE_BRANCH HEAD)
           echo "All Changed Files: $ALL_CHANGED_FILES"
           unauthorized_changes=false
           unauthorized_paths=""
