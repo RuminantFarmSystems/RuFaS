@@ -65,16 +65,16 @@ class NutritionSupplyCalculator:
         fat_content = cls._calculate_fat_content(feeds)
 
         return NutritionSupply(
-            metabolizable=total_metabolizable_energy,
-            maintenance=maintenance_energy,
-            lactation=lactation_energy,
-            growth=growth_energy,
-            protein=protein,
+            metabolizable_energy=total_metabolizable_energy,
+            maintenance_energy=maintenance_energy,
+            lactation_energy=lactation_energy,
+            growth_energy=growth_energy,
+            metabolizable_protein=protein,
             calcium=calcium,
             phosphorus=phosphorus,
             dry_matter=dry_matter_intake,
-            ndf_content=ndf_content,
-            fat_content=fat_content,
+            ndf_supply=ndf_content,
+            fat_supply=fat_content,
         )
 
     @classmethod
