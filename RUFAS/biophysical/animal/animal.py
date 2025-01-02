@@ -654,7 +654,6 @@ class Animal:
 
         """
         if self.animal_type is AnimalType.CALF:
-<<<<<<< HEAD
             calf_intake = CalfRationManager.calc_intake(
                 self.birth_weight, self.body_weight, AnimalConfig.wean_day, AnimalConfig.wean_length, available_feeds
             )  # TODO: wean length
@@ -688,9 +687,6 @@ class Animal:
                 activity=0.0,
                 essential_amino_acids=calf_essetial_amino_acids
             )
-=======
-            pass  # TODO: calves' requirements are implemented in PR #2153, which is not merged yet.
->>>>>>> 1782-start-user-defined-ration
 
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
