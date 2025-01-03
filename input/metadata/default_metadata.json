@@ -188,6 +188,13 @@
       "path": "input/data/feed_management/default_feed_management.json",
       "type": "json",
       "properties": "feed_storage_input_properties"
+    },
+    "chunks": {
+      "title": "Chunks",
+      "description": "Chunk data.",
+      "path": "input/data/chunks/default_chunks.json",
+      "type": "json",
+      "properties": "chunks_properties"
     }
   },
   "cross-validation": {}
