@@ -694,10 +694,9 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         Notes
         -----
-        Note that both NRC and NASEM calculations use distance walked in kilometers, hence the unit conversion in the
-        code itself. Activity requirement (net_energy_activity) is proportional to body weight and daily walking
-        distance. Grazing system and hilly topography will cost additional energy. Grazing is not implemented yet in the
-        current version of code.
+        NASEM calculations use distance walked in kilometers, hence the unit conversion. Activity requirement
+        (net_energy_activity) is proportional to body weight and daily walking distance. Grazing system and hilly
+        topography will cost additional energy. Grazing is not implemented yet in the current version of code.
 
         This is separate because it must be calculated after grouping due to pen input args and cannot be used
         individually on an animal.
