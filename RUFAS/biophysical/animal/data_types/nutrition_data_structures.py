@@ -205,6 +205,7 @@ class NutritionSupply:
             potassium_supply=self.potassium_supply / divisor,
         )
 
+    @classmethod
     def make_empty_nutrition_supply(cls) -> "NutritionSupply":
         """Manufactures an empty NutritionSupply object."""
         return NutritionSupply(
@@ -344,6 +345,7 @@ class NutritionEvaluationResults:
             fat_percent=self.fat_percent / divisor,
         )
 
+    @classmethod
     def make_empty_evaluation_results(cls) -> "NutritionEvaluationResults":
         """Manufactures an empty NutritionEvaluationResults object."""
         return NutritionEvaluationResults(

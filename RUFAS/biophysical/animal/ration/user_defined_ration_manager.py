@@ -5,6 +5,7 @@ from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID
 from RUFAS.enums import AnimalCombination
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.output_manager import OutputManager
+from RUFAS.units import MeasurementUnits
 
 
 class UserDefinedRationManager:
@@ -41,29 +42,37 @@ class UserDefinedRationManager:
             AnimalCombination.CLOSE_UP: {},
             AnimalCombination.LAC_COW: {},
         }
-        for feed in ration_config:
-            user_defined_ration_percentages = feed["user_defined_ration_percentages"]
-            cls.user_defined_rations[AnimalCombination.CALF][feed["rufas_id"]] = user_defined_ration_percentages[
-                AnimalCombination.CALF.value()
-            ]
-            cls.user_defined_rations[AnimalCombination.GROWING][feed["rufas_id"]] = user_defined_ration_percentages[
-                AnimalCombination.GROWING.value()
-            ]
-            cls.user_defined_rations[AnimalCombination.CLOSE_UP][feed["rufas_id"]] = user_defined_ration_percentages[
-                AnimalCombination.CLOSE_UP.value()
-            ]
-            cls.user_defined_rations[AnimalCombination.LAC_COW][feed["rufas_id"]] = user_defined_ration_percentages[
-                AnimalCombination.LAC_COW.value()
-            ]
+        # for feed in ration_config:
+        #     user_defined_ration_percentages = feed["user_defined_ration_percentages"]
+        #     cls.user_defined_rations[AnimalCombination.CALF][feed["rufas_id"]] = user_defined_ration_percentages[
+        #         AnimalCombination.CALF.value()
+        #     ]
+        #     cls.user_defined_rations[AnimalCombination.GROWING][feed["rufas_id"]] = user_defined_ration_percentages[
+        #         AnimalCombination.GROWING.value()
+        #     ]
+        #     cls.user_defined_rations[AnimalCombination.CLOSE_UP][feed["rufas_id"]] = user_defined_ration_percentages[
+        #         AnimalCombination.CLOSE_UP.value()
+        #     ]
+        #     cls.user_defined_rations[AnimalCombination.LAC_COW][feed["rufas_id"]] = user_defined_ration_percentages[
+        #         AnimalCombination.LAC_COW.value()
+        #     ]
+        user_defined_ration_percentages = ration_config["user_defined_ration_percentages"]
+        for combination in cls.user_defined_rations.keys():
+            print(user_defined_ration_percentages[combination.value])
+            cls.user_defined_rations[combination] = {
+                feed["feed_type"]: feed["ration_percentage"]
+                for feed
+                in user_defined_ration_percentages[combination.value]
+            }
 
         invalid_ration_found: bool = False
         for animal_combo, ration in cls.user_defined_rations.items():
             total_percentage_of_ration = sum(ration.values())
             info_map["ration"] = ration
-            info_map["animal_combination"] = animal_combo.value()
-            if total_percentage_of_ration != 100.0:
-                error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to "
-                f"{total_percentage_of_ration}. Simulation will be halted."
+            info_map["animal_combination"] = animal_combo.value
+            info_map["units"] = MeasurementUnits.PERCENT
+            if abs(total_percentage_of_ration - 100.0) > 0.1:
+                error_msg = f"Invalid user-defined ration for {animal_combo.value}. Ration percentages sum to {total_percentage_of_ration}. Simulation will be halted."
                 cls._om.add_error("invalid_user_defined_ration_found", error_msg, info_map)
                 invalid_ration_found = True
             else:

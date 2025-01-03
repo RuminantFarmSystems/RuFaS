@@ -23,5 +23,5 @@ class AnimalCombination(Enum):
     CALF = "calf"
     GROWING = "growing"
     CLOSE_UP = "close_up"
-    LAC_COW = "lactating"
+    LAC_COW = "lac_cow"
     GROWING_AND_CLOSE_UP = "growing and close_up"
