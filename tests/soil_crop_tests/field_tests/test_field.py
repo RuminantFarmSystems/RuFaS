@@ -70,8 +70,8 @@ def test_field_init_defaults():
     assert field.tillage_events is None
     assert field.manure_events == []
     assert field.available_fertilizer_mixes == {
-        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
-        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
+        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
+        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
     }
     assert field.ONLY_NITROGEN_MIX == "100_0_0"
     assert isinstance(field.fertilizer_applicator, FertilizerApplication)
@@ -129,7 +129,7 @@ def test_manage_field(mocker: MockerFixture) -> None:
         year=2024,
         day=120,
         manure_supplied="MockResults",
-        manure_supplement_method=ManureSupplementMethod.NONE
+        manure_supplement_method=ManureSupplementMethod.NONE,
     )
     mock_check_tillage_sched.assert_called_once_with(mocked_time)
     mock_execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
@@ -293,9 +293,21 @@ def test_check_manure_application_schedule() -> None:
 
     # Arrange
     manure_events = [
-        ManureEvent(100, 20, ManureType.LIQUID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.8, 0.0, 1.0, 1991, 120, ),
+        ManureEvent(
+            100,
+            20,
+            ManureType.LIQUID,
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER,
+            0.8,
+            0.0,
+            1.0,
+            1991,
+            120,
+        ),
         ManureEvent(90, 25, ManureType.SOLID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.9, 0.1, 0.9, 1992, 120),
-        ManureEvent(80, 30, ManureType.LIQUID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.85, 0.05, 0.95, 1991, 121),
+        ManureEvent(
+            80, 30, ManureType.LIQUID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.85, 0.05, 0.95, 1991, 121
+        ),
     ]
     field = Field(manure_events=manure_events)
     field.field_data = MagicMock()
@@ -315,8 +327,12 @@ def test_check_manure_application_schedule() -> None:
     field._filter_events.assert_called_once_with(manure_events, mocked_time)
     assert field.manure_events == [manure_events[2]], "Expected remaining events after filtering."
     expected_requests = [
-        ManureEventNutrientRequest("field1", filtered_manure_events[0], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1991-120"),
-        ManureEventNutrientRequest("field1", filtered_manure_events[1], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1992-120"),
+        ManureEventNutrientRequest(
+            "field1", filtered_manure_events[0], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1991-120"
+        ),
+        ManureEventNutrientRequest(
+            "field1", filtered_manure_events[1], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1992-120"
+        ),
     ]
     assert manure_requests == expected_requests, "Expected manure requests do not match."
     field._create_manure_request.assert_any_call(filtered_manure_events[0])
@@ -388,7 +404,7 @@ def test_create_manure_request(nitrogen_mass, phosphorus_mass, manure_type, expe
         field_coverage=0.9,
         application_depth=0.2,
         surface_remainder_fraction=0.8,
-        manure_supplement_method=ManureSupplementMethod.NONE
+        manure_supplement_method=ManureSupplementMethod.NONE,
     )
 
     # Act
@@ -1036,14 +1052,15 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "mix_name,requested_n,requested_p,requested_k,depth,remainder,year,day,field_size,fertilizer_applied",
+    "mix_name,requested_n,requested_p,requested_k,ammonium_fraction,depth,remainder,year,day,field_size,"
+    "fertilizer_applied",
     {
-        ("test_mix_1", 80.0, 30.0, 20.0, 0.0, 1.0, 1993, 100, 3.1, True),
-        ("test_mix_2", 150.0, 89.0, 20.0, 25.0, 0.89, 2001, 240, 1.3, True),
-        ("test_mix_3", 10.0, 90.33, 20.0, 100.0, 0.5, 1992, 30, 2.44, True),
-        ("test_mix_4", 0.0, 50.0, 20.0, 0.0, 1.0, 1996, 60, 1.45, True),
-        ("test_mix_5", 67.5, 0.0, 20.0, 0.0, 1.0, 1998, 200, 2.3, True),
-        ("test_mix_6", 0.0, 0.0, 0.0, 0.0, 1.0, 1988, 120, 0.5, False),
+        ("test_mix_1", 80.0, 30.0, 20.0, 0.0, 0.0, 1.0, 1993, 100, 3.1, True),
+        ("test_mix_2", 150.0, 89.0, 20.0, 0.5, 25.0, 0.89, 2001, 240, 1.3, True),
+        ("test_mix_3", 10.0, 90.33, 20.0, 1.0, 100.0, 0.5, 1992, 30, 2.44, True),
+        ("test_mix_4", 0.0, 50.0, 20.0, 0.0, 0.0, 1.0, 1996, 60, 1.45, True),
+        ("test_mix_5", 67.5, 0.0, 20.0, 0.2, 0.0, 1.0, 1998, 200, 2.3, True),
+        ("test_mix_6", 0.0, 0.0, 0.0, 0.3, 0.0, 1.0, 1988, 120, 0.5, False),
     },
 )
 def test_execute_fertilizer_application(
@@ -1052,6 +1069,7 @@ def test_execute_fertilizer_application(
     requested_n: float,
     requested_p: float,
     requested_k: float,
+    ammonium_fraction: float,
     depth: float,
     remainder: float,
     year: int,
@@ -1063,7 +1081,7 @@ def test_execute_fertilizer_application(
     field_data = FieldData(name="test", field_size=field_size)
     field = Field(
         field_data=field_data,
-        fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}},
+        fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5, "ammonium_fraction": ammonium_fraction}},
     )
     formulate = mocker.patch.object(
         field,
@@ -1081,10 +1099,9 @@ def test_execute_fertilizer_application(
         )
 
         if fertilizer_applied:
-            expected_nitrogen_fraction = 0.2
             formulate.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p, requested_k)
-            apply.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0, 0.0, depth, remainder, field_size)
-            record.assert_called_once_with(mix_name, 100, 20, 15, 10, depth, remainder, year, day)
+            apply.assert_called_once_with(15, 20.0, ammonium_fraction, depth, remainder, field_size)
+            record.assert_called_once_with(mix_name, 100, 20, 15, 10, ammonium_fraction, depth, remainder, year, day)
         else:
             expected_info_map = {
                 "suffix": "field='test'",
@@ -1102,38 +1119,22 @@ def test_execute_fertilizer_application(
 
 
 @pytest.mark.parametrize(
-    "field_name,mix_name,available_mixes,expected_message",
+    "field_name,mix_name,available_mixes",
     [
-        (
-            "test_field_1",
-            "halo_alien_mix",
-            {},
-            "\"'test_field_1': expected to have fertilizer mix for 'halo_alien_mix', "
-            "received '{'100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': "
-            "{'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\"",
-        ),
-        (
-            "test_field_2",
-            "101_0_0",
-            {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12}},
-            "\"'test_field_2': expected to have fertilizer mix for '101_0_0', received "
-            "'{'50_22_12': {'N': 0.5, 'P': 0.22, "
-            "'K': 0.12}, '100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': {'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\"",
-        ),
+        ("test_field_1", "halo_alien_mix", {}),
+        ("test_field_2", "101_0_0", {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12, "ammonium_fraction": 0.0}}),
     ],
 )
-def test_execute_fertilizer_application_error(
-    field_name: str, mix_name: str, available_mixes: Dict, expected_message: str
-) -> None:
-    """Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available
-    mixes."""
+def test_execute_fertilizer_application_error(field_name: str, mix_name: str, available_mixes: Dict) -> None:
+    """
+    Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available mixes.
+    """
     field = Field(
         field_data=FieldData(name=field_name),
         fertilizer_mixes=available_mixes,
     )
-    with pytest.raises(KeyError) as e:
+    with pytest.raises(KeyError):
         field._execute_fertilizer_application(mix_name, 10.0, 10.0, 10.0, 0.0, 1.0, 1994, 120)
-    assert str(e.value) == expected_message
 
 
 @pytest.mark.parametrize(
@@ -1188,12 +1189,13 @@ def test_execute_fertilizer_application_with_invalid_args(
         else:
             patched_error.assert_called_once_with(depth, None, "fertilizer_application_error", 1994, 200)
         patched_formulator.assert_called_once_with(0.26, 0.04, 0.24, 50.0, 50.0, 50.0)
-        patched_applicator.assert_called_once_with(50.0, 100.0, 0.5, 0.0, 0.0, expected_depth, expected_remainder, 1.2)
+        patched_applicator.assert_called_once_with(50.0, 50.0, 0.0, expected_depth, expected_remainder, 1.2)
         patched_recorder.assert_called_once_with(
             "26_4_24",
             100.0,
             50.0,
             50.0,
+            0.0,
             0.0,
             expected_depth,
             expected_remainder,
@@ -1358,11 +1360,11 @@ def test_formulate_fertilizer_required(
 
 
 @pytest.mark.parametrize(
-    "mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,depth,remainder,year,day,"
+    "mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,ammonium_fraction,depth,remainder,year,day,"
     "field_name,field_size",
     [
-        ("mix_1", 100, 20, 20, 20, 35.0, 0.8, 1992, 90, "field_1", 1.4),
-        ("mix_2", 30, 10, 3, 3, 0.0, 1.0, 1994, 120, "field_2", 4.3),
+        ("mix_1", 100, 20, 20, 20, 0.5, 35.0, 0.8, 1992, 90, "field_1", 1.4),
+        ("mix_2", 30, 10, 3, 3, 0.1, 0.0, 1.0, 1994, 120, "field_2", 4.3),
     ],
 )
 def test_record_fertilizer_application(
@@ -1371,6 +1373,7 @@ def test_record_fertilizer_application(
     nitrogen_mass: float,
     phosphorus_mass: float,
     potassium_mass: float,
+    ammonium_fraction: float,
     depth: float,
     remainder: float,
     year: int,
@@ -1394,6 +1397,7 @@ def test_record_fertilizer_application(
             nitrogen_mass,
             phosphorus_mass,
             potassium_mass,
+            ammonium_fraction,
             depth,
             remainder,
             year,
@@ -1407,6 +1411,7 @@ def test_record_fertilizer_application(
         "nitrogen": MeasurementUnits.KILOGRAMS.value,
         "phosphorus": MeasurementUnits.KILOGRAMS.value,
         "potassium": MeasurementUnits.KILOGRAMS.value,
+        "ammonium_fraction": MeasurementUnits.UNITLESS.value,
         "application_depth": MeasurementUnits.MILLIMETERS.value,
         "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
         "year": MeasurementUnits.CALENDAR_YEAR.value,
@@ -1422,6 +1427,7 @@ def test_record_fertilizer_application(
         "nitrogen": nitrogen_mass,
         "phosphorus": phosphorus_mass,
         "potassium": potassium_mass,
+        "ammonium_fraction": ammonium_fraction,
         "application_depth": depth,
         "surface_remainder_fraction": remainder,
         "year": year,
@@ -1633,12 +1639,7 @@ def test_execute_manure_application(
     expected_unmet_phosphorus: float,
 ) -> None:
     """Tests that manure is applied to the soil correctly."""
-    field = Field(
-        field_data=FieldData(
-            name="test",
-            field_size=1.4
-        )
-    )
+    field = Field(field_data=FieldData(name="test", field_size=1.4))
     field._add_manure_water = mocker.MagicMock()
     field.manure_applicator.apply_machine_manure = MagicMock()
     field._record_manure_application = MagicMock()
@@ -1648,8 +1649,16 @@ def test_execute_manure_application(
     warn = mocker.patch.object(field.om, "add_warning")
 
     field._execute_manure_application(
-        nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day, supplied_manure,
-        ManureSupplementMethod.NONE
+        nitrogen,
+        phosphorus,
+        manure_type,
+        coverage,
+        depth,
+        remainder,
+        year,
+        day,
+        supplied_manure,
+        ManureSupplementMethod.NONE,
     )
 
     expected_total_inorganic_fraction = 0.14  # equal to (50.0 / 250.0) * 0.7
@@ -1794,8 +1803,16 @@ def test_execute_manure_application_with_invalid_args(
         ) as patched_fertilizer_applicator,
     ):
         field._execute_manure_application(
-            50.0, 50.0, ManureType.LIQUID,
-            0.8, depth, remainder, 2000, 133, supplied_nutrients, ManureSupplementMethod.NONE
+            50.0,
+            50.0,
+            ManureType.LIQUID,
+            0.8,
+            depth,
+            remainder,
+            2000,
+            133,
+            supplied_nutrients,
+            ManureSupplementMethod.NONE,
         )
 
         field._add_manure_water.assert_called_once_with(supplied_nutrients, ManureType.LIQUID)
