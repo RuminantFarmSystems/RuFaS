@@ -2,6 +2,7 @@ import pytest
 from mock.mock import MagicMock
 from pytest_mock import MockerFixture
 
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import StorageType, HarvestedCropStorageType
@@ -178,6 +179,8 @@ def test_generate_daily_manure_applications(mocker: MockerFixture) -> None:
     manure_event_request_2 = mocker.MagicMock()
     manure_event_request_1.field_name = "Field 1"
     manure_event_request_1.event = "Event 1"
+    manure_event_request_1.manure_supplement_method = ManureSupplementMethod.NONE
+    manure_event_request_2.manure_supplement_method = ManureSupplementMethod.NONE
     manure_event_request_1.nutrient_request = "Nutrient Request 1"
     manure_event_request_2.field_name = "Field 2"
     manure_event_request_2.event = "Event 2"
@@ -193,8 +196,8 @@ def test_generate_daily_manure_applications(mocker: MockerFixture) -> None:
     result = simulation_engine.generate_daily_manure_applications()
 
     assert result == [
-        ManureEventNutrientRequestResults("Field 1", "Event 1", "Nutrient Result 1"),
-        ManureEventNutrientRequestResults("Field 2", "Event 2", None),
+        ManureEventNutrientRequestResults("Field 1", "Event 1", ManureSupplementMethod.NONE, "Nutrient Result 1"),
+        ManureEventNutrientRequestResults("Field 2", "Event 2", ManureSupplementMethod.NONE, None),
     ]
     simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_1, simulation_engine.time)
     simulation_engine.field_manager.check_manure_schedules.assert_any_call(field_2, simulation_engine.time)
