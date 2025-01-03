@@ -2158,6 +2158,13 @@
           "description": "Fraction of potassium contained in the fertilizer mix by mass.",
           "minimum": 0.0,
           "maximum": 1.0
+        },
+        "ammonium_fraction": {
+          "type": "number",
+          "description": "Fraction fertilizer nitrogen that is ammonium. All non-ammonium nitrogen is assumed to be nitrate.",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.0
         }
       }
     },
