@@ -124,6 +124,8 @@ class ManureNutrientManager:
             [nitrogen_derived_manure_mass, phosphorus_derived_manure_mass]
         )
 
+        # TODO check if user wants to supplement shortfalls with supplemental manure
+
         if math.isclose(projected_manure_mass, 0.0, abs_tol=1e-6):
             # Unable to fulfill request
             return None
