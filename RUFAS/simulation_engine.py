@@ -4,7 +4,6 @@ import time as timer
 from datetime import date, timedelta
 from enum import Enum
 
-from RUFAS import routines
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
@@ -123,18 +122,19 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        harvested_crops, next_harvest_dates = self.field_manager.daily_update_routine(self.weather, self.time)
+        harvested_crops, _next_harvest_dates = self.field_manager.daily_update_routine(self.weather, self.time)
         if harvested_crops:
-            self.feed_manager.add_harvested_crops(harvested_crops)
-            ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
-            were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
-            if not were_ideal_feeds_purchased:
-                pass  # TODO: log warning
+            pass
+            # self.feed_manager.add_harvested_crops(harvested_crops)
+            # ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
+            # were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
+            # if not were_ideal_feeds_purchased:
+            #     pass  # TODO: log warning
 
-        is_time_to_recalculate_max_daily_feeds = pass  # TODO: implement logic for user-control over this
-        if is_time_to_recalculate_max_daily_feeds:
-            total_inventory = self.feed_manager.get_total_inventory()
-            self.herd_manager.update_max_daily_feeds(total_inventory)
+        # is_time_to_recalculate_max_daily_feeds = pass  # TODO: implement logic for user-control over this
+        # if is_time_to_recalculate_max_daily_feeds:
+        #     total_inventory = self.feed_manager.get_total_inventory()
+        #     self.herd_manager.update_max_daily_feeds(total_inventory)
         
         is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
         if is_time_to_reformulate_ration:
@@ -154,9 +154,14 @@ class SimulationEngine:
 
     def _formulate_ration(self) -> None:
         """Formulates the ration for the animals."""
-        self.next_ration_reformulation = self.time.current_date + self.ration_reformulation_interval_length
-        total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)
-        requested_feed = self.herd_manager.reformulate_rations(total_inventory)
+        self.next_ration_reformulation = self.time.current_date + self.ration_formulation_interval_length
+        total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)  # TODO: decide which
+                                                                                                 # date to use
+
+        current_temperature = self.weather.get_current_day_conditions(time=self.time).mean_air_temperature
+        requested_feed = self.herd_manager.formulate_rations(
+            total_inventory.available_feeds, current_temperature, self.ration_formulation_interval_length.days()
+        )
         self.feed_manager.manage_ration_interval_purchases(requested_feed)
 
     def _advance_time(self) -> None:
@@ -218,7 +223,7 @@ class SimulationEngine:
         self.next_ration_reformulation = self.time.current_date
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
 
-        self.herd_manager = HerdManager(animal_class_config, self.feed, self.weather, self.time)
+        self.herd_manager = HerdManager(animal_class_config, self.weather, self.time, is_ration_defined_by_user=True)
         all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager = ManureManager(

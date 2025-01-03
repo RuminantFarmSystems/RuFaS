@@ -334,8 +334,7 @@ class Pen:
 
         """
         animal_combination = self.animal_combination
-        average_animal_requirements: NutritionRequirements = self.average_animal_requirements
-        ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, average_animal_requirements)
+        ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, self.average_animal_requirements)
 
         total_nutrient_evaluation_results = NutritionEvaluationResults(
             total_energy=0.0,

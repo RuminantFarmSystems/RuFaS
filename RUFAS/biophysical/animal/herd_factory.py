@@ -9,7 +9,6 @@ from tqdm import tqdm
 from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.data_types.animal_population import AnimalPopulation
 from RUFAS.biophysical.animal.data_types.animal_typed_dicts import AnimalBaseInitArgsTypedDict
-from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
 from RUFAS.time import Time
@@ -347,7 +346,7 @@ class HerdFactory:
         The initialized herd with be randomly sampled with replacement, and added to the InputManager pool.
         """
         Animal.set_config(HerdManager.get_animal_config(self.im.get_data("animal.animal_config")))
-        Animal.set_nutrient_list(Feed(self.im.get_data("feed")).nutrient_rqmts)
+        Animal.set_nutrient_list()
 
         time = Time()
         Animal.setup_lactation_curve_parameters(time)

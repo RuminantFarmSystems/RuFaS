@@ -172,6 +172,7 @@ class FeedManager:
 
         self.purchase_feed(feeds_to_purchase)
         self._deduct_feeds_from_inventory(feeds_to_remove_from_inventory)
+        return True
 
     def get_total_inventory(self, inventory_date: date) -> TotalInventory:
         """Gets the inventory expected to be held in storage at the specified date."""
@@ -197,6 +198,10 @@ class FeedManager:
         }
 
         self.purchase_feed(feeds_to_purchase)
+
+    def manage_ration_interval_purchases(self, requested_feeds: RequestedFeed) -> None:
+        """Manages the purchasing of feeds at the beginning of a ration interval."""
+        self.purchase_feed(requested_feeds.requested_feed)
 
     def _query_available_feed_totals(self, query_feed_ids: list[RUFAS_ID]) -> dict[RUFAS_ID, float]:
         """Gets the current dry matter mass of each feed ID currently in storage"""
