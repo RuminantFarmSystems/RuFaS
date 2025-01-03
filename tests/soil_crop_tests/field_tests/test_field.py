@@ -6,6 +6,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.current_day_conditions import CurrentDayConditions
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
@@ -109,6 +110,7 @@ def test_manage_field(mocker: MockerFixture) -> None:
     manure_application_mock = MagicMock(spec=ManureEventNutrientRequestResults)
     manure_application_mock.event = manure_event_mock
     manure_application_mock.nutrient_request_results = "MockResults"
+    manure_application_mock.manure_supplement_method = ManureSupplementMethod.NONE
 
     mock_manure_applications = [manure_application_mock]
 
@@ -127,6 +129,7 @@ def test_manage_field(mocker: MockerFixture) -> None:
         year=2024,
         day=120,
         manure_supplied="MockResults",
+        manure_supplement_method=ManureSupplementMethod.NONE
     )
     mock_check_tillage_sched.assert_called_once_with(mocked_time)
     mock_execute_daily_processes.assert_called_once_with(mocked_weather, mocked_time)
@@ -290,9 +293,9 @@ def test_check_manure_application_schedule() -> None:
 
     # Arrange
     manure_events = [
-        ManureEvent(100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0, 1991, 120),
-        ManureEvent(90, 25, ManureType.SOLID, 0.9, 0.1, 0.9, 1992, 120),
-        ManureEvent(80, 30, ManureType.LIQUID, 0.85, 0.05, 0.95, 1991, 121),
+        ManureEvent(100, 20, ManureType.LIQUID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.8, 0.0, 1.0, 1991, 120, ),
+        ManureEvent(90, 25, ManureType.SOLID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.9, 0.1, 0.9, 1992, 120),
+        ManureEvent(80, 30, ManureType.LIQUID, ManureSupplementMethod.SYNTHETIC_FERTILIZER, 0.85, 0.05, 0.95, 1991, 121),
     ]
     field = Field(manure_events=manure_events)
     field.field_data = MagicMock()
@@ -312,8 +315,8 @@ def test_check_manure_application_schedule() -> None:
     field._filter_events.assert_called_once_with(manure_events, mocked_time)
     assert field.manure_events == [manure_events[2]], "Expected remaining events after filtering."
     expected_requests = [
-        ManureEventNutrientRequest("field1", filtered_manure_events[0], "Request for 1991-120"),
-        ManureEventNutrientRequest("field1", filtered_manure_events[1], "Request for 1992-120"),
+        ManureEventNutrientRequest("field1", filtered_manure_events[0], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1991-120"),
+        ManureEventNutrientRequest("field1", filtered_manure_events[1], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1992-120"),
     ]
     assert manure_requests == expected_requests, "Expected manure requests do not match."
     field._create_manure_request.assert_any_call(filtered_manure_events[0])
@@ -385,6 +388,7 @@ def test_create_manure_request(nitrogen_mass, phosphorus_mass, manure_type, expe
         field_coverage=0.9,
         application_depth=0.2,
         surface_remainder_fraction=0.8,
+        manure_supplement_method=ManureSupplementMethod.NONE
     )
 
     # Act
@@ -1448,7 +1452,7 @@ def test_record_fertilizer_application(
             1.0,
             1993,
             175,
-            True,
+            ManureSupplementMethod.SYNTHETIC_FERTILIZER,
             True,
             False,
             NutrientRequestResults(
@@ -1563,7 +1567,7 @@ def test_record_fertilizer_application(
             1.0,
             2010,
             120,
-            False,
+            ManureSupplementMethod.NONE,
             True,
             True,
             NutrientRequestResults(
@@ -1590,7 +1594,7 @@ def test_record_fertilizer_application(
             1.0,
             2010,
             120,
-            False,
+            ManureSupplementMethod.NONE,
             False,
             False,
             NutrientRequestResults(
@@ -1620,7 +1624,7 @@ def test_execute_manure_application(
     remainder: float,
     year: int,
     day: int,
-    supplement: bool,
+    supplement: ManureSupplementMethod,
     fertilizer_applied: bool,
     only_nitrogen_unmet: bool,
     supplied_manure: NutrientRequestResults,
@@ -1632,8 +1636,7 @@ def test_execute_manure_application(
     field = Field(
         field_data=FieldData(
             name="test",
-            field_size=1.4,
-            supplement_manure_nutrient_deficiencies=supplement,
+            field_size=1.4
         )
     )
     field._add_manure_water = mocker.MagicMock()
@@ -1645,7 +1648,8 @@ def test_execute_manure_application(
     warn = mocker.patch.object(field.om, "add_warning")
 
     field._execute_manure_application(
-        nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day, supplied_manure
+        nitrogen, phosphorus, manure_type, coverage, depth, remainder, year, day, supplied_manure,
+        ManureSupplementMethod.NONE
     )
 
     expected_total_inorganic_fraction = 0.14  # equal to (50.0 / 250.0) * 0.7
@@ -1696,15 +1700,15 @@ def test_execute_manure_application(
         ]
         field._record_manure_application.assert_has_calls(expected_record_manure_application_calls)
 
-        if fertilizer_applied and not supplement:
+        if fertilizer_applied and not supplement == ManureSupplementMethod.NONE:
             warn.assert_called_once()
             field._determine_optimal_fertilizer_mix.assert_not_called()
             field._execute_fertilizer_application.assert_not_called()
-        elif not fertilizer_applied and not supplement:
+        elif not fertilizer_applied and not supplement == ManureSupplementMethod.NONE:
             warn.assert_not_called()
             field._determine_optimal_fertilizer_mix.assert_not_called()
             field._execute_fertilizer_application.assert_not_called()
-        elif fertilizer_applied and only_nitrogen_unmet and supplement:
+        elif fertilizer_applied and only_nitrogen_unmet and supplement == ManureSupplementMethod.SYNTHETIC_FERTILIZER:
             warn.assert_not_called()
             field._determine_optimal_fertilizer_mix.assert_not_called()
             field._execute_fertilizer_application.assert_called_once_with(
@@ -1717,7 +1721,7 @@ def test_execute_manure_application(
                 year,
                 day,
             )
-        elif fertilizer_applied and not only_nitrogen_unmet and supplement:
+        elif fertilizer_applied and not only_nitrogen_unmet and ManureSupplementMethod.SYNTHETIC_FERTILIZER:
             warn.assert_not_called()
             field._determine_optimal_fertilizer_mix.assert_called_once_with(
                 expected_unmet_nitrogen,
@@ -1790,7 +1794,8 @@ def test_execute_manure_application_with_invalid_args(
         ) as patched_fertilizer_applicator,
     ):
         field._execute_manure_application(
-            50.0, 50.0, ManureType.LIQUID, 0.8, depth, remainder, 2000, 133, supplied_nutrients
+            50.0, 50.0, ManureType.LIQUID,
+            0.8, depth, remainder, 2000, 133, supplied_nutrients, ManureSupplementMethod.NONE
         )
 
         field._add_manure_water.assert_called_once_with(supplied_nutrients, ManureType.LIQUID)
