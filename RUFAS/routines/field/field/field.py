@@ -12,6 +12,7 @@ from RUFAS.data_structures.events import (
     PlantingEvent,
     TillageEvent,
 )
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
@@ -192,6 +193,7 @@ class Field:
                 year=manure_event.year,
                 day=manure_event.day,
                 manure_supplied=manure_request_results,
+                manure_supplement_method=manure_application.manure_supplement_method,
             )
 
         self._check_tillage_schedule(time)
@@ -411,7 +413,7 @@ class Field:
             Minimum mass of nitrogen to be included in fertilizer application (kg)
         requested_phosphorus : float
             Minimum mass of phosphorus to be included in fertilizer application (kg)
-        reqested_potassium : float
+        requested_potassium : float
             Minimum mass of potassium to be included in fertilizer application (kg)
 
         Returns
@@ -523,6 +525,7 @@ class Field:
         year: int,
         day: int,
         manure_supplied: NutrientRequestResults | None,
+        manure_supplement_method: ManureSupplementMethod,
     ) -> None:
         """
         Receives a manure application request result and the corresponding ManureEvent data and executes
@@ -649,7 +652,7 @@ class Field:
         if unmet_nitrogen_demand == 0.0 and unmet_phosphorus_demand == 0.0:
             return
 
-        if not self.field_data.supplement_manure_nutrient_deficiencies:
+        if manure_supplement_method == ManureSupplementMethod.NONE:
             warning_name = "Nutrient deficient manure application"
             warning_message = (
                 f"Manure nitrogen deficient by {unmet_nitrogen_demand} kg, manure phosphorus "
@@ -914,7 +917,9 @@ class Field:
         manure_requests: list[ManureEventNutrientRequest] = []
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
-            manure_requests.append(ManureEventNutrientRequest(self.field_data.name, event, manure_request))
+            manure_requests.append(
+                ManureEventNutrientRequest(self.field_data.name, event, event.manure_supplement_method, manure_request)
+            )
         return manure_requests
 
     def _create_manure_request(self, event: ManureEvent) -> NutrientRequest | None:
