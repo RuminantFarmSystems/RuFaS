@@ -1,6 +1,7 @@
 from typing import NamedTuple, Optional
 from dataclasses import dataclass, fields
 from RUFAS.data_structures.events import ManureEvent
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
 import math
 
@@ -123,6 +124,7 @@ class ManureEventNutrientRequest(NamedTuple):
 
     field_name: str
     event: ManureEvent
+    manure_supplement_method: ManureSupplementMethod
     nutrient_request: Optional[NutrientRequest]
 
 
@@ -131,4 +133,5 @@ class ManureEventNutrientRequestResults(NamedTuple):
 
     field_name: str
     event: ManureEvent
+    manure_supplement_method: ManureSupplementMethod
     nutrient_request_results: Optional[NutrientRequestResults]
