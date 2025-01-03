@@ -10,7 +10,7 @@ crop that is presently growing in a field will be harvested.
 
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.time import Time
 
