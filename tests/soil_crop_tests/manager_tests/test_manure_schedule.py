@@ -107,9 +107,9 @@ from RUFAS.data_structures.manure_types import ManureType
             [0.0],
             [1.0],
             "'test_8':  Mismatch in length of parameters. Provided parameters are: "
-            'years=[1990, 1990, 1993], days=[120, 140], nitrogen_masses=[20, 20, 20], '
-            'phosphorus_masses=[15, 10, 20], application_depths=[0.0, 0.0, 0.0], '
-            'surface_remainder_fractions=[1.0, 1.0, 1.0], '
+            "years=[1990, 1990, 1993], days=[120, 140], nitrogen_masses=[20, 20, 20], "
+            "phosphorus_masses=[15, 10, 20], application_depths=[0.0, 0.0, 0.0], "
+            "surface_remainder_fractions=[1.0, 1.0, 1.0], "
             "manure_types=[<ManureType.LIQUID: 'liquid'>, <ManureType.LIQUID: 'liquid'>, "
             "<ManureType.LIQUID: 'liquid'>], "
             "manure_supplement_methods=[<ManureSupplementMethod.NONE: 'none'>, "
