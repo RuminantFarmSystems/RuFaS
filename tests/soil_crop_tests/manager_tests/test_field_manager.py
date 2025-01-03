@@ -692,7 +692,7 @@ def test_setup_fertilizer_schedule(
                     "none",
                     "none",
                     "none",
-                    "none"
+                    "none",
                 ],
                 "years": [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016],
                 "days": [200, 200, 200, 200, 200, 200, 200, 200, 200],
@@ -2000,10 +2000,18 @@ def test_check_manure_schedules() -> None:
     field = MagicMock(Field)
     time = MagicMock(Time)
     expected_manure_requests = [
-        ManureEventNutrientRequest(field_name="field1", event=MagicMock(),
-                                   manure_supplement_method=ManureSupplementMethod.NONE, nutrient_request=MagicMock()),
-        ManureEventNutrientRequest(field_name="field2", event=MagicMock(),
-                                   manure_supplement_method=ManureSupplementMethod.NONE, nutrient_request=MagicMock()),
+        ManureEventNutrientRequest(
+            field_name="field1",
+            event=MagicMock(),
+            manure_supplement_method=ManureSupplementMethod.NONE,
+            nutrient_request=MagicMock(),
+        ),
+        ManureEventNutrientRequest(
+            field_name="field2",
+            event=MagicMock(),
+            manure_supplement_method=ManureSupplementMethod.NONE,
+            nutrient_request=MagicMock(),
+        ),
     ]
     field.check_manure_application_schedule.return_value = expected_manure_requests
     field_manager = FieldManager()
