@@ -1,6 +1,7 @@
 from typing import List, Tuple, Any
 
 from RUFAS.data_structures.events import FertilizerEvent, ManureEvent, TillageEvent, PlantingEvent, HarvestEvent
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequest,
     ManureEventNutrientRequestResults,
@@ -290,6 +291,11 @@ class FieldManager:
         im = InputManager()
         manure_schedule_data: dict[str, Any] = im.get_data(manure_schedule)
         manure_type_strings: list[str] = manure_schedule_data["manure_types"]
+        manure_supplement_methods_strings: list[str] = manure_schedule_data[
+            "supplement_manure_nutrient_deficiencies"]
+        manure_supplement_methods: list[ManureSupplementMethod] = \
+            [ManureSupplementMethod(manure_supplement_methods_string) for manure_supplement_methods_string in
+             manure_supplement_methods_strings]
         manure_types: list[ManureType] = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
         manure_schedule_instance = ManureSchedule(
             name="manure_schedule",
@@ -298,6 +304,7 @@ class FieldManager:
             nitrogen_masses=manure_schedule_data["nitrogen_masses"],
             phosphorus_masses=manure_schedule_data["phosphorus_masses"],
             manure_types=manure_types,
+            manure_supplement_methods=manure_supplement_methods,
             field_coverages=manure_schedule_data["coverage_fractions"],
             application_depths=manure_schedule_data["application_depths"],
             surface_remainder_fractions=manure_schedule_data["surface_remainder_fractions"],
