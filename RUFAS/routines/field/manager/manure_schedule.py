@@ -1,6 +1,7 @@
 from typing import List, Optional, Any
 
 from RUFAS.data_structures.events import ManureEvent
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.routines.field.manager.schedule import Schedule
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.util import Utility
@@ -65,6 +66,7 @@ class ManureSchedule(Schedule):
         nitrogen_masses: List[float],
         phosphorus_masses: List[float],
         manure_types: List[ManureType],
+        manure_supplement_methods: List[ManureSupplementMethod],
         field_coverages: List[float],
         application_depths: Optional[List[float]] = None,
         surface_remainder_fractions: Optional[List[float]] = None,
@@ -76,6 +78,7 @@ class ManureSchedule(Schedule):
         self.nitrogen_masses = Utility.elongate_list(nitrogen_masses, len(years))
         self.phosphorus_masses = Utility.elongate_list(phosphorus_masses, len(years))
         self.manure_types = Utility.elongate_list(manure_types, len(years))
+        self.manure_supplement_methods = Utility.elongate_list(manure_supplement_methods, len(years))
         self.field_coverages = Utility.elongate_list(field_coverages, len(years))
 
         if application_depths is None:
@@ -133,6 +136,7 @@ class ManureSchedule(Schedule):
             application_depths=self.application_depths,
             surface_remainder_fractions=self.surface_remainder_fractions,
             manure_types=self.manure_types,
+            manure_supplement_methods=self.manure_supplement_methods,
         )
 
     def generate_manure_events(self) -> list[ManureEvent]:
@@ -154,6 +158,7 @@ class ManureSchedule(Schedule):
                     self.nitrogen_masses,
                     self.phosphorus_masses,
                     self.manure_types,
+                    self.manure_supplement_methods,
                     self.field_coverages,
                     self.application_depths,
                     self.surface_remainder_fractions,
