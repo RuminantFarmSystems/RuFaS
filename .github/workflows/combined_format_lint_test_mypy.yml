@@ -76,7 +76,6 @@ jobs:
             "input/data/soil/default_soil_2.json"
             "input/data/tillage_schedule/default_tillage_schedule.json"
           )
-          echo "All Changed Files: $ALL_CHANGED_FILES"
           unauthorized_changes=false
           unauthorized_paths=""
           
