@@ -74,8 +74,8 @@ class FeedManager:
     def __init__(self, feed_config: dict[str, Any], nutrient_standard: NutrientStandard) -> None:
         self.active_storages: Dict[StorageType, Storage] = {}
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
-        self.planning_cycle_allowance: PlanningCycleAllowance = PlanningCycleAllowance(feed_config)
-        self.runtime_purchase_allowance: RuntimePurchaseAllowance = RuntimePurchaseAllowance(feed_config)
+        self.planning_cycle_allowance: PlanningCycleAllowance = {}
+        self.runtime_purchase_allowance: RuntimePurchaseAllowance = {}
 
     @property
     def available_feeds(self) -> list[Feed]:
@@ -286,8 +286,10 @@ class FeedManager:
 
         feed_representation = NASEMFeed if nutrient_standard is NutrientStandard.NASEM else NRCFeed
         available_feeds = []
-        for feed in feed_config:
+        feeds_to_parse = feed_config["purchased_feeds"]
+        for feed in feeds_to_parse:
             rufas_id = feed["purchased_feed"]
+            price = feed["purchased_feed_cost"]
             try:
                 nutritive_properties = feed_library[rufas_id]
             except KeyError:
@@ -295,8 +297,8 @@ class FeedManager:
             new_feed = feed_representation(
                 rufas_id=rufas_id,
                 amount_available=0.0,
-                on_farm_cost=feed["on_farm_cost"],
-                purchase_cost=feed["purchased_feed_cost"],
+                on_farm_cost=price * 0.01,
+                purchase_cost=price,
                 **nutritive_properties,
             )
             available_feeds.append(new_feed)
