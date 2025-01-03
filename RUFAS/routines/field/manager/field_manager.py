@@ -192,7 +192,6 @@ class FieldManager:
             seasonal_high_water_table=field_configuration_data["seasonal_high_water_table"],
             watering_amount_in_liters=field_configuration_data["watering_amount_in_liters"],
             watering_interval=field_configuration_data["watering_interval"],
-            supplement_manure_nutrient_deficiencies=field_configuration_data["supplement_manure_nutrient_deficiencies"],
             simulate_water_stress=field_configuration_data["simulate_water_stress"],
             simulate_temp_stress=field_configuration_data["simulate_temp_stress"],
             simulate_nitrogen_stress=field_configuration_data["simulate_nitrogen_stress"],
