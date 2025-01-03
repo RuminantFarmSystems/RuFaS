@@ -63,6 +63,7 @@ class HerdManager:
         feed: Feed,
         weather: Weather,
         time: Time,
+        is_ration_defined_by_user: bool,
         feed_emissions_estimator: PurchasedFeedEmissionsEstimator = None,
     ) -> None:
         """
@@ -82,6 +83,8 @@ class HerdManager:
             instance of the Time class
         feed_emissions_estimator : PurchasedFeedEmissionsEstimator, default=None
             Instance of the PurchasedFeedEmissionsEstimator class.
+        is_ration_defined_by_user : bool
+            True if user-defined rations are used for the herd, otherwise false.
 
         """
         self.im = InputManager()
@@ -144,7 +147,7 @@ class HerdManager:
         self.housing = animal_config_data["housing"]
         self.pasture_concentrate = animal_config_data["pasture_concentrate"]
 
-        self.is_ration_defined_by_user = animal_config_data["ration"]["user_input"]
+        self.is_ration_defined_by_user = is_ration_defined_by_user
         if self.is_ration_defined_by_user:
             ration_feed_config = self.im.get_data("feed")
             UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
@@ -271,16 +274,6 @@ class HerdManager:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
         self.record_pen_history(time.simulation_day)
-
-        if is_end_of_ration_interval := self.end_ration_interval(time.simulation_day) is True:
-            self.clear_pens()
-            self.allocate_animals_to_pens()
-
-        total_requested_feed = RequestedFeed({})
-        for pen in self.all_pens:
-            if pen.needs_ration_formulation or is_end_of_ration_interval:
-                self.reformulate_ration_single_pen(pen, available_feeds, current_temperature)
-            total_requested_feed += pen.get_requested_feed()
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
@@ -1040,7 +1033,31 @@ class HerdManager:
             or simulation_day == 0
         )
 
-    def reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
+    def formulate_rations(self, available_feeds: list[Feed], current_temperature: float, ration_interval_length: int) -> RequestedFeed:
+        """
+        Formulates rations for all pens.
+
+        Parameters
+        ----------
+        available_feeds : List[Feed]
+            List of available feeds.
+        current_temperature : float
+            Current temperature (C).
+        ration_interval_length : int
+            Length of the ration interval (days).
+
+        """
+        self.clear_pens()
+        self.allocate_animals_to_pens()
+
+        total_requested_feed = RequestedFeed({})
+        for pen in self.all_pens:
+            self._reformulate_ration_single_pen(pen, available_feeds, current_temperature)
+            total_requested_feed += pen.get_requested_feed(ration_interval_length)
+
+        return total_requested_feed
+
+    def _reformulate_ration_single_pen(self, pen: Pen, available_feeds: list[Feed], current_temperature: float) -> None:
         """
         Reformulates ration for a single pen.
 
@@ -1058,7 +1075,6 @@ class HerdManager:
             pen.use_user_defined_ration(available_feeds, current_temperature)
         else:
             pen.formulate_optimized_ration(available_feeds)
-
 
     def update_herd_statistics(self) -> None:
         (

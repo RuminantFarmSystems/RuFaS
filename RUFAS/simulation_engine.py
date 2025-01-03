@@ -1,6 +1,7 @@
 # !/usr/bin/env python3
 
 import time as timer
+from datetime import date, timedelta
 from enum import Enum
 
 from RUFAS import routines
@@ -152,9 +153,7 @@ class SimulationEngine:
         self._advance_time()
 
     def _formulate_ration(self) -> None:
-        """
-        Formulates the ration for the animals.
-        """
+        """Formulates the ration for the animals."""
         self.next_ration_reformulation = self.time.current_date + self.ration_reformulation_interval_length
         total_inventory = self.feed_manager.get_total_inventory(self.next_ration_reformulation)
         requested_feed = self.herd_manager.reformulate_rations(total_inventory)
@@ -213,6 +212,11 @@ class SimulationEngine:
         manure_class_config = self.im.get_data("manure_management")
         animal_class_config = self.im.get_data("animal")
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
+
+        ration_interval_length = self.im.get_data("animal.ration.formulation_interval")
+        self.ration_formulation_interval_length = timedelta(days=ration_interval_length)
+        self.next_ration_reformulation = self.time.current_date
+        self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
 
         self.herd_manager = HerdManager(animal_class_config, self.feed, self.weather, self.time)
         all_pen_manure_data = self.herd_manager.collect_pen_manure_data()

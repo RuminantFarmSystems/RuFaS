@@ -391,9 +391,14 @@ class Pen:
         self.average_nutrition_supply = total_nutrition_supply / len(self.animals_in_pen.values())
         self.ration = ration
 
-    def get_requested_feed(self) -> RequestedFeed:
+    def get_requested_feed(self, ration_interval_length: int) -> RequestedFeed:
         """
         Returns the requested feed for the pen.
+
+        Parameters
+        ----------
+        ration_interval_length : int
+            The length of the ration interval (days).
 
         Returns
         -------
@@ -402,6 +407,6 @@ class Pen:
 
         """
         ration_for_all_animals = {
-            rufas_id: amount * len(self.animals_in_pen) for rufas_id, amount in self.ration.items()
+            rufas_id: amount * len(self.animals_in_pen) * ration_interval_length for rufas_id, amount in self.ration.items()
         }
         return RequestedFeed(requested_feed=ration_for_all_animals)
