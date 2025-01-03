@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, PropertyMock, call
 import pytest
 from pytest_mock import MockerFixture
 
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.field.field import Field
 from RUFAS.routines.field.field.field_data import FieldData
 from RUFAS.routines.field.field.tillage_application import TillageApplication
