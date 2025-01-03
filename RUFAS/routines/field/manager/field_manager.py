@@ -291,11 +291,11 @@ class FieldManager:
         im = InputManager()
         manure_schedule_data: dict[str, Any] = im.get_data(manure_schedule)
         manure_type_strings: list[str] = manure_schedule_data["manure_types"]
-        manure_supplement_methods_strings: list[str] = manure_schedule_data[
-            "supplement_manure_nutrient_deficiencies"]
-        manure_supplement_methods: list[ManureSupplementMethod] = \
-            [ManureSupplementMethod(manure_supplement_methods_string) for manure_supplement_methods_string in
-             manure_supplement_methods_strings]
+        manure_supplement_methods_strings: list[str] = manure_schedule_data["supplement_manure_nutrient_deficiencies"]
+        manure_supplement_methods: list[ManureSupplementMethod] = [
+            ManureSupplementMethod(manure_supplement_methods_string)
+            for manure_supplement_methods_string in manure_supplement_methods_strings
+        ]
         manure_types: list[ManureType] = [ManureType(manure_type_string) for manure_type_string in manure_type_strings]
         manure_schedule_instance = ManureSchedule(
             name="manure_schedule",

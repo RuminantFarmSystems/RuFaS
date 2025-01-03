@@ -136,7 +136,7 @@ class ManureSchedule(Schedule):
             application_depths=self.application_depths,
             surface_remainder_fractions=self.surface_remainder_fractions,
             manure_types=self.manure_types,
-            manure_supplement_methods=self.manure_supplement_methods
+            manure_supplement_methods=self.manure_supplement_methods,
         )
 
     def generate_manure_events(self) -> list[ManureEvent]:

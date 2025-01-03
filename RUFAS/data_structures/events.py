@@ -7,12 +7,12 @@ type of management operation. For example, the `HarvestEvent` contains the `oper
 specific harvest method will be used when harvesting a crop, and a `crop_reference` attribute, which specifies which
 crop that is presently growing in a field will be harvested.
 """
+
 from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
 from RUFAS.time import Time
-
 
 
 class BaseFieldManagementEvent:
