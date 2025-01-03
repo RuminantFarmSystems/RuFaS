@@ -11,7 +11,6 @@
   "seasonal_high_water_table": false,
   "watering_amount_in_liters": 0.0,
   "watering_interval": 0,
-  "supplement_manure_nutrient_deficiencies": false,
   "simulate_water_stress": true,
   "simulate_temp_stress": true,
   "simulate_nitrogen_stress": true,
