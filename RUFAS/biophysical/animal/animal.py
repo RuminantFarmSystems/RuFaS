@@ -651,6 +651,8 @@ class Animal:
             The nutrition requirements for the animal.
 
         """
+        if self.animal_type is AnimalType.CALF:
+            pass  # TODO: calves' requirements are implemented in PR #2153, which is not merged yet.
 
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
