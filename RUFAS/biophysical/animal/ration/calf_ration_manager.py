@@ -2,7 +2,7 @@ from enum import Enum
 
 from numpy import exp, log
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, NutrientStandard, NASEMFeed, NRCFeed
 from RUFAS.general_constants import GeneralConstants
 
 
@@ -145,7 +145,7 @@ class CalfRationManager:
 
     @classmethod
     def calc_intake(
-        cls, birth_weight: float, body_weight: float, wean_day: int, wean_length: int, available_feeds: list[Feed], nutrient_standard: NutrientStandard,
+        cls, birth_weight: float, body_weight: float, wean_day: int, wean_length: int, available_feeds: list[NASEMFeed, NRCFeed], nutrient_standard: NutrientStandard,
     ) -> dict[str, float]:
         """
         Calculates the amounts of whole milk, milk replacer, and starter that a calf consumes.
@@ -183,9 +183,9 @@ class CalfRationManager:
         wean_fraction = 1 - milk_reduct / (wean_length + 1)
 
         if nutrient_standard == NutrientStandard.NASEM:
-            whole_milk_digestible_energy = whole_milk.DE_base
-            milk_replacer_digestible_energy = milk_replacer.DE_base
-            starter_digestible_energy = starter.DE_base
+            whole_milk_digestible_energy = whole_milk.DE_Base
+            milk_replacer_digestible_energy = milk_replacer.DE_Base
+            starter_digestible_energy = starter.DE_Base
         else:
             whole_milk_digestible_energy = whole_milk.DE
             milk_replacer_digestible_energy = milk_replacer.DE
