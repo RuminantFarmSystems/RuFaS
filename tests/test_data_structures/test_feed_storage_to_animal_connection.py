@@ -25,6 +25,7 @@ def test_feed_categorization() -> None:
 
 def test_feed_commponent_type() -> None:
     """Tests that FeedComponentType enum works correctly."""
+    
     assert FeedComponentType.AMINOACIDS.value == "Aminoacids"
     assert FeedComponentType.FORAGE.value == "Forage"
     assert FeedComponentType.CONC.value == "Conc"
@@ -33,3 +34,10 @@ def test_feed_commponent_type() -> None:
     assert FeedComponentType.VITAMINS.value == "Vitamins"
     assert FeedComponentType.STARTER.value == "Starter"
     assert FeedComponentType.NO.value == "No"
+
+
+def test_nutrient_standard() -> None:
+    """Tests that NutrientStandard enum works correctly."""
+
+    assert NutrientStandard.NASEM.value == "NASEM"
+    assert NutrientStandard.NRC.value == "NRC"
