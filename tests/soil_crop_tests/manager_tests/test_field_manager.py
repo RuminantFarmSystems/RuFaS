@@ -189,11 +189,11 @@ def test_annual_update_routine(fields: List[Field]) -> None:
         (
             {
                 "available_fertilizer_mixes": [
-                    {"name": "0_0_60", "N": 0.0, "P": 0.0, "K": 0.6},
-                    {"name": "6_10_20", "N": 0.0672511, "P": 0.112085, "K": 0.22417},
-                    {"name": "5_4_27", "N": 0.0560426, "P": 0.0493175, "K": 0.2790919},
-                    {"name": "5_6_40", "N": 0.0560426, "P": 0.06904443, "K": 0.39},
-                    {"name": "82_0_0", "N": 0.82, "P": 0.0, "K": 0.0},
+                    {"name": "0_0_60", "N": 0.0, "P": 0.0, "K": 0.6, "ammonium_fraction": 0.0},
+                    {"name": "6_10_20", "N": 0.0672511, "P": 0.112085, "K": 0.22417, "ammonium_fraction": 0.0},
+                    {"name": "5_4_27", "N": 0.0560426, "P": 0.0493175, "K": 0.2790919, "ammonium_fraction": 0.0},
+                    {"name": "5_6_40", "N": 0.0560426, "P": 0.06904443, "K": 0.39, "ammonium_fraction": 0.5},
+                    {"name": "82_0_0", "N": 0.82, "P": 0.0, "K": 0.0, "ammonium_fraction": 1.0},
                 ],
                 "mix_names": [
                     "6_10_20",
@@ -239,11 +239,11 @@ def test_annual_update_routine(fields: List[Field]) -> None:
                 "pattern_skip": 0,
             },
             {
-                "0_0_60": {"N": 0.0, "P": 0.0, "K": 0.6},
-                "6_10_20": {"N": 0.0672511, "P": 0.112085, "K": 0.22417},
-                "5_4_27": {"N": 0.0560426, "P": 0.0493175, "K": 0.2790919},
-                "5_6_40": {"N": 0.0560426, "P": 0.06904443, "K": 0.39},
-                "82_0_0": {"N": 0.82, "P": 0.0, "K": 0.0},
+                "0_0_60": {"N": 0.0, "P": 0.0, "K": 0.6, "ammonium_fraction": 0.0},
+                "6_10_20": {"N": 0.0672511, "P": 0.112085, "K": 0.22417, "ammonium_fraction": 0.0},
+                "5_4_27": {"N": 0.0560426, "P": 0.0493175, "K": 0.2790919, "ammonium_fraction": 0.0},
+                "5_6_40": {"N": 0.0560426, "P": 0.06904443, "K": 0.39, "ammonium_fraction": 0.5},
+                "82_0_0": {"N": 0.82, "P": 0.0, "K": 0.0, "ammonium_fraction": 1.0},
             },
             FertilizerSchedule(
                 name="fertilizer_schedule",
@@ -293,7 +293,9 @@ def test_annual_update_routine(fields: List[Field]) -> None:
         ),
         (
             {
-                "available_fertilizer_mixes": [{"name": "barnyard_fert", "N": 0.4, "P": 0.2, "K": 0.1}],
+                "available_fertilizer_mixes": [
+                    {"name": "barnyard_fert", "N": 0.4, "P": 0.2, "K": 0.1, "ammonium_fraction": 0.3}
+                ],
                 "mix_names": ["barnyard_fert"],
                 "years": [2010],
                 "days": [200],
@@ -305,7 +307,7 @@ def test_annual_update_routine(fields: List[Field]) -> None:
                 "pattern_repeat": 0,
                 "pattern_skip": 0,
             },
-            {"barnyard_fert": {"N": 0.4, "P": 0.2, "K": 0.1}},
+            {"barnyard_fert": {"N": 0.4, "P": 0.2, "K": 0.1, "ammonium_fraction": 0.3}},
             FertilizerSchedule(
                 name="fertilizer_schedule",
                 mix_names=["barnyard_fert"],
@@ -1792,7 +1794,7 @@ def test_setup_field(
     mock_planting_events = [MagicMock(PlantingEvent)]
     mock_harvest_events = [MagicMock(HarvestEvent)]
 
-    dummy_available_fertilizer_mixes = {"A": {"N": 0.0, "P": 1.1, "K": 2.2}}
+    dummy_available_fertilizer_mixes = {"A": {"N": 0.0, "P": 1.1, "K": 2.2, "ammonium_fraction": 0.0}}
 
     mocked_soil_profile = MagicMock(Soil)
     mocked_soil_data = MagicMock(SoilData)
@@ -1838,9 +1840,9 @@ def test_setup_field(
 
     assert new_field.soil == mocked_soil_profile
     assert new_field.available_fertilizer_mixes == {
-        "A": {"N": 0.0, "P": 1.1, "K": 2.2},
-        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
-        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
+        "A": {"N": 0.0, "P": 1.1, "K": 2.2, "ammonium_fraction": 0.0},
+        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
+        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
     }
 
     mock_input_manager.get_data.assert_called_once_with(field_name)
