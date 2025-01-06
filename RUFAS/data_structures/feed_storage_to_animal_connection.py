@@ -296,10 +296,6 @@ class NASEMFeed(Feed):
     Abs_manganesum: float
     Abs_zinc: float
 
-    def __post_init__(self) -> None:
-        """Sets DE equal to DE_Base, so that DE_Base is always used for NASEM feeds."""
-        self.DE = self.DE_Base
-
 
 @dataclass
 class NRCFeed(Feed):
