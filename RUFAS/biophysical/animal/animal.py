@@ -43,8 +43,6 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
-from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
-from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
 from RUFAS.general_constants import GeneralConstants
 from RUFAS.time import Time
@@ -653,40 +651,6 @@ class Animal:
             The nutrition requirements for the animal.
 
         """
-        if self.animal_type is AnimalType.CALF:
-            calf_intake = CalfRationManager.calc_intake(
-                self.birth_weight, self.body_weight, AnimalConfig.wean_day, AnimalConfig.wean_length, available_feeds
-            )  # TODO: wean length
-            calf_requirements = CalfRationManager.calc_requirements(
-                self.days_born, self.body_weight, previous_temperature, calf_intake
-            )
-            calf_essetial_amino_acids = EssentialAminoAcidRequirements(
-                lysine=0.0,
-                methionine=0.0,
-                threonine=0.0,
-                tryptophan=0.0,
-                valine=0.0,
-                isoleucine=0.0,
-                arginine=0.0,
-                histidine=0.0,
-                leucine=0.0,
-                phenylalanine=0.0,
-            )
-            self.growth.daily_growth = calf_requirements["live_weight_change"]
-
-            return NutritionRequirements(
-                dry_matter=calf_intake["dry_matter_intake"],
-                maintentance=calf_requirements["ne_maint"],
-                growth=calf_requirements["ne_gain"],
-                pregnancy=0.0,
-                lactation=0.0,
-                protein=calf_requirements["adp_maintentance"],
-                calcium=0.0,
-                phosphorus=0.0,
-                secondary_phosphorus=0.0,
-                activity=0.0,
-                essential_amino_acids=calf_essetial_amino_acids
-            )
 
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
