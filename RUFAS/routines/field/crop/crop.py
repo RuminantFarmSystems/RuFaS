@@ -92,6 +92,41 @@ class Crop:
         """Provides access to the CropData object."""
         return self._data
 
+    @property
+    def growth_constraints(self) -> GrowthConstraints:
+        """Provides access to the GrowthConstraints object."""
+        return self._growth_constraints
+
+    @property
+    def biomass_allocation(self) -> BiomassAllocation:
+        """Provides access to the BiomassAllocation object."""
+        return self._biomass_allocation
+
+    @property
+    def nitrogen_incorporation(self) -> NitrogenIncorporation:
+        """Provides access to the NitrogenIncorporation object."""
+        return self._nitrogen_incorporation
+
+    @property
+    def leaf_area_index(self) -> LeafAreaIndex:
+        """Provides access to the LeafAreaIndex object."""
+        return self._leaf_area_index
+
+    @property
+    def water_dynamics(self) -> WaterDynamics:
+        """Provides access to the WaterDynamics object."""
+        return self._water_dynamics
+
+    @property
+    def crop_management(self) -> CropManagement:
+        """Provides access to the CropManagement object."""
+        return self._crop_management
+
+    @property
+    def phosphorus_incorporation(self) -> PhosphorusIncorporation:
+        """Provides access to the PhosphorusIncorporation object."""
+        return self._phosphorus_incorporation
+
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
     ) -> None:

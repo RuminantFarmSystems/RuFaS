@@ -1,0 +1,13 @@
+{
+    "years": [1980],
+    "days": [122],
+    "nitrogen_masses": [392.298],
+    "phosphorus_masses": [146.328],
+    "potassium_masses": [0.0],
+    "coverage_fractions": [0.95],
+    "application_depths": [101.6],
+    "surface_remainder_fractions": [0.05],
+    "manure_types": ["liquid"],
+    "pattern_repeat": 24,
+    "pattern_skip": 0
+}

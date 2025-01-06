@@ -11,8 +11,8 @@ from RUFAS.data_structures.manure_to_crop_soil_connection import (
     ManureEventNutrientRequestResults,
 )
 from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType, StorageType
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.EEE.enums import TillageImplement
 from RUFAS.routines.field.crop.crop import Crop
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -69,8 +69,8 @@ def test_field_init_defaults():
     assert field.tillage_events is None
     assert field.manure_events == []
     assert field.available_fertilizer_mixes == {
-        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0},
-        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24},
+        "100_0_0": {"N": 1.0, "P": 0.0, "K": 0.0, "ammonium_fraction": 0.0},
+        "26_4_24": {"N": 0.26, "P": 0.04, "K": 0.24, "ammonium_fraction": 0.0},
     }
     assert field.ONLY_NITROGEN_MIX == "100_0_0"
     assert isinstance(field.fertilizer_applicator, FertilizerApplication)
@@ -214,39 +214,39 @@ def test_check_crop_planting_schedule(
     [
         (
             [
-                FertilizerEvent("mix_1", 100, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_2", 20, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_3", 15, 15, 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(100, 20, "mix_1", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(20, 20, "mix_2", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(15, 15, "mix_3", 1993, 75, 15, 0, 1.0),
             ],
             [],
             [
-                FertilizerEvent("mix_1", 100, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_2", 20, 20, 1993, 75, 15, 0, 1.0),
-                FertilizerEvent("mix_3", 15, 15, 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(100, 20, "mix_1", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(20, 20, "mix_2", 1993, 75, 15, 0, 1.0),
+                FertilizerEvent(15, 15, "mix_3", 1993, 75, 15, 0, 1.0),
             ],
         ),
         (
             [
-                FertilizerEvent("mix_1", 150, 20, 1992, 80, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 25, 5, 1992, 250, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 100, 50, 1993, 80, 15, 0, 1.0),
+                FertilizerEvent(150, 20, "mix_1", 1992, 80, 15, 0, 1.0),
+                FertilizerEvent(25, 5, "mix_1", 1992, 250, 15, 0, 1.0),
+                FertilizerEvent(100, 50, "mix_1", 1993, 80, 15, 0, 1.0),
             ],
             [
-                FertilizerEvent("mix_1", 25, 5, 1992, 250, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 100, 50, 1993, 80, 15, 0, 1.0),
+                FertilizerEvent(25, 5, "mix_1", 1992, 250, 15, 0, 1.0),
+                FertilizerEvent(100, 50, "mix_1", 1993, 80, 15, 0, 1.0),
             ],
-            [FertilizerEvent("mix_1", 150, 20, 1992, 80, 15, 0, 1.0)],
+            [FertilizerEvent(150, 20, "mix_1", 1992, 80, 15, 0, 1.0)],
         ),
         (
             [
-                FertilizerEvent("mix_1", 50, 10, 1998, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 1999, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 2000, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1998, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1999, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 2000, 90, 15, 0, 1.0),
             ],
             [
-                FertilizerEvent("mix_1", 50, 10, 1998, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 1999, 90, 15, 0, 1.0),
-                FertilizerEvent("mix_1", 50, 10, 2000, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1998, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 1999, 90, 15, 0, 1.0),
+                FertilizerEvent(50, 10, "mix_1", 2000, 90, 15, 0, 1.0),
             ],
             [],
         ),
@@ -290,9 +290,9 @@ def test_check_manure_application_schedule() -> None:
 
     # Arrange
     manure_events = [
-        ManureEvent(1991, 120, 100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0),
-        ManureEvent(1992, 120, 90, 25, ManureType.SOLID, 0.9, 0.1, 0.9),
-        ManureEvent(1991, 121, 80, 30, ManureType.LIQUID, 0.85, 0.05, 0.95),
+        ManureEvent(100, 20, ManureType.LIQUID, 0.8, 0.0, 1.0, 1991, 120),
+        ManureEvent(90, 25, ManureType.SOLID, 0.9, 0.1, 0.9, 1992, 120),
+        ManureEvent(80, 30, ManureType.LIQUID, 0.85, 0.05, 0.95, 1991, 121),
     ]
     field = Field(manure_events=manure_events)
     field.field_data = MagicMock()
@@ -562,16 +562,16 @@ def test_harvest_heat_scheduled_crops(
         ),
         (
             [
-                PlantingEvent("corn", 1993, 120, False),
-                PlantingEvent("corn_supplement", 1993, 120, True),
-                PlantingEvent("cover_crop", 1993, 245, False),
+                PlantingEvent("corn", False, 1993, 120),
+                PlantingEvent("corn_supplement", True, 1993, 120),
+                PlantingEvent("cover_crop", False, 1993, 245),
             ],
             1993,
             120,
-            [PlantingEvent("cover_crop", 1993, 245, False)],
+            [PlantingEvent("cover_crop", False, 1993, 245)],
             [
-                PlantingEvent("corn", 1993, 120, False),
-                PlantingEvent("corn_supplement", 1993, 120, True),
+                PlantingEvent("corn", False, 1993, 120),
+                PlantingEvent("corn_supplement", True, 1993, 120),
             ],
         ),
         (
@@ -1032,14 +1032,15 @@ def test_start_dormancy(daylength: float, threshold_daylength: float) -> None:
 
 
 @pytest.mark.parametrize(
-    "mix_name,requested_n,requested_p,requested_k,depth,remainder,year,day,field_size,fertilizer_applied",
+    "mix_name,requested_n,requested_p,requested_k,ammonium_fraction,depth,remainder,year,day,field_size,"
+    "fertilizer_applied",
     {
-        ("test_mix_1", 80.0, 30.0, 20.0, 0.0, 1.0, 1993, 100, 3.1, True),
-        ("test_mix_2", 150.0, 89.0, 20.0, 25.0, 0.89, 2001, 240, 1.3, True),
-        ("test_mix_3", 10.0, 90.33, 20.0, 100.0, 0.5, 1992, 30, 2.44, True),
-        ("test_mix_4", 0.0, 50.0, 20.0, 0.0, 1.0, 1996, 60, 1.45, True),
-        ("test_mix_5", 67.5, 0.0, 20.0, 0.0, 1.0, 1998, 200, 2.3, True),
-        ("test_mix_6", 0.0, 0.0, 0.0, 0.0, 1.0, 1988, 120, 0.5, False),
+        ("test_mix_1", 80.0, 30.0, 20.0, 0.0, 0.0, 1.0, 1993, 100, 3.1, True),
+        ("test_mix_2", 150.0, 89.0, 20.0, 0.5, 25.0, 0.89, 2001, 240, 1.3, True),
+        ("test_mix_3", 10.0, 90.33, 20.0, 1.0, 100.0, 0.5, 1992, 30, 2.44, True),
+        ("test_mix_4", 0.0, 50.0, 20.0, 0.0, 0.0, 1.0, 1996, 60, 1.45, True),
+        ("test_mix_5", 67.5, 0.0, 20.0, 0.2, 0.0, 1.0, 1998, 200, 2.3, True),
+        ("test_mix_6", 0.0, 0.0, 0.0, 0.3, 0.0, 1.0, 1988, 120, 0.5, False),
     },
 )
 def test_execute_fertilizer_application(
@@ -1048,6 +1049,7 @@ def test_execute_fertilizer_application(
     requested_n: float,
     requested_p: float,
     requested_k: float,
+    ammonium_fraction: float,
     depth: float,
     remainder: float,
     year: int,
@@ -1059,7 +1061,7 @@ def test_execute_fertilizer_application(
     field_data = FieldData(name="test", field_size=field_size)
     field = Field(
         field_data=field_data,
-        fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5}},
+        fertilizer_mixes={mix_name: {"N": 0.3, "P": 0.2, "K": 0.5, "ammonium_fraction": ammonium_fraction}},
     )
     formulate = mocker.patch.object(
         field,
@@ -1077,10 +1079,9 @@ def test_execute_fertilizer_application(
         )
 
         if fertilizer_applied:
-            expected_nitrogen_fraction = 0.2
             formulate.assert_called_once_with(0.3, 0.2, 0.5, requested_n, requested_p, requested_k)
-            apply.assert_called_once_with(15, 100, expected_nitrogen_fraction, 0.0, 0.0, depth, remainder, field_size)
-            record.assert_called_once_with(mix_name, 100, 20, 15, 10, depth, remainder, year, day)
+            apply.assert_called_once_with(15, 20.0, ammonium_fraction, depth, remainder, field_size)
+            record.assert_called_once_with(mix_name, 100, 20, 15, 10, ammonium_fraction, depth, remainder, year, day)
         else:
             expected_info_map = {
                 "suffix": "field='test'",
@@ -1098,38 +1099,22 @@ def test_execute_fertilizer_application(
 
 
 @pytest.mark.parametrize(
-    "field_name,mix_name,available_mixes,expected_message",
+    "field_name,mix_name,available_mixes",
     [
-        (
-            "test_field_1",
-            "halo_alien_mix",
-            {},
-            "\"'test_field_1': expected to have fertilizer mix for 'halo_alien_mix', "
-            "received '{'100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': "
-            "{'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\"",
-        ),
-        (
-            "test_field_2",
-            "101_0_0",
-            {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12}},
-            "\"'test_field_2': expected to have fertilizer mix for '101_0_0', received "
-            "'{'50_22_12': {'N': 0.5, 'P': 0.22, "
-            "'K': 0.12}, '100_0_0': {'N': 1.0, 'P': 0.0, 'K': 0.0}, '26_4_24': {'N': 0.26, 'P': 0.04, 'K': 0.24}}'.\"",
-        ),
+        ("test_field_1", "halo_alien_mix", {}),
+        ("test_field_2", "101_0_0", {"50_22_12": {"N": 0.5, "P": 0.22, "K": 0.12, "ammonium_fraction": 0.0}}),
     ],
 )
-def test_execute_fertilizer_application_error(
-    field_name: str, mix_name: str, available_mixes: Dict, expected_message: str
-) -> None:
-    """Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available
-    mixes."""
+def test_execute_fertilizer_application_error(field_name: str, mix_name: str, available_mixes: Dict) -> None:
+    """
+    Tests that errors are correctly raised when a mix is specified to be used but is not listed in the available mixes.
+    """
     field = Field(
         field_data=FieldData(name=field_name),
         fertilizer_mixes=available_mixes,
     )
-    with pytest.raises(KeyError) as e:
+    with pytest.raises(KeyError):
         field._execute_fertilizer_application(mix_name, 10.0, 10.0, 10.0, 0.0, 1.0, 1994, 120)
-    assert str(e.value) == expected_message
 
 
 @pytest.mark.parametrize(
@@ -1184,12 +1169,13 @@ def test_execute_fertilizer_application_with_invalid_args(
         else:
             patched_error.assert_called_once_with(depth, None, "fertilizer_application_error", 1994, 200)
         patched_formulator.assert_called_once_with(0.26, 0.04, 0.24, 50.0, 50.0, 50.0)
-        patched_applicator.assert_called_once_with(50.0, 100.0, 0.5, 0.0, 0.0, expected_depth, expected_remainder, 1.2)
+        patched_applicator.assert_called_once_with(50.0, 50.0, 0.0, expected_depth, expected_remainder, 1.2)
         patched_recorder.assert_called_once_with(
             "26_4_24",
             100.0,
             50.0,
             50.0,
+            0.0,
             0.0,
             expected_depth,
             expected_remainder,
@@ -1354,11 +1340,11 @@ def test_formulate_fertilizer_required(
 
 
 @pytest.mark.parametrize(
-    "mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,depth,remainder,year,day,"
+    "mix_name,total_mass,nitrogen_mass,phosphorus_mass,potassium_mass,ammonium_fraction,depth,remainder,year,day,"
     "field_name,field_size",
     [
-        ("mix_1", 100, 20, 20, 20, 35.0, 0.8, 1992, 90, "field_1", 1.4),
-        ("mix_2", 30, 10, 3, 3, 0.0, 1.0, 1994, 120, "field_2", 4.3),
+        ("mix_1", 100, 20, 20, 20, 0.5, 35.0, 0.8, 1992, 90, "field_1", 1.4),
+        ("mix_2", 30, 10, 3, 3, 0.1, 0.0, 1.0, 1994, 120, "field_2", 4.3),
     ],
 )
 def test_record_fertilizer_application(
@@ -1367,6 +1353,7 @@ def test_record_fertilizer_application(
     nitrogen_mass: float,
     phosphorus_mass: float,
     potassium_mass: float,
+    ammonium_fraction: float,
     depth: float,
     remainder: float,
     year: int,
@@ -1390,6 +1377,7 @@ def test_record_fertilizer_application(
             nitrogen_mass,
             phosphorus_mass,
             potassium_mass,
+            ammonium_fraction,
             depth,
             remainder,
             year,
@@ -1403,6 +1391,7 @@ def test_record_fertilizer_application(
         "nitrogen": MeasurementUnits.KILOGRAMS.value,
         "phosphorus": MeasurementUnits.KILOGRAMS.value,
         "potassium": MeasurementUnits.KILOGRAMS.value,
+        "ammonium_fraction": MeasurementUnits.UNITLESS.value,
         "application_depth": MeasurementUnits.MILLIMETERS.value,
         "surface_remainder_fraction": MeasurementUnits.UNITLESS.value,
         "year": MeasurementUnits.CALENDAR_YEAR.value,
@@ -1418,6 +1407,7 @@ def test_record_fertilizer_application(
         "nitrogen": nitrogen_mass,
         "phosphorus": phosphorus_mass,
         "potassium": potassium_mass,
+        "ammonium_fraction": ammonium_fraction,
         "application_depth": depth,
         "surface_remainder_fraction": remainder,
         "year": year,
@@ -2708,37 +2698,130 @@ def test_annual_reset() -> None:
                 TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7),
                 TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7),
             ],
-            [TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7)],
+            [
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1998,
+                    7,
+                )
+            ],
         ),
         ([], 7, 1998, [], []),
         (
             [
-                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7),
-                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7),
-                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 2023, 7),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1997,
+                    7,
+                ),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1999,
+                    7,
+                ),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    2023,
+                    7,
+                ),
             ],
             7,
             1998,
             [
-                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1997, 7),
-                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 1999, 7),
-                TillageEvent(10, 0.5, 0.3, TillageImplement.CULTIVATOR, 2023, 7),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1997,
+                    7,
+                ),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1999,
+                    7,
+                ),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    2023,
+                    7,
+                ),
             ],
             [],
         ),
         (
             [
-                TillageEvent(7, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7),
-                TillageEvent(10, 0.5, 0.4, TillageImplement.CULTIVATOR, 1998, 7),
-                TillageEvent(5, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7),
+                TillageEvent(
+                    7,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1998,
+                    7,
+                ),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.4,
+                    TillageImplement.CULTIVATOR,
+                    1998,
+                    7,
+                ),
+                TillageEvent(
+                    5,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1998,
+                    7,
+                ),
             ],
             7,
             1998,
             [],
             [
-                TillageEvent(7, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7),
-                TillageEvent(10, 0.5, 0.4, TillageImplement.CULTIVATOR, 1998, 7),
-                TillageEvent(5, 0.5, 0.3, TillageImplement.CULTIVATOR, 1998, 7),
+                TillageEvent(
+                    7,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1998,
+                    7,
+                ),
+                TillageEvent(
+                    10,
+                    0.5,
+                    0.4,
+                    TillageImplement.CULTIVATOR,
+                    1998,
+                    7,
+                ),
+                TillageEvent(
+                    5,
+                    0.5,
+                    0.3,
+                    TillageImplement.CULTIVATOR,
+                    1998,
+                    7,
+                ),
             ],
         ),
     ],

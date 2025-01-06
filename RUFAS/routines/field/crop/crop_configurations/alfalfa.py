@@ -12,8 +12,6 @@ class Alfalfa(CropData):
     """
 
     name: str = "default alfalfa"
-    plant_code: str = "ALFA"
-    scientific_name: str = "Medicago sativa"
     plant_category: PlantCategory = PlantCategory("perennial_legume")
     is_nitrogen_fixer: bool = True
 

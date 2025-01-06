@@ -69,7 +69,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "usable_light",
-            crop.data.usable_light,
+            crop.biomass_allocation.usable_light,
             dict(info_map, **{"units": MeasurementUnits.MEGAJOULES_PER_SQUARE_METER}),
         )
         self.om.add_variable(
@@ -79,7 +79,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "biomass_growth",
-            crop.data.biomass_growth,
+            crop.biomass_allocation.biomass_growth,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
@@ -103,19 +103,19 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
         self.om.add_variable(
-            "water_stress", crop.data.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            "water_stress", crop.growth_constraints.water_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
         self.om.add_variable(
-            "temp_stress", crop.data.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
+            "temp_stress", crop.growth_constraints.temp_stress, dict(info_map, **{"units": MeasurementUnits.UNITLESS})
         )
         self.om.add_variable(
             "nitrogen_stress",
-            crop.data.nitrogen_stress,
+            crop.growth_constraints.nitrogen_stress,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
             "phosphorus_stress",
-            crop.data.phosphorus_stress,
+            crop.growth_constraints.phosphorus_stress,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
@@ -136,31 +136,31 @@ class FieldDataReporter:
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
-            "canopy_height", crop.data.canopy_height, dict(info_map, **{"units": MeasurementUnits.METERS})
+            "canopy_height", crop.leaf_area_index.canopy_height, dict(info_map, **{"units": MeasurementUnits.METERS})
         )
         self.om.add_variable(
             "leaf_area_added",
-            crop.data.leaf_area_added,
+            crop.leaf_area_index.leaf_area_added,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
             "optimal_leaf_area_change",
-            crop.data.optimal_leaf_area_change,
+            crop.leaf_area_index.optimal_leaf_area_change,
             dict(info_map, **{"units": MeasurementUnits.UNITLESS}),
         )
         self.om.add_variable(
             "potential_nitrogen_uptake",
-            crop.data.potential_nitrogen_uptake,
+            crop.nitrogen_incorporation.potential_nitrogen_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "total_nitrogen_uptake",
-            crop.data.total_nitrogen_uptake,
+            crop.nitrogen_incorporation.total_nitrogen_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "actual_nitrogen_uptakes",
-            crop.data.actual_nitrogen_uptakes,
+            crop.nitrogen_incorporation.actual_nitrogen_uptakes,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
@@ -170,17 +170,17 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "potential_phosphorus_uptake",
-            crop.data.potential_phosphorus_uptake,
+            crop.phosphorus_incorporation.potential_phosphorus_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "total_phosphorus_uptake",
-            crop.data.total_phosphorus_uptake,
+            crop.phosphorus_incorporation.total_phosphorus_uptake,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "actual_phosphorus_uptakes",
-            crop.data.actual_phosphorus_uptakes,
+            crop.phosphorus_incorporation.actual_phosphorus_uptakes,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
@@ -195,7 +195,7 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "cumulative_evapotranspiration",
-            crop.data.cumulative_evapotranspiration,
+            crop.water_dynamics.cumulative_evapotranspiration,
             dict(info_map, **{"units": MeasurementUnits.MILLIMETERS}),
         )
         self.om.add_variable(
@@ -215,37 +215,37 @@ class FieldDataReporter:
         )
         self.om.add_variable(
             "cut_biomass",
-            crop.data.cut_biomass,
+            crop.crop_management.cut_biomass,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "wet_yield_collected",
-            crop.data.wet_yield_collected,
+            crop.crop_management.wet_yield_collected,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "dry_matter_yield_residue",
-            crop.data.yield_residue,
+            crop.crop_management.yield_residue,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "yield_nitrogen",
-            crop.data.yield_nitrogen,
+            crop.crop_management.yield_nitrogen,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "yield_phosphorus",
-            crop.data.yield_phosphorus,
+            crop.crop_management.yield_phosphorus,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "residue_nitrogen",
-            crop.data.residue_nitrogen,
+            crop.crop_management.residue_nitrogen,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
         self.om.add_variable(
             "residue_phosphorus",
-            crop.data.residue_phosphorus,
+            crop.crop_management.residue_phosphorus,
             dict(info_map, **{"units": MeasurementUnits.KILOGRAMS_PER_HECTARE}),
         )
 

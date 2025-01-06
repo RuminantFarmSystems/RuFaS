@@ -93,10 +93,10 @@ class InputManager:
         self._load_properties()
         valid, message = self.data_validator.validate_properties(self.__metadata, self.metadata_depth_limit)
         if not valid:
-            self._route_logs(self.data_validator.event_logs)
+            self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
-        self._route_logs(self.data_validator.event_logs)
+        self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: Path) -> None:
@@ -579,7 +579,7 @@ class InputManager:
         variable_path = data_address.split(".")
         try:
             self.data_validator.extract_value_by_key_list(self.__pool, variable_path)
-            self._route_logs(self.data_validator.event_logs)
+            self.om.route_logs(self.data_validator.event_logs)
             return True
         except KeyError:
             return False
@@ -1344,36 +1344,3 @@ class InputManager:
         except OSError as e:
             self.om.add_error("Save CSV failure.", f"Unable to save to {output_path} because of {e}.", info_map)
             raise e
-
-    def _route_logs(self, log_pool: list[dict[str, str | dict[str, str]]]) -> None:
-        """Takes logs from other classes and routes them to the appropriate pools in
-        Output Manager.
-
-        Parameters
-        ----------
-        log_pool : List[Dict[str, str | Dict[str, str]]]
-            A list of log, warning, and error dictionaries containing all the components needed
-            to log the information to the appropriate pool.
-        """
-        for log in log_pool:
-            if "error" in log:
-                if (
-                    isinstance(log["error"], str)
-                    and isinstance(log["message"], str)
-                    and isinstance(log["info_map"], dict)
-                ):
-                    self.om.add_error(log["error"], log["message"], log["info_map"])
-            elif "log" in log:
-                if (
-                    isinstance(log["log"], str)
-                    and isinstance(log["message"], str)
-                    and isinstance(log["info_map"], dict)
-                ):
-                    self.om.add_log(log["log"], log["message"], log["info_map"])
-            elif "warning" in log:
-                if (
-                    isinstance(log["warning"], str)
-                    and isinstance(log["message"], str)
-                    and isinstance(log["info_map"], dict)
-                ):
-                    self.om.add_warning(log["warning"], log["message"], log["info_map"])

@@ -10,8 +10,6 @@ class Corn(CropData):
     """Crop data class with default values for corn."""
 
     name: str = "default corn"
-    plant_code: str = "CORN"
-    scientific_name: str = "Zea mays"
     plant_category: PlantCategory = PlantCategory("warm_annual")
     is_nitrogen_fixer: bool = False
 

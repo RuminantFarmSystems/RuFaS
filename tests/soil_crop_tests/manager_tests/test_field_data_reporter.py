@@ -30,7 +30,6 @@ def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: Output
         planting_year=1993,
         root_depth=1,
         biomass=2,
-        usable_light=3,
         biomass_growth_max=4,
     )
     crop = Crop(crop_data)
@@ -50,9 +49,6 @@ def test_send_crop_daily_variables(mocker: MockerFixture, output_manager: Output
     assert pool["FieldDataReporter.send_crop_daily_variables.biomass.field='f1',crop='crop 1',planted=100,1993"][
         "values"
     ] == [2]
-    assert pool["FieldDataReporter.send_crop_daily_variables.usable_light.field='f1',crop='crop 1',planted=100,1993"][
-        "values"
-    ] == [3]
     assert pool[
         (
             "FieldDataReporter.send_crop_daily_variables.biomass_growth_max.field='f1',crop='crop 1',"

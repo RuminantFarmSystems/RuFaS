@@ -2,6 +2,7 @@ from bisect import bisect
 from math import exp, log
 from typing import List, Optional
 
+from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -15,11 +16,59 @@ class NitrogenIncorporation:
     crop_data : Optional[CropData], optional
         An instance of `CropData` containing crop specifications and attributes.
         Defaults to a new instance of `CropData` if not provided.
+    nitrogen_distro_param : float, default 10.0
+        Nitrogen uptake distribution parameter (unitless).
+    nitrogen_shapes : Optional[List[float]], default None
+        Shape coefficients for nitrogen uptake equations (unitless).
+    previous_nitrogen : Optional[float], default None
+        Nitrogen in biomass on the previous day (kg/ha).
+    potential_nitrogen_uptake : Optional[float], default None
+        Potential nitrogen uptake under ideal conditions (kg/ha).
+    layer_nitrogen_potentials : Optional[float], default None
+        Potential nitrogen uptake from each soil layer (kg/ha).
+    unmet_nitrogen_demands : Optional[float], default None
+        Unmet nitrogen demands by overlaying soil layers (kg/ha).
+    nitrogen_requests : Optional[float], default None
+        Nitrogen requested from each soil layer (kg/ha).
+    actual_nitrogen_uptakes : Optional[List[float]], default None
+        Actual nitrogen uptake from each soil layer (kg/ha).
+    total_nitrogen_uptake : Optional[float], default None
+        Total nitrogen uptake by the plant (kg/ha).
+    fixed_nitrogen : Optional[float], default None
+        Total nitrogen fixed by the plant (kg/ha).
+    nitrate_factor : Optional[float], default None
+        Soil nitrate factor (unitless).
+    fixation_stage_factor : Optional[float], default None
+        Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     Attributes
     ----------
     data : CropData
         Reference to the provided `CropData` instance or a new default instance.
+    nitrogen_distro_param : float
+        Nitrogen uptake distribution parameter (unitless).
+    nitrogen_shapes : Optional[List[float]]
+        Shape coefficients for nitrogen uptake equations (unitless).
+    previous_nitrogen : Optional[float]
+        Nitrogen in biomass on the previous day (kg/ha).
+    potential_nitrogen_uptake : Optional[float]
+        Potential nitrogen uptake under ideal conditions (kg/ha).
+    layer_nitrogen_potentials : Optional[float]
+        Potential nitrogen uptake from each soil layer (kg/ha).
+    unmet_nitrogen_demands : Optional[float]
+        Unmet nitrogen demands by overlaying soil layers (kg/ha).
+    nitrogen_requests : Optional[float]
+        Nitrogen requested from each soil layer (kg/ha).
+    actual_nitrogen_uptakes : Optional[List[float]]
+        Actual nitrogen uptake from each soil layer (kg/ha).
+    total_nitrogen_uptake : Optional[float]
+        Total nitrogen uptake by the plant (kg/ha).
+    fixed_nitrogen : Optional[float]
+        Total nitrogen fixed by the plant (kg/ha).
+    nitrate_factor : Optional[float]
+        Soil nitrate factor (unitless).
+    fixation_stage_factor : Optional[float]
+        Growth stage factor for nitrogen-fixing symbiotes (unitless).
 
     References
     ----------
@@ -27,10 +76,37 @@ class NitrogenIncorporation:
 
     """
 
-    def __init__(self, crop_data: Optional[CropData] = None):
-        self.data = crop_data or CropData()  # initialize with defaults, if not given
+    def __init__(
+        self,
+        crop_data: Optional[CropData] = None,
+        nitrogen_distro_param: float = 10.0,
+        nitrogen_shapes: Optional[List[float]] = None,
+        previous_nitrogen: Optional[float] = None,
+        potential_nitrogen_uptake: Optional[float] = None,
+        layer_nitrogen_potentials: Optional[float] = None,
+        unmet_nitrogen_demands: Optional[float] = None,
+        nitrogen_requests: Optional[float] = None,
+        actual_nitrogen_uptakes: Optional[List[float]] = None,
+        total_nitrogen_uptake: Optional[float] = None,
+        fixed_nitrogen: Optional[float] = None,
+        nitrate_factor: Optional[float] = None,
+        fixation_stage_factor: Optional[float] = None,
+    ):
+        self.data = crop_data or CropData()
 
-    # ---- wrapper functions (main routines) ----
+        self.nitrogen_distro_param = nitrogen_distro_param
+        self.nitrogen_shapes = nitrogen_shapes
+        self.previous_nitrogen = previous_nitrogen
+        self.potential_nitrogen_uptake = potential_nitrogen_uptake
+        self.layer_nitrogen_potentials = layer_nitrogen_potentials
+        self.unmet_nitrogen_demands = unmet_nitrogen_demands
+        self.nitrogen_requests = nitrogen_requests
+        self.actual_nitrogen_uptakes = actual_nitrogen_uptakes
+        self.total_nitrogen_uptake = total_nitrogen_uptake
+        self.fixed_nitrogen = fixed_nitrogen
+        self.nitrate_factor = nitrate_factor
+        self.fixation_stage_factor = fixation_stage_factor
+
     def incorporate_nitrogen(self, soil_data: SoilData) -> None:
         """
         Main nitrogen incorporation function that runs all nitrogen processes and stores nitrogen as biomass.
@@ -54,7 +130,7 @@ class NitrogenIncorporation:
         soil_water_factor = soil_data.soil_water_factor
 
         self.shift_nitrogen_time()
-        self.data.nitrogen_shapes = self.determine_nutrient_shape_parameters(
+        self.nitrogen_shapes = self.determine_nutrient_shape_parameters(
             self.data.half_mature_heat_fraction,
             self.data.mature_heat_fraction,
             self.data.emergence_nitrogen_fraction,
@@ -65,18 +141,18 @@ class NitrogenIncorporation:
             self.data.heat_fraction,
             self.data.emergence_nitrogen_fraction,
             self.data.mature_nitrogen_fraction,
-            self.data.nitrogen_shapes[0],
-            self.data.nitrogen_shapes[1],
+            self.nitrogen_shapes[0],
+            self.nitrogen_shapes[1],
         )
         self.data.optimal_nitrogen = self.determine_optimal_nutrient(
             self.data.optimal_nitrogen_fraction, self.data.biomass
         )
-        if self.data.optimal_nitrogen - self.data.previous_nitrogen < 0:
-            self.data.potential_nitrogen_uptake = 0
+        if self.data.optimal_nitrogen - self.previous_nitrogen < 0:
+            self.potential_nitrogen_uptake = 0
         else:
-            self.data.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
+            self.potential_nitrogen_uptake = self.determine_potential_nutrient_uptake(
                 self.data.optimal_nitrogen,
-                self.data.previous_nitrogen,
+                self.previous_nitrogen,
                 self.data.mature_nitrogen_fraction,
                 self.data.biomass_growth_max,
             )
@@ -85,9 +161,9 @@ class NitrogenIncorporation:
         total_accessible_nitrates = sum(self.access_layers(layer_nitrates))
         self.try_fixation(total_accessible_nitrates, soil_water_factor)
         self.data.nitrogen = self.determine_stored_nutrient(
-            self.data.total_nitrogen_uptake,
+            self.total_nitrogen_uptake,
             self.data.nitrogen,
-            self.data.fixed_nitrogen,
+            self.fixed_nitrogen,
         )
 
     def uptake_nitrogen(self, layer_nitrates: List[float], layer_depths: List[float]) -> None:
@@ -110,22 +186,22 @@ class NitrogenIncorporation:
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_nitrates = self.access_layers(layer_nitrates)
-        self.data.layer_nitrogen_potentials = self.determine_layer_nutrient_uptake_potential(
+        self.layer_nitrogen_potentials = self.determine_layer_nutrient_uptake_potential(
             accessible_depths,
-            self.data.potential_nitrogen_uptake,
+            self.potential_nitrogen_uptake,
             self.data.root_depth,
-            self.data.nitrogen_distro_param,
+            self.nitrogen_distro_param,
         )
-        self.data.unmet_nitrogen_demands = self.determine_layer_nutrient_demands(
-            self.data.layer_nitrogen_potentials, accessible_nitrates
+        self.unmet_nitrogen_demands = self.determine_layer_nutrient_demands(
+            self.layer_nitrogen_potentials, accessible_nitrates
         )
-        self.data.nitrogen_requests = self.determine_layer_nutrient_uptake(
-            self.data.unmet_nitrogen_demands,
-            self.data.layer_nitrogen_potentials,
+        self.nitrogen_requests = self.determine_layer_nutrient_uptake(
+            self.unmet_nitrogen_demands,
+            self.layer_nitrogen_potentials,
             accessible_nitrates,
         )
-        self.data.actual_nitrogen_uptakes = self.determine_layer_extracted_resource(
-            self.data.nitrogen_requests, accessible_nitrates
+        self.actual_nitrogen_uptakes = self.determine_layer_extracted_resource(
+            self.nitrogen_requests, accessible_nitrates
         )
         self.extend_nitrate_uptakes_to_full_profile()
         self.extract_nitrogen_from_soil_layers(layer_nitrates)
@@ -137,7 +213,7 @@ class NitrogenIncorporation:
         Copies the current nitrogen value to previous_nitrogen (for use between time steps).
 
         """
-        self.data.previous_nitrogen = self.data.nitrogen
+        self.previous_nitrogen = self.data.nitrogen
 
     def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
         """
@@ -189,7 +265,7 @@ class NitrogenIncorporation:
 
         """
         if self.data.inaccessible_soil_layers > 0:
-            self.data.actual_nitrogen_uptakes += [0] * self.data.inaccessible_soil_layers
+            self.actual_nitrogen_uptakes += [0] * self.data.inaccessible_soil_layers
 
     def extract_nitrogen_from_soil_layers(self, layer_nitrates: List[float]) -> None:
         """
@@ -207,11 +283,11 @@ class NitrogenIncorporation:
         are subtracted from the nitrate content of each corresponding soil layer.
 
         """
-        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.data.actual_nitrogen_uptakes)]
+        layer_nitrates[:] = [max(src - snk, 0) for src, snk in zip(layer_nitrates, self.actual_nitrogen_uptakes)]
 
     def tally_total_nitrogen_uptake(self) -> None:
         """determines total nitrogen extracted from soil by summing actual uptake from each layer"""
-        self.data.total_nitrogen_uptake = sum(self.data.actual_nitrogen_uptakes)
+        self.total_nitrogen_uptake = sum(self.actual_nitrogen_uptakes)
 
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
         """
@@ -237,7 +313,7 @@ class NitrogenIncorporation:
             self.update_fixation_attributes(total_accessible_nitrates)
             self.fix_nitrogen(soil_water_factor)
         else:
-            self.data.fixed_nitrogen = 0
+            self.fixed_nitrogen = 0
 
     def update_fixation_attributes(self, total_accessible_nitrates: float) -> None:
         """
@@ -249,8 +325,8 @@ class NitrogenIncorporation:
             The total nitrates accessible to the plant's roots.
 
         """
-        self.data.nitrate_factor = self._determine_nitrate_factor(total_accessible_nitrates)
-        self.data.fixation_stage_factor = self._determine_fixation_stage_factor(self.data.heat_fraction)
+        self.nitrate_factor = self._determine_nitrate_factor(total_accessible_nitrates)
+        self.fixation_stage_factor = self._determine_fixation_stage_factor(self.data.heat_fraction)
 
     def fix_nitrogen(self, water_factor: float) -> None:
         """
@@ -263,16 +339,16 @@ class NitrogenIncorporation:
             (unitless).
 
         """
-        unmet_demand = self.data.potential_nitrogen_uptake - self.data.total_nitrogen_uptake
+        unmet_demand = self.potential_nitrogen_uptake - self.total_nitrogen_uptake
         if unmet_demand > 0:
-            self.data.fixed_nitrogen = self._determine_fixed_nitrogen(
+            self.fixed_nitrogen = self._determine_fixed_nitrogen(
                 unmet_demand,
-                stage_factor=self.data.fixation_stage_factor,
+                stage_factor=self.fixation_stage_factor,
                 water_factor=water_factor,
-                nitrate_factor=self.data.nitrate_factor,
+                nitrate_factor=self.nitrate_factor,
             )
         else:
-            self.data.fixed_nitrogen = 0
+            self.fixed_nitrogen = 0
 
     # ---- static methods ----
     @staticmethod
@@ -322,6 +398,17 @@ class NitrogenIncorporation:
 
         """
         if mature_heat_fraction == half_mature_heat_fraction:  # leads to divide by 0
+            info_map = {
+                "class": NitrogenIncorporation.__class__.__name__,
+                "function": NitrogenIncorporation.determine_nutrient_shape_parameters.__name__,
+            }
+            om = OutputManager()
+            om.add_error(
+                "A crop's half mature heat fraction and mature heat fraction are equal.",
+                f"Half mature heat fraction and mature heat fraction are both {mature_heat_fraction},"
+                f" this results in a divide by zero error.",
+                info_map,
+            )
             raise ValueError("half_mature_heat_fraction must not equal mature_heat_fraction")
         # 1st shape parameter
         log_half = NitrogenIncorporation._determine_shape_log(
@@ -395,7 +482,11 @@ class NitrogenIncorporation:
         SWAT 5:2.3.2, 5:2.3.3, 5:2.3.20, 5:2.3.21
 
         """
-        # throw an error if any parameters do not satisfy [0-1]
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation._determine_shape_log.__name__,
+        }
+        om = OutputManager()
         if (
             nitrogen_fraction < 0
             or nitrogen_fraction > 1
@@ -406,24 +497,55 @@ class NitrogenIncorporation:
             or emergence_nitrogen_fraction < 0
             or emergence_nitrogen_fraction > 1
         ):
+            om.add_error(
+                "Received invalid fractional value",
+                f"All following values must be in the range (0, 1), received {nitrogen_fraction=}, {heat_fraction=}"
+                f", {mature_nitrogen_fraction=}, {emergence_nitrogen_fraction=}.",
+                info_map,
+            )
             frac_error_msg = (
                 "nitrogen_fraction, heat_fraction, mature_nitrogen_fraction, and"
                 + " emergence_nitrogen_fraction must all be between 0 and 1"
             )
             raise ValueError(frac_error_msg)
-        if emergence_nitrogen_fraction == mature_nitrogen_fraction:  # leads to divide by zero
+        if emergence_nitrogen_fraction == mature_nitrogen_fraction:
+            om.add_error(
+                "A crop's emergence_nitrogen_fraction and mature_nitrogen_fraction are equal.",
+                f"The emergence_nitrogen_fraction and mature_nitrogen_fraction are both"
+                f" {emergence_nitrogen_fraction}, this results in a divide by zero error.",
+                info_map,
+            )
             raise ValueError("emergence_nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
-        if nitrogen_fraction == emergence_nitrogen_fraction:  # leads to divide by zero
+        if nitrogen_fraction == emergence_nitrogen_fraction:
+            om.add_error(
+                "A crop's emergence_nitrogen_fraction and nitrogen_fraction are equal.",
+                f"The emergence_nitrogen_fraction and nitrogen_fraction are both"
+                f" {emergence_nitrogen_fraction}, this results in a divide by zero error.",
+                info_map,
+            )
             raise ValueError("nitrogen_fraction must not be equivalent to emergence_nitrogen_fraction")
-        if nitrogen_fraction == mature_nitrogen_fraction:  # leads to log(0)
+        if nitrogen_fraction == mature_nitrogen_fraction:
+            om.add_error(
+                "A crop's nitrogen_fraction and mature_nitrogen_fraction are equal.",
+                f"The nitrogen_fraction and mature_nitrogen_fraction are both"
+                f" {mature_nitrogen_fraction}, this results in a divide by zero error.",
+                info_map,
+            )
             raise ValueError("nitrogen_fraction must not be equivalent to mature_nitrogen_fraction")
-        if (
-            nitrogen_fraction > emergence_nitrogen_fraction or nitrogen_fraction == emergence_nitrogen_fraction
-        ):  # leads to ln(-y) or divide by 0
+        if nitrogen_fraction > emergence_nitrogen_fraction:
+            om.add_error(
+                "A crop's nitrogen_fraction is greater than emergence_nitrogen_fraction.",
+                f"The nitrogen_fraction is greater than mature_nitrogen_fraction,"
+                f" nitrogen_fraction is {mature_nitrogen_fraction} and mature_nitrogen_fraction is"
+                f" {emergence_nitrogen_fraction}, this results in ln(-y) calculation.",
+                info_map,
+            )
             raise ValueError("nitrogen_fraction must be less than emergence_nitrogen_fraction")
-        if nitrogen_fraction == 0:  # leads to ln(0)
+        if nitrogen_fraction == 0:
+            om.add_error("Invalid nitrogen_fraction.", "nitrogen_fraction can not be 0.", info_map)
             raise ValueError("nitrogen_fraction must be greater than 0")
         if heat_fraction == 0:
+            om.add_error("Invalid heat_fraction.", "heat_fraction can not be 0.", info_map)
             raise ValueError("heat_fraction must be greater than 0")
 
         # calculate first component of formula
@@ -433,6 +555,17 @@ class NitrogenIncorporation:
 
         # additional check
         if denominator > 1:  # leads to log(-y)
+            om.add_error(
+                "Invalid value pair for nitrogen_fraction and mature_nitrogen_fraction or"
+                " emergence_nitrogen_fraction and mature_nitrogen_fraction or both pairs.",
+                "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
+                " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
+                f"is negative, which will leads to log(-y) calculation. \nIs nitrogen_fraction({nitrogen_fraction}) <"
+                f" mature_nitrogen_fraction({mature_nitrogen_fraction}) or"
+                f" emergence_nitrogen_fraction({emergence_nitrogen_fraction}) <"
+                f" mature_nitrogen_fraction({mature_nitrogen_fraction})?",
+                info_map,
+            )
             raise ValueError(
                 "the quantity (nitrogen_fraction - mature_nitrogen_fraction) /"
                 + " (emergence_nitrogen_fraction - mature_nitrogen_fraction)"
@@ -569,6 +702,14 @@ class NitrogenIncorporation:
 
         """
         if root_depth < 0.0:
+            info_map = {
+                "class": NitrogenIncorporation.__class__.__name__,
+                "function": NitrogenIncorporation.determine_deepest_accessible_layer.__name__,
+            }
+            om = OutputManager()
+            om.add_error(
+                "Invalid root depth.", f"Root depth must be >= 0, provided root depth is {root_depth}.", info_map
+            )
             raise ValueError("root_depth cannot be less than zero")
         elif root_depth == 0.0:
             return 0
@@ -619,13 +760,28 @@ class NitrogenIncorporation:
         pseudocode: C.5.C.2, C.5.C.3
 
         """
-        # check that boundaries are in ascending order
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation.determine_layer_nutrient_uptake_potential.__name__,
+        }
+        om = OutputManager()
         sorted_boundaries = layer_bounds.copy()
         sorted_boundaries.sort()
         if sorted_boundaries != layer_bounds:
+            om.add_error(
+                "Invalid layer boundaries order.",
+                f"Boundaries must be in ascending order (deeper layers follow shallower ones),"
+                f" received {layer_bounds}.",
+                info_map,
+            )
             raise ValueError("boundaries must be in ascending order (deeper layers follow shallower ones)")
         # check that there aren't duplicates (each layer should have a unique depth)
         if len(layer_bounds) != len(set(layer_bounds)):
+            om.add_error(
+                "Invalid layer boundaries depth.",
+                f"Boundaries all have different depth, received {layer_bounds}.",
+                info_map,
+            )
             raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
         # calculate results
         boundary_nitrogen = [
@@ -672,8 +828,18 @@ class NitrogenIncorporation:
         SWAT 5:2.3.6, 5:2.3.24
 
         """
-        # error checks
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation._determine_nitrogen_uptake_to_depth.__name__,
+        }
+        om = OutputManager()
         if nitrogen_distribution_parameter == 0:
+            om.add_error(
+                "Invalid nitrogen_distribution_parameter.",
+                "Received invalid value 0 for nitrogen_distribution_parameter. 0 nitrogen_distribution_parameter"
+                " will lead to exp(0) calculation.",
+                info_map,
+            )
             raise ValueError("nitrogen_distribution_parameter cannot equal 0")
         # calculate results
         if root_depth <= 0:
@@ -740,7 +906,19 @@ class NitrogenIncorporation:
 
         """
         # ensure all list inputs are the same length
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation.determine_layer_nutrient_uptake.__name__,
+        }
+        om = OutputManager()
         if len(layer_uptake_potentials) != len(layer_demands) or len(layer_uptake_potentials) != len(layer_nutrient):
+            om.add_error(
+                "Invalid layer_potential, layer_demand, and layer_nitrate length.",
+                "layer_potential, layer_demand, and layer_nitrate length do not have equal length,"
+                f"length of layer_potential, layer_demand, and layer_nitrate are"
+                f" {len(layer_uptake_potentials)}, {len(layer_demands)} and {len(layer_nutrient)}.",
+                info_map,
+            )
             raise ValueError("layer_potential, layer_demand, and layer_nitrate must be the same length")
         # calculate results
         layer_desired = [potential + demand for potential, demand in zip(layer_uptake_potentials, layer_demands)]
@@ -768,7 +946,17 @@ class NitrogenIncorporation:
         SWAT 5:2.3.8, 5:2.3.26
 
         """
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation.determine_layer_extracted_resource.__name__,
+        }
+        om = OutputManager()
         if len(requests) != len(sources):
+            om.add_error(
+                "Invalid requests and sources length.",
+                f"The length of requests({len(requests)}) and sources({len(sources)}) are unequal.",
+                info_map,
+            )
             raise ValueError("requests and sources should be the same length")
         return [NitrogenIncorporation._determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
 
@@ -900,11 +1088,27 @@ class NitrogenIncorporation:
         SWAT 5:2.3.9
 
         """
+        info_map = {
+            "class": NitrogenIncorporation.__class__.__name__,
+            "function": NitrogenIncorporation._determine_fixed_nitrogen.__name__,
+        }
+        om = OutputManager()
         if not 0 <= stage_factor <= 1:
+            om.add_error(
+                "Invalid stage_factor.", f"stage_factor must be between 0 and 1, received {stage_factor}.", info_map
+            )
             raise ValueError("stage_factor must be between 0 and 1")
         if not 0 <= water_factor <= 1:
+            om.add_error(
+                "Invalid water_factor.", f"water_factor must be between 0 and 1, received {water_factor}.", info_map
+            )
             raise ValueError("water_factor must be between 0 and 1")
         if not 0 <= nitrate_factor <= 1:
+            om.add_error(
+                "Invalid nitrate_factor.",
+                f"nitrate_factor must be between 0 and 1, received {nitrate_factor}.",
+                info_map,
+            )
             raise ValueError("nitrate_factor must be between 0 and 1")
 
         fixed = demand * stage_factor * min(water_factor, nitrate_factor, 1)

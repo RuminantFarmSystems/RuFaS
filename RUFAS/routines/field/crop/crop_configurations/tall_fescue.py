@@ -10,8 +10,6 @@ class TallFescue(CropData):
     """crop data class with default values for tall fescue"""
 
     name: str = "default tall_fescue"
-    plant_code: str = "FESC"
-    scientific_name: str = "Festuca arundinaceae"
     plant_category: PlantCategory = PlantCategory("perennial")
     is_nitrogen_fixer: bool = False
 

@@ -12,8 +12,6 @@ class WinterWheat(CropData):
     """
 
     name: str = "default winter_wheat"
-    plant_code: str = "WWHT"
-    scientific_name: str = "Triticum aestivum"
     plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
