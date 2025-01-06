@@ -145,7 +145,13 @@ class CalfRationManager:
 
     @classmethod
     def calc_intake(
-        cls, birth_weight: float, body_weight: float, wean_day: int, wean_length: int, available_feeds: list[NASEMFeed, NRCFeed], nutrient_standard: NutrientStandard,
+        cls,
+        birth_weight: float,
+        body_weight: float,
+        wean_day: int,
+        wean_length: int,
+        available_feeds: list[NASEMFeed, NRCFeed],
+        nutrient_standard: NutrientStandard,
     ) -> dict[str, float]:
         """
         Calculates the amounts of whole milk, milk replacer, and starter that a calf consumes.
@@ -211,7 +217,9 @@ class CalfRationManager:
 
         dry_matter_intake = whole_milk_intake + milk_replacer_intake + starter_intake
 
-        starter_metabolizable_energy = (1.01 * starter_digestible_energy - 0.45) + 0.0046 * (starter_digestible_energy - 3)
+        starter_metabolizable_energy = (1.01 * starter_digestible_energy - 0.45) + 0.0046 * (
+            starter_digestible_energy - 3
+        )
 
         milk_me_intake = (
             whole_milk_metabolizable_energy * whole_milk_intake
@@ -229,7 +237,9 @@ class CalfRationManager:
         starter_cp_intake = GeneralConstants.PERCENTAGE_TO_FRACTION * starter.CP * starter_intake
         total_cp_intake = milk_cp_intake + starter_cp_intake
 
-        adp_intake = (0.93 * milk_cp_intake / total_cp_intake + 0.75 * starter_cp_intake / total_cp_intake) * GeneralConstants.KG_TO_GRAMS
+        adp_intake = (
+            0.93 * milk_cp_intake / total_cp_intake + 0.75 * starter_cp_intake / total_cp_intake
+        ) * GeneralConstants.KG_TO_GRAMS
 
         milk_proportion = (whole_milk_intake + milk_replacer_intake) / dry_matter_intake
         starter_proportion = starter_intake / dry_matter_intake
