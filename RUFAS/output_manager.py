@@ -1296,7 +1296,7 @@ class OutputManager(object):
                 self.add_error(error_title, error_msg, info_map)
 
         slice_start: int = filter_content.get("slice_start", 0)
-        slice_end: int | None = filter_content.get("slice_end")
+        slice_end: int | None = filter_content.get("slice_end", None)
         for key in results.keys():
             if "info_maps" in results[key].keys():
                 results[key]["info_maps"] = results[key]["info_maps"][slice_start:slice_end]
