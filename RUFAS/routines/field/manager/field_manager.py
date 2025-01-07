@@ -253,6 +253,7 @@ class FieldManager:
                 "N": mix["N"],
                 "P": mix["P"],
                 "K": mix["K"],
+                "ammonium_fraction": mix["ammonium_fraction"],
             }
 
         fertilizer_application_schedule = FertilizerSchedule(
