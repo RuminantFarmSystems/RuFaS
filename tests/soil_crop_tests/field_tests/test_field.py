@@ -328,12 +328,8 @@ def test_check_manure_application_schedule() -> None:
     field._filter_events.assert_called_once_with(manure_events, mocked_time)
     assert field.manure_events == [manure_events[2]], "Expected remaining events after filtering."
     expected_requests = [
-        ManureEventNutrientRequest(
-            "field1", filtered_manure_events[0], "Request for 1991-120"
-        ),
-        ManureEventNutrientRequest(
-            "field1", filtered_manure_events[1], "Request for 1992-120"
-        ),
+        ManureEventNutrientRequest("field1", filtered_manure_events[0], "Request for 1991-120"),
+        ManureEventNutrientRequest("field1", filtered_manure_events[1], "Request for 1992-120"),
     ]
     assert manure_requests == expected_requests, "Expected manure requests do not match."
     field._create_manure_request.assert_any_call(filtered_manure_events[0])
