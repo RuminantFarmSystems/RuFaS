@@ -316,7 +316,7 @@ class HerdFactory:
 
         return post_animals
 
-    def initialize_herd(self) -> None:
+    def initialize_herd(self) -> AnimalPopulation:
         """
         Initialize an AnimalPopulation object for simulation, either from input data or generate from simulation. This
         function also optionally saves the generated herd data into a JSON file.
@@ -339,9 +339,4 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
-        self.im.add_dict_variable_to_pool(
-            variable_name="runtime_animal_population",
-            data=self.post_animal_population.__repr__(),
-            properties_blob_key="animal_population_properties",
-            eager_termination=False,
-        )
+        return self.pre_animal_population

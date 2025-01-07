@@ -10,10 +10,10 @@ import numpy
 from SALib.sample import ff as fractional_factorial_sampler
 from SALib.sample import saltelli as saltelli_sampler
 
+from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.e2e_test_results_comparer import E2ETestResultsComparer
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import LogVerbosity, OutputManager
-from RUFAS.routines.animal.life_cycle.herd_factory import HerdFactory
 from RUFAS.simulation_engine import SimulationEngine
 from RUFAS.units import MeasurementUnits
 from RUFAS.util import Utility

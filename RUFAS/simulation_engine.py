@@ -6,7 +6,6 @@ from enum import Enum
 from RUFAS import routines
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_manager import AnimalManager
 from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.feed.feed import Feed
 from RUFAS.routines.feed_storage.feed_manager import FeedManager
@@ -15,6 +14,7 @@ from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 from RUFAS.weather import Weather
+from .biophysical.animal.herd_manager import HerdManager
 
 from .routines.EEE.EEE_manager import EEEManager
 
@@ -45,8 +45,8 @@ class SimulationEngine:
         The time object that contains methods for accessing and manipulating the simulation time.
     feed: Feed
         The Feed object that stores the information for the feeds managed by the farm, and the methods for storage.
-    animal_manager: AnimalManager
-        The AnimalManager object that manages all animal routines.
+    herd_manager: HerdManager
+        The HerdManager object that manages all animal in the herd.
     manure_manager: ManureManager
         The ManureManager object that sets up and manages different manure management components including manure
         handlers, reception pits, manure separators, and manure storage treatments.
@@ -87,9 +87,9 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
-        AnimalModuleReporter.report_end_of_simulation(
-            self.animal_manager.life_cycle_manager, self.time, self.animal_manager.heiferIIs, self.animal_manager.cows
-        )
+        # AnimalModuleReporter.report_end_of_simulation(
+        #     self.animal_manager.life_cycle_manager, self.time, self.animal_manager.heiferIIs, self.animal_manager.cows
+        # )
         available_feeds_on_final_day = [
             {k: v.value if isinstance(v, Enum) else v for k, v in feed.items()}
             for feed in self.feed_manager.query_available_feeds()
@@ -129,11 +129,11 @@ class SimulationEngine:
             if process_degradations_today:
                 self.feed_manager.process_degradations(self.weather, self.time)
 
-        self.animal_manager.daily_updates(self.feed, self.weather, self.time)
-        all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
-        self.manure_manager.daily_update(all_pen_manure_data, self.animal_manager.simulation_day)
+        self.herd_manager.daily_routines(self.feed, self.weather, self.time)
+        all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
+        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
         self.field_manager.daily_update_routine(self.weather, self.time)
-        routines.daily_feed_routine(self.feed, self.field_manager, self.animal_manager)
+        routines.daily_feed_routine(self.feed, self.field_manager, self.herd_manager)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -146,7 +146,6 @@ class SimulationEngine:
         """
 
         self.time.advance()
-        self.animal_manager.simulation_day += 1
 
     def _run_pre_annual_routines(self) -> None:
         """TODO GitHub issue #137"""
@@ -198,8 +197,8 @@ class SimulationEngine:
         animal_class_config = self.im.get_data("animal")
         animal_class_config["manure_management_scenarios"] = manure_class_config["manure_management_scenarios"]
 
-        self.animal_manager = AnimalManager(animal_class_config, self.feed, self.weather, self.time)
-        all_pen_manure_data = self.animal_manager.collect_pen_manure_data()
+        self.herd_manager = HerdManager(self.feed, self.weather, self.time)
+        all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager = ManureManager(
             all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals

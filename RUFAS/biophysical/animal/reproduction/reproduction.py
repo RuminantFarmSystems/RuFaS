@@ -1,5 +1,4 @@
 import math
-import sys
 from dataclasses import asdict
 from random import random
 from typing import Callable, Union, Any
@@ -15,7 +14,7 @@ from RUFAS.biophysical.animal.data_types.preg_check_config import PregnancyCheck
 from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, \
     CowReproductionProtocol, ReproStateEnum, CowTAISubProtocol, CowPreSynchSubProtocol, CowReSynchSubProtocol, \
     HeiferTAISubProtocol, HeiferSynchEDSubProtocol
-from RUFAS.biophysical.animal.data_types.reproduction_io import (ReproductionOutputs, ReproductionInputs,
+from RUFAS.biophysical.animal.data_types.reproduction import (ReproductionOutputs, ReproductionInputs,
                                                                  ReproductionDataStream, AnimalReproductionStatistics,
                                                                  HerdReproductionStatistics)
 
@@ -129,6 +128,7 @@ class Reproduction:
             calving_interval_history: list[int] = None,
             body_weight_at_calving: float = 0.0,
             do_not_breed: bool = None,
+            estrus_count: int = 0
     ) -> None:
         self.heifer_reproduction_program = HeiferReproductionProtocol(AnimalConfig.heifer_reproduction_program) \
             if heifer_reproduction_program is None else heifer_reproduction_program

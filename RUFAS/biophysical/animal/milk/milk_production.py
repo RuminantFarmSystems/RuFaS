@@ -47,6 +47,16 @@ class MilkProduction:
     wood_n: float
     milk_production_history: list[MilkProductionRecord]
 
+    def __init__(self) -> None:
+        self.daily_milk_produced = 0.0
+        self.crude_protein_content = 0.0
+        self.true_protein_content = 0.0
+        self.fat_content = 0.0
+        self.lactose_content = 0.0
+        self.milk_production_reduction = 0.0
+        self.current_lactation_305_day_milk_produced = 0.0
+        self.milk_production_history = []
+
     @classmethod
     def set_milk_quality(cls, fat_percent: float, true_protein_percent: float) -> None:
         """Sets user-defined milk qualities."""

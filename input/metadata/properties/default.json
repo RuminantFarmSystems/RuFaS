@@ -859,6 +859,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -914,6 +919,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -968,6 +978,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1005,12 +1020,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1098,6 +1113,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1135,12 +1155,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
+          "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1228,6 +1248,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1265,12 +1290,21 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
+          "type": "string",
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$"
+        },
+        "heifer_reproduction_sub_protocol": {
+          "type": "string",
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+        },
+        "cow_reproduction_program": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "repro_sub_protocol": {
+        "cow_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1388,6 +1422,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1425,14 +1464,16 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|ED-TAI)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$",
+          "default": "N/A"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+          "default": "N/A"
         },
         "estrus_count": {
           "type": "number",

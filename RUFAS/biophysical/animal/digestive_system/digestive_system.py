@@ -59,7 +59,7 @@ class DigestiveSystem:
         elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
                 AnimalConfig.methane_model,
-                digestive_system_inputs.nutrients["dm"],
+                0.0,
                 digestive_system_inputs.nutrient_concentrations,
             )
 
