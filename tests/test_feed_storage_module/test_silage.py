@@ -80,7 +80,6 @@ def test_process_degradations(
     assert npn_coefficient.call_count == (len(silage.stored) if days_of_loss else 0)
     assert cp_coeffient.call_count == (len(silage.stored) if days_of_loss else 0)
     assert reset_attributes.call_count == (len(silage.stored) if days_of_loss else 0)
-    print(add_variable.call_count)
     add_variable.assert_has_calls(
         [
             call("total_effluent_dry_matter_loss", expected_dry_loss, expected_info_map),
