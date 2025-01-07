@@ -1,7 +1,6 @@
 from typing import NamedTuple, Optional
 from dataclasses import dataclass, fields
 from RUFAS.data_structures.events import ManureEvent
-from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
 import math
 
