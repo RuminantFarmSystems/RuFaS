@@ -1,3 +1,4 @@
+from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.time import Time
 
 
@@ -10,6 +11,6 @@ class AnimalGenetics:
         pass
         return 0.0
 
-    def assign_net_merit_value_to_newborn_calf(self, time: Time, dam_net_merit_value: float) -> float:
+    def assign_net_merit_value_to_newborn_calf(self, time: Time, breed: Breed, dam_net_merit_value: float) -> float:
         pass
         return 0.0

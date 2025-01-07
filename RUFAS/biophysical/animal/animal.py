@@ -344,9 +344,18 @@ class Animal:
             reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(
                 reproduction_inputs, time)
 
+            self.body_weight = reproduction_outputs.body_weight
+            self.events += reproduction_outputs.events
+            self.days_in_milk = reproduction_outputs.days_in_milk
+            self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+            self.nutrients.phosphorus_for_gestation_required_for_calf = (
+                reproduction_outputs.phosphorus_for_gestation_required_for_calf)
+
             if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
                 daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
                 daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
+                self.future_death_date = self.determine_future_death_date()
+                self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
         return daily_routines_output
 
@@ -524,6 +533,97 @@ class Animal:
             "net_merit": self.net_merit,
         }
 
+    def determine_future_death_date(self) -> int:
+        """
+        Determine the future death date of the animal based on its parity.
+
+        Returns
+        -------
+        int
+            Calculated future death date in simulation days.
+        """
+        if self.reproduction.calves >= 4:
+            death_rate = AnimalConfig.parity_death_probability[3]
+        else:
+            death_rate = AnimalConfig.parity_death_probability[self.reproduction.calves - 1]
+        death_rand = random()
+        if death_rand <= death_rate:
+            death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
+            death_date_random = random()
+            for i in range(len(AnimalConfig.death_day_probability) - 1):
+                if (
+                        AnimalConfig.death_day_probability[i]
+                        <= death_date_random
+                        < AnimalConfig.death_day_probability[i + 1]
+                ):
+                    death_lower_limit = AnimalConfig.death_day_probability[i]
+                    death_upper_limit = AnimalConfig.death_day_probability[i + 1]
+                    death_time_lower_limit = AnimalConfig.cull_day_count[i]
+                    death_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
+            n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
+            return round(
+                death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
+            )
+        return sys.maxsize
+
+    def determine_future_cull_date(self) -> tuple[int, str]:
+        """
+        Determine the future cull date and reason for the animal based on parity-specific probabilities.
+
+        Returns
+        -------
+        tuple[int, str]
+            Future cull date in simulation days and reason for culling.
+        """
+        cull_reason = ""
+        future_cull_date = sys.maxsize
+        if self.reproduction.calves >= 4:
+            inv_cull_rate = AnimalConfig.parity_cull_probability[3]
+        else:
+            inv_cull_rate = AnimalConfig.parity_cull_probability[self.reproduction.calves - 1]
+        cull_rand = random()
+        if cull_rand <= inv_cull_rate:
+            cull_reason_rand = random()
+            cull_prob = 0
+            if cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.feet_leg_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.feet_leg_cull_day_probability
+                cull_reason = animal_constants.LAMENESS_CULL
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.injury_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.injury_cull_day_probability
+                cull_reason = animal_constants.INJURY_CULL
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.mastitis_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.mastitis_cull_day_probability
+                cull_reason = animal_constants.MASTITIS_CULL
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.disease_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.disease_cull_day_probability
+                cull_reason = animal_constants.DISEASE_CULL
+
+            elif cull_reason_rand <= (cull_prob + AnimalConfig.udder_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.udder_cull_day_probability
+                cull_reason = animal_constants.UDDER_CULL
+
+            else:
+                cull_reason_cull_prob = AnimalConfig.unknown_cull_day_probability
+                cull_reason = animal_constants.UNKNOWN_CULL
+
+            cull_time_rand = random()
+            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
+            for i in range(len(cull_reason_cull_prob) - 1):
+                if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
+                    cull_reason_lower_limit = cull_reason_cull_prob[i]
+                    cull_reason_upper_limit = cull_reason_cull_prob[i + 1]
+                    cull_time_lower_limit = AnimalConfig.cull_day_count[i]
+                    cull_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
+            x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
+            future_cull_date = round(
+                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born
+            )
+
+        return future_cull_date, cull_reason
+    
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
         Updates the animal's pen history by either appending to the existing
