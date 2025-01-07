@@ -106,6 +106,7 @@ def test_manage_field(mocker: MockerFixture) -> None:
     setattr(manure_event_mock, "surface_remainder_fraction", 0.2)
     setattr(manure_event_mock, "year", 2024)
     setattr(manure_event_mock, "day", 120)
+    setattr(manure_event_mock, "manure_supplement_method", ManureSupplementMethod.NONE)
 
     manure_application_mock = MagicMock(spec=ManureEventNutrientRequestResults)
     manure_application_mock.event = manure_event_mock
@@ -328,10 +329,10 @@ def test_check_manure_application_schedule() -> None:
     assert field.manure_events == [manure_events[2]], "Expected remaining events after filtering."
     expected_requests = [
         ManureEventNutrientRequest(
-            "field1", filtered_manure_events[0], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1991-120"
+            "field1", filtered_manure_events[0], "Request for 1991-120"
         ),
         ManureEventNutrientRequest(
-            "field1", filtered_manure_events[1], ManureSupplementMethod.SYNTHETIC_FERTILIZER, "Request for 1992-120"
+            "field1", filtered_manure_events[1], "Request for 1992-120"
         ),
     ]
     assert manure_requests == expected_requests, "Expected manure requests do not match."

@@ -193,7 +193,7 @@ class Field:
                 year=manure_event.year,
                 day=manure_event.day,
                 manure_supplied=manure_request_results,
-                manure_supplement_method=manure_application.manure_supplement_method,
+                manure_supplement_method=manure_event.manure_supplement_method
             )
 
         self._check_tillage_schedule(time)
@@ -918,7 +918,7 @@ class Field:
         for event in todays_manure_events:
             manure_request = self._create_manure_request(event)
             manure_requests.append(
-                ManureEventNutrientRequest(self.field_data.name, event, event.manure_supplement_method, manure_request)
+                ManureEventNutrientRequest(self.field_data.name, event, manure_request)
             )
         return manure_requests
 

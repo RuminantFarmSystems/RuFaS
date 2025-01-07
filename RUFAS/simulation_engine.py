@@ -164,7 +164,7 @@ class SimulationEngine:
                     manure_request_results = self.manure_manager.request_nutrients(manure_request)
                 manure_applications.append(
                     ManureEventNutrientRequestResults(
-                        field_name, event, manure_event_request.manure_supplement_method, manure_request_results
+                        field_name, event, manure_request_results
                     )
                 )
         return manure_applications

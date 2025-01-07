@@ -124,7 +124,6 @@ class ManureEventNutrientRequest(NamedTuple):
 
     field_name: str
     event: ManureEvent
-    manure_supplement_method: ManureSupplementMethod
     nutrient_request: Optional[NutrientRequest]
 
 
@@ -133,5 +132,4 @@ class ManureEventNutrientRequestResults(NamedTuple):
 
     field_name: str
     event: ManureEvent
-    manure_supplement_method: ManureSupplementMethod
     nutrient_request_results: Optional[NutrientRequestResults]
