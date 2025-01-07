@@ -2003,13 +2003,11 @@ def test_check_manure_schedules() -> None:
         ManureEventNutrientRequest(
             field_name="field1",
             event=MagicMock(),
-            manure_supplement_method=ManureSupplementMethod.NONE,
             nutrient_request=MagicMock(),
         ),
         ManureEventNutrientRequest(
             field_name="field2",
             event=MagicMock(),
-            manure_supplement_method=ManureSupplementMethod.NONE,
             nutrient_request=MagicMock(),
         ),
     ]
