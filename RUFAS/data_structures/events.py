@@ -222,6 +222,8 @@ class ManureEvent(BaseFieldManagementEvent):
         Depth that manure is injected into the soil at (mm).
     surface_remainder_fraction : float
         Fraction of manure applied that remains on the soil surface (unitless).
+    manure_supplement_method : ManureSupplementMethod
+        The method that the event will use to supplement nutrient deficiencies.
 
     """
 

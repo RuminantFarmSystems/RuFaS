@@ -35,21 +35,25 @@ class ManureSchedule(Schedule):
         The number of years to skip between repetitions of the manure application pattern.
     pattern_repeat : int, optional
         The number of times the specified manure application pattern should be repeated.
+    manure_supplement_methods: list[ManureSupplementMethod]
+        The methods that each event will use to supplement nutrient deficiencies.
 
     Attributes
     ----------
     nitrogen_masses : List[float]
         Elongated list of nitrogen masses to ensure a mass value for each application year.
-    phosphorus_masses : List[float]
+    phosphorus_masses : list[float]
         Elongated list of phosphorus masses to ensure a mass value for each application year.
-    manure_types : List[ManureType]
+    manure_types : list[ManureType]
         Elongated list of manure types to ensure a type for each application year.
-    field_coverages : List[float]
+    field_coverages : list[float]
         Elongated list of field coverages to ensure a coverage value for each application year.
-    application_depths : List[float]
+    application_depths : list[float]
         Elongated list or default value for application depths to ensure a depth for each application year.
-    surface_remainder_fractions : List[float]
+    surface_remainder_fractions : list[float]
         Elongated list or default value for surface remainder fractions to ensure a fraction for each application year.
+    manure_supplement_methods: list[ManureSupplementMethod]
+        The methods that each event will use to supplement nutrient deficiencies.
 
     Notes
     -----
@@ -61,12 +65,12 @@ class ManureSchedule(Schedule):
     def __init__(
         self,
         name: str,
-        years: List[int],
-        days: List[int],
-        nitrogen_masses: List[float],
-        phosphorus_masses: List[float],
-        manure_types: List[ManureType],
-        manure_supplement_methods: List[ManureSupplementMethod],
+        years: list[int],
+        days: list[int],
+        nitrogen_masses: list[float],
+        phosphorus_masses: list[float],
+        manure_types: list[ManureType],
+        manure_supplement_methods: list[ManureSupplementMethod],
         field_coverages: List[float],
         application_depths: Optional[List[float]] = None,
         surface_remainder_fractions: Optional[List[float]] = None,
