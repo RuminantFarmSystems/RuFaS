@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class AnimalManureExcretions:
     """
@@ -51,7 +52,7 @@ class AnimalManureExcretions:
     manure_nitrogen: float = 0.0
     manure_mass: float = 0.0
     total_solids: float = 0.0
-    degradable_volatile_solids: float  = 0.0
+    degradable_volatile_solids: float = 0.0
     non_degradable_volatile_solids: float = 0.0
     inorganic_phosphorus_fraction: float = 0.0
     organic_phosphorus_fraction: float = 0.0
@@ -61,7 +62,7 @@ class AnimalManureExcretions:
     phosphorus_fraction: float = 0.0
     potassium: float = 0.0
 
-    def __add__(self, other: 'AnimalManureExcretions') -> 'AnimalManureExcretions':
+    def __add__(self, other: "AnimalManureExcretions") -> "AnimalManureExcretions":
         return AnimalManureExcretions(
             self.urea + other.urea,
             self.urine + other.urine,
@@ -72,11 +73,11 @@ class AnimalManureExcretions:
             self.total_solids + other.total_solids,
             self.degradable_volatile_solids + other.degradable_volatile_solids,
             self.non_degradable_volatile_solids + other.non_degradable_volatile_solids,
-            self.inorganic_phosphorus_fraction + other.inorganic_phosphorus_fraction, # fraction addition?
+            self.inorganic_phosphorus_fraction + other.inorganic_phosphorus_fraction,  # fraction addition?
             self.organic_phosphorus_fraction + other.organic_phosphorus_fraction,
             self.non_water_inorganic_phosphorus_fraction + other.non_water_inorganic_phosphorus_fraction,
             self.non_water_organic_phosphorus_fraction + other.non_water_organic_phosphorus_fraction,
             self.phosphorus + other.phosphorus + other.phosphorus_fraction,
             self.phosphorus_fraction + other.phosphorus_fraction,  # how to handle fraction for addition
-            self.potassium + other.potassium
+            self.potassium + other.potassium,
         )

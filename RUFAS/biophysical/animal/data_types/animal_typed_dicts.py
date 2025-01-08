@@ -6,8 +6,15 @@ from typing_extensions import NotRequired
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed
 from RUFAS.biophysical.animal.data_types.body_weight_history import BodyWeightHistory
 from RUFAS.biophysical.animal.data_types.pen_history import PenHistory
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, HeiferTAISubProtocol, \
-    HeiferSynchEDSubProtocol, CowReproductionProtocol, CowTAISubProtocol, CowReSynchSubProtocol, CowPreSynchSubProtocol
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
+    HeiferReproductionProtocol,
+    HeiferTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+    CowReproductionProtocol,
+    CowTAISubProtocol,
+    CowReSynchSubProtocol,
+    CowPreSynchSubProtocol,
+)
 
 
 class HerdInfoTypedDict(TypedDict):
@@ -78,8 +85,10 @@ class CalfValuesTypedDict(TypedDict):
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
+
 class NewBornCalfValuesTypedDict(TypedDict):
     """List of expected keys for calf values dictionary"""
+
     id: int
     breed: str
     animal_type: str
@@ -92,6 +101,7 @@ class NewBornCalfValuesTypedDict(TypedDict):
     pen_history: NotRequired[list[PenHistory]]
     conceptus_weight: NotRequired[float]
     calf_birth_weight: NotRequired[float]
+
 
 class HeiferIValuesTypedDict(TypedDict):
     """List of expected keys for heifer I values dictionary"""
@@ -149,6 +159,7 @@ class HeiferIIValuesTypedDict(TypedDict):
     phosphorus_for_gestation_required_for_calf: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
+
 class HeiferIIIValuesTypedDict(TypedDict):
     id: int
     breed: str
@@ -185,8 +196,10 @@ class HeiferIIIValuesTypedDict(TypedDict):
     phosphorus_for_gestation_required_for_calf: NotRequired[float]
     calf_birth_weight: NotRequired[float]
 
+
 class CowValuesTypedDict(TypedDict):
     """List of expected keys for cow values dictionary"""
+
     id: int
     breed: str
     animal_type: str
@@ -216,6 +229,7 @@ class CowValuesTypedDict(TypedDict):
     days_in_milk: NotRequired[int]
     calves: NotRequired[int]
     calving_interval: NotRequired[int]
+
 
 class AnimalConfigTypedDict(TypedDict):
     """Keeps track of all the attributes stored in the animal config object used
