@@ -4,7 +4,7 @@ from copy import copy
 from typing import Any, Optional
 
 from RUFAS.current_day_conditions import CurrentDayConditions
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import HarvestedCropStorageType
 from RUFAS.routines.field.crop.biomass_allocation import BiomassAllocation
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -91,6 +91,41 @@ class Crop:
     def data(self) -> CropData:
         """Provides access to the CropData object."""
         return self._data
+
+    @property
+    def growth_constraints(self) -> GrowthConstraints:
+        """Provides access to the GrowthConstraints object."""
+        return self._growth_constraints
+
+    @property
+    def biomass_allocation(self) -> BiomassAllocation:
+        """Provides access to the BiomassAllocation object."""
+        return self._biomass_allocation
+
+    @property
+    def nitrogen_incorporation(self) -> NitrogenIncorporation:
+        """Provides access to the NitrogenIncorporation object."""
+        return self._nitrogen_incorporation
+
+    @property
+    def leaf_area_index(self) -> LeafAreaIndex:
+        """Provides access to the LeafAreaIndex object."""
+        return self._leaf_area_index
+
+    @property
+    def water_dynamics(self) -> WaterDynamics:
+        """Provides access to the WaterDynamics object."""
+        return self._water_dynamics
+
+    @property
+    def crop_management(self) -> CropManagement:
+        """Provides access to the CropManagement object."""
+        return self._crop_management
+
+    @property
+    def phosphorus_incorporation(self) -> PhosphorusIncorporation:
+        """Provides access to the PhosphorusIncorporation object."""
+        return self._phosphorus_incorporation
 
     def perform_daily_crop_update(
         self, current_conditions: CurrentDayConditions, field_data: FieldData, soil_data: SoilData
@@ -205,8 +240,7 @@ class Crop:
         field_size: float,
         time: Time,
         soil_data: SoilData,
-        feed_manager: FeedManager,
-    ) -> None:
+    ) -> HarvestedCropStorageType | None:
         """Wrapper function for the Crop's CropManagement harvesting operation.
 
         Parameters
@@ -221,10 +255,14 @@ class Crop:
             Time instance containing the current time of the simulation.
         soil_data : SoilData
             The object tracking the attributes of the soil profile.
-        feed_manager : FeedManager
-            Instance of the FeedManager that receives harvested crops.
+
+        Returns
+        -------
+        HarvestedCropStorageType | None
+            Harvested Crop and the type of storage it will go in if the crop harvest produced a yield, otherwise None.
+
         """
-        self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data, feed_manager)
+        return self._crop_management.manage_harvest(harvest_op, field_name, field_size, time, soil_data)
 
     def set_maximum_transpiration(self, evapotranspirative_demand: float) -> None:
         """Wrapper method for setting the max transpiration for a crop."""

@@ -2,9 +2,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from RUFAS.routines.EEE.enums import TillageImplement
+from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
-from RUFAS.routines.field.manager.events import (
+from RUFAS.data_structures.events import (
     BaseFieldManagementEvent,
     FertilizerEvent,
     HarvestEvent,
@@ -12,7 +12,7 @@ from RUFAS.routines.field.manager.events import (
     PlantingEvent,
     TillageEvent,
 )
-from RUFAS.routines.manure.manure_treatments.manure_types import ManureType
+from RUFAS.data_structures.manure_types import ManureType
 
 
 @pytest.mark.parametrize(

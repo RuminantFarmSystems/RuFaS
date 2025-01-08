@@ -279,6 +279,7 @@ class AnimalModuleReporter:
                 "DMIest_requirement": MeasurementUnits.KILOGRAMS,
                 "avg_BW": MeasurementUnits.KILOGRAMS,
                 "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+                "avg_essential_amino_acid_requirement": MeasurementUnits.GRAMS_PER_DAY,
             }
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.avg_rqmts_pen_0_CALF",
@@ -1053,7 +1054,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_animal_events.__name__,
         }
         for animal in animals:
@@ -1070,7 +1071,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_heiferIIs_conception_rate.__name__,
         }
         om.add_variable(
@@ -1164,7 +1165,7 @@ class AnimalModuleReporter:
         """
 
         info_map = {
-            "class": AnimalModuleReporter.__class__.__name__,
+            "class": AnimalModuleReporter.__name__,
             "function": AnimalModuleReporter._record_cows_conception_rate.__name__,
         }
         om.add_variable(

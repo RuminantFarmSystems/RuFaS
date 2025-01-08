@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-from RUFAS.routines.feed_storage.enums import CropCategory, CropType
-from RUFAS.routines.feed_storage.feed_manager import StorageType
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import CropCategory, CropType, StorageType
 from RUFAS.routines.field.crop.crop_data import CropData, PlantCategory
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
 
@@ -13,8 +12,6 @@ class CerealRye(CropData):
     """
 
     name: str = "default cereal_rye"
-    plant_code: str = "RYE"
-    scientific_name: str = "Secale cereale"
     plant_category: PlantCategory = PlantCategory("cool_annual")
     is_nitrogen_fixer: bool = False
 
