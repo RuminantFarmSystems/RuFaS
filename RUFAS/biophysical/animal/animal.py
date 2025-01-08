@@ -71,7 +71,7 @@ class Animal:
     @property
     def days_in_milk(self) -> int:
         if not self.animal_type.is_cow:
-            raise TypeError()
+            return 0
         return self._days_in_milk
 
     @days_in_milk.setter
@@ -83,7 +83,7 @@ class Animal:
     @property
     def days_in_pregnancy(self) -> int:
         if self.animal_type in [AnimalType.CALF, AnimalType.HEIFER_I]:
-            raise TypeError()
+            return 0
         return self._days_in_pregnancy
 
     @days_in_pregnancy.setter
@@ -193,9 +193,12 @@ class Animal:
             AnimalType.DRY_COW: self._initialize_cow,
         }
         self.id = int(args.get("id"))
-        self.breed = Breed(args.get("breed"))
-        self.animal_type = AnimalType(args.get("animal_type"))
-        self.birth_date = datetime.strptime(args.get("birth_date"), "%Y-%m-%d").date()
+        self.breed = Breed[args.get("breed")]
+        try:
+            self.animal_type = AnimalType(args.get("animal_type"))
+        except ValueError as value_error:
+            print(args)
+            raise value_error
         self.days_born = int(args.get("days_born"))
         self.birth_weight = float(args.get("birth_weight"))
         self.net_merit = args.get("net_merit", 0.0)
@@ -275,12 +278,15 @@ class Animal:
 
     def _initialize_heiferII_or_heiferIII(self, args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict) -> None:
         self._initialize_calf_or_heiferI(args)
-        heifer_reproduction_program = HeiferReproductionProtocol(args.get("heifer_repro_program"))
-        heifer_reproduction_sub_program = None
+        heifer_reproduction_program_string = args.get("heifer_reproduction_program")
+        heifer_reproduction_program, heifer_reproduction_sub_program = None, None
+
+        heifer_reproduction_program = None if heifer_reproduction_program_string == "N/A" \
+            else HeiferReproductionProtocol(heifer_reproduction_program_string)
         if heifer_reproduction_program == HeiferReproductionProtocol.TAI:
-            heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("heifer_repro_sub_protocol"))
+            heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("heifer_reproduction_sub_protocol"))
         elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
-            heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("heifer_repro_sub_protocol"))
+            heifer_reproduction_sub_program = HeiferSynchEDSubProtocol(args.get("heifer_reproduction_sub_protocol"))
         self.days_in_pregnancy = args.get("days_in_pregnancy", 0)
         self.reproduction = Reproduction(
             heifer_reproduction_program=heifer_reproduction_program,
@@ -327,6 +333,8 @@ class Animal:
 
     def daily_routines(self, time: Time) -> DailyRoutinesOutput:
         self.days_born += 1
+
+        daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update(time.simulation_day)
 
         nutrients_inputs = NutrientsInputs(
             animal_type=self.animal_type,
@@ -384,22 +392,32 @@ class Animal:
         self.events += growth_outputs.events
         self.reproduction.conceptus_weight = growth_outputs.conceptus_weight
 
-        reproduction_inputs = ReproductionInputs(
-            animal_type=self.animal_type,
-            body_weight=self.body_weight,
-            breed=self.breed,
-            days_born=self.days_born,
-            days_in_pregnancy=self.days_in_pregnancy,
-            days_in_milk=self.days_in_milk,
-            net_merit=self.net_merit,
-            phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
-        )
-        reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
+        if self.animal_type == AnimalType.HEIFER_II or self.animal_type.is_cow:
+            reproduction_inputs = ReproductionInputs(
+                animal_type=self.animal_type,
+                body_weight=self.body_weight,
+                breed=self.breed,
+                days_born=self.days_born,
+                days_in_pregnancy=self.days_in_pregnancy,
+                days_in_milk=self.days_in_milk,
+                net_merit=self.net_merit,
+                phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf
+            )
+            reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(
+                reproduction_inputs, time)
 
-        daily_routines_output: DailyRoutinesOutput = self.animal_life_stage_update(time.simulation_day)
-        if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
-            daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
-            daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
+            self.body_weight = reproduction_outputs.body_weight
+            self.events += reproduction_outputs.events
+            self.days_in_milk = reproduction_outputs.days_in_milk
+            self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
+            self.nutrients.phosphorus_for_gestation_required_for_calf = (
+                reproduction_outputs.phosphorus_for_gestation_required_for_calf)
+
+            if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
+                daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
+                daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
+                self.future_death_date = self.determine_future_death_date()
+                self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
         return daily_routines_output
 
@@ -504,7 +522,6 @@ class Animal:
         return {
             "id": self.id,
             "breed": self.breed,
-            "birth_date": self.birth_date,
             "days_born": self.days_born,
             "birth_weight": self.birth_weight,
             "body_weight": self.body_weight,
@@ -521,7 +538,6 @@ class Animal:
         return {
             "id": self.id,
             "breed": self.breed,
-            "birth_date": self.birth_date,
             "days_born": self.days_born,
             "birth_weight": self.birth_weight,
             "body_weight": self.body_weight,
@@ -549,7 +565,6 @@ class Animal:
         return {
             "id": self.id,
             "breed": self.breed,
-            "birth_date": self.birth_date,
             "days_born": self.days_born,
             "birth_weight": self.birth_weight,
             "body_weight": self.body_weight,
@@ -573,6 +588,97 @@ class Animal:
             "net_merit": self.net_merit,
         }
 
+    def determine_future_death_date(self) -> int:
+        """
+        Determine the future death date of the animal based on its parity.
+
+        Returns
+        -------
+        int
+            Calculated future death date in simulation days.
+        """
+        if self.reproduction.calves >= 4:
+            death_rate = AnimalConfig.parity_death_probability[3]
+        else:
+            death_rate = AnimalConfig.parity_death_probability[self.reproduction.calves - 1]
+        death_rand = random()
+        if death_rand <= death_rate:
+            death_upper_limit = death_lower_limit = death_time_upper_limit = death_time_lower_limit = 0
+            death_date_random = random()
+            for i in range(len(AnimalConfig.death_day_probability) - 1):
+                if (
+                        AnimalConfig.death_day_probability[i]
+                        <= death_date_random
+                        < AnimalConfig.death_day_probability[i + 1]
+                ):
+                    death_lower_limit = AnimalConfig.death_day_probability[i]
+                    death_upper_limit = AnimalConfig.death_day_probability[i + 1]
+                    death_time_lower_limit = AnimalConfig.cull_day_count[i]
+                    death_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
+            n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
+            return round(
+                death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
+            )
+        return sys.maxsize
+
+    def determine_future_cull_date(self) -> tuple[int, str]:
+        """
+        Determine the future cull date and reason for the animal based on parity-specific probabilities.
+
+        Returns
+        -------
+        tuple[int, str]
+            Future cull date in simulation days and reason for culling.
+        """
+        cull_reason = ""
+        future_cull_date = sys.maxsize
+        if self.reproduction.calves >= 4:
+            inv_cull_rate = AnimalConfig.parity_cull_probability[3]
+        else:
+            inv_cull_rate = AnimalConfig.parity_cull_probability[self.reproduction.calves - 1]
+        cull_rand = random()
+        if cull_rand <= inv_cull_rate:
+            cull_reason_rand = random()
+            cull_prob = 0
+            if cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.feet_leg_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.feet_leg_cull_day_probability
+                cull_reason = animal_constants.LAMENESS_CULL
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.injury_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.injury_cull_day_probability
+                cull_reason = animal_constants.INJURY_CULL
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.mastitis_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.mastitis_cull_day_probability
+                cull_reason = animal_constants.MASTITIS_CULL
+
+            elif cull_reason_rand <= (cull_prob := cull_prob + AnimalConfig.disease_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.disease_cull_day_probability
+                cull_reason = animal_constants.DISEASE_CULL
+
+            elif cull_reason_rand <= (cull_prob + AnimalConfig.udder_cull_probability):
+                cull_reason_cull_prob = AnimalConfig.udder_cull_day_probability
+                cull_reason = animal_constants.UDDER_CULL
+
+            else:
+                cull_reason_cull_prob = AnimalConfig.unknown_cull_day_probability
+                cull_reason = animal_constants.UNKNOWN_CULL
+
+            cull_time_rand = random()
+            cull_reason_upper_limit = cull_reason_lower_limit = cull_time_upper_limit = cull_time_lower_limit = 0
+            for i in range(len(cull_reason_cull_prob) - 1):
+                if cull_reason_cull_prob[i] <= cull_time_rand < cull_reason_cull_prob[i + 1]:
+                    cull_reason_lower_limit = cull_reason_cull_prob[i]
+                    cull_reason_upper_limit = cull_reason_cull_prob[i + 1]
+                    cull_time_lower_limit = AnimalConfig.cull_day_count[i]
+                    cull_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
+            x = (cull_time_upper_limit - cull_time_lower_limit) / (cull_reason_upper_limit - cull_reason_lower_limit)
+            future_cull_date = round(
+                cull_time_lower_limit + x * (cull_time_rand - cull_reason_lower_limit) + self.days_born
+            )
+
+        return future_cull_date, cull_reason
+    
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
         Updates the animal's pen history by either appending to the existing

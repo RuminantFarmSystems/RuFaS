@@ -5,6 +5,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.crop_management import CropManagement
 from RUFAS.routines.field.soil.carbon_cycling.residue_partition import ResiduePartition
 from RUFAS.routines.field.soil.layer_data import LayerData
 from RUFAS.routines.field.soil.soil_data import SoilData
@@ -613,7 +614,7 @@ def test_add_residue_to_pools(rainfall: float) -> None:
                     field_size=1.1,
                 ),
             ],
-            CropData(yield_residue=300),
+            CropData(),
         ),
         (
             [
@@ -645,7 +646,7 @@ def test_add_residue_to_pools(rainfall: float) -> None:
                     field_size=1.1,
                 ),
             ],
-            CropData(yield_residue=30),
+            CropData(),
         ),
         (
             [
@@ -677,16 +678,18 @@ def test_add_residue_to_pools(rainfall: float) -> None:
                     field_size=1.1,
                 ),
             ],
-            CropData(yield_residue=3),
+            CropData(),
         ),
     ],
 )
-def test_partition_residue(layers: list, crop: CropData, rainfall=10):
+def test_partition_residue(layers: list, crop: CropData) -> None:
     """Testing if main routine correctly updates the attributes"""
     data = SoilData(soil_layers=layers, field_size=1.1)
-    data.plant_surface_residue = crop.yield_residue or 0
+    crop_management = CropManagement()
+    data.plant_surface_residue = crop_management.yield_residue or 0
     data.plant_root_residue = crop.root_biomass or 0
     partition = ResiduePartition(data)
+    rainfall = 10
 
     ResiduePartition._determine_plant_metabolic_active_carbon_usage = MagicMock(return_value=2.1)
     ResiduePartition._determine_plant_metabolic_carbon_amount = MagicMock(return_value=2.4)

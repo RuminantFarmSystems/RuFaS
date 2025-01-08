@@ -84,7 +84,7 @@
       "breed": {
         "type": "string",
         "default": "HO",
-        "pattern": "(HO|JE)",
+        "pattern": "^(HO|JE)$",
         "description": "Breed (select one) -- The predominant breed of the herd (Holstein or Jersey)"
       },
       "parity_fractions": {
@@ -93,17 +93,20 @@
         "1": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 1.0
+          "maximum": 1.0,
+          "default": 0.346
         },
         "2": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 1.0
+          "maximum": 1.0,
+          "default": 0.272
         },
         "3": {
           "type": "number",
           "minimum": 0.0,
-          "maximum": 1.0
+          "maximum": 1.0,
+          "default": 0.379
         }
       },
       "annual_milk_yield": {
@@ -164,7 +167,7 @@
           "type": "number",
           "description": "Days In Pregnancy When Dry (days) -- The average days in pregnancy of cows at dry-off",
           "default": 218,
-          "minimum": 0
+          "minimum": 1
         },
         "heifer_repro_cull_time": {
           "type": "number",
@@ -240,7 +243,7 @@
             "type": "number",
             "description": "Wean Length (days) -- Length of the weaning process",
             "default": 7,
-            "minimum": 0
+            "minimum": 1
           },
           "milk_type": {
             "type": "string",
@@ -297,7 +300,7 @@
             "type": "number",
             "description": "Calving Interval (days) -- Current average calving interval, used for initial bodyweight adjustment and other calculations",
             "default": 400,
-            "minimum": 0
+            "minimum": 1
           },
           "heifers": {
             "type": "object",
@@ -401,7 +404,7 @@
             "type": "number",
             "description": "Average Holstein Birth Weight (kg/head)",
             "default": 42.9,
-            "minimum": 0
+            "minimum": 1
           },
           "birth_weight_std_ho": {
             "type": "number",
@@ -413,7 +416,7 @@
             "type": "number",
             "description": "Average Jersey Birth Weight (kg/head)",
             "default": 25.2,
-            "minimum": 0
+            "minimum": 1
           },
           "birth_weight_std_je": {
             "type": "number",
@@ -537,10 +540,10 @@
         },
         "culling": {
           "type": "object",
-          "description": "Probabilities for removal from the herd for specific reason",
+          "description": "Defines probabilities and distributions for death and six health-related reasons (feet-and-leg, injury, mastitis, disease, udder, unknown) an animal might be removed (culled) from the herd.",
           "cull_day_count": {
             "type": "array",
-            "description": "Culling day count",
+            "description": "Defines breakpoints that partition the cumulative distribution function (CDF) for culling probabilities into segments. These values correspond to the 'cull_day_prob' array, allowing for more accurate definition of the CDF.The numbers in the array represent days into the lactation (days in milk).", 
             "properties": {
               "type": "number",
               "minimum": 0
@@ -551,13 +554,13 @@
             "description": "Cull probabilities due to feet-and-leg-related health issues.",
             "probability": {
               "type": "number",
-              "description": "The probability of culling due to feet-and-leg-related health issues.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to feet-and-leg-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six  culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
             "cull_day_prob": {
               "type": "array",
-              "description": "Culling probability on the cull day for feet-and-leg-related health issues.",
+              "description": "Cumulative distribution function (CDF) values associated with the likelihood of feet-and-leg-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -570,13 +573,13 @@
             "description": "Cull probabilities due to injury-related health issues.",
             "probability": {
               "type": "number",
-              "description": "The probability of culling due to injury-related health issues.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to injury-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
             "cull_day_prob": {
               "type": "array",
-              "description": "Culling probability on the cull day for injury-related health issues.",
+              "description": "Cumulative distribution function (CDF) values associated with the likelihood of injury-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -589,13 +592,13 @@
             "description": "Cull probabilities due to mastitis-related health issues.",
             "probability": {
               "type": "number",
-              "description": "The probability of culling due to mastitis-related health issues.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to mastitis-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
             "cull_day_prob": {
               "type": "array",
-              "description": "Culling probability on the cull day for mastitis-related health issues.",
+              "description": "Cumulative distribution function (CDF) values associated with the likelihood of mastitis-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -608,13 +611,13 @@
             "description": "Cull probabilities due to disease-related health issues.",
             "probability": {
               "type": "number",
-              "description": "The probability of culling due to disease-related health issues.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to general disease-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
             "cull_day_prob": {
               "type": "array",
-              "description": "Culling probability on the cull day for disease-related health issues.",
+              "description": "Cumulative distribution function (CDF) values associated with the likelihood of general disease-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -627,13 +630,13 @@
             "description": "Cull probabilities due to udder-related health issues.",
             "probability": {
               "type": "number",
-              "description": "The probability of culling due to udder-related health issues.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to udder-related issues. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
             "cull_day_prob": {
               "type": "array",
-              "description": "Culling probability on the cull day for udder-related health issues.",
+              "description": "Cumulative distribution function (CDF) values associated with the likelihood of udder-related culling over time. The 'cull_day_count' array defines the segments of the CDF.",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -646,13 +649,13 @@
             "description": "Cull probabilities due to other health issues.",
             "probability": {
               "type": "number",
-              "description": "The probability of culling due to other health issues.",
+              "description": "Conditional probability that a culled (sold) animal is removed due to unknown reasons. This probability is used to determine the reason for culling after it has been decided that the animal will be culled during the current lactation. The sum of probabilities for the six culling reasons equals 1.",
               "minimum": 0,
               "maximum": 1
             },
             "cull_day_prob": {
               "type": "array",
-              "description": "Culling probability on the cull day for unknown health issues.",
+              "description": "Cumulative distribution function (CDF) values associated with the likelihood of culling for unknown reasons over time. The 'cull_day_count' array defines the segments of the CDF.",
               "properties": {
                 "type": "number",
                 "minimum": 0,
@@ -675,14 +678,14 @@
             "description": "Cull Probability, by Parity",
             "properties": {
               "type": "number",
-              "description": "Cull Probability, by Parity -- The probability of culling for cows of a single parity (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total)",
+              "description": "Cull Probability, by Parity Group -- The probability of culling for cows of a single parity group (first lactation, second lactation, etc.); a separate entry should be included for 1st, 2nd, 3rd, and 4th+ parities (4 entries total). Culling refers to removal from the herd while alive.",
               "minimum": 0,
               "maximum": 1
             }
           },
           "death_day_prob": {
             "type": "array",
-            "description": "Culling probability for death",
+            "description": "Cumulative distribution function (CDF) values associated with the likelihood of death over time. The 'cull_day_count' array defines the segments of the CDF.",
             "properties": {
               "type": "number",
               "minimum": 0,
@@ -859,6 +862,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -914,6 +922,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -968,6 +981,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1005,12 +1023,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
           "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1098,6 +1116,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1135,12 +1158,12 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
+          "description": "Heifer Reproduction Program",
           "pattern": "^(TAI|ED|SynchED)$"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1228,6 +1251,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1265,12 +1293,21 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
+          "type": "string",
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$"
+        },
+        "heifer_reproduction_sub_protocol": {
+          "type": "string",
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+        },
+        "cow_reproduction_program": {
           "type": "string",
           "description": "Reproduction Program",
           "pattern": "^(TAI|ED|ED-TAI)$"
         },
-        "repro_sub_protocol": {
+        "cow_reproduction_sub_protocol": {
           "type": "string",
           "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
         },
@@ -1388,6 +1425,11 @@
           "description": "Unique integer identifier.",
           "minimum": 1
         },
+        "animal_type": {
+          "type": "string",
+          "description": "Animal type.",
+          "pattern": "^(Calf|HeiferI|HeiferII|HeiferIII|DryCow|LacCow)$"
+        },
         "breed": {
           "type": "string",
           "description": "Breed.",
@@ -1425,14 +1467,16 @@
         "events": {
           "type": "string"
         },
-        "repro_program": {
+        "heifer_reproduction_program": {
           "type": "string",
-          "description": "Reproduction Program",
-          "pattern": "^(TAI|ED|ED-TAI)$"
+          "description": "Heifer Reproduction Program",
+          "pattern": "^(TAI|ED|SynchED|N/A)$",
+          "default": "N/A"
         },
-        "repro_sub_protocol": {
+        "heifer_reproduction_sub_protocol": {
           "type": "string",
-          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$"
+          "pattern": "^(5dCG2P|5dCGP|2P|CP|N/A)$",
+          "default": "N/A"
         },
         "estrus_count": {
           "type": "number",
@@ -2155,6 +2199,13 @@
           "description": "Fraction of potassium contained in the fertilizer mix by mass.",
           "minimum": 0.0,
           "maximum": 1.0
+        },
+        "ammonium_fraction": {
+          "type": "number",
+          "description": "Fraction fertilizer nitrogen that is ammonium. All non-ammonium nitrogen is assumed to be nitrate.",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.0
         }
       }
     },
@@ -3807,7 +3858,7 @@
       "description": "The general type or category of the feed (group).",
       "properties": {
         "type": "string",
-        "pattern": "(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)"
+        "pattern": "^(Aminoacids|Forage|Conc|Milk|Mineral|Vitamins|Starter)$"
       }
     },
     "units": {
@@ -3815,7 +3866,7 @@
       "description": "The unit of measurement used for the feed.",
       "properties": {
         "type": "string",
-        "pattern": "(kg)"
+        "pattern": "^(kg)$"
       }
     }
   },
@@ -5073,7 +5124,7 @@
         "manure_cover": {
           "type": "string",
           "description": "Indicates the presence or absence of a cover in the manure treatment or storage system. A cover referes to a human made cover where as a crust is naturally formed. A cover and flare refers to a storage system that is covered to capture and then destroy the methane produced with a flare. For the anaerobic diesgtion treatment, this property should be set to N/A.",
-          "pattern": "(cover|crust|no cover|cover and flare|N/A)",
+          "pattern": "^(cover|crust|no cover|cover and flare|N/A)$",
           "default": "no cover"
         },
         "hydraulic_retention_time": {
@@ -5521,7 +5572,7 @@
       "description": "The categorical size of the tractor",
       "properties": {
         "type": "string",
-        "pattern": "(small|medium|large)",
+        "pattern": "^(small|medium|large)$",
         "default": "medium"
       }
     },
@@ -5838,6 +5889,22 @@
       "ash": {
         "type": "number"
       }
+    }
+  },
+  "feed_storage_input_properties": {
+    "hay_bale_diameter": {
+        "type": "number",
+        "description": "Diameter of hay bales (meters).",
+        "minimum": 0.5,
+        "maximum": 4,
+        "default": 2.5
+    },
+    "post_wilting_moisture_percentage": {
+        "type": "number",
+        "description": "The post-wilting moisture level that baleage will dry down to.",
+        "minimum": 30,
+        "maximum": 60,
+        "default": 45
     }
   }
 }

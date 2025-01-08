@@ -100,7 +100,8 @@ class AnimalConfig:
     @classmethod
     def initialize_animal_config(cls) -> None:
         im = InputManager()
-        animal_config_data = im.get_data("animal.animal_config")
+        animal_data = im.get_data("animal")
+        animal_config_data = animal_data["animal_config"]
 
         cls.wean_day = animal_config_data["farm_level"]["calf"]["wean_day"]
         cls.target_heifer_pregnant_day = animal_config_data["farm_level"]["bodyweight"]["target_heifer_preg_day"]
@@ -211,7 +212,6 @@ class AnimalConfig:
         cls.unknown_cull_day_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"][
             "cull_day_prob"]
 
-        animal_data = im.get_data("animal")
         cls.methane_model = animal_data["methane_model"]
         cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
         cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"][

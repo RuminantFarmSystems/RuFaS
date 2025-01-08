@@ -46,6 +46,7 @@ class InputManager:
             self.__get_data_logs_pool: Dict[str, str] = {}
             self.elements_counter = ElementsCounter()
             self.csv_report_generation_list: list[str] = []
+            self.data_validator = DataValidator()
         self.metadata_depth_limit = 7 if metadata_depth_limit is None else metadata_depth_limit
 
     @property
@@ -86,14 +87,16 @@ class InputManager:
             True if data is valid, otherwise False.
         """
         self._load_metadata(metadata_path)
-        valid, message = DataValidator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
+        valid, message = self.data_validator.validate_metadata(self.__metadata, VALID_INPUT_TYPES, ADDRESS_TO_INPUTS)
         if not valid:
             raise ValueError(message)
         self._load_properties()
-        valid, message = DataValidator.validate_properties(self.__metadata, self.metadata_depth_limit)
+        valid, message = self.data_validator.validate_properties(self.__metadata, self.metadata_depth_limit)
         if not valid:
+            self.om.route_logs(self.data_validator.event_logs)
             raise ValueError(message)
         is_input_data_valid = self._populate_pool(eager_termination)
+        self.om.route_logs(self.data_validator.event_logs)
         return is_input_data_valid
 
     def _load_metadata(self, metadata_path: Path) -> None:
@@ -307,7 +310,7 @@ class InputManager:
             validated_data = {}
             for metadata_property in metadata_properties.keys():
                 variable_properties = metadata_properties[metadata_property]
-                is_element_acceptable = DataValidator.validate_data_by_type(
+                is_element_acceptable = self.data_validator.validate_data_by_type(
                     variable_path=[metadata_property],
                     variable_properties=variable_properties,
                     data=input_data,
@@ -535,7 +538,7 @@ class InputManager:
         }
         element_hierarchy = data_address.split(".")
         try:
-            data_value = DataValidator.extract_value_by_key_list(self.__pool, element_hierarchy)
+            data_value = self.data_validator.extract_value_by_key_list(self.__pool, element_hierarchy)
             timestamp = Utility.get_timestamp(include_millis=True)
             self.__get_data_logs_pool[timestamp] = f"InputManager.get_data() called for {element_hierarchy}."
             return deepcopy(data_value)
@@ -575,7 +578,8 @@ class InputManager:
         """
         variable_path = data_address.split(".")
         try:
-            DataValidator.extract_value_by_key_list(self.__pool, variable_path)
+            self.data_validator.extract_value_by_key_list(self.__pool, variable_path)
+            self.om.route_logs(self.data_validator.event_logs)
             return True
         except KeyError:
             return False
@@ -927,7 +931,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self._add_variable_to_pool.__name__,
+            "function": self._check_modifiability.__name__,
         }
         is_modifiable_during_runtime = self._is_modifiable_during_runtime(
             variable_name=variable_name, variable_properties=metadata_properties
@@ -980,7 +984,7 @@ class InputManager:
             if metadata_property in variable_properties_to_ignore:
                 continue
             variable_properties = metadata_properties[metadata_property]
-            is_element_acceptable = DataValidator.validate_data_by_type(
+            is_element_acceptable = self.data_validator.validate_data_by_type(
                 variable_path=[metadata_property],
                 variable_properties=variable_properties,
                 data=data,
@@ -1020,7 +1024,7 @@ class InputManager:
             )
         self.__pool[variable_name] = validated_data
 
-    def add_dict_variable_to_pool(
+    def add_runtime_variable_to_pool(
         self,
         variable_name: str,
         data: Dict[str, Any],
@@ -1028,7 +1032,7 @@ class InputManager:
         eager_termination: bool,
     ) -> bool:
         """
-        Adds a dictionary variable to the InputManager's pool after validating it against metadata.
+        Adds a variable to the InputManager's pool after validating it against metadata.
 
         Notes
         -----
@@ -1060,7 +1064,7 @@ class InputManager:
         """
         info_map = {
             "class": self.__class__.__name__,
-            "function": self.add_dict_variable_to_pool.__name__,
+            "function": self.add_runtime_variable_to_pool.__name__,
         }
         if not (isinstance(data, Dict)):
             self.om.add_error(
@@ -1070,75 +1074,6 @@ class InputManager:
                 info_map,
             )
             raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, Any]`.")
-
-        metadata_properties_exist = self._metadata_properties_exist(
-            variable_name=variable_name, properties_blob_key=properties_blob_key
-        )
-
-        if metadata_properties_exist:
-            add_variable_success = self._add_variable_to_pool(
-                variable_name=variable_name,
-                input_data=data,
-                properties_blob_key=properties_blob_key,
-                eager_termination=eager_termination,
-            )
-            return add_variable_success
-        else:
-            return False
-
-    def add_tabular_variable_to_pool(
-        self,
-        variable_name: str,
-        data: Dict[str, List[Any]] | List[Any],
-        properties_blob_key: str,
-        eager_termination: bool,
-    ) -> bool:
-        """
-        Adds a tabular variable to the InputManager's pool after validating it against metadata.
-
-        Notes
-        -----
-        This function takes in a variable along with its name and a key to access its validation metadata.
-        It validates the data against the provided metadata and adds the data to the InputManager pool if it is valid.
-
-        Parameters
-        ----------
-        variable_name: str
-            The name of the variable to be added.
-        data : Dict[str, List[Any]] | List[Any]
-            The data of the tabular variable, structured as a dictionary of lists or a list.
-        properties_blob_key : str
-            A key used to locate the metadata for validation of the variable.
-        eager_termination : bool
-            If True, a ValueError will be raised from _add_variable_to_pool() when the variable is invalid.
-            If False, the function returns False.
-
-        Returns
-        -------
-        bool
-            True if the variable is successfully validated and added to the pool.
-            False if the variable is invalid and not added to the pool.
-
-        Raises
-        -------
-        TypeError
-            If `data` is not the expected type of Dict[str, List[Any]] | List[Any].
-
-        """
-        info_map = {
-            "class": self.__class__.__name__,
-            "function": self.add_tabular_variable_to_pool.__name__,
-        }
-        if not (isinstance(data, Dict) or isinstance(data, List)):
-            self.om.add_error(
-                "Incorrect variable type",
-                f"Variable {variable_name} has type {type(data)}, does not match "
-                f"the expected type of `Dict[str, List[Any]] | List[Any]`.",
-                info_map,
-            )
-            raise TypeError("Incorrect variable type. Expected types: `data: Dict[str, List[Any]] | List[Any]`.")
-
-        data = {variable_name: data} if isinstance(data, List) else data
 
         metadata_properties_exist = self._metadata_properties_exist(
             variable_name=variable_name, properties_blob_key=properties_blob_key

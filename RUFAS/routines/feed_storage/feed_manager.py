@@ -1,19 +1,22 @@
-from enum import Enum
 from typing import Dict, List
 
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
+    CropCategory,
+    CropType,
+    HarvestedCrop,
+    StorageType,
+)
 from RUFAS.time import Time
 from RUFAS.weather import Weather
 
 from .baleage import Baleage
-from .enums import CropCategory, CropType
 from .grain import Dry, Grain, HighMoisture
-from .harvested_crop import HarvestedCrop
 from .hay import Hay, ProtectedIndoors, ProtectedTarped, ProtectedWrapped, Unprotected
 from .silage import Bag, Bunker, Pile, Silage
 from .storage import Storage
 
-# Defines the compatilibty between Crop Categories and Storage Types.
-CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
+""""Defines the compatilibty between Crop Categories and Storage Types."""
+CROP_TO_STORAGE_MAPPING: Dict[CropCategory, type[List[Storage]]] = {
     CropCategory.ALFALFA: [Hay, Silage, Baleage],
     CropCategory.CORN: [Grain, Silage],
     CropCategory.GRASS: [Hay, Silage, Baleage],
@@ -22,21 +25,19 @@ CROP_TO_STORAGE_MAPPING: Dict[CropCategory, List[Storage]] = {
 }
 
 
-class StorageType(Enum):
-    """
-    Maps each storage type to its respective class.
-    """
-
-    PROTECTED_INDOORS = ProtectedIndoors
-    PROTECTED_WRAPPED = ProtectedWrapped
-    PROTECTED_TARPED = ProtectedTarped
-    UNPROTECTED = Unprotected
-    BALEAGE = Baleage
-    DRY = Dry
-    HIGH_MOISTURE = HighMoisture
-    BUNKER = Bunker
-    PILE = Pile
-    BAG = Bag
+"""Maps each StorageType enum element to the associated Storage subclass."""
+STORAGE_TYPE_TO_CLASS_MAP: dict[StorageType, type[Storage]] = {
+    StorageType.PROTECTED_INDOORS: ProtectedIndoors,
+    StorageType.PROTECTED_WRAPPED: ProtectedWrapped,
+    StorageType.PROTECTED_TARPED: ProtectedTarped,
+    StorageType.UNPROTECTED: Unprotected,
+    StorageType.BALEAGE: Baleage,
+    StorageType.DRY: Dry,
+    StorageType.HIGH_MOISTURE: HighMoisture,
+    StorageType.BUNKER: Bunker,
+    StorageType.PILE: Pile,
+    StorageType.BAG: Bag,
+}
 
 
 QUERY_RESULT_DATA_TYPE = Dict[str, CropCategory | CropType | float]
@@ -87,7 +88,8 @@ class FeedManager:
         """
         compatible_storage_classes = CROP_TO_STORAGE_MAPPING.get(harvested_crop.category, [])
         is_crop_compatible_with_storage = any(
-            issubclass(storage_type.value, storage_class) for storage_class in compatible_storage_classes
+            issubclass(STORAGE_TYPE_TO_CLASS_MAP[storage_type], storage_class)
+            for storage_class in compatible_storage_classes
         )
 
         if not is_crop_compatible_with_storage:
@@ -97,7 +99,7 @@ class FeedManager:
             )
 
         if storage_type not in self.active_storages:
-            self.active_storages[storage_type] = storage_type.value()
+            self.active_storages[storage_type] = STORAGE_TYPE_TO_CLASS_MAP[storage_type]()
 
         self.active_storages[storage_type].receive_crop(harvested_crop)
 

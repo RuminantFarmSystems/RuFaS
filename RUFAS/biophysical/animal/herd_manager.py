@@ -18,6 +18,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed
+from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -165,8 +166,21 @@ class HerdManager:
 
         if self.simulate_animals:
             herd_factory = HerdFactory()
-            (self.calves, self.heiferIs, self.heiferIIs, self.heiferIIIs, self.cows, self.replacement_market) = (
-                herd_factory.initialize_herd()
+            herd_population = herd_factory.initialize_herd()
+            (
+                self.calves,
+                self.heiferIs,
+                self.heiferIIs,
+                self.heiferIIIs,
+                self.cows,
+                self.replacement_market
+            ) = (
+                herd_population.calves,
+                herd_population.heiferIs,
+                herd_population.heiferIIs,
+                herd_population.heiferIIIs,
+                herd_population.cows,
+                herd_population.replacement
             )
 
             self.initialize_nutrient_requirements(weather, time, feed)
@@ -190,9 +204,11 @@ class HerdManager:
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
 
-    def daily_routines(self, available_feeds: list[Feed], weather: Weather, time: Time) -> list[HerdManagerOutput]:
-        current_conditions = weather.get_current_day_conditions(time)
-        current_temperature = current_conditions.mean_air_temperature
+    def collect_pen_manure_data(self) -> list[PenManureData]:
+        """Returns the manure information from all pens in PenManureData."""
+        return [pen.get_manure_data() for pen in self.all_pens]
+
+    def daily_routines(self, available_feeds: list[Feed], time: Time) -> list[HerdManagerOutput]:
 
         graduated_animals: list[Animal] = []
         newborn_calves: list[Animal] = []
