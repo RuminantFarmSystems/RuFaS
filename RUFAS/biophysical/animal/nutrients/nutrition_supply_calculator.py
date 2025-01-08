@@ -486,7 +486,7 @@ class NutritionSupplyCalculator:
         Returns
         -------
         float
-            Percentage of the ration's dry matter which is made up of concentrates.
+            Percentage of the ration's dry matter which is made up of concentrates (percent).
 
         """
         dry_matter_from_concentrate = sum(
@@ -565,7 +565,7 @@ class NutritionSupplyCalculator:
         Returns
         -------
         dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to RDP percentages.
+            Mapping of RuFaS Feed IDs to RDP percentages (percent).
 
         References
         ----------
@@ -604,7 +604,7 @@ class NutritionSupplyCalculator:
         Returns
         -------
         dict[RUFAS_ID, float]
-            Mapping of RuFaS Feed IDs to RUP percentages.
+            Mapping of RuFaS Feed IDs to RUP percentages (percent).
 
         References
         ----------

@@ -18,6 +18,7 @@ from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed.feed import Feed
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
+from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
@@ -156,6 +157,7 @@ class HerdManager:
 
         if self.simulate_animals:
             herd_factory = HerdFactory()
+            herd_population = herd_factory.initialize_herd()
             (
                 self.calves,
                 self.heiferIs,
@@ -163,7 +165,14 @@ class HerdManager:
                 self.heiferIIIs,
                 self.cows,
                 self.replacement_market
-            ) = herd_factory.initialize_herd()
+            ) = (
+                herd_population.calves,
+                herd_population.heiferIs,
+                herd_population.heiferIIs,
+                herd_population.heiferIIIs,
+                herd_population.cows,
+                herd_population.replacement
+            )
 
             self.initialize_nutrient_requirements(weather, time, feed)
 
@@ -185,6 +194,10 @@ class HerdManager:
             AnimalType.LAC_COW: [cow for cow in self.cows if cow.is_milking],
             AnimalType.DRY_COW: [cow for cow in self.cows if not cow.is_milking],
         }
+
+    def collect_pen_manure_data(self) -> list[PenManureData]:
+        """Returns the manure information from all pens in PenManureData."""
+        return [pen.get_manure_data() for pen in self.all_pens]
 
     def daily_routines(self, available_feeds: list[Feed], weather: Weather, time: Time) -> list[HerdManagerOutput]:
         current_conditions = weather.get_current_day_conditions(time)

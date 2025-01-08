@@ -255,7 +255,7 @@ class NutritionEvaluationResults:
     dry_matter : float
         Amount of dry matter by which a ration was outside the acceptable bounds (kg). If dry matter is within
         acceptable bounds, this value will be 0.0.
-    ndf_percentage : float
+    ndf_percent : float
         Surplus or deficit of neutral detergent fiber (NDF) percentage in a ration. If NDF percentage is within
         acceptable bounds, this value will be 0.0.
     fat_percent : float

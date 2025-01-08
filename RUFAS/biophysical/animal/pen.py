@@ -277,11 +277,7 @@ class Pen:
 
     def _set_animal_nutrient_values(
         self,
-        animal: Animal,
-        animal_grouping_scenario: AnimalGroupingScenario,
-        feed: Feed,
-        temperature: float,
-        phosphorus_concentration: float,
+        animal: Animal
     ) -> None:
         """
         Set the nutrient values for the animal.
@@ -290,11 +286,6 @@ class Pen:
         ----------
         animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
             The animal to set the nutrient values for.
-        animal_grouping_scenario
-        temperature
-        temp
-        phosphorus_concentration : float
-
         Returns
         -------
         None

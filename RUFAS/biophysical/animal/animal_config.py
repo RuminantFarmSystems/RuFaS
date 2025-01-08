@@ -100,10 +100,11 @@ class AnimalConfig:
     @classmethod
     def initialize_animal_config(cls) -> None:
         im = InputManager()
-        animal_config_data = im.get_data("animal.animal_config")
+        animal_data = im.get_data("animal")
+        animal_config_data = animal_data["animal_config"]
 
         cls.wean_day = animal_config_data["farm_level"]["calf"]["wean_day"]
-        cls.target_heifer_pregnant_day = animal_config_data["bodyweight"]["target_heifer_preg_day"]
+        cls.target_heifer_pregnant_day = animal_config_data["farm_level"]["bodyweight"]["target_heifer_preg_day"]
         cls.heifer_breed_start_day = animal_config_data["management_decisions"]["breeding_start_day_h"]
         cls.heifer_prefresh_day = animal_config_data["farm_level"]["repro"]["prefresh_day"]
         cls.dry_off_day_of_pregnancy = animal_config_data["management_decisions"]["days_in_preg_when_dry"]
@@ -211,8 +212,8 @@ class AnimalConfig:
         cls.unknown_cull_day_probability = animal_config_data["from_literature"]["culling"]["unknown_cull"][
             "cull_day_prob"]
 
-        cls.methane_model = animal_config_data["methane_model"]
-        cls.methane_mitigation_method = animal_config_data["methane_mitigation"]["methane_mitigation_method"]
-        cls.methane_mitigation_additive_amount = animal_config_data["methane_mitigation"][
+        cls.methane_model = animal_data["methane_model"]
+        cls.methane_mitigation_method = animal_data["methane_mitigation"]["methane_mitigation_method"]
+        cls.methane_mitigation_additive_amount = animal_data["methane_mitigation"][
             "methane_mitigation_additive_amount"
         ]

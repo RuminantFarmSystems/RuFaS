@@ -30,6 +30,8 @@ class Nutrients:
         self.ration_phosphorus_concentration = 0.0
         self.phosphorus_for_gestation = 0.0
         self.phosphorus_for_gestation_required_for_calf = 0.0
+        self.fecal_phosphorus = 0.0
+        self.urine_phosphorus_required = 0.0
 
     def perform_daily_phosphorus_update(self, nutrients_inputs: NutrientsInputs) -> None:
         """Manages animal's daily phosphorus update."""
