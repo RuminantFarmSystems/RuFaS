@@ -5,8 +5,11 @@ from mock.mock import MagicMock, PropertyMock, patch
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.feed_storage.feed_manager import FeedManager
-from RUFAS.routines.feed_storage.harvested_crop import HarvestedCrop
+from RUFAS.data_structures.crop_soil_to_feed_storage_connection import (
+    HarvestedCrop,
+    StorageType,
+    HarvestedCropStorageType,
+)
 from RUFAS.routines.field.crop.crop_configurations.alfalfa import AlfalfaSilage
 from RUFAS.routines.field.crop.crop_data import DEFAULT_DRY_MATTER_DIGESTIBILITY, CropData
 from RUFAS.routines.field.crop.crop_enum import CropSpecies
@@ -21,11 +24,6 @@ from RUFAS.units import MeasurementUnits
 @pytest.fixture
 def mock_time() -> Time:
     return MagicMock(auto_spec=Time)
-
-
-@pytest.fixture
-def mock_feed_manager() -> FeedManager:
-    return FeedManager()
 
 
 @pytest.fixture
@@ -111,10 +109,10 @@ def test_determine_biomass_cut_from_whole_plant(bmass: float, harv_ind: float) -
 # ---- Test Member functions
 def test_kill() -> None:
     """tests that a crop is properly killed by kill()"""
-    crop = CropManagement(crop_data=CropData(yield_residue=5.29, biomass=192.33))
+    crop = CropManagement(crop_data=CropData(biomass=192.33), yield_residue=5.29)
     crop.kill()
     assert not crop.data.is_alive
-    assert crop.data.yield_residue == 5.29 + 192.33
+    assert crop.yield_residue == 5.29 + 192.33
 
 
 @pytest.mark.parametrize(
@@ -137,75 +135,79 @@ def test_kill() -> None:
 def test_determine_harvest_index(harvest, heat_frac, water_def) -> None:
     """ensure that the harvest index is properly evaluated"""
     data = CropData(
-        user_harvest_index=harvest,
-        optimal_harvest_index=0.95,
-        min_harvest_index=0.5,
-        water_deficiency=water_def,
+        user_harvest_index=harvest, water_deficiency=water_def, optimal_harvest_index=0.95, minimum_harvest_index=0.5
     )
     crop = CropManagement(data)
     with patch.object(CropData, "heat_fraction", new_callable=PropertyMock, return_value=heat_frac):
         crop.determine_harvest_index()
 
     if harvest is not None:
-        assert data.harvest_index == harvest
+        assert crop.harvest_index == harvest
     else:
         potential = CropManagement._determine_potential_harvest_index(heat_frac, 0.95)
-        assert data.potential_harvest_index == potential
-        assert data.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
+        assert crop.potential_harvest_index == potential
+        assert crop.harvest_index == CropManagement._adjust_harvest_index(potential, 0.5, water_def)
 
 
 @pytest.mark.parametrize(
-    "harvest_op,field_name,field_size,soil_data,killed",
+    "harvest_op,field_name,field_size,soil_data,killed,expect_harvest",
     [
-        (HarvestOperation.HARVEST_KILL, "test_1", 1.8, SoilData(field_size=1.8), True),
-        (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, SoilData(field_size=4.5), False),
-        (HarvestOperation.KILL_ONLY, "test_3", 2.2, SoilData(field_size=2.5), True),
+        (HarvestOperation.HARVEST_KILL, "test_1", 1.8, SoilData(field_size=1.8), True, True),
+        (HarvestOperation.HARVEST_ONLY, "test_2", 4.5, SoilData(field_size=4.5), False, True),
+        (HarvestOperation.KILL_ONLY, "test_3", 2.2, SoilData(field_size=2.5), True, False),
     ],
 )
 def test_manage_harvest(
+    mocker: MockerFixture,
     mock_time: Time,
-    mock_feed_manager: FeedManager,
     harvest_op: HarvestOperation,
     field_name: str,
     field_size: float,
     soil_data: SoilData,
     killed: bool,
+    expect_harvest: bool,
 ) -> None:
     """ensure that crops are harvested properly, dependent on their operation specs"""
-    crop = CropManagement()
-    crop.data.yield_residue = 100.0
+    crop = CropManagement(yield_residue=100.0)
 
-    with (
-        patch.object(crop, "determine_harvest_index") as harvest_index,
-        patch.object(crop, "kill", wraps=crop.kill) as kill,
-        patch.object(crop, "cut_crop") as cut_crop,
-        patch.object(crop, "_store_harvested_crop") as store_crop,
-        patch.object(crop, "_record_yield") as record_yield,
-        patch.object(crop, "_transfer_residue") as transfer_residue,
-    ):
-        crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data, mock_feed_manager)
+    harvest_index = mocker.patch.object(crop, "determine_harvest_index")
+    kill = mocker.patch.object(crop, "kill", wraps=crop.kill)
+    cut_crop = mocker.patch.object(crop, "cut_crop")
+    get_crop = mocker.patch.object(
+        crop,
+        "_get_harvested_crop",
+        return_value=(expected_val := HarvestedCropStorageType(mocker.MagicMock(), StorageType.DRY)),
+    )
+    record_yield = mocker.patch.object(crop, "_record_yield")
+    transfer_residue = mocker.patch.object(crop, "_transfer_residue")
 
-        harvest_index.assert_called_once()
-        # Method specific (one for each op type)
-        if harvest_op == HarvestOperation.HARVEST_KILL:
-            cut_crop.assert_called_once()
-            kill.assert_called_once()
-            store_crop.assert_called_once()
+    actual = crop.manage_harvest(harvest_op, field_name, field_size, mock_time, soil_data)
 
-        if harvest_op == HarvestOperation.HARVEST_ONLY:
-            cut_crop.assert_called_once()
-            kill.assert_not_called()
-            store_crop.assert_called_once()
+    harvest_index.assert_called_once()
+    if harvest_op == HarvestOperation.HARVEST_KILL:
+        cut_crop.assert_called_once()
+        kill.assert_called_once()
+        get_crop.assert_called_once()
 
-        if harvest_op == HarvestOperation.KILL_ONLY:
-            cut_crop.assert_not_called()
-            kill.assert_called_once()
-            store_crop.assert_not_called()
+    if harvest_op == HarvestOperation.HARVEST_ONLY:
+        cut_crop.assert_called_once()
+        kill.assert_not_called()
+        get_crop.assert_called_once()
 
-        record_yield.assert_called_once_with(
-            field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
-        )
-        transfer_residue.assert_called_once_with(soil_data, killed)
+    if harvest_op == HarvestOperation.KILL_ONLY:
+        cut_crop.assert_not_called()
+        kill.assert_called_once()
+        get_crop.assert_not_called()
+
+    record_yield.assert_called_once_with(
+        field_name, field_size, mock_time.current_calendar_year, mock_time.current_julian_day
+    )
+    transfer_residue.assert_called_once_with(soil_data, killed)
+
+    if expect_harvest:
+        assert actual == expected_val
+    else:
+        assert actual is None
 
 
 @pytest.mark.parametrize(
@@ -225,19 +227,18 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
     """Ensure that the crop cutting routines are properly executed and that errors are raised properly."""
     # setup
     data = CropData(
-        harvest_index=harvest,
         biomass=100,
         leaf_area_index=2.3,
         accumulated_heat_units=1.1,
         optimal_nitrogen_fraction=0.09,
         optimal_phosphorus_fraction=0.02,
         yield_nitrogen_fraction=0.12,
-        yield_phosphorus_fraction=0.0092,
         above_ground_biomass=75.0,
+        yield_phosphorus_fraction=0.0092,
     )
     if override:
         data.user_harvest_index = harvest
-    crop = CropManagement(data)
+    crop = CropManagement(data, harvest_index=harvest)
     crop._recalculate_biomass_distribution = MagicMock()
 
     # act
@@ -254,7 +255,7 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         else:
             cut_biomass = data.above_ground_biomass * harvest
 
-        assert data.cut_biomass == cut_biomass
+        assert crop.cut_biomass == cut_biomass
         assert data.biomass == 100 - cut_biomass
         assert data.leaf_area_index == 2.3 * (1 - (cut_biomass / 100))
         assert data.accumulated_heat_units == 1.1 * (1 - (cut_biomass / 100))
@@ -262,20 +263,20 @@ def test_cut_crop(efficiency: float, harvest: float, override: bool, should_fail
         collected_dry_matter_yield = cut_biomass * efficiency
         residue = cut_biomass * (1 - efficiency)
         crop._recalculate_biomass_distribution.assert_called_once()
-        assert data.wet_yield_collected == collected_fresh_yield
-        assert data.dry_matter_yield_collected == collected_dry_matter_yield
-        assert data.yield_residue == residue
+        assert crop.wet_yield_collected == collected_fresh_yield
+        assert crop.dry_matter_yield_collected == collected_dry_matter_yield
+        assert crop.yield_residue == residue
 
         if override:
-            assert data.yield_nitrogen == collected_fresh_yield * 0.09
-            assert data.yield_phosphorus == collected_fresh_yield * 0.02
-            assert data.residue_nitrogen == residue * 0.09
-            assert data.residue_phosphorus == residue * 0.02
+            assert crop.yield_nitrogen == collected_fresh_yield * 0.09
+            assert crop.yield_phosphorus == collected_fresh_yield * 0.02
+            assert crop.residue_nitrogen == residue * 0.09
+            assert crop.residue_phosphorus == residue * 0.02
         else:
-            assert data.yield_nitrogen == collected_dry_matter_yield * 0.12
-            assert data.yield_phosphorus == collected_dry_matter_yield * 0.0092
-            assert data.residue_nitrogen == residue * 0.12
-            assert data.residue_phosphorus == residue * 0.0092
+            assert crop.yield_nitrogen == collected_dry_matter_yield * 0.12
+            assert crop.yield_phosphorus == collected_dry_matter_yield * 0.0092
+            assert crop.residue_nitrogen == residue * 0.12
+            assert crop.residue_phosphorus == residue * 0.0092
 
 
 @pytest.mark.parametrize(
@@ -296,13 +297,12 @@ def test_recalculate_biomass_distribution(
 ) -> None:
     """Tests that biomass is correctly redistributed after a harvest event."""
     crop = CropData(
-        cut_biomass=cut_biomass,
         biomass=biomass,
         above_ground_biomass=150,
         root_biomass=50,
         root_fraction=0.25,
     )
-    crop_management = CropManagement(crop)
+    crop_management = CropManagement(crop, cut_biomass=cut_biomass)
 
     crop_management._recalculate_biomass_distribution(roots_harvested)
 
@@ -311,24 +311,17 @@ def test_recalculate_biomass_distribution(
     assert crop.root_fraction == expected_root_fraction
 
 
-@pytest.mark.skip(reason="Issue #2008")
 @pytest.mark.parametrize(
-    "field_size,wet_yield_collected,expected_fresh_mass",
-    [
-        (1.0, 2000.0, 2000.0),
-        (2.0, 1500.0, 3000.0),
-    ],
+    "field_size,wet_yield_collected,expected_fresh_mass", [(1.0, 2000.0, 2000.0), (2.0, 1500.0, 3000.0)]
 )
 def test_store_harvested_crop(
     mock_time: Time,
-    mock_feed_manager: FeedManager,
     mock_alfalfa_silage_data: AlfalfaSilage,
     field_size: float,
     wet_yield_collected: float,
     expected_fresh_mass: float,
 ) -> None:
-    mock_alfalfa_silage_data.wet_yield_collected = wet_yield_collected
-    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data)
+    crop_management = CropManagement(crop_data=mock_alfalfa_silage_data, wet_yield_collected=wet_yield_collected)
     expected_harvest_crop = HarvestedCrop(
         category=mock_alfalfa_silage_data.crop_category,
         type=mock_alfalfa_silage_data.crop_type,
@@ -348,10 +341,11 @@ def test_store_harvested_crop(
     )
     expected_harvest_crop.last_time_degraded = expected_harvest_crop.storage_time
 
-    with patch.object(mock_feed_manager, "receive_crop") as receive_crop:
-        crop_management._store_harvested_crop(mock_time, field_size, mock_feed_manager)
+    actual = crop_management._get_harvested_crop(mock_time, field_size)
 
-        receive_crop.assert_called_once_with(expected_harvest_crop, mock_alfalfa_silage_data.storage_type)
+    assert actual.harvested_crop.category == mock_alfalfa_silage_data.crop_category
+    assert actual.harvested_crop.fresh_mass == expected_fresh_mass
+    assert actual.storage_type == mock_alfalfa_silage_data.storage_type
 
 
 @pytest.mark.parametrize(
@@ -381,12 +375,12 @@ def test_record_yield(
     crop_manager.data.planting_day = 100
     crop_manager.data.planting_year = 1995
     crop_manager.data.species = species
-    crop_manager.data.wet_yield_collected = mass
-    crop_manager.data.dry_matter_yield_collected = dry_mass
-    crop_manager.data.yield_nitrogen = nitrogen
-    crop_manager.data.yield_phosphorus = phosphorus
-    crop_manager.data.residue_nitrogen = 333.3
-    crop_manager.data.residue_phosphorus = 33.3
+    crop_manager.wet_yield_collected = mass
+    crop_manager.dry_matter_yield_collected = dry_mass
+    crop_manager.yield_nitrogen = nitrogen
+    crop_manager.yield_phosphorus = phosphorus
+    crop_manager.residue_nitrogen = 333.3
+    crop_manager.residue_phosphorus = 33.3
 
     expected_units = {
         "crop": MeasurementUnits.UNITLESS,
@@ -420,10 +414,10 @@ def test_record_yield(
         "phosphorus": phosphorus,
         "planting_year": 1995,
         "planting_day": 100,
-        "yield_residue": crop_manager.data.yield_residue,
+        "yield_residue": crop_manager.yield_residue,
         "residue_nitrogen": 333.3,
         "residue_phosphorus": 33.3,
-        "harvest_index": crop_manager.data.harvest_index,
+        "harvest_index": crop_manager.harvest_index,
         "harvest_year": year,
         "harvest_day": day,
         "field_size": field_size,
@@ -458,10 +452,10 @@ def test_transfer_residue(
     soil_data = SoilData(field_size=1)
     soil_data.soil_layers[0].fresh_organic_nitrogen_content = 0
     soil_data.soil_layers[0].labile_inorganic_phosphorus_content = 0
-    crop_data = CropData(yield_residue=residue, residue_nitrogen=22, residue_phosphorus=23)
+    crop_data = CropData()
     crop_data.root_depth = 100.0
     crop_data.root_biomass = root_biomass
-    crop_manage = CropManagement(crop_data)
+    crop_manage = CropManagement(crop_data, yield_residue=residue, residue_nitrogen=22, residue_phosphorus=23)
 
     with patch.object(crop_manage, "_distribute_residue_nutrients") as distribute_nutrients:
         crop_manage._transfer_residue(soil_data, killed)
@@ -471,9 +465,9 @@ def test_transfer_residue(
         assert soil_data.soil_layers[0].plant_residue == expected_surface_residue
         assert soil_data.soil_layers[0].fresh_organic_nitrogen_content == 22
         assert soil_data.soil_layers[0].labile_inorganic_phosphorus_content == 23
-    assert crop_data.yield_residue == 0.0
-    assert crop_data.residue_nitrogen == 0.0
-    assert crop_data.residue_phosphorus == 0.0
+    assert crop_manage.yield_residue == 0.0
+    assert crop_manage.residue_nitrogen == 0.0
+    assert crop_manage.residue_phosphorus == 0.0
 
 
 @pytest.mark.parametrize(
@@ -493,13 +487,10 @@ def test_distribute_residue_nutrients(
 ) -> None:
     """Tests that residue nutrients are correctly partitioned between the nutrient pools in a soil profile."""
     crop_data = CropData(
-        yield_residue=100.0,
         root_biomass=50.0,
-        residue_nitrogen=n,
-        residue_phosphorus=p,
         max_root_depth=root_depth,
     )
-    crop_manager = CropManagement(crop_data)
+    crop_manager = CropManagement(crop_data, yield_residue=100.0, residue_nitrogen=n, residue_phosphorus=p)
     mocker.patch.object(crop_manager, "_calculate_root_mass_distribution", side_effect=[0.1, 0.7, 0.8, 1.0])
     field_size = 1.0
     top_soil_layer = LayerData(top_depth=0.0, bottom_depth=20.0, field_size=field_size)
@@ -583,8 +574,8 @@ def test_calculate_root_mass_distribution(
     crop_manager: CropManagement, d_a: float, c: float, root_depth: float, depth: float, expected: float
 ) -> None:
     """Tests _calculate_root_mass_distribution() in CropManagement."""
-    crop_manager.data.root_distribution_param_da = d_a
-    crop_manager.data.root_distribution_param_c = c
+    crop_manager.root_distribution_param_da = d_a
+    crop_manager.root_distribution_param_c = c
     crop_manager.data.max_root_depth = root_depth
 
     actual = crop_manager._calculate_root_mass_distribution(depth)
@@ -596,18 +587,17 @@ def test_cut_crop_zero_division(mocker: MockerFixture) -> None:
     """Ensure that the crop cutting routines have division error"""
     # setup
     data = CropData(
-        harvest_index=3,
         biomass=0,
         leaf_area_index=2.3,
         accumulated_heat_units=1.1,
         optimal_nitrogen_fraction=0.09,
         optimal_phosphorus_fraction=0.02,
         yield_nitrogen_fraction=0.12,
-        yield_phosphorus_fraction=0.0092,
         above_ground_biomass=75.0,
+        yield_phosphorus_fraction=0.0092,
     )
 
-    crop = CropManagement(data)
+    crop = CropManagement(data, harvest_index=3)
     crop._recalculate_biomass_distribution = MagicMock()
     crop.determine_biomass_cut_from_whole_plant = MagicMock(return_value=0)
 

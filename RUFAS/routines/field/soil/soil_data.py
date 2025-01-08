@@ -419,6 +419,8 @@ class SoilData:
         self.machine_manure.annual_runoff_manure_inorganic_phosphorus = 0
         self.machine_manure.annual_runoff_manure_organic_phosphorus = 0
         self.annual_soil_phosphorus_runoff = 0
+        self.machine_manure.annual_decomposed_manure = 0
+        self.grazing_manure.annual_decomposed_manure = 0
 
         self.annual_runoff_nitrates_total = 0
         self.annual_runoff_ammonium_total = 0

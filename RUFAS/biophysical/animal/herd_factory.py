@@ -339,4 +339,5 @@ class HerdFactory:
             self.pre_animal_population = self._initialize_herd_from_data()
 
         self.post_animal_population = self._random_sample_with_replacement()
-        return self.pre_animal_population
+        return self.post_animal_population
+
