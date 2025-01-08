@@ -75,7 +75,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         net_energy_diet_concentration : float
             Metabolizable energy density of formulated ration.
         days_born : float
-            Number of days since birth.
+            Number of days since birth (days).
         TDN_percentage : float
             Percentage of Total Digestible Nutrients in previously fed ration (%).
 
@@ -601,7 +601,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         net_energy_diet_concentration : float
             Metabolizable energy density of formulated ration.
         days_born : float
-            Number of days since birth.
+            Number of days since birth (days).
 
         Returns
         -------
