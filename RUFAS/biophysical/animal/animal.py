@@ -68,6 +68,11 @@ class Animal:
     #     "nutrient_requirements",
     # }
 
+    @classmethod
+    def set_nutrient_standard(cls, nutrient_standard: NutrientStandard) -> None:
+        """Setter for nutrient standard class attribute."""
+        cls.nutrient_standard = nutrient_standard
+
     @property
     def days_in_milk(self) -> int:
         if not self.animal_type.is_cow:
@@ -96,7 +101,7 @@ class Animal:
     def is_pregnant(self) -> bool:
         if self.animal_type in {AnimalType.CALF, AnimalType.HEIFER_I}:
             # check which is more time efficient [] or {} or ()
-            raise False
+            return False
         return self.days_in_pregnancy > 0
 
     @property
@@ -155,8 +160,8 @@ class Animal:
 
     @property
     def daily_distance(self) -> float:
-        if not self.animal_type.is_cow:
-            raise TypeError()
+        if not self.animal_type.is_cow and self.is_milking:
+            return 0.0
         return self._daily_distance
 
     @daily_distance.setter
@@ -727,7 +732,7 @@ class Animal:
         self.daily_distance = sqrt(self.daily_vertical_distance ** 2 + self.daily_horizontal_distance ** 2)
 
     def set_nutrition_requirements(
-        self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
+        self, housing: str, walking_distance: float, previous_temperature: float
     ) -> NutritionRequirements:
         """Sets the nutrition requirements for an animal."""
         self.nutrition_requirements = self.calculate_nutrition_requirements(
@@ -735,7 +740,7 @@ class Animal:
         )
 
     def calculate_nutrition_requirements(
-        self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
+        self, housing: str, walking_distance: float, previous_temperature: float
     ) -> NutritionRequirements:
         """
         Gets the nutrition requirements for an animal.

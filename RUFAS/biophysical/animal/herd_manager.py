@@ -17,7 +17,7 @@ from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RequestedFeed, NutrientStandard
 from RUFAS.data_structures.pen_manure_data import PenManureData
 from RUFAS.enums import AnimalCombination
 from RUFAS.input_manager import InputManager
@@ -160,6 +160,8 @@ class HerdManager:
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
+        nutrient_standard = NutrientStandard(config_data["nutrient_standard"])
+        Animal.set_nutrient_standard(nutrient_standard)
 
         self.initialize_pens(animal_config_data["pen_information"], manure_management_config_data)
 

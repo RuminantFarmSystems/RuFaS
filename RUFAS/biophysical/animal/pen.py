@@ -176,7 +176,7 @@ class Pen:
         """
         for animal in new_animals:
             self.animals_in_pen[animal.id] = animal
-            self._set_animal_nutrient_values(animal)
+            animal.set_nutrition_requirements(self.housing_type, animal.daily_distance, 20.0)
 
     def update_animal_combination(self, animal_combination: AnimalCombination) -> None:
         """
