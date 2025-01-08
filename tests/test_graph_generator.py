@@ -248,6 +248,44 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
     graph_generator._add_var_units.assert_called_once_with(filtered_pool, "dummy.graph/title")
 
 
+def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    graph_generator._draw_graph = MagicMock()
+    graph_generator._customize_graph = MagicMock()
+    graph_generator._validate_graph_filter = MagicMock(return_value=[])
+    graph_generator._save_graph = MagicMock()
+    graph_generator._generate_legend_keys = MagicMock(side_effect=lambda k, **kwargs: f"legend_{k}")
+    graph_generator._add_var_units = MagicMock(
+        return_value=({"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}, [])
+    )
+    graph_generator._log_non_numerical_data = MagicMock(return_value=[])
+
+    filtered_pool = {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}
+    graph_details = {
+        "type": "plot",
+        "filters": ["var1", "var2"],
+        "title": "dummy graph",
+        "legend": True,
+    }
+    filter_file_name = "filter_file"
+    graphics_dir = Path("graphs")
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
+
+    graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir, True)
+
+    graph_generator._generate_legend_keys.assert_any_call("var1", omit_legend_prefix=True, omit_legend_suffix=True)
+    graph_generator._generate_legend_keys.assert_any_call("var2", omit_legend_prefix=True, omit_legend_suffix=True)
+
+    sorted_keys = ["var1", "var2"]
+    expected_prepared_data = {"var1": [1, 2, 3], "var2": [4, 5, 6]}
+    graph_generator._draw_graph.assert_called_once_with(
+        "plot", expected_prepared_data, sorted_keys, mock_ax, False, False, None, None, None
+    )
+
+    graph_generator._customize_graph.assert_called_once()
+    graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
+
+
 def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
     graph_generator._draw_graph = MagicMock()
     graph_generator._customize_graph = MagicMock()
