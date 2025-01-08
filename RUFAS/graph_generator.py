@@ -226,7 +226,10 @@ class GraphGenerator:
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
             date_format = graph_details.get("date_format", None)
             if graph_details.get("legend", False):
-                sorted_keys = sorted(prepared_data.keys(), key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=True))
+                sorted_keys = sorted(
+                    prepared_data.keys(),
+                    key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=True)
+                )
                 prepared_data = {key: prepared_data[key] for key in sorted_keys}
             else:
                 graph_details = self._set_graph_legend(graph_details, prepared_data)
