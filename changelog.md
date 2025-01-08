@@ -77,6 +77,8 @@ v0.9.2
 - [2134](https://github.com/RuminantFarmSystems/MASM/pull/2134) - [minor change] [Crop & Soil] Adds ammonium fraction to fertilizer mixes input.
 - [2136](https://github.com/RuminantFarmSystems/MASM/pull/2136) - [minor change] [Animal] Adds data structures to support calculation of animal nutrient requirements and supply.
 - [2138](https://github.com/RuminantFarmSystems/MASM/pull/2138) - [minor change] [Animal] Refreshes module which calculates the nutrients supplied to an animal by a ration.
+- [2128](https://github.com/RuminantFarmSystems/MASM/pull/2128) - [minor change] [Animal] Updates culling-related metadata descriptions
+
 
 ### v0.9.2
 
