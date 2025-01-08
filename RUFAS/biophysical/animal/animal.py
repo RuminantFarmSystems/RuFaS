@@ -221,7 +221,7 @@ class Animal:
         self.milk_production: MilkProduction = MilkProduction()
         self.nutrients: Nutrients = Nutrients()
         self._reproduction: Reproduction = Reproduction()
-        self.nutrition_requirements: NutritionRequirements = self.calculate_nutrition_requirements()
+        self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
         self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()

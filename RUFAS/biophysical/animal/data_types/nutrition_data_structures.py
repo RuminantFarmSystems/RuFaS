@@ -93,6 +93,33 @@ class NutritionRequirements:
             essential_amino_acids=self.essential_amino_acids / divisor,
         )
 
+    @classmethod
+    def make_empty_nutrition_requirements(cls) -> "NutritionRequirements":
+        """Makes an empty NutritionRequirements instance."""
+        return NutritionRequirements(
+            maintenance_energy=0.0,
+            growth_energy=0.0,
+            pregnancy_energy=0.0,
+            lactation_energy=0.0,
+            metabolizable_protein=0.0,
+            calcium=0.0,
+            phosphorus=0.0,
+            secondary_phosphorus=0.0,
+            dry_matter=0.0,
+            activity_energy=0.0,
+            essential_amino_acids=EssentialAminoAcidRequirements(
+                histidine=0.0,
+                isoleucine=0.0,
+                leucine=0.0,
+                lysine=0.0,
+                methionine=0.0,
+                phenylalanine=0.0,
+                threonine=0.0,
+                thryptophan=0.0,
+                valine=0.0,
+            )
+        )
+
 
 @dataclass
 class NutritionSupply:
