@@ -672,7 +672,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
     def _calculate_activity_energy_requirements(
         cls,
         body_weight: float,
-        housing: float,
+        housing: str,
         distance: float,
     ) -> float:
         """
