@@ -242,7 +242,10 @@ class GraphGenerator:
                 graph_details["title"] = corrected_graph_title
 
             if graph_details.get("legend"):
-                sorted_keys = sorted(prepared_data.keys(), key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=True))
+                sorted_keys = sorted(
+                    prepared_data.keys(),
+                    key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=True),
+                )
                 prepared_data = {key: prepared_data[key] for key in sorted_keys}
             else:
                 graph_details = self._set_graph_legend(graph_details, prepared_data)

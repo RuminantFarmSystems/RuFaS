@@ -254,7 +254,9 @@ def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mock
     graph_generator._validate_graph_filter = MagicMock(return_value=[])
     graph_generator._save_graph = MagicMock()
     graph_generator._generate_legend_keys = MagicMock(side_effect=lambda k, **kwargs: f"legend_{k}")
-    graph_generator._add_var_units = MagicMock(return_value=({"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}, []))
+    graph_generator._add_var_units = MagicMock(
+        return_value=({"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}, [])
+    )
     graph_generator._log_non_numerical_data = MagicMock(return_value=[])
 
     filtered_pool = {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}
