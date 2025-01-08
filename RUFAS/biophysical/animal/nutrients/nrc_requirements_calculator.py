@@ -35,7 +35,56 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         days_born: float,
         TDN_percentage: float,
     ) -> NutritionRequirements:
-        """Calculates energy and nutrition requirements for an animal using the NRC methodology."""
+        """
+        Calculates energy and nutrition requirements for an animal using the NRC methodology.
+
+        Parameters
+        ----------
+        body_weight : float
+            Body weight (kg).
+        mature_body_weight : float
+            Mature body weight (kg).
+        day_of_pregnancy : int
+            Day of pregnancy (days).
+        body_condition_score_5 : int
+            Body condition score (score from 1 to 5).
+        days_in_milk : int | None
+            Days in milk (days).
+        average_daily_gain_heifer : float
+            Average daily gain (grams per day).
+        animal_type : AnimalType
+            A type or subtype of animal specified in the AnimalType enum.
+        parity : int
+            Parity number (lactation 1, 2.. n).
+        calving_interval : int
+            Calving interval (days).
+        milk_fat : float
+            Fat contents in milk (%).
+        milk_true_protein : float
+            True protein contents in milk (%).
+        milk_lactose : float
+            Lactose contents in milk (%).
+        milk_production: float
+            Daily milk yield (kg).
+        housing : str
+            Housing type (Barn or Grazing).
+        distance : float
+            Distance walked (m).
+        previous_temperature : float
+            Adjustment for previous temperature.
+        net_energy_diet_concentration : float
+            Metabolizable energy density of formulated ration.
+        days_born : float
+            Number of days since birth (days).
+        TDN_percentage : float
+            Percentage of Total Digestible Nutrients in previously fed ration (%).
+
+        Returns
+        -------
+        NutritionRequirements
+            NutritionRequirements instance containing all the required amounts of energy and nutrition.
+
+        """
         maintenance_requirement, conceptus_weight, calf_birth_weight = cls._calculate_maintentance_energy_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type
         )
@@ -49,7 +98,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             average_daily_gain_heifer,
         )
         pregnancy_requirement = cls._calculate_pregnancy_energy_requirements(day_of_pregnancy, calf_birth_weight)
-        lactation_requirement = cls.calculate_lactation_energy_requirements(
+        lactation_requirement = cls._calculate_lactation_energy_requirements(
             animal_type, milk_fat, milk_true_protein, milk_lactose, milk_production
         )
         dry_matter_intake = cls._calculate_dry_matter_intake(
@@ -130,22 +179,22 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         body_weight : float
-            Body weight (kg)
+            Body weight (kg).
         mature_body_weight : float
-            Mature body weight (kg)
+            Mature body weight (kg).
         day_of_pregnancy : int
-            Day of pregnancy (days)
+            Day of pregnancy (days).
         body_condition_score_5 : int
-            Body condition score (score from 1 to 5)
+            Body condition score (score from 1 to 5).
         previous_temperature : float
-            Adjustment for previous temperature
+            Adjustment for previous temperature.
         animal_type : AnimalType
-            A type or subtype of animal specified in the AnimalType enum
+            A type or subtype of animal specified in the AnimalType enum.
 
         Returns
         -------
         tuple[float, float, float]
-            Net energy requirement for maintenance (Mcal/day), conceptus weight (kg), and calf birth weight (kg)
+            Net energy requirement for maintenance (Mcal/day), conceptus weight (kg), and calf birth weight (kg).
 
         Notes
         -----
@@ -190,19 +239,19 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         body_weight : float
-            Body weight (kg)
+            Body weight (kg).
         mature_body_weight : float
-            Mature body weight (kg)
+            Mature body weight (kg).
         conceptus_weight : float
-            Conceptus weight (kg)
+            Conceptus weight (kg).
         animal_type : AnimalType
-            A type or subtype of animal specified in AnimalType enum
+            A type or subtype of animal specified in AnimalType enum.
         parity : int
-            Parity number (lactation 1, 2.. n)
+            Parity number (lactation 1, 2.. n).
         calving_interval : int
-            Calving interval (days)
+            Calving interval (days).
         average_daily_gain_heifer : float
-            Average daily gain (grams per day)
+            Average daily gain (grams per day).
 
         Returns
         -------
@@ -302,45 +351,45 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         body_weight : float
-            Body weight (kilograms)
+            Body weight (kilograms).
         conceptus_weight : float
-            Conceptus weight (kilograms)
+            Conceptus weight (kilograms).
         day_of_pregnancy : int
-            Day of pregnancy (days)
+            Day of pregnancy (days).
         animal_type : AnimalType
-            A type or subtype of animal specified in the AnimalType enum
+            A type or subtype of animal specified in the AnimalType enum.
         milk_production: float
-            Milk yield (kg/d)
+            Milk yield (kg/d).
         milk_true_protein : float
-            True protein contents in milk (%)
+            True protein contents in milk (%).
         calf_birth_weight : float
-            Calf birth weight
+            Calf birth weight.
         net_energy_growth : float
-            Net energy requirement for growth (Mcal/d)
+            Net energy requirement for growth (Mcal/d).
         average_daily_gain : float
-            Average daily gain (grams per day)
+            Average daily gain (grams per day).
         equivalent_shrunk_body_weight : float
-            Equivalent shrunk body weight (kilograms)
+            Equivalent shrunk body weight (kilograms).
         dry_matter_intake_estimate : float
-            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d)
+            Estimated dry matter intake according to empirical prediction equation within NASEM (2021) (kg/d).
         TDN_conc:
             Concentration (percent value) of Total Digestible Nutrients in previously fed ration.
 
         Returns
         -------
         float
-            Metabolizable protein requirement (g/day)
+            Metabolizable protein requirement (g/day).
 
         Notes
         -----
-        bacteria_estimate: Bacteria metabolizable protein production, g
+        bacteria_estimate: Bacteria metabolizable protein production (g).
         TDN: Total digestible nutrients
-        maintenance: Metabolizable protein requirement for maintenance, g
-        net_growth: Net protein requirement for growth, g
+        maintenance: Metabolizable protein requirement for maintenance (g).
+        net_growth: Net protein requirement for growth (g).
         metabolizable_to_net_efficiency: Efficiency of converting metabolizable protein to net protein
-        metabolizable_growth: Metabolizable protein requirement for growth, g
-        pregnancy: Metabolizable protein requirement for pregnancy, g
-        lactation: Metabolizable protein requirement for lactation, g
+        metabolizable_growth: Metabolizable protein requirement for growth (g).
+        pregnancy: Metabolizable protein requirement for pregnancy (g).
+        lactation: Metabolizable protein requirement for lactation (g).
 
         References
         ----------
@@ -406,22 +455,22 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         body_weight : float
-            Body weight (kilograms)
+            Body weight (kilograms).
         mature_body_weight : float
-            Mature body weight (kilograms)
+            Mature body weight (kilograms).
         day_of_pregnancy : int
-            Day of pregnancy (days)
+            Day of pregnancy (days).
         animal_type : AnimalType
-            A type or subtype of animal specified in the AnimalType enum
+            A type or subtype of animal specified in the AnimalType enum.
         average_daily_gain : float
-            Average daily gain (grams per day)
+            Average daily gain (grams per day).
         milk_production: float
-            Milk yield (kg/d)
+            Milk yield (kg/d).
 
         Returns
         -------
         float
-            Calcium requirement (grams per day)
+            Calcium requirement (grams per day).
 
         References
         ----------
@@ -474,24 +523,24 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         body_weight : float
-            Body weight (kilograms)
+            Body weight (kilograms).
         mature_body_weight : float
-            Mature body weight (kilograms)
+            Mature body weight (kilograms).
         day_of_pregnancy : int
-            Day of pregnancy (days)
+            Day of pregnancy (days).
         milk_production: float
-            Milk yield (kg/d)
+            Milk yield (kg/d).
         animal_type : AnimalType
-            A type or subtype of animal specified in the AnimalType enum
+            A type or subtype of animal specified in the AnimalType enum.
         average_daily_gain : float
-            Average daily gain (grams per day)
+            Average daily gain (grams per day).
         dry_matter_intake_estimate : float
-            Estimated dry matter intake (kg/d)
+            Estimated dry matter intake (kg/d).
 
         Returns
         -------
         float
-            Phosphorus requirement (grams per day)
+            Phosphorus requirement (grams per day).
 
         References
         ----------
@@ -538,26 +587,26 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         animal_type : AnimalType
-            A type or subtype of animal specified in the AnimalType enum
+            A type or subtype of animal specified in the AnimalType enum.
         body_weight : float
-            Body weight (kilograms)
+            Body weight (kilograms).
         day_of_pregnancy : int
-            Day of pregnancy (days)
+            Day of pregnancy (days).
         days_in_milk : int
-            Days in milk (days)
+            Days in milk (days).
         milk_production : float
-            Milk yield (kg/d)
+            Milk yield (kg/d).
         milk_fat : float
-            Fat contents in milk (%)
+            Fat contents in milk (%).
         net_energy_diet_concentration : float
-            Metabolizable energy density of formulated ration
+            Metabolizable energy density of formulated ration.
         days_born : float
-            number of days since birth
+            Number of days since birth (days).
 
         Returns
         -------
         dry_matter_intake_estimate : float
-            Dry matter intake (kilograms per day)
+            Dry matter intake (kilograms per day).
 
         Notes
         -----
@@ -613,16 +662,16 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
         Parameters
         ----------
         body_weight : float
-            Body weight (kg)
+            Body weight (kg).
         housing : str
-            Housing type (Barn or Grazing)
+            Housing type (Barn or Grazing).
         distance : float
             Distance walked (m).
 
         Returns
         -------
         float
-            Net energy requirement for activity (Mcal/day)
+            Net energy requirement for activity (Mcal/day).
 
         Notes
         -----
