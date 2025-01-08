@@ -150,7 +150,7 @@ class CalfRationManager:
         body_weight: float,
         wean_day: int,
         wean_length: int,
-        available_feeds: list[NASEMFeed, NRCFeed],
+        available_feeds: list[NASEMFeed | NRCFeed],
         nutrient_standard: NutrientStandard,
     ) -> dict[str, float]:
         """
@@ -166,8 +166,10 @@ class CalfRationManager:
             Number of days after birth that calf is fully weaned from milk (or replacer).
         wean_length : int
             Wean length of the calf (days).
-        available_feeds : list[Feed]
+        available_feeds : list[NASEMFeed | NRCFeed]
             List of feeds available to the calf.
+        nutrient_standard : NutrientStandard
+            Enum member indicating whether the NASEM or NRC nutrition standard is being used.
 
         Returns
         -------
