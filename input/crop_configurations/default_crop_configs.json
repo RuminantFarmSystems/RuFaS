@@ -300,8 +300,17 @@
                 "sugar": 12.73,
                 "ash": 6.293,
                 "yield_nitrogen_fraction": 0.012192,
-                "yield_phosphorus_fraction": 0.00179,
+                "yield_phosphorus_fraction": 0.00179
             }
+        },
+        {
+            "name": "corn grain",
+            "plant_category": "warm_annual",
+            "crop_category": "Corn",
+            "crop_type": "Grain",
+            "species": "corn grain",
+            "growth_parameters": {},
+            "storage_parameters": {}
         }
     ]
 }
