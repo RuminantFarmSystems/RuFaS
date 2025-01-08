@@ -61,7 +61,6 @@ class HerdManager:
 
     def __init__(
         self,
-        feed: Feed,
         weather: Weather,
         time: Time,
         is_ration_defined_by_user: bool,
@@ -183,7 +182,7 @@ class HerdManager:
                 herd_population.replacement
             )
 
-            self.initialize_nutrient_requirements(weather, time, feed)
+            self.initialize_nutrient_requirements(weather, time)
 
             self.allocate_animals_to_pens()
 

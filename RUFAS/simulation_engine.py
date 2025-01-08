@@ -244,7 +244,7 @@ class SimulationEngine:
         self.next_ration_reformulation = self.time.current_date
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
 
-        self.herd_manager = HerdManager(animal_class_config, self.weather, self.time, is_ration_defined_by_user=True)
+        self.herd_manager = HerdManager(self.weather, self.time, is_ration_defined_by_user=True)
         all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
         simulate_animals: bool = self.im.get_data("config.simulate_animals")
         self.manure_manager = ManureManager(
