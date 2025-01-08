@@ -228,7 +228,7 @@ class GraphGenerator:
             if graph_details.get("legend", False):
                 sorted_keys = sorted(
                     prepared_data.keys(),
-                    key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=True),
+                    key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=True)
                 )
                 prepared_data = {key: prepared_data[key] for key in sorted_keys}
             else:

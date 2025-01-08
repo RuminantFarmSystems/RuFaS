@@ -218,18 +218,18 @@ def test_generate_graph_error_found(graph_generator: GraphGenerator) -> None:
 
 
 def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    graph_generator._draw_graph = MagicMock()
-    graph_generator._customize_graph = MagicMock()
-    graph_generator._validate_graph_filter = MagicMock(return_value=[])
-    graph_generator._save_graph = MagicMock(return_value="graph path")
+    mocker.patch.object(graph_generator, "_draw_graph")
+    mocker.patch.object(graph_generator, "_customize_graph")
+    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
+    mocker.patch.object(graph_generator, "_save_graph", return_value="graph path")
     filtered_pool = {"var1": {"values": [1, 2, 3]}}
     updated_pool = {"var1": {"values": [1, 2, 3], "units": "units"}}
     var_units_logs = []
-    graph_generator._add_var_units = MagicMock(return_value=(updated_pool, var_units_logs))
+    mocker.patch.object(graph_generator, "_add_var_units", return_value=(updated_pool, var_units_logs))
     prepared_data = {"var1": [1, 2, 3]}
     mock_log_pool = [{"log": "mock_log_message"}]
     mock_remove_special_chars = mocker.patch("RUFAS.util.Utility.remove_special_chars")
-    graph_generator._log_non_numerical_data = MagicMock(return_value=[{"log": "mock_log_message"}])
+    mocker.patch.object(graph_generator, "_log_non_numerical_data", return_value=[{"log": "mock_log_message"}])
     graph_details = {"type": "plot", "filters": ["var1", "var2"], "title": "dummy.graph/title", "display_units": True}
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
@@ -249,15 +249,23 @@ def test_generate_graph_success(graph_generator: GraphGenerator, mocker: MockerF
 
 
 def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
-    graph_generator._draw_graph = MagicMock()
-    graph_generator._customize_graph = MagicMock()
-    graph_generator._validate_graph_filter = MagicMock(return_value=[])
-    graph_generator._save_graph = MagicMock()
-    graph_generator._generate_legend_keys = MagicMock(side_effect=lambda k, **kwargs: f"legend_{k}")
-    graph_generator._add_var_units = MagicMock(
-        return_value=({"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}, [])
+    mocker.patch.object(graph_generator, "_draw_graph")
+    mocker.patch.object(graph_generator, "_customize_graph")
+    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
+    mocker.patch.object(graph_generator, "_save_graph")
+    mock_generate_legend_keys = mocker.patch.object(
+        graph_generator,
+        "_generate_legend_keys",
+        side_effect=lambda k, **kwargs: f"legend_{k}",
     )
-    graph_generator._log_non_numerical_data = MagicMock(return_value=[])
+    mocker.patch.object(
+        graph_generator,
+        "_add_var_units",
+        return_value=({"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}, []),
+    )
+    mocker.patch.object(graph_generator, "_log_non_numerical_data", return_value=[])
+    mock_ax = mocker.MagicMock()
+    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
 
     filtered_pool = {"var1": {"values": [1, 2, 3]}, "var2": {"values": [4, 5, 6]}}
     graph_details = {
@@ -268,13 +276,11 @@ def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mock
     }
     filter_file_name = "filter_file"
     graphics_dir = Path("graphs")
-    mock_ax = mocker.MagicMock()
-    mocker.patch("matplotlib.pyplot.subplots", return_value=(mocker.MagicMock(), mock_ax))
 
     graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir, True)
 
-    graph_generator._generate_legend_keys.assert_any_call("var1", omit_legend_prefix=True, omit_legend_suffix=True)
-    graph_generator._generate_legend_keys.assert_any_call("var2", omit_legend_prefix=True, omit_legend_suffix=True)
+    mock_generate_legend_keys.assert_any_call("var1", omit_legend_prefix=True, omit_legend_suffix=True)
+    mock_generate_legend_keys.assert_any_call("var2", omit_legend_prefix=True, omit_legend_suffix=True)
 
     sorted_keys = ["var1", "var2"]
     expected_prepared_data = {"var1": [1, 2, 3], "var2": [4, 5, 6]}
@@ -286,11 +292,11 @@ def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mock
     graph_generator._save_graph.assert_called_once_with(graph_details, filter_file_name, graphics_dir)
 
 
-def test_generate_graph_exception(graph_generator: GraphGenerator) -> None:
-    graph_generator._draw_graph = MagicMock()
-    graph_generator._customize_graph = MagicMock()
-    graph_generator._validate_graph_filter = MagicMock(return_value=[])
-    graph_generator._save_graph = MagicMock(side_effect=Exception)
+def test_generate_graph_exception(graph_generator: GraphGenerator, mocker: MockerFixture) -> None:
+    mocker.patch.object(graph_generator, "_draw_graph")
+    mocker.patch.object(graph_generator, "_customize_graph")
+    mocker.patch.object(graph_generator, "_validate_graph_filter", return_value=[])
+    mocker.patch.object(graph_generator, "_save_graph", side_effect=Exception)
     filtered_pool = {}
     graph_details = {"type": "plot", "variables": ["var1", "var2"]}
     filter_file_name = "filter_file"
