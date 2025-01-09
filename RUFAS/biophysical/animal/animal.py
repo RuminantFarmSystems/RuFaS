@@ -225,6 +225,7 @@ class Animal:
         self._reproduction: Reproduction = Reproduction()
         self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
         self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
+        self.nutrition_supply.dry_matter = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
         self.previous_nutrition_supply: NutritionSupply | None = None
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
