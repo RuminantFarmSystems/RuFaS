@@ -52,8 +52,7 @@ class ManureExcretionCalculator:
 
         """
         dry_matter_intake = nutrient_amounts.dry_matter
-        crude_protein_concentration = 10.0
-        # crude_protein_concentration = nutrient_amounts.crude_protein_percentage
+        crude_protein_concentration = nutrient_amounts.crude_protein_percentage
 
         total_manure_excreted = 3.45 * dry_matter_intake
 

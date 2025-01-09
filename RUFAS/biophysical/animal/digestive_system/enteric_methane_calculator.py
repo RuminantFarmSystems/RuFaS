@@ -136,12 +136,11 @@ class EntericMethaneCalculator:
                 milk_fat,
                 metabolizable_energy_intake,
                 nutrient_amounts,
-                nutrient_concentrations,
                 methane_model,
             )
         else:
             methane_emission = EntericMethaneCalculator._calculate_dry_cow_manure(
-                methane_model, metabolizable_energy_intake, nutrient_amounts, nutrient_concentrations
+                methane_model, metabolizable_energy_intake, nutrient_amounts
             )
 
         if methane_mitigation_method:
@@ -170,8 +169,7 @@ class EntericMethaneCalculator:
         body_weight: float,
         milk_fat: float,
         metabolizable_energy_intake: float,
-        nutrient_amounts: dict[str, float],
-        nutrient_concentrations: dict[str, float],
+        nutrient_amounts: NutritionSupply,
         methane_model: str,
     ) -> float:
         """
@@ -209,13 +207,13 @@ class EntericMethaneCalculator:
         Methane emission calculation: [A.3B.C.3]
 
         """
-        dry_matter_intake = nutrient_amounts["dm"]
-        ash_concentration = nutrient_concentrations["ash"]
-        acid_detergent_fiber_concentrations = nutrient_concentrations["ADF"]
-        crude_protein_concentration = nutrient_concentrations["CP"]
-        neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
-        ethyl_ester_concentration = nutrient_concentrations["EE"]
-        starch_concentration = nutrient_concentrations["starch"]
+        dry_matter_intake = nutrient_amounts.dry_matter
+        ash_concentration = nutrient_amounts.ash_percentage
+        acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
+        crude_protein_concentration = nutrient_amounts.crude_protein_percentage
+        neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
+        ethyl_ester_concentration = nutrient_amounts.fat_percentage
+        starch_concentration = nutrient_amounts.starch_percentage
         methane_emission = 0.0
         if methane_model == "Mutian":
             methane_emission = (
@@ -255,8 +253,7 @@ class EntericMethaneCalculator:
     def _calculate_dry_cow_manure(
         methane_model: str,
         metabolizable_energy_intake: float,
-        nutrient_amounts: dict[str, float],
-        nutrient_concentrations: dict[str, float],
+        nutrient_amounts: NutritionSupply,
     ) -> float:
         """
         Calculates the daily enteric methane emissions for dry cows.
@@ -288,13 +285,13 @@ class EntericMethaneCalculator:
         IPCC tier2 calculation: [A.3B.C.2]
 
         """
-        dry_matter_intake = nutrient_amounts["dm"]
-        ash_concentration = nutrient_concentrations["ash"]
-        acid_detergent_fiber_concentrations = nutrient_concentrations["ADF"]
-        crude_protein_concentration = nutrient_concentrations["CP"]
-        neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
-        ethyl_ester_concentration = nutrient_concentrations["EE"]
-        starch_concentration = nutrient_concentrations["starch"]
+        dry_matter_intake = nutrient_amounts.dry_matter
+        ash_concentration = nutrient_amounts.ash_percentage
+        acid_detergent_fiber_concentrations = nutrient_amounts.adf_percentage
+        crude_protein_concentration = nutrient_amounts.crude_protein_percentage
+        neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
+        ethyl_ester_concentration = nutrient_amounts.fat_percentage
+        starch_concentration = nutrient_amounts.starch_percentage
         soluble_residue = (
             (100 - ash_concentration)
             - neutral_detergent_fiber_concentration
