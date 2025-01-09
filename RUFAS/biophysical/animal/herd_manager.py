@@ -14,6 +14,7 @@ from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
 from RUFAS.biophysical.animal.data_types.daily_routines_output import DailyRoutinesOutput
 from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
+from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
@@ -98,6 +99,7 @@ class HerdManager:
 
         # how do we set lactation curve
         LactationCurve.set_lactation_parameters(time)
+        # MilkProduction.set_milk_quality()
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)

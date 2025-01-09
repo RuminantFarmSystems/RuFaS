@@ -60,8 +60,8 @@ class MilkProduction:
     @classmethod
     def set_milk_quality(cls, fat_percent: float, true_protein_percent: float) -> None:
         """Sets user-defined milk qualities."""
-        cls.FAT_PERCENT = fat_percent
-        cls.TRUE_PROTEIN_PERCENT = true_protein_percent
+        cls.fat_percent = fat_percent
+        cls.true_protein_percent = true_protein_percent
 
     def perform_daily_milking_update(self,
         milk_production_inputs: MilkProductionInputs, time: Time
