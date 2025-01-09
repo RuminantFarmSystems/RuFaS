@@ -82,7 +82,7 @@ class Animal:
     @days_in_milk.setter
     def days_in_milk(self, days_in_milk: int) -> None:
         if not self.animal_type.is_cow:
-            raise TypeError()
+            self._days_in_milk = 0
         self._days_in_milk = days_in_milk
 
     @property
@@ -353,8 +353,7 @@ class Animal:
         digestive_system_inputs = DigestiveSystemInputs(
             animal_type=self.animal_type,
             body_weight=self.body_weight,
-            nutrients=self.nutrient,
-            nutrient_concentrations=self.nutrient_concentrations,
+            nutrients=self.nutrition_supply,
             days_in_milk=self.days_in_milk,
             metabolizable_energy_intake=self.metabolizable_energy_intake,
             fecal_phosphorus=self.nutrients.fecal_phosphorus,
@@ -535,7 +534,17 @@ class Animal:
         }
 
     def _get_heiferI_values(self) -> dict[str, Any]:
-        return self.get_animal_values()
+        return {
+            "id": self.id,
+            "breed": self.breed,
+            "days_born": self.days_born,
+            "birth_weight": self.birth_weight,
+            "body_weight": self.body_weight,
+            "wean_weight": self.wean_weight,
+            "mature_body_weight": self.mature_body_weight,
+            "events": str(self.events),
+            "net_merit": self.net_merit,
+        }
 
     def _get_heiferII_values(self) -> dict[str, Any]:
         return {

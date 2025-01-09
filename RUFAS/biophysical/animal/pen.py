@@ -216,10 +216,11 @@ class Pen:
     @property
     def average_animal_requirements(self) -> NutritionRequirements:
         """Calculates the average nutrient requirements of all animals in the pen."""
-        animal_requirements: NutritionRequirements = [
+        animal_requirements: list[NutritionRequirements] = [
             animal.nutrition_requirements for animal in self.animals_in_pen.values()
         ]
-        return sum(animal_requirements) / len(self.animals_in_pen)
+        return sum(animal_requirements, NutritionRequirements.make_empty_nutrition_requirements()) / len(self.animals_in_pen)
+
 
     def update_daily_walking_distance(self) -> None:
         if AnimalType.LAC_COW in self.animal_types_in_pen or AnimalType.DRY_COW in self.animal_types_in_pen:
@@ -302,7 +303,9 @@ class Pen:
             The average milk production reduction for the cows in the pen (kg).
 
         """
-        return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / len(self.cows_in_pen)
+        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
+            return 0
+        return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     def formulate_optimized_ration(self, _available_feeds: list[Feed]) -> None:
         """Formulates a ration while optimizing for multiple goals."""
@@ -336,23 +339,13 @@ class Pen:
         animal_combination = self.animal_combination
         ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, self.average_animal_requirements)
 
-        total_nutrient_evaluation_results = NutritionEvaluationResults(
-            total_energy=0.0,
-            maintenance=0.0,
-            growth=0.0,
-            protein=0.0,
-            calcium=0.0,
-            phosphorus=0.0,
-            dry_matter=0.0,
-            ndf=0.0,
-            fat=0.0,
-        )
+        total_nutrient_evaluation_results = NutritionEvaluationResults.make_empty_evaluation_results()
         ration_sufficient_for_milk_production = True
         total_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
         for animal in self.animals_in_pen.values():
             while ration_sufficient_for_milk_production:
                 nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
-                    feeds_used=available_feeds, ration=ration, body_weight=animal.body_weight
+                    feeds_used=available_feeds, ration_formulation=ration, body_weight=animal.body_weight
                 )
 
                 walking_distance = (
@@ -363,7 +356,6 @@ class Pen:
                     housing=self.housing_type,
                     walking_distance=walking_distance,
                     previous_temperature=temperature,
-                    available_feeds=available_feeds,
                 )
                 is_ration_adequate, evaluation_result = NutritionEvaluator.evaluate_nutrition_supply(
                     animal.nutrition_requirements, nutrition_supply, animal.animal_type.is_cow
