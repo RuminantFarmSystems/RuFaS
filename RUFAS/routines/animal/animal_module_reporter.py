@@ -17,10 +17,9 @@ from RUFAS.routines.animal.life_cycle.cow import Cow
 from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
 from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
-from RUFAS.routines.animal.life_cycle.life_cycle import LifeCycleManager
 from RUFAS.biophysical.animal.pen import Pen
+from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, FeedCategorization
 from RUFAS.routines.animal.ration.ration_driver import RationReporter
-from RUFAS.routines.feed import Feed
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -348,7 +347,7 @@ class AnimalModuleReporter:
     def report_daily_ration(
             cls,
             animal_manager,
-            available_feeds: Dict[str, Dict[str, Any]],
+            available_feeds: list[Feed],
             simulation_day: int
     ) -> None:
         """
@@ -382,10 +381,11 @@ class AnimalModuleReporter:
                 # TODO: update avaiable feed
 
                 if key in ration_across_pens:
-                    ration_across_pens[key] += ration_per_pen[key]
+                    ration_across_pens[str(key)] += ration_per_pen[key]
                 else:
-                    ration_across_pens[key] = ration_per_pen[key]
+                    ration_across_pens[str(key)] = ration_per_pen[key]
 
+            ration_per_pen = {str(key): val for key, val in ration_per_pen.items()}
             AnimalModuleReporter.report_daily_feed_emissions(
                 ration_per_pen, pen.id, pen.animal_combination.name, animal_manager, simulation_day
             )
