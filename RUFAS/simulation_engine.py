@@ -88,6 +88,7 @@ class SimulationEngine:
         }
         t_start_sim = timer.time()
         self._run_simulation_main_loop()
+        # TODO: fix report end of simulation
         # AnimalModuleReporter.report_end_of_simulation(
         #     self.animal_manager.life_cycle_manager, self.time, self.animal_manager.heiferIIs, self.animal_manager.cows
         # )

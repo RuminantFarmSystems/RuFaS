@@ -216,6 +216,8 @@ class Pen:
     @property
     def average_animal_requirements(self) -> NutritionRequirements:
         """Calculates the average nutrient requirements of all animals in the pen."""
+        if len(self.animals_in_pen) <= 0:
+            return NutritionRequirements.make_empty_nutrition_requirements()
         animal_requirements: list[NutritionRequirements] = [
             animal.nutrition_requirements for animal in self.animals_in_pen.values()
         ]
@@ -378,8 +380,10 @@ class Pen:
             total_nutrition_supply += nutrition_supply
             total_nutrient_evaluation_results += evaluation_result
 
-        self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values())
-        self.average_nutrition_supply = total_nutrition_supply / len(self.animals_in_pen.values())
+        self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values()) \
+            if self.animals_in_pen else NutritionEvaluationResults.make_empty_evaluation_results()
+        self.average_nutrition_supply = total_nutrition_supply / len(self.animals_in_pen.values()) \
+            if self.animals_in_pen else NutritionSupply.make_empty_nutrition_supply()
         self.ration = ration
 
     def get_requested_feed(self, ration_interval_length: int) -> RequestedFeed:
