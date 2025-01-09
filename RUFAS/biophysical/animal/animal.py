@@ -218,9 +218,6 @@ class Animal:
         # remove sold and dead to use sold_at_day and dead_at_day instead
         self.events = AnimalEvents()
 
-        self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
-        self.previous_nutrition_supply: NutritionSupply | None = None
-
         self.growth: Growth = Growth()
         self.digestive_system: DigestiveSystem = DigestiveSystem()
         self.milk_production: MilkProduction = MilkProduction()
@@ -228,6 +225,7 @@ class Animal:
         self._reproduction: Reproduction = Reproduction()
         self.nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
         self.nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
+        self.previous_nutrition_supply: NutritionSupply | None = None
 
         self.animal_statistics: AnimalStatistics = AnimalStatistics()
 
