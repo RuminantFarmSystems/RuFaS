@@ -31,6 +31,9 @@ class AnimalModuleConstants:
     DEFAULT_NUM_STALLS_FOR_GROWING_AND_CLOSE_UP_PEN: int = 500
     """The default number of stalls to be created in a combined growing and close-up pen."""
 
+    DEFAULT_DRY_MATTER_INTAKE: float = 10.0
+    """Default dry matter intake of a ration when this value is not known for an animal (kg)."""
+
     DEFAULT_NET_ENERGY_DIET_CONCENTRATION: float = 1.0
     """Default metabolizable energy density of a ration when this value is not known for an animal."""
 

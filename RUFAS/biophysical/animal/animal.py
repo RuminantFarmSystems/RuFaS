@@ -777,6 +777,7 @@ class Animal:
         days_in_milk = self.days_in_milk if self.is_milking else None
 
         if self.previous_nutrition_supply is None:
+            previous_dmi = AnimalModuleConstants.DEFAULT_DRY_MATTER_INTAKE
             ndf_percentage = AnimalModuleConstants.DEFAULT_NDF_PERCENTAGE
             tdn_percentage = AnimalModuleConstants.DEFAULT_TDN_PERCENTAGE
             net_energy_diet_conc = AnimalModuleConstants.DEFAULT_NET_ENERGY_DIET_CONCENTRATION
