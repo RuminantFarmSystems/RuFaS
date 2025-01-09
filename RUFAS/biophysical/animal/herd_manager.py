@@ -99,7 +99,9 @@ class HerdManager:
 
         # how do we set lactation curve
         LactationCurve.set_lactation_parameters(time)
-        # MilkProduction.set_milk_quality()
+        fat_percent = animal_config_data["animal_config"]["management_decisions"]["milk_fat_percent"]
+        true_protein_percent = animal_config_data["animal_config"]["management_decisions"]["milk_protein_percent"]
+        MilkProduction.set_milk_quality(fat_percent, true_protein_percent, AnimalModuleConstants.MILK_LACTOSE)
 
         # if False, there are no animals being simulated on the farm
         self.simulate_animals = config_data.get("simulate_animals", True)

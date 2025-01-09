@@ -765,7 +765,7 @@ class Animal:
         if self.animal_type is AnimalType.CALF:
             pass  # TODO: calves' requirements are implemented in PR #2153, which is not merged yet.
 
-        days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
+        days_in_pregnancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
 
         if self.previous_nutrition_supply is None:
@@ -788,10 +788,10 @@ class Animal:
             requirements = NASEMRequirementsCalculator.calculate_requirements(
                 body_weight=self.body_weight,
                 mature_body_weight=self.mature_body_weight,
-                days_in_pregancy=days_in_pregancy,
+                day_of_pregnancy=days_in_pregnancy,
                 body_condition_score_5=self.body_condition_score_5,
                 days_in_milk=days_in_milk,
-                average_daily_heifer_gain=self.growth.daily_growth,
+                average_daily_gain_heifer=self.growth.daily_growth,
                 animal_type=self.animal_type,
                 parity=self.reproduction.calves,  # TODO: calves
                 calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
@@ -809,10 +809,10 @@ class Animal:
             requirements = NRCRequirementsCalculator.calculate_requirements(
                 body_weight=self.body_weight,
                 mature_body_weight=self.mature_body_weight,
-                days_in_pregancy=days_in_pregancy,
+                day_of_pregnancy=days_in_pregnancy,
                 body_condition_score_5=self.body_condition_score_5,
                 days_in_milk=days_in_milk,
-                average_daily_heifer_gain=self.growth.daily_growth,
+                average_daily_gain_heifer=self.growth.daily_growth,
                 animal_type=self.animal_type,
                 parity=self.reproduction.calves,  # TODO: calves
                 calving_interval=self.reproduction.calving_interval,  # TODO: calving interval
