@@ -783,13 +783,13 @@ class Animal:
         else:
             previous_dmi = self.previous_nutrition_supply.dry_matter
             ndf_percentage = (
-                self.previous_nutrition_supply.ndf_content / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+                self.previous_nutrition_supply.ndf_supply / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
             )
             tdn_percentage = (
-                self.previous_nutrition_supply.tdn_content / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+                self.previous_nutrition_supply.tdn_supply / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
             )
             net_energy_diet_conc = (
-                self.previous_nutrition_supply.metabolizable / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
+                self.previous_nutrition_supply.metabolizable_energy / previous_dmi * GeneralConstants.FRACTION_TO_PERCENTAGE
             )
 
         if self.nutrient_standard is NutrientStandard.NASEM:
