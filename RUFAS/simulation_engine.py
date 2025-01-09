@@ -123,9 +123,9 @@ class SimulationEngine:
 
     def _daily_simulation(self) -> None:
         """Executes the daily simulation routines."""
-        harvested_crops, _next_harvest_dates = self.field_manager.daily_update_routine(self.weather, self.time)
-        if harvested_crops:
-            pass
+        # harvested_crops, _next_harvest_dates = self.field_manager.daily_update_routine(self.weather, self.time)
+        # if harvested_crops:
+        #     pass
             # self.feed_manager.add_harvested_crops(harvested_crops)
             # ideal_feeds = self.herd_manager.update_max_daily_feeds(harvested_crops, next_harvest_dates)
             # were_ideal_feeds_purchased = self.feed_manager.manage_planning_cycle_purchases(ideal_feeds)
@@ -137,16 +137,16 @@ class SimulationEngine:
         #     total_inventory = self.feed_manager.get_total_inventory()
         #     self.herd_manager.update_max_daily_feeds(total_inventory)
         
-        is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
-        if is_time_to_reformulate_ration:
-            self._formulate_ration()
+        # is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
+        # if is_time_to_reformulate_ration:
+        #     self._formulate_ration()
 
-        requested_feed = self.herd_manager.collect_daily_feed_request()
-        is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed)
-        if not is_ok_to_feed_animals:
-            self._formulate_ration()
-        all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.weather, self.time)
-        self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
+        # requested_feed = self.herd_manager.collect_daily_feed_request()
+        # is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed)
+        # if not is_ok_to_feed_animals:
+        #     self._formulate_ration()
+        _all_pen_manure_data = self.herd_manager.daily_routines(self.feed_manager.available_feeds, self.time)
+        # self.manure_manager.daily_update(all_pen_manure_data, self.time.simulation_day)
 
         self.time.record_time()
         self.weather.record_weather(self.time)
@@ -207,7 +207,7 @@ class SimulationEngine:
         """
         Executes the annual simulation routines.
         """
-        self._run_pre_annual_routines()
+        # self._run_pre_annual_routines()
         for _ in range(self.time.year_start_day, self.time.year_end_day + 1):
             self._daily_simulation()
 
@@ -245,11 +245,11 @@ class SimulationEngine:
         self.is_ration_defined_by_user = self.im.get_data("animal.ration.user_input")
 
         self.herd_manager = HerdManager(self.weather, self.time, is_ration_defined_by_user=True)
-        all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
-        simulate_animals: bool = self.im.get_data("config.simulate_animals")
-        self.manure_manager = ManureManager(
-            all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
-        )
+        # all_pen_manure_data = self.herd_manager.collect_pen_manure_data()
+        # simulate_animals: bool = self.im.get_data("config.simulate_animals")
+        # self.manure_manager = ManureManager(
+        #     all_pen_manure_data, self.weather, self.time, manure_class_config, simulate_animals
+        # )
 
         self.field_manager = FieldManager()
 
