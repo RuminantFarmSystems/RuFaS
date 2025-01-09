@@ -137,9 +137,9 @@ class SimulationEngine:
         #     total_inventory = self.feed_manager.get_total_inventory()
         #     self.herd_manager.update_max_daily_feeds(total_inventory)
         
-        # is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
-        # if is_time_to_reformulate_ration:
-        #     self._formulate_ration()
+        is_time_to_reformulate_ration = self.time.current_date == self.next_ration_reformulation
+        if is_time_to_reformulate_ration:
+            self._formulate_ration()
 
         # requested_feed = self.herd_manager.collect_daily_feed_request()
         # is_ok_to_feed_animals = self.feed_manager.manage_daily_feed_request(requested_feed)
@@ -161,7 +161,7 @@ class SimulationEngine:
 
         current_temperature = self.weather.get_current_day_conditions(time=self.time).mean_air_temperature
         requested_feed = self.herd_manager.formulate_rations(
-            total_inventory.available_feeds, current_temperature, self.ration_formulation_interval_length.days()
+            total_inventory.available_feeds, current_temperature, self.ration_formulation_interval_length.days
         )
         self.feed_manager.manage_ration_interval_purchases(requested_feed)
 
