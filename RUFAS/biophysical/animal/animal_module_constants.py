@@ -62,7 +62,7 @@ class AnimalModuleConstants:
     """Milk lactose content, percentage."""
 
     DMI_CONSTRAINT_FRACTION: float = 0.20
-    """The +/- fraction of DMI estimated allowed for ration formulation"""
+    """The +/- fraction of DMI estimated allowed for ration formulation."""
 
     MINIMUM_DMI: float = 1.0
     """Minimum estimated DMI instituted for all animals, kg/day"""
@@ -85,13 +85,13 @@ class AnimalModuleConstants:
     """Minimum calcium estimate, g/day"""
 
     MINIMUM_NDF: float = 15.0
-    """Minimum percentage of neutral detergent fiber (NDF) that a ration's dry matter must be."""
+    """Minimum percentage of a ration's dry matter that must be neutral detergent fiber (NDF)."""
 
     MAXIMUM_NDF: float = 45.0
-    """Maximum percentage of neutral detergent fiber (NDF) that a ration's dry matter must be."""
+    """Maximum percentage of a ration's dry matter that must be neutral detergent fiber (NDF)."""
 
     MINIMUM_FAT: float = 7.0
-    """Minimum percentage of fat that a ration's dry matter must be."""
+    """Minimum percentage of a ration's dry matter that must be fat."""
 
     MILK_REDUCTION_KG: float = 0.25
     """Milk reduction amount for each failed ration optimization attempt, kg"""
