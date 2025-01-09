@@ -89,7 +89,7 @@ class NutritionRequirements:
             phosphorus=self.phosphorus / divisor,
             secondary_phosphorus=self.secondary_phosphorus / divisor,
             dry_matter=self.dry_matter / divisor,
-            activity=self.activity_energy / divisor,
+            activity_energy=self.activity_energy / divisor,
             essential_amino_acids=self.essential_amino_acids / divisor,
         )
 
@@ -144,6 +144,8 @@ class NutritionSupply:
         Phosphorus supplied in a ration (g).
     dry_matter : float
         Total dry matter supply of a ration (kg).
+    wet_matter : float
+        Total wet matter or fresh mass supply of a ration (kg).
     ndf_supply : float
         Total neutral detergent fiber (NDF) supplied by the ration (kg).
     fat_supply : float
@@ -160,6 +162,8 @@ class NutritionSupply:
         Total ash supplied by the ration (kg).
     potassium_supply : float
         Total potassium supplied by the ration (kg).
+    starch_supply : float
+        Total starch supplied by the ration (kg).
     nitrogen_supply : float
         Total nitrogen supplied by the ration (kg). This value is derived from the crude protein supply.
 
@@ -173,6 +177,7 @@ class NutritionSupply:
     calcium: float
     phosphorus: float
     dry_matter: float
+    wet_matter: float
     ndf_supply: float
     fat_supply: float
     crude_protein: float
@@ -181,11 +186,52 @@ class NutritionSupply:
     lignin_supply: float
     ash_supply: float
     potassium_supply: float
+    starch_supply: float
     nitrogen_supply: float = field(init=False)
 
     def __post_init__(self) -> None:
         """Sets the nitrogen supply of a ration based on the crude protein supply."""
         self.nitrogen_supply = self.crude_protein * GeneralConstants.PROTEIN_TO_NITROGEN
+
+    @property
+    def adf_percentage(self) -> float:
+        """Acid Detergent Fiber (ADF) concentration of the dry matter content (percent)."""
+        return self.adf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def ash_percentage(self) -> float:
+        """Ash concentration of the dry matter content (percent)."""
+        return self.ash_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def crude_protein_percentage(self) -> float:
+        """Crude protein concentration of the dry matter content (percent)."""
+        return self.crude_protein / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def dry_matter_percentage(self) -> float:
+        """Dry matter concentration of the nutrition supply's wet or fresh mass (percent)."""
+        return self.dry_matter / self.wet_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def fat_percentage(self) -> float:
+        """Fat concentration of the dry matter content (percent)."""
+        return self.fat_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def ndf_percentage(self) -> float:
+        """Neutral Detergent Fiber (ADF) concentration of the dry matter content (percent)."""
+        return self.ndf_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def potassium_percentage(self) -> float:
+        """Potassium concentration of the dry matter content (percent)."""
+        return self.potassium_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+    @property
+    def starch_percentage(self) -> float:
+        """Starch concentration of the dry matter content (percent)."""
+        return self.starch_supply / self.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
     def __add__(self, other: "NutritionSupply") -> "NutritionSupply":
         """Add two NutritionSupply objects together."""
@@ -198,6 +244,7 @@ class NutritionSupply:
             calcium=self.calcium + other.calcium,
             phosphorus=self.phosphorus + other.phosphorus,
             dry_matter=self.dry_matter + other.dry_matter,
+            wet_matter=self.wet_matter + other.wet_matter,
             ndf_supply=self.ndf_supply + other.ndf_supply,
             fat_supply=self.fat_supply + other.fat_supply,
             crude_protein=self.crude_protein + other.crude_protein,
@@ -206,6 +253,7 @@ class NutritionSupply:
             lignin_supply=self.lignin_supply + other.lignin_supply,
             ash_supply=self.ash_supply + other.ash_supply,
             potassium_supply=self.potassium_supply + other.potassium_supply,
+            starch_supply=self.starch_supply + other.starch_supply,
         )
 
     def __truediv__(self, divisor: float | int) -> "NutritionSupply":
@@ -216,12 +264,13 @@ class NutritionSupply:
         return NutritionSupply(
             metabolizable_energy=self.metabolizable_energy / divisor,
             maintenance_energy=self.maintenance_energy / divisor,
-            lactalactation_energytion=self.lactation_energy / divisor,
+            lactation_energy=self.lactation_energy / divisor,
             growth_energy=self.growth_energy / divisor,
             metabolizable_protein=self.metabolizable_protein / divisor,
             calcium=self.calcium / divisor,
             phosphorus=self.phosphorus / divisor,
             dry_matter=self.dry_matter / divisor,
+            wet_matter=self.wet_matter / divisor,
             ndf_supply=self.ndf_supply / divisor,
             fat_supply=self.fat_supply / divisor,
             crude_protein=self.crude_protein / divisor,
@@ -230,6 +279,7 @@ class NutritionSupply:
             lignin_supply=self.lignin_supply / divisor,
             ash_supply=self.ash_supply / divisor,
             potassium_supply=self.potassium_supply / divisor,
+            starch_supply=self.starch_supply / divisor,
         )
 
     @classmethod
@@ -244,6 +294,7 @@ class NutritionSupply:
             calcium=0.0,
             phosphorus=0.0,
             dry_matter=0.0,
+            wet_matter=0.0,
             ndf_supply=0.0,
             fat_supply=0.0,
             crude_protein=0.0,
@@ -252,6 +303,7 @@ class NutritionSupply:
             lignin_supply=0.0,
             ash_supply=0.0,
             potassium_supply=0.0,
+            starch_supply=0.0,
         )
 
 
