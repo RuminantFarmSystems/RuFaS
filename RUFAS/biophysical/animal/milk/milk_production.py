@@ -64,6 +64,11 @@ class MilkProduction:
         cls.true_protein_percent = true_protein_percent
         cls.lactose_percent = lactose_percent
 
+    def set_wood_parameters(self, wood_l: float, wood_m: float, wood_n: float) -> None:
+        self.wood_l = wood_l
+        self.wood_m = wood_m
+        self.wood_n = wood_n
+
     def perform_daily_milking_update(self,
         milk_production_inputs: MilkProductionInputs, time: Time
     ) -> MilkProductionOutputs:
@@ -153,7 +158,7 @@ class MilkProduction:
 
         return milk_production_outputs
 
-    @njit
+    # @njit
     def calculate_daily_milk_production(self, days_in_milk: int, l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.

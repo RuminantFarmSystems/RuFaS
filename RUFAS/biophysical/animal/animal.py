@@ -309,8 +309,13 @@ class Animal:
     def _initialize_cow(self, args: CowValuesTypedDict) -> None:
         self._initialize_heiferII_or_heiferIII(args)
         self.days_in_milk = args.get("days_in_milk", 0)
-        self.reproduction.calves = args.get("calves", 0)
+        self.reproduction.calves = args.get("parity", 0)
         self.reproduction.calving_interval = args.get("calving_interval", 0)
+        if self.reproduction.calves > 0:
+            wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
+            self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"], wood_parameters["n"])
+            if self.reproduction.calves == 1:
+                self.reproduction.calving_interval = self.events.get_most_recent_date(animal_constants.NEW_BIRTH)
 
     @classmethod
     def setup_lactation_curve_parameters(cls, time: Time) -> None:
@@ -364,16 +369,17 @@ class Animal:
         )
         self.digestive_system.process_digestion(digestive_system_inputs)
 
-        milk_production_inputs = MilkProductionInputs(
-            days_in_milk=self.days_in_milk,
-            days_born=self.days_born,
-            days_in_pregnancy=self.days_in_pregnancy,
-        )
-        milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
-            milk_production_inputs, time
-        )
-        self.days_in_milk = milk_production_outputs.days_in_milk
-        self.events += milk_production_outputs.events
+        if self.animal_type.is_cow:
+            milk_production_inputs = MilkProductionInputs(
+                days_in_milk=self.days_in_milk,
+                days_born=self.days_born,
+                days_in_pregnancy=self.days_in_pregnancy,
+            )
+            milk_production_outputs: MilkProductionOutputs = self.milk_production.perform_daily_milking_update(
+                milk_production_inputs, time
+            )
+            self.days_in_milk = milk_production_outputs.days_in_milk
+            self.events += milk_production_outputs.events
 
         growth_inputs = GrowthInputs(
             days_in_pregnancy=self.days_in_pregnancy,
@@ -410,7 +416,8 @@ class Animal:
 
             self.body_weight = reproduction_outputs.body_weight
             self.events += reproduction_outputs.events
-            self.days_in_milk = reproduction_outputs.days_in_milk
+            if self.animal_type.is_cow:
+                self.days_in_milk = reproduction_outputs.days_in_milk
             self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
             self.nutrients.phosphorus_for_gestation_required_for_calf = (
                 reproduction_outputs.phosphorus_for_gestation_required_for_calf)
@@ -418,6 +425,9 @@ class Animal:
             if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
                 daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
                 daily_routines_output.animal_values = reproduction_outputs.newborn_calf_config
+                wood_parameters = LactationCurve.get_wood_parameters(self.reproduction.calves)
+                self.milk_production.set_wood_parameters(wood_parameters["l"], wood_parameters["m"],
+                                                         wood_parameters["n"])
                 self.future_death_date = self.determine_future_death_date()
                 self.future_cull_date, self.cull_reason = self.determine_future_cull_date()
 
@@ -510,6 +520,7 @@ class Animal:
         self.animal_type = AnimalType.DRY_COW
 
     def get_animal_values(self) -> dict[str, Any]:
+        # return {}
         mapping: dict[AnimalType, Callable[[], dict[str, Any]]] = {
             AnimalType.CALF: self._get_calf_values,
             AnimalType.HEIFER_I: self._get_heiferI_values,
@@ -534,17 +545,7 @@ class Animal:
         }
 
     def _get_heiferI_values(self) -> dict[str, Any]:
-        return {
-            "id": self.id,
-            "breed": self.breed,
-            "days_born": self.days_born,
-            "birth_weight": self.birth_weight,
-            "body_weight": self.body_weight,
-            "wean_weight": self.wean_weight,
-            "mature_body_weight": self.mature_body_weight,
-            "events": str(self.events),
-            "net_merit": self.net_merit,
-        }
+        return self._get_calf_values()
 
     def _get_heiferII_values(self) -> dict[str, Any]:
         return {

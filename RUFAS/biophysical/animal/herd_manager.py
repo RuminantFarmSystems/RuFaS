@@ -213,6 +213,9 @@ class HerdManager:
         """Returns the manure information from all pens in PenManureData."""
         return [pen.get_manure_data() for pen in self.all_pens]
 
+    def collect_daily_feed_request(self):
+        pass
+
     def daily_routines(self, available_feeds: list[Feed], time: Time) -> list[HerdManagerOutput]:
 
         graduated_animals: list[Animal] = []
@@ -290,7 +293,7 @@ class HerdManager:
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
             herd_manager_output.append(
-                HerdManagerOutput(pen_manure=pen.get_manure_data, manure_excretion=pen.total_manure_excretion)
+                HerdManagerOutput(pen_manure=pen.get_manure_data(), manure_excretion=pen.total_manure_excretion)
             )
 
         self.update_herd_statistics()
@@ -300,9 +303,6 @@ class HerdManager:
         AnimalModuleReporter.report_daily_reports(self, available_feeds, time.simulation_day)
 
         return herd_manager_output
-
-    def collect_pen_manure_data(self) -> list[dict[str, Any]]:
-        pass
 
     def initialize_pens(
         self, all_pen_data: list[dict[str, Any]], manure_management_scenarios: list[dict[str, Any]]

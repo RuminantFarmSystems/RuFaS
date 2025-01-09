@@ -215,7 +215,7 @@ class CowValuesTypedDict(TypedDict):
     resynch_method: str
 
     days_in_milk: NotRequired[int]
-    calves: NotRequired[int]
+    parity: NotRequired[int]
     calving_interval: NotRequired[int]
 
 class AnimalConfigTypedDict(TypedDict):

@@ -69,7 +69,7 @@ class Growth:
                                         events=AnimalEvents())
 
         is_non_pregnant_heifer = not growth_inputs.is_pregnant and (
-                growth_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II)
+                growth_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III)
         )
         is_pregnant_heifer = growth_inputs.is_pregnant and (
                 growth_inputs.animal_type in (AnimalType.HEIFER_II, AnimalType.HEIFER_III)

@@ -344,7 +344,12 @@ class AnimalModuleReporter:
                 )
 
     @classmethod
-    def report_daily_ration(cls, animal_manager, available_feeds: Dict[str, Dict[str, Any]]) -> None:
+    def report_daily_ration(
+            cls,
+            animal_manager,
+            available_feeds: Dict[str, Dict[str, Any]],
+            simulation_day: int
+    ) -> None:
         """
         Adds ration totals as fed to each pen to output manager.
 
@@ -366,10 +371,10 @@ class AnimalModuleReporter:
         ration_across_pens = {"dry_matter_intake_total": 0, "byproducts_total": 0}
         for pen in animal_manager.all_pens:
             ration_per_pen = {"dry_matter_intake_total": 0, "byproducts_total": 0}
-            for key in pen.ration_per_animal.keys():
+            for key in pen.ration.keys():
                 if key in non_numeric_keys:
                     continue
-                ration_per_pen[key] = pen.ration_per_animal[key] * len(pen.animals_in_pen)
+                ration_per_pen[key] = pen.ration[key] * len(pen.animals_in_pen)
                 ration_per_pen["dry_matter_intake_total"] += ration_per_pen[key]
                 if available_feeds[key]["Fd_Category"] == "By-Product/Other":
                     ration_per_pen["byproducts_total"] += ration_per_pen[key]
@@ -380,14 +385,14 @@ class AnimalModuleReporter:
                     ration_across_pens[key] = ration_per_pen[key]
 
             AnimalModuleReporter.report_daily_feed_emissions(
-                ration_per_pen, pen.id, pen.animal_combination.name, animal_manager
+                ration_per_pen, pen.id, pen.animal_combination.name, animal_manager, simulation_day
             )
             units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_pen.keys()}
             AnimalModuleReporter.data_padder(
                 f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_0_CALF",
                 f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
                 {},
-                animal_manager.simulation_day,
+                simulation_day,
                 info_map,
                 units,
             )
@@ -402,7 +407,9 @@ class AnimalModuleReporter:
             ration_across_pens,
             dict(info_map, **{"units": units}),
         )
-        AnimalModuleReporter.report_daily_feed_emissions(ration_across_pens, "ALL", "", animal_manager)
+        AnimalModuleReporter.report_daily_feed_emissions(
+            ration_across_pens, "ALL", "", animal_manager, simulation_day
+        )
 
     @classmethod
     def report_daily_feed_emissions(
@@ -411,6 +418,7 @@ class AnimalModuleReporter:
         pen_id: int | str,
         pen_animal_name: str,
         animal_manager,
+        simulation_day: int,
     ) -> None:
         """
         Adds emissions totals from purchased feeds on a pen / feed basis.
@@ -457,7 +465,7 @@ class AnimalModuleReporter:
                 f"{classname}.{funcname}.pen_0_animal_CALF_feed_emissions",
                 f"{classname}.{funcname}.pen_{pen_id}_animal_{pen_animal_name}_feed_emissions",
                 {},
-                animal_manager.simulation_day,
+                simulation_day,
                 info_map,
                 MeasurementUnits.KILOGRAMS_CARBON_DIOXIDE_EQ,
             )
@@ -976,7 +984,7 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_life_cycle_manager_data(
             herd_statistics, simulation_day
         )
-        AnimalModuleReporter.report_daily_ration(herd_manager, available_feeds)
+        AnimalModuleReporter.report_daily_ration(herd_manager, available_feeds, simulation_day)
         AnimalModuleReporter.report_daily_pen_total(simulation_day, herd_manager.all_pens)
         AnimalModuleReporter.report_305d_milk([cow for cow in herd_manager.cows if cow.is_milking])
         for pen in herd_manager.all_pens:
