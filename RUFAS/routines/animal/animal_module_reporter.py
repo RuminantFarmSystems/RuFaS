@@ -376,9 +376,10 @@ class AnimalModuleReporter:
                     continue
                 ration_per_pen[key] = pen.ration[key] * len(pen.animals_in_pen)
                 ration_per_pen["dry_matter_intake_total"] += ration_per_pen[key]
-                # if available_feeds[key]["Fd_Category"] == "By-Product/Other":
-                #     ration_per_pen["byproducts_total"] += ration_per_pen[key]
-                # TODO: update avaiable feed
+
+                feed_info = next((feed for feed in available_feeds if feed.rufas_id == key), None)
+                if feed_info.Fd_Category == FeedCategorization.BY_PRODUCT_OTHER:
+                    ration_per_pen["byproducts_total"] += ration_per_pen[key]
 
                 if key in ration_across_pens:
                     ration_across_pens[str(key)] += ration_per_pen[key]
