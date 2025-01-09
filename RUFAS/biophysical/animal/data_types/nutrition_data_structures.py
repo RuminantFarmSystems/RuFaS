@@ -25,7 +25,7 @@ class NutritionRequirements:
         Calcium requirement (g).
     phosphorus : float
         Phosphorus requirement calculated with either the NASEM or NRC methodologies (g).
-    secondary_phosphorus : float
+    process_based_phosphorus : float
         Phosphorus requirement calculated with the dedicated animal phosphorus submodule (g).
     dry_matter : float
         Dry matter intake requirement (kg).
@@ -43,7 +43,7 @@ class NutritionRequirements:
     metabolizable_protein: float
     calcium: float
     phosphorus: float
-    secondary_phosphorus: float
+    process_based_phosphorus: float
     dry_matter: float
     activity_energy: float
     essential_amino_acids: EssentialAminoAcidRequirements
@@ -69,7 +69,7 @@ class NutritionRequirements:
             metabolizable_protein=self.metabolizable_protein + other.metabolizable_protein,
             calcium=self.calcium + other.calcium,
             phosphorus=self.phosphorus + other.phosphorus,
-            secondary_phosphorus=self.secondary_phosphorus + other.secondary_phosphorus,
+            process_based_phosphorus=self.process_based_phosphorus + other.process_based_phosphorus,
             dry_matter=self.dry_matter + other.dry_matter,
             activity_energy=self.activity_energy + other.activity_energy,
             essential_amino_acids=self.essential_amino_acids + other.essential_amino_acids,
@@ -87,7 +87,7 @@ class NutritionRequirements:
             metabolizable_protein=self.metabolizable_protein / divisor,
             calcium=self.calcium / divisor,
             phosphorus=self.phosphorus / divisor,
-            secondary_phosphorus=self.secondary_phosphorus / divisor,
+            process_based_phosphorus=self.process_based_phosphorus / divisor,
             dry_matter=self.dry_matter / divisor,
             activity=self.activity_energy / divisor,
             essential_amino_acids=self.essential_amino_acids / divisor,
