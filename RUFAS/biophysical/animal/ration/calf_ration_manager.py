@@ -255,6 +255,8 @@ class CalfRationManager:
             "milk_intake_wean": milk_intake_wean,
             "dry_matter_intake": dry_matter_intake,
             "me_intake": me_intake,
+            "milk_cp_intake": milk_cp_intake,
+            "starter_cp_intake": starter_cp_intake,
             "cp_intake": total_cp_intake,
             "adp_intake": adp_intake,
             "milk_me_proportion": milk_me_proportion,
