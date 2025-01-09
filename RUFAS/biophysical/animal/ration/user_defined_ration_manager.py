@@ -58,7 +58,6 @@ class UserDefinedRationManager:
         #     ]
         user_defined_ration_percentages = ration_config["user_defined_ration_percentages"]
         for combination in cls.user_defined_rations.keys():
-            print(user_defined_ration_percentages[combination.value])
             cls.user_defined_rations[combination] = {
                 feed["feed_type"]: feed["ration_percentage"]
                 for feed
