@@ -570,7 +570,7 @@ class HerdManager:
             self.pens_by_animal_combination[animal_combination],
             key=lambda p: p.current_stocking_density,
         )
-        pen_with_min_stocking_density.update_animals([animal], self.ANIMAL_GROUPING_SCENARIO)
+        pen_with_min_stocking_density.update_animals([animal], animal_combination)
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def _sort_cows_before_allocation(self) -> None:
