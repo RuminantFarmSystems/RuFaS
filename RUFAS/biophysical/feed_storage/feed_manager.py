@@ -21,6 +21,7 @@ from RUFAS.time import Time
 from RUFAS.weather import Weather
 from RUFAS.util import Utility
 from RUFAS.units import MeasurementUnits
+from RUFAS.output_manager import OutputManager
 
 from .baleage import Baleage
 from .enums import CropCategory, CropType
@@ -76,6 +77,7 @@ class FeedManager:
         self._available_feeds: list[Feed] = self._setup_available_feeds(feed_config, nutrient_standard)
         self.planning_cycle_allowance: PlanningCycleAllowance = {}
         self.runtime_purchase_allowance: RuntimePurchaseAllowance = {}
+        self._om = OutputManager()
 
     @property
     def available_feeds(self) -> list[Feed]:
@@ -184,7 +186,7 @@ class FeedManager:
         for feed in self._available_feeds:
             feed.amount_available = available_feed_totals.get(feed.rufas_id, 0.0)
 
-        return TotalInventory(available_feeds=self._available_feeds, date=inventory_date)
+        return TotalInventory(available_feeds=self._available_feeds, inventory_date=inventory_date)
 
     def manage_planning_cycle_purchases(self, ideal_feeds: IdealFeeds) -> None:
         """
@@ -269,11 +271,22 @@ class FeedManager:
 
         return results
 
-    def purchase_feed(self) -> None:
+    def purchase_feed(self, feed_to_purchase: dict[RUFAS_ID, float]) -> None:
         """The purchase feed logic is currently in the Animal Module. We will move it to here."""
         # TODO: this function will take in a `RequestedFeed` or dict[RUFAS_ID, float] of feeds to purchase, purchase them,
         # and put them in storage. It will also record the amounts and money spent on feeds.
-        pass  # TODO: implement me!
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self.purchase_feed.__name__,
+            "units": MeasurementUnits.DOLLARS,
+        }
+        for rufas_id, purchase_amount in feed_to_purchase.items():
+            feed_info = next(
+                (available_feed for available_feed in self.available_feeds if available_feed.rufas_id == rufas_id), None
+            )
+            var_name = f"purchased_feed_{rufas_id}"
+            info_map = info_map | {"price": feed_info.purchase_cost, "amount_purchased": purchase_amount}
+            self._om.add_variable(var_name, purchase_amount * feed_info.purchase_cost, info_map)
 
     def _deduct_feeds_from_inventory(self, feeds_to_deduct: dict[RUFAS_ID, float]) -> None:
         """Removes feeds from storage in a FIFO manner."""
