@@ -56,7 +56,7 @@ class NutritionEvaluator:
 
         evaluation = NutritionEvaluationResults(
             total_energy=results.get("total_energy"),
-            maintenance_energy=results["maintentance"],
+            maintenance_energy=results["maintenance"],
             lactation_energy=results.get("lactation"),
             growth_energy=results["growth"],
             calcium=results["calcium"],
