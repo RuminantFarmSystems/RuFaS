@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Sequence
 import numpy as np
 
 from RUFAS.biophysical.animal.animal import Animal
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTypedDict
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
@@ -831,7 +832,7 @@ class AnimalModuleReporter:
             )
 
     @classmethod
-    def report_sold_animal_information(cls, life_cycle_manager: LifeCycleManager) -> None:
+    def report_sold_animal_information(cls, herd_statistics: HerdStatistics) -> None:
         """
         Adds a dictionary of sold animal information to the output manager.
 
@@ -842,13 +843,13 @@ class AnimalModuleReporter:
 
         """
         sold_animals = (
-            life_cycle_manager.sold_calves_info
-            + life_cycle_manager.sold_heiferIIs_info
-            + life_cycle_manager.sold_heiferIIIs_info
+            herd_statistics.sold_calves_info
+            + herd_statistics.sold_heiferIIs_info
+            + herd_statistics.sold_heiferIIIs_info
             + list(
                 filter(
                     lambda cow: cow["cull_reason"] != animal_constants.DEATH_CULL,
-                    life_cycle_manager.sold_and_died_cows_info,
+                    herd_statistics.sold_and_died_cows_info,
                 )
             )
         )
@@ -877,7 +878,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_sold_animal_information_sort_by_sell_day(
-        cls, sold_animals: Sequence[Calf | HeiferI | HeiferII | HeiferIII | Cow], report_name: str, total_days: int
+        cls, sold_animals: list[SoldAnimalTypedDict], report_name: str, total_days: int
     ) -> None:
         """
         Adds a dictionary of sold animal information to the output manager on daily basis.
@@ -899,7 +900,7 @@ class AnimalModuleReporter:
 
         sold_at_day_min: int = sys.maxsize
         sold_at_day_max: int = 0
-        daily_sell: Dict[int, List[object]] = {}
+        daily_sell: Dict[int, List[SoldAnimalTypedDict]] = {}
 
         for animal in sold_animals:
             if animal["sold_at_day"] < sold_at_day_min:
@@ -995,7 +996,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_end_of_simulation(
-        cls, life_cycle_manager: LifeCycleManager, time: Time, heiferIIs: List[HeiferII], cows: List[Cow]
+        cls, herd_statistics: HerdStatistics, time: Time, heiferIIs: List[HeiferII], cows: List[Cow]
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1011,30 +1012,30 @@ class AnimalModuleReporter:
         cows : List[Cow]
             The list of Cows
         """
-        AnimalModuleReporter.report_sold_animal_information(life_cycle_manager)
-        if life_cycle_manager.sold_calves_info:
+        AnimalModuleReporter.report_sold_animal_information(herd_statistics)
+        if herd_statistics.sold_calves_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-                life_cycle_manager.sold_calves_info,
+                herd_statistics.sold_calves_info,
                 "sold_calves",
                 time.simulation_day,
             )
-        if life_cycle_manager.sold_heiferIIs_info:
+        if herd_statistics.sold_heiferIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-                life_cycle_manager.sold_heiferIIs_info, "heiferII", time.simulation_day
+                herd_statistics.sold_heiferIIs_info, "heiferII", time.simulation_day
             )
-        if life_cycle_manager.sold_heiferIIIs_info:
+        if herd_statistics.sold_heiferIIIs_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-                life_cycle_manager.sold_heiferIIIs_info, "heiferIII", time.simulation_day
+                herd_statistics.sold_heiferIIIs_info, "heiferIII", time.simulation_day
             )
-        if life_cycle_manager.sold_and_died_cows_info:
+        if herd_statistics.sold_and_died_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-                life_cycle_manager.sold_and_died_cows_info,
+                herd_statistics.sold_and_died_cows_info,
                 "sold_and_died_cows",
                 time.simulation_day,
             )
-        if life_cycle_manager.sold_cows_info:
+        if herd_statistics.sold_cows_info:
             AnimalModuleReporter.report_sold_animal_information_sort_by_sell_day(
-                life_cycle_manager.sold_cows_info,
+                herd_statistics.sold_cows_info,
                 "sold_cows",
                 time.simulation_day,
             )
