@@ -49,7 +49,6 @@ class DigestiveSystem:
                 digestive_system_inputs.fecal_phosphorus,
                 digestive_system_inputs.urine_phosphorus_required,
                 digestive_system_inputs.nutrients,
-                digestive_system_inputs.nutrient_concentrations,
             )
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
@@ -59,8 +58,7 @@ class DigestiveSystem:
         elif digestive_system_inputs.animal_type in (AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III):
             methane_emission = EntericMethaneCalculator.calculate_heifer_methane(
                 AnimalConfig.methane_model,
-                digestive_system_inputs.nutrients["dm"],
-                digestive_system_inputs.nutrient_concentrations,
+                digestive_system_inputs.nutrients,
             )
 
             phosphorus, excretion = ManureExcretionCalculator.calculate_heifer_manure(
@@ -68,7 +66,6 @@ class DigestiveSystem:
                 digestive_system_inputs.fecal_phosphorus,
                 digestive_system_inputs.urine_phosphorus_required,
                 digestive_system_inputs.nutrients,
-                digestive_system_inputs.nutrient_concentrations,
             )
             self.enteric_methane_emission = methane_emission
             self.phosphorus_excreted = phosphorus
@@ -82,7 +79,6 @@ class DigestiveSystem:
                 digestive_system_inputs.fat_content,
                 digestive_system_inputs.metabolizable_energy_intake,
                 digestive_system_inputs.nutrients,
-                digestive_system_inputs.nutrient_concentrations,
                 AnimalConfig.methane_mitigation_method,
                 AnimalConfig.methane_mitigation_additive_amount,
                 AnimalConfig.methane_model,
@@ -97,7 +93,6 @@ class DigestiveSystem:
                 digestive_system_inputs.fecal_phosphorus,
                 digestive_system_inputs.urine_phosphorus_required,
                 digestive_system_inputs.nutrients,
-                digestive_system_inputs.nutrient_concentrations,
             )
 
             self.enteric_methane_emission = methane_emission

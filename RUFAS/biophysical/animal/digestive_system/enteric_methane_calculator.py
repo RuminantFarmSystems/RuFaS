@@ -1,5 +1,6 @@
 from numpy import exp
 
+from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.digestive_system.methane_mitigation_calculator import MethaneMitigationCalculator
 from RUFAS.general_constants import GeneralConstants
 
@@ -31,7 +32,7 @@ class EntericMethaneCalculator:
 
     @staticmethod
     def calculate_heifer_methane(
-        methane_model: str | None, dry_matter_intake: float, nutrient_concentrations: dict[str, float]
+        methane_model: str | None, nutrition_supply: NutritionSupply,
     ) -> float:
         """
         Calculates the amount of methane emission for heifer.
@@ -57,10 +58,10 @@ class EntericMethaneCalculator:
         """
         methane_emission = 0.0
         if methane_model:
-            crude_protein_concentration = nutrient_concentrations["CP"]
-            ethyl_ester_concentration = nutrient_concentrations["EE"]
-            neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
-            ash_concentration = nutrient_concentrations["ash"]
+            crude_protein_concentration = nutrition_supply.ndf_percentage
+            ethyl_ester_concentration = nutrition_supply.fat_percentage
+            neutral_detergent_fiber_concentration = nutrition_supply.ndf_percentage
+            ash_concentration = nutrition_supply.ash_percentage
             soluble_residue = (
                 (100 - ash_concentration)
                 - neutral_detergent_fiber_concentration
@@ -73,7 +74,7 @@ class EntericMethaneCalculator:
                 + 0.198 * neutral_detergent_fiber_concentration
                 + 0.160 * soluble_residue
             )
-            methane_emission = (0.065 * gross_energy_concentration * dry_matter_intake) / 0.05565  # [A.3B.C.3]
+            methane_emission = (0.065 * gross_energy_concentration * nutrition_supply.dry_matter) / 0.05565  # [A.3B.C.3]
 
         return methane_emission
 
@@ -83,8 +84,7 @@ class EntericMethaneCalculator:
         body_weight: float,
         milk_fat: float,
         metabolizable_energy_intake: float,
-        nutrient_amounts: dict[str, float],
-        nutrient_concentrations: dict[str, float],
+        nutrient_amounts: NutritionSupply,
         methane_mitigation_method: str,
         methane_mitigation_additive_amount: float,
         methane_model: str,
@@ -125,10 +125,10 @@ class EntericMethaneCalculator:
         and nitrogen ("N") are all percentages of dry matter.
 
         """
-        dry_matter_intake = nutrient_amounts["dm"]
-        neutral_detergent_fiber_concentration = nutrient_concentrations["NDF"]
-        ethyl_ester_concentration = nutrient_concentrations["EE"]
-        starch_concentration = nutrient_concentrations["starch"]
+        dry_matter_intake = nutrient_amounts.dry_matter
+        neutral_detergent_fiber_concentration = nutrient_amounts.ndf_percentage
+        ethyl_ester_concentration = nutrient_amounts.fat_percentage
+        starch_concentration = nutrient_amounts.starch_percentage
 
         if is_lactating:
             methane_emission = EntericMethaneCalculator._calculate_lactating_cow_manure(
