@@ -46,7 +46,7 @@ class NutritionEvaluator:
             "fat": cls._check_fat_content,
             "dry_matter": cls._check_dry_matter_intake,
         }
-        cow_energy_nutrition_checkers = heifer_energy_nutrition_checkers + {
+        cow_energy_nutrition_checkers = heifer_energy_nutrition_checkers | {
             "total_energy": cls._check_total_energy_supplied,
             "lactation": cls._check_lactation_energy_supplied,
         }
@@ -56,7 +56,7 @@ class NutritionEvaluator:
 
         evaluation = NutritionEvaluationResults(
             total_energy=results.get("total_energy"),
-            maintenance_energy=results["maintentance"],
+            maintenance_energy=results["maintenance"],
             lactation_energy=results.get("lactation"),
             growth_energy=results["growth"],
             calcium=results["calcium"],
@@ -71,7 +71,7 @@ class NutritionEvaluator:
         return is_valid_ration, evaluation
 
     @classmethod
-    def _check_total_energy_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_total_energy_supplied(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates difference between the supplied and required amounts of total energy.
 
@@ -104,7 +104,7 @@ class NutritionEvaluator:
 
     @classmethod
     def _check_activity_maintenance_energy_supplied(
-        requirements: NutritionRequirements, supply: NutritionSupply
+        cls, requirements: NutritionRequirements, supply: NutritionSupply
     ) -> float:
         """
         Calculates difference between the supplied and required amounts energy for maintenance.
@@ -127,7 +127,7 @@ class NutritionEvaluator:
         return supply.maintenance_energy - energy_requirement
 
     @classmethod
-    def _check_lactation_energy_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_lactation_energy_supplied(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates difference between the supplied and required amounts energy for lactation.
 
@@ -149,7 +149,7 @@ class NutritionEvaluator:
         return supply.lactation_energy - energy_requirement
 
     @classmethod
-    def _check_growth_energy_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_growth_energy_supplied(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates difference between the supplied and required amounts energy for growth.
 
@@ -169,7 +169,7 @@ class NutritionEvaluator:
         return supply.growth_energy - requirements.growth_energy
 
     @classmethod
-    def _check_calcium_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_calcium_supplied(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates difference between the supplied and required amounts of calcium.
 
@@ -189,7 +189,7 @@ class NutritionEvaluator:
         return supply.calcium - requirements.calcium
 
     @classmethod
-    def _check_phosphorus_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_phosphorus_supplied(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates difference between the supplied and required amounts of phosphorus.
 
@@ -211,7 +211,7 @@ class NutritionEvaluator:
         return supply.phosphorus - requirement
 
     @classmethod
-    def _check_protein_supplied(requirements: NutritionRequirements, supply: NutritionSupply) -> bool:
+    def _check_protein_supplied(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> bool:
         """
         Calculates amount by which supplied protein under- or overshoots the required amount of protein.
 
@@ -238,7 +238,7 @@ class NutritionEvaluator:
             return 0.0
 
     @classmethod
-    def _check_neutral_detergent_fiber_supplied(_: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_neutral_detergent_fiber_supplied(cls, _: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates amount by which supplied neutral detergent fiber (NDF) under- or overshoots the required amount of
         NDF.
@@ -266,7 +266,7 @@ class NutritionEvaluator:
             return 0.0
 
     @classmethod
-    def _check_fat_content(_: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_fat_content(cls, _: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates difference between the supplied and required percentages of fat in the ration.
 
@@ -288,7 +288,7 @@ class NutritionEvaluator:
         return fat_percentage - AnimalModuleConstants.MINIMUM_FAT
 
     @classmethod
-    def _check_dry_matter_intake(requirements: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _check_dry_matter_intake(cls, requirements: NutritionRequirements, supply: NutritionSupply) -> float:
         """Checks that the dry matter supplied meets the requirement."""
         """
         Calculates amount by which supplied dry matter under- or overshoots the required amount dry matter.

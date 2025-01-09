@@ -58,10 +58,11 @@ class NutritionSupplyCalculator:
         calcium = cls._calculate_calcium_supply(feeds)
         phosphorus = cls._calculate_phosphorus_supply(feeds)
         dry_matter_intake = sum([feed.amount for feed in feeds])
+        wet_matter = sum([feed.amount / feed.info.DM * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
         protein = cls._calculate_metabolizable_protein_supply(
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
-        nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "TDN", "lignin", "ash", "potassium"]
+        nutrients_to_calculate = ["NDF", "EE", "CP", "ADF", "TDN", "lignin", "ash", "potassium", "starch"]
         nutrient_contents = {
             nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in nutrients_to_calculate
         }
@@ -75,6 +76,7 @@ class NutritionSupplyCalculator:
             calcium=calcium,
             phosphorus=phosphorus,
             dry_matter=dry_matter_intake,
+            wet_matter=wet_matter,
             ndf_supply=nutrient_contents["NDF"],
             fat_supply=nutrient_contents["EE"],
             crude_protein=nutrient_contents["CP"],
@@ -83,6 +85,7 @@ class NutritionSupplyCalculator:
             lignin_supply=nutrient_contents["lignin"],
             ash_supply=nutrient_contents["ash"],
             potassium_supply=nutrient_contents["potassium"],
+            starch_supply=nutrient_contents["starch"],
         )
 
     @classmethod
