@@ -196,7 +196,7 @@ class NutritionEvaluator:
             Difference between the phosphorus supplied and the phosphorus required (g).
 
         """
-        requirement = max(requirements.phosphorus, requirements.secondary_phosphorus)
+        requirement = max(requirements.phosphorus, requirements.process_based_phosphorus)
 
         return supply.phosphorus - requirement
 
