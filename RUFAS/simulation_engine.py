@@ -4,13 +4,13 @@ import time as timer
 from datetime import date, timedelta
 from enum import Enum
 
+from RUFAS.biophysical.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.biophysical.animal.herd_manager import HerdManager
 from RUFAS.biophysical.feed_storage.feed_manager import FeedManager
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard
 from RUFAS.data_structures.manure_to_crop_soil_connection import ManureEventNutrientRequestResults
 from RUFAS.input_manager import InputManager
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.animal_module_reporter import AnimalModuleReporter
 from RUFAS.routines.field.manager.field_manager import FieldManager
 from RUFAS.routines.manure.manure_manager import ManureManager
 from RUFAS.time import Time
