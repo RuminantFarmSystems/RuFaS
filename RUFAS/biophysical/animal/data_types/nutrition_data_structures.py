@@ -104,7 +104,7 @@ class NutritionRequirements:
             metabolizable_protein=0.0,
             calcium=0.0,
             phosphorus=0.0,
-            secondary_phosphorus=0.0,
+            process_based_phosphorus=0.0,
             dry_matter=0.0,
             activity_energy=0.0,
             essential_amino_acids=EssentialAminoAcidRequirements(

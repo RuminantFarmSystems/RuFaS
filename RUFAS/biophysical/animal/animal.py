@@ -813,7 +813,7 @@ class Animal:
                 distance=walking_distance,
                 lactating=self.is_milking,
                 ndf_percentage=ndf_percentage,
-                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement
+                process_based_phosphorus_requirement=self.nutrients.phosphorus_requirement
             )
         else:
             requirements = NRCRequirementsCalculator.calculate_requirements(
@@ -836,7 +836,7 @@ class Animal:
                 net_energy_diet_concentration=net_energy_diet_conc,
                 days_born=self.days_born,
                 TDN_percentage=tdn_percentage,
-                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement
+                process_based_phosphorus_requirement=self.nutrients.phosphorus_requirement
             )
 
         return requirements
