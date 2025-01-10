@@ -84,6 +84,8 @@ class NutritionSupply:
         Total dry matter supply of a ration (kg).
     ndf_supply : float
         Total neutral detergent fiber (NDF) supplied by the ration (kg).
+    forage_ndf_supply : float
+        Total NDF supplied by forages in the ration (kg).
     fat_supply : float
         Total fat supplied by the ration (kg).
 
@@ -98,6 +100,7 @@ class NutritionSupply:
     phosphorus: float
     dry_matter: float
     ndf_supply: float
+    forage_ndf_supply: float
     fat_supply: float
 
 
@@ -132,6 +135,9 @@ class NutritionEvaluationResults:
     ndf_percent : float
         Surplus or deficit of neutral detergent fiber (NDF) percentage in a ration. If NDF percentage is within
         acceptable bounds, this value will be 0.0.
+    ndf_percent : float
+        Surplus or deficit of neutral detergent fiber (NDF) percentage supplied by forages in a ration. If forage NDF
+        percentage is within acceptable bounds, this value will be 0.0.
     fat_percent : float
         Surplus or deficit of fat percentage in a ration. If fat percentage is within acceptable bounds, this value will
         be 0.0.
@@ -151,6 +157,7 @@ class NutritionEvaluationResults:
     phosphorus: float
     dry_matter: float
     ndf_percent: float
+    forage_ndf_percent: float
     fat_percent: float
 
     @property
