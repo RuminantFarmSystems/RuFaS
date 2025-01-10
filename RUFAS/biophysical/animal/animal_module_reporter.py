@@ -236,28 +236,10 @@ class AnimalModuleReporter:
             "DE": MeasurementUnits.MEGACALORIES,
             "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
         }
-        classname = AnimalModuleReporter.__name__
-        funcname = AnimalModuleReporter.report_ration_interval_data.__name__
-        AnimalModuleReporter.data_padder(
-            f"{classname}.{funcname}.ration_nutrient_amount_pen_0_CALF",
-            f"{classname}.{funcname}.ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
-            {},
-            simulation_day,
-            info_map,
-            nutrient_amount_units,
-        )
         om.add_variable(
             f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
             nutrient_amount,
             dict(info_map, **{"units": nutrient_amount_units}),
-        )
-        AnimalModuleReporter.data_padder(
-            f"{classname}.{funcname}.MEdiet_pen_0_CALF",
-            f"{classname}.{funcname}.MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
-            0,
-            simulation_day,
-            info_map,
-            MeasurementUnits.KILOGRAMS,
         )
         om.add_variable(
             f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
@@ -279,14 +261,6 @@ class AnimalModuleReporter:
             "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
             "avg_essential_amino_acid_requirement": MeasurementUnits.GRAMS_PER_DAY,
         }
-        AnimalModuleReporter.data_padder(
-            f"{classname}.{funcname}.avg_rqmts_pen_0_CALF",
-            f"{classname}.{funcname}.avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
-            {},
-            simulation_day,
-            info_map,
-            avg_nutrient_rqmts_units,
-        )
         om.add_variable(
             f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
             pen.avg_nutrient_rqmts,
@@ -314,14 +288,6 @@ class AnimalModuleReporter:
                 )
             else:
                 ration_supply_report = {}
-            AnimalModuleReporter.data_padder(
-                f"{classname}.{funcname}.ration_supply_report_for_pen_0_CALF",
-                f"{classname}.{funcname}.ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
-                {},
-                simulation_day,
-                info_map,
-                ration_supply_report_units,
-            )
             om.add_variable(
                 f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
                 ration_supply_report,
@@ -471,7 +437,7 @@ class AnimalModuleReporter:
         #         )
 
     @classmethod
-    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> None:
+    def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
         """
         For each pen, adds the average ration per animal to the OutputManager.
 
@@ -481,6 +447,10 @@ class AnimalModuleReporter:
             Pen object.
         simulation_day : int
             Day of simulation.
+
+        Returns
+        -------
+        TODO!
 
         """
         total_dry_matter = pen.average_nutrition_supply.dry_matter
@@ -505,6 +475,37 @@ class AnimalModuleReporter:
         cls._om.add_variable(
             f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}", ration_amounts, info_map
         )
+
+        return ration_amounts
+
+    @classmethod
+    def _report_average_nutrient_requirements(cls, pen: Pen, simulation_day: int) -> None:
+        """
+        Adds the average ration per animal of a pen to the OutputManager.
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen object.
+        simulation_day : int
+            Day of simulation.
+
+        """
+        avg_requirements = {
+            "NEmaint_requirement": pen.average_nutrition_requirements.maintenance_energy,
+            "NEa_requirement": pen.average_nutrition_requirements.activity_energy,
+            "NEg_requirement": pen.average_nutrition_requirements,
+            "NEpreg_requirement": pen.average_nutrition_requirements,
+            "NEl_requirement": pen.average_nutrition_requirements,
+            "MP_requirement": pen.average_nutrition_requirements,
+            "Ca_requirement": pen.average_nutrition_requirements,
+            "P_req": pen.average_nutrition_requirements,
+            "P_req_process": pen.average_nutrition_requirements,
+            "DMIest_requirement": pen.average_nutrition_requirements,
+            "avg_BW": pen.average_body_weight,
+            "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "avg_essential_amino_acid_requirement": pen.average_nutrition_requirements,
+        }
 
     @classmethod
     def report_daily_ration(cls, animal_manager, available_feeds: list[Feed], simulation_day: int) -> None:
