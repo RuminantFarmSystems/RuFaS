@@ -51,7 +51,7 @@ def test_calculate_neutral_detergent_fiber_supplied() -> None:
     pass
 
 
-def test_calculate_fat_content() -> None:
+def test_calculate_fat_supplied() -> None:
     """Tests that fat supplied in ration is correctly compared against an animal's fat requirement."""
     pass
 

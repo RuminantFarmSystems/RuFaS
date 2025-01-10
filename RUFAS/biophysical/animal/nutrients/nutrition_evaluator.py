@@ -42,8 +42,8 @@ class NutritionEvaluator:
             "calcium": cls._calculate_calcium_supplied,
             "phosphorus": cls._calculate_phosphorus_supplied,
             "protein": cls._calculate_protein_supplied,
-            "ndf": cls._calculate_neutral_detergent_fiber_supplied,
-            "fat": cls._calculate_fat_content,
+            "ndf_supplied": cls._calculate_neutral_detergent_fiber_supplied,
+            "fat_supplied": cls._calculate_fat_supplied,
             "dry_matter": cls._calculate_dry_matter_intake,
         }
         cow_energy_nutrition_checkers = heifer_energy_nutrition_checkers | {
@@ -62,8 +62,8 @@ class NutritionEvaluator:
             calcium=results["calcium"],
             phosphorus=results["phosphorus"],
             metabolizable_protein=results["protein"],
-            ndf_percent=results["ndf"],
-            fat_percent=results["fat"],
+            ndf_percent=results["ndf_supplied"],
+            fat_percent=results["fat_supplied"],
             dry_matter=results["dry_matter"],
         )
 
@@ -256,7 +256,7 @@ class NutritionEvaluator:
             return 0.0
 
     @classmethod
-    def _calculate_fat_content(_: NutritionRequirements, supply: NutritionSupply) -> float:
+    def _calculate_fat_supplied(_: NutritionRequirements, supply: NutritionSupply) -> float:
         """
         Calculates difference between the supplied and required percentages of fat in the ration.
 
