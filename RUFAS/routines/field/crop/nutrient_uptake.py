@@ -8,8 +8,12 @@ from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class NutrientUptake:
-    def __int__(self, crop_data: Optional[CropData], soil_data: Optional[SoilData],
-                actual_nutrient_uptakes: Optional[list[float]] = None):
+    def __int__(
+        self,
+        crop_data: Optional[CropData],
+        soil_data: Optional[SoilData],
+        actual_nutrient_uptakes: Optional[list[float]] = None,
+    ):
         self.crop_data = crop_data or CropData()
         self.soil_Data = soil_data or SoilData()
         self.actual_nutrient_uptakes = actual_nutrient_uptakes
@@ -222,7 +226,7 @@ class NutrientUptake:
             A trimmed list with an element for each soil layer that is accessible to the plant's roots.
 
         """
-        return layer_list[0: self.crop_data.accessible_soil_layers]
+        return layer_list[0 : self.crop_data.accessible_soil_layers]
 
     @classmethod
     def determine_layer_nutrient_uptake_potential(
@@ -292,15 +296,11 @@ class NutrientUptake:
             raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
 
         boundary_nutrient = [
-            cls._determine_nitrogen_uptake_to_depth(
-                total_demand, x, root_depth, nutrient_distribution_parameter
-            )
+            cls._determine_nitrogen_uptake_to_depth(total_demand, x, root_depth, nutrient_distribution_parameter)
             for x in layer_bounds
         ]
         boundary_nutrient.insert(0, 0)
-        layer_nutrient = [
-            below - above for below, above in zip(boundary_nutrient[1:], boundary_nutrient)
-        ]
+        layer_nutrient = [below - above for below, above in zip(boundary_nutrient[1:], boundary_nutrient)]
         return layer_nutrient
 
     @staticmethod
