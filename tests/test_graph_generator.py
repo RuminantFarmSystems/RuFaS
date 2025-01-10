@@ -279,8 +279,8 @@ def test_generate_graph_with_custom_legend(graph_generator: GraphGenerator, mock
 
     graph_generator.generate_graph(filtered_pool, graph_details, filter_file_name, graphics_dir, True)
 
-    mock_generate_legend_keys.assert_any_call("var1", omit_legend_prefix=True, omit_legend_suffix=True)
-    mock_generate_legend_keys.assert_any_call("var2", omit_legend_prefix=True, omit_legend_suffix=True)
+    mock_generate_legend_keys.assert_any_call("var1", omit_legend_prefix=True, omit_legend_suffix=False)
+    mock_generate_legend_keys.assert_any_call("var2", omit_legend_prefix=True, omit_legend_suffix=False)
 
     sorted_keys = ["var1", "var2"]
     expected_prepared_data = {"var1": [1, 2, 3], "var2": [4, 5, 6]}
