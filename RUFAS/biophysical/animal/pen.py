@@ -35,6 +35,19 @@ class Pen:
         animal_combination: AnimalCombination,
         max_stocking_density: float,
     ) -> None:
+        """
+        
+        Attributes
+        ----------
+        ration : dict[RUFAS_ID, float], default {}
+            Maps RuFaS Feed ID to the percentage of that feed in the pen's ration.
+        average_nutrition_supply : NutritionSupply
+            Average nutrition supplied by the ration to an animal in the pen.
+        average_nutrition_evaluation : NutritionEvaluationResults
+            Average surpluses and/or deficits of nutrients supplied to animal in the pen.
+        
+        
+        """
         self.pen_statistics = PenStatistics()
         self.id = pen_id
         self.max_stocking_density = max_stocking_density
@@ -56,7 +69,8 @@ class Pen:
 
         self.ration: dict[RUFAS_ID, float] = {}
         self.average_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
-        self.average_nutrient_evaluation: NutritionEvaluationResults = (
+        self.average_nutrition_requirements: NutritionRequirements = NutritionRequirements.make_empty_nutrition_requirements()
+        self.average_nutrition_evaluation: NutritionEvaluationResults = (
             NutritionEvaluationResults.make_empty_evaluation_results()
         )
 
@@ -341,9 +355,11 @@ class Pen:
         animal_combination = self.animal_combination
         ration = UserDefinedRationManager.get_user_defined_ration(animal_combination, self.average_animal_requirements)
 
-        total_nutrient_evaluation_results = NutritionEvaluationResults.make_empty_evaluation_results()
+        total_nutrition_supply = NutritionSupply.make_empty_nutrition_supply()
+        total_nutrition_requirements = NutritionRequirements.make_empty_nutrition_requirements()
+        total_nutrition_evaluation_results = NutritionEvaluationResults.make_empty_evaluation_results()
+        
         ration_sufficient_for_milk_production = True
-        total_nutrition_supply: NutritionSupply = NutritionSupply.make_empty_nutrition_supply()
         for animal in self.animals_in_pen.values():
             while ration_sufficient_for_milk_production:
                 nutrition_supply: NutritionSupply = NutritionSupplyCalculator.calculate_nutrient_supply(
@@ -378,12 +394,19 @@ class Pen:
             animal.previous_nutrition_supply = animal.nutrition_supply
             animal.nutrition_supply = nutrition_supply
             total_nutrition_supply += nutrition_supply
-            total_nutrient_evaluation_results += evaluation_result
+            total_nutrition_requirements += animal.nutrition_requirements
+            total_nutrition_evaluation_results += evaluation_result
 
-        self.average_nutrient_evaluation = total_nutrient_evaluation_results / len(self.animals_in_pen.values()) \
-            if self.animals_in_pen else NutritionEvaluationResults.make_empty_evaluation_results()
-        self.average_nutrition_supply = total_nutrition_supply / len(self.animals_in_pen.values()) \
-            if self.animals_in_pen else NutritionSupply.make_empty_nutrition_supply()
+        if self.animals_in_pen:
+            number_animals_in_pen = len(self.animals_in_pen.values())
+            self.average_nutrition_supply = total_nutrition_supply / number_animals_in_pen
+            self.average_nutrition_requirements = total_nutrition_requirements / number_animals_in_pen
+            self.average_nutrition_evaluation = total_nutrition_evaluation_results / number_animals_in_pen
+        else:
+            self.average_nutrition_supply = NutritionSupply.make_empty_nutrition_supply()
+            self.average_nutrition_requirements = NutritionRequirements.make_empty_nutrition_requirements()
+            self.average_nutrition_evaluation = NutritionEvaluationResults.make_empty_evaluation_results()
+
         self.ration = ration
 
     def get_requested_feed(self, ration_interval_length: int) -> RequestedFeed:
