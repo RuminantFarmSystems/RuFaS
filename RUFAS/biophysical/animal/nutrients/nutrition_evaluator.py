@@ -43,6 +43,7 @@ class NutritionEvaluator:
             "phosphorus": cls._calculate_phosphorus_supplied,
             "protein": cls._calculate_protein_supplied,
             "ndf_supplied": cls._calculate_neutral_detergent_fiber_supplied,
+            "forage_ndf_supplied": cls._calculate_forage_neutral_detergent_fiber_supplied,
             "fat_supplied": cls._calculate_fat_supplied,
             "dry_matter": cls._calculate_dry_matter_intake,
         }
@@ -63,6 +64,7 @@ class NutritionEvaluator:
             phosphorus=results["phosphorus"],
             metabolizable_protein=results["protein"],
             ndf_percent=results["ndf_supplied"],
+            forage_ndf_percent=results["forage_ndf_supplied"],
             fat_percent=results["fat_supplied"],
             dry_matter=results["dry_matter"],
         )
@@ -254,6 +256,29 @@ class NutritionEvaluator:
             return ndf_percentage - AnimalModuleConstants.MAXIMUM_RATION_NDF
         else:
             return 0.0
+
+    @classmethod
+    def _calculate_forage_neutral_detergent_fiber_supplied(_: NutritionRequirements, supply: NutritionSupply) -> float:
+        """
+        Calculates amount by which supplied neutral detergent fiber (NDF) from forage undershoots the required amount of
+        NDF.
+
+        Parameters
+        ----------
+        _ : NutritionRequirements
+            This argument is provided to keep the method signature uniform with other helper methods.
+        supply : NutritionSupply
+            Energy and nutrition supplied by a ration.
+
+        Returns
+        -------
+        float
+            Percentage by which supplied NDF undershoots the required NDF range (percent).
+
+        """
+        forage_ndf_percentage = supply.forage_ndf_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
+
+        return forage_ndf_percentage - AnimalModuleConstants.MINIMUM_RATION_FORAGE_NDF
 
     @classmethod
     def _calculate_fat_supplied(_: NutritionRequirements, supply: NutritionSupply) -> float:
