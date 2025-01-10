@@ -8,7 +8,7 @@ from RUFAS.general_constants import GeneralConstants
 
 
 class NutritionEvaluator:
-    """Checks if energy and nutrients supplied in a ration satisfy the demand for an individual animal."""
+    """Checks if energy and nutrients supplied in a ration satisfy the demand of an animal or a pen's average demand."""
 
     @classmethod
     def evaluate_nutrition_supply(
@@ -23,11 +23,11 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal against which the nutrient supply will be compared.
+            Energy and nutrition requirements against which the nutrient supply will be compared.
         supply : NutritionSupply
-            Energy and nutrition supply against which an animal's nutrient requirements will be compared.
+            Energy and nutrition supply against which nutrient requirements will be compared.
         is_cow : bool
-            True if the animal consuming the ration is a cow, false if it is a heifer.
+            True if the requirements are for a cow or cows, false if they are for a heifer or heifer pen.
 
         Returns
         -------
@@ -78,7 +78,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 
@@ -102,7 +102,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 
@@ -124,7 +124,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 
@@ -146,7 +146,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 
@@ -166,7 +166,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 
@@ -186,7 +186,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 
@@ -208,7 +208,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 
@@ -248,10 +248,10 @@ class NutritionEvaluator:
         """
         ndf_percentage = supply.ndf_supply / supply.dry_matter * GeneralConstants.FRACTION_TO_PERCENTAGE
 
-        if ndf_percentage < AnimalModuleConstants.MINIMUM_NDF:
-            return ndf_percentage - AnimalModuleConstants.MINIMUM_NDF
-        elif ndf_percentage > AnimalModuleConstants.MAXIMUM_NDF:
-            return ndf_percentage - AnimalModuleConstants.MAXIMUM_NDF
+        if ndf_percentage < AnimalModuleConstants.MINIMUM_RATION_NDF:
+            return ndf_percentage - AnimalModuleConstants.MINIMUM_RATION_NDF
+        elif ndf_percentage > AnimalModuleConstants.MAXIMUM_RATION_NDF:
+            return ndf_percentage - AnimalModuleConstants.MAXIMUM_RATION_NDF
         else:
             return 0.0
 
@@ -285,7 +285,7 @@ class NutritionEvaluator:
         Parameters
         ----------
         requirements : NutritionRequirements
-            Energy and nutrition requirements of an animal.
+            Energy and nutrition requirements.
         supply : NutritionSupply
             Energy and nutrition supplied by a ration.
 

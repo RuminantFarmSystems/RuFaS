@@ -84,11 +84,11 @@ class AnimalModuleConstants:
     MINIMUM_CALCIUM: float = 0.0
     """Minimum calcium estimate, g/day"""
 
-    MINIMUM_NDF: float = 15.0
-    """Minimum percentage of a ration's dry matter that must be neutral detergent fiber (NDF)."""
+    MINIMUM_RATION_NDF: float = 15.0
+    """Minimum percentage of a pen's ration's dry matter that must be neutral detergent fiber (NDF)."""
 
-    MAXIMUM_NDF: float = 45.0
-    """Maximum percentage of a ration's dry matter that must be neutral detergent fiber (NDF)."""
+    MAXIMUM_RATION_NDF: float = 45.0
+    """Maximum percentage of a pen's ration's dry matter that must be neutral detergent fiber (NDF)."""
 
     MINIMUM_FAT: float = 7.0
     """Minimum percentage of a ration's dry matter that must be fat."""
