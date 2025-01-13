@@ -225,6 +225,17 @@ class GraphGenerator:
             mask_values = graph_details.get("mask_values", False)
             use_calendar_dates = graph_details.get("use_calendar_dates", False)
             date_format = graph_details.get("date_format", None)
+            if graph_details.get("legend", False):
+                sorted_keys = sorted(
+                    prepared_data.keys(),
+                    key=lambda k: self._generate_legend_keys(k, omit_legend_prefix=True, omit_legend_suffix=False),
+                )
+                prepared_data = {key: prepared_data[key] for key in sorted_keys}
+            else:
+                graph_details = self._set_graph_legend(graph_details, prepared_data)
+            if graph_details.get("title"):
+                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
+                graph_details["title"] = corrected_graph_title
             self._draw_graph(
                 graph_details["type"],
                 prepared_data,
@@ -236,11 +247,6 @@ class GraphGenerator:
                 graph_details.get("slice_start", None),
                 graph_details.get("slice_end", None),
             )
-            if graph_details.get("title"):
-                corrected_graph_title = Utility.remove_special_chars(graph_details.get("title", "Untitled graph"))
-                graph_details["title"] = corrected_graph_title
-            if not graph_details.get("legend"):
-                graph_details = self._set_graph_legend(graph_details, prepared_data)
 
             self._customize_graph(fig, graph_details)
             self._save_graph(graph_details, filter_file_name, graphics_dir)
