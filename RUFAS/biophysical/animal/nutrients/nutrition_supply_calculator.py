@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, FeedComponentType
+from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, FeedComponentType, NutrientStandard
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.general_constants import GeneralConstants
 
@@ -17,6 +17,8 @@ class FeedInRation:
 
 class NutritionSupplyCalculator:
     """Calculates the energy and nutrients supplied by a ration."""
+
+    nutrient_standard: NutrientStandard
 
     @classmethod
     def calculate_nutrient_supply(
@@ -58,7 +60,7 @@ class NutritionSupplyCalculator:
         calcium = cls._calculate_calcium_supply(feeds)
         phosphorus = cls._calculate_phosphorus_supply(feeds)
         dry_matter_intake = sum([feed.amount for feed in feeds])
-        wet_matter = sum([feed.amount / feed.info.DM * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds])
+        wet_matter = sum([feed.amount / (feed.info.DM * GeneralConstants.PERCENTAGE_TO_FRACTION) for feed in feeds])
         protein = cls._calculate_metabolizable_protein_supply(
             feeds, dry_matter_intake, actual_tdn_percentages, body_weight
         )
@@ -66,6 +68,7 @@ class NutritionSupplyCalculator:
         nutrient_contents = {
             nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in nutrients_to_calculate
         }
+        digestible_energy = cls._calculate_digestible_energy(feeds)
 
         return NutritionSupply(
             metabolizable_energy=total_metabolizable_energy,
@@ -81,6 +84,7 @@ class NutritionSupplyCalculator:
             fat_supply=nutrient_contents["EE"],
             crude_protein=nutrient_contents["CP"],
             adf_supply=nutrient_contents["ADF"],
+            digestible_energy_supply=digestible_energy,
             tdn_supply=nutrient_contents["TDN"],
             lignin_supply=nutrient_contents["lignin"],
             ash_supply=nutrient_contents["ash"],
@@ -644,3 +648,24 @@ class NutritionSupplyCalculator:
         return sum(
             [feed.amount * getattr(feed.info, nutrient) * GeneralConstants.PERCENTAGE_TO_FRACTION for feed in feeds]
         )
+
+    @classmethod
+    def _calculate_digestible_energy(cls, feeds: list[FeedInRation]) -> float:
+        """
+        Calculates the amount of digestible energy in a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+        nutrient : str
+            Name of the nutrient.
+
+        Returns
+        -------
+        float
+            Total supply of nutrient in a ration (Mcal).
+
+        """
+        de_attribute = "DE_Base" if cls.nutrient_standard is NutrientStandard.NASEM else "DE"
+        return sum([feed.amount * getattr(feed.info, de_attribute) for feed in feeds])

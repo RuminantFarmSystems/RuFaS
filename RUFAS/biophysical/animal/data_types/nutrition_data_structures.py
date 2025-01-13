@@ -155,7 +155,8 @@ class NutritionSupply:
     adf_supply : float
         Total Acid Detergent Fiber (ADF) supplied by the ration (kg).
     digestible_energy_supply : float
-        Total amount of digestible energy supplied by the ration (Mcal).
+        Total amount of digestible energy (DE) supplied by the ration (Mcal). This value is calculated with the "DE"
+        attribute of a Feed when using the NRC methodology, and "DE_Base" when using NASEM.
     tdn_supply : float
         Total Digestible Nutrients (TDN) supplied by the ration (kg).
     lignin_supply : float

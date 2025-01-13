@@ -16,13 +16,14 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
 
 
 @pytest.mark.parametrize(
-    "ration, weight, tdn, de, expected_supply",
+    "ration, weight, tdn, de, dm_percent, expected_supply",
     [
         (
             {1: 20.0, 2: 30.0, 3: 4.0},
             550.0,
             (60.0, 10.0, 70.0),
             (22.0, 40.0, 30.0),
+            (80.0, 20.0, 10.0),
             NutritionSupply(
                 metabolizable_energy=7_300.0,
                 maintenance_energy=1_000.0,
@@ -32,6 +33,7 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
                 calcium=1.5,
                 phosphorus=1.6,
                 dry_matter=54.0,
+                wet_matter=215.0,
                 ndf_supply=10.0,
                 fat_supply=10.0,
                 crude_protein=10.0,
@@ -40,6 +42,8 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
                 lignin_supply=10.0,
                 ash_supply=10.0,
                 potassium_supply=10.0,
+                starch_supply=10.0,
+                digestible_energy_supply=11.0,
             ),
         )
     ],
@@ -51,11 +55,13 @@ def test_calculate_nutrient_supply(
     weight: float,
     tdn: tuple[float, float, float],
     de: tuple[float, float, float],
+    dm_percent: tuple[float, float, float],
     expected_supply: NutritionSupply,
 ) -> None:
     """Test that the nutritive and energy content of a ration is calculated correctly."""
     feeds[0].TDN, feeds[1].TDN, feeds[2].TDN = tdn
     feeds[0].DE, feeds[1].DE, feeds[2].DE = de
+    feeds[0].DM, feeds[1].DM, feeds[2].DM = dm_percent
     discount = mocker.patch.object(NutritionSupplyCalculator, "_calculate_nutrient_intake_discount", return_value=0.3)
     metabolizable = mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_actual_metabolizable_energy", return_value={1: 100.0, 2: 150.0, 3: 200.0}
@@ -75,6 +81,9 @@ def test_calculate_nutrient_supply(
     nutritive_content = mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_nutritive_content", return_value=10.0
     )
+    digestible_energy = mocker.patch.object(
+        NutritionSupplyCalculator, "_calculate_digestible_energy", return_value=11.0
+    )
 
     actual = NutritionSupplyCalculator.calculate_nutrient_supply(feeds, ration, weight)
 
@@ -87,7 +96,8 @@ def test_calculate_nutrient_supply(
     calcium.assert_called_once()
     phosphorus.assert_called_once()
     protein.assert_called_once()
-    assert nutritive_content.call_count == 8
+    assert nutritive_content.call_count == 9
+    digestible_energy.assert_called_once()
 
 
 @pytest.mark.parametrize(
