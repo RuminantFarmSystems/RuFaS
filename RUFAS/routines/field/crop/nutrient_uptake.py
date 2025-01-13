@@ -4,18 +4,15 @@ from typing import Optional
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.soil.soil_data import SoilData
 
 
 class NutrientUptake:
     def __int__(
         self,
         crop_data: Optional[CropData],
-        soil_data: Optional[SoilData],
         actual_nutrient_uptakes: Optional[list[float]] = None,
     ):
         self.crop_data = crop_data or CropData()
-        self.soil_Data = soil_data or SoilData()
         self.actual_nutrient_uptakes = actual_nutrient_uptakes
 
     @staticmethod
