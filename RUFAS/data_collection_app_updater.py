@@ -84,7 +84,10 @@ class DataCollectionAppUpdater:
         properties: dict[str, Any] = self._im.meta_data["properties"]
 
         schema_paths = []
+
         for key in properties.keys():
+            print(properties)
+
             if not properties[key]["data_collection_app_compatible"]:
                 continue
             schema_dict = \
