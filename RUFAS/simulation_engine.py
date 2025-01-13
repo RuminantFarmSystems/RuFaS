@@ -168,6 +168,9 @@ class SimulationEngine:
         )
         self.feed_manager.manage_ration_interval_purchases(requested_feed)
 
+        for pen in self.herd_manager.all_pens:
+            AnimalModuleReporter.report_ration_interval_data(pen, self.time.simulation_day)
+
     def generate_daily_manure_applications(self) -> list[ManureEventNutrientRequestResults]:
         """Requests nutrients from the manure manager for each field in the simulation.
 

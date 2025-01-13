@@ -40,7 +40,7 @@ class Pen:
         Attributes
         ----------
         ration : dict[RUFAS_ID, float], default {}
-            Maps RuFaS Feed ID to the percentage of that feed in the pen's ration.
+            Maps RuFaS Feed ID to the amount of that feed in the ration (kg dry matter).
         average_nutrition_supply : NutritionSupply
             Average nutrition supplied by the ration to an animal in the pen.
         average_nutrition_evaluation : NutritionEvaluationResults
@@ -388,7 +388,7 @@ class Pen:
         total_nutrition_supply = NutritionSupply.make_empty_nutrition_supply()
         total_nutrition_requirements = NutritionRequirements.make_empty_nutrition_requirements()
         total_nutrition_evaluation_results = NutritionEvaluationResults.make_empty_evaluation_results()
-        
+
         ration_sufficient_for_milk_production = True
         for animal in self.animals_in_pen.values():
             while ration_sufficient_for_milk_production:

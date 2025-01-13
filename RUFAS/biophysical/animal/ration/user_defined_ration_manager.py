@@ -42,20 +42,6 @@ class UserDefinedRationManager:
             AnimalCombination.CLOSE_UP: {},
             AnimalCombination.LAC_COW: {},
         }
-        # for feed in ration_config:
-        #     user_defined_ration_percentages = feed["user_defined_ration_percentages"]
-        #     cls.user_defined_rations[AnimalCombination.CALF][feed["rufas_id"]] = user_defined_ration_percentages[
-        #         AnimalCombination.CALF.value()
-        #     ]
-        #     cls.user_defined_rations[AnimalCombination.GROWING][feed["rufas_id"]] = user_defined_ration_percentages[
-        #         AnimalCombination.GROWING.value()
-        #     ]
-        #     cls.user_defined_rations[AnimalCombination.CLOSE_UP][feed["rufas_id"]] = user_defined_ration_percentages[
-        #         AnimalCombination.CLOSE_UP.value()
-        #     ]
-        #     cls.user_defined_rations[AnimalCombination.LAC_COW][feed["rufas_id"]] = user_defined_ration_percentages[
-        #         AnimalCombination.LAC_COW.value()
-        #     ]
         user_defined_ration_percentages = ration_config["user_defined_ration_percentages"]
         for combination in cls.user_defined_rations.keys():
             cls.user_defined_rations[combination] = {
