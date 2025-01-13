@@ -207,7 +207,6 @@ class AnimalModuleReporter:
         ration_amounts = cls._report_ration_per_animal(pen, simulation_day)
 
         cls._report_nutrient_amounts(pen, simulation_day)
-        nutrient_amount = pen.ration_nutrient_amount
         nutrient_conc = pen.ration_nutrient_conc
         ration_report = {}
         ration_report["nutrient_amount"] = nutrient_amount
@@ -484,12 +483,6 @@ class AnimalModuleReporter:
     @classmethod
     def _report_nutrient_amounts(cls, pen: Pen, simulation_day: int) -> None:
         """Reports the amounts of nutrients in the ration."""
-        info_map = {
-            "class": AnimalModuleReporter.__name__,
-            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
-            "number_animals_in_pen": len(pen.animals_in_pen.keys()),
-            "simulation_day": simulation_day,
-        }
         nutrient_amount_units = {
             "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
             "CP": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
@@ -506,6 +499,13 @@ class AnimalModuleReporter:
             "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
             "DE": MeasurementUnits.MEGACALORIES,
             "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        }
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
+            "number_animals_in_pen": len(pen.animals_in_pen.keys()),
+            "simulation_day": simulation_day,
+            "units": nutrient_amount_units
         }
 
         nutrient_amounts = {
@@ -525,6 +525,10 @@ class AnimalModuleReporter:
             "DE": pen.average_nutrition_supply.digestible_energy_supply,
             "calcium": pen.average_nutrition_supply.calcium,
         }
+
+        cls._om.add_variable(
+            f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}", nutrient_amounts, info_map
+        )
 
     @classmethod
     def _report_average_nutrient_requirements(cls, pen: Pen, simulation_day: int) -> None:
