@@ -86,7 +86,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
 
         """
         maintenance_requirement, gravid_uterine_weight, uterine_weight = (
-            cls._calculate_maintentance_energy_requirements(
+            cls._calculate_maintenance_energy_requirements(
                 body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
             )
         )
@@ -168,7 +168,7 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
         )
 
     @classmethod
-    def _calculate_maintentance_energy_requirements(
+    def _calculate_maintenance_energy_requirements(
         cls, body_weight: float, mature_body_weight: float, day_of_pregnancy: int | None, days_in_milk: int | None
     ) -> tuple[float, float, float]:
         """

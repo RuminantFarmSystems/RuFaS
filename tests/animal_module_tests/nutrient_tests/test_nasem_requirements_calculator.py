@@ -9,7 +9,7 @@ def test_calculate_requirements() -> None:
     pass
 
 
-def test_calculate_maintentance_energy_requirements() -> None:
+def test_calculate_maintenance_energy_requirements() -> None:
     """Test that energy requirements for maintenance are calculated correctly."""
     pass
 
