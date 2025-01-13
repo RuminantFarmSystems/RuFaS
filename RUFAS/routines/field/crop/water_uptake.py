@@ -2,7 +2,6 @@ from math import exp
 from typing import List, Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
 
@@ -57,16 +56,17 @@ class WaterUptake(NutrientUptake):
         self,
         crop_data: Optional[CropData] = None,
         water_distro_parameter: float = 10,
-        potential_water_uptakes: Optional[list[float]] = None,
+        potential_water_uptakes: Optional[List[float]] = None,
         water_compensation_factor: float = 0.01,
-        unmet_water_demands: Optional[list[float]] = None,
-        actual_water_uptakes: Optional[list[float]] = None,
+        unmet_water_demands: Optional[List[float]] = None,
+        actual_water_uptakes: Optional[List[float]] = None,
     ):
-        super().__init__(crop_data, actual_water_uptakes)
+        super().__init__(crop_data)
         self.water_distro_parameter = water_distro_parameter
         self.potential_water_uptakes = potential_water_uptakes
         self.water_compensation_factor = water_compensation_factor
         self.unmet_water_demands = unmet_water_demands
+        self.actual_water_uptakes = actual_water_uptakes
 
     def uptake_water(self, soil_data: SoilData) -> None:
         """
@@ -105,7 +105,7 @@ class WaterUptake(NutrientUptake):
             water_availabilities=water_availabilities,
             available_capacities=water_capacities,
         )
-        self.actual_nutrient_uptakes = self._take_up_water(
+        self.actual_water_uptakes = self._take_up_water(
             potential_uptakes=self.potential_water_uptakes,
             water_availabilities=water_availabilities,
             wilting_points=wilting_points,
@@ -113,7 +113,7 @@ class WaterUptake(NutrientUptake):
 
         self.extract_water_from_soil(soil_data)
 
-        self.crop_data.water_uptake = self.tally_total_nutrient_uptake()
+        self.crop_data.water_uptake = sum(self.actual_water_uptakes)
         self.crop_data.cumulative_water_uptake += self.crop_data.water_uptake
 
     def extract_water_from_soil(self, soil_data: SoilData) -> None:
@@ -137,19 +137,20 @@ class WaterUptake(NutrientUptake):
         layers in the SoilData object.
 
         """
-        if len(soil_data.soil_layers) != len(self.actual_nutrient_uptakes):
+        if len(soil_data.soil_layers) != len(self.actual_water_uptakes):
             raise Exception("actual_water_uptakes should be the same length as the number of soil layers")
 
         available_water = soil_data.get_vectorized_layer_attribute("water_content")
-        zipped = zip(available_water, self.actual_nutrient_uptakes)
+        zipped = zip(available_water, self.actual_water_uptakes)
         extracts = [min(avail, request) for avail, request in zipped]
         zipped = zip(available_water, extracts)
         leftovers = [avail - extract for avail, extract in zipped]
         soil_data.set_vectorized_layer_attribute("water_content", leftovers)
-        self.actual_nutrient_uptakes = extracts
+        self.actual_water_uptakes = extracts
 
-    @staticmethod
+    @classmethod
     def _take_up_water(
+        cls,
         potential_uptakes: List[float],
         water_availabilities: List[float],
         wilting_points: List[float],
@@ -176,7 +177,7 @@ class WaterUptake(NutrientUptake):
             raise Exception("potential_uptakes, water_availabilities, and wilting_points must be of equal length")
 
         zipped = zip(potential_uptakes, water_availabilities, wilting_points)
-        return [WaterUptake._determine_actual_layer_uptake(pot, avail, wilt) for pot, avail, wilt in zipped]
+        return [cls._determine_actual_layer_uptake(pot, avail, wilt) for pot, avail, wilt in zipped]
 
     @staticmethod
     def _determine_actual_layer_uptake(potential: float, available_water: float, wilting_point_water: float) -> float:
