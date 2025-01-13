@@ -113,7 +113,7 @@ class WaterUptake(NutrientUptake):
 
         self.extract_water_from_soil(soil_data)
 
-        self.crop_data.water_uptake = sum(self.actual_water_uptakes)
+        self.crop_data.water_uptake = self.tally_total_nutrient_uptake(self.actual_water_uptakes)
         self.crop_data.cumulative_water_uptake += self.crop_data.water_uptake
 
     def extract_water_from_soil(self, soil_data: SoilData) -> None:
