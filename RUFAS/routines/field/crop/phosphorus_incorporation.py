@@ -4,7 +4,6 @@ from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.soil.soil_data import SoilData
 
-
 """
 This module is based upon the 'Phosphorus Uptake" section (5:2.3.2) of of the SWAT model documentation
 
