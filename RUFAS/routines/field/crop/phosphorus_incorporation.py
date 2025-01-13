@@ -2,8 +2,8 @@ from typing import List, Optional
 
 from RUFAS.routines.field.crop.crop_data import CropData
 from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
+from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 from RUFAS.routines.field.soil.soil_data import SoilData
-
 
 """
 This module is based upon the 'Phosphorus Uptake" section (5:2.3.2) of of the SWAT model documentation
@@ -13,7 +13,7 @@ called directly.
 """
 
 
-class PhosphorusIncorporation:
+class PhosphorusIncorporation(NutrientUptake):
     """
     A class for managing phosphorus incorporation in crops.
 
@@ -43,7 +43,7 @@ class PhosphorusIncorporation:
 
     Attributes
     ----------
-    data : CropData
+    crop_data : CropData
         A reference to the `crop_data` object, used for accessing and updating information related to phosphorus
         uptake and incorporation.
     phosphorus_distro_param : float, default 10
@@ -86,19 +86,18 @@ class PhosphorusIncorporation:
         potential_phosphorus_uptake: Optional[float] = None,
         actual_phosphorus_uptakes: Optional[List[float]] = None,
         layer_phosphorus_potentials: Optional[float] = None,
-        unmnet_phosphorus_demands: Optional[float] = None,
+        unmet_phosphorus_demands: Optional[float] = None,
         phosphorus_requests: Optional[float] = None,
     ):
-        self.data = crop_data or CropData()
+        super().__init__(crop_data, actual_phosphorus_uptakes)
 
         self.phosphorus_distro_param = phosphorus_distro_param
         self.phosphorus_shapes = phosphorus_shapes
         self.previous_phosphorus = previous_phosphorus
         self.total_phosphorus_uptake = total_phosphorus_uptake
         self.potential_phosphorus_uptake = potential_phosphorus_uptake
-        self.actual_phosphorus_uptakes = actual_phosphorus_uptakes
         self.layer_phosphorus_potentials = layer_phosphorus_potentials
-        self.unmet_phosphorus_demands = unmnet_phosphorus_demands
+        self.unmet_phosphorus_demands = unmet_phosphorus_demands
         self.phosphorus_requests = phosphorus_requests
 
     def incorporate_phosphorus(self, soil_data: SoilData) -> None:
@@ -121,36 +120,36 @@ class PhosphorusIncorporation:
         layer_phosphates = soil_data.get_vectorized_layer_attribute("labile_inorganic_phosphorus_content")
 
         self.shift_phosphorus_time()
-        self.phosphorus_shapes = NitrogenIncorporation.determine_nutrient_shape_parameters(
-            self.data.half_mature_heat_fraction,
-            self.data.mature_heat_fraction,
-            self.data.emergence_phosphorus_fraction,
-            self.data.half_mature_phosphorus_fraction,
-            self.data.mature_phosphorus_fraction,
+        self.phosphorus_shapes = self.determine_nutrient_shape_parameters(
+            self.crop_data.half_mature_heat_fraction,
+            self.crop_data.mature_heat_fraction,
+            self.crop_data.emergence_phosphorus_fraction,
+            self.crop_data.half_mature_phosphorus_fraction,
+            self.crop_data.mature_phosphorus_fraction,
         )
-        self.data.optimal_phosphorus_fraction = NitrogenIncorporation.determine_optimal_nutrient_fraction(
-            self.data.heat_fraction,
-            self.data.emergence_phosphorus_fraction,
-            self.data.mature_phosphorus_fraction,
+        self.crop_data.optimal_phosphorus_fraction = self.determine_optimal_nutrient_fraction(
+            self.crop_data.heat_fraction,
+            self.crop_data.emergence_phosphorus_fraction,
+            self.crop_data.mature_phosphorus_fraction,
             self.phosphorus_shapes[0],
             self.phosphorus_shapes[1],
         )
-        self.data.optimal_phosphorus = NitrogenIncorporation.determine_optimal_nutrient(
-            self.data.optimal_phosphorus_fraction, self.data.biomass
+        self.crop_data.optimal_phosphorus = self.determine_optimal_nutrient(
+            self.crop_data.optimal_phosphorus_fraction, self.crop_data.biomass
         )
-        if self.data.optimal_phosphorus - self.previous_phosphorus < 0:
+        if self.crop_data.optimal_phosphorus - self.previous_phosphorus < 0:
             self.potential_phosphorus_uptake = 0
         else:
-            self.potential_phosphorus_uptake = NitrogenIncorporation.determine_potential_nutrient_uptake(
-                self.data.optimal_phosphorus,
+            self.potential_phosphorus_uptake = self.determine_potential_nutrient_uptake(
+                self.crop_data.optimal_phosphorus,
                 self.previous_phosphorus,
-                self.data.mature_phosphorus_fraction,
-                self.data.biomass_growth_max,
+                self.crop_data.mature_phosphorus_fraction,
+                self.crop_data.biomass_growth_max,
             )
         self.uptake_phosphorus(layer_phosphates, layer_depths)
         soil_data.set_vectorized_layer_attribute("labile_inorganic_phosphorus_content", layer_phosphates)
-        self.data.phosphorus = NitrogenIncorporation.determine_stored_nutrient(
-            self.total_phosphorus_uptake, self.data.phosphorus, 0
+        self.crop_data.phosphorus = self.determine_stored_nutrient(
+            self.total_phosphorus_uptake, self.crop_data.phosphorus, 0
         )
 
     def uptake_phosphorus(self, layer_phosphates: List[float], layer_depths: List[float]) -> None:
@@ -174,10 +173,10 @@ class PhosphorusIncorporation:
         self.find_deepest_accessible_soil_layer(layer_depths)
         accessible_depths = self.access_layers(layer_depths)
         accessible_phosphates = self.access_layers(layer_phosphates)
-        self.layer_phosphorus_potentials = NitrogenIncorporation.determine_layer_nutrient_uptake_potential(
+        self.layer_phosphorus_potentials = self.determine_layer_nutrient_uptake_potential(
             accessible_depths,
             self.potential_phosphorus_uptake,
-            self.data.root_depth,
+            self.crop_data.root_depth,
             self.phosphorus_distro_param,
         )
         self.unmet_phosphorus_demands = NitrogenIncorporation.determine_layer_nutrient_demands(
@@ -188,12 +187,14 @@ class PhosphorusIncorporation:
             self.layer_phosphorus_potentials,
             accessible_phosphates,
         )
-        self.actual_phosphorus_uptakes = NitrogenIncorporation.determine_layer_extracted_resource(
+
+        self.actual_nutrient_uptakes = self.determine_layer_extracted_resource(
             self.phosphorus_requests, accessible_phosphates
         )
-        self.extend_phosphate_uptakes_to_full_profile()
-        self.extract_phosphorus_from_soil_layers(layer_phosphates)
-        self.tally_total_phosphorus_uptake()
+
+        self.extend_nutrient_uptakes_to_full_profile()
+        self.extract_nutrient_from_soil_layers(layer_phosphates)
+        self.total_phosphorus_uptake = self.tally_total_nutrient_uptake()
 
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_phosphorus_time(self) -> None:
@@ -201,87 +202,4 @@ class PhosphorusIncorporation:
         Copies the current phosphorus value to previous_phosphorus (for use between time steps).
 
         """
-        self.previous_phosphorus = self.data.phosphorus
-
-    def find_deepest_accessible_soil_layer(self, depths: List[float]) -> None:
-        """
-        Evaluates the accessibility of layers in the soil profile by plant roots.
-
-        Parameters
-        ----------
-        depths : List[float]
-            The maximum depth of each soil layer.
-
-        Notes
-        -----
-        This function determines the total number of soil layers, identifies the deepest layer accessible to the roots,
-        and calculates the number of layers that remain inaccessible to the plant. It provides insight into how deep
-        the plant can potentially draw nutrients and water from the soil profile.
-
-        """
-        self.data.total_soil_layers = len(depths)
-        self.data.accessible_soil_layers = NitrogenIncorporation.determine_deepest_accessible_layer(
-            self.data.root_depth, depths
-        )
-        self.data.inaccessible_soil_layers = max(len(depths) - self.data.accessible_soil_layers, 0)
-
-    def access_layers(self, layer_list: List[float]) -> List[float]:
-        """
-        Utility function that removes any inaccessible layers from a list.
-
-        Parameters
-        ----------
-        layer_list : List[float]
-            A list containing a value for each layer of the soil profile.
-
-        Returns
-        -------
-        List[float]
-            A trimmed resource list with an element for each soil layer that is accessible to the plant's roots.
-
-        """
-        return layer_list[0 : self.data.accessible_soil_layers]
-
-    def extend_phosphate_uptakes_to_full_profile(self) -> None:
-        """
-        Determines the actual phosphorus uptakes for the full soil profile, not just accessible layers.
-
-        Returns
-        -------
-        List[float]
-            The adjusted list of phosphorus uptakes, including zeros for inaccessible layers.
-
-        Notes
-        -----
-        Zeros are appended to the list of phosphorus uptakes for each inaccessible soil layer. This adjustment ensures
-        the uptake list reflects the entire soil profile, including layers from which no phosphorus is absorbed due to
-        inaccessibility by plant roots.
-
-        """
-        if self.data.inaccessible_soil_layers > 0:
-            self.actual_phosphorus_uptakes += [0] * self.data.inaccessible_soil_layers
-
-    def extract_phosphorus_from_soil_layers(self, layer_phosphates: List[float]) -> None:
-        """
-        Extracts phosphorus from the soil profile by layer.
-
-        Parameters
-        ----------
-        layer_phosphates : List[float]
-            A list of phosphates in each layer of the soil profile, from which phosphates will be extracted by the
-            plant.
-
-        Notes
-        -----
-        The `layer_phosphates` list is updated in place. Actual phosphorus uptake values are subtracted from each layer,
-        reflecting the reduction in phosphate levels due to plant absorption.
-
-        """
-        layer_phosphates[:] = [max(src - snk, 0) for src, snk in zip(layer_phosphates, self.actual_phosphorus_uptakes)]
-
-    def tally_total_phosphorus_uptake(self) -> None:
-        """
-        Determines total phosphorus extracted from soil by summing actual uptake from each layer.
-
-        """
-        self.total_phosphorus_uptake = sum(self.actual_phosphorus_uptakes)
+        self.previous_phosphorus = self.crop_data.phosphorus
