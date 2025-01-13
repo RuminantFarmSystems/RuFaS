@@ -204,7 +204,7 @@ class AnimalModuleReporter:
         if pen.is_populated is False:
             return
 
-        cls._report_ration_per_animal(pen, simulation_day)
+        ration_amounts = cls._report_ration_per_animal(pen, simulation_day)
 
         nutrient_amount = pen.ration_nutrient_amount
         nutrient_conc = pen.ration_nutrient_conc
@@ -450,15 +450,15 @@ class AnimalModuleReporter:
 
         Returns
         -------
-        TODO!
+        dict[RUFAS_ID, float]
+            Map of RuFaS Feed IDs to amounts of that feed in the ration (kg dry matter).
 
         """
         total_dry_matter = pen.average_nutrition_supply.dry_matter
         ration_amounts = {
-            str(rufas_id): percentage * total_dry_matter * GeneralConstants.PERCENTAGE_TO_FRACTION
+            rufas_id: percentage * total_dry_matter * GeneralConstants.PERCENTAGE_TO_FRACTION
             for rufas_id, percentage in pen.ration
         }
-        ration_amounts["dry_matter_intake_total"] = total_dry_matter
 
         units = {
             key: MeasurementUnits.KILOGRAMS for key in ration_amounts.keys()
@@ -472,8 +472,10 @@ class AnimalModuleReporter:
             "units": units,
         }
 
+        ration_amounts_with_str_keys = {str(key): amount for key, amount in ration_amounts.items()}
+        ration_amounts_with_str_keys["dry_matter_intake_total"] = total_dry_matter
         cls._om.add_variable(
-            f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}", ration_amounts, info_map
+            f"ration_per_animal_for_pen_{pen.id}_{pen.animal_combination.name}", ration_amounts_with_str_keys, info_map
         )
 
         return ration_amounts
