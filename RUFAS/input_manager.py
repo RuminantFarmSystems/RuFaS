@@ -309,6 +309,8 @@ class InputManager:
 
             validated_data = {}
             for metadata_property in metadata_properties.keys():
+                if metadata_property == "data_collection_app_compatible":
+                    continue
                 variable_properties = metadata_properties[metadata_property]
                 is_element_acceptable = self.data_validator.validate_data_by_type(
                     variable_path=[metadata_property],
@@ -978,8 +980,7 @@ class InputManager:
 
         """
         validated_data = {}
-        variable_properties_to_ignore = ["type", "description", "modifiability"]
-
+        variable_properties_to_ignore = ["type", "description", "modifiability", "data_collection_app_compatible"]
         for metadata_property in metadata_properties.keys():
             if metadata_property in variable_properties_to_ignore:
                 continue
