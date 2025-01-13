@@ -309,6 +309,21 @@ class Pen:
             )
 
     @property
+    def average_body_weight(self) -> float:
+        """
+        Calculate the average body weight of animals in the pen.
+
+        Returns
+        -------
+        float
+            Average body weight of animals in the pen (kg).
+
+        """
+        if (number_of_animals_in_pen := len(self.animals_in_pen.values())) == 0:
+            return 0.0
+        return sum([animal.body_weight for animal in self.animals_in_pen.values()]) / number_of_animals_in_pen
+
+    @property
     def average_milk_production(self) -> float:
         """
         Calculate the average milk production for the cows in the pen.
@@ -320,8 +335,23 @@ class Pen:
 
         """
         if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
-            return 0
+            return 0.0
         return sum([cow.milk_production.daily_milk_produced for cow in self.cows_in_pen]) / number_of_cows_in_pen
+
+    @property
+    def average_milk_production_reduction(self) -> float:
+        """
+        Calculate the average milk production reduction for the cows in the pen.
+
+        Returns
+        -------
+        float
+            The average milk production reduction for the cows in the pen (kg).
+
+        """
+        if (number_of_cows_in_pen := len(self.cows_in_pen)) == 0:
+            return 0.0
+        return sum([cow.milk_production.milk_production_reduction for cow in self.cows_in_pen]) / number_of_cows_in_pen
 
     def formulate_optimized_ration(self, _available_feeds: list[Feed]) -> None:
         """Formulates a ration while optimizing for multiple goals."""

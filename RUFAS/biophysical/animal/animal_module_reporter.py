@@ -543,21 +543,46 @@ class AnimalModuleReporter:
             Day of simulation.
 
         """
+        units = {
+            "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
+            "NEa_requirement": MeasurementUnits.MEGACALORIES,
+            "NEg_requirement": MeasurementUnits.MEGACALORIES,
+            "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
+            "NEl_requirement": MeasurementUnits.MEGACALORIES,
+            "MP_requirement": MeasurementUnits.GRAMS,
+            "Ca_requirement": MeasurementUnits.GRAMS,
+            "P_req": MeasurementUnits.GRAMS,
+            "P_req_process": MeasurementUnits.GRAMS,
+            "DMIest_requirement": MeasurementUnits.KILOGRAMS,
+            "avg_BW": MeasurementUnits.KILOGRAMS,
+            "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "avg_essential_amino_acid_requirement": MeasurementUnits.GRAMS_PER_DAY,
+        }
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
+            "number_animals_in_pen": len(pen.animals_in_pen),
+            "simulation_day": simulation_day,
+            "units": units
+        }
+
         avg_requirements = {
             "NEmaint_requirement": pen.average_nutrition_requirements.maintenance_energy,
             "NEa_requirement": pen.average_nutrition_requirements.activity_energy,
-            "NEg_requirement": pen.average_nutrition_requirements,
-            "NEpreg_requirement": pen.average_nutrition_requirements,
-            "NEl_requirement": pen.average_nutrition_requirements,
-            "MP_requirement": pen.average_nutrition_requirements,
-            "Ca_requirement": pen.average_nutrition_requirements,
-            "P_req": pen.average_nutrition_requirements,
-            "P_req_process": pen.average_nutrition_requirements,
-            "DMIest_requirement": pen.average_nutrition_requirements,
+            "NEg_requirement": pen.average_nutrition_requirements.growth_energy,
+            "NEpreg_requirement": pen.average_nutrition_requirements.pregnancy_energy,
+            "NEl_requirement": pen.average_nutrition_requirements.lactation_energy,
+            "MP_requirement": pen.average_nutrition_requirements.metabolizable_protein,
+            "Ca_requirement": pen.average_nutrition_requirements.calcium,
+            "P_req": pen.average_nutrition_requirements.phosphorus,
+            "P_req_process": pen.average_nutrition_requirements.process_based_phosphorus,
+            "DMIest_requirement": pen.average_nutrition_requirements.dry_matter,
             "avg_BW": pen.average_body_weight,
-            "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "avg_essential_amino_acid_requirement": pen.average_nutrition_requirements,
+            "avg_milk_production_reduction_pen": pen.average_milk_production_reduction,
+            "avg_essential_amino_acid_requirement": pen.average_nutrition_requirements.essential_amino_acids,
         }
+
+        cls._om.add_variable(f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}", avg_requirements, info_map)
 
     @classmethod
     def report_daily_ration(cls, animal_manager, available_feeds: list[Feed], simulation_day: int) -> None:
