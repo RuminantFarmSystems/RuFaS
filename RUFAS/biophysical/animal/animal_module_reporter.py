@@ -207,6 +207,8 @@ class AnimalModuleReporter:
         ration_amounts = cls._report_ration_per_animal(pen, simulation_day)
 
         cls._report_nutrient_amounts(pen, simulation_day)
+        cls._report_average_nutrient_requirements(pen, simulation_day)
+        nutrient_amount = pen.ration_nutrient_amount
         nutrient_conc = pen.ration_nutrient_conc
         ration_report = {}
         ration_report["nutrient_amount"] = nutrient_amount
@@ -219,53 +221,6 @@ class AnimalModuleReporter:
             "number_animals_in_pen": len(pen.animals_in_pen),
             "simulation_day": simulation_day,
         }
-        nutrient_amount_units = {
-            "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "CP": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "ADF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "NDF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "lignin": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "ash": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "phosphorus": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "potassium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "N": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "as_fed": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "EE": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "starch": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "DE": MeasurementUnits.MEGACALORIES,
-            "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-        }
-        om.add_variable(
-            f"ration_nutrient_amount_pen_{pen.id}_{pen.animal_combination.name}",
-            nutrient_amount,
-            dict(info_map, **{"units": nutrient_amount_units}),
-        )
-        om.add_variable(
-            f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
-            pen.MEdiet,
-            dict(info_map, **{"units": MeasurementUnits.KILOGRAMS}),
-        )
-        avg_nutrient_rqmts_units = {
-            "NEmaint_requirement": MeasurementUnits.MEGACALORIES,
-            "NEa_requirement": MeasurementUnits.MEGACALORIES,
-            "NEg_requirement": MeasurementUnits.MEGACALORIES,
-            "NEpreg_requirement": MeasurementUnits.MEGACALORIES,
-            "NEl_requirement": MeasurementUnits.MEGACALORIES,
-            "MP_requirement": MeasurementUnits.GRAMS,
-            "Ca_requirement": MeasurementUnits.GRAMS,
-            "P_req": MeasurementUnits.GRAMS,
-            "P_req_process": MeasurementUnits.GRAMS,
-            "DMIest_requirement": MeasurementUnits.KILOGRAMS,
-            "avg_BW": MeasurementUnits.KILOGRAMS,
-            "avg_milk_production_reduction_pen": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
-            "avg_essential_amino_acid_requirement": MeasurementUnits.GRAMS_PER_DAY,
-        }
-        om.add_variable(
-            f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}",
-            pen.avg_nutrient_rqmts,
-            dict(info_map, **{"units": avg_nutrient_rqmts_units}),
-        )
 
         if pen.animal_combination != AnimalCombination.CALF:
             ration_supply_report_units = {
@@ -583,6 +538,33 @@ class AnimalModuleReporter:
         }
 
         cls._om.add_variable(f"avg_rqmts_pen_{pen.id}_{pen.animal_combination.name}", avg_requirements, info_map)
+
+    @classmethod
+    def _report_me_diet(cls, pen: Pen, simulation_day: int) -> None:
+        """
+        Report the total metabolizable energy of a pen's average ration to the Output Manager as "MEdiet".
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen object.
+        simulation_day : int
+            Day of simulation.
+
+
+        """
+        units = MeasurementUnits.MEGACALORIES
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
+            "number_animals_in_pen": len(pen.animals_in_pen.values()),
+            "simulation_day": simulation_day,
+            units: units
+        }
+
+        cls._om.add_variable(
+            f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}", pen.average_nutrition_supply.metabolizable_energy, info_map
+        )
 
     @classmethod
     def report_daily_ration(cls, animal_manager, available_feeds: list[Feed], simulation_day: int) -> None:
