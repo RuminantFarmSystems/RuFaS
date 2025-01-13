@@ -76,7 +76,6 @@ class NitrogenIncorporation(NutrientUptake):
     def __init__(
         self,
         crop_data: Optional[CropData] = None,
-        soil_data: Optional[SoilData] = None,
         nitrogen_distro_param: float = 10.0,
         nitrogen_shapes: Optional[List[float]] = None,
         previous_nitrogen: Optional[float] = None,
@@ -203,7 +202,7 @@ class NitrogenIncorporation(NutrientUptake):
 
         self.extend_nutrient_uptakes_to_full_profile()
         self.extract_nutrient_from_soil_layers(layer_nitrates)
-        self.tally_total_nitrogen_uptake()
+        self.total_nitrogen_uptake = self.tally_total_nutrient_uptake()
 
     # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_nitrogen_time(self) -> None:
@@ -212,10 +211,6 @@ class NitrogenIncorporation(NutrientUptake):
 
         """
         self.previous_nitrogen = self.crop_data.nitrogen
-
-    def tally_total_nitrogen_uptake(self) -> None:
-        """determines total nitrogen extracted from soil by summing actual uptake from each layer"""
-        self.total_nitrogen_uptake = sum(self.actual_nutrient_uptakes)
 
     def try_fixation(self, total_accessible_nitrates: float, soil_water_factor: float) -> None:
         """

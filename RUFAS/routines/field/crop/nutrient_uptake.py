@@ -738,3 +738,10 @@ class NutrientUptake:
             raise ValueError("layer_potential, layer_demand, and layer_nitrate must be the same length")
         layer_desired = [potential + demand for potential, demand in zip(layer_uptake_potentials, layer_demands)]
         return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nutrient)]
+
+    def tally_total_nutrient_uptake(self) -> float:
+        """
+        Determines total nutrient extracted from soil by summing actual uptake from each layer.
+
+        """
+        return sum(self.actual_nutrient_uptakes)
