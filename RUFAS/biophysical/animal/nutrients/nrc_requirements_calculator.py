@@ -85,7 +85,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             NutritionRequirements instance containing all the required amounts of energy and nutrition.
 
         """
-        maintenance_requirement, conceptus_weight, calf_birth_weight = cls._calculate_maintentance_energy_requirements(
+        maintenance_requirement, conceptus_weight, calf_birth_weight = cls._calculate_maintenance_energy_requirements(
             body_weight, mature_body_weight, day_of_pregnancy, body_condition_score_5, previous_temperature, animal_type
         )
         growth_requirement, average_daily_gain, shrunk_body_weight = cls._calculate_growth_energy_requirements(
@@ -159,12 +159,13 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             metabolizable_protein=protein_requirement,
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
+            dry_matter=dry_matter_intake,
             activity_energy=activity_requirement,
             essential_amino_acids=essential_amino_acids,
         )
 
     @classmethod
-    def _calculate_maintentance_energy_requirements(
+    def _calculate_maintenance_energy_requirements(
         cls,
         body_weight: float,
         mature_body_weight: float,
@@ -653,7 +654,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     def _calculate_activity_energy_requirements(
         cls,
         body_weight: float,
-        housing: float,
+        housing: str,
         distance: float,
     ) -> float:
         """
