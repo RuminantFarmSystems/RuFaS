@@ -7,7 +7,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
 
 
 class NutrientUptake:
-    def __int__(self, crop_data: Optional[CropData]):
+    def __init__(self, crop_data: Optional[CropData]):
         self.crop_data = crop_data or CropData()
 
     @staticmethod
