@@ -188,15 +188,14 @@ class PhosphorusIncorporation(NutrientUptake):
             accessible_phosphates,
         )
 
-        self.actual_nutrient_uptakes = self.determine_layer_extracted_resource(
+        self.actual_phosphorus_uptakes = self.determine_layer_extracted_resource(
             self.phosphorus_requests, accessible_phosphates
         )
 
-        self.extend_nutrient_uptakes_to_full_profile()
-        self.extract_nutrient_from_soil_layers(layer_phosphates)
-        self.total_phosphorus_uptake = self.tally_total_nutrient_uptake()
+        self.extend_nutrient_uptakes_to_full_profile(self.actual_phosphorus_uptakes)
+        self.extract_nutrient_from_soil_layers(layer_phosphates, self.actual_phosphorus_uptakes)
+        self.total_phosphorus_uptake = self.tally_total_nutrient_uptake(self.actual_phosphorus_uptakes)
 
-    # ---- member functions (setters, internal utility, call sub-routines) ----
     def shift_phosphorus_time(self) -> None:
         """
         Copies the current phosphorus value to previous_phosphorus (for use between time steps).

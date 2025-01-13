@@ -358,7 +358,8 @@ class NutrientUptake:
 
         Parameters
         ----------
-        actual_nutrient_uptakes
+        actual_nutrient_uptakes : Optional[List[float]]
+            Actual nutrient uptake from each soil layer (kg/ha).
         layer_nutrients : list[float]
             A list of nutrients (in units such as kg/ha) present in each layer of the soil profile, from which nutrients
             will be extracted by the plant.
@@ -374,6 +375,11 @@ class NutrientUptake:
     def extend_nutrient_uptakes_to_full_profile(self, actual_nutrient_uptakes: list[float]) -> None:
         """
         Determines the actual nutrient uptakes for the full soil profile, not just the accessible layers.
+
+        Parameters
+        ----------
+        actual_nutrient_uptakes : Optional[List[float]]
+            Actual nutrient uptake from each soil layer (kg/ha).
 
         Notes
         -----
@@ -740,6 +746,11 @@ class NutrientUptake:
     def tally_total_nutrient_uptake(actual_nutrient_uptakes: list[float]) -> float:
         """
         Determines total nutrient extracted from soil by summing actual uptake from each layer.
+
+        Parameters
+        ----------
+        actual_nutrient_uptakes : Optional[List[float]]
+            Actual nutrient uptake from each soil layer (kg/ha).
 
         """
         return sum(actual_nutrient_uptakes)
