@@ -292,7 +292,7 @@ class NutrientUptake:
             raise ValueError("multiple soil boundaries cannot have the same depths. Remove the redundant layer?")
 
         boundary_nutrient = [
-            cls._determine_nitrogen_uptake_to_depth(
+            cls._determine_nutrient_uptake_to_depth(
                 total_demand, x, root_depth, nutrient_distribution_parameter
             )
             for x in layer_bounds
@@ -304,31 +304,31 @@ class NutrientUptake:
         return layer_nutrient
 
     @staticmethod
-    def _determine_nitrogen_uptake_to_depth(
+    def _determine_nutrient_uptake_to_depth(
         demand: float,
         depth: float,
         root_depth: float,
         nutrient_distribution_parameter: float,
     ) -> float:
         """
-        Calculates the potential nitrogen uptake from the soil surface to a specified depth.
+        Calculates the potential nutrient uptake from the soil surface to a specified depth.
 
         Parameters
         ----------
         demand : float
-            The current nitrogen demand of the plant (kg/ha).
+            The current nutrient demand of the plant (kg/ha).
         depth : float
-            The depth (in the same units as root_depth, typically centimeters or meters) to which nitrogen uptake is
+            The depth (in the same units as root_depth, typically centimeters or meters) to which nutrient uptake is
             calculated (mm).
         root_depth : float
             The current depth of the plant's roots (mm).
         nutrient_distribution_parameter : float
-            The nitrogen uptake distribution parameter affecting how uptake is allocated with depth.
+            The nutrient uptake distribution parameter affecting how uptake is allocated with depth.
 
         Returns
         -------
         float
-            The potential amount of nitrogen that can be taken up from the soil surface to the specified depth (kg/ha).
+            The potential amount of nutrient that can be taken up from the soil surface to the specified depth (kg/ha).
 
         References
         ----------
@@ -337,17 +337,17 @@ class NutrientUptake:
         """
         info_map = {
             "class": NutrientUptake.__class__.__name__,
-            "function": NutrientUptake._determine_nitrogen_uptake_to_depth.__name__,
+            "function": NutrientUptake._determine_nutrient_uptake_to_depth.__name__,
         }
         om = OutputManager()
         if nutrient_distribution_parameter == 0:
             om.add_error(
                 "Invalid nitrogen_distribution_parameter.",
-                "Received invalid value 0 for nitrogen_distribution_parameter. 0 nitrogen_distribution_parameter"
+                "Received invalid value 0 for nutrient_distribution_parameter. 0 nutrient_distribution_parameter"
                 " will lead to exp(0) calculation.",
                 info_map,
             )
-            raise ValueError("nitrogen_distribution_parameter cannot equal 0")
+            raise ValueError("nutrient_distribution_parameter cannot equal 0")
         if root_depth <= 0:
             return 0
         else:
