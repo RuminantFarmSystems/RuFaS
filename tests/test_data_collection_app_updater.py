@@ -42,9 +42,12 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
     empty_dir = mocker.patch.object(Utility, "empty_dir")
     dca_updater._im.meta_data = {
         "properties": {
-            "animal_properties": "dummy_animal_props",
-            "config_properties": "dummy_config_props",
-            "unneeded_properties": "dummy_props",
+            "animal_properties": {"data_collection_app_compatible": True,
+                                  "dummy_animal_props": "dummy_prop_content"},
+            "config_properties": {"data_collection_app_compatible": True,
+                                  "dummy_config_props": "dummy_prop_content"},
+            "unneeded_properties": {"data_collection_app_compatible": False,
+                                    "dummy_config_props": "dummy_prop_content"},
         }
     }
     expected_schema_paths = [
@@ -55,8 +58,8 @@ def test_rewrite_schemas(dca_updater: DataCollectionAppUpdater, mocker: MockerFi
     create_object_schema = mocker.patch.object(dca_updater, "_create_object_schema", return_value={"test?": "test!"})
     add_filename = mocker.patch.object(dca_updater, "_add_filename_input_field", return_value=dummy_schema)
     expected_create_calls = [
-        mocker.call("animal_properties", "dummy_animal_props"),
-        mocker.call("config_properties", "dummy_config_props"),
+        mocker.call("animal_properties", {'dummy_animal_props': 'dummy_prop_content'}),
+        mocker.call("config_properties", {'dummy_config_props': 'dummy_prop_content'}),
     ]
     mock_open = mocker.patch("RUFAS.data_collection_app_updater.open")
 
@@ -507,7 +510,7 @@ def test_create_array_schema(
                     "default": "HO",
                     "pattern": "^(HO|JE)$",
                     "description": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd (Holstein "
-                    "or Jersey)",
+                                   "or Jersey)",
                 },
             },
             {
@@ -535,7 +538,7 @@ def test_create_array_schema(
                             "grid_columns": 12,
                             "inputAttributes": {"class": "text-primary form-control", "placeholder": "HO"},
                             "infoText": "Breed (select one Holstein/Jersey) -- The predominant breed of the herd "
-                            "(Holstein or Jersey)",
+                                        "(Holstein or Jersey)",
                         },
                         "default": "HO",
                         "enum": ["HO", "JE"],
@@ -584,7 +587,7 @@ def test_add_filename_input_field(dca_updater: DataCollectionAppUpdater) -> None
                     "grid_columns": 12,
                     "inputAttributes": {"class": "text-primary form-control", "placeholder": "null"},
                     "infoText": "Used to name the file that saves the data entered. This name will not be included in "
-                    "the saved file.",
+                                "the saved file.",
                 },
             }
         }
