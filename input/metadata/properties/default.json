@@ -5160,6 +5160,7 @@
     }
   },
   "soil_profile_properties": {
+    "data_collection_app_compatible": false,
     "second_moisture_condition_parameter": {
       "type": "number",
       "description": "Curve number parameter for average moisture condition equation.\nUnitless.\nReference: SWAT Input .MGT - CN2.",
@@ -5697,6 +5698,7 @@
     }
   },
   "end_to_end_test_result_path_properties": {
+    "data_collection_app_compatible": false,
     "end_to_end_test_result_paths": {
       "type": "array",
       "description": "List of paths to results used to execute end-to-end testing, as well as the domain that they are in.",
@@ -5718,6 +5720,7 @@
     }
   },
   "end_to_end_testing_input_properties": {
+    "data_collection_app_compatible": false,
     "reusable_values": {
       "type": "object",
       "fresh_mass": {
@@ -5873,6 +5876,7 @@
     }
   },
   "feed_storage_input_properties": {
+    "data_collection_app_compatible": false,
     "hay_bale_diameter": {
         "type": "number",
         "description": "Diameter of hay bales (meters).",
