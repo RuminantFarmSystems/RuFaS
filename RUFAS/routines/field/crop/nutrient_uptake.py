@@ -9,11 +9,9 @@ from RUFAS.routines.field.crop.crop_data import CropData
 class NutrientUptake:
     def __int__(
         self,
-        crop_data: Optional[CropData],
-        actual_nutrient_uptakes: Optional[list[float]] = None,
+        crop_data: Optional[CropData]
     ):
         self.crop_data = crop_data or CropData()
-        self.actual_nutrient_uptakes = actual_nutrient_uptakes
 
     @staticmethod
     def determine_layer_nutrient_demands(
@@ -352,12 +350,15 @@ class NutrientUptake:
             second_term = 1 - exp(-nutrient_distribution_parameter * (depth / root_depth))
             return first_term * second_term
 
-    def extract_nutrient_from_soil_layers(self, layer_nutrients: list[float]) -> None:
+    @staticmethod
+    def extract_nutrient_from_soil_layers(layer_nutrients: list[float],
+                                          actual_nutrient_uptakes: list[float]) -> None:
         """
         Extracts nutrient from the soil profile by layer.
 
         Parameters
         ----------
+        actual_nutrient_uptakes
         layer_nutrients : list[float]
             A list of nutrients (in units such as kg/ha) present in each layer of the soil profile, from which nutrients
             will be extracted by the plant.
@@ -368,9 +369,9 @@ class NutrientUptake:
         are subtracted from the nitrate content of each corresponding soil layer.
 
         """
-        layer_nutrients[:] = [max(src - snk, 0) for src, snk in zip(layer_nutrients, self.actual_nutrient_uptakes)]
+        layer_nutrients[:] = [max(src - snk, 0) for src, snk in zip(layer_nutrients, actual_nutrient_uptakes)]
 
-    def extend_nutrient_uptakes_to_full_profile(self) -> None:
+    def extend_nutrient_uptakes_to_full_profile(self, actual_nutrient_uptakes: list[float]) -> None:
         """
         Determines the actual nutrient uptakes for the full soil profile, not just the accessible layers.
 
@@ -381,7 +382,7 @@ class NutrientUptake:
 
         """
         if self.crop_data.inaccessible_soil_layers > 0:
-            self.actual_nutrient_uptakes += [0] * self.crop_data.inaccessible_soil_layers
+            actual_nutrient_uptakes += [0] * self.crop_data.inaccessible_soil_layers
 
     @classmethod
     def determine_nutrient_shape_parameters(
@@ -735,9 +736,10 @@ class NutrientUptake:
         layer_desired = [potential + demand for potential, demand in zip(layer_uptake_potentials, layer_demands)]
         return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nutrient)]
 
-    def tally_total_nutrient_uptake(self) -> float:
+    @staticmethod
+    def tally_total_nutrient_uptake(actual_nutrient_uptakes: list[float]) -> float:
         """
         Determines total nutrient extracted from soil by summing actual uptake from each layer.
 
         """
-        return sum(self.actual_nutrient_uptakes)
+        return sum(actual_nutrient_uptakes)

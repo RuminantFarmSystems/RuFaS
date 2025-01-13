@@ -58,6 +58,8 @@ class NitrogenIncorporation(NutrientUptake):
         Unmet nitrogen demands by overlaying soil layers (kg/ha).
     nitrogen_requests : Optional[float]
         Nitrogen requested from each soil layer (kg/ha).
+    actual_nitrogen_uptakes : Optional[List[float]], default None
+        Actual nitrogen to be taken up by the plant from each soil layer (kg/ha).
     total_nitrogen_uptake : Optional[float]
         Total nitrogen uptake by the plant (kg/ha).
     fixed_nitrogen : Optional[float]
@@ -77,19 +79,19 @@ class NitrogenIncorporation(NutrientUptake):
         self,
         crop_data: Optional[CropData] = None,
         nitrogen_distro_param: float = 10.0,
-        nitrogen_shapes: Optional[List[float]] = None,
+        nitrogen_shapes: Optional[list[float]] = None,
         previous_nitrogen: Optional[float] = None,
         potential_nitrogen_uptake: Optional[float] = None,
         layer_nitrogen_potentials: Optional[float] = None,
         unmet_nitrogen_demands: Optional[float] = None,
         nitrogen_requests: Optional[float] = None,
-        actual_nitrogen_uptakes: Optional[List[float]] = None,
+        actual_nitrogen_uptakes: Optional[list[float]] = None,
         total_nitrogen_uptake: Optional[float] = None,
         fixed_nitrogen: Optional[float] = None,
         nitrate_factor: Optional[float] = None,
         fixation_stage_factor: Optional[float] = None,
     ):
-        super().__init__(crop_data, actual_nitrogen_uptakes)
+        super().__init__(crop_data)
         self.nitrogen_distro_param = nitrogen_distro_param
         self.nitrogen_shapes = nitrogen_shapes
         self.previous_nitrogen = previous_nitrogen
@@ -97,6 +99,7 @@ class NitrogenIncorporation(NutrientUptake):
         self.layer_nitrogen_potentials = layer_nitrogen_potentials
         self.unmet_nitrogen_demands = unmet_nitrogen_demands
         self.nitrogen_requests = nitrogen_requests
+        self.actual_nitrogen_uptakes = actual_nitrogen_uptakes
         self.total_nitrogen_uptake = total_nitrogen_uptake
         self.fixed_nitrogen = fixed_nitrogen
         self.nitrate_factor = nitrate_factor

@@ -80,17 +80,17 @@ class PhosphorusIncorporation(NutrientUptake):
         self,
         crop_data: Optional[CropData] = None,
         phosphorus_distro_param: float = 10,
-        phosphorus_shapes: Optional[List[float]] = None,
+        phosphorus_shapes: Optional[list[float]] = None,
         previous_phosphorus: Optional[float] = None,
         total_phosphorus_uptake: Optional[float] = None,
         potential_phosphorus_uptake: Optional[float] = None,
-        actual_phosphorus_uptakes: Optional[List[float]] = None,
+        actual_phosphorus_uptakes: Optional[list[float]] = None,
         layer_phosphorus_potentials: Optional[float] = None,
         unmet_phosphorus_demands: Optional[float] = None,
         phosphorus_requests: Optional[float] = None,
     ):
-        super().__init__(crop_data, actual_phosphorus_uptakes)
-
+        super().__init__(crop_data)
+        self.actual_phosphorus_uptakes = actual_phosphorus_uptakes
         self.phosphorus_distro_param = phosphorus_distro_param
         self.phosphorus_shapes = phosphorus_shapes
         self.previous_phosphorus = previous_phosphorus
