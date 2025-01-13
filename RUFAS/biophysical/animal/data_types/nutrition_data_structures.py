@@ -169,7 +169,11 @@ class NutritionEvaluationResults:
     def is_valid_heifer_ration(self) -> bool:
         """True if evaluated supply meets requirements for heifers, else false."""
         non_negative_fields = {
-            self.maintenance_energy, self.growth_energy, self.calcium, self.phosphorus, self.forage_ndf_percent
+            self.maintenance_energy,
+            self.growth_energy,
+            self.calcium,
+            self.phosphorus,
+            self.forage_ndf_percent,
         }
         valid_non_negative_fields = all([field >= 0.0 for field in non_negative_fields])
 
