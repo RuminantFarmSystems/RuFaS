@@ -85,10 +85,8 @@ class NASEMRequirementsCalculator(NutritionRequirementsCalculator):
             NutritionRequirements instance containing all the required amounts of energy and nutrition.
 
         """
-        maintenance_requirement, gravid_uterine_weight, uterine_weight = (
-            cls._calculate_maintenance_energy_requirements(
-                body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
-            )
+        maintenance_requirement, gravid_uterine_weight, uterine_weight = cls._calculate_maintenance_energy_requirements(
+            body_weight, mature_body_weight, day_of_pregnancy, days_in_milk
         )
         growth_requirement, average_daily_gain, frame_weight_gain = cls._calculate_growth_energy_requirements(
             body_weight, mature_body_weight, average_daily_gain_heifer, animal_type, parity, calving_interval
