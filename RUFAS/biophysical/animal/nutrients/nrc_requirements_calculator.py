@@ -159,6 +159,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
             metabolizable_protein=protein_requirement,
             calcium=calcium_requirement,
             phosphorus=phosphorus_requirement,
+            dry_matter=dry_matter_intake,
             activity_energy=activity_requirement,
             essential_amino_acids=essential_amino_acids,
         )
@@ -653,7 +654,7 @@ class NRCRequirementsCalculator(NutritionRequirementsCalculator):
     def _calculate_activity_energy_requirements(
         cls,
         body_weight: float,
-        housing: float,
+        housing: str,
         distance: float,
     ) -> float:
         """
