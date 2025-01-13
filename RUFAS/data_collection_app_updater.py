@@ -88,8 +88,9 @@ class DataCollectionAppUpdater:
         for key in properties.keys():
             if not properties[key]["data_collection_app_compatible"]:
                 continue
-            schema_dict = \
-                {key: value for key, value in properties[key].items() if key != "data_collection_app_compatible"}
+            schema_dict = {
+                key: value for key, value in properties[key].items() if key != "data_collection_app_compatible"
+            }
 
             new_schema = self._create_object_schema(key, schema_dict)
             new_schema_with_filename = self._add_filename_input_field(new_schema)
