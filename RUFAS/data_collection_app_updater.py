@@ -102,7 +102,7 @@ class DataCollectionAppUpdater:
 
         schema_paths = []
         for key in properties.keys():
-            if key not in PROPERTIES_TO_CREATE_SCHEMA_FOR:
+            if not properties[key]["data_collection_app_compatible"]:
                 continue
 
             new_schema = self._create_object_schema(key, properties[key])
