@@ -7,10 +7,7 @@ from RUFAS.routines.field.crop.crop_data import CropData
 
 
 class NutrientUptake:
-    def __int__(
-        self,
-        crop_data: Optional[CropData]
-    ):
+    def __int__(self, crop_data: Optional[CropData]):
         self.crop_data = crop_data or CropData()
 
     @staticmethod
@@ -351,8 +348,7 @@ class NutrientUptake:
             return first_term * second_term
 
     @staticmethod
-    def extract_nutrient_from_soil_layers(layer_nutrients: list[float],
-                                          actual_nutrient_uptakes: list[float]) -> None:
+    def extract_nutrient_from_soil_layers(layer_nutrients: list[float], actual_nutrient_uptakes: list[float]) -> None:
         """
         Extracts nutrient from the soil profile by layer.
 
