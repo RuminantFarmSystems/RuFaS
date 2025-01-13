@@ -206,6 +206,7 @@ class AnimalModuleReporter:
 
         ration_amounts = cls._report_ration_per_animal(pen, simulation_day)
 
+        cls._report_nutrient_amounts(pen, simulation_day)
         nutrient_amount = pen.ration_nutrient_amount
         nutrient_conc = pen.ration_nutrient_conc
         ration_report = {}
@@ -479,6 +480,51 @@ class AnimalModuleReporter:
         )
 
         return ration_amounts
+
+    @classmethod
+    def _report_nutrient_amounts(cls, pen: Pen, simulation_day: int) -> None:
+        """Reports the amounts of nutrients in the ration."""
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
+            "number_animals_in_pen": len(pen.animals_in_pen.keys()),
+            "simulation_day": simulation_day,
+        }
+        nutrient_amount_units = {
+            "dm": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "CP": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "ADF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "NDF": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "lignin": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "ash": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "phosphorus": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "potassium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "N": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "as_fed": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "EE": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "starch": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "TDN": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+            "DE": MeasurementUnits.MEGACALORIES,
+            "calcium": MeasurementUnits.KILOGRAMS_PER_ANIMAL,
+        }
+
+        nutrient_amounts = {
+            "dm": pen.average_nutrition_supply.dry_matter,
+            "CP": pen.average_nutrition_supply.crude_protein,
+            "ADF": pen.average_nutrition_supply.adf_supply,
+            "NDF": pen.average_nutrition_supply.ndf_supply,
+            "lignin": pen.average_nutrition_supply.lignin_supply,
+            "ash": pen.average_nutrition_supply.ash_supply,
+            "phosphorus": pen.average_nutrition_supply.phosphorus,
+            "potassium": pen.average_nutrition_supply.potassium_supply,
+            "N": pen.average_nutrition_supply.nitrogen_supply,
+            "as_fed": pen.average_nutrition_supply.wet_matter,
+            "EE": pen.average_nutrition_supply.fat_supply,
+            "starch": pen.average_nutrition_supply.starch_supply,
+            "TDN": pen.average_nutrition_supply.tdn_supply,
+            "DE": pen.average_nutrition_supply.digestible_energy_supply,
+            "calcium": pen.average_nutrition_supply.calcium,
+        }
 
     @classmethod
     def _report_average_nutrient_requirements(cls, pen: Pen, simulation_day: int) -> None:

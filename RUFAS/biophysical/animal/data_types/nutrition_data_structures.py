@@ -154,6 +154,8 @@ class NutritionSupply:
         Total crude protein supplied by the ration (kg).
     adf_supply : float
         Total Acid Detergent Fiber (ADF) supplied by the ration (kg).
+    digestible_energy_supply : float
+        Total amount of digestible energy supplied by the ration (Mcal).
     tdn_supply : float
         Total Digestible Nutrients (TDN) supplied by the ration (kg).
     lignin_supply : float
@@ -182,6 +184,7 @@ class NutritionSupply:
     fat_supply: float
     crude_protein: float
     adf_supply: float
+    digestible_energy_supply: float
     tdn_supply: float
     lignin_supply: float
     ash_supply: float
@@ -249,6 +252,7 @@ class NutritionSupply:
             fat_supply=self.fat_supply + other.fat_supply,
             crude_protein=self.crude_protein + other.crude_protein,
             adf_supply=self.adf_supply + other.adf_supply,
+            digestible_energy_supply=self.digestible_energy_supply + other.digestible_energy_supply,
             tdn_supply=self.tdn_supply + other.tdn_supply,
             lignin_supply=self.lignin_supply + other.lignin_supply,
             ash_supply=self.ash_supply + other.ash_supply,
@@ -275,6 +279,7 @@ class NutritionSupply:
             fat_supply=self.fat_supply / divisor,
             crude_protein=self.crude_protein / divisor,
             adf_supply=self.adf_supply / divisor,
+            digestible_energy_supply=self.digestible_energy_supply / divisor,
             tdn_supply=self.tdn_supply / divisor,
             lignin_supply=self.lignin_supply / divisor,
             ash_supply=self.ash_supply / divisor,
@@ -299,6 +304,7 @@ class NutritionSupply:
             fat_supply=0.0,
             crude_protein=0.0,
             adf_supply=0.0,
+            digestible_energy_supply=0.0,
             tdn_supply=0.0,
             lignin_supply=0.0,
             ash_supply=0.0,
