@@ -90,9 +90,7 @@ class NitrogenIncorporation(NutrientUptake):
         nitrate_factor: Optional[float] = None,
         fixation_stage_factor: Optional[float] = None,
     ):
-        super().__init__(crop_data, soil_data, actual_nitrogen_uptakes, potential_nitrogen_uptake,
-                         nitrogen_distro_param,
-                         unmet_nitrogen_demands)
+        super().__init__(crop_data, actual_nitrogen_uptakes)
         self.nitrogen_distro_param = nitrogen_distro_param
         self.nitrogen_shapes = nitrogen_shapes
         self.previous_nitrogen = previous_nitrogen
