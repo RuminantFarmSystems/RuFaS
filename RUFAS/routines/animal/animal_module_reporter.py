@@ -99,9 +99,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_daily_animal_population.__name__,
             "data_origin": [("AnimalManager", "daily_updates")],
         }
-        om.add_variable(
-            "sim_day", simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY})
-        )
+        om.add_variable("sim_day", simulation_day, dict(info_map, **{"units": MeasurementUnits.SIMULATION_DAY}))
         om.add_variable(
             "num_animals",
             herd_statistics.calf_num
@@ -527,7 +525,7 @@ class AnimalModuleReporter:
             manure: AnimalManureExcretions = pen_manure_data["manure_excretion"]
             for manure_property, manure_value in asdict(manure).items():
                 om.add_variable(
-                    f'{pen_id}_{str(manure_property)}',
+                    f"{pen_id}_{str(manure_property)}",
                     manure_value,
                     dict(info_map, **{"units": manure_value_units[manure_property]}),
                 )
@@ -970,8 +968,9 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_reports(cls, herd_manager, available_feeds: Dict[str, Dict[str, Any]],
-                             simulation_day: int) -> None:
+    def report_daily_reports(
+        cls, herd_manager, available_feeds: Dict[str, Dict[str, Any]], simulation_day: int
+    ) -> None:
         """
         Calls all reporter methods that should happen at the end of each day.
 
@@ -984,10 +983,8 @@ class AnimalModuleReporter:
         """
         herd_statistics = herd_manager.herd_statistics
         AnimalModuleReporter.report_daily_animal_population(herd_statistics, simulation_day)
-        AnimalModuleReporter.report_life_cycle_manager_data(
-            herd_statistics, simulation_day
-        )
-        AnimalModuleReporter.report_daily_ration(herd_manager, available_feeds, simulation_day)
+        AnimalModuleReporter.report_life_cycle_manager_data(herd_statistics, simulation_day)
+        AnimalModuleReporter.report_daily_ration(herd_manager, available_feeds)
         AnimalModuleReporter.report_daily_pen_total(simulation_day, herd_manager.all_pens)
         AnimalModuleReporter.report_305d_milk([cow for cow in herd_manager.cows if cow.is_milking])
         for pen in herd_manager.all_pens:

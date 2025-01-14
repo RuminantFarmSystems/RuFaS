@@ -31,6 +31,7 @@ class MilkProduction:
     that animal.
 
     """
+
     daily_milk_produced: float
     crude_protein_content: float
     true_protein_content: float
@@ -69,8 +70,8 @@ class MilkProduction:
         self.wood_m = wood_m
         self.wood_n = wood_n
 
-    def perform_daily_milking_update(self,
-        milk_production_inputs: MilkProductionInputs, time: Time
+    def perform_daily_milking_update(
+        self, milk_production_inputs: MilkProductionInputs, time: Time
     ) -> MilkProductionOutputs:
         """
         Handles an animal's daily milking update.
@@ -91,8 +92,7 @@ class MilkProduction:
 
         """
         milk_production_outputs = MilkProductionOutputs(
-            events=AnimalEvents(),
-            days_in_milk=milk_production_inputs.days_in_milk
+            events=AnimalEvents(), days_in_milk=milk_production_inputs.days_in_milk
         )
 
         if not milk_production_inputs.is_milking:
@@ -101,7 +101,8 @@ class MilkProduction:
                 days_in_milk=milk_production_inputs.days_in_milk,
                 days_born=milk_production_inputs.days_born,
                 daily_milk_produced=self.daily_milk_produced,
-                time=time,)
+                time=time,
+            )
             return milk_production_outputs
 
         is_dry_off_day = milk_production_inputs.days_in_pregnancy == AnimalConfig.dry_off_day_of_pregnancy
@@ -122,7 +123,8 @@ class MilkProduction:
                 days_in_milk=milk_production_outputs.days_in_milk,
                 days_born=milk_production_inputs.days_born,
                 daily_milk_produced=self.daily_milk_produced,
-                time=time,)
+                time=time,
+            )
             return milk_production_outputs
 
         milk_production_outputs.days_in_milk += 1
@@ -139,18 +141,15 @@ class MilkProduction:
         self.true_protein_content = self._calculate_nutrient_content(
             self.daily_milk_produced, self.true_protein_percent
         )
-        self.fat_content = self._calculate_nutrient_content(
-            self.daily_milk_produced, self.fat_percent
-        )
-        self.lactose_content = self._calculate_nutrient_content(
-            self.daily_milk_produced, self.lactose_percent
-        )
+        self.fat_content = self._calculate_nutrient_content(self.daily_milk_produced, self.fat_percent)
+        self.lactose_content = self._calculate_nutrient_content(self.daily_milk_produced, self.lactose_percent)
 
         self._update_milking_history(
-                days_in_milk=milk_production_outputs.days_in_milk,
-                days_born=milk_production_inputs.days_born,
-                daily_milk_produced=self.daily_milk_produced,
-                time=time,)
+            days_in_milk=milk_production_outputs.days_in_milk,
+            days_born=milk_production_inputs.days_born,
+            daily_milk_produced=self.daily_milk_produced,
+            time=time,
+        )
 
         if milk_production_outputs.days_in_milk == 305:
             milk_history = [record["milk_production"] for record in self.milk_production_history[-305:]]
@@ -158,8 +157,11 @@ class MilkProduction:
 
         return milk_production_outputs
 
-    # @njit
-    def calculate_daily_milk_production(self, days_in_milk: int, l_param: float, m_param: float, n_param: float) -> float:
+    @staticmethod
+    @njit
+    def calculate_daily_milk_production(
+        days_in_milk: int, l_param: float, m_param: float, n_param: float
+    ) -> float:
         """
         Calculates the milk yield on the given day using Wood's lactation curve.
 
@@ -187,7 +189,7 @@ class MilkProduction:
         """
         return l_param * np.power(days_in_milk, m_param) * np.exp(-1 * n_param * days_in_milk)
 
-    def calc_305_day_milk_yield(self,l_param: float, m_param: float, n_param: float) -> float:
+    def calc_305_day_milk_yield(self, l_param: float, m_param: float, n_param: float) -> float:
         """
         Calculates the total milk yield from day 1 to day 305 of the lactation.
 
@@ -252,8 +254,8 @@ class MilkProduction:
         """
         return milk * nutrient_percentage * GeneralConstants.PERCENTAGE_TO_FRACTION
 
-    def _update_milking_history(self,
-        days_in_milk: int, daily_milk_produced: float, days_born: int, time: Time
+    def _update_milking_history(
+        self, days_in_milk: int, daily_milk_produced: float, days_born: int, time: Time
     ) -> None:
         """Updates the milking history kept in a MilkProductionProperties instance."""
         self.milk_production_history.append(

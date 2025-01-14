@@ -1,35 +1,10 @@
-from abc import ABC, abstractmethod
-from typing import Any
-
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionRequirements
 
 
-class NutritionRequirementsCalculator(ABC):
+class NutritionRequirementsCalculator:
     """
-    Defines the interface for animal nutritional requirements calculation, and logic shared between the NASEM and NRC
-    equations.
+    Holds logic for calculating animal requirements that is shared by both the NASEM and NRC methodologies.
     """
-
-    @classmethod
-    @abstractmethod
-    def calculate_requirements(cls, **kwargs: dict[str, Any]) -> NutritionRequirements:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def _calculate_maintentance_energy_requirements(cls, **kwargs: dict[str, Any]) -> tuple[float, float, float]:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def _calculate_growth_energy_requirements(cls, **kwargs: dict[str, Any]) -> tuple[float, float, float]:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def _calculate_pregnancy_energy_requirements(cls, **kwargs: dict[str, Any]) -> float:
-        pass
 
     @classmethod
     def _calculate_lactation_energy_requirements(
@@ -75,28 +50,3 @@ class NutritionRequirementsCalculator(ABC):
         else:
             net_energy_lactation = 0.0
         return net_energy_lactation
-
-    @classmethod
-    @abstractmethod
-    def _calculate_protein_requirement(cls, **kwargs: dict[str, Any]) -> float:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def _calculate_calcium_requirement(cls, **kwargs: dict[str, Any]) -> float:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def _calculate_phosphorus_requirement(cls, **kwargs: dict[str, Any]) -> float:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def _calculate_dry_matter_intake(cls, **kwargs: dict[str, Any]) -> float:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def _calculate_activity_energy_requirements(cls, **kwargs: dict[str, Any]) -> float:
-        pass
