@@ -204,50 +204,10 @@ class AnimalModuleReporter:
         if pen.is_populated is False:
             return
 
-        _ration_amounts = cls._report_ration_per_animal(pen, simulation_day)
-
+        cls._report_ration_per_animal(pen, simulation_day)
         cls._report_nutrient_amounts(pen, simulation_day)
         cls._report_average_nutrient_requirements(pen, simulation_day)
-        # nutrient_amount = pen.ration_nutrient_amount
-        # nutrient_conc = pen.ration_nutrient_conc
-        # ration_report = {}
-        # ration_report["nutrient_amount"] = nutrient_amount
-        # ration_report["nutrient_conc"] = nutrient_conc
-
-        # info_map = {
-        #     "class": AnimalModuleReporter.__name__,
-        #     "function": AnimalModuleReporter.report_ration_interval_data.__name__,
-        #     "data_origin": [("AnimalManager", "_handle_pen_ration")],
-        #     "number_animals_in_pen": len(pen.animals_in_pen),
-        #     "simulation_day": simulation_day,
-        # }
-
-        # if pen.animal_combination != AnimalCombination.CALF:
-        #     ration_supply_report_units = {
-        #         "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-        #         "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-        #         "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-        #         "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-        #         "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-        #         "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-        #         "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-        #         "fat": MeasurementUnits.GRAMS,
-        #         "fat_percentage": MeasurementUnits.PERCENT,
-        #         "forage_NDF": MeasurementUnits.PERCENT,
-        #         "forage_NDF_percent": MeasurementUnits.PERCENT_OF_DRY_MATTER,
-        #         "metabolizable_protein": MeasurementUnits.GRAMS,
-        #     }
-        #     if pen.ration_per_animal:
-        #         ration_supply_report = RationReporter.report_ration_supply(
-        #             pen.ration_per_animal, feed.available_feeds, ration_report, pen.avg_nutrient_rqmts["avg_BW"]
-        #         )
-        #     else:
-        #         ration_supply_report = {}
-        #     om.add_variable(
-        #         f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}",
-        #         ration_supply_report,
-        #         dict(info_map, **{"units": ration_supply_report_units}),
-        #     )
+        cls._report_me_diet(pen, simulation_day)
 
     @classmethod
     def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
@@ -272,9 +232,7 @@ class AnimalModuleReporter:
         ration_amounts_with_str_keys = {str(key): amount for key, amount in pen.ration.items()}
         ration_amounts_with_str_keys["dry_matter_intake_total"] = total_dry_matter
 
-        units = {
-            key: MeasurementUnits.KILOGRAMS for key in ration_amounts_with_str_keys.keys()
-        }
+        units = {key: MeasurementUnits.KILOGRAMS for key in ration_amounts_with_str_keys.keys()}
 
         info_map = {
             "class": AnimalModuleReporter.__name__,
@@ -315,7 +273,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_ration_interval_data.__name__,
             "number_animals_in_pen": len(pen.animals_in_pen.keys()),
             "simulation_day": simulation_day,
-            "units": nutrient_amount_units
+            "units": nutrient_amount_units,
         }
 
         nutrient_amounts = {
@@ -373,7 +331,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_ration_interval_data.__name__,
             "number_animals_in_pen": len(pen.animals_in_pen),
             "simulation_day": simulation_day,
-            "units": units
+            "units": units,
         }
 
         avg_requirements = {
@@ -413,27 +371,84 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_ration_interval_data.__name__,
             "number_animals_in_pen": len(pen.animals_in_pen.values()),
             "simulation_day": simulation_day,
-            units: units
+            units: units,
         }
 
         cls._om.add_variable(
-            f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}", pen.average_nutrition_supply.metabolizable_energy, info_map
+            f"MEdiet_pen_{pen.id}_{pen.animal_combination.name}",
+            pen.average_nutrition_supply.metabolizable_energy,
+            info_map,
         )
 
-    # @classmethod
-    # def _report_ration_supply(cls, pen: Pen, simulation_day: int) -> None:
-    #     """
-    #     Reports the ration supply.
+    @classmethod
+    def _report_ration_supply(cls, pen: Pen, simulation_day: int) -> None:
+        """
+        Reports the ration supply.
 
-    #     Parameters
-    #     ----------
-    #     pen : Pen
-    #         Pen object.
-    #     simulation_day : int
-    #         Day of simulation.
-        
-    #     """
-    #     metabolizable_energy = 
+        Parameters
+        ----------
+        pen : Pen
+            Pen object.
+        simulation_day : int
+            Day of simulation.
+
+        """
+        # TODO: add forage NDF reporting when 2144 is merged into dev
+        # fields are "forage_NDF" and "forage_NDF_percent", units are PERCENT and PERCENT_OF_DRY_MATTER respectively.
+
+        units = {
+            "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+            "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+            "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+            "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+            "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+            "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+            "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
+            "fat": MeasurementUnits.GRAMS,
+            "fat_percentage": MeasurementUnits.PERCENT,
+            "metabolizable_protein": MeasurementUnits.GRAMS,
+        }
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_ration_interval_data.__name__,
+            "number_animals_in_pen": len(pen.animals_in_pen.values()),
+            "simulation_day": simulation_day,
+            units: units,
+        }
+
+        pen.average_nutrition_supply
+
+        dry_matter = pen.average_nutrition_supply.dry_matter
+        calcium_percentage = (
+            pen.average_nutrition_supply.calcium
+            * GeneralConstants.GRAMS_TO_KG
+            / dry_matter
+            * GeneralConstants.FRACTION_TO_PERCENTAGE
+        )
+        phosphorus_percentage = (
+            pen.average_nutrition_supply.phosphorus
+            * GeneralConstants.GRAMS_TO_KG
+            / dry_matter
+            * GeneralConstants.FRACTION_TO_PERCENTAGE
+        )
+        fat_grams = pen.average_nutrition_supply.fat_supply * GeneralConstants.KG_TO_GRAMS
+
+        supply_report = {
+            "ME": pen.average_nutrition_supply.metabolizable_energy / dry_matter,
+            "DE": pen.average_nutrition_supply.digestible_energy_supply / dry_matter,
+            "NE_maintenance_and_activity": pen.average_nutrition_supply.maintenance_energy / dry_matter,
+            "NE_lactation": pen.average_nutrition_supply.lactation_energy / dry_matter,
+            "NE_growth": pen.average_nutrition_supply.growth_energy / dry_matter,
+            "calcium": calcium_percentage,
+            "phosphorus": phosphorus_percentage,
+            "fat": fat_grams,
+            "fat_percentage": pen.average_nutrition_supply.fat_percentage,
+            "metabolizable_protein": pen.average_nutrition_supply.metabolizable_protein,
+        }
+
+        cls._om.add_variable(
+            f"ration_supply_report_for_pen_{pen.id}_{pen.animal_combination.name}", supply_report, info_map
+        )
 
     @classmethod
     def report_daily_ration(cls, animal_manager, available_feeds: list[Feed], simulation_day: int) -> None:
