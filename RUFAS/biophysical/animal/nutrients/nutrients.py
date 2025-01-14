@@ -57,23 +57,12 @@ class Nutrients:
         - Change in body P reserves (g), must be <= 0
 
         """
-        self.phosphorus_excess_in_diet = max(
-            self.phosphorus_intake - self.phosphorus_requirement, 0
-        )
+        self.phosphorus_excess_in_diet = max(self.phosphorus_intake - self.phosphorus_requirement, 0)
         previous_phosphorus_reserves = self.phosphorus_reserves
         if self.phosphorus_intake < self.phosphorus_requirement:
-            self.phosphorus_reserves = (
-                self.phosphorus_intake
-                - self.phosphorus_requirement
-                + self.phosphorus_reserves
-            )
-        elif (
-            self.phosphorus_intake >= self.phosphorus_requirement
-            and self.phosphorus_reserves < 0
-        ):
-            self.phosphorus_reserves = (
-                0.7 * self.phosphorus_excess_in_diet + self.phosphorus_reserves
-            )
+            self.phosphorus_reserves = self.phosphorus_intake - self.phosphorus_requirement + self.phosphorus_reserves
+        elif self.phosphorus_intake >= self.phosphorus_requirement and self.phosphorus_reserves < 0:
+            self.phosphorus_reserves = 0.7 * self.phosphorus_excess_in_diet + self.phosphorus_reserves
         else:
             self.phosphorus_reserves = 0.0
         self.total_phosphorus_in_animal = (
@@ -83,9 +72,7 @@ class Nutrients:
             + (self.phosphorus_reserves - previous_phosphorus_reserves)
         )
 
-    def _calculate_phosphorus_requirements(self,
-        nutrients_inputs: NutrientsInputs, dry_matter_intake: float
-    ) -> None:
+    def _calculate_phosphorus_requirements(self, nutrients_inputs: NutrientsInputs, dry_matter_intake: float) -> None:
         """Calculates animal's phosophorus requirements"""
         self.phosphorus_endogenous_loss = self._calculate_phosphorus_endogenous_loss(
             nutrients_inputs, dry_matter_intake
@@ -108,8 +95,8 @@ class Nutrients:
             nutrients_inputs, absorbed_phosphorus
         )
 
-    def _calculate_phosphorus_endogenous_loss(self,
-        nutrients_inputs: NutrientsInputs, dry_matter_intake: float
+    def _calculate_phosphorus_endogenous_loss(
+        self, nutrients_inputs: NutrientsInputs, dry_matter_intake: float
     ) -> float:
         """Calculates phosphorus required for endogenous loss based on animal type.
 
@@ -136,9 +123,7 @@ class Nutrients:
             return (
                 (
                     0.0012
-                    + 0.004635
-                    * (nutrients_inputs.mature_body_weight**0.22)
-                    * (nutrients_inputs.body_weight ** (-0.22))
+                    + 0.004635 * (nutrients_inputs.mature_body_weight**0.22) * (nutrients_inputs.body_weight ** (-0.22))
                 )
                 * nutrients_inputs.daily_growth
                 / 0.96
@@ -157,7 +142,8 @@ class Nutrients:
         if nutrients_inputs.days_in_pregnancy >= 190:
             exp_1 = (0.05527 - 0.000075 * nutrients_inputs.days_in_pregnancy) * nutrients_inputs.days_in_pregnancy
             exp_2 = (0.05527 - 0.000075 * (nutrients_inputs.days_in_pregnancy - 1)) * (
-                    nutrients_inputs.days_in_pregnancy - 1)
+                nutrients_inputs.days_in_pregnancy - 1
+            )
             return (0.00002743 * math.exp(exp_1) - 0.00002743 * math.exp(exp_2)) * GeneralConstants.KG_TO_GRAMS
         else:
             return 0.0
@@ -175,7 +161,7 @@ class Nutrients:
             return 0.0
 
     def _calculate_absorbed_phosphorus(
-            self,
+        self,
         nutrients_inputs: NutrientsInputs,
         milk_phosphorus: float,
         urine_production_phosphorus: float,
@@ -202,14 +188,10 @@ class Nutrients:
                 + self.phosphorus_for_gestation
             )
         else:
-            return (
-                urine_production_phosphorus
-                + self.phosphorus_endogenous_loss
-                + self.phosphorus_for_growth
-            )
+            return urine_production_phosphorus + self.phosphorus_endogenous_loss + self.phosphorus_for_growth
 
-    def _calculate_animal_phosphorus_requirement(self,
-        nutrients_inputs: NutrientsInputs, absorbed_phosphorus: float
+    def _calculate_animal_phosphorus_requirement(
+        self, nutrients_inputs: NutrientsInputs, absorbed_phosphorus: float
     ) -> float:
         """Calculates an animal's phosphorus requirement by animal type.
 

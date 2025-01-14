@@ -9,7 +9,7 @@ def test_calculate_requirements() -> None:
     pass
 
 
-def test_calculate_maintentance_energy_requirements() -> None:
+def test_calculate_maintenance_energy_requirements() -> None:
     """Test that energy requirements for maintenance are calculated correctly."""
     pass
 
@@ -134,9 +134,13 @@ def test_calculate_dry_matter_intake(
     "weight, housing, distance, expected",
     [(450.0, "Barn", 100.0, 0.01575), (475.0, "Grazing", 120.0, 41.895), (500.0, "Other", 50.0, 0.0)],
 )
+<<<<<<< HEAD
 def test_calculate_activity_energy_requirements(
     weight: float, housing: float, distance: float, expected: float
 ) -> None:
+=======
+def test_calculate_activity_energy_requirements(weight: float, housing: str, distance: float, expected: float) -> None:
+>>>>>>> herd_factory
     """Test that net energy requirement for activity is calculated correctly."""
     actual = NASEMRequirementsCalculator._calculate_activity_energy_requirements(weight, housing, distance)
 
