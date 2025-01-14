@@ -1,6 +1,12 @@
 from dataclasses import dataclass
 
-from RUFAS.data_structures.feed_storage_to_animal_connection import RUFAS_ID, Feed, FeedComponentType, NutrientStandard
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    RUFAS_ID,
+    Feed,
+    FeedCategorization,
+    FeedComponentType,
+    NutrientStandard,
+)
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.general_constants import GeneralConstants
 
@@ -69,6 +75,7 @@ class NutritionSupplyCalculator:
             nutrient: cls._calculate_nutritive_content(feeds, nutrient) for nutrient in nutrients_to_calculate
         }
         digestible_energy = cls._calculate_digestible_energy(feeds)
+        total_byproducts = cls._calculate_byproducts_supply(feeds)
 
         return NutritionSupply(
             metabolizable_energy=total_metabolizable_energy,
@@ -90,6 +97,7 @@ class NutritionSupplyCalculator:
             ash_supply=nutrient_contents["ash"],
             potassium_supply=nutrient_contents["potassium"],
             starch_supply=nutrient_contents["starch"],
+            byproduct_supply=total_byproducts,
         )
 
     @classmethod
@@ -658,8 +666,6 @@ class NutritionSupplyCalculator:
         ----------
         feeds : list[FeedInRation]
             List of feeds in ration, including the amount and nutritive properties.
-        nutrient : str
-            Name of the nutrient.
 
         Returns
         -------
@@ -669,3 +675,26 @@ class NutritionSupplyCalculator:
         """
         de_attribute = "DE_Base" if cls.nutrient_standard is NutrientStandard.NASEM else "DE"
         return sum([feed.amount * getattr(feed.info, de_attribute) for feed in feeds])
+
+    @classmethod
+    def _calculate_byproducts_supply(cls, feeds: list[FeedInRation]) -> float:
+        """
+        Calculates amount of byproducts in a ration.
+
+        Parameters
+        ----------
+        feeds : list[FeedInRation]
+            List of feeds in ration, including the amount and nutritive properties.
+
+        Returns
+        -------
+        float
+            Total supply of byproduct in a ration (kg dry matter).
+
+        """
+        return sum(
+            [
+                feed.amount * (1.0 if feed.info.Fd_Category is FeedCategorization.BY_PRODUCT_OTHER else 0.0)
+                for feed in feeds
+            ]
+        )

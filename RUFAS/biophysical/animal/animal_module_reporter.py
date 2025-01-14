@@ -515,6 +515,8 @@ class AnimalModuleReporter:
         AnimalModuleReporter.report_daily_feed_emissions(ration_across_pens, "ALL", "", animal_manager, simulation_day)
 
     @classmethod
+
+    @classmethod
     def report_daily_feed_emissions(
         cls,
         ration_total: dict[str, float],

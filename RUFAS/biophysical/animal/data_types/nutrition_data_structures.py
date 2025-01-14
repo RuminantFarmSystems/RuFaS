@@ -117,7 +117,7 @@ class NutritionRequirements:
                 threonine=0.0,
                 thryptophan=0.0,
                 valine=0.0,
-            )
+            ),
         )
 
 
@@ -167,6 +167,8 @@ class NutritionSupply:
         Total potassium supplied by the ration (kg).
     starch_supply : float
         Total starch supplied by the ration (kg).
+    byproduct_supply : float
+        Total dry matter in the matter made up of byproducts (kg).
     nitrogen_supply : float
         Total nitrogen supplied by the ration (kg). This value is derived from the crude protein supply.
 
@@ -191,6 +193,7 @@ class NutritionSupply:
     ash_supply: float
     potassium_supply: float
     starch_supply: float
+    byproduct_supply: float
     nitrogen_supply: float = field(init=False)
 
     def __post_init__(self) -> None:
@@ -259,6 +262,7 @@ class NutritionSupply:
             ash_supply=self.ash_supply + other.ash_supply,
             potassium_supply=self.potassium_supply + other.potassium_supply,
             starch_supply=self.starch_supply + other.starch_supply,
+            byproduct_supply=self.byproduct_supply + other.byproduct_supply,
         )
 
     def __truediv__(self, divisor: float | int) -> "NutritionSupply":
@@ -286,6 +290,7 @@ class NutritionSupply:
             ash_supply=self.ash_supply / divisor,
             potassium_supply=self.potassium_supply / divisor,
             starch_supply=self.starch_supply / divisor,
+            byproduct_supply=self.byproduct_supply / divisor,
         )
 
     @classmethod
@@ -311,6 +316,7 @@ class NutritionSupply:
             ash_supply=0.0,
             potassium_supply=0.0,
             starch_supply=0.0,
+            byproduct_supply=0.0,
         )
 
 

@@ -3,7 +3,12 @@ from pytest_mock import MockerFixture
 
 from RUFAS.biophysical.animal.data_types.nutrition_data_structures import NutritionSupply
 from RUFAS.biophysical.animal.nutrients.nutrition_supply_calculator import FeedInRation, NutritionSupplyCalculator
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, RUFAS_ID, FeedComponentType
+from RUFAS.data_structures.feed_storage_to_animal_connection import (
+    Feed,
+    RUFAS_ID,
+    FeedCategorization,
+    FeedComponentType,
+)
 
 
 @pytest.fixture
@@ -44,6 +49,7 @@ def feeds(mocker: MockerFixture) -> tuple[Feed, Feed, Feed]:
                 potassium_supply=10.0,
                 starch_supply=10.0,
                 digestible_energy_supply=11.0,
+                byproduct_supply=12.0,
             ),
         )
     ],
@@ -84,6 +90,7 @@ def test_calculate_nutrient_supply(
     digestible_energy = mocker.patch.object(
         NutritionSupplyCalculator, "_calculate_digestible_energy", return_value=11.0
     )
+    byproduct_suppy = mocker.patch.object(NutritionSupplyCalculator, "_calculate_byproducts_supply", return_value=12.0)
 
     actual = NutritionSupplyCalculator.calculate_nutrient_supply(feeds, ration, weight)
 
@@ -98,6 +105,7 @@ def test_calculate_nutrient_supply(
     protein.assert_called_once()
     assert nutritive_content.call_count == 9
     digestible_energy.assert_called_once()
+    byproduct_suppy.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -613,3 +621,54 @@ def test_calculate_nutrient_content(
     actual = NutritionSupplyCalculator._calculate_nutritive_content(feeds_in_ration, name)
 
     assert pytest.approx(actual) == expected
+
+
+@pytest.mark.parametrize(
+    "category, feed_amounts, expected",
+    [
+        (
+            (
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.BY_PRODUCT_OTHER,
+            ),
+            (10.0, 20.0, 30.0),
+            60.0,
+        ),
+        (
+            (
+                FeedCategorization.ANIMAL_PROTEIN,
+                FeedCategorization.BY_PRODUCT_OTHER,
+                FeedCategorization.GRASS_LEGUME_FORAGE,
+            ),
+            (20.0, 10.0, 40.0),
+            10.0,
+        ),
+        (
+            (
+                FeedCategorization.ANIMAL_PROTEIN,
+                FeedCategorization.ENERGY_SOURCE,
+                FeedCategorization.GRASS_LEGUME_FORAGE,
+            ),
+            (20.0, 10.0, 40.0),
+            0.0,
+        ),
+    ],
+)
+def test_calculate_byproducts_supply(
+    feeds: tuple[Feed, Feed, Feed],
+    category: tuple[FeedCategorization, FeedCategorization, FeedCategorization],
+    feed_amounts: tuple[float, float, float],
+    expected: float,
+) -> None:
+    """Tests that the supply of byproducts in a ration is calculated correctly."""
+    feeds[0].Fd_Category, feeds[1].Fd_Category, feeds[2].Fd_Category = category
+    feeds_in_ration = [
+        FeedInRation(feed_amounts[0], feeds[0]),
+        FeedInRation(feed_amounts[1], feeds[1]),
+        FeedInRation(feed_amounts[2], feeds[2]),
+    ]
+
+    actual = NutritionSupplyCalculator._calculate_byproducts_supply(feeds_in_ration)
+
+    assert actual == expected
