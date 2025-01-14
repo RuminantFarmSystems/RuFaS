@@ -131,8 +131,11 @@ class Pen:
 
     @property
     def cows_in_pen(self) -> list[Animal]:
-        return [animal for animal in self.animals_in_pen.values()
-                if animal.animal_type == AnimalType.LAC_COW or animal.animal_type == AnimalType.DRY_COW]
+        return [
+            animal
+            for animal in self.animals_in_pen.values()
+            if animal.animal_type == AnimalType.LAC_COW or animal.animal_type == AnimalType.DRY_COW
+        ]
 
     def remove_animals_by_ids(self, animal_ids: list[int]) -> None:
         """
@@ -207,7 +210,8 @@ class Pen:
             for animal in list(self.animals_in_pen.values()):
                 if animal.animal_type.is_cow:
                     animal.calculate_daily_walking_distance(
-                        self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor)
+                        self.vertical_dist_to_parlor, self.horizontal_dist_to_parlor
+                    )
 
     @property
     def average_growth(self) -> float:
@@ -275,7 +279,6 @@ class Pen:
             num_lactating_cows=self.number_of_lactating_cows_in_pen,
             num_stalls=self.num_stalls,
         )
-
 
     def _set_animal_nutrient_values(
         self,

@@ -91,8 +91,9 @@ class HerdManager:
         self.im = InputManager()
         config_data: dict[str, Any] = self.im.get_data("config")
         animal_config_data: dict[str, Any] = self.im.get_data("animal")
-        manure_management_config_data: list[dict[str, Any]] = self.im.get_data(
-            "manure_management")["manure_management_scenarios"]
+        manure_management_config_data: list[dict[str, Any]] = self.im.get_data("manure_management")[
+            "manure_management_scenarios"
+        ]
 
         AnimalConfig.initialize_animal_config()
 
@@ -138,9 +139,14 @@ class HerdManager:
         # in _update_phosphorus_concentrations() and are calculated by dividing the total P in the animals
         # of the class by the total body weight of the animals, on a per-animal basis
         self.phosphorus_concentration_by_animal_class = {
-            animal_type: 0.0 for animal_type in [
-                AnimalType.CALF, AnimalType.HEIFER_I, AnimalType.HEIFER_II, AnimalType.HEIFER_III, AnimalType.LAC_COW,
-                AnimalType.CALF.DRY_COW
+            animal_type: 0.0
+            for animal_type in [
+                AnimalType.CALF,
+                AnimalType.HEIFER_I,
+                AnimalType.HEIFER_II,
+                AnimalType.HEIFER_III,
+                AnimalType.LAC_COW,
+                AnimalType.CALF.DRY_COW,
             ]
         }
         self.herd_statistics = HerdStatistics()
@@ -223,27 +229,21 @@ class HerdManager:
             calf_daily_routines_output: DailyRoutinesOutput = calf.daily_routines(time)
             if calf_daily_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(calf)
-            elif calf_daily_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.SOLD
-            ]:
+            elif calf_daily_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(calf)
         # heiferI update
         for heiferI in self.heiferIs:
             heiferI_routines_output: DailyRoutinesOutput = heiferI.daily_routines(time)
             if heiferI_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferI)
-            elif heiferI_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.SOLD
-            ]:
+            elif heiferI_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(heiferI)
         # heiferII update
         for heiferII in self.heiferIIs:
             heiferII_routines_output: DailyRoutinesOutput = heiferII.daily_routines(time)
             if heiferII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferII)
-            elif heiferII_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.SOLD
-            ]:
+            elif heiferII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(heiferII)
                 sold_heiferIIs.append(heiferII)
         # heiferIII update
@@ -251,9 +251,7 @@ class HerdManager:
             heiferIII_routines_output: DailyRoutinesOutput = heiferIII.daily_routines(time)
             if heiferIII_routines_output.animal_status == AnimalStatus.LIFE_STAGE_CHANGED:
                 graduated_animals.append(heiferIII)
-            elif heiferIII_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.SOLD
-            ]:
+            elif heiferIII_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(heiferIII)
         # cow update
         for cow in self.cows:
@@ -268,9 +266,7 @@ class HerdManager:
                 else:
                     sold_newborn_calves.append(newborn_calf)
 
-            elif cow_routines_output.animal_status in [
-                AnimalStatus.DEAD, AnimalStatus.SOLD
-            ]:
+            elif cow_routines_output.animal_status in [AnimalStatus.DEAD, AnimalStatus.SOLD]:
                 removed_animals.append(cow)
                 sold_and_died_cows.append(cow)
         self._update_sold_and_died_cows(sold_and_died_cows)
@@ -286,7 +282,6 @@ class HerdManager:
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
-
         self.record_pen_history(time.simulation_day)
 
         if self.end_ration_interval(time.simulation_day):
@@ -299,10 +294,9 @@ class HerdManager:
 
         herd_manager_output: list[HerdManagerOutput] = []
         for pen in self.all_pens:
-            herd_manager_output.append(HerdManagerOutput(
-                pen_manure=pen.get_manure_data,
-                manure_excretion=pen.total_manure_excretion
-            ))
+            herd_manager_output.append(
+                HerdManagerOutput(pen_manure=pen.get_manure_data, manure_excretion=pen.total_manure_excretion)
+            )
 
         self.update_herd_statistics()
 
@@ -313,9 +307,7 @@ class HerdManager:
         return herd_manager_output
 
     def initialize_pens(
-            self,
-            all_pen_data: list[dict[str, Any]],
-            manure_management_scenarios: list[dict[str, Any]]
+        self, all_pen_data: list[dict[str, Any]], manure_management_scenarios: list[dict[str, Any]]
     ) -> None:
         """
         Populates the list of pens with the information from the input json file.
@@ -331,9 +323,9 @@ class HerdManager:
         # Initialize pens from all_pen_data
         for pen_data in all_pen_data:
             animal_combination_value: int = AnimalCombination[pen_data.get("animal_combination")].value
-            pen_id = pen_data.get('id')
+            pen_id = pen_data.get("id")
             pen_name = pen_data.get("name", "")
-            animal_combination=AnimalCombination(animal_combination_value)
+            animal_combination = AnimalCombination(animal_combination_value)
             vertical_dist_to_milking_parlor = pen_data.get("vertical_dist_to_milking_parlor")
             horizontal_dist_to_milking_parlor = pen_data.get("horizontal_dist_to_milking_parlor")
             number_of_stalls = pen_data.get("number_of_stalls")
@@ -350,8 +342,7 @@ class HerdManager:
             bedding_type = manure_management_scenario["bedding_type"]
             manure_handling = manure_management_scenario["manure_handler"]
             manure_separator = manure_management_scenario["manure_separator"]
-            manure_separator_after_digestion = manure_management_scenario[
-                "manure_separator_after_digestion"]
+            manure_separator_after_digestion = manure_management_scenario["manure_separator_after_digestion"]
             manure_storage = manure_management_scenario["manure_treatment"]
 
             pen = Pen(
@@ -467,8 +458,10 @@ class HerdManager:
         """
         animals_removed: list[Animal] = []
         sell_threshold = 1.03
-        while (len(self.heiferIIIs) + len(self.cows) > self.herd_statistics.herd_num * sell_threshold
-               and len(self.heiferIIIs) > 0):
+        while (
+            len(self.heiferIIIs) + len(self.cows) > self.herd_statistics.herd_num * sell_threshold
+            and len(self.heiferIIIs) > 0
+        ):
             removed_heiferIII = self.heiferIIIs.pop()
             animals_removed.append(removed_heiferIII)
             removed_heiferIII.sold_at_day = simulation_day
@@ -487,10 +480,7 @@ class HerdManager:
             self.herd_statistics.heiferIII_num -= 1
         return animals_removed
 
-    def _check_if_replacement_heifers_needed(
-        self,
-        simulation_day: int
-    ) -> list[Animal]:
+    def _check_if_replacement_heifers_needed(self, simulation_day: int) -> list[Animal]:
         """Checks if replacement heifers are needed.
 
         If the number of heifers is less than what is needed for the herd,
@@ -505,8 +495,11 @@ class HerdManager:
         """
         animals_added: list[Animal] = []
         buy_threshold = 1.01
-        while (len(self.cows) + len(self.heiferIIIs) + self.herd_statistics.bought_heifer_num <
-               self.herd_statistics.herd_num * buy_threshold and simulation_day > 1):
+        while (
+            len(self.cows) + len(self.heiferIIIs) + self.herd_statistics.bought_heifer_num
+            < self.herd_statistics.herd_num * buy_threshold
+            and simulation_day > 1
+        ):
             if len(self.replacement_market) == 0:
                 break
             replacement = self.replacement_market.pop(0)
@@ -1078,11 +1071,7 @@ class HerdManager:
         Returns: True if today is the day a new ration has to be formulated,
                 False otherwise.
         """
-        return (
-            simulation_day % self.formulation_interval == 1
-            or self.formulation_interval == 1
-            or simulation_day == 0
-        )
+        return simulation_day % self.formulation_interval == 1 or self.formulation_interval == 1 or simulation_day == 0
 
     def reformulate_ration_single_pen(self, pen: Pen, current_temperature: float, feed: Feed) -> None:
         """
@@ -1104,9 +1093,7 @@ class HerdManager:
             self.herd_statistics.heiferII_num,
             self.herd_statistics.heiferIII_num,
             self.herd_statistics.cow_num,
-        ) = (
-            len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs), len(self.cows)
-        )
+        ) = (len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs), len(self.cows))
         self._calculate_herd_percentages()
 
         self._update_heifer_reproduction_statistics()
@@ -1131,8 +1118,9 @@ class HerdManager:
             total_animal_num: The total number of animals in the herd.
 
         """
-        denominator = sum([len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs),
-                           len(self.cows)])
+        denominator = sum(
+            [len(self.calves), len(self.heiferIs), len(self.heiferIIs), len(self.heiferIIIs), len(self.cows)]
+        )
         denominator = denominator if denominator > 0 else 1
         pc = Utility.percent_calculator(denominator)
         self.herd_statistics.calf_percent = pc(self.herd_statistics.calf_num)
@@ -1156,7 +1144,8 @@ class HerdManager:
         pc = Utility.percent_calculator(denominator)
         for cull_reason in self.herd_statistics.cull_reason_stats:
             self.herd_statistics.cull_reason_stats_percent[cull_reason] = pc(
-                self.herd_statistics.cull_reason_stats[cull_reason])
+                self.herd_statistics.cull_reason_stats[cull_reason]
+            )
 
     def _update_cow_parity_statistics(self) -> None:
         """Calculates the percentage of cows for each parity number."""
@@ -1169,13 +1158,13 @@ class HerdManager:
             "1": len(parity_1_cows),
             "2": len(parity_2_cows),
             "3": len(parity_3_cows),
-            "greater_than_3": len(parity_greater_than_3_cows)
+            "greater_than_3": len(parity_greater_than_3_cows),
         }
         self.herd_statistics.avg_age_for_parity = {
             "1": sum([cow.days_born for cow in parity_1_cows]) / denominator,
             "2": sum([cow.days_born for cow in parity_2_cows]) / denominator,
             "3": sum([cow.days_born for cow in parity_3_cows]) / denominator,
-            "greater_than_3": sum([cow.days_born for cow in parity_greater_than_3_cows]) / denominator
+            "greater_than_3": sum([cow.days_born for cow in parity_greater_than_3_cows]) / denominator,
         }
 
         parity_1_calving_age = [cow.events.get_most_recent_date(animal_constants.NEW_BIRTH) for cow in parity_1_cows]
@@ -1196,8 +1185,10 @@ class HerdManager:
             "2": (sum(parity_2_calving_age) / len(parity_2_calving_age)) if len(parity_2_calving_age) > 0 else 0,
             "3": (sum(parity_3_calving_age) / len(parity_3_calving_age)) if len(parity_3_calving_age) > 0 else 0,
             "greater_than_3": (
-                    sum(parity_greater_than_3_calving_age) / len(parity_greater_than_3_calving_age)
-            ) if len(parity_greater_than_3_calving_age) > 0 else 0,
+                (sum(parity_greater_than_3_calving_age) / len(parity_greater_than_3_calving_age))
+                if len(parity_greater_than_3_calving_age) > 0
+                else 0
+            ),
         }
 
         parity_1_calving_to_pregnancy_time = [
@@ -1214,36 +1205,49 @@ class HerdManager:
         ]
 
         parity_1_calving_to_pregnancy_time = [
-            calving_to_pregnancy_time for calving_to_pregnancy_time in parity_1_calving_to_pregnancy_time
+            calving_to_pregnancy_time
+            for calving_to_pregnancy_time in parity_1_calving_to_pregnancy_time
             if calving_to_pregnancy_time > 0
         ]
         parity_2_calving_to_pregnancy_time = [
-            calving_to_pregnancy_time for calving_to_pregnancy_time in parity_2_calving_to_pregnancy_time
+            calving_to_pregnancy_time
+            for calving_to_pregnancy_time in parity_2_calving_to_pregnancy_time
             if calving_to_pregnancy_time > 0
         ]
         parity_3_calving_to_pregnancy_time = [
-            calving_to_pregnancy_time for calving_to_pregnancy_time in parity_3_calving_to_pregnancy_time
+            calving_to_pregnancy_time
+            for calving_to_pregnancy_time in parity_3_calving_to_pregnancy_time
             if calving_to_pregnancy_time > 0
         ]
         parity_greater_than_3_calving_to_pregnancy_time = [
-            calving_to_pregnancy_time for calving_to_pregnancy_time in parity_greater_than_3_calving_to_pregnancy_time
+            calving_to_pregnancy_time
+            for calving_to_pregnancy_time in parity_greater_than_3_calving_to_pregnancy_time
             if calving_to_pregnancy_time > 0
         ]
         self.herd_statistics.avg_calving_to_preg_time = {
             "1": (
-                    sum(parity_1_calving_to_pregnancy_time) / len(parity_1_calving_to_pregnancy_time)
-            ) if len(parity_1_calving_to_pregnancy_time) > 0 else 0,
+                (sum(parity_1_calving_to_pregnancy_time) / len(parity_1_calving_to_pregnancy_time))
+                if len(parity_1_calving_to_pregnancy_time) > 0
+                else 0
+            ),
             "2": (
-                    sum(parity_2_calving_to_pregnancy_time) / len(parity_2_calving_to_pregnancy_time)
-            ) if len(parity_2_calving_to_pregnancy_time) > 0 else 0,
+                (sum(parity_2_calving_to_pregnancy_time) / len(parity_2_calving_to_pregnancy_time))
+                if len(parity_2_calving_to_pregnancy_time) > 0
+                else 0
+            ),
             "3": (
-                    sum(parity_3_calving_to_pregnancy_time) / len(parity_3_calving_to_pregnancy_time)
-            ) if len(parity_3_calving_to_pregnancy_time) > 0 else 0,
+                (sum(parity_3_calving_to_pregnancy_time) / len(parity_3_calving_to_pregnancy_time))
+                if len(parity_3_calving_to_pregnancy_time) > 0
+                else 0
+            ),
             "greater_than_3": (
-                    sum(
-                        parity_greater_than_3_calving_to_pregnancy_time
-                    ) / len(parity_greater_than_3_calving_to_pregnancy_time)
-            ) if len(parity_greater_than_3_calving_to_pregnancy_time) > 0 else 0,
+                (
+                    sum(parity_greater_than_3_calving_to_pregnancy_time)
+                    / len(parity_greater_than_3_calving_to_pregnancy_time)
+                )
+                if len(parity_greater_than_3_calving_to_pregnancy_time) > 0
+                else 0
+            ),
         }
 
         pc = Utility.percent_calculator(denominator)
@@ -1262,21 +1266,21 @@ class HerdManager:
         self.herd_statistics.dry_cow_num = len(dry_cows)
         self.herd_statistics.vwp_cow_num = len(vwp_cows)
 
-        self.herd_statistics.avg_days_in_milk = (sum(
-            [cow.days_in_milk for cow in lactating_cows]) / len(lactating_cows)) if len(lactating_cows) > 0 else 0
-
+        self.herd_statistics.avg_days_in_milk = (
+            (sum([cow.days_in_milk for cow in lactating_cows]) / len(lactating_cows)) if len(lactating_cows) > 0 else 0
+        )
 
         self.herd_statistics.daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in self.cows)
         self.herd_statistics.herd_milk_fat_kg = sum(cow.milk_production.fat_content for cow in lactating_cows)
         self.herd_statistics.herd_milk_fat_percent = (
-                                                             self.herd_statistics.herd_milk_fat_kg /
-                                                             self.herd_statistics.daily_milk_production
-                                                     ) * 100
-        self.herd_statistics.herd_milk_protein_kg = sum(cow.milk_production.true_protein_content for cow in lactating_cows)
+            self.herd_statistics.herd_milk_fat_kg / self.herd_statistics.daily_milk_production
+        ) * 100
+        self.herd_statistics.herd_milk_protein_kg = sum(
+            cow.milk_production.true_protein_content for cow in lactating_cows
+        )
         self.herd_statistics.herd_milk_protein_percent = (
-                                                                 self.herd_statistics.herd_milk_protein_kg /
-                                                                 self.herd_statistics.daily_milk_production
-                                                         ) * 100
+            self.herd_statistics.herd_milk_protein_kg / self.herd_statistics.daily_milk_production
+        ) * 100
 
         dry_cows_daily_milk_production = sum(cow.milk_production.daily_milk_produced for cow in dry_cows)
         dry_cows_milk_fat_kg = sum(cow.milk_production.fat_content for cow in dry_cows)
@@ -1285,14 +1289,16 @@ class HerdManager:
             om.add_error("Dry cow milking error", "Unexpected milking from dry cows", info_map)
             raise ValueError("Unexpected milking from dry cows")
 
-
     def _update_cow_pregnancy_statistics(self) -> None:
         pregnant_cows: list[Animal] = [cow for cow in self.cows if cow.is_pregnant]
         self.herd_statistics.preg_cow_num = len(pregnant_cows)
         self.herd_statistics.open_cow_num = len(self.cows) - len(pregnant_cows)
 
-        self.herd_statistics.avg_days_in_preg = (sum(
-            [cow.days_in_pregnancy for cow in pregnant_cows]) / len(pregnant_cows)) if len(pregnant_cows) > 0 else 0
+        self.herd_statistics.avg_days_in_preg = (
+            (sum([cow.days_in_pregnancy for cow in pregnant_cows]) / len(pregnant_cows))
+            if len(pregnant_cows) > 0
+            else 0
+        )
 
     def _update_sold_and_died_cows(self, sold_and_died_cows: list[Animal]) -> None:
         sum_cow_culling_age = self.herd_statistics.avg_cow_culling_age * self.herd_statistics.cow_herd_exit_num + sum(
@@ -1300,8 +1306,10 @@ class HerdManager:
         )
         self.herd_statistics.cow_herd_exit_num += len(sold_and_died_cows)
         self.herd_statistics.avg_cow_culling_age = (
-                sum_cow_culling_age / self.herd_statistics.cow_herd_exit_num
-        ) if self.herd_statistics.cow_herd_exit_num > 0 else 0
+            (sum_cow_culling_age / self.herd_statistics.cow_herd_exit_num)
+            if self.herd_statistics.cow_herd_exit_num > 0
+            else 0
+        )
 
         self.herd_statistics.sold_and_died_cows_info += [
             {
@@ -1312,11 +1320,13 @@ class HerdManager:
                 "cull_reason": cow.cull_reason,
                 "days_in_milk": cow.days_in_milk,
                 "parity": cow.reproduction.calves,
-            } for cow in sold_and_died_cows
+            }
+            for cow in sold_and_died_cows
         ]
         for cull_reason in self.herd_statistics.cull_reason_stats.keys():
-            self.herd_statistics.cull_reason_stats[cull_reason] += len([cow for cow in sold_and_died_cows if
-                                                                        cow.cull_reason == cull_reason])
+            self.herd_statistics.cull_reason_stats[cull_reason] += len(
+                [cow for cow in sold_and_died_cows if cow.cull_reason == cull_reason]
+            )
 
         sold_cows: list[Animal] = [cow for cow in sold_and_died_cows if cow.cull_reason != animal_constants.DEATH_CULL]
         self.herd_statistics.sold_cows_info += [
@@ -1328,7 +1338,8 @@ class HerdManager:
                 "cull_reason": cow.cull_reason,
                 "days_in_milk": cow.days_in_milk,
                 "parity": cow.reproduction.calves,
-            } for cow in sold_cows
+            }
+            for cow in sold_cows
         ]
         self.herd_statistics.sold_cow_num += len(sold_cows)
 
@@ -1337,8 +1348,9 @@ class HerdManager:
                 culled_cows_with_current_parity = [cow for cow in sold_and_died_cows if cow.reproduction.calves > 3]
             else:
                 current_parity = int(parity)
-                culled_cows_with_current_parity = [cow for cow in sold_and_died_cows
-                                                   if cow.reproduction.calves == current_parity]
+                culled_cows_with_current_parity = [
+                    cow for cow in sold_and_died_cows if cow.reproduction.calves == current_parity
+                ]
             self.herd_statistics.parity_culling_stats_range[parity] += len(culled_cows_with_current_parity)
         self._calculate_cull_reason_stats_percent()
 
@@ -1349,33 +1361,37 @@ class HerdManager:
 
         self.herd_statistics.sold_heiferII_num += len(sold_heiferIIs)
         self.herd_statistics.sold_heiferIIs_info += [
-                {
-                    "id": heiferII.id,
-                    "animal_type": heiferII.animal_type,
-                    "sold_at_day": heiferII.sold_at_day,
-                    "body_weight": heiferII.body_weight,
-                    "cull_reason": "NA",
-                    "days_in_milk": "NA",
-                    "parity": "NA",
-                }
-            for heiferII in sold_heiferIIs]
+            {
+                "id": heiferII.id,
+                "animal_type": heiferII.animal_type,
+                "sold_at_day": heiferII.sold_at_day,
+                "body_weight": heiferII.body_weight,
+                "cull_reason": "NA",
+                "days_in_milk": "NA",
+                "parity": "NA",
+            }
+            for heiferII in sold_heiferIIs
+        ]
         self.herd_statistics.avg_heifer_culling_age = (
-                sum_heifer_culling_age / self.herd_statistics.sold_heiferII_num
-        ) if self.herd_statistics.sold_heiferII_num > 0 else 0
+            (sum_heifer_culling_age / self.herd_statistics.sold_heiferII_num)
+            if self.herd_statistics.sold_heiferII_num > 0
+            else 0
+        )
 
     def _update_sold_newborn_calves(self, sold_newborn_calves: list[Animal]) -> None:
         self.herd_statistics.sold_calf_num += len(sold_newborn_calves)
         self.herd_statistics.sold_calves_info += [
-                {
-                    "id": calf.id,
-                    "animal_type": calf.animal_type,
-                    "sold_at_day": calf.sold_at_day,
-                    "body_weight": calf.body_weight,
-                    "cull_reason": "NA",
-                    "days_in_milk": "NA",
-                    "parity": "NA",
-                }
-            for calf in sold_newborn_calves]
+            {
+                "id": calf.id,
+                "animal_type": calf.animal_type,
+                "sold_at_day": calf.sold_at_day,
+                "body_weight": calf.body_weight,
+                "cull_reason": "NA",
+                "days_in_milk": "NA",
+                "parity": "NA",
+            }
+            for calf in sold_newborn_calves
+        ]
 
     def _update_cow_reproduction_statistics(self) -> None:
         self.herd_statistics.GnRH_injection_num = sum(
@@ -1393,15 +1409,13 @@ class HerdManager:
         self.herd_statistics.semen_num = sum(
             [cow.reproduction.reproduction_statistics.semen_number for cow in self.cows]
         )
-        self.herd_statistics.ai_num = sum(
-            [cow.reproduction.reproduction_statistics.AI_times for cow in self.cows]
+        self.herd_statistics.ai_num = sum([cow.reproduction.reproduction_statistics.AI_times for cow in self.cows])
+        self.herd_statistics.avg_CI = (
+            sum([cow.reproduction.calving_interval for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
         )
-        self.herd_statistics.avg_CI = sum(
-            [cow.reproduction.calving_interval for cow in self.cows]
-        ) / len(self.cows) if len(self.cows) > 0 else 0
-        self.herd_statistics.avg_CI_for_calving = sum(
-            [cow.reproduction.calving_interval for cow in self.cows]
-        ) / len(self.cows) if len(self.cows) > 0 else 0
+        self.herd_statistics.avg_CI_for_calving = (
+            sum([cow.reproduction.calving_interval for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
+        )
 
     def _update_heifer_reproduction_statistics(self) -> None:
         self.herd_statistics.GnRH_injection_num_h = sum(
@@ -1425,21 +1439,25 @@ class HerdManager:
         self.herd_statistics.ed_period_h = sum(
             [heiferII.reproduction.reproduction_statistics.ED_days for heiferII in self.heiferIIs]
         )
-        self.herd_statistics.avg_breeding_to_preg_time = sum(
-            [heiferII.reproduction.breeding_to_preg_time for heiferII in self.heiferIIs if heiferII.is_pregnant]
-        ) / len(self.heiferIIs) if len(self.heiferIIs) > 0 else 0
+        self.herd_statistics.avg_breeding_to_preg_time = (
+            sum([heiferII.reproduction.breeding_to_preg_time for heiferII in self.heiferIIs if heiferII.is_pregnant])
+            / len(self.heiferIIs)
+            if len(self.heiferIIs) > 0
+            else 0
+        )
 
     def _update_average_mature_body_weight(self) -> None:
         all_animals: list[Animal] = self.calves + self.heiferIs + self.heiferIIs + self.heiferIIIs + self.cows
-        self.herd_statistics.avg_mature_body_weight = sum(
-            [animal.mature_body_weight for animal in all_animals]) / len(all_animals) if len(all_animals) > 0 else 0
+        self.herd_statistics.avg_mature_body_weight = (
+            sum([animal.mature_body_weight for animal in all_animals]) / len(all_animals) if len(all_animals) > 0 else 0
+        )
 
     def _update_average_cow_body_weight(self) -> None:
-        self.herd_statistics.avg_cow_body_weight = sum(
-            [cow.body_weight for cow in self.cows]
-        ) / len(self.cows) if len(self.cows) > 0 else 0
+        self.herd_statistics.avg_cow_body_weight = (
+            sum([cow.body_weight for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
+        )
 
     def _update_average_cow_parity(self) -> None:
-        self.herd_statistics.avg_parity_num = sum(
-            [cow.reproduction.calves for cow in self.cows]
-        ) / len(self.cows) if len(self.cows) > 0 else 0
+        self.herd_statistics.avg_parity_num = (
+            sum([cow.reproduction.calves for cow in self.cows]) / len(self.cows) if len(self.cows) > 0 else 0
+        )

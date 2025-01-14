@@ -12,6 +12,7 @@ class DigestiveSystem:
     """
     This class serves as an entry point for the animal digestive systems.
     """
+
     manure_excretion: AnimalManureExcretions
     phosphorus_excreted: float
     enteric_methane_emission: float

@@ -16,6 +16,7 @@ class NutrientsInputs:
     @property
     def is_pregnant(self) -> bool:
         return self.days_in_pregnancy > 0
+
     @property
     def is_milking(self) -> bool:
         return self.days_in_milk > 0
