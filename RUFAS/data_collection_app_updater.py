@@ -90,9 +90,10 @@ class DataCollectionAppUpdater:
             if not data_collection_app_compatible:
                 continue
             schema_dict = {
-                key: value for key, value in properties[key].items() if key != "data_collection_app_compatible"
+                property_name: property_value
+                for property_name, property_value in properties[key].items()
+                if property_name != "data_collection_app_compatible"
             }
-
             new_schema = self._create_object_schema(key, schema_dict)
             new_schema_with_filename = self._add_filename_input_field(new_schema)
 
