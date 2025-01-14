@@ -371,7 +371,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_ration_interval_data.__name__,
             "number_animals_in_pen": len(pen.animals_in_pen.values()),
             "simulation_day": simulation_day,
-            units: units,
+            "units": units,
         }
 
         cls._om.add_variable(
@@ -451,70 +451,79 @@ class AnimalModuleReporter:
         )
 
     @classmethod
-    def report_daily_ration(cls, animal_manager, available_feeds: list[Feed], simulation_day: int) -> None:
+    def report_daily_ration(cls, herd_manager, simulation_day: int) -> None:
         """
         Adds ration totals as fed to each pen to output manager.
 
         Parameters
         ----------
-        animal_manager : AnimalManager
-            Instance of AnimalManager class.
-        available_feeds : Dict[str, Dict[str, Any]]
-            Available feeds dictionary from the Feed class object.
+        herd_manager : HerdManager
+            Instance of HerdManager class.
+        simulation_day : int
+
         """
-        classname = AnimalModuleReporter.__name__
-        funcname = AnimalModuleReporter.report_daily_ration.__name__
-        info_map = {
-            "class": classname,
-            "function": funcname,
-            "data_origin": [(classname, funcname)],
-        }
-        non_numeric_keys = ["status", "objective"]
-        ration_across_pens = {"dry_matter_intake_total": 0, "byproducts_total": 0}
-        for pen in animal_manager.all_pens:
-            ration_per_pen = {"dry_matter_intake_total": 0, "byproducts_total": 0}
-            for key in pen.ration.keys():
-                if key in non_numeric_keys:
-                    continue
-                ration_per_pen[key] = pen.ration[key] * len(pen.animals_in_pen)
-                ration_per_pen["dry_matter_intake_total"] += ration_per_pen[key]
+        ration_across_pens: dict[str, float] = {}
+        for pen in herd_manager.all_pens:
+            pen_ration = cls._report_daily_ration_per_pen(pen, simulation_day, herd_manager)
+            for key, amount in pen_ration.items():
+                if key not in ration_across_pens.keys():
+                    ration_across_pens[key] = 0.0
+                ration_across_pens[key] += amount
 
-                feed_info = next((feed for feed in available_feeds if feed.rufas_id == key), None)
-                if feed_info.Fd_Category == FeedCategorization.BY_PRODUCT_OTHER:
-                    ration_per_pen["byproducts_total"] += ration_per_pen[key]
-
-                if key in ration_across_pens:
-                    ration_across_pens[str(key)] += ration_per_pen[key]
-                else:
-                    ration_across_pens[str(key)] = ration_per_pen[key]
-
-            ration_per_pen = {str(key): val for key, val in ration_per_pen.items()}
-            AnimalModuleReporter.report_daily_feed_emissions(
-                ration_per_pen, pen.id, pen.animal_combination.name, animal_manager, simulation_day
-            )
-            units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_pen.keys()}
-            AnimalModuleReporter.data_padder(
-                f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_0_CALF",
-                f"{classname}.{funcname}.ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
-                {},
-                simulation_day,
-                info_map,
-                units,
-            )
-            om.add_variable(
-                f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}",
-                ration_per_pen,
-                dict(info_map, **{"units": units}),
-            )
         units = {key: MeasurementUnits.KILOGRAMS for key in ration_across_pens.keys()}
-        om.add_variable(
-            "ration_daily_feed_total_across_pens",
-            ration_across_pens,
-            dict(info_map, **{"units": units}),
-        )
-        AnimalModuleReporter.report_daily_feed_emissions(ration_across_pens, "ALL", "", animal_manager, simulation_day)
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_ration.__name__,
+            "simulation_day": simulation_day,
+            "units": units,
+        }
+        om.add_variable("ration_daily_feed_total_across_pens", ration_across_pens, info_map)
+        AnimalModuleReporter.report_daily_feed_emissions(ration_across_pens, "ALL", "", herd_manager, simulation_day)
 
     @classmethod
+    def _report_daily_ration_per_pen(cls, pen: Pen, simulation_day: int, herd_manager) -> dict[str, float]:
+        """
+        Calculates and reports the total amounts of feed fed to animals in a pen in a given day.
+
+        Parameters
+        ----------
+        pen : Pen
+            Pen object.
+        simulation_day : int
+            Day of simulation.
+        herd_manager : HerdManager
+            Herd Manager object.
+
+        Returns
+        -------
+        dict[str, float]
+            Maps the RuFaS Feed ID (as a string) to the total amount of that feed used for the given pen, as well as the
+            total amounts of all feeds and byproducts used for the given pen (kg dry matter).
+
+        """
+        animal_count = len(pen.animals_in_pen.values())
+
+        ration_per_pen = {str(rufas_id): amount * animal_count for rufas_id, amount in pen.ration.items()}
+        ration_per_pen["dry_matter_intake_total"] = sum([total_feed for total_feed in ration_per_pen.values()])
+        ration_per_pen["byproducts_total"] = pen.average_nutrition_supply.byproduct_supply * animal_count
+
+        units = {key: MeasurementUnits.KILOGRAMS for key in ration_per_pen.keys()}
+        info_map = {
+            "class": AnimalModuleReporter.__name__,
+            "function": AnimalModuleReporter.report_daily_ration.__name__,
+            "simulation_day": simulation_day,
+            "units": units,
+        }
+
+        AnimalModuleReporter.report_daily_feed_emissions(
+            ration_per_pen, pen.id, pen.animal_combination.name, herd_manager, simulation_day
+        )
+
+        cls._om.add_variable(
+            f"ration_daily_feed_totals_for_pen_{pen.id}_{pen.animal_combination.name}", ration_per_pen, info_map
+        )
+
+        return ration_per_pen
 
     @classmethod
     def report_daily_feed_emissions(
