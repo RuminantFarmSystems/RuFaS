@@ -208,6 +208,7 @@ class AnimalModuleReporter:
         cls._report_nutrient_amounts(pen, simulation_day)
         cls._report_average_nutrient_requirements(pen, simulation_day)
         cls._report_me_diet(pen, simulation_day)
+        cls._report_ration_supply(pen, simulation_day)
 
     @classmethod
     def _report_ration_per_animal(cls, pen: Pen, simulation_day: int) -> dict[str, float]:
@@ -413,7 +414,7 @@ class AnimalModuleReporter:
             "function": AnimalModuleReporter.report_ration_interval_data.__name__,
             "number_animals_in_pen": len(pen.animals_in_pen.values()),
             "simulation_day": simulation_day,
-            units: units,
+            "units": units,
         }
 
         pen.average_nutrition_supply
