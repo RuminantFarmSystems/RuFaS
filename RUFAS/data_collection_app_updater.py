@@ -86,7 +86,8 @@ class DataCollectionAppUpdater:
         schema_paths = []
 
         for key in properties.keys():
-            if not properties[key]["data_collection_app_compatible"]:
+            data_collection_app_compatible = properties[key].get("data_collection_app_compatible", False)
+            if not data_collection_app_compatible:
                 continue
             schema_dict = {
                 key: value for key, value in properties[key].items() if key != "data_collection_app_compatible"
