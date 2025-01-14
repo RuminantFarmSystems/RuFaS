@@ -398,11 +398,12 @@ class AnimalModuleReporter:
         # fields are "forage_NDF" and "forage_NDF_percent", units are PERCENT and PERCENT_OF_DRY_MATTER respectively.
 
         units = {
-            "ME": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-            "DE": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-            "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-            "NE_lactation": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
-            "NE_growth": MeasurementUnits.MEGACALORIES_PER_KILOGRAM,
+            # TODO: alert reviewers that ME, DE, and all NE units were probably wrong in the old code
+            "ME": MeasurementUnits.MEGACALORIES,
+            "DE": MeasurementUnits.MEGACALORIES,
+            "NE_maintenance_and_activity": MeasurementUnits.MEGACALORIES,
+            "NE_lactation": MeasurementUnits.MEGACALORIES,
+            "NE_growth": MeasurementUnits.MEGACALORIES,
             "calcium": MeasurementUnits.PERCENT_OF_DRY_MATTER,
             "phosphorus": MeasurementUnits.PERCENT_OF_DRY_MATTER,
             "fat": MeasurementUnits.GRAMS,
@@ -435,11 +436,11 @@ class AnimalModuleReporter:
         fat_grams = pen.average_nutrition_supply.fat_supply * GeneralConstants.KG_TO_GRAMS
 
         supply_report = {
-            "ME": pen.average_nutrition_supply.metabolizable_energy / dry_matter,
-            "DE": pen.average_nutrition_supply.digestible_energy_supply / dry_matter,
-            "NE_maintenance_and_activity": pen.average_nutrition_supply.maintenance_energy / dry_matter,
-            "NE_lactation": pen.average_nutrition_supply.lactation_energy / dry_matter,
-            "NE_growth": pen.average_nutrition_supply.growth_energy / dry_matter,
+            "ME": pen.average_nutrition_supply.metabolizable_energy,
+            "DE": pen.average_nutrition_supply.digestible_energy_supply,
+            "NE_maintenance_and_activity": pen.average_nutrition_supply.maintenance_energy,
+            "NE_lactation": pen.average_nutrition_supply.lactation_energy,
+            "NE_growth": pen.average_nutrition_supply.growth_energy,
             "calcium": calcium_percentage,
             "phosphorus": phosphorus_percentage,
             "fat": fat_grams,
