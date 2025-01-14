@@ -19,7 +19,6 @@ class DigestiveSystemInputs:
     fat_content: float
     crude_protein_content: float
 
-
     @property
     def is_milking(self) -> bool:
         return self.days_in_milk > 0

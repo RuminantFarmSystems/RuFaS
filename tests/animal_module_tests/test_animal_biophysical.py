@@ -9,11 +9,20 @@ from RUFAS.biophysical.animal.animal import Animal
 from RUFAS.biophysical.animal.animal_config import AnimalConfig
 from RUFAS.biophysical.animal.data_types.animal_enums import Breed, Sex
 from RUFAS.biophysical.animal.data_types.animal_events import AnimalEvents
-from RUFAS.biophysical.animal.data_types.animal_typed_dicts import NewBornCalfValuesTypedDict, CalfValuesTypedDict, \
-    HeiferIValuesTypedDict, HeiferIIValuesTypedDict, HeiferIIIValuesTypedDict, CowValuesTypedDict
+from RUFAS.biophysical.animal.data_types.animal_typed_dicts import (
+    NewBornCalfValuesTypedDict,
+    CalfValuesTypedDict,
+    HeiferIValuesTypedDict,
+    HeiferIIValuesTypedDict,
+    HeiferIIIValuesTypedDict,
+    CowValuesTypedDict,
+)
 from RUFAS.biophysical.animal.data_types.animal_types import AnimalType
-from RUFAS.biophysical.animal.data_types.repro_protocol_enums import HeiferReproductionProtocol, HeiferTAISubProtocol, \
-    HeiferSynchEDSubProtocol
+from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
+    HeiferReproductionProtocol,
+    HeiferTAISubProtocol,
+    HeiferSynchEDSubProtocol,
+)
 from RUFAS.biophysical.animal.digestive_system.digestive_system import DigestiveSystem
 from RUFAS.biophysical.animal.growth.growth import Growth
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
@@ -27,22 +36,18 @@ def mock_submodule_init(mocker: MockerFixture) -> None:
 
     mocker.patch(
         "RUFAS.biophysical.animal.digestive_system.digestive_system.DigestiveSystem",
-        return_value=MagicMock(auto_spec=DigestiveSystem)
+        return_value=MagicMock(auto_spec=DigestiveSystem),
     )
 
     mocker.patch(
-        "RUFAS.biophysical.animal.milk.milk_production.MilkProduction",
-        return_value=MagicMock(auto_spec=MilkProduction)
+        "RUFAS.biophysical.animal.milk.milk_production.MilkProduction", return_value=MagicMock(auto_spec=MilkProduction)
     )
 
-    mocker.patch(
-        "RUFAS.biophysical.animal.nutrients.nutrients.Nutrients",
-        return_value=MagicMock(auto_spec=Nutrients)
-    )
+    mocker.patch("RUFAS.biophysical.animal.nutrients.nutrients.Nutrients", return_value=MagicMock(auto_spec=Nutrients))
 
     mocker.patch(
         "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction",
-        return_value=MagicMock(auto_spec=Reproduction)
+        return_value=MagicMock(auto_spec=Reproduction),
     )
 
 
@@ -50,20 +55,27 @@ def mock_animal_init_methods(mocker: MockerFixture) -> tuple[MagicMock, MagicMoc
     mock_initialize_newborn_calf = mocker.patch("RUFAS.biophysical.animal.animal.Animal._initialize_newborn_calf")
     mock_initialize_calf_or_heiferI = mocker.patch("RUFAS.biophysical.animal.animal.Animal._initialize_calf_or_heiferI")
     mock_initialize_heiferII_or_heiferIII = mocker.patch(
-        "RUFAS.biophysical.animal.animal.Animal._initialize_heiferII_or_heiferIII")
+        "RUFAS.biophysical.animal.animal.Animal._initialize_heiferII_or_heiferIII"
+    )
     mock_initialize_cow = mocker.patch("RUFAS.biophysical.animal.animal.Animal._initialize_cow")
     return (
         mock_initialize_newborn_calf,
         mock_initialize_calf_or_heiferI,
         mock_initialize_heiferII_or_heiferIII,
-        mock_initialize_cow
+        mock_initialize_cow,
     )
 
 
 def assert_animal_init_properties(
-        result: Animal,
-        args: NewBornCalfValuesTypedDict | CalfValuesTypedDict | HeiferIValuesTypedDict |
-                   HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict | CowValuesTypedDict
+    result: Animal,
+    args: (
+        NewBornCalfValuesTypedDict
+        | CalfValuesTypedDict
+        | HeiferIValuesTypedDict
+        | HeiferIIValuesTypedDict
+        | HeiferIIIValuesTypedDict
+        | CowValuesTypedDict
+    ),
 ) -> None:
     assert result.id == args["id"]
     assert result.breed == Breed(args["breed"])
@@ -74,18 +86,22 @@ def assert_animal_init_properties(
     assert result.net_merit == args["net_merit"]
     assert result.cull_reason == ""
 
-@pytest.mark.parametrize("args", [
-    NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    )
-])
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        NewBornCalfValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="Calf",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            initial_phosphorus=10.0,
+        )
+    ],
+)
 def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixture) -> None:
     mock_submodule_init(mocker)
 
@@ -93,7 +109,7 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
         mock_initialize_newborn_calf,
         mock_initialize_calf_or_heiferI,
         mock_initialize_heiferII_or_heiferIII,
-        mock_initialize_cow
+        mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
     result = Animal(args)
@@ -106,105 +122,157 @@ def test_init_newborn_calf(args: NewBornCalfValuesTypedDict, mocker: MockerFixtu
     mock_initialize_cow.assert_not_called()
 
 
-@pytest.mark.parametrize("args, semen_type, sex, culled, sold", [
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "conventional", Sex.FEMALE, False, False),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "sexed", Sex.FEMALE, False, False),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "conventional", Sex.MALE, False, True),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "sexed", Sex.MALE, False, True),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "random", Sex.MALE, False, True),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "conventional", Sex.FEMALE, True, False),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "sexed", Sex.FEMALE, True, False),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "conventional", Sex.MALE, True, True),
-    (NewBornCalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        initial_phosphorus=10.0,
-    ), "sexed", Sex.MALE, True, True),
-])
+@pytest.mark.parametrize(
+    "args, semen_type, sex, culled, sold",
+    [
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.FEMALE,
+            False,
+            False,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.FEMALE,
+            False,
+            False,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.MALE,
+            False,
+            True,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.MALE,
+            False,
+            True,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "random",
+            Sex.MALE,
+            False,
+            True,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.FEMALE,
+            True,
+            False,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.FEMALE,
+            True,
+            False,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "conventional",
+            Sex.MALE,
+            True,
+            True,
+        ),
+        (
+            NewBornCalfValuesTypedDict(
+                id=1,
+                breed="Holstein",
+                animal_type="Calf",
+                birth_date="2023-01-01",
+                days_born=10,
+                birth_weight=10.0,
+                net_merit=10.0,
+                initial_phosphorus=10.0,
+            ),
+            "sexed",
+            Sex.MALE,
+            True,
+            True,
+        ),
+    ],
+)
 def test_initialize_newborn_calf(
-        args: NewBornCalfValuesTypedDict,
-        semen_type: str,
-        sex: Sex,
-        culled: bool,
-        sold: bool,
-        mocker: MockerFixture
+    args: NewBornCalfValuesTypedDict, semen_type: str, sex: Sex, culled: bool, sold: bool, mocker: MockerFixture
 ) -> None:
     original_semen_type = AnimalConfig.semen_type
     AnimalConfig.semen_type = semen_type
@@ -213,15 +281,19 @@ def test_initialize_newborn_calf(
         with pytest.raises(ValueError):
             Animal(args)
         return
-    male_calf_rate = AnimalConfig.male_calf_rate_conventional_semen if semen_type == "conventional" \
+    male_calf_rate = (
+        AnimalConfig.male_calf_rate_conventional_semen
+        if semen_type == "conventional"
         else AnimalConfig.male_calf_rate_sexed_semen
+    )
 
     sex_random_value = male_calf_rate + 0.01 if sex == Sex.FEMALE else male_calf_rate - 0.01
     culled_random_value = AnimalConfig.still_birth_rate - 0.01 if culled else AnimalConfig.still_birth_rate + 0.01
     sold_random_value = AnimalConfig.keep_female_calf_rate + 0.01 if sold else AnimalConfig.keep_female_calf_rate - 0.01
 
-    mocker.patch("RUFAS.biophysical.animal.animal.random",
-                               side_effect=[sex_random_value, culled_random_value, sold_random_value])
+    mocker.patch(
+        "RUFAS.biophysical.animal.animal.random", side_effect=[sex_random_value, culled_random_value, sold_random_value]
+    )
     mock_rvs = mocker.patch("RUFAS.biophysical.animal.animal.truncnorm.rvs", return_value=600)
 
     animal = Animal(args)
@@ -243,21 +315,24 @@ def test_initialize_newborn_calf(
     AnimalConfig.semen_type = original_semen_type
 
 
-@pytest.mark.parametrize("args", [
-    CalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events=""
-    )
-])
+@pytest.mark.parametrize(
+    "args",
+    [
+        CalfValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="Calf",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+        )
+    ],
+)
 def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
     mock_submodule_init(mocker)
 
@@ -265,7 +340,7 @@ def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
         mock_initialize_newborn_calf,
         mock_initialize_calf_or_heiferI,
         mock_initialize_heiferII_or_heiferIII,
-        mock_initialize_cow
+        mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
     result = Animal(args)
@@ -278,21 +353,24 @@ def test_init_calf(args: CalfValuesTypedDict, mocker: MockerFixture) -> None:
     mock_initialize_cow.assert_not_called()
 
 
-@pytest.mark.parametrize("args", [
-    HeiferIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferI",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events=""
-    )
-])
+@pytest.mark.parametrize(
+    "args",
+    [
+        HeiferIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferI",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+        )
+    ],
+)
 def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> None:
     mock_submodule_init(mocker)
 
@@ -300,7 +378,7 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
         mock_initialize_newborn_calf,
         mock_initialize_calf_or_heiferI,
         mock_initialize_heiferII_or_heiferIII,
-        mock_initialize_cow
+        mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
     result = Animal(args)
@@ -313,37 +391,41 @@ def test_init_heiferI(args: HeiferIValuesTypedDict, mocker: MockerFixture) -> No
     mock_initialize_cow.assert_not_called()
 
 
-@pytest.mark.parametrize("args", [
-    CalfValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="Calf",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events=""
-    ),
-    HeiferIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferI",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events=""
-    )
-])
+@pytest.mark.parametrize(
+    "args",
+    [
+        CalfValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="Calf",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+        ),
+        HeiferIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferI",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+        ),
+    ],
+)
 def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTypedDict, mocker: MockerFixture) -> None:
     mock_init_events_from_string = mocker.patch(
-        "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string")
+        "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
+    )
 
     animal = Animal(args)
     assert animal.sex == Sex.FEMALE
@@ -356,25 +438,28 @@ def test_initialize_calf_or_heiferI(args: CalfValuesTypedDict | HeiferIValuesTyp
     mock_init_events_from_string.assert_called_once_with(args["events"])
 
 
-@pytest.mark.parametrize("args", [
-    HeiferIIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferII",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP"
-    )
-])
+@pytest.mark.parametrize(
+    "args",
+    [
+        HeiferIIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferII",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+        )
+    ],
+)
 def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> None:
     mock_submodule_init(mocker)
 
@@ -382,7 +467,7 @@ def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> 
         mock_initialize_newborn_calf,
         mock_initialize_calf_or_heiferI,
         mock_initialize_heiferII_or_heiferIII,
-        mock_initialize_cow
+        mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
     result = Animal(args)
@@ -395,25 +480,28 @@ def test_init_heiferII(args: HeiferIIValuesTypedDict, mocker: MockerFixture) -> 
     mock_initialize_cow.assert_not_called()
 
 
-@pytest.mark.parametrize("args", [
-    HeiferIIIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferII",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP"
-    )
-])
+@pytest.mark.parametrize(
+    "args",
+    [
+        HeiferIIIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferII",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+        )
+    ],
+)
 def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -> None:
     mock_submodule_init(mocker)
 
@@ -421,7 +509,7 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
         mock_initialize_newborn_calf,
         mock_initialize_calf_or_heiferI,
         mock_initialize_heiferII_or_heiferIII,
-        mock_initialize_cow
+        mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
     result = Animal(args)
@@ -434,94 +522,98 @@ def test_init_heiferIII(args: HeiferIIIValuesTypedDict, mocker: MockerFixture) -
     mock_initialize_cow.assert_not_called()
 
 
-@pytest.mark.parametrize("args", [
-    HeiferIIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferII",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP"
-    ),
-    HeiferIIIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferIII",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP"
-    ),
-    HeiferIIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferII",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        days_in_pregnancy=10
-    ),
-
-    HeiferIIIValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="HeiferIII",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        phosphorus_for_gestation_required_for_calf=23.3
-    ),
-])
+@pytest.mark.parametrize(
+    "args",
+    [
+        HeiferIIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferII",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+        ),
+        HeiferIIIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferIII",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+        ),
+        HeiferIIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferII",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            days_in_pregnancy=10,
+        ),
+        HeiferIIIValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="HeiferIII",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            phosphorus_for_gestation_required_for_calf=23.3,
+        ),
+    ],
+)
 def test_initialize_heiferII_or_heiferIII(
-        args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture
+    args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture
 ) -> None:
     mock_init_events_from_string = mocker.patch(
-        "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string")
+        "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
+    )
     mock_reproduction_init = mocker.patch(
-        "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__",
-        return_value=None
+        "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None
     )
 
     expected_days_in_pregnancy = args.get("days_in_pregnancy", 0)
     expected_p_calf = args.get("phosphorus_for_gestation_required_for_calf", 0)
-    expected_repro_sub_program = HeiferTAISubProtocol(args["heifer_repro_sub_protocol"]) \
-        if args["heifer_repro_program"] == "TAI" \
+    expected_repro_sub_program = (
+        HeiferTAISubProtocol(args["heifer_repro_sub_protocol"])
+        if args["heifer_repro_program"] == "TAI"
         else HeiferSynchEDSubProtocol(args["heifer_repro_sub_protocol"])
+    )
 
     animal = Animal(args)
 
@@ -530,7 +622,8 @@ def test_initialize_heiferII_or_heiferIII(
 
     mock_init_events_from_string.assert_called_once_with(args["events"])
     assert mock_reproduction_init.call_args_list == [
-        call(), call(
+        call(),
+        call(
             heifer_reproduction_program=HeiferReproductionProtocol(args["heifer_repro_program"]),
             heifer_reproduction_sub_program=expected_repro_sub_program,
             ai_day=args.get("ai_day", 0),
@@ -539,57 +632,60 @@ def test_initialize_heiferII_or_heiferIII(
             abortion_day=args.get("abortion_day", 0),
             conception_rate=args.get("conception_rate", 0),
             gestation_length=args.get("gestation_length", 0),
-            calf_birth_weight=args.get("calf_birth_weight", 0)
-        )
+            calf_birth_weight=args.get("calf_birth_weight", 0),
+        ),
     ]
 
 
-@pytest.mark.parametrize("args", [
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="DryCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0
-    ),
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="LacCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0
-    )
-])
+@pytest.mark.parametrize(
+    "args",
+    [
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="DryCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+        ),
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="LacCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+        ),
+    ],
+)
 def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
     mock_submodule_init(mocker)
 
@@ -597,7 +693,7 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
         mock_initialize_newborn_calf,
         mock_initialize_calf_or_heiferI,
         mock_initialize_heiferII_or_heiferIII,
-        mock_initialize_cow
+        mock_initialize_cow,
     ) = mock_animal_init_methods(mocker)
 
     result = Animal(args)
@@ -610,152 +706,151 @@ def test_init_cow(args: CowValuesTypedDict, mocker: MockerFixture) -> None:
     mock_initialize_cow.assert_called_once()
 
 
-@pytest.mark.parametrize("args", [
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="DryCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0
-    ),
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="LacCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0
-    ),
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="DryCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0
-    ),
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="LacCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0,
-        days_in_milk=10
-    ),
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="DryCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0,
-        calves=3
-    ),
-    CowValuesTypedDict(
-        id=1,
-        breed="Holstein",
-        animal_type="LacCow",
-        birth_date="2023-01-01",
-        days_born=10,
-        birth_weight=10.0,
-        net_merit=10.0,
-        mature_body_weight=10.0,
-        body_weight=12.3,
-        wean_weight=10.0,
-        events="",
-        heifer_repro_program="TAI",
-        heifer_repro_sub_protocol="5dCG2P",
-        tai_method_h="5dCG2P",
-        synch_ed_method_h="CP",
-        cow_repro_program="TAI",
-        tai_method_c="OvSynch 56",
-        pre_synch_method_="PreSynch",
-        resynch_method="TAIbeforePD",
-        calf_birth_weight=15.0,
-        calving_interval=45
-    )
-])
-def test_initialize_cow(
-        args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture
-) -> None:
+@pytest.mark.parametrize(
+    "args",
+    [
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="DryCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+        ),
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="LacCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+        ),
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="DryCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+        ),
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="LacCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+            days_in_milk=10,
+        ),
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="DryCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+            calves=3,
+        ),
+        CowValuesTypedDict(
+            id=1,
+            breed="Holstein",
+            animal_type="LacCow",
+            birth_date="2023-01-01",
+            days_born=10,
+            birth_weight=10.0,
+            net_merit=10.0,
+            mature_body_weight=10.0,
+            body_weight=12.3,
+            wean_weight=10.0,
+            events="",
+            heifer_repro_program="TAI",
+            heifer_repro_sub_protocol="5dCG2P",
+            tai_method_h="5dCG2P",
+            synch_ed_method_h="CP",
+            cow_repro_program="TAI",
+            tai_method_c="OvSynch 56",
+            pre_synch_method_="PreSynch",
+            resynch_method="TAIbeforePD",
+            calf_birth_weight=15.0,
+            calving_interval=45,
+        ),
+    ],
+)
+def test_initialize_cow(args: HeiferIIValuesTypedDict | HeiferIIIValuesTypedDict, mocker: MockerFixture) -> None:
     mock_init_events_from_string = mocker.patch(
-        "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string")
-    mocker.patch(
-        "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__",
-        return_value=None
+        "RUFAS.biophysical.animal.data_types.animal_events.AnimalEvents.init_from_string"
     )
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     expected_days_in_milk = args.get("days_in_milk", 0)
     expected_calves = args.get("calves", 0)
     expected_calving_interval = args.get("calving_interval", 0)
@@ -782,7 +877,7 @@ def mock_calf() -> Animal:
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
-        events=""
+        events="",
     )
     return Animal(args)
 
@@ -800,17 +895,14 @@ def mock_heiferI() -> Animal:
         mature_body_weight=10.0,
         body_weight=12.3,
         wean_weight=10.0,
-        events=""
+        events="",
     )
     return Animal(args)
 
 
 @pytest.fixture
 def mock_heiferII(mocker: MockerFixture) -> Animal:
-    mocker.patch(
-        "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__",
-        return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = HeiferIIValuesTypedDict(
         id=1,
         breed="Holstein",
@@ -827,17 +919,14 @@ def mock_heiferII(mocker: MockerFixture) -> Animal:
         heifer_repro_sub_protocol="5dCG2P",
         tai_method_h="5dCG2P",
         synch_ed_method_h="CP",
-        days_in_pregnancy=10
+        days_in_pregnancy=10,
     )
     return Animal(args)
 
 
 @pytest.fixture
 def mock_heiferIII(mocekr: MockerFixture) -> Animal:
-    mocker.patch(
-        "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__",
-        return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = HeiferIIIValuesTypedDict(
         id=1,
         breed="Holstein",
@@ -854,17 +943,14 @@ def mock_heiferIII(mocekr: MockerFixture) -> Animal:
         heifer_repro_sub_protocol="5dCG2P",
         tai_method_h="5dCG2P",
         synch_ed_method_h="CP",
-        days_in_pregnancy=10
+        days_in_pregnancy=10,
     )
     return Animal(args)
 
 
 @pytest.fixture
 def mock_lactating_cow(mocker: MockerFixture) -> Animal:
-    mocker.patch(
-        "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__",
-        return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = CowValuesTypedDict(
         id=1,
         breed="Holstein",
@@ -886,17 +972,14 @@ def mock_lactating_cow(mocker: MockerFixture) -> Animal:
         pre_synch_method_="PreSynch",
         resynch_method="TAIbeforePD",
         calf_birth_weight=15.0,
-        days_in_milk=10
+        days_in_milk=10,
     )
     return Animal(args)
 
 
 @pytest.fixture
 def mock_dry_cow(mocker: MockerFixture) -> Animal:
-    mocker.patch(
-        "RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__",
-        return_value=None
-    )
+    mocker.patch("RUFAS.biophysical.animal.reproduction.reproduction.Reproduction.__init__", return_value=None)
     args = CowValuesTypedDict(
         id=1,
         breed="Holstein",
@@ -918,14 +1001,12 @@ def mock_dry_cow(mocker: MockerFixture) -> Animal:
         pre_synch_method_="PreSynch",
         resynch_method="TAIbeforePD",
         calf_birth_weight=15.0,
-        calves=3
+        calves=3,
     )
     return Animal(args)
 
 
-@pytest.mark.parametrize("is_pregnant", [
-    True, False
-])
+@pytest.mark.parametrize("is_pregnant", [True, False])
 def test_is_pregnant(is_pregnant: bool, mock_heiferII: Animal) -> None:
     days_in_pregnancy = 10 if is_pregnant else 0
     animal = mock_heiferII
@@ -934,9 +1015,7 @@ def test_is_pregnant(is_pregnant: bool, mock_heiferII: Animal) -> None:
     assert animal.is_pregnant == is_pregnant
 
 
-@pytest.mark.parametrize("is_milking", [
-    True, False
-])
+@pytest.mark.parametrize("is_milking", [True, False])
 def test_is_milking(is_milking: bool, mock_lactating_cow: Animal) -> None:
     days_in_milk = 10 if is_milking else 0
     animal = mock_lactating_cow
@@ -954,4 +1033,3 @@ def test_setup_lactation_curve_parameters(mocker: MockerFixture) -> None:
     Animal.setup_lactation_curve_parameters(time=mock_time)
 
     mock_set_lactation_parameters.assert_called_once_with(mock_time)
-
