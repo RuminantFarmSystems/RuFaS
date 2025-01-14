@@ -16,23 +16,6 @@ INDEX_PATH: Path = Path("").joinpath("DataCollectionApp", "index.html")
 """Path to the template for regenerating the Data Collection App's home page."""
 TEMPLATE_PATH: Path = Path("").joinpath("DataCollectionApp", "template")
 
-"""
-Metadata properties for which the Data Collection App will generate schema.
-If a property is not listed, its schema will not be generated.
-"""
-PROPERTIES_TO_CREATE_SCHEMA_FOR: list[str] = [
-    "animal_properties",
-    "config_properties",
-    "crop_schedule_properties",
-    "feed_properties",
-    "fertilizer_schedule_properties",
-    "field_properties",
-    "manure_management_properties",
-    "manure_schedule_properties",
-    "tillage_schedule_properties",
-    "tractor_dataset_properties",
-]
-
 """Placeholder for inserting schema import scripts in index.html."""
 SCHEMA_SCRIPT_TAG_PLACEHOLDER: str = "    <!-- Schema imports go here-->"
 
@@ -101,11 +84,17 @@ class DataCollectionAppUpdater:
         properties: dict[str, Any] = self._im.meta_data["properties"]
 
         schema_paths = []
-        for key in properties.keys():
-            if key not in PROPERTIES_TO_CREATE_SCHEMA_FOR:
-                continue
 
-            new_schema = self._create_object_schema(key, properties[key])
+        for key in properties.keys():
+            data_collection_app_compatible = properties[key].get("data_collection_app_compatible", False)
+            if not data_collection_app_compatible:
+                continue
+            schema_dict = {
+                property_name: property_value
+                for property_name, property_value in properties[key].items()
+                if property_name != "data_collection_app_compatible"
+            }
+            new_schema = self._create_object_schema(key, schema_dict)
             new_schema_with_filename = self._add_filename_input_field(new_schema)
 
             schema_name = key.replace("properties", "schema")
