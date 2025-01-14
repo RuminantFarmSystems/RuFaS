@@ -1082,7 +1082,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_daily_reports(
-        cls, herd_manager, available_feeds: Dict[str, Dict[str, Any]], simulation_day: int
+        cls, herd_manager, simulation_day: int
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of each day.
@@ -1097,7 +1097,7 @@ class AnimalModuleReporter:
         herd_statistics = herd_manager.herd_statistics
         AnimalModuleReporter.report_daily_animal_population(herd_statistics, simulation_day)
         AnimalModuleReporter.report_life_cycle_manager_data(herd_statistics, simulation_day)
-        AnimalModuleReporter.report_daily_ration(herd_manager, available_feeds, simulation_day)
+        AnimalModuleReporter.report_daily_ration(herd_manager, simulation_day)
         AnimalModuleReporter.report_daily_pen_total(simulation_day, herd_manager.all_pens)
         AnimalModuleReporter.report_305d_milk([cow for cow in herd_manager.cows if cow.is_milking])
         for pen in herd_manager.all_pens:
