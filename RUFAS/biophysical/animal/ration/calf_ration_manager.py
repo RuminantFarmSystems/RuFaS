@@ -56,7 +56,7 @@ class CalfRationManager:
         days_born : int
             Number of days since the calf was born.
         body_weight : float
-            Body weight of the calf (kg)
+            Body weight of the calf (kg).
         temp : float
             Average temperature of the simulation day (C).
         animal_intake : dict
