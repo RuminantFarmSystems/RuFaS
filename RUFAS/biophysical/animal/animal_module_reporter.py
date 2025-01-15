@@ -284,7 +284,7 @@ class AnimalModuleReporter:
             "NDF": pen.average_nutrition_supply.ndf_supply,
             "lignin": pen.average_nutrition_supply.lignin_supply,
             "ash": pen.average_nutrition_supply.ash_supply,
-            "phosphorus": pen.average_nutrition_supply.phosphorus,
+            "phosphorus": pen.average_nutrition_supply.phosphorus * GeneralConstants.GRAMS_TO_KG,
             "potassium": pen.average_nutrition_supply.potassium_supply,
             "N": pen.average_nutrition_supply.nitrogen_supply,
             "as_fed": pen.average_nutrition_supply.wet_matter,
@@ -292,7 +292,7 @@ class AnimalModuleReporter:
             "starch": pen.average_nutrition_supply.starch_supply,
             "TDN": pen.average_nutrition_supply.tdn_supply,
             "DE": pen.average_nutrition_supply.digestible_energy_supply,
-            "calcium": pen.average_nutrition_supply.calcium,
+            "calcium": pen.average_nutrition_supply.calcium * GeneralConstants.GRAMS_TO_KG,
         }
 
         cls._om.add_variable(
