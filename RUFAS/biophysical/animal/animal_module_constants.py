@@ -94,7 +94,7 @@ class AnimalModuleConstants:
     """Minimum percentage of a pen's ration's dry matter that must be NDF from forages (percent)."""
 
     MINIMUM_RATION_FAT: float = 7.0
-    """Minimum percentage of a ration's dry matter that must be fat."""
+    """Minimum percentage of a ration's dry matter that must be fat (percent)."""
 
     MILK_REDUCTION_KG: float = 0.25
     """Milk reduction amount for each failed ration optimization attempt, kg"""
