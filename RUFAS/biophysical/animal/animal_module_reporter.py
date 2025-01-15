@@ -1,6 +1,6 @@
 import sys
 from dataclasses import asdict
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List
 
 import numpy as np
 
@@ -9,18 +9,12 @@ from RUFAS.biophysical.animal.data_types.animal_typed_dicts import SoldAnimalTyp
 from RUFAS.biophysical.animal.data_types.herd_statistics import HerdStatistics
 from RUFAS.data_structures.animal_manure_excretions import AnimalManureExcretions
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
-from RUFAS.enums import AnimalCombination
 from RUFAS.output_manager import OutputManager
-from RUFAS.routines.animal.life_cycle import animal_constants
-from RUFAS.routines.animal.life_cycle.calf import Calf
-from RUFAS.routines.animal.life_cycle.cow import Cow
-from RUFAS.routines.animal.life_cycle.heiferI import HeiferI
+from RUFAS.biophysical.animal import animal_constants
+from RUFAS.routines.animal.life_cycle.cow import Cow            # TODO: remove Cow and HeiferII types
 from RUFAS.routines.animal.life_cycle.heiferII import HeiferII
-from RUFAS.routines.animal.life_cycle.heiferIII import HeiferIII
 from RUFAS.biophysical.animal.pen import Pen
-from RUFAS.data_structures.feed_storage_to_animal_connection import Feed, FeedCategorization
 from RUFAS.general_constants import GeneralConstants
-from RUFAS.routines.animal.ration.ration_driver import RationReporter
 from RUFAS.time import Time
 from RUFAS.units import MeasurementUnits
 
@@ -1109,7 +1103,7 @@ class AnimalModuleReporter:
 
     @classmethod
     def report_end_of_simulation(
-        cls, herd_statistics: HerdStatistics, time: Time, heiferIIs: List[HeiferII], cows: List[Cow]
+        cls, herd_statistics: HerdStatistics, time: Time, heiferIIs: List[Animal], cows: List[Animal]
     ) -> None:
         """
         Calls all reporter methods that should happen at the end of the simulation.
@@ -1120,9 +1114,9 @@ class AnimalModuleReporter:
             Instance of LifeCycleManager class.
         time : Time
             The Time object with the current time information.
-        heiferIIs : List[HeiferII]
+        heiferIIs : List[Animal]
             The list of HeiferIIs.
-        cows : List[Cow]
+        cows : List[Animal]
             The list of Cows
         """
         AnimalModuleReporter.report_sold_animal_information(herd_statistics)
@@ -1159,14 +1153,14 @@ class AnimalModuleReporter:
 
     @classmethod
     def _record_animal_events(
-        cls, animals: list[Calf | HeiferI | HeiferII | HeiferIII | Cow], simulation_day: int
+        cls, animals: list[Animal], simulation_day: int
     ) -> None:
         """
         Record the events of the animals.
 
         Parameters
         ----------
-        animals : list[Calf, HeiferI, HeiferII, HeiferIII, Cow]
+        animals : list[Animal]
             A list of animals.
         simulation_day : int
             The current simulation day.
