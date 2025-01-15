@@ -8,6 +8,7 @@ specific harvest method will be used when harvesting a crop, and a `crop_referen
 crop that is presently growing in a field will be harvested.
 """
 
+from RUFAS.data_structures.manure_supplement_methods import ManureSupplementMethod
 from RUFAS.data_structures.manure_types import ManureType
 from RUFAS.data_structures.tillage_implements import TillageImplement
 from RUFAS.routines.field.crop.harvest_operations import HarvestOperation
@@ -221,6 +222,8 @@ class ManureEvent(BaseFieldManagementEvent):
         Depth that manure is injected into the soil at (mm).
     surface_remainder_fraction : float
         Fraction of manure applied that remains on the soil surface (unitless).
+    manure_supplement_method : ManureSupplementMethod
+        The method that the event will use to supplement nutrient deficiencies.
 
     """
 
@@ -229,6 +232,7 @@ class ManureEvent(BaseFieldManagementEvent):
         nitrogen_mass: float,
         phosphorus_mass: float,
         manure_type: ManureType,
+        manure_supplement_method: ManureSupplementMethod,
         field_coverage: float,
         application_depth: float,
         surface_remainder_fraction: float,
@@ -239,6 +243,7 @@ class ManureEvent(BaseFieldManagementEvent):
         self.nitrogen_mass = nitrogen_mass
         self.phosphorus_mass = phosphorus_mass
         self.manure_type = manure_type
+        self.manure_supplement_method = manure_supplement_method
         self.field_coverage = field_coverage
         self.application_depth = application_depth
         self.surface_remainder_fraction = surface_remainder_fraction
@@ -254,6 +259,7 @@ class ManureEvent(BaseFieldManagementEvent):
                 and other.field_coverage == self.field_coverage
                 and other.application_depth == self.application_depth
                 and other.surface_remainder_fraction == self.surface_remainder_fraction
+                and other.manure_supplement_method == self.manure_supplement_method
             )
         return False
 

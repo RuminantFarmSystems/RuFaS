@@ -2331,6 +2331,14 @@
         "pattern": "^(liquid|solid)$"
       }
     },
+    "supplement_manure_nutrient_deficiencies": {
+      "type": "array",
+      "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
+      "properties": {
+        "type": "string",
+        "pattern": "^(manure|synthetic fertilizer|none)$"
+      }
+    },
     "pattern_repeat": {
       "type": "number",
       "description": "Number of times that this manure application schedule should be repeated.",
@@ -5435,11 +5443,6 @@
       "description": "Number of days that make up the irrigation interval.\nUnits: days.",
       "minimum": 0,
       "default": 0
-    },
-    "supplement_manure_nutrient_deficiencies": {
-      "type": "bool",
-      "description": "Determines if nutrient deficient manure applications are supplemented with chemical fertilizer.",
-      "default": false
     },
     "simulate_water_stress": {
       "type": "bool",
