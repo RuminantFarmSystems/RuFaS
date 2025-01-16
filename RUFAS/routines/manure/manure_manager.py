@@ -4,7 +4,6 @@ import typing
 from typing import Any, Dict, List, Optional, Tuple
 
 from RUFAS.data_structures.pen_manure_data import PenManureData
-from RUFAS.output_manager import OutputManager
 from RUFAS.routines.manure.beddings.bedding_classes import BaseBedding, BeddingFactory
 from RUFAS.routines.manure.constants_and_units.manure_constants import ManureConstants
 from RUFAS.routines.manure.field_manure_supplier import FieldManureSupplier

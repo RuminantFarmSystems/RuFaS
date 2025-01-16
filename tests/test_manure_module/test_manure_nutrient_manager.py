@@ -39,8 +39,9 @@ def test_add_nutrients(manure_type: ManureType) -> None:
 
 
 @pytest.mark.parametrize(
-    "eval_return, expected_result, remove_called",
+    "eval_return, manure_request_fulfilled, use_supplemental_manure, supplemental_manure, expected_result, remove_called, supplemental_called",
     [
+        # Case 1: Request fulfilled completely, no supplemental manure needed
         (
             NutrientRequestResults(
                 nitrogen=1,
@@ -49,6 +50,9 @@ def test_add_nutrients(manure_type: ManureType) -> None:
                 dry_matter=2,
                 dry_matter_fraction=0.5,
             ),
+            True,
+            False,
+            None,
             NutrientRequestResults(
                 nitrogen=1,
                 phosphorus=1,
@@ -57,37 +61,83 @@ def test_add_nutrients(manure_type: ManureType) -> None:
                 dry_matter_fraction=0.5,
             ),
             True,
+            False,
         ),
-        (None, None, False),
+        # Case 2: Request not fulfilled, supplemental manure needed and used
+        (
+            NutrientRequestResults(
+                nitrogen=0.5,
+                phosphorus=0.5,
+                total_manure_mass=1,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            False,
+            True,
+            NutrientRequestResults(
+                nitrogen=0.5,
+                phosphorus=0.5,
+                total_manure_mass=1,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            NutrientRequestResults(
+                nitrogen=0.5,
+                phosphorus=0.5,
+                total_manure_mass=1,
+                dry_matter=1,
+                dry_matter_fraction=0.5,
+            ),
+            True,
+            True,
+        ),
+        # Case 3: Request cannot be fulfilled, no supplemental manure allowed
+        (
+            None,
+            False,
+            False,
+            None,
+            None,
+            False,
+            False,
+        ),
     ],
 )
 def test_request_nutrients(
     mocker: MockerFixture,
     eval_return: NutrientRequestResults,
+    manure_request_fulfilled: bool,
+    use_supplemental_manure: bool,
+    supplemental_manure: NutrientRequestResults,
     expected_result: NutrientRequestResults,
     remove_called: bool,
+    supplemental_called: bool,
 ) -> None:
     """
-    Unit test for the request_nutrients() method of the ManureNutrientManager class in the
-    manure_nutrient_manager.py file.
+    Unit test for the request_nutrients() method of the ManureNutrientManager class.
 
-    This test verifies that the request_nutrients() method calls the _evaluate_nutrient_request()
-    method and the _remove_nutrients() method when the _evaluate_nutrient_request() method returns
-    a NutrientRequestResults object.
-
-    It also verifies that the request_nutrients() method does not
-    call the _remove_nutrients() method when the _evaluate_nutrient_request() method returns None.
-
+    This test verifies that the method behaves as expected for various combinations of
+    evaluated results, request fulfillment, and supplemental manure use.
     """
     # Arrange
     manager = ManureNutrientManager()
     dummy_manure_type = ManureType.LIQUID
-    nutrient_request = NutrientRequest(nitrogen=1, phosphorus=1, manure_type=dummy_manure_type)
+    nutrient_request = NutrientRequest(
+        nitrogen=1, phosphorus=1, manure_type=dummy_manure_type, use_supplemental_manure=use_supplemental_manure
+    )
 
+    manager.field_manure_supplier = mocker.Mock()
     patch_for_evaluate_nutrient_request = mocker.patch.object(
-        manager, "_evaluate_nutrient_request", return_value=eval_return
+        manager, "_evaluate_nutrient_request", return_value=(eval_return, manure_request_fulfilled)
     )
     patch_for_remove_nutrients = mocker.patch.object(manager, "_remove_nutrients")
+    patch_for_calculate_supplemental_manure = mocker.patch.object(
+        manager, "_calculate_supplemental_manure_needed", return_value=supplemental_manure
+    )
+    patch_for_request_supplemental_manure = mocker.patch.object(
+        manager.field_manure_supplier, "request_manure", return_value=supplemental_manure
+    )
+    patch_for_logging = mocker.patch.object(manager.om, "add_log")
 
     # Act
     actual_result = manager.request_nutrients(nutrient_request)
@@ -96,9 +146,21 @@ def test_request_nutrients(
     patch_for_evaluate_nutrient_request.assert_called_once_with(nutrient_request)
 
     if remove_called:
-        patch_for_remove_nutrients.assert_called_once_with(expected_result, dummy_manure_type)
+        patch_for_remove_nutrients.assert_called_once_with(eval_return, dummy_manure_type)
     else:
         patch_for_remove_nutrients.assert_not_called()
+
+    if supplemental_called:
+        patch_for_calculate_supplemental_manure.assert_called_once_with(eval_return, nutrient_request)
+        patch_for_request_supplemental_manure.assert_called_once_with(supplemental_manure)
+        patch_for_logging.assert_any_call(
+            "Supplemental manure used",
+            f"Amount: {supplemental_manure.total_manure_mass}",
+            {"class": "ManureNutrientManager", "function": "request_nutrients"},
+        )
+    else:
+        patch_for_calculate_supplemental_manure.assert_not_called()
+        patch_for_request_supplemental_manure.assert_not_called()
 
     assert actual_result == expected_result
 
