@@ -282,7 +282,7 @@ class HerdManager:
         removed_animals += self._check_if_heifers_need_to_be_sold(simulation_day=time.simulation_day)
         newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
 
-        self._handle_graduated_animals(graduated_animals)
+        self._handle_graduated_animals(graduated_animals, available_feeds)
         self._handle_newly_added_animals(newborn_calves)
         self._handle_newly_added_animals(newly_added_animals)
         for removed_animal in removed_animals:
@@ -541,7 +541,7 @@ class HerdManager:
             self.herd_statistics.bought_heifer_num += 1
         return animals_added
 
-    def _handle_graduated_animals(self, graduated_animals: list[Animal]) -> None:
+    def _handle_graduated_animals(self, graduated_animals: list[Animal], available_feeds: list[Feed]) -> None:
         """
         Finds animals that have graduated (moved from one class to another), moves them between pens,
          and updates pen id map accordingly.
@@ -555,14 +555,17 @@ class HerdManager:
         animals_snapshot_after_update : Dict[str, set | Dict]
             Snapshot of the animals after the update. This should be a dictionary with the same
             structure as animals_snapshot_before_update.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         """
         for animal in graduated_animals:
-            self._add_animal_to_pen_and_id_map(animal)
+            self._add_animal_to_pen_and_id_map(animal, available_feeds)
 
     def _handle_newly_added_animals(
         self,
         new_animals: list[Animal],
+        available_feeds: list[Feed],
     ) -> None:
         """
         For all new animals, adds animal to a pen, and updates the pen id map.
@@ -571,10 +574,12 @@ class HerdManager:
         ----------
         animal : List[Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]]
             One of the possible animal types.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         """
         for animal in new_animals:
-            self._add_animal_to_pen_and_id_map(animal)
+            self._add_animal_to_pen_and_id_map(animal, available_feeds)
             self.animals_by_type[animal.animal_type].append(animal)
 
     def _remove_animal_from_pen_and_id_map(self, animal: Animal) -> None:
@@ -591,7 +596,7 @@ class HerdManager:
         self.all_pens[pen_id].remove_animals_by_ids([animal.id])
         del self.animal_to_pen_id_map[animal.id]
 
-    def _add_animal_to_pen_and_id_map(self, animal: Animal) -> None:
+    def _add_animal_to_pen_and_id_map(self, animal: Animal, available_feeds: list[Feed]) -> None:
         """
         Adds animal to pen with lowest stocking density, and updates the pen id map accordingly.
 
@@ -599,6 +604,8 @@ class HerdManager:
         ----------
         animal : Union[Calf, HeiferI, HeiferII, HeiferIII, Cow]
             One of the possible animal types.
+        available_feeds : list[Feed]
+            Nutrition information of feeds available to formulate animals rations with.
 
         """
         animal_combination = self.ANIMAL_GROUPING_SCENARIO.find_animal_combination(animal)
@@ -606,7 +613,7 @@ class HerdManager:
             self.pens_by_animal_combination[animal_combination],
             key=lambda p: p.current_stocking_density,
         )
-        pen_with_min_stocking_density.update_animals([animal], animal_combination)
+        pen_with_min_stocking_density.update_animals([animal], animal_combination, available_feeds)
         self.animal_to_pen_id_map[animal.id] = pen_with_min_stocking_density.id
 
     def _sort_cows_before_allocation(self) -> None:
