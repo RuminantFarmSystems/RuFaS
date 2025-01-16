@@ -4,6 +4,8 @@ import pytest
 from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
+from RUFAS.routines.field.crop.crop_data import CropData
+from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 
 
@@ -291,3 +293,215 @@ def test_error_determine_nutrient_uptake_to_depth(
     with pytest.raises(Exception):
         NutrientUptake._determine_nutrient_uptake_to_depth(demand, depth, root_depth, ndistro)
     mock_add.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "pots,avails",
+    [
+        ([0.5, 0.25, 0.05], [0.3, 0.2, 0.01]),
+        ([0.5, 0.25, 0.05], [0.6, 0.3, 0.06]),  # abundant nitrates
+        ([0.5, 0.25, 0.05], [0, 0, 0]),  # no nitrates
+        ([0.5, 0.25, 0.05, 0.01], [0.3, 0.2, 0.01, 0.01]),  # 4 layers
+        ([0.5, 0.25, 0.05], [0.5, 0.25, 0.05]),  # exactly met demands
+        ([112.3, 50.44, 17, 12.99], [50.33, 15.10, 8.05, 6.66]),  # arbitrary
+    ],
+)
+def test_determine_layer_nutrient_demands(pots: list[float], avails: list[float]) -> None:
+    """test that nutrient demand is correctly calculated for each layer by determine_layer_nitrogen_demand()"""
+    observe = NutrientUptake.determine_layer_nutrient_demands(pots, avails)
+    no3_sum = 0
+    up_sum = 0
+    demand_list = []
+    for pot_up, no3 in zip(pots, avails):
+        demand = up_sum - no3_sum
+        demand = max(demand, 0)
+        demand_list.append(demand)
+        up_sum += pot_up
+        no3_sum += no3
+    assert demand_list == pytest.approx(observe, rel=0.00001)
+
+
+@pytest.mark.parametrize(
+    "demand,potential,nitrate",
+    [
+        ([1, 1, 1], [0.5, 0.5, 0.5], [0.3, 0.3, 0.3]),
+        ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.6, 0.6]),
+        (
+            [1, 1, 1],
+            [0.5, 0.5, 0.5],
+            [0.6, 0.3, 0.6],
+        ),
+        ([1, 1, 1], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),
+        ([0.01, 0.01, 0.01], [0.5, 0.5, 0.5], [0.6, 0.3, 0.6]),
+        (
+            [25, 8.33, 2.05, 12.99, 0.5],
+            [22.5, 15.98, 2.22, 35.4, 0.001],
+            [15.5, 20.99, 8, 5.5, 0.1],
+        ),
+    ],
+)
+def test_determine_layer_nutrient_uptake(demand: list[float], potential: list[float], nitrate: list[float]) -> None:
+    """test that actual nutrient uptake from each layer is properly calculated by determine_layer_nitrogen_uptake()"""
+    observe = NutrientUptake.determine_layer_nutrient_uptake(demand, potential, nitrate)
+    expect = []
+    for d, p, n in zip(demand, potential, nitrate):
+        uptake = min(p + d, n)
+        expect.append(uptake)
+    assert observe == expect
+
+
+@pytest.mark.parametrize(
+    "reqs,srcs",
+    [
+        ([0, 0], [1, 1]),  # no requests
+        ([0.5, 0], [1, 1]),  # request from first layer
+        ([0, 0.5], [1, 1]),  # request from second layer
+        ([0.5, 0.5], [1, 1]),  # request from both
+        ([18.66, 33.74], [20.30, 19.93]),  # arbitrary
+    ],
+)
+def test_determine_layer_extracted_resource(reqs: list[float], srcs: list[float]) -> None:
+    """ensure that extracted nutrient is correctly calculated for each layer"""
+    draws = []
+    for i in range(len(reqs)):
+        draws.append(NutrientUptake._determine_extracted_resource(reqs[i], srcs[i]))
+    assert draws == NutrientUptake.determine_layer_extracted_resource(reqs, srcs)
+
+
+@pytest.mark.parametrize(
+    "requested,available",
+    [
+        (0, 1),  # no request
+        (0.5, 1),  # request < avaialble
+        (1, 1),  # request = available
+        (1.5, 1),  # request > available
+        (85.93, 232.7),  # arbitrary
+    ],
+)
+def test_determine_extracted_resource(requested: float, available: float) -> None:
+    """ensure that extracted resource is correctly calculated by determine_extracted_resource()"""
+    if available < 0:
+        drawn = 0
+    elif requested > available:
+        drawn = available
+    else:
+        drawn = requested
+    assert drawn == NutrientUptake._determine_extracted_resource(requested, available)
+
+
+@pytest.mark.parametrize(
+    "prev,new,fix",
+    [
+        (1, 1, 1),
+        (1, 1, 0),
+        (1, 0, 1),
+        (0, 1, 1),
+        (0, 0, 0),
+        (50.39, 10.55, 3.05),
+    ],
+)
+def test_determine_stored_nutrient(prev: float, new: float, fix: float) -> None:
+    """test the stored nutrient is properly calculated by determine_stored_nutrient()"""
+    observe = NutrientUptake.determine_stored_nutrient(new, prev, fix)
+    assert observe == prev + new + fix
+
+
+@pytest.mark.parametrize(
+    "root_depth,depths,expect",
+    [
+        (1.5, [0, 1, 2, 3], [4, 1]),
+        (2.6, [0, 1, 2, 3], [4, 0]),
+        (0.3, [0, 0.5, 1, 2, 3], [5, 3]),
+        (28.4, [18.2, 21.6, 100.4], [3, 0]),
+    ],
+)
+def test_find_deepest_accessible_soil_layer(root_depth: float, depths: list[float], expect: list[float]) -> None:
+    """ensure that layers are partitioned correctly by determine_deepest_accessible_soil_layer"""
+    data = CropData(root_depth=root_depth)
+    incorp = NutrientUptake(data)
+    incorp.find_deepest_accessible_soil_layer(depths)
+    assert data.total_soil_layers == expect[0]
+    assert data.accessible_soil_layers == NutrientUptake._determine_deepest_accessible_layer(root_depth, depths)
+    assert data.inaccessible_soil_layers == expect[1]
+
+
+@pytest.mark.parametrize(
+    "deepest,layers",
+    [
+        (1, [1, 2, 3, 4]),  # one layer
+        (2, [1, 2, 3, 4]),  # two layers
+        (3, [1, 2, 3, 4]),  # three layers
+        (4, [1, 2, 3, 4]),  # four layers
+        (2, [22.5, 80.6, 100.0, 199.9]),  # arbitrary list
+    ],
+)
+def test_access_layers(deepest: int, layers: list[float]) -> None:
+    """check that soil layers are accessed correctly with access_layers()"""
+    data = CropData(accessible_soil_layers=deepest)
+    incorp = NutrientUptake(data)
+    assert incorp.access_layers(layers) == layers[slice(deepest)]
+
+
+@pytest.mark.parametrize(
+    "missed,uptakes,expect",
+    [
+        (-1, [0.25, 0.5, 1], [0.25, 0.5, 1]),  # negative missed layers
+        (0, [0.25, 0.5, 1], [0.25, 0.5, 1]),  # no missed layers
+        (1, [0.25, 0.5, 1], [0.25, 0.5, 1, 0]),  # one missed layer
+        (2, [0.25, 0.5, 1], [0.25, 0.5, 1, 0, 0]),  # 2 missed layers
+        (
+            3,
+            [12.5, 8.3, 22.2, 7.8],
+            [12.5, 8.3, 22.2, 7.8, 0, 0, 0],
+        ),  # arbitrary, 3 missed
+    ],
+)
+def test_extend_nutrient_uptakes_to_full_profile(missed: int, uptakes: list[float], expect: list[float]) -> None:
+    """check that the correct number of zeros are padded to uptakes by extend_nutrient_uptakes_to_full_profile()"""
+    data = CropData(inaccessible_soil_layers=missed)
+    incorp = NutrientUptake(data)
+    incorp.extend_nutrient_uptakes_to_full_profile(uptakes)
+    assert uptakes == expect
+
+
+@pytest.mark.parametrize(
+    "uptakes,nutrients",
+    [
+        ([1], [1]),  # start
+        ([1], [0]),
+        ([0], [1]),  # no uptakes
+        ([0.5], [1]),
+        ([1.2], [1]),
+        ([37.9, 40.2, 18.3], [100.5, 83.3, 30.7]),  # arbitrary - abundant nitrates
+        ([87.36, 86.40, 30.33], [82.4, 83.0, 29.9]),
+        ([57.33, 32.20, 0], [40.2, 99.0, 30.7]),  # no uptake from last layer
+    ],
+)
+def test_extract_nitrogen_from_soil_layers(uptakes: list[float], nutrients: list[float]) -> None:
+    nitrates_copy = nutrients.copy()
+
+    data = CropData()
+    incorp = NutrientUptake(data)
+    incorp.extract_nutrient_from_soil_layers(nutrients, uptakes)
+
+    remaining = []
+    for i in range(len(uptakes)):
+        remaining.append(max(nitrates_copy[i] - uptakes[i], 0))
+    assert nutrients == remaining
+
+
+@pytest.mark.parametrize(
+    "uptakes",
+    [
+        [1],  # one layer
+        [1, 1, 1, 1],  # four layers
+        [81.2, 0],  # arbitrary with zero
+        [15.3, 18.2, 4, 20.33],
+    ],
+)
+def test_tally_total_nitrogen_uptake(uptakes: list[float]) -> None:
+    """check that total nutrient is correctly calculated by tally_total_nutrient_uptake()"""
+    data = CropData()
+    incorp = NutrientUptake(data)
+    result = incorp.tally_total_nutrient_uptake(uptakes)
+    assert result == sum(uptakes)
