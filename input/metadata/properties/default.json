@@ -1,5 +1,6 @@
 {
   "config_properties": {
+    "data_collection_app_compatible": true,
     "start_date": {
       "type": "string",
       "description": "The year and Julian day on which the simulation will start.",
@@ -36,6 +37,7 @@
     }
   },
   "animal_properties": {
+    "data_collection_app_compatible": true,
     "herd_information": {
       "type": "object",
       "description": "Herd Demographics",
@@ -852,6 +854,7 @@
     }
   },
   "animal_population_properties": {
+    "data_collection_app_compatible": false,
     "calves": {
       "type": "array",
       "description": "calves data",
@@ -1569,6 +1572,7 @@
     }
   },
   "animal_net_merit_properties": {
+    "data_collection_app_compatible": false,
     "year_month": {
       "type": "array",
       "description": "The birth year and month of the animal.",
@@ -1596,6 +1600,7 @@
     }
   },
   "animal_top_listing_semen_properties": {
+    "data_collection_app_compatible": false,
     "year_month": {
       "type": "array",
       "description": "The birth year and month of the baby calf.",
@@ -1614,6 +1619,7 @@
     }
   },
   "lactation_properties": {
+    "data_collection_app_compatible": false,
     "adjustments": {
       "type": "object",
       "description": "Adjustment values for the Wood lactation curve coefficients.",
@@ -2084,6 +2090,7 @@
     }
   },
   "crop_schedule_properties": {
+    "data_collection_app_compatible": true,
     "crop_schedules": {
       "type": "array",
       "description": "Array of all crop schedules to be executed over the run of the simulation.",
@@ -2171,6 +2178,7 @@
     }
   },
   "fertilizer_schedule_properties": {
+    "data_collection_app_compatible": true,
     "available_fertilizer_mixes": {
       "type": "array",
       "description": "All the available fertilizer mixes that are available besides the default ones.",
@@ -2288,6 +2296,7 @@
     }
   },
   "manure_schedule_properties": {
+    "data_collection_app_compatible": true,
     "years": {
       "type": "array",
       "description": "List of years in which manure will be applied.",
@@ -2377,6 +2386,7 @@
     }
   },
   "tillage_schedule_properties": {
+    "data_collection_app_compatible": true,
     "years": {
       "type": "array",
       "description": "List of years in which tillage will occur.",
@@ -2442,6 +2452,7 @@
     }
   },
   "economic_properties": {
+    "data_collection_app_compatible": false,
     "diesel_cost_gal": {
       "description": "cost of diesel per gallon",
       "type": "array",
@@ -2484,6 +2495,7 @@
     }
   },
   "emissions_properties": {
+    "data_collection_app_compatible": false,
     "alfalfa_tillage_emissions": {
       "type": "array",
       "description": "The amount of total tonnes CO2-eq generated from alfalfa tillage",
@@ -2513,6 +2525,7 @@
     }
   },
   "feed_emissions_properties": {
+    "data_collection_app_compatible": false,
     "county_code": {
       "type": "array",
       "properties": {
@@ -3607,6 +3620,7 @@
     }
   },
   "feed_properties": {
+    "data_collection_app_compatible": true,
     "calf_feeds": {
       "type": "array",
       "description": "Calf Feeds (raised off farm - 24 hrs of age).",
@@ -3831,6 +3845,7 @@
     }
   },
   "user_feeds_properties": {
+    "data_collection_app_compatible": false,
     "rufas_id": {
       "type": "array",
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
@@ -3871,6 +3886,7 @@
     }
   },
   "NRC_Comp_properties": {
+    "data_collection_app_compatible": false,
     "rufas_id": {
       "type": "array",
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
@@ -4191,6 +4207,7 @@
     }
   },
   "NASEM_Comp_properties": {
+    "data_collection_app_compatible": false,
     "rufas_id": {
       "type": "array",
       "description": "Unique integer identifier for feeds used within the RuFaS model.",
@@ -4901,6 +4918,7 @@
     }
   },
   "manure_management_properties": {
+    "data_collection_app_compatible": true,
     "manure_management_scenarios": {
       "type": "array",
       "description": "Manure Management Scenarios -- Add as many different manure scenarios as needed",
@@ -5183,6 +5201,7 @@
     }
   },
   "soil_profile_properties": {
+    "data_collection_app_compatible": false,
     "second_moisture_condition_parameter": {
       "type": "number",
       "description": "Curve number parameter for average moisture condition equation.\nUnitless.\nReference: SWAT Input .MGT - CN2.",
@@ -5394,6 +5413,7 @@
     }
   },
   "field_properties": {
+    "data_collection_app_compatible": true,
     "soil_specification": {
       "type": "string",
       "description": "Name of the metadata blob that contains the data for this field's soil specification."
@@ -5484,6 +5504,7 @@
     }
   },
   "weather_properties": {
+    "data_collection_app_compatible": false,
     "year": {
       "description": "Year.",
       "type": "array",
@@ -5553,6 +5574,7 @@
     }
   },
   "tractor_dataset_properties": {
+    "data_collection_app_compatible": true,
     "ID": {
       "type": "array",
       "description": "Unique integer identifier for the data entry",
@@ -5682,6 +5704,7 @@
     }
   },
   "EEE_constants_properties": {
+    "data_collection_app_compatible": false,
     "constants": {
       "type": "array",
       "description": "The constants used in EEE module.",
@@ -5716,6 +5739,7 @@
     }
   },
   "end_to_end_test_result_path_properties": {
+    "data_collection_app_compatible": false,
     "end_to_end_test_result_paths": {
       "type": "array",
       "description": "List of paths to results used to execute end-to-end testing, as well as the domain that they are in.",
@@ -5732,11 +5756,18 @@
         "actual_results_path": {
           "type": "string",
           "description": "Path to the file with the actual results for the specified domain."
+        },
+        "tolerance": {
+          "type": "number",
+          "description": "The relative tolerance (expressed as a percent) used to compare expected and actual results for changed values found in the e2e results comparison.",
+          "default": 0.0,
+          "minimum": 0.0
         }
       }
     }
   },
   "end_to_end_testing_input_properties": {
+    "data_collection_app_compatible": false,
     "reusable_values": {
       "type": "object",
       "fresh_mass": {
@@ -5892,6 +5923,7 @@
     }
   },
   "feed_storage_input_properties": {
+    "data_collection_app_compatible": false,
     "hay_bale_diameter": {
         "type": "number",
         "description": "Diameter of hay bales (meters).",
