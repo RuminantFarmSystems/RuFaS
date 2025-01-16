@@ -16,6 +16,7 @@ from RUFAS.biophysical.animal.herd_factory import HerdFactory
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.pen import Pen
 from RUFAS.biophysical.feed.feed import Feed
+from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfMilkType, CalfRationManager, WHOLE_MILK_ID
 from RUFAS.biophysical.animal.ration.user_defined_ration_manager import UserDefinedRationManager
 from RUFAS.data_structures.herd_manager_output import HerdManagerOutput
 from RUFAS.data_structures.pen_manure_data import PenManureData
@@ -155,6 +156,7 @@ class HerdManager:
         if self.is_ration_defined_by_user:
             ration_feed_config = self.im.get_data("feed")
             UserDefinedRationManager.set_user_defined_rations(ration_feed_config)
+            self._set_milk_type_in_calf_ration_manager()
 
         # how often a ration is calculated, days
         self.formulation_interval = animal_config_data["ration"]["formulation_interval"]
@@ -360,6 +362,31 @@ class HerdManager:
             )
 
             self.all_pens.append(pen)
+
+    def _set_milk_type_in_calf_ration_manager(self) -> None:
+        """
+        Sets the milk type of calves to be either whole or replacement depending on the diet configured by the user.
+        """
+        calf_ration = UserDefinedRationManager.user_defined_rations[AnimalCombination.CALF]
+
+        if WHOLE_MILK_ID in calf_ration.keys():
+            milk_type: CalfMilkType = CalfMilkType.WHOLE
+        else:
+            milk_type: CalfMilkType = CalfMilkType.REPLACER
+
+        CalfRationManager.set_milk_type(milk_type)
+
+        info_map = {
+            "class": self.__class__.__name__,
+            "function": self._set_milk_type_in_calf_ration_manager.__name__,
+            "milk_type": milk_type.value,
+            "calf_ration": calf_ration,
+        }
+        om.add_log(
+            "Milk type set for calf ration",
+            f"Calf requirements routines will assume 100% of calves' milk intake is {milk_type.value}",
+            info_map,
+        )
 
     def initialize_nutrient_requirements(self, weather: Weather, time: Time, feed: Feed) -> None:
         """
