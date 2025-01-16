@@ -218,7 +218,7 @@ class NutrientUptake:
             A trimmed list with an element for each soil layer that is accessible to the plant's roots.
 
         """
-        return layer_list[0: self.crop_data.accessible_soil_layers]
+        return layer_list[0 : self.crop_data.accessible_soil_layers]
 
     @classmethod
     def determine_layer_nutrient_uptake_potential(

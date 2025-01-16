@@ -56,9 +56,9 @@ def test_determine_nutrient_shape_parameters(
         expected_near = mature + 0.00001
         observe = NutrientUptake.determine_nutrient_shape_parameters(halfheat, heatfrac, emerge, half, mature)
         expect_2 = (
-                       NutrientUptake._determine_shape_log(halfheat, half, mature, emerge)
-                       - NutrientUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
-                   ) / (heatfrac - halfheat)
+            NutrientUptake._determine_shape_log(halfheat, half, mature, emerge)
+            - NutrientUptake._determine_shape_log(heatfrac, expected_near, mature, emerge)
+        ) / (heatfrac - halfheat)
         expect_1 = NutrientUptake._determine_shape_log(halfheat, half, mature, emerge) + (expect_2 * halfheat)
         assert observe == [expect_1, expect_2]
 
@@ -164,7 +164,7 @@ def test_determine_potential_nutrient_uptake(optimal: float, previous: float, ma
 )
 def test_determine_deepest_accessible_layer(root: float, depths: list[float], expect: float) -> None:
     """test that the deepest soil layer that is accessible to roots
-     is correctly calculated by _determine_deepest_accessible_layer()"""
+    is correctly calculated by _determine_deepest_accessible_layer()"""
     assert NutrientUptake._determine_deepest_accessible_layer(root, depths) == expect
 
 
@@ -217,9 +217,7 @@ def test_determine_layer_nutrient_uptake_potential(
     layer_nitrogen = []  # empty list to fill
     upper_nitrogen = 0  # nitrogen in the top boundary (soil surface) is 0
     for i in range(len(bounds)):
-        lower_nitrogen = NutrientUptake._determine_nutrient_uptake_to_depth(
-            demand, bounds[i], root_depth, ndistro
-        )
+        lower_nitrogen = NutrientUptake._determine_nutrient_uptake_to_depth(demand, bounds[i], root_depth, ndistro)
         layer_nitrogen.append(lower_nitrogen - upper_nitrogen)
         upper_nitrogen = lower_nitrogen
     expect = layer_nitrogen
