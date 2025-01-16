@@ -5,7 +5,6 @@ from pytest_mock import MockerFixture
 
 from RUFAS.output_manager import OutputManager
 from RUFAS.routines.field.crop.crop_data import CropData
-from RUFAS.routines.field.crop.nitrogen_incorporation import NitrogenIncorporation
 from RUFAS.routines.field.crop.nutrient_uptake import NutrientUptake
 
 
