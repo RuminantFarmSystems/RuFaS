@@ -216,14 +216,14 @@ class ManureEvent(BaseFieldManagementEvent):
         Minimum mass of phosphorus that should be contained in this manure application (kg).
     manure_type : ManureType
         The type of manure for which the application request will be made.
+    manure_supplement_method : ManureSupplementMethod
+        The method that the event will use to supplement nutrient deficiencies.
     field_coverage : float
         Fraction of the field covered by this manure application (unitless).
     application_depth : float
         Depth that manure is injected into the soil at (mm).
     surface_remainder_fraction : float
         Fraction of manure applied that remains on the soil surface (unitless).
-    manure_supplement_method : ManureSupplementMethod
-        The method that the event will use to supplement nutrient deficiencies.
 
     """
 
