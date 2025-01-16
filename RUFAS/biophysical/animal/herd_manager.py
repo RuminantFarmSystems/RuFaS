@@ -283,8 +283,8 @@ class HerdManager:
         newly_added_animals = self._check_if_replacement_heifers_needed(simulation_day=time.simulation_day)
 
         self._handle_graduated_animals(graduated_animals, available_feeds)
-        self._handle_newly_added_animals(newborn_calves)
-        self._handle_newly_added_animals(newly_added_animals)
+        self._handle_newly_added_animals(newborn_calves, available_feeds)
+        self._handle_newly_added_animals(newly_added_animals, available_feeds)
         for removed_animal in removed_animals:
             self._remove_animal_from_pen_and_id_map(removed_animal)
 
