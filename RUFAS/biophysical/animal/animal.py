@@ -42,6 +42,8 @@ from RUFAS.biophysical.animal.data_types.repro_protocol_enums import (
 )
 from RUFAS.biophysical.animal.milk.lactation_curve import LactationCurve
 from RUFAS.biophysical.animal.milk.milk_production import MilkProduction
+from RUFAS.biophysical.animal.ration.amino_acid import EssentialAminoAcidRequirements
+from RUFAS.biophysical.animal.ration.calf_ration_manager import CalfRationManager
 from RUFAS.biophysical.animal.reproduction.reproduction import Reproduction
 from RUFAS.data_structures.feed_storage_to_animal_connection import NutrientStandard, Feed
 from RUFAS.general_constants import GeneralConstants
@@ -281,8 +283,11 @@ class Animal:
         heifer_reproduction_program_string = args.get("heifer_reproduction_program")
         heifer_reproduction_program, heifer_reproduction_sub_program = None, None
 
-        heifer_reproduction_program = None if heifer_reproduction_program_string == "N/A" \
+        heifer_reproduction_program = (
+            None
+            if heifer_reproduction_program_string == "N/A"
             else HeiferReproductionProtocol(heifer_reproduction_program_string)
+        )
         if heifer_reproduction_program == HeiferReproductionProtocol.TAI:
             heifer_reproduction_sub_program = HeiferTAISubProtocol(args.get("heifer_reproduction_sub_protocol"))
         elif heifer_reproduction_program == HeiferReproductionProtocol.SynchED:
@@ -401,17 +406,17 @@ class Animal:
                 days_in_pregnancy=self.days_in_pregnancy,
                 days_in_milk=self.days_in_milk,
                 net_merit=self.net_merit,
-                phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf
+                phosphorus_for_gestation_required_for_calf=self.nutrients.phosphorus_for_gestation_required_for_calf,
             )
-            reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(
-                reproduction_inputs, time)
+            reproduction_outputs: ReproductionOutputs = self.reproduction.reproduction_update(reproduction_inputs, time)
 
             self.body_weight = reproduction_outputs.body_weight
             self.events += reproduction_outputs.events
             self.days_in_milk = reproduction_outputs.days_in_milk
             self.days_in_pregnancy = reproduction_outputs.days_in_pregnancy
             self.nutrients.phosphorus_for_gestation_required_for_calf = (
-                reproduction_outputs.phosphorus_for_gestation_required_for_calf)
+                reproduction_outputs.phosphorus_for_gestation_required_for_calf
+            )
 
             if self.animal_type.is_cow and reproduction_outputs.newborn_calf_config:
                 daily_routines_output.animal_status = AnimalStatus.NEW_CALF_BORN
@@ -607,18 +612,16 @@ class Animal:
             death_date_random = random()
             for i in range(len(AnimalConfig.death_day_probability) - 1):
                 if (
-                        AnimalConfig.death_day_probability[i]
-                        <= death_date_random
-                        < AnimalConfig.death_day_probability[i + 1]
+                    AnimalConfig.death_day_probability[i]
+                    <= death_date_random
+                    < AnimalConfig.death_day_probability[i + 1]
                 ):
                     death_lower_limit = AnimalConfig.death_day_probability[i]
                     death_upper_limit = AnimalConfig.death_day_probability[i + 1]
                     death_time_lower_limit = AnimalConfig.cull_day_count[i]
                     death_time_upper_limit = AnimalConfig.cull_day_count[i + 1]
             n = (death_time_upper_limit - death_time_lower_limit) / (death_upper_limit - death_lower_limit)
-            return round(
-                death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born
-            )
+            return round(death_time_lower_limit + n * (death_date_random - death_lower_limit) + self.days_born)
         return sys.maxsize
 
     def determine_future_cull_date(self) -> tuple[int, str]:
@@ -678,7 +681,7 @@ class Animal:
             )
 
         return future_cull_date, cull_reason
-    
+
     def update_pen_history(self, current_pen: int, current_day: int, animal_types_in_pen: set[AnimalType]) -> None:
         """
         Updates the animal's pen history by either appending to the existing
@@ -705,9 +708,7 @@ class Animal:
             self.pen_history[-1]["end_date"] = current_day
             self.pen_history[-1]["animal_types_in_pen"] = list(animal_types_in_pen)
 
-    def set_daily_walking_distance(
-        self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float
-    ) -> None:
+    def set_daily_walking_distance(self, vertical_dist_to_parlor: float, horizontal_dist_to_parlor: float) -> None:
         """
         Calculates and sets the animal's daily vertical and horizontal
         walking distance (DVD and DHD).
@@ -724,7 +725,7 @@ class Animal:
             raise ValueError("Cannot calculate daily walking distance for animal types other than cow.")
         self.daily_vertical_distance = 2 * vertical_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
         self.daily_horizontal_distance = 2 * horizontal_dist_to_parlor * AnimalConfig.cow_times_milked_per_day
-        self.daily_distance = sqrt(self.daily_vertical_distance ** 2 + self.daily_horizontal_distance ** 2)
+        self.daily_distance = sqrt(self.daily_vertical_distance**2 + self.daily_horizontal_distance**2)
 
     def set_nutrition_requirements(
         self, housing: str, walking_distance: float, previous_temperature: float, available_feeds: list[Feed]
@@ -758,7 +759,41 @@ class Animal:
 
         """
         if self.animal_type is AnimalType.CALF:
-            pass  # TODO: calves' requirements are implemented in PR #2153, which is not merged yet.
+            calf_intake = CalfRationManager.calc_intake(
+                self.birth_weight,
+                self.body_weight,
+                AnimalConfig.wean_day,
+                AnimalConfig.wean_length,
+                available_feeds,
+                self.nutrient_standard,
+            )
+            calf_requirements = CalfRationManager.calc_requirements(
+                self.days_born, self.body_weight, previous_temperature, calf_intake
+            )
+            # TODO: do not use dummy values for calf calcium and phosphorus requirements - issue pending.
+            return NutritionRequirements(
+                maintenance_energy=calf_requirements["ne_maint"],
+                growth_energy=calf_requirements["ne_gain"],
+                pregnancy_energy=0.0,
+                lactation_energy=0.0,
+                metabolizable_protein=calf_intake["me_intake"],
+                calcium=0.0,
+                phosphorus=0.0,
+                process_based_phosphorus=0.0,
+                dry_matter=calf_intake["dry_matter_intake"],
+                activity_energy=0.0,
+                essential_amino_acids=EssentialAminoAcidRequirements(
+                    histidine=0.0,
+                    isoleucine=0.0,
+                    leucine=0.0,
+                    lysine=0.0,
+                    methionine=0.0,
+                    phenylalanine=0.0,
+                    threonine=0.0,
+                    thryptophan=0.0,
+                    valine=0.0,
+                ),
+            )
 
         days_in_pregancy = self.days_in_pregnancy if self.is_pregnant else None
         days_in_milk = self.days_in_milk if self.is_milking else None
@@ -798,7 +833,7 @@ class Animal:
                 distance=walking_distance,
                 lactating=self.is_milking,
                 ndf_percentage=ndf_percentage,
-                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement
+                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement,
             )
         else:
             requirements = NRCRequirementsCalculator.calculate_requirements(
@@ -821,7 +856,7 @@ class Animal:
                 net_energy_diet_concentration=net_energy_diet_conc,
                 days_born=self.days_born,
                 TDN_percentage=tdn_percentage,
-                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement
+                secondary_phosphorus_requirement=self.nutrients.phosphorus_requirement,
             )
 
         return requirements
