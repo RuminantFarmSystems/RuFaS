@@ -10,6 +10,7 @@ class NutrientUptake:
     def __init__(self, crop_data: Optional[CropData]):
         self.crop_data = crop_data or CropData()
 
+    # tested
     @staticmethod
     def determine_layer_nutrient_demands(
         uptake_potentials: list[float], nutrient_availabilities: list[float]
@@ -72,6 +73,7 @@ class NutrientUptake:
         """
         return min(demand - nutrient_start, 4 * mature_nutrient_fraction * max_growth)
 
+    # tested
     @classmethod
     def determine_layer_extracted_resource(cls, requests: list[float], sources: list[float]) -> list[float]:
         """
@@ -108,6 +110,7 @@ class NutrientUptake:
             raise ValueError("requests and sources should be the same length")
         return [cls._determine_extracted_resource(req, src) for req, src in zip(requests, sources)]
 
+    # tested
     @staticmethod
     def _determine_extracted_resource(request: float, source: float) -> float:
         """
@@ -132,6 +135,7 @@ class NutrientUptake:
         """
         return min(request, max(0.0, source))
 
+    # tested
     def find_deepest_accessible_soil_layer(self, depths: list[float]) -> None:
         """
         Evaluates the accessibility of layers in the soil profile by plant roots.
@@ -202,6 +206,7 @@ class NutrientUptake:
             deepest_layer = len(layer_bounds)
             return min(insert_position + 1, deepest_layer)
 
+    # tested
     def access_layers(self, layer_list: list[float]) -> list[float]:
         """
         Utility function that removes any inaccessible layers from a list.
@@ -351,6 +356,7 @@ class NutrientUptake:
             second_term = 1 - exp(-nutrient_distribution_parameter * (depth / root_depth))
             return first_term * second_term
 
+    # tested
     @staticmethod
     def extract_nutrient_from_soil_layers(layer_nutrients: list[float], actual_nutrient_uptakes: list[float]) -> None:
         """
@@ -372,6 +378,7 @@ class NutrientUptake:
         """
         layer_nutrients[:] = [max(src - snk, 0) for src, snk in zip(layer_nutrients, actual_nutrient_uptakes)]
 
+    # tested
     def extend_nutrient_uptakes_to_full_profile(self, actual_nutrient_uptakes: list[float]) -> None:
         """
         Determines the actual nutrient uptakes for the full soil profile, not just the accessible layers.
@@ -678,6 +685,7 @@ class NutrientUptake:
         """
         return fraction * whole
 
+    # tested
     @staticmethod
     def determine_stored_nutrient(uptake: float, previous: float, fixed: float) -> float:
         """
@@ -700,6 +708,7 @@ class NutrientUptake:
         """
         return previous + uptake + fixed
 
+    # tested
     @staticmethod
     def determine_layer_nutrient_uptake(
         layer_demands: list[float],
@@ -746,6 +755,7 @@ class NutrientUptake:
         layer_desired = [potential + demand for potential, demand in zip(layer_uptake_potentials, layer_demands)]
         return [min(desired, nitrate) for desired, nitrate in zip(layer_desired, layer_nutrient)]
 
+    # tested
     @staticmethod
     def tally_total_nutrient_uptake(actual_nutrient_uptakes: list[float]) -> float:
         """
