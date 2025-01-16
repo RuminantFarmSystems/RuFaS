@@ -56,9 +56,7 @@ def test_uptake_phosphorus(phosphates, depths):
     NutrientUptake.determine_layer_nutrient_demands.assert_called_once_with([3.25, 6.33, 7.10], [1, 2, 3])
     assert incorp.unmet_phosphorus_demands == [12, 15, 17]
 
-    NutrientUptake.determine_layer_nutrient_uptake.assert_called_once_with(
-        [12, 15, 17], [3.25, 6.33, 7.10], [1, 2, 3]
-    )
+    NutrientUptake.determine_layer_nutrient_uptake.assert_called_once_with([12, 15, 17], [3.25, 6.33, 7.10], [1, 2, 3])
     assert incorp.phosphorus_requests == [8.9, 9.9, 13.12]
 
     NutrientUptake.determine_layer_extracted_resource.assert_called_once_with([8.9, 9.9, 13.12], [1, 2, 3])
